@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use wasm_bindgen::prelude::*;
 
+#[allow(dead_code)]
 pub struct WindowWidth(i32);
 
 pub fn _use_window_width(cx: &ScopeState) -> i32 {

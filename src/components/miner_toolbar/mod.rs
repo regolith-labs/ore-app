@@ -16,7 +16,7 @@ use dioxus::prelude::*;
 
 use crate::{
     gateway::{mine, submit_solution, AsyncResult},
-    hooks::{use_ore_supply, use_proof, use_treasury, use_webworker},
+    hooks::{use_gateway, use_ore_supply, use_proof, use_treasury, use_webworker},
 };
 
 #[derive(Debug)]
@@ -38,12 +38,14 @@ pub struct MinerToolbarProps {
 
 #[component]
 pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
+    let gateway = use_gateway(cx);
     let treasury = use_treasury(cx);
     let proof = use_proof(cx);
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
     let timer = use_state(cx, || 0u64);
     let (worker, message) = use_webworker(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
+
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
 
@@ -51,11 +53,17 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
         let message = message.read().clone();
         let status = miner_status.clone();
         let worker = worker.clone();
+        let gateway = gateway.clone();
         async move {
             if let Some(solution) = message {
-                if let Some(_sig) = submit_solution(&solution).await {
-                    if let MinerStatus::Active = *status.read() {
-                        mine(worker).await;
+                match submit_solution(&gateway, &solution).await {
+                    Ok(_sig) => {
+                        if let MinerStatus::Active = *status.read() {
+                            mine(&gateway, worker).await.ok();
+                        }
+                    }
+                    Err(_err) => {
+                        // TODO
                     }
                 }
             }

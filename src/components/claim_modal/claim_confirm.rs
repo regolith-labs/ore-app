@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    gateway::claim,
+    hooks::use_gateway,
 };
 
 use super::ClaimStep;
@@ -21,6 +21,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
     let balance_ = cx.props.balance_handle;
     let claim_step = cx.props.claim_step;
     let amountf = (amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
+    let gateway = use_gateway(cx);
 
     render! {
         div {
@@ -67,8 +68,9 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                         let balance_ = balance_.clone();
                         let claim_step = claim_step.clone();
                         let is_busy = is_busy.clone();
+                        let gateway = gateway.clone();
                         cx.spawn(async move {
-                            match claim(amount).await {
+                            match gateway.claim_ore(amount).await {
                                 Some(_sig) => {
                                     is_busy.set(false);
                                     balance_.restart();

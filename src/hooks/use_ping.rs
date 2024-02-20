@@ -1,16 +1,19 @@
 use dioxus::prelude::*;
 
-use crate::gateway::{wasm_client, AsyncResult};
+use crate::gateway::AsyncResult;
+
+use super::use_gateway;
 
 pub fn use_ping(cx: &ScopeState) -> AsyncResult<u64> {
+    let gateway = use_gateway(cx);
     let ping_status = use_state(cx, || AsyncResult::Loading);
 
     use_future(cx, (), |_| {
         let ping_status = ping_status.clone();
+        let gateway = gateway.clone();
         async move {
-            let client = wasm_client();
             loop {
-                match client.get_slot().await {
+                match gateway.rpc.get_slot().await {
                     Ok(slot) => ping_status.set(AsyncResult::Ok(slot)),
                     Err(err) => ping_status.set(AsyncResult::Error(err.into())),
                 }

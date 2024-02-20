@@ -1,5 +1,6 @@
 mod use_account;
 mod use_clipboard;
+mod use_gateway;
 mod use_keypair;
 mod use_ore_balance;
 mod use_ore_supply;
@@ -15,6 +16,7 @@ mod use_window_width;
 
 pub use use_account::*;
 pub use use_clipboard::*;
+pub use use_gateway::*;
 pub use use_keypair::*;
 pub use use_ore_balance::*;
 pub use use_ore_supply::*;

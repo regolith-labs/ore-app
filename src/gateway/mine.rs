@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use ore::EPOCH_DURATION;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
@@ -9,51 +11,52 @@ use solana_client_wasm::solana_sdk::{
 };
 use web_sys::Worker;
 
-use crate::gateway::{
-    get_clock_account, get_keypair, get_proof, get_treasury, send_and_confirm, wasm_client,
-};
+use super::{signer, Gateway, GatewayResult};
 
-pub async fn mine(worker: Worker) {
-    let keypair = get_keypair();
-    let treasury = get_treasury().await;
-    let proof = get_proof(keypair.pubkey()).await;
+pub async fn mine(gateway: &Rc<Gateway>, worker: Worker) -> GatewayResult<()> {
+    let signer = signer();
+    let treasury = gateway.get_treasury().await?;
+    let proof = gateway.get_proof(signer.pubkey()).await?;
     let req = MineRequest {
         hash: proof.hash.into(),
         difficulty: treasury.difficulty.into(),
-        pubkey: keypair.pubkey(),
+        pubkey: signer.pubkey(),
     };
     let msg = to_value(&req).unwrap();
     worker.post_message(&msg).unwrap();
+    Ok(())
 }
 
-pub async fn submit_solution(res: &MineResponse) -> Option<Signature> {
+pub async fn submit_solution(
+    gateway: &Rc<Gateway>,
+    res: &MineResponse,
+) -> GatewayResult<Signature> {
     // Submit mine tx.
     let mut bus_id = 0;
     let next_hash = res.hash;
     let nonce = res.nonce;
-    let keypair = get_keypair();
-    let client = wasm_client();
+    let signer = signer();
     loop {
         // Check if epoch needs to be reset
-        let treasury = get_treasury().await;
-        let clock = get_clock_account().await;
+        let treasury = gateway.get_treasury().await?;
+        let clock = gateway.get_clock().await?;
         let epoch_end_at = treasury.epoch_start_at.saturating_add(EPOCH_DURATION);
 
         // Submit restart epoch tx, if needed.
         if clock.unix_timestamp.ge(&epoch_end_at) {
-            let ix = ore::instruction::reset(keypair.pubkey());
-            send_and_confirm(&client, &[ix]).await;
+            let ix = ore::instruction::reset(signer.pubkey());
+            gateway.send_and_confirm(&[ix]).await;
         }
 
         // Submit mine tx
         let ix = ore::instruction::mine(
-            keypair.pubkey(),
+            signer.pubkey(),
             ore::BUS_ADDRESSES[bus_id],
             next_hash.into(),
             nonce,
         );
-        match send_and_confirm(&client, &[ix]).await {
-            Some(sig) => return Some(sig),
+        match gateway.send_and_confirm(&[ix]).await {
+            Some(sig) => return Ok(sig),
             None => {
                 // Retry on different bus.
                 bus_id += 1;

@@ -49,7 +49,7 @@ pub fn User(cx: Scope, id: String) -> Element {
             }
         }
         match transfers {
-            AsyncResult::Ok(transfers) => {
+            AsyncResult::Ok(_transfers) => {
                 render! {
                     p {
                         "Transfers [TODO]"
