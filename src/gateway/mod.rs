@@ -1,12 +1,12 @@
 mod async_result;
 mod error;
-mod mine;
 mod pubkey;
+mod webworker;
 
 pub use async_result::*;
 pub use error::*;
-pub use mine::*;
 pub use pubkey::*;
+pub use webworker::*;
 
 use cached::proc_macro::cached;
 use gloo::net::websocket::futures::WebSocket;
