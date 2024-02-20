@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply text-4xl text-black font-bold;
+  }
+  h2 {
+    @apply text-xl text-black font-bold;
+  }
+}
+
+@layer components {
+  .primary-button {
+    @apply bg-green-500 text-white font-semibold px-6 py-3 w-fit hover:bg-green-600;
+  }
+  .skip-button {
+    @apply bg-transparent text-black font-semibold px-6 py-3 w-fit hover:bg-gray-100;
+  }
+}

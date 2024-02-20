@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <link data-trunk rel="copy-dir" href="/img">
+    <link data-trunk rel="icon" href="/favicon.ico" type="image/x-icon">
+    <script>
+      window.setupResizeListener = function(callback) {
+        window.addEventListener('resize', () => {
+          // Call the Rust function with the new width
+          callback(window.innerWidth);
+        });
+      };
+    </script>
+</head>
+
+<body>
+    <div id="main" />
+</body>
+
+</html>
