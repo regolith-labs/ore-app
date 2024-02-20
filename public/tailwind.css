@@ -728,6 +728,10 @@ h2 {
   margin-left: auto;
 }
 
+.mt-16 {
+  margin-top: 4rem;
+}
+
 .inline-block {
   display: inline-block;
 }
@@ -1574,6 +1578,11 @@ h2 {
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(245 245 247 / var(--tw-text-opacity));
+}
+
+.hover\:text-black:hover {
+  --tw-text-opacity: 1;
+  color: rgb(29 29 31 / var(--tw-text-opacity));
 }
 
 .hover\:underline:hover {

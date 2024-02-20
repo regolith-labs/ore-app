@@ -14,7 +14,6 @@ pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
 
     use_future(cx, &sol_balance, |_| {
-        let sol_balance = sol_balance.clone();
         let miner_status = miner_status.clone();
         async move {
             if let AsyncResult::Ok(sol_balance) = sol_balance {

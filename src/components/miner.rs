@@ -12,7 +12,6 @@ pub fn Miner(cx: Scope) -> Element {
     use_shared_state_provider(cx, || IsToolbarOpen(false));
     use_shared_state_provider(cx, || IsModalOpen(false));
     let is_onboarded = use_is_onboarded(cx);
-    let nav = use_navigator(cx);
     let route = use_route::<Route>(cx);
 
     // If the user is not onboarded, redirect to Landing.

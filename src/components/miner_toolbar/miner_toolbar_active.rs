@@ -36,7 +36,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let time = cx.props.timer.get();
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
 
-    let hash = match cx.props.proof.clone() {
+    let hash = match cx.props.proof {
         AsyncResult::Ok(proof) => proof.hash.to_string(),
         _ => "–".to_string(),
     };
@@ -47,14 +47,14 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         "–".to_string()
     };
 
-    let claimable_rewards = match cx.props.proof.clone() {
+    let claimable_rewards = match cx.props.proof {
         AsyncResult::Ok(proof) => {
             (proof.claimable_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
         }
         _ => 0f64,
     };
 
-    let circulating_supply = match cx.props.treasury.clone() {
+    let circulating_supply = match cx.props.treasury {
         AsyncResult::Ok(treasury) => {
             (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
         }

@@ -1,8 +1,5 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
-use dioxus_router::prelude::*;
-
-use crate::{hooks::use_is_onboarded, Route};
 
 #[component]
 pub fn Download(cx: Scope) -> Element {

@@ -52,5 +52,5 @@ pub fn use_account<T: AccountDeserialize + Send + Sync + Clone + Copy + 'static>
         }
     });
 
-    acc.read().unwrap().clone()
+    *acc.read().unwrap()
 }

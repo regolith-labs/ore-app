@@ -1,11 +1,9 @@
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     gateway::AsyncResult,
     hooks::{use_pubkey, use_sol_balance},
-    route::Route,
 };
 
 // Phase 1 (core)

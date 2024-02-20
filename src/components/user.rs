@@ -22,7 +22,7 @@ pub fn User(cx: Scope, id: String) -> Element {
 
     let user_id = user_id.unwrap();
     let offset = use_state(cx, || 0);
-    let (transfers, has_more) = use_user_transfers(cx, user_id, offset);
+    let (transfers, _has_more) = use_user_transfers(cx, user_id, offset);
     let (balance, _) = use_ore_balance(cx, user_id);
 
     render! {

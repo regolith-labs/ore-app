@@ -46,5 +46,5 @@ pub fn use_sol_balance(cx: &ScopeState) -> AsyncResult<u64> {
         }
     });
 
-    balance.read().unwrap().clone()
+    *balance.read().unwrap()
 }

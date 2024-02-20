@@ -19,5 +19,5 @@ pub fn use_ping(cx: &ScopeState) -> AsyncResult<u64> {
         }
     });
 
-    ping_status.get().clone()
+    *ping_status.get()
 }
