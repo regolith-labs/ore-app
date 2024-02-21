@@ -32,6 +32,10 @@ use solana_client_wasm::{
 
 // TODO GatewayResult type
 
+const API_URL: &str = "https://ore-api-lthm.onrender.com/transfers";
+const RPC_URL: &str = "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
+
 pub struct Gateway {
     // api: Client,
     pub rpc: WasmClient,
@@ -40,11 +44,11 @@ pub struct Gateway {
 }
 
 impl Gateway {
-    pub fn new(api_url: String, rpc_url: String, wss_url: String) -> Self {
+    pub fn new() -> Self {
         Gateway {
-            api_url,
-            rpc: WasmClient::new(&rpc_url),
-            wss: WebSocket::open(&wss_url).unwrap(),
+            api_url: API_URL.to_string(),
+            rpc: WasmClient::new(RPC_URL),
+            wss: WebSocket::open(WSS_URL).unwrap(),
         }
     }
 
@@ -94,6 +98,19 @@ impl Gateway {
     }
 
     // Ore
+    pub async fn register_ore(&self) {
+        // Return early, if account is already initialized
+        let signer = signer();
+        let proof_address = proof_pubkey(signer.pubkey());
+        if self.rpc.get_account(&proof_address).await.is_ok() {
+            return;
+        }
+
+        // Sign and send transaction.
+        let ix = ore::instruction::register(signer.pubkey());
+        self.send_and_confirm(&[ix]).await;
+    }
+
     pub async fn claim_ore(&self, amount: u64) -> Option<Signature> {
         let signer = signer();
         let beneficiary = ore_token_account_address(signer.pubkey());
@@ -119,19 +136,6 @@ impl Gateway {
         )
         .unwrap();
         self.send_and_confirm(&[memo_ix, transfer_ix]).await
-    }
-
-    pub async fn register_ore(&self) {
-        // Return early, if account is already initialized
-        let signer = signer();
-        let proof_address = proof_pubkey(signer.pubkey());
-        if self.rpc.get_account(&proof_address).await.is_ok() {
-            return;
-        }
-
-        // Sign and send transaction.
-        let ix = ore::instruction::register(signer.pubkey());
-        self.send_and_confirm(&[ix]).await;
     }
 
     // TODO Result type

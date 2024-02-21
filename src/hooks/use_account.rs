@@ -36,18 +36,20 @@ pub fn use_account<T: AccountDeserialize + Send + Sync + Clone + Copy + 'static>
             let _ = gateway
                 .rpc
                 .account_subscribe(address, move |account| {
-                    async_std::task::block_on({
-                        // let sender = sender.clone();
-                        let acc = acc.clone();
-                        async move {
-                            if let Some(account) = account.value.unwrap().decode::<Account>() {
-                                if let Ok(t) = T::try_from_bytes(account.data.as_ref()) {
-                                    acc.write(AsyncResult::Ok(*t)).unwrap();
-                                    // sender.send(*t).await.unwrap();
-                                }
+                    // async_std::task::block_on({
+                    // let sender = sender.clone();
+                    // async_std::task::spawn({
+                    let acc = acc.clone();
+                    wasm_bindgen_futures::spawn_local(async move {
+                        if let Some(account) = account.value.unwrap().decode::<Account>() {
+                            if let Ok(t) = T::try_from_bytes(account.data.as_ref()) {
+                                acc.write(AsyncResult::Ok(*t)).unwrap();
+                                // sender.send(*t).await.unwrap();
                             }
                         }
                     });
+                    // });
+                    // });
                 })
                 .await;
             // loop {
