@@ -32,7 +32,7 @@ use solana_client_wasm::{
 
 // TODO GatewayResult type
 
-const API_URL: &str = "https://ore-api-lthm.onrender.com/transfers";
+const API_URL: &str = "https://ore-api-lthm.onrender.com";
 const RPC_URL: &str = "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
@@ -175,7 +175,11 @@ impl Gateway {
     // API
     pub async fn get_transfer(&self, sig: String) -> Option<Transfer> {
         let client = reqwest::Client::new();
-        match client.get(format!("{}/{}", self.api_url, sig)).send().await {
+        match client
+            .get(format!("{}/transfers/{}", self.api_url, sig))
+            .send()
+            .await
+        {
             Ok(res) => res.json::<Transfer>().await.ok(),
             Err(e) => {
                 log::error!("{:?}", e);
@@ -199,7 +203,12 @@ impl Gateway {
             query.push(("user", user_str));
         };
         let client = reqwest::Client::new();
-        match client.get(&self.api_url).query(&query).send().await {
+        match client
+            .get(format!("{}/transfers", &self.api_url))
+            .query(&query)
+            .send()
+            .await
+        {
             Ok(res) => res.json::<GetTransfersResponse>().await.ok(),
             Err(e) => {
                 log::error!("{:?}", e);

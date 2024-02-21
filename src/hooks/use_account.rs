@@ -28,37 +28,37 @@ pub fn use_account<T: AccountDeserialize + Send + Sync + Clone + Copy + 'static>
     });
 
     // Stream changes.
-    let _: &Coroutine<()> = use_coroutine(cx, |mut _rx| {
-        let acc = acc.clone();
-        let gateway = gateway.clone();
-        async move {
-            // let (sender, receiver) = async_std::channel::unbounded();
-            let _ = gateway
-                .rpc
-                .account_subscribe(address, move |account| {
-                    // async_std::task::block_on({
-                    // let sender = sender.clone();
-                    // async_std::task::spawn({
-                    let acc = acc.clone();
-                    wasm_bindgen_futures::spawn_local(async move {
-                        if let Some(account) = account.value.unwrap().decode::<Account>() {
-                            if let Ok(t) = T::try_from_bytes(account.data.as_ref()) {
-                                acc.write(AsyncResult::Ok(*t)).unwrap();
-                                // sender.send(*t).await.unwrap();
-                            }
-                        }
-                    });
-                    // });
-                    // });
-                })
-                .await;
-            // loop {
-            //     if let Ok(result) = receiver.recv().await {
-            //         acc.write(AsyncResult::Ok(result)).unwrap();
-            //     }
-            // }
-        }
-    });
+    // let _: &Coroutine<()> = use_coroutine(cx, |mut _rx| {
+    //     let acc = acc.clone();
+    //     let gateway = gateway.clone();
+    //     async move {
+    //         // let (sender, receiver) = async_std::channel::unbounded();
+    //         let _ = gateway
+    //             .rpc
+    //             .account_subscribe(address, move |account| {
+    //                 // async_std::task::block_on({
+    //                 // let sender = sender.clone();
+    //                 // async_std::task::spawn({
+    //                 let acc = acc.clone();
+    //                 wasm_bindgen_futures::spawn_local(async move {
+    //                     if let Some(account) = account.value.unwrap().decode::<Account>() {
+    //                         if let Ok(t) = T::try_from_bytes(account.data.as_ref()) {
+    //                             acc.write(AsyncResult::Ok(*t)).unwrap();
+    //                             // sender.send(*t).await.unwrap();
+    //                         }
+    //                     }
+    //                 });
+    //                 // });
+    //                 // });
+    //             })
+    //             .await;
+    //         // loop {
+    //         //     if let Ok(result) = receiver.recv().await {
+    //         //         acc.write(AsyncResult::Ok(result)).unwrap();
+    //         //     }
+    //         // }
+    //     }
+    // });
 
     *acc.read().unwrap()
 }
