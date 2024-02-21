@@ -9,7 +9,6 @@ use crate::{
 
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActivatingProps {
-    pub timer: UseState<u64>,
     pub worker: Worker,
 }
 
@@ -22,7 +21,6 @@ pub fn MinerToolbarActivating(cx: Scope<MinerToolbarActivatingProps>) -> Element
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
 
     use_future(cx, &sol_balance.clone(), |_| {
-        let timer = cx.props.timer.clone();
         let worker = worker.clone();
         let miner_status = miner_status.clone();
         let gateway = gateway.clone();
@@ -32,13 +30,14 @@ pub fn MinerToolbarActivating(cx: Scope<MinerToolbarActivatingProps>) -> Element
                     Ok(did_start) => {
                         if did_start {
                             *miner_status.write() = MinerStatus::Active;
-                            timer.set(0);
                         } else {
                             // TODO Insufficient balance... Set appropriate error
+                            log::error!("Insufficient balance to start mining");
                             *miner_status.write() = MinerStatus::NetworkError;
                         };
                     }
-                    Err(_err) => {
+                    Err(err) => {
+                        log::error!("Failed to start mining: {:?}", err);
                         *miner_status.write() = MinerStatus::NetworkError;
                         // TODO Present error to user
                     }

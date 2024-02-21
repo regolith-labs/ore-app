@@ -71,12 +71,12 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                         let gateway = gateway.clone();
                         cx.spawn(async move {
                             match gateway.claim_ore(amount).await {
-                                Some(_sig) => {
+                                Ok(_sig) => {
                                     is_busy.set(false);
                                     balance_.restart();
                                     claim_step.set(ClaimStep::Done);
                                 }
-                                None => {
+                                Err(_err) => {
                                     // TODO Handle error
                                     is_busy.set(false);
                                     log::error!("Failed to claim!");

@@ -45,7 +45,7 @@ pub async fn submit_solution(
         // Submit restart epoch tx, if needed.
         if clock.unix_timestamp.ge(&epoch_end_at) {
             let ix = ore::instruction::reset(signer.pubkey());
-            gateway.send_and_confirm(&[ix]).await;
+            gateway.send_and_confirm(&[ix]).await?;
         }
 
         // Submit mine tx
@@ -56,8 +56,8 @@ pub async fn submit_solution(
             nonce,
         );
         match gateway.send_and_confirm(&[ix]).await {
-            Some(sig) => return Ok(sig),
-            None => {
+            Ok(sig) => return Ok(sig),
+            Err(_err) => {
                 // Retry on different bus.
                 bus_id += 1;
                 if bus_id.ge(&ore::BUS_COUNT) {

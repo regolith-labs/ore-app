@@ -64,14 +64,14 @@ pub fn use_transfers(
     let transfers = use_rw::<AsyncResult<Vec<Transfer>>>(cx, || AsyncResult::Loading);
     let has_more = use_state(cx, || false);
 
-    // use_transfers_websocket(
-    //     cx,
-    //     filter,
-    //     transfers,
-    //     offset,
-    //     has_more,
-    //     ACTIVITY_TABLE_PAGE_LIMIT,
-    // );
+    use_transfers_websocket(
+        cx,
+        filter,
+        transfers,
+        offset,
+        has_more,
+        ACTIVITY_TABLE_PAGE_LIMIT,
+    );
 
     let _ = use_future(cx, (&filter.clone(), &offset.clone()), |_| {
         let gateway = gateway.clone();

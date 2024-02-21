@@ -4033,7 +4033,6 @@ dependencies = [
  "bs58 0.4.0",
  "clap",
  "futures",
- "js-sys",
  "reqwest",
  "serde",
  "serde_derive",
@@ -4041,9 +4040,6 @@ dependencies = [
  "solana-extra-wasm",
  "solana-sdk",
  "thiserror",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]

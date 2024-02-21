@@ -24,10 +24,10 @@ pub async fn try_start_mining(
     }
 
     // Create token account, if needed
-    gateway.create_token_account_ore().await;
+    gateway.create_token_account_ore().await?;
 
     // Create proof account, if needed
-    gateway.register_ore().await;
+    gateway.register_ore().await?;
 
     // Start mining
     mine(gateway, worker.clone()).await?;

@@ -31,12 +31,14 @@ pub fn use_ore_balance(
                 Err(err) => {
                     let err = GatewayError::from(err);
                     match err {
-                        GatewayError::NotFound => balance.set(AsyncResult::Ok(UiTokenAmount {
-                            ui_amount: Some(0f64),
-                            decimals: ore::TOKEN_DECIMALS,
-                            amount: "0.00".to_string(),
-                            ui_amount_string: "0.00".to_string(),
-                        })),
+                        GatewayError::AccountNotFound => {
+                            balance.set(AsyncResult::Ok(UiTokenAmount {
+                                ui_amount: Some(0f64),
+                                decimals: ore::TOKEN_DECIMALS,
+                                amount: "0.00".to_string(),
+                                ui_amount_string: "0.00".to_string(),
+                            }))
+                        }
                         _ => {
                             balance.set(AsyncResult::Error(err));
                         }

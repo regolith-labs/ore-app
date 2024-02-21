@@ -90,12 +90,12 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                         let gateway = gateway.clone();
                         cx.spawn(async move {
                             match gateway.transfer_ore(amount, recipient, memo).await {
-                                Some(sig) => {
+                                Ok(sig) => {
                                     log::info!("Transfer: {:?}", sig);
                                     is_busy.set(false);
                                     send_step.set(SendStep::Done);
                                 }
-                                None => {
+                                Err(_err) => {
                                     // TODO Handle error
                                     is_busy.set(false);
                                     log::error!("Failed to claim!");

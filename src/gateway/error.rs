@@ -4,9 +4,10 @@ pub type GatewayResult<T> = Result<T, GatewayError>;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GatewayError {
-    DeserializationFailure,
-    NotFound,
+    FailedDeserialization,
+    FailedTransaction,
     NetworkUnavailable,
+    AccountNotFound,
     Unknown,
 }
 
@@ -16,7 +17,7 @@ impl From<ClientError> for GatewayError {
         if msg.starts_with("Client error: Invalid param: could not find account")
             || msg.starts_with("Client error: AccountNotFound: ")
         {
-            GatewayError::NotFound
+            GatewayError::AccountNotFound
         } else if msg.starts_with("Client error: error sending request") {
             GatewayError::NetworkUnavailable
         } else {

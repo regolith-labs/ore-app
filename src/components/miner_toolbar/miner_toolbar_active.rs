@@ -26,17 +26,17 @@ pub enum MinerChart {
 pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,
     pub proof: AsyncResult<Proof>,
-    pub timer: UseState<u64>,
     pub ore_supply: AsyncResult<UiTokenAmount>,
 }
 
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let chart = use_state(cx, || MinerChart::Hash);
-    let time = cx.props.timer.get();
+    let timer = use_state(cx, || 0u64);
+    let proof = cx.props.proof;
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
 
-    let hash = match cx.props.proof {
+    let hash = match proof {
         AsyncResult::Ok(proof) => proof.hash.to_string(),
         _ => "–".to_string(),
     };
@@ -73,6 +73,21 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         }
         _ => 0f64,
     };
+
+    use_effect(cx, &proof, |_| {
+        timer.set(0);
+        async move {}
+    });
+
+    let _n = use_future(cx, (), |_| {
+        let timer = timer.clone();
+        async move {
+            loop {
+                async_std::task::sleep(std::time::Duration::from_secs(1)).await;
+                timer.set(*timer.current() + 1);
+            }
+        }
+    });
 
     // let container_class =
     //     "flex flex-col gap-1 justify-between px-3 py-2 rounded hover:bg-green-600 active:bg-green-700 cursor-pointer transition transition-colors";
@@ -145,7 +160,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         }
                         p {
                             class: "{value_class}",
-                            "{time} sec"
+                            "{timer.current()} sec"
                         }
                     }
                     div {

@@ -6,6 +6,7 @@ mod webworker;
 pub use async_result::*;
 pub use error::*;
 pub use pubkey::*;
+use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
 pub use webworker::*;
 
 use cached::proc_macro::cached;
@@ -30,17 +31,14 @@ use solana_client_wasm::{
     WasmClient,
 };
 
-// TODO GatewayResult type
-
 const API_URL: &str = "https://ore-api-lthm.onrender.com";
 const RPC_URL: &str = "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 pub struct Gateway {
-    // api: Client,
     pub rpc: WasmClient,
     api_url: String,
-    wss: WebSocket,
+    _wss: WebSocket,
 }
 
 impl Gateway {
@@ -48,7 +46,7 @@ impl Gateway {
         Gateway {
             api_url: API_URL.to_string(),
             rpc: WasmClient::new(RPC_URL),
-            wss: WebSocket::open(WSS_URL).unwrap(),
+            _wss: WebSocket::open(WSS_URL).unwrap(),
         }
     }
 
@@ -58,7 +56,7 @@ impl Gateway {
             .get_account_data(&sysvar::clock::ID)
             .await
             .or(Err(GatewayError::NetworkUnavailable))?;
-        bincode::deserialize::<Clock>(&data).or(Err(GatewayError::DeserializationFailure))
+        bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
     }
 
     pub async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
@@ -79,46 +77,44 @@ impl Gateway {
         Ok(*Treasury::try_from_bytes(&data).expect("Failed to parse treasury account"))
     }
 
-    pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> Option<Signature> {
+    pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {
         let signer = signer();
         let mut transaction = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
         let recent_blockhash = self.rpc.get_latest_blockhash().await.unwrap();
         transaction.sign(&[&signer], recent_blockhash);
-        let result = self.rpc.send_and_confirm_transaction(&transaction).await;
-        match result {
-            Ok(sig) => {
-                log::info!("Transaction success: {:?}", sig);
-                Some(sig)
-            }
-            Err(err) => {
-                log::error!("Transaction failed: {:?}", err);
-                None
-            }
-        }
+        self.rpc
+            .send_and_confirm_transaction(&transaction)
+            .await
+            .or(Err(GatewayError::FailedTransaction))
     }
 
     // Ore
-    pub async fn register_ore(&self) {
+    pub async fn register_ore(&self) -> GatewayResult<()> {
         // Return early, if account is already initialized
         let signer = signer();
         let proof_address = proof_pubkey(signer.pubkey());
         if self.rpc.get_account(&proof_address).await.is_ok() {
-            return;
+            return Ok(());
         }
 
         // Sign and send transaction.
         let ix = ore::instruction::register(signer.pubkey());
-        self.send_and_confirm(&[ix]).await;
+        self.send_and_confirm(&[ix]).await.map(|_| ())
     }
 
-    pub async fn claim_ore(&self, amount: u64) -> Option<Signature> {
+    pub async fn claim_ore(&self, amount: u64) -> GatewayResult<Signature> {
         let signer = signer();
         let beneficiary = ore_token_account_address(signer.pubkey());
         let ix = ore::instruction::claim(signer.pubkey(), beneficiary, amount);
         self.send_and_confirm(&[ix]).await
     }
 
-    pub async fn transfer_ore(&self, amount: u64, to: Pubkey, memo: String) -> Option<Signature> {
+    pub async fn transfer_ore(
+        &self,
+        amount: u64,
+        to: Pubkey,
+        memo: String,
+    ) -> GatewayResult<Signature> {
         let signer = signer();
         let from_token_account = ore_token_account_address(signer.pubkey());
         let to_token_account = ore_token_account_address(to);
@@ -139,7 +135,7 @@ impl Gateway {
     }
 
     // TODO Result type
-    pub async fn create_token_account_ore(&self) -> Pubkey {
+    pub async fn create_token_account_ore(&self) -> GatewayResult<Pubkey> {
         // Build instructions.
         let signer = signer();
 
@@ -148,28 +144,27 @@ impl Gateway {
         match self.rpc.get_token_account(&token_account_address).await {
             Ok(token_account) => {
                 if token_account.is_some() {
-                    return token_account_address;
+                    return Ok(token_account_address);
                 }
             }
             Err(err) => {
-                if let GatewayError::NotFound = GatewayError::from(err) {
-                    // Do nothing
+                if let GatewayError::AccountNotFound = GatewayError::from(err) {
+                    // Noop
                 }
             }
         }
 
         // Sign and send transaction.
-        let ix =
-        solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account(
+        let ix = create_associated_token_account(
             &signer.pubkey(),
             &signer.pubkey(),
             &ore::MINT_ADDRESS,
             &solana_extra_wasm::program::spl_token::id(),
         );
-        self.send_and_confirm(&[ix]).await;
+        self.send_and_confirm(&[ix]).await?;
 
         // Return token account address
-        token_account_address
+        Ok(token_account_address)
     }
 
     // API

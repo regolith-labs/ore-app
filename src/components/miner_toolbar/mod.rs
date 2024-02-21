@@ -42,7 +42,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
     let treasury = use_treasury(cx);
     let proof = use_proof(cx);
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
-    let timer = use_state(cx, || 0u64);
     let (worker, message) = use_webworker(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
 
@@ -62,27 +61,12 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
                             mine(&gateway, worker).await.ok();
                         }
                     }
-                    Err(_err) => {
-                        // TODO
+                    Err(err) => {
+                        log::error!("Failed to submit hash: {:?}", err);
                     }
                 }
             }
         }
-    });
-
-    let _n = use_future(cx, (), |_| {
-        let timer = timer.clone();
-        async move {
-            loop {
-                async_std::task::sleep(std::time::Duration::from_secs(1)).await;
-                timer.set(*timer.current() + 1);
-            }
-        }
-    });
-
-    use_effect(cx, &proof, |_| {
-        timer.set(0);
-        async move {}
     });
 
     // If epoch resets, refresh the total supply tracker.
@@ -106,6 +90,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
 
     let bg = match *miner_status.read() {
         MinerStatus::Active => "bg-green-500 text-white",
+        MinerStatus::NetworkError => "bg-red-500 text-white",
         MinerStatus::NotStarted => {
             if is_open {
                 "bg-white"
@@ -117,6 +102,8 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
     };
 
     let display = if cx.props.hidden { "hidden" } else { "" };
+
+    log::info!("Status: {:?}", *miner_status.read());
 
     render! {
         div {
@@ -134,7 +121,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
                     MinerStatus::Activating => {
                         render! {
                             MinerToolbarActivating {
-                                timer: timer.clone(),
                                 worker: worker.clone()
                             }
                         }
@@ -144,17 +130,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
                             MinerToolbarActive {
                                 treasury: treasury,
                                 proof: proof,
-                                timer: timer.clone(),
                                 ore_supply: ore_supply,
                             }
                         }
                     }
                     MinerStatus::NetworkError => {
-                        render! {
-                            div {
-                                class: "bg-red-500"
-                            }
-                        }
+                        // TODO
+                        None
                     }
                 }
             }
