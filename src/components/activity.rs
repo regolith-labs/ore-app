@@ -33,7 +33,7 @@ pub fn Activity(cx: Scope) -> Element {
                         class: "flex flex-row justify-between",
                         h2 {
                             class: "text-lg md:text-2xl font-bold",
-                            "Activity"
+                            "Transactions"
                         }
                         FilterButtons {
                             filter: filter,
