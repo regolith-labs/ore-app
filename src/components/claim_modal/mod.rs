@@ -30,7 +30,8 @@ pub struct ClaimModalProps<'a> {
 
 #[component]
 pub fn ClaimModal<'a>(cx: Scope<'a, ClaimModalProps<'a>>) -> Element {
-    let proof = use_proof(cx);
+    let (proof_rw, proof_) = use_proof(cx);
+    let proof = *proof_rw.read().unwrap();
     let claim_step = use_state(cx, || ClaimStep::Preview);
     let is_modal_open = use_shared_state::<IsModalOpen>(cx).unwrap();
     let amount_input = use_state(cx, || "".to_string());
@@ -103,7 +104,8 @@ pub fn ClaimModal<'a>(cx: Scope<'a, ClaimModalProps<'a>>) -> Element {
                         ClaimConfirm {
                             claim_step: claim_step,
                             amount: parsed_amount,
-                            balance_handle: balance_
+                            balance_handle: balance_,
+                            proof_handle: proof_,
                         }
                     }
                 }

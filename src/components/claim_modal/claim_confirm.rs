@@ -11,6 +11,7 @@ use super::ClaimStep;
 pub struct ClaimConfirmProps<'a> {
     pub claim_step: &'a UseState<ClaimStep>,
     pub balance_handle: &'a UseFuture<()>,
+    pub proof_handle: &'a UseFuture<()>,
     pub amount: u64,
 }
 
@@ -19,6 +20,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
     let is_busy = use_state(cx, || false);
     let amount = cx.props.amount;
     let balance_ = cx.props.balance_handle;
+    let proof_ = cx.props.proof_handle;
     let claim_step = cx.props.claim_step;
     let amountf = (amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
     let gateway = use_gateway(cx);
@@ -66,6 +68,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                     onclick: move |_| {
                         is_busy.set(true);
                         let balance_ = balance_.clone();
+                        let proof_ = proof_.clone();
                         let claim_step = claim_step.clone();
                         let is_busy = is_busy.clone();
                         let gateway = gateway.clone();
@@ -74,6 +77,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                                 Ok(_sig) => {
                                     is_busy.set(false);
                                     balance_.restart();
+                                    proof_.restart();
                                     claim_step.set(ClaimStep::Done);
                                 }
                                 Err(_err) => {

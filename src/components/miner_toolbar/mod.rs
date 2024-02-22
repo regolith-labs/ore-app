@@ -10,6 +10,8 @@ pub use miner_toolbar_activating::*;
 pub use miner_toolbar_active::*;
 pub use miner_toolbar_insufficient_sol::*;
 pub use miner_toolbar_not_started::*;
+use ore::{state::Treasury, utils::AccountDeserialize, TREASURY_ADDRESS};
+use solana_client_wasm::solana_sdk::account::Account;
 pub use utils::*;
 
 use dioxus::prelude::*;
@@ -39,11 +41,33 @@ pub struct MinerToolbarProps {
 #[component]
 pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
     let gateway = use_gateway(cx);
-    let treasury = use_treasury(cx);
-    let proof = use_proof(cx);
+    let (treasury_rw, _) = use_treasury(cx);
+    let treasury = *treasury_rw.read().unwrap();
+    let (proof_rw, proof_fut) = use_proof(cx);
+    let proof = *proof_rw.read().unwrap();
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
     let (worker, message) = use_webworker(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
+
+    let _: &Coroutine<()> = use_coroutine(cx, |mut _rx| {
+        let gateway = gateway.clone();
+        let treasury_rw = treasury_rw.clone();
+        async move {
+            let _sub_id = gateway
+                .rpc
+                .account_subscribe(TREASURY_ADDRESS, move |account| {
+                    if let Some(ui_account) = account.value {
+                        if let Some(account) = ui_account.decode::<Account>() {
+                            if let Ok(t) = Treasury::try_from_bytes(account.data.as_ref()) {
+                                log::info!("Got: {:?}", t);
+                                treasury_rw.write(AsyncResult::Ok(*t)).ok();
+                            }
+                        }
+                    }
+                })
+                .await;
+        }
+    });
 
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
@@ -53,10 +77,12 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
         let status = miner_status.clone();
         let worker = worker.clone();
         let gateway = gateway.clone();
+        let proof_fut = proof_fut.clone();
         async move {
             if let Some(solution) = message {
                 match submit_solution(&gateway, &solution).await {
                     Ok(_sig) => {
+                        proof_fut.restart();
                         if let MinerStatus::Active = *status.read() {
                             mine(&gateway, worker).await.ok();
                         }
