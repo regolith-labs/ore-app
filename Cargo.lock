@@ -4025,8 +4025,7 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.17.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fa014471b9c14ce2d6d8673da46cabce848f094be2cd874cc04cd28a516859c"
+source = "git+https://github.com/HardhatChad/solana-playground?branch=master#6fdf7ced1a42522ef6a93a0ab55cb3ad0af9680d"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -4050,8 +4049,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.17.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3246b4841ea08df0d8cc5f996c06e3cc97bac3e93c87c4c7750642142e8d4c0f"
+source = "git+https://github.com/HardhatChad/solana-playground?branch=master#6fdf7ced1a42522ef6a93a0ab55cb3ad0af9680d"
 dependencies = [
  "Inflector",
  "arrayref",

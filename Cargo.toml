@@ -49,6 +49,6 @@ features = [
     'WorkerGlobalScope',
 ]
 
-# [patch.crates-io]
-# solana-client-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "hardhat/pub-methods" }
-# solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "hardhat/pub-methods" }
+[patch.crates-io]
+solana-client-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "master" }
+solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "master" }
