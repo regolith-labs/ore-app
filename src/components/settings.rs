@@ -1,4 +1,9 @@
-use dioxus::prelude::*;
+use std::fmt;
+
+use dioxus::{
+    html::{form, option, select},
+    prelude::*,
+};
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
@@ -24,10 +29,45 @@ use crate::{
 // TODO Bio
 // TODO Contacts
 
+pub enum Explorer {
+    Solana,
+    SolanaFm,
+    Solscan,
+    Xray,
+}
+
+impl fmt::Display for Explorer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Explorer::Solana => write!(f, "Solana Explorer"),
+            Explorer::SolanaFm => write!(f, "SolanaFM"),
+            Explorer::Solscan => write!(f, "Solscan"),
+            Explorer::Xray => write!(f, "Xray"),
+        }
+    }
+}
+
+pub enum Appearance {
+    Light,
+    Dark,
+}
+
+impl fmt::Display for Appearance {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Appearance::Light => write!(f, "Light mode"),
+            Appearance::Dark => write!(f, "Dark mode"),
+        }
+    }
+}
+
 #[component]
 pub fn Settings(cx: Scope) -> Element {
     let pubkey = use_pubkey(cx);
     let sol_balance = use_sol_balance(cx);
+    let selected_explorer = use_state(cx, || Explorer::Solana);
+    let selected_appearance = use_state(cx, || Appearance::Light);
+
     render! {
         div {
             class: "flex flex-col gap-16",
@@ -101,8 +141,17 @@ pub fn Settings(cx: Scope) -> Element {
                         class: "font-bold",
                         "Appearance"
                     }
-                    p {
-                        "Light mode"
+                    select {
+                        class: "text-right",
+                        onchange: move |e| {
+                            selected_appearance.set(match e.value.as_str() {
+                                "Light mode" => Appearance::Light,
+                                "Dark mode" => Appearance::Dark,
+                                _ => Appearance::Light,
+                            });
+                        },
+                        option { value: "{Appearance::Light}", "{Appearance::Light}" }
+                        option { value: "{Appearance::Dark}", "{Appearance::Dark}" }
                     }
                 }
                 div {
@@ -111,11 +160,21 @@ pub fn Settings(cx: Scope) -> Element {
                         class: "font-bold",
                         "Explorer"
                     }
-                    p {
-                        "Solana Explorer"
-                        // TODO Solana FM
-                        // TODO Solscan
-                        // TODO Xray
+                    select {
+                        class: "text-right",
+                        onchange: move |e| {
+                            selected_explorer.set(match e.value.as_str() {
+                                "Solana Explorer" => Explorer::Solana,
+                                "SolanaFM" => Explorer::SolanaFm,
+                                "Solscan" => Explorer::Solscan,
+                                "Xray" => Explorer::Xray,
+                                _ => Explorer::Solana
+                            });
+                        },
+                        option { value: "{Explorer::Solana}", "{Explorer::Solana}" }
+                        option { value: "{Explorer::SolanaFm}", "{Explorer::SolanaFm}" }
+                        option { value: "{Explorer::Solscan}", "{Explorer::Solscan}" }
+                        option { value: "{Explorer::Xray}", "{Explorer::Xray}" }
                     }
                 }
             }
