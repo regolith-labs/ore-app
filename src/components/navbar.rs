@@ -1,10 +1,12 @@
+use std::ops::Deref;
+
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
     components::{Banner, BannerType},
     gateway::AsyncResult,
-    hooks::{use_is_onboarded, use_ping},
+    hooks::{use_appearance, use_is_onboarded, use_ping},
     route::Route,
 };
 
@@ -12,9 +14,9 @@ use super::Appearance;
 
 #[component]
 pub fn Navbar(cx: Scope) -> Element {
-    let appearance = use_shared_state::<Appearance>(cx).unwrap();
+    let appearance = use_appearance(cx);
     let ping = use_ping(cx);
-    let dark = match *appearance.read() {
+    let dark = match appearance.read().deref() {
         Appearance::Dark => "dark",
         _ => "",
     };

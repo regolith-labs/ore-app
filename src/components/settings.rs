@@ -1,11 +1,12 @@
-use std::fmt;
+use std::{fmt, io, str::FromStr};
 
 use dioxus::prelude::*;
+use serde::{Deserialize, Serialize};
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     gateway::AsyncResult,
-    hooks::{use_pubkey, use_sol_balance},
+    hooks::{use_appearance, use_appearance_persistant, use_pubkey, use_sol_balance},
 };
 
 // Phase 1 (core)
@@ -44,9 +45,43 @@ impl fmt::Display for Explorer {
     }
 }
 
+impl FromStr for Explorer {
+    type Err = io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Solana Explorer" => Ok(Explorer::Solana),
+            "SolanaFM" => Ok(Explorer::SolanaFm),
+            "Solscan" => Ok(Explorer::Solscan),
+            "Xray" => Ok(Explorer::Xray),
+            _ => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Unknown explorer",
+            )),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub enum Appearance {
+    #[default]
     Light,
     Dark,
+}
+
+impl FromStr for Appearance {
+    type Err = io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Light mode" => Ok(Appearance::Light),
+            "Dark mode" => Ok(Appearance::Dark),
+            _ => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Unknown appearance",
+            )),
+        }
+    }
 }
 
 impl fmt::Display for Appearance {
@@ -64,7 +99,9 @@ pub fn Settings(cx: Scope) -> Element {
     let sol_balance = use_sol_balance(cx);
     let selected_explorer = use_state(cx, || Explorer::Solana);
     // let selected_appearance = use_state(cx, || Appearance::Light);
-    let appearance = use_shared_state::<Appearance>(cx).unwrap();
+    // let appearance = use_shared_state::<Appearance>(cx).unwrap();
+    let appearance = use_appearance(cx);
+    let appearance_persistent = use_appearance_persistant(cx);
 
     render! {
         div {
@@ -140,16 +177,15 @@ pub fn Settings(cx: Scope) -> Element {
                         "Appearance"
                     }
                     select {
-                        class: "text-right",
+                        class: "text-right dark:bg-black dark:text-white",
                         onchange: move |e| {
-                            *appearance.write() = match e.value.as_str() {
-                                "Light mode" => Appearance::Light,
-                                "Dark mode" => Appearance::Dark,
-                                _ => Appearance::Light,
-                            };
+                            if let Ok(a) = Appearance::from_str(e.value.as_str()) {
+                                *appearance.write() = a;
+                                appearance_persistent.set(a);
+                            }
                         },
-                        option { value: "{Appearance::Light}", "{Appearance::Light}" }
-                        option { value: "{Appearance::Dark}", "{Appearance::Dark}" }
+                        option { initial_selected: appearance.read().eq(&Appearance::Light), value: "{Appearance::Light}", "{Appearance::Light}" }
+                        option { initial_selected: appearance.read().eq(&Appearance::Dark), value: "{Appearance::Dark}", "{Appearance::Dark}" }
                     }
                 }
                 div {
@@ -159,7 +195,7 @@ pub fn Settings(cx: Scope) -> Element {
                         "Explorer"
                     }
                     select {
-                        class: "text-right",
+                        class: "text-right dark:bg-black dark:text-white",
                         onchange: move |e| {
                             selected_explorer.set(match e.value.as_str() {
                                 "Solana Explorer" => Explorer::Solana,

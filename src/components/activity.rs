@@ -1,5 +1,4 @@
 use dioxus_router::components::Link;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use dioxus::prelude::*;
