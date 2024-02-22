@@ -1,4 +1,5 @@
 use dioxus_router::components::Link;
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use dioxus::prelude::*;
@@ -33,7 +34,7 @@ pub fn Activity(cx: Scope) -> Element {
                         class: "flex flex-row justify-between",
                         h2 {
                             class: "text-lg md:text-2xl font-bold",
-                            "Transactions"
+                            "Activity"
                         }
                         FilterButtons {
                             filter: filter,

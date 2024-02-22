@@ -16,6 +16,8 @@ use crate::{
 // TODO Total rewards
 // TODO Time since registration
 
+// TODO Preferred explorer
+
 // Phase 2 (social)
 // TODO Username
 // TODO Profile photo
@@ -53,7 +55,7 @@ pub fn Settings(cx: Scope) -> Element {
                     class: "flex flex-row justify-between w-full",
                     p {
                         class: "font-bold",
-                        "Key"
+                        "Private key"
                     }
                     div {
                         class: "flex flex-col",
@@ -103,6 +105,19 @@ pub fn Settings(cx: Scope) -> Element {
                         "Light mode"
                     }
                 }
+                div {
+                    class: "flex flex-row justify-between",
+                    p {
+                        class: "font-bold",
+                        "Explorer"
+                    }
+                    p {
+                        "Solana Explorer"
+                        // TODO Solana FM
+                        // TODO Solscan
+                        // TODO Xray
+                    }
+                }
             }
             div {
                 class: "flex flex-col gap-4",
@@ -136,7 +151,7 @@ pub fn Settings(cx: Scope) -> Element {
                         "GPU"
                     }
                     p {
-                        "Metal"
+                        "Coming soon"
                     }
                 }
                 // div {

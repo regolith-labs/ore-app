@@ -16,7 +16,7 @@ pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
                             class: "flex flex-col grow gap-3",
                             h2 {
                                 class: "text-lg md:text-2xl font-bold",
-                                "Account"
+                                "Balance"
                             }
                             div {
                                 class: "flex flex-row grow justify-between",

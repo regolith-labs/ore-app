@@ -12,7 +12,7 @@ pub fn Home(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col gap-16 grow",
+            class: "flex flex-col gap-16",
             Balance { balance: balance }
             Activity {}
             ClaimModal {
