@@ -27,7 +27,9 @@ use crate::{
 // TODO Bio
 // TODO Contacts
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub enum Explorer {
+    #[default]
     Solana,
     SolanaFm,
     Solscan,
