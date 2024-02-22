@@ -103,17 +103,15 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
         MinerStatus::NetworkError => "bg-red-500 text-white",
         MinerStatus::NotStarted => {
             if is_open {
-                "bg-white"
+                "bg-white dark:bg-black"
             } else {
-                "bg-gray-100"
+                "bg-gray-100 dark:bg-gray-900"
             }
         }
-        _ => "bg-gray-100",
+        _ => "bg-gray-100 dark:bg-gray-900",
     };
 
     let display = if cx.props.hidden { "hidden" } else { "" };
-
-    log::info!("Status: {:?}", *miner_status.read());
 
     render! {
         div {

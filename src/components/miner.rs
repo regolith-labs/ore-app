@@ -31,7 +31,7 @@ pub fn Miner(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col h-full grow",
+            class: "flex flex-col h-full grow dark",
             Outlet::<Route> {}
         }
         ToolbarClose {}

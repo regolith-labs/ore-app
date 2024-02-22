@@ -93,7 +93,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                             "Amount"
                         }
                         span {
-                            class: "flex flex-row gap-1",
+                            class: "flex flex-row gap-1.5",
                             OreIcon {
                                 class: "w-3.5 h-3.5 my-auto",
                             }

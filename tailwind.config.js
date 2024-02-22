@@ -7,6 +7,8 @@ module.exports = {
     // include all html files in the output (dist) directory
     "./dist/**/*.html",
   ],
+  darkMode: 'selector',
+  plugins: [],
   theme: {
     colors: ({ colors }) => ({
       ...colors,
@@ -22,6 +24,8 @@ module.exports = {
         100: '#e8e8ea',
         200: '#d6d6d8',
         300: '#b0b0b2',
+        800: '#464648',
+        900: '#313133',
       },
     }),
     lineHeight: {
@@ -33,5 +37,4 @@ module.exports = {
       },
     },
   },
-  plugins: [],
 }

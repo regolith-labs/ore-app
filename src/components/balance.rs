@@ -8,7 +8,7 @@ use crate::{components::OreIcon, gateway::AsyncResult, route::Route};
 pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
     render! {
         div {
-            class: "flex flex-row w-full min-h-16 rounded justify-between text-black",
+            class: "flex flex-row w-full min-h-16 rounded justify-between",
             match balance {
                 AsyncResult::Ok(b) => {
                     render! {
@@ -38,7 +38,7 @@ pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
                 _ => {
                     render! {
                         div {
-                            class: "flex flex-row grow animate-pulse bg-gray-100 rounded",
+                            class: "flex flex-row grow loading rounded",
                         }
                     }
                 }
@@ -52,7 +52,7 @@ pub fn SendButton(cx: Scope) -> Element {
     render! {
         Link {
             to: Route::Send {},
-            class: "flex h-10 w-10 my-auto bg-black rounded-full justify-center text-white text-2xl font-semibold",
+            class: "flex h-10 w-10 my-auto bg-black text-white rounded-full justify-center text-2xl font-semibold dark:bg-white dark:text-black",
             span {
                 class: "my-auto bg-transparent",
                 "↑"

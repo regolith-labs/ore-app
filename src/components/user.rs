@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::ActivityTable,
+    components::{ActivityTable, OreIcon},
     gateway::AsyncResult,
     hooks::{use_ore_balance, use_user_transfers},
 };
@@ -59,16 +59,22 @@ pub fn User(cx: Scope, id: String) -> Element {
                     match balance {
                         AsyncResult::Ok(balance) => {
                             render! {
-                                p {
-                                    class: "{value_class}",
-                                    "{balance.real_number_string_trimmed()}"
+                                span {
+                                    class: "flex flex-row gap-1.5",
+                                    OreIcon {
+                                        class: "w-3.5 h-3.5 my-auto",
+                                    }
+                                    p {
+                                        class: "{value_class}",
+                                        "{balance.real_number_string_trimmed()}"
+                                    }
                                 }
                             }
                         }
                         _ => {
                             render! {
                                 p {
-                                    class: "{value_class} w-16 h-8 bg-gray-100 animate-pulse",
+                                    class: "{value_class} w-16 h-8 loading",
                                 }
                             }
                         }
@@ -109,7 +115,7 @@ pub fn UserActivity(cx: Scope, user_id: Pubkey) -> Element {
         _ => {
             render! {
                 div {
-                    class: "flex flex-row h-64 w-full animate-pulse bg-gray-100 rounded",
+                    class: "flex flex-row h-64 w-full loading rounded",
                 }
             }
         }

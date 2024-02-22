@@ -93,7 +93,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                     dangerous_inner_html: "{qrcode}",
                 }
                 button {
-                    class: "transition-colors text-center rounded p-2 hover:bg-gray-100 active:bg-gray-200",
+                    class: "transition-colors text-center rounded p-2 hover-100 active-200",
                     onclick: move |_e| {
                         // TODO Fix clipboard
                         // if let Some(cb) = clipboard.clone() {

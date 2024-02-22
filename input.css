@@ -4,14 +4,23 @@
 
 @layer base {
   h1 {
-    @apply text-4xl text-black font-bold;
+    @apply text-4xl text-black dark:text-white font-bold;
   }
   h2 {
-    @apply text-xl text-black font-bold;
+    @apply text-xl text-black dark:text-white font-bold;
   }
 }
 
 @layer components {
+  .loading {
+    @apply bg-gray-100 dark:bg-gray-900 animate-pulse;
+  }
+  .hover-100 {
+    @apply hover:bg-gray-100 dark:hover:bg-gray-900; 
+  }
+  .active-200 {
+    @apply active:bg-gray-200 dark:active:bg-gray-800;
+  }
   .primary-button {
     @apply bg-green-500 text-white font-semibold px-6 py-3 w-fit hover:bg-green-600;
   }

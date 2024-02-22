@@ -29,7 +29,7 @@ pub fn Activity(cx: Scope) -> Element {
         AsyncResult::Ok(transfers) => {
             render! {
                 div {
-                    class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start text-black",
+                    class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
                     div {
                         class: "flex flex-row justify-between",
                         h2 {
@@ -52,7 +52,7 @@ pub fn Activity(cx: Scope) -> Element {
         _ => {
             render! {
                 div {
-                    class: "flex flex-row h-64 w-full animate-pulse bg-gray-100 rounded",
+                    class: "flex flex-row h-64 w-full loading rounded",
                 }
             }
         }
@@ -70,7 +70,7 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
     let offset = cx.props.offset;
     let filter = cx.props.filter.clone();
     let filter_ = cx.props.filter;
-    let selected_class = "text-black";
+    let selected_class = "";
     let unselected_class = "text-gray-300";
     let (global_class, personal_class) = match filter.get() {
         ActivityFilter::Global => (selected_class, unselected_class),
@@ -80,7 +80,7 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
         div {
             class: "flex flex-row gap-2 font-semibold -mx-4",
             button {
-                class: "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover:bg-gray-100 active:bg-gray-200 transition-colors {personal_class}",
+                class: "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover-100 active-200 transition-colors {personal_class}",
                 onclick: move |_e| {
                     filter_.set(ActivityFilter::Personal);
                     offset.set(0);
@@ -91,7 +91,7 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
                 "Personal"
             }
             button {
-                class: "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover:bg-gray-100 active:bg-gray-200 transition-colors {global_class}",
+                class: "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover-100 active-200 transition-colors {global_class}",
                 onclick: move |_| {
                     filter.set(ActivityFilter::Global);
                     offset.set(0);
@@ -165,7 +165,7 @@ pub fn ActivityTablePagination<'a>(cx: Scope<'a, ActivityTablePaginationProps<'a
                         onclick: move |_| {
                             cx.props.offset.set(cx.props.offset.current().saturating_sub(ACTIVITY_TABLE_PAGE_LIMIT as u64));
                         },
-                        class: "rounded-full h-10 w-10 font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors",
+                        class: "rounded-full h-10 w-10 font-semibold hover-100 active-200 transition-colors",
                         "←"
                     }
                 }
@@ -180,7 +180,7 @@ pub fn ActivityTablePagination<'a>(cx: Scope<'a, ActivityTablePaginationProps<'a
                         onclick: move |_| {
                             cx.props.offset.set(cx.props.offset.current().saturating_add(ACTIVITY_TABLE_PAGE_LIMIT as u64));
                         },
-                        class: "rounded-full h-10 w-10 font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors",
+                        class: "rounded-full h-10 w-10 font-semibold hover-100 active-200 transition-colors",
                         "→"
                     }
                 }
@@ -247,7 +247,7 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
             to: Route::Tx {
                 sig: transfer.sig
             },
-            class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 hover:bg-gray-100 active:bg-gray-200 transition-colors",
+            class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 hover-100 active-200 transition-colors",
             p {
                 class: "flex flex-row w-1/4 text-left font-mono",
                 "{&transfer.to_address[..5]}"

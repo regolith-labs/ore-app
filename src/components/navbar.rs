@@ -8,12 +8,19 @@ use crate::{
     route::Route,
 };
 
+use super::Appearance;
+
 #[component]
 pub fn Navbar(cx: Scope) -> Element {
+    let appearance = use_shared_state::<Appearance>(cx).unwrap();
     let ping = use_ping(cx);
+    let dark = match *appearance.read() {
+        Appearance::Dark => "dark",
+        _ => "",
+    };
     render! {
         div {
-            class: "relative min-h-screen flex flex-col",
+            class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
             if let AsyncResult::Error(_) = ping {
                 render! {
                     Banner {
@@ -28,7 +35,7 @@ pub fn Navbar(cx: Scope) -> Element {
                     to: Route::Home {},
                     class: "flex h-10",
                     h1 {
-                        class: "text-xl font-black my-auto w-min text-black",
+                        class: "text-xl font-black my-auto w-min",
                         "ORE"
                     }
                 }

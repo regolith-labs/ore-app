@@ -73,7 +73,7 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
                     },
                 }
                 button {
-                    class: "flex transition-colors w-min text-nowrap py-2 px-4 mx-auto text-center rounded-full font-medium hover:bg-gray-100 active:bg-gray-200",
+                    class: "flex transition-colors w-min text-nowrap py-2 px-4 mx-auto text-center rounded-full font-medium hover-100 active-200",
                     onclick: move |_| {
                         amount_input.set(max_rewards.to_string())
                     },
@@ -83,7 +83,7 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
             div {
                 class: "flex flex-col sm:flex-row gap-2",
                 button {
-                    class: "w-full py-3 rounded font-semibold transition-colors hover:bg-gray-100 active:bg-gray-200",
+                    class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
                     onclick: move |_| {
                         claim_step.set(ClaimStep::Preview);
                     },

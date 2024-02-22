@@ -1,9 +1,6 @@
 use std::fmt;
 
-use dioxus::{
-    html::{form, option, select},
-    prelude::*,
-};
+use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
@@ -66,7 +63,8 @@ pub fn Settings(cx: Scope) -> Element {
     let pubkey = use_pubkey(cx);
     let sol_balance = use_sol_balance(cx);
     let selected_explorer = use_state(cx, || Explorer::Solana);
-    let selected_appearance = use_state(cx, || Appearance::Light);
+    // let selected_appearance = use_state(cx, || Appearance::Light);
+    let appearance = use_shared_state::<Appearance>(cx).unwrap();
 
     render! {
         div {
@@ -123,7 +121,7 @@ pub fn Settings(cx: Scope) -> Element {
                         _ => {
                             render! {
                                 div {
-                                    class: "flex w-32 animate-pulse bg-gray-100 rounded",
+                                    class: "flex w-32 loading rounded",
                                 }
                             }
                         }
@@ -144,11 +142,11 @@ pub fn Settings(cx: Scope) -> Element {
                     select {
                         class: "text-right",
                         onchange: move |e| {
-                            selected_appearance.set(match e.value.as_str() {
+                            *appearance.write() = match e.value.as_str() {
                                 "Light mode" => Appearance::Light,
                                 "Dark mode" => Appearance::Dark,
                                 _ => Appearance::Light,
-                            });
+                            };
                         },
                         option { value: "{Appearance::Light}", "{Appearance::Light}" }
                         option { value: "{Appearance::Dark}", "{Appearance::Dark}" }

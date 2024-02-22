@@ -105,7 +105,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                             },
                         }
                         button {
-                            class: "flex transition-colors w-min text-nowrap py-2 px-4 mx-auto text-center rounded-full text-sm font-medium hover:bg-gray-100 active:bg-gray-200",
+                            class: "flex transition-colors w-min text-nowrap py-2 px-4 mx-auto text-center rounded-full text-sm font-medium hover-100 active-200",
                             onclick: move |_| {
                                 amount_input.set(max_amount_str.clone());
                             },
@@ -180,7 +180,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
             div {
                 class: "flex flex-col sm:flex-row gap-2 mt-auto",
                 button {
-                    class: "w-full py-3 rounded font-semibold transition-colors hover:bg-gray-100 active:bg-gray-200",
+                    class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
                     onclick: move |_| {
                         nav.go_back();
                     },

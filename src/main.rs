@@ -11,7 +11,7 @@ mod hooks;
 mod route;
 
 pub use crate::gateway::find_next_hash;
-use crate::route::Route;
+use crate::{components::Appearance, route::Route};
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
@@ -20,6 +20,7 @@ fn main() {
 
 #[component]
 fn App(cx: Scope) -> Element {
+    use_shared_state_provider(cx, || Appearance::Light);
     use_context_provider(cx, || Rc::new(Gateway::new()));
     render! {
         Router::<Route> {}
