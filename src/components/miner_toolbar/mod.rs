@@ -10,15 +10,17 @@ pub use miner_toolbar_activating::*;
 pub use miner_toolbar_active::*;
 pub use miner_toolbar_insufficient_sol::*;
 pub use miner_toolbar_not_started::*;
-use ore::{state::Treasury, utils::AccountDeserialize, TREASURY_ADDRESS};
-use solana_client_wasm::solana_sdk::account::Account;
+use ore::TREASURY_ADDRESS;
+
 pub use utils::*;
 
 use dioxus::prelude::*;
 
 use crate::{
     gateway::{mine, submit_solution, AsyncResult},
-    hooks::{use_gateway, use_ore_supply, use_proof, use_treasury, use_webworker},
+    hooks::{
+        use_account_subscribe, use_gateway, use_ore_supply, use_proof, use_treasury, use_webworker,
+    },
 };
 
 #[derive(Debug)]
@@ -49,25 +51,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
     let (worker, message) = use_webworker(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
 
-    let _: &Coroutine<()> = use_coroutine(cx, |mut _rx| {
-        let gateway = gateway.clone();
-        let treasury_rw = treasury_rw.clone();
-        async move {
-            let _sub_id = gateway
-                .rpc
-                .account_subscribe(TREASURY_ADDRESS, move |account| {
-                    if let Some(ui_account) = account.value {
-                        if let Some(account) = ui_account.decode::<Account>() {
-                            if let Ok(t) = Treasury::try_from_bytes(account.data.as_ref()) {
-                                log::info!("Got: {:?}", t);
-                                treasury_rw.write(AsyncResult::Ok(*t)).ok();
-                            }
-                        }
-                    }
-                })
-                .await;
-        }
-    });
+    let _ = use_account_subscribe(cx, TREASURY_ADDRESS, treasury_rw);
 
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();

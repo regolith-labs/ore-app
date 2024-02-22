@@ -31,9 +31,10 @@ use solana_client_wasm::{
     WasmClient,
 };
 
-const API_URL: &str = "https://ore-api-lthm.onrender.com";
-const RPC_URL: &str = "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
-const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
+pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
+pub const RPC_URL: &str =
+    "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+pub const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 pub struct Gateway {
     pub rpc: WasmClient,

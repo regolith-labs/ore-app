@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_router::components::Link;
+use ore_types::TransferType;
 
 use crate::{gateway::AsyncResult, hooks::use_transfer, route::Route};
 
@@ -17,6 +18,12 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
 
     match transfer {
         AsyncResult::Ok(transfer) => {
+            let transfer_memo = transfer.memo.unwrap_or("–".to_string());
+            let transfer_type = match transfer.transfer_type {
+                TransferType::Claim => "Claim",
+                TransferType::Mine => "Mine",
+                TransferType::Spl => "Spl",
+            };
             render! {
                 p {
                     "Transfer"
@@ -35,12 +42,12 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                 p {
                     "{transfer.amount}"
                 }
-                // p {
-                //     "{transfer.memo}"
-                // }
-                // p {
-                //     "{transfer.transfer_type}"
-                // }
+                p {
+                    "{transfer_memo}"
+                }
+                p {
+                    "{transfer_type}"
+                }
                 p {
                     "{transfer.ts}"
                 }
