@@ -100,16 +100,10 @@ pub fn Settings(cx: Scope) -> Element {
     let appearance = use_appearance(cx);
     let appearance_persistent = use_appearance_persistant(cx);
 
-    let (cores, user_agent) = if let Some(window) = window() {
-        (
-            window.navigator().hardware_concurrency().to_string(),
-            window
-                .navigator()
-                .user_agent()
-                .unwrap_or("Unknown".to_string()),
-        )
+    let cores = if let Some(window) = window() {
+        window.navigator().hardware_concurrency().to_string()
     } else {
-        ("Unknown".to_string(), "Unknown".to_string())
+        "Unknown".to_string()
     };
 
     render! {
@@ -230,17 +224,6 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                     p {
                         "{cores} core"
-                    }
-                }
-                div {
-                    class: "flex flex-row justify-between gap-8",
-                    p {
-                        class: "font-bold text-nowrap",
-                        "User agent"
-                    }
-                    p {
-                        class: "text-right",
-                        "{user_agent}"
                     }
                 }
                 // div {
