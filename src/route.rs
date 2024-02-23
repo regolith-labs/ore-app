@@ -20,9 +20,9 @@ pub enum Route {
             Claim {},
             #[route("/me")]
             Settings {},
-            #[route("/t/new")]
+            #[route("/send")]
             Send {},
-            #[route("/t/:sig")]
+            #[route("/tx/:sig")]
             Tx {
                 sig: String,
             },

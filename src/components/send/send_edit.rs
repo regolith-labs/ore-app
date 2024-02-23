@@ -72,7 +72,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                     "Transfer"
                 }
                 p {
-                    class: "text-black text-lg",
+                    class: "text-lg",
                     "Select an amount and recipient to send Ore to."
                 }
                 // p {

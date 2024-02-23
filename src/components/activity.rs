@@ -243,6 +243,11 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
         format!("{}s ago", t)
     };
 
+    let address = match transfer.transfer_type {
+        TransferType::Claim | TransferType::Mine => transfer.to_address[..5].to_string(),
+        TransferType::Spl => transfer.from_address[..5].to_string(),
+    };
+
     render! {
         Link {
             to: Route::Tx {
@@ -251,7 +256,7 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
             class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 hover-100 active-200 transition-colors",
             p {
                 class: "flex flex-row w-1/4 text-left font-mono",
-                "{&transfer.to_address[..5]}"
+                "{address}"
                 span {
                     class: "my-auto px-2",
                     match transfer.transfer_type {

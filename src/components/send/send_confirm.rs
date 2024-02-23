@@ -29,7 +29,7 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
 
     render! {
         div {
-            class: "flex flex-col h-full grow justify-between",
+            class: "flex flex-col h-full grow gap-12",
             div {
                 class: "flex flex-col gap-3",
                 BackButton {
@@ -41,43 +41,55 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                     "Confirm transfer"
                 }
                 p {
-                    class: "text-black text-lg",
+                    class: "text-lg",
                     "Please review your transfer information for correctness."
                 }
                 p {
-                    class: "text-gray-300 text-sm",
+                    class: "text-sm text-gray-300 dark:text-gray-700",
                     "Once confirmed, this transaction cannot be undone."
                 }
             }
             div {
                 class: "flex flex-col gap-8",
                 div {
-                    class: "flex flex-row gap-2.5 md:gap-4 mx-auto",
-                    OreIcon {
-                        class: "my-auto w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10"
-                    }
+                    class: "flex flex-col gap-2",
                     p {
-                        class: "text-3xl sm:text-4xl md:text-5xl font-semibold",
-                        "{amountf}"
+                        "Amount"
+                    }
+                    div {
+                        class: "flex flex-row gap-2",
+                        OreIcon {
+                            class: "my-auto w-5 h-5"
+                        }
+                        p {
+                            class: "text-2xl",
+                            "{amountf}"
+                        }
                     }
                 }
                 div {
-                    class: "flex flex-row gap-2.5 md:gap-4 mx-auto",
+                    class: "flex flex-col gap-2",
                     p {
-                        class: "text-3xl sm:text-4xl md:text-5xl font-semibold",
+                        "To"
+                    }
+                    p {
+                        class: "text-2xl",
                         "{recipient.to_string()}"
                     }
                 }
                 div {
-                    class: "flex flex-row gap-2.5 md:gap-4 mx-auto",
+                    class: "flex flex-col gap-2",
                     p {
-                        class: "text-3xl sm:text-4xl md:text-5xl font-semibold",
+                        "Memo"
+                    }
+                    p {
+                        class: "text-2xl",
                         "{memo_}"
                     }
                 }
             }
             div {
-                class: "flex flex-col sm:flex-row gap-2",
+                class: "flex flex-col mt-auto sm:flex-row gap-2",
                 button {
                     class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
                     disabled: *is_busy.get(),

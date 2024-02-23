@@ -1,10 +1,12 @@
 mod send_confirm;
+mod send_done;
 mod send_edit;
 
 use std::str::FromStr;
 
 use dioxus::prelude::*;
 use send_confirm::*;
+use send_done::*;
 use send_edit::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
@@ -57,7 +59,7 @@ pub fn Send(cx: Scope) -> Element {
                 }
                 SendStep::Done => {
                     render! {
-                        div{}
+                        SendDone {}
                     }
                 }
             }
