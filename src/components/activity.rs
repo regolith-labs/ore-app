@@ -70,16 +70,18 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
     let filter = cx.props.filter.clone();
     let filter_ = cx.props.filter;
     let selected_class = "";
-    let unselected_class = "text-gray-300";
+    let unselected_class = "text-gray-300 dark:text-gray-700";
     let (global_class, personal_class) = match filter.get() {
         ActivityFilter::Global => (selected_class, unselected_class),
         ActivityFilter::Personal => (unselected_class, selected_class),
     };
+    let button_class =
+        "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover-100 active-200 transition-colors";
     render! {
         div {
             class: "flex flex-row gap-2 font-semibold -mx-4",
             button {
-                class: "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover-100 active-200 transition-colors {personal_class}",
+                class: "{button_class} {personal_class}",
                 onclick: move |_e| {
                     filter_.set(ActivityFilter::Personal);
                     offset.set(0);
@@ -90,7 +92,7 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
                 "Personal"
             }
             button {
-                class: "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover-100 active-200 transition-colors {global_class}",
+                class: "{button_class} {global_class}",
                 onclick: move |_| {
                     filter.set(ActivityFilter::Global);
                     offset.set(0);
@@ -192,7 +194,7 @@ pub fn ActivityTablePagination<'a>(cx: Scope<'a, ActivityTablePaginationProps<'a
 pub fn ActivityTableHeader(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 transition-colors text-xs font-medium text-gray-200",
+            class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 transition-colors text-xs font-medium text-gray-300",
             p {
                 class: "text-left w-1/4",
                 "Action"

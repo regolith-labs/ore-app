@@ -10,7 +10,7 @@ use super::ClaimStep;
 #[derive(Props)]
 pub struct ClaimConfirmProps<'a> {
     pub claim_step: &'a UseState<ClaimStep>,
-    pub balance_handle: &'a UseFuture<()>,
+    // pub balance_handle: &'a UseFuture<()>,
     pub proof_handle: &'a UseFuture<()>,
     pub amount: u64,
 }
@@ -19,7 +19,7 @@ pub struct ClaimConfirmProps<'a> {
 pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
     let is_busy = use_state(cx, || false);
     let amount = cx.props.amount;
-    let balance_ = cx.props.balance_handle;
+    // let balance_ = cx.props.balance_handle;
     let proof_ = cx.props.proof_handle;
     let claim_step = cx.props.claim_step;
     let amountf = (amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
@@ -27,7 +27,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
 
     render! {
         div {
-            class: "flex flex-col h-full grow justify-between p-4 sm:p-8",
+            class: "flex flex-col h-full grow justify-between",
             div {
                 class: "flex flex-col gap-3",
                 BackButton {
@@ -39,11 +39,11 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                     "Confirm claim"
                 }
                 p {
-                    class: "text-black text-lg",
+                    class: "text-lg",
                     "Please review your claim information for correctness."
                 }
                 p {
-                    class: "text-gray-300 text-sm",
+                    class: "text-sm text-gray-300 dark:text-gray-700",
                     "Once confirmed, this transaction cannot be undone."
                 }
             }
@@ -67,7 +67,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                     disabled: *is_busy.get(),
                     onclick: move |_| {
                         is_busy.set(true);
-                        let balance_ = balance_.clone();
+                        // let balance_ = balance_.clone();
                         let proof_ = proof_.clone();
                         let claim_step = claim_step.clone();
                         let is_busy = is_busy.clone();
@@ -76,7 +76,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                             match gateway.claim_ore(amount).await {
                                 Ok(_sig) => {
                                     is_busy.set(false);
-                                    balance_.restart();
+                                    // balance_.restart();
                                     proof_.restart();
                                     claim_step.set(ClaimStep::Done);
                                 }

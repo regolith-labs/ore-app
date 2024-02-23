@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_router::hooks::use_navigator;
 
 use crate::components::WarningIcon;
 
@@ -17,6 +18,7 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
     let amount_input = cx.props.amount_input;
     let claim_step = cx.props.claim_step;
     let max_rewards = (cx.props.max_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
+    let nav = use_navigator(cx);
 
     let error_text: Option<String> = if cx.props.parsed_amount.gt(&cx.props.max_rewards) {
         Some("Amount too large".to_string())
@@ -30,18 +32,18 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
 
     render! {
         div {
-            class: "flex flex-col h-full p-4 sm:p-8 grow justify-between",
+            class: "flex flex-col h-full grow justify-between",
             div {
                 class: "flex flex-col gap-3",
                 h1 {
                     "Claim"
                 }
                 p {
-                    class: "text-black text-lg",
+                    class: "text-lg",
                     "Select an amount of rewards to claim."
                 }
                 p {
-                    class: "text-gray-300 text-sm",
+                    class: "text-sm text-gray-300 dark:text-gray-700",
                     "Upon claiming, this amount will be immediately added to your balance in the dashboard."
                 }
             }
@@ -60,7 +62,7 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
                 }
                 input {
                     autofocus: true,
-                    class: "mx-auto w-full text-center focus:ring-0 outline-none placeholder-gray-200 bg-transparent text-3xl sm:text-4xl md:text-5xl font-medium",
+                    class: "mx-auto w-full text-center focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-800 bg-transparent text-3xl sm:text-4xl md:text-5xl font-medium",
                     value: "{amount_input}",
                     placeholder: "0",
                     oninput: move |evt| {
@@ -85,12 +87,12 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
                 button {
                     class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
                     onclick: move |_| {
-                        claim_step.set(ClaimStep::Preview);
+                        nav.go_back();
                     },
                     "Cancel"
                 }
                 button {
-                    class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:bg-gray-100",
+                    class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
                     disabled: is_disabled,
                     onclick: move |_| {
                         claim_step.set(ClaimStep::Confirm);

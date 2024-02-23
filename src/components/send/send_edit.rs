@@ -164,17 +164,6 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                             memo_input.set(s);
                         },
                     }
-                    // if let Some(err) = recipient_error_text {
-                    //     render! {
-                    //         p {
-                    //             class: "flex flex-row flex-nowrap gap-1.5 w-min text-nowrap text-red-500 font-semibold text-sm",
-                    //             WarningIcon {
-                    //                 class: "w-4 h-4 my-auto"
-                    //             }
-                    //             "{err}"
-                    //         }
-                    //     }
-                    // }
                 }
             }
             div {
@@ -187,7 +176,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                     "Cancel"
                 }
                 button {
-                    class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:bg-gray-100",
+                    class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
                     disabled: is_disabled,
                     onclick: move |_| {
                         send_step.set(SendStep::Confirm);

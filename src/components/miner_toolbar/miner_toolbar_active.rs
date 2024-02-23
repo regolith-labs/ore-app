@@ -1,13 +1,14 @@
 use dioxus::prelude::*;
+use dioxus_router::components::Link;
 use ore::state::{Proof, Treasury};
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
     components::{
-        stop_mining, IsModalOpen, IsToolbarOpen, MinerStatus, OreIcon, PauseIcon, Tooltip,
-        TooltipDirection,
+        stop_mining, IsToolbarOpen, MinerStatus, OreIcon, PauseIcon, Tooltip, TooltipDirection,
     },
     gateway::AsyncResult,
+    route::Route,
 };
 
 // TODO Lifetime rewards
@@ -300,19 +301,24 @@ pub struct ClaimButtonProps {
 
 #[component]
 pub fn ClaimButton(cx: Scope<ClaimButtonProps>) -> Element {
-    let is_claim_modal_open = use_shared_state::<IsModalOpen>(cx).unwrap();
+    let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
+    let colors = match *miner_status.read() {
+        MinerStatus::Active => "hover:bg-green-600 active:bg-green-700",
+        _ => "hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
+    };
     let opacity = if cx.props.claimable_rewards.gt(&0f64) {
         "opacity-100"
     } else {
         "opacity-0 pointer-events-none"
     };
     render! {
-        button {
-            class: "transition transition-colors text-sm font-semibold px-4 h-10 hover:bg-green-600 active:bg-green-700 rounded-full {opacity}",
-            onclick: |_| {
-                *is_claim_modal_open.write() = IsModalOpen(true);
-            },
-            "Claim"
+        Link {
+            class: "flex transition transition-colors text-sm font-semibold px-4 h-10 rounded-full {colors} {opacity}",
+            to: Route::Claim {},
+            span {
+                class: "my-auto",
+                "Claim"
+            }
         }
     }
 }

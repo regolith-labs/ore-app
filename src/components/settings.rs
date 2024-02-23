@@ -3,23 +3,19 @@ use std::{fmt, io, str::FromStr};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
+use web_sys::window;
 
 use crate::{
     gateway::AsyncResult,
-    hooks::{use_appearance, use_appearance_persistant, use_pubkey, use_sol_balance},
+    hooks::{
+        use_appearance, use_appearance_persistant, use_explorer, use_explorer_persistant,
+        use_pubkey, use_sol_balance,
+    },
 };
 
 // Phase 1 (core)
-// TODO Address
-// TODO Solana balance
 // TODO Export private key
-// TODO Display (dark mode)
-// TODO Performance
-// TODO Total hashes
-// TODO Total rewards
-// TODO Time since registration
-
-// TODO Preferred explorer
+// TODO CPU benchmark
 
 // Phase 2 (social)
 // TODO Username
@@ -99,11 +95,22 @@ impl fmt::Display for Appearance {
 pub fn Settings(cx: Scope) -> Element {
     let pubkey = use_pubkey(cx);
     let sol_balance = use_sol_balance(cx);
-    let selected_explorer = use_state(cx, || Explorer::Solana);
-    // let selected_appearance = use_state(cx, || Appearance::Light);
-    // let appearance = use_shared_state::<Appearance>(cx).unwrap();
+    let explorer = use_explorer(cx);
+    let explorer_persistent = use_explorer_persistant(cx);
     let appearance = use_appearance(cx);
     let appearance_persistent = use_appearance_persistant(cx);
+
+    let (cores, user_agent) = if let Some(window) = window() {
+        (
+            window.navigator().hardware_concurrency().to_string(),
+            window
+                .navigator()
+                .user_agent()
+                .unwrap_or("Unknown".to_string()),
+        )
+    } else {
+        ("Unknown".to_string(), "Unknown".to_string())
+    };
 
     render! {
         div {
@@ -128,10 +135,9 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                 }
                 div {
-                    // TODO Copy + QR code buttons
                     class: "flex flex-row justify-between w-full",
                     p {
-                        class: "font-bold",
+                        class: "font-bold text-nowrap",
                         "Private key"
                     }
                     div {
@@ -145,7 +151,7 @@ pub fn Settings(cx: Scope) -> Element {
                 div {
                     class: "flex flex-row justify-between w-full",
                     p {
-                        class: "font-bold",
+                        class: "font-bold text-nowrap",
                         "Solana balance"
                     }
                     match sol_balance {
@@ -199,18 +205,15 @@ pub fn Settings(cx: Scope) -> Element {
                     select {
                         class: "text-right dark:bg-black dark:text-white",
                         onchange: move |e| {
-                            selected_explorer.set(match e.value.as_str() {
-                                "Solana Explorer" => Explorer::Solana,
-                                "SolanaFM" => Explorer::SolanaFm,
-                                "Solscan" => Explorer::Solscan,
-                                "Xray" => Explorer::Xray,
-                                _ => Explorer::Solana
-                            });
+                            if let Ok(e) = Explorer::from_str(e.value.as_str()) {
+                                *explorer.write() = e;
+                                explorer_persistent.set(e);
+                            }
                         },
-                        option { value: "{Explorer::Solana}", "{Explorer::Solana}" }
-                        option { value: "{Explorer::SolanaFm}", "{Explorer::SolanaFm}" }
-                        option { value: "{Explorer::Solscan}", "{Explorer::Solscan}" }
-                        option { value: "{Explorer::Xray}", "{Explorer::Xray}" }
+                        option { initial_selected: explorer.read().eq(&Explorer::Solana), value: "{Explorer::Solana}", "{Explorer::Solana}" }
+                        option { initial_selected: explorer.read().eq(&Explorer::SolanaFm), value: "{Explorer::SolanaFm}", "{Explorer::SolanaFm}" }
+                        option { initial_selected: explorer.read().eq(&Explorer::Solscan), value: "{Explorer::Solscan}", "{Explorer::Solscan}" }
+                        option { initial_selected: explorer.read().eq(&Explorer::Xray), value: "{Explorer::Xray}", "{Explorer::Xray}" }
                     }
                 }
             }
@@ -220,35 +223,36 @@ pub fn Settings(cx: Scope) -> Element {
                     "System"
                 }
                 div {
-                    class: "flex flex-row justify-between",
-                    p {
-                        class: "font-bold",
-                        "Runtime"
-                    }
-                    p {
-                        "Chromium web browser"
-                    }
-                }
-                div {
-                    class: "flex flex-row justify-between",
+                    class: "flex flex-row justify-between gap-8",
                     p {
                         class: "font-bold",
                         "CPU"
                     }
                     p {
-                        "12 core"
+                        "{cores} core"
                     }
                 }
                 div {
-                    class: "flex flex-row justify-between",
+                    class: "flex flex-row justify-between gap-8",
                     p {
-                        class: "font-bold",
-                        "GPU"
+                        class: "font-bold text-nowrap",
+                        "User agent"
                     }
                     p {
-                        "Coming soon"
+                        class: "text-right",
+                        "{user_agent}"
                     }
                 }
+                // div {
+                //     class: "flex flex-row justify-between",
+                //     p {
+                //         class: "font-bold",
+                //         "GPU"
+                //     }
+                //     p {
+                //         "Coming soon"
+                //     }
+                // }
                 // div {
                 //     class: "flex flex-col mt-16 w-full text-sm justify-center",
                 //     p {

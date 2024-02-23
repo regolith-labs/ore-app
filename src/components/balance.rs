@@ -13,7 +13,7 @@ pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
                 AsyncResult::Ok(b) => {
                     render! {
                         div {
-                            class: "flex flex-col grow gap-3",
+                            class: "flex flex-col grow gap-4",
                             h2 {
                                 class: "text-lg md:text-2xl font-bold",
                                 "Balance"
@@ -52,7 +52,7 @@ pub fn SendButton(cx: Scope) -> Element {
     render! {
         Link {
             to: Route::Send {},
-            class: "flex h-10 w-10 my-auto bg-black text-white rounded-full justify-center text-2xl font-semibold dark:bg-white dark:text-black",
+            class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-black transition-colors bg-black text-white dark:bg-white dark:text-black",
             span {
                 class: "my-auto bg-transparent",
                 "↑"

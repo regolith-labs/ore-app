@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{IsModalOpen, IsToolbarOpen, MinerToolbar},
+    components::{IsToolbarOpen, MinerToolbar},
     hooks::use_is_onboarded,
     Route,
 };
@@ -10,7 +10,6 @@ use crate::{
 #[component]
 pub fn Miner(cx: Scope) -> Element {
     use_shared_state_provider(cx, || IsToolbarOpen(false));
-    use_shared_state_provider(cx, || IsModalOpen(false));
     let is_onboarded = use_is_onboarded(cx);
     let route = use_route::<Route>(cx);
 
@@ -34,7 +33,9 @@ pub fn Miner(cx: Scope) -> Element {
             class: "flex flex-col h-full grow",
             Outlet::<Route> {}
         }
-        ToolbarClose {}
+        ToolbarClose {
+            hidden: hidden
+        }
         MinerToolbar {
             hidden: hidden
         }
@@ -42,13 +43,16 @@ pub fn Miner(cx: Scope) -> Element {
 }
 
 #[component]
-pub fn ToolbarClose(cx: Scope) -> Element {
+pub fn ToolbarClose(cx: Scope, hidden: bool) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let opacity = if is_toolbar_open.read().0 {
         "opacity-80"
     } else {
         "opacity-0 pointer-events-none"
     };
+    if *hidden {
+        return None;
+    }
     render! {
         button {
             class: "absolute transition-opacity flex flex-row left-0 top-0 h-screen w-screen bg-black {opacity}",

@@ -2,7 +2,7 @@
 use std::rc::Rc;
 
 use dioxus::prelude::*;
-use dioxus_router::components::Router;
+use dioxus_router::prelude::*;
 use gateway::Gateway;
 
 mod components;
@@ -10,8 +10,8 @@ mod gateway;
 mod hooks;
 mod route;
 
-pub use crate::gateway::find_next_hash;
 use crate::{
+    gateway::find_next_hash,
     hooks::{use_appearance_persistant, use_explorer_persistant},
     route::Route,
 };

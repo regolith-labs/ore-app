@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::{IsToolbarOpen, MinerToolbarInsufficientFunds, PlayIcon};
+use crate::components::{ClaimButton, IsToolbarOpen, MinerToolbarInsufficientFunds, PlayIcon};
 
 #[component]
 pub fn MinerToolbarNotStarted(cx: Scope) -> Element {
@@ -19,6 +19,9 @@ pub fn MinerToolbarNotStarted(cx: Scope) -> Element {
                 }
                 div {
                     class: "flex flex-row gap-2 sm:gap-4",
+                    ClaimButton {
+                        claimable_rewards: f64::MAX // TODO Set this appropriately
+                    }
                     StartButton {}
                 }
             }
@@ -31,7 +34,7 @@ pub fn StartButton(cx: Scope) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     render! {
         button {
-            class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-gray-200 active:bg-gray-300",
+            class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
             onclick: move |_e| {
                 *is_toolbar_open.write() = IsToolbarOpen(true);
             },

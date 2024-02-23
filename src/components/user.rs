@@ -74,7 +74,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                         _ => {
                             render! {
                                 p {
-                                    class: "{value_class} w-16 h-8 loading",
+                                    class: "{value_class} w-16 h-8 loading rounded",
                                 }
                             }
                         }
@@ -96,7 +96,7 @@ pub fn UserActivity(cx: Scope, user_id: Pubkey) -> Element {
         AsyncResult::Ok(transfers) => {
             render! {
                 div {
-                    class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start text-black",
+                    class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
                     div {
                         class: "flex flex-row justify-between",
                         h2 {

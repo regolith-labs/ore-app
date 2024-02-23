@@ -1278,6 +1278,11 @@ h2:where(.dark, .dark *) {
   color: rgb(245 245 247 / var(--tw-text-opacity));
 }
 
+.text-gray-100 {
+  --tw-text-opacity: 1;
+  color: rgb(232 232 234 / var(--tw-text-opacity));
+}
+
 .underline {
   text-decoration-line: underline;
 }
@@ -1408,6 +1413,10 @@ h2:where(.dark, .dark *) {
   background-color: rgb(232 232 234 / var(--tw-bg-opacity));
 }
 
+.disabled\:opacity-20:disabled {
+  opacity: 0.2;
+}
+
 .group:hover .group-hover\:block {
   display: block;
 }
@@ -1509,4 +1518,34 @@ h2:where(.dark, .dark *) {
 .dark\:text-white:where(.dark, .dark *) {
   --tw-text-opacity: 1;
   color: rgb(245 245 247 / var(--tw-text-opacity));
+}
+
+.dark\:text-gray-700:where(.dark, .dark *) {
+  --tw-text-opacity: 1;
+  color: rgb(90 90 92 / var(--tw-text-opacity));
+}
+
+.dark\:placeholder-gray-800:where(.dark, .dark *)::-moz-placeholder {
+  --tw-placeholder-opacity: 1;
+  color: rgb(70 70 72 / var(--tw-placeholder-opacity));
+}
+
+.dark\:placeholder-gray-800:where(.dark, .dark *)::placeholder {
+  --tw-placeholder-opacity: 1;
+  color: rgb(70 70 72 / var(--tw-placeholder-opacity));
+}
+
+.dark\:hover\:bg-gray-800:hover:where(.dark, .dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(70 70 72 / var(--tw-bg-opacity));
+}
+
+.dark\:active\:bg-gray-700:active:where(.dark, .dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(90 90 92 / var(--tw-bg-opacity));
+}
+
+.dark\:disabled\:bg-gray-900:disabled:where(.dark, .dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(49 49 51 / var(--tw-bg-opacity));
 }
