@@ -879,6 +879,10 @@ h2:where(.dark, .dark *) {
   width: 100vw;
 }
 
+.w-8 {
+  width: 2rem;
+}
+
 .max-w-44 {
   max-width: 11rem;
 }
@@ -1185,6 +1189,18 @@ h2:where(.dark, .dark *) {
 
 .pt-5 {
   padding-top: 1.25rem;
+}
+
+.pl-8 {
+  padding-left: 2rem;
+}
+
+.pl-6 {
+  padding-left: 1.5rem;
+}
+
+.pl-2 {
+  padding-left: 0.5rem;
 }
 
 .text-left {

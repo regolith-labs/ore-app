@@ -61,7 +61,7 @@ pub fn Profile(cx: Scope) -> Element {
         render! {
             Link {
                 to: Route::Settings {},
-                class: "bg-gray-100 w-10 h-10 rounded-full"
+                class: "bg-gray-100 dark:bg-gray-900 w-10 h-10 rounded-full"
             }
         }
     } else {

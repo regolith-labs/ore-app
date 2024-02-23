@@ -1,12 +1,13 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
+use dioxus_router::components::Link;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{ActivityTable, OreIcon},
     gateway::AsyncResult,
-    hooks::{use_ore_balance, use_user_transfers},
+    hooks::{use_explorer_account_url, use_ore_balance, use_user_transfers},
 };
 
 // TODO Not found
@@ -25,56 +26,68 @@ pub fn User(cx: Scope, id: String) -> Element {
 
     let user_id = user_id.unwrap();
     let (balance, _) = use_ore_balance(cx, user_id);
+    let explorer_url = use_explorer_account_url(cx, id);
 
     let container_class = "flex flex-row justify-between py-2 px-1";
     let title_class = "text-gray-300";
     let value_class = "font-medium";
+    let link_class = "font-medium hover:underline";
 
     render! {
         div {
             class: "flex flex-col gap-16",
             div {
                 class: "flex flex-col gap-2",
-                h2 {
-                    class: "text-lg md:text-2xl font-bold",
-                    "User"
-                }
                 div {
-                    class: "{container_class}",
-                    p {
-                        class: "{title_class}",
-                        "ID"
+                    class: "flex flex-row gap-8",
+                    div {
+                        class: "rounded-full w-16 h-16 bg-gray-100 dark:bg-gray-900",
                     }
-                    p {
-                        class: "{value_class}",
-                        "{id}"
+                    h2 {
+                        class: "text-lg md:text-2xl font-bold my-auto",
+                        "User"
                     }
                 }
                 div {
-                    class: "{container_class}",
-                    p {
-                        class: "{title_class}",
-                        "Balance"
+                    class: "pl-2",
+                    div {
+                        class: "{container_class}",
+                        p {
+                            class: "{title_class}",
+                            "ID"
+                        }
+                        Link {
+                            class: "{link_class}",
+                            to: "{explorer_url}",
+                            "{id}"
+                        }
                     }
-                    match balance {
-                        AsyncResult::Ok(balance) => {
-                            render! {
-                                span {
-                                    class: "flex flex-row gap-1.5",
-                                    OreIcon {
-                                        class: "w-3.5 h-3.5 my-auto",
-                                    }
-                                    p {
-                                        class: "{value_class}",
-                                        "{balance.real_number_string_trimmed()}"
+                    div {
+                        class: "{container_class}",
+                        p {
+                            class: "{title_class}",
+                            "Balance"
+                        }
+                        match balance {
+                            AsyncResult::Ok(balance) => {
+                                render! {
+                                    span {
+                                        class: "flex flex-row gap-1.5",
+                                        OreIcon {
+                                            class: "w-3.5 h-3.5 my-auto",
+                                        }
+                                        p {
+                                            class: "{value_class}",
+                                            "{balance.real_number_string_trimmed()}"
+                                        }
                                     }
                                 }
                             }
-                        }
-                        _ => {
-                            render! {
-                                p {
-                                    class: "{value_class} w-16 h-8 loading rounded",
+                            _ => {
+                                render! {
+                                    p {
+                                        class: "{value_class} w-16 h-8 loading rounded",
+                                    }
                                 }
                             }
                         }

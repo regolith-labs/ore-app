@@ -9,7 +9,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use crate::{
     components::OreIcon,
     gateway::AsyncResult,
-    hooks::{use_explorer_url, use_transfer},
+    hooks::{use_explorer_transaction_url, use_transfer},
     route::Route,
 };
 
@@ -28,7 +28,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                 TransferType::Spl => "Spl",
             };
             let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
-            let explorer_url = use_explorer_url(cx, &transfer.sig);
+            let explorer_url = use_explorer_transaction_url(cx, &transfer.sig);
             let container_class = "flex flex-row justify-between py-2 px-1";
             let title_class = "text-gray-300";
             let value_class = "font-medium";
