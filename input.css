@@ -31,55 +31,55 @@
 
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-Thin.otf') format('otf');
+    src: url('/fonts/Geist-Thin.otf') format('opentype');
     font-weight: 100;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-UltraLight.otf') format('otf');
+    src: url('/fonts/Geist-UltraLight.otf') format('opentype');
     font-weight: 200;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-Light.otf') format('otf');
+    src: url('/fonts/Geist-Light.otf') format('opentype');
     font-weight: 300;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-Regular.otf') format('otf');
+    src: url('/fonts/Geist-Regular.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-Medium.otf') format('otf');
+    src: url('/fonts/Geist-Medium.otf') format('opentype');
     font-weight: 500;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-SemiBold.otf') format('otf');
+    src: url('/fonts/Geist-SemiBold.otf') format('opentype');
     font-weight: 600;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-Bold.otf') format('otf');
+    src: url('/fonts/Geist-Bold.otf') format('opentype');
     font-weight: 700;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-Black.otf') format('otf');
+    src: url('/fonts/Geist-Black.otf') format('opentype');
     font-weight: 800;
     font-style: normal;
 }
 @font-face {
     font-family: 'Geist';
-    src: url('/fonts/Geist-UltraBlack.otf') format('otf');
+    src: url('/fonts/Geist-UltraBlack.otf') format('opentype');
     font-weight: 900;
     font-style: normal;
 }
@@ -87,56 +87,56 @@
 
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-Thin.otf') format('otf');
+    src: url('/fonts/GeistMono-Thin.otf') format('opentype');
     font-weight: 100;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-UltraLight.otf') format('otf');
+    src: url('/fonts/GeistMono-UltraLight.otf') format('opentype');
     font-weight: 200;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-Light.otf') format('otf');
+    src: url('/fonts/GeistMono-Light.otf') format('opentype');
     font-weight: 300;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-Regular.otf') format('otf');
+    src: url('/fonts/GeistMono-Regular.otf') format('opentype');
     font-weight: 400;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-Medium.otf') format('otf');
+    src: url('/fonts/GeistMono-Medium.otf') format('opentype');
     font-weight: 500;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-SemiBold.otf') format('otf');
+    src: url('/fonts/GeistMono-SemiBold.otf') format('opentype');
     font-weight: 600;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-Bold.otf') format('otf');
+    src: url('/fonts/GeistMono-Bold.otf') format('opentype');
     font-weight: 700;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-Black.otf') format('otf');
+    src: url('/fonts/GeistMono-Black.otf') format('opentype');
     font-weight: 800;
-    font-style: mono;
+    font-style: normal;
 }
 @font-face {
     font-family: 'GeistMono';
-    src: url('/fonts/GeistMono-UltraBlack.otf') format('otf');
+    src: url('/fonts/GeistMono-UltraBlack.otf') format('opentype');
     font-weight: 900;
-    font-style: mono;
+    font-style: normal;
 }
 

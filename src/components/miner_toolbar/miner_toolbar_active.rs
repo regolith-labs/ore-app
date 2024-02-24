@@ -95,7 +95,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let container_class = "flex flex-col gap-1 shrink h-min";
     let header_container_class = "flex flex-row justify-start gap-1.5";
     let header_class = "font-medium text-xs z-0 text-nowrap opacity-80";
-    let mono_value_class = "font-mono text-white";
+    let mono_value_class = "font-mono font-medium text-white";
     let value_class = "font-medium text-white";
 
     if is_toolbar_open.read().0 {

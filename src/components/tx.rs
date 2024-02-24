@@ -22,10 +22,10 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
     match transfer {
         AsyncResult::Ok(transfer) => {
             let transfer_memo = transfer.memo.unwrap_or("–".to_string());
-            let transfer_type = match transfer.transfer_type {
+            let title = match transfer.transfer_type {
                 TransferType::Claim => "Claim",
                 TransferType::Mine => "Mine",
-                TransferType::Spl => "Spl",
+                TransferType::Spl => "Transfer",
             };
             let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
             let explorer_url = use_explorer_transaction_url(cx, &transfer.sig);
@@ -53,18 +53,29 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                     class: "flex flex-col gap-2",
                     h2 {
                         class: "text-lg md:text-2xl font-bold",
-                        "Transfer"
+                        "{title}"
+                    }                    div {
+                        class: "{container_class}",
+                        p {
+                            class: "{title_class}",
+                            "Signature"
+                        }
+                        Link {
+                            class: "{link_class} font-mono",
+                            to: "{explorer_url}",
+                            "{&transfer.sig.as_str()[..32]}"
+                        }
                     }
                     div {
                         class: "{container_class}",
                         p {
                             class: "{title_class}",
-                            "ID"
+                            "To"
                         }
                         Link {
-                            class: "{link_class}",
-                            to: "{explorer_url}",
-                            "{&transfer.sig.as_str()[..32]}"
+                            class: "{link_class} font-mono",
+                            to: Route::User { id: transfer.to_address.clone() },
+                            "{transfer.to_address}"
                         }
                     }
                     div {
@@ -77,18 +88,6 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                             class: "{link_class}",
                             to: Route::User { id: transfer.from_address.clone() },
                             "{from_name}"
-                        }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "To"
-                        }
-                        Link {
-                            class: "{link_class}",
-                            to: Route::User { id: transfer.to_address.clone() },
-                            "{transfer.to_address}"
                         }
                     }
                     div {
@@ -117,17 +116,6 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                         p {
                             class: "{value_class}",
                             "{transfer_memo}"
-                        }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "Type"
-                        }
-                        p {
-                            class: "{value_class}",
-                            "{transfer_type}"
                         }
                     }
                     div {

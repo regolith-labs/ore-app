@@ -41,7 +41,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                 div {
                     class: "flex flex-row gap-8",
                     div {
-                        class: "rounded-full w-16 h-16 bg-gray-100 dark:bg-gray-900",
+                        class: "rounded-full w-16 h-16 bg-gray-100 dark:bg-gray-700",
                     }
                     h2 {
                         class: "text-lg md:text-2xl font-bold my-auto",
@@ -57,7 +57,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                             "ID"
                         }
                         Link {
-                            class: "{link_class}",
+                            class: "{link_class} font-mono",
                             to: "{explorer_url}",
                             "{id}"
                         }

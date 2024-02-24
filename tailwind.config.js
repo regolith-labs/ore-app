@@ -35,9 +35,9 @@ module.exports = {
     },
     extend: {
       fontFamily: {
+        mono: ['GeistMono', 'ui-monospace', 'monospace'],
         sans: ['Geist', 'ui-sans-serif', 'system-ui'],
         serif: ['ui-serif'],
-        mono: ['GeistMono', 'ui-monospace']
       },
       transitionProperty: {
         'height': 'height'

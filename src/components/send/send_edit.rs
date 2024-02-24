@@ -92,7 +92,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                         class: "flex flex-row gap-3",
                         input {
                             autofocus: true,
-                            class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 bg-transparent text-xl font-medium",
+                            class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl font-medium",
                             value: "{amount_input}",
                             placeholder: "0",
                             oninput: move |evt| {
@@ -131,7 +131,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                         "To"
                     }
                     input {
-                        class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 bg-transparent text-xl",
+                        class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl",
                         placeholder: "Address",
                         oninput: move |evt| {
                             let s = evt.value.clone();
@@ -157,7 +157,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                         "Memo"
                     }
                     input {
-                        class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 bg-transparent text-xl",
+                        class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl",
                         placeholder: "What's this for?",
                         oninput: move |evt| {
                             let s = evt.value.clone();
