@@ -17,8 +17,9 @@ pub fn Copyable<'a>(cx: Scope, value: String, children: Element<'a>) -> Element 
     });
     render! {
         div {
-            class: "flex flex-row gap-1",
+            class: "flex flex-row",
             button {
+                class: "flex px-2 py-1 rounded hover-100 active-200 transition-colors",
                 onclick: move |_e| {
                     if let Some(cb) = clipboard.clone() {
                         let _ = cb.write_text(value);
@@ -26,7 +27,7 @@ pub fn Copyable<'a>(cx: Scope, value: String, children: Element<'a>) -> Element 
                     solid.set(true);
                 },
                 CopyIcon {
-                    class: "w-4 h-4",
+                    class: "w-4 h-4 my-auto",
                     solid: *solid.get(),
                 }
             }

@@ -6,6 +6,7 @@ use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 use web_sys::window;
 
 use crate::{
+    components::Copyable,
     gateway::AsyncResult,
     hooks::{
         use_appearance, use_appearance_persistant, use_explorer, use_explorer_persistant,
@@ -22,74 +23,6 @@ use crate::{
 // TODO Profile photo
 // TODO Bio
 // TODO Contacts
-
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
-pub enum Explorer {
-    #[default]
-    Solana,
-    SolanaFm,
-    Solscan,
-    Xray,
-}
-
-impl fmt::Display for Explorer {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Explorer::Solana => write!(f, "Solana Explorer"),
-            Explorer::SolanaFm => write!(f, "SolanaFM"),
-            Explorer::Solscan => write!(f, "Solscan"),
-            Explorer::Xray => write!(f, "Xray"),
-        }
-    }
-}
-
-impl FromStr for Explorer {
-    type Err = io::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Solana Explorer" => Ok(Explorer::Solana),
-            "SolanaFM" => Ok(Explorer::SolanaFm),
-            "Solscan" => Ok(Explorer::Solscan),
-            "Xray" => Ok(Explorer::Xray),
-            _ => Err(io::Error::new(
-                io::ErrorKind::InvalidData,
-                "Unknown explorer",
-            )),
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
-pub enum Appearance {
-    #[default]
-    Light,
-    Dark,
-}
-
-impl FromStr for Appearance {
-    type Err = io::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Light mode" => Ok(Appearance::Light),
-            "Dark mode" => Ok(Appearance::Dark),
-            _ => Err(io::Error::new(
-                io::ErrorKind::InvalidData,
-                "Unknown appearance",
-            )),
-        }
-    }
-}
-
-impl fmt::Display for Appearance {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Appearance::Light => write!(f, "Light mode"),
-            Appearance::Dark => write!(f, "Dark mode"),
-        }
-    }
-}
 
 #[component]
 pub fn Settings(cx: Scope) -> Element {
@@ -115,15 +48,15 @@ pub fn Settings(cx: Scope) -> Element {
                     "Account"
                 }
                 div {
-                    // TODO Copy + QR code buttons
                     class: "flex flex-row justify-between w-full",
                     p {
                         class: "font-bold",
                         "Address"
                     }
-                    div {
-                        class: "flex flex-col",
+                    Copyable {
+                        value: pubkey.to_string(),
                         p {
+                            class: "font-mono px-2 py-1 rounded",
                             "{pubkey}"
                         }
                     }
@@ -134,12 +67,9 @@ pub fn Settings(cx: Scope) -> Element {
                         class: "font-bold text-nowrap",
                         "Private key"
                     }
-                    div {
-                        class: "flex flex-col",
-                        button {
-                            class: "font-medium shrink ml-auto text-nowrap hover:text-black hover:underline",
-                            "Export"
-                        }
+                    button {
+                        class: "font-medium shrink px-2 py-1 text-nowrap hover-100 active-200",
+                        "Export"
                     }
                 }
                 div {
@@ -258,6 +188,74 @@ pub fn Settings(cx: Scope) -> Element {
                 //     }
                 // }
             }
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
+pub enum Explorer {
+    #[default]
+    Solana,
+    SolanaFm,
+    Solscan,
+    Xray,
+}
+
+impl fmt::Display for Explorer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Explorer::Solana => write!(f, "Solana Explorer"),
+            Explorer::SolanaFm => write!(f, "SolanaFM"),
+            Explorer::Solscan => write!(f, "Solscan"),
+            Explorer::Xray => write!(f, "Xray"),
+        }
+    }
+}
+
+impl FromStr for Explorer {
+    type Err = io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Solana Explorer" => Ok(Explorer::Solana),
+            "SolanaFM" => Ok(Explorer::SolanaFm),
+            "Solscan" => Ok(Explorer::Solscan),
+            "Xray" => Ok(Explorer::Xray),
+            _ => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Unknown explorer",
+            )),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
+pub enum Appearance {
+    #[default]
+    Light,
+    Dark,
+}
+
+impl FromStr for Appearance {
+    type Err = io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Light mode" => Ok(Appearance::Light),
+            "Dark mode" => Ok(Appearance::Dark),
+            _ => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Unknown appearance",
+            )),
+        }
+    }
+}
+
+impl fmt::Display for Appearance {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Appearance::Light => write!(f, "Light mode"),
+            Appearance::Dark => write!(f, "Dark mode"),
         }
     }
 }
