@@ -46,7 +46,7 @@ html,
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: Geist, ui-sans-serif, system-ui;
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -135,7 +135,7 @@ code,
 kbd,
 samp,
 pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: GeistMono, ui-monospace;
   /* 1 */
   font-feature-settings: normal;
   /* 2 */
@@ -1179,7 +1179,7 @@ h2:where(.dark, .dark *) {
 }
 
 .font-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: GeistMono, ui-monospace;
 }
 
 .text-2xl {
@@ -1329,6 +1329,186 @@ h2:where(.dark, .dark *) {
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-Thin.otf') format('otf');
+
+  font-weight: 100;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-UltraLight.otf') format('otf');
+
+  font-weight: 200;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-Light.otf') format('otf');
+
+  font-weight: 300;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-Regular.otf') format('otf');
+
+  font-weight: 400;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-Medium.otf') format('otf');
+
+  font-weight: 500;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-SemiBold.otf') format('otf');
+
+  font-weight: 600;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-Bold.otf') format('otf');
+
+  font-weight: 700;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-Black.otf') format('otf');
+
+  font-weight: 800;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+
+  src: url('/fonts/Geist-UltraBlack.otf') format('otf');
+
+  font-weight: 900;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-Thin.otf') format('otf');
+
+  font-weight: 100;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-UltraLight.otf') format('otf');
+
+  font-weight: 200;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-Light.otf') format('otf');
+
+  font-weight: 300;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-Regular.otf') format('otf');
+
+  font-weight: 400;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-Medium.otf') format('otf');
+
+  font-weight: 500;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-SemiBold.otf') format('otf');
+
+  font-weight: 600;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-Bold.otf') format('otf');
+
+  font-weight: 700;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-Black.otf') format('otf');
+
+  font-weight: 800;
+
+  font-style: mono;
+}
+
+@font-face {
+  font-family: 'GeistMono';
+
+  src: url('/fonts/GeistMono-UltraBlack.otf') format('otf');
+
+  font-weight: 900;
+
+  font-style: mono;
 }
 
 .hover\:bg-gray-200:hover {
@@ -1498,3 +1678,4 @@ h2:where(.dark, .dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(90 90 92 / var(--tw-bg-opacity));
 }
+

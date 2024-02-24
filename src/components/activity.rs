@@ -255,7 +255,7 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
             },
             class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 hover-100 active-200 transition-colors",
             p {
-                class: "flex flex-row w-1/4 text-left font-mono",
+                class: "flex flex-row w-1/4 text-left",
                 "{address}"
                 span {
                     class: "my-auto px-2",

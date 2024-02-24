@@ -34,6 +34,11 @@ module.exports = {
         'relaxed': '1.3',
     },
     extend: {
+      fontFamily: {
+        sans: ['Geist', 'ui-sans-serif', 'system-ui'],
+        serif: ['ui-serif'],
+        mono: ['GeistMono', 'ui-monospace']
+      },
       transitionProperty: {
         'height': 'height'
       },
