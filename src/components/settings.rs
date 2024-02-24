@@ -55,8 +55,11 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                     Copyable {
                         value: pubkey.to_string(),
-                        p {
-                            class: "font-mono px-2 py-1 rounded",
+                        Link {
+                            class: "font-mono px-2 py-1 rounded hover-100 active-200 transition-colors",
+                            to: Route::User {
+                                id: pubkey.to_string()
+                            },
                             "{pubkey}"
                         }
                     }
@@ -68,7 +71,7 @@ pub fn Settings(cx: Scope) -> Element {
                         "Private key"
                     }
                     button {
-                        class: "font-medium shrink px-2 py-1 text-nowrap hover-100 active-200",
+                        class: "font-medium shrink px-2 py-1 text-nowrap hover-100 active-200 rounded",
                         "Export"
                     }
                 }
