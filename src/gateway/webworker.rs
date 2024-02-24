@@ -13,11 +13,50 @@ use web_sys::Worker;
 
 use super::{signer, Gateway, GatewayResult};
 
+/// Mining request for web workers
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WebworkerRequest {
+    pub hash: KeccakHash,
+    pub difficulty: KeccakHash,
+    pub pubkey: Pubkey,
+}
+
+/// Mining response from web workers
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WebworkerResponse {
+    pub hash: KeccakHash,
+    pub nonce: u64,
+}
+
+/// Finds the a valid hash given the mining request.
+pub fn find_next_hash(req: WebworkerRequest) -> WebworkerResponse {
+    let mut next_hash: KeccakHash;
+    let mut nonce = 0u64;
+    loop {
+        if nonce % 10_000 == 0 {
+            log::info!("Nonce: {}", nonce);
+        }
+        next_hash = hashv(&[
+            req.hash.to_bytes().as_slice(),
+            req.pubkey.to_bytes().as_slice(),
+            nonce.to_be_bytes().as_slice(),
+        ]);
+        if next_hash.le(&req.difficulty) {
+            break;
+        }
+        nonce += 1;
+    }
+    WebworkerResponse {
+        hash: next_hash,
+        nonce,
+    }
+}
+
 pub async fn mine(gateway: &Rc<Gateway>, worker: Worker) -> GatewayResult<()> {
     let signer = signer();
     let treasury = gateway.get_treasury().await?;
     let proof = gateway.get_proof(signer.pubkey()).await?;
-    let req = MineRequest {
+    let req = WebworkerRequest {
         hash: proof.hash.into(),
         difficulty: treasury.difficulty.into(),
         pubkey: signer.pubkey(),
@@ -29,7 +68,7 @@ pub async fn mine(gateway: &Rc<Gateway>, worker: Worker) -> GatewayResult<()> {
 
 pub async fn submit_solution(
     gateway: &Rc<Gateway>,
-    res: &MineResponse,
+    res: &WebworkerResponse,
 ) -> GatewayResult<Signature> {
     // Submit mine tx.
     let mut bus_id = 0;
@@ -65,44 +104,5 @@ pub async fn submit_solution(
                 }
             }
         }
-    }
-}
-
-/// Mining request for web workers
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MineRequest {
-    pub hash: KeccakHash,
-    pub difficulty: KeccakHash,
-    pub pubkey: Pubkey,
-}
-
-/// Mining response from web workers
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MineResponse {
-    pub hash: KeccakHash,
-    pub nonce: u64,
-}
-
-/// Finds the a valid hash given the mining request.
-pub fn find_next_hash(req: MineRequest) -> MineResponse {
-    let mut next_hash: KeccakHash;
-    let mut nonce = 0u64;
-    loop {
-        if nonce % 10_000 == 0 {
-            log::info!("Nonce: {}", nonce);
-        }
-        next_hash = hashv(&[
-            req.hash.to_bytes().as_slice(),
-            req.pubkey.to_bytes().as_slice(),
-            nonce.to_be_bytes().as_slice(),
-        ]);
-        if next_hash.le(&req.difficulty) {
-            break;
-        }
-        nonce += 1;
-    }
-    MineResponse {
-        hash: next_hash,
-        nonce,
     }
 }

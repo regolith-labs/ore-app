@@ -7,18 +7,19 @@ use web_sys::{DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, W
 
 use crate::{
     find_next_hash,
-    gateway::{MineRequest, MineResponse},
+    gateway::{WebworkerRequest, WebworkerResponse},
 };
 
-pub fn use_webworker(cx: &ScopeState) -> (&mut Worker, &UseRef<Option<MineResponse>>) {
-    let message = use_ref::<Option<MineResponse>>(cx, || None);
+pub fn use_webworker(cx: &ScopeState) -> (&mut Worker, &UseRef<Option<WebworkerResponse>>) {
+    let message = use_ref::<Option<WebworkerResponse>>(cx, || None);
 
     let worker = cx.use_hook(|| {
         let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
         let message = message.clone();
 
+        // On message
         let f: Closure<dyn Fn(MessageEvent)> = Closure::new(move |event: MessageEvent| {
-            let res: MineResponse = from_value(event.data()).unwrap();
+            let res: WebworkerResponse = from_value(event.data()).unwrap();
             log::info!("Message from worker: {:?}", res);
             *message.write() = Some(res);
         });
@@ -26,6 +27,15 @@ pub fn use_webworker(cx: &ScopeState) -> (&mut Worker, &UseRef<Option<MineRespon
         let val = f.into_js_value();
         let f = js_sys::Function::unchecked_from_js(val);
         worker.set_onmessage(Some(&f));
+
+        // On error
+        let e: Closure<dyn Fn(MessageEvent)> = Closure::new(move |e: MessageEvent| {
+            log::info!("Error from worker: {:?}", e.data());
+        });
+        let val = e.into_js_value();
+        let e = js_sys::Function::unchecked_from_js(val);
+        worker.set_onerror(Some(&e));
+
         worker
     });
 
@@ -42,7 +52,7 @@ pub fn start_webworker() {
     let _scope = scope.clone();
 
     let f: Closure<dyn Fn(MessageEvent)> = Closure::new(move |event: MessageEvent| {
-        let req: MineRequest = from_value(event.data()).unwrap();
+        let req: WebworkerRequest = from_value(event.data()).unwrap();
         let res = find_next_hash(req);
         _scope.post_message(&to_value(&res).unwrap()).unwrap();
     });
