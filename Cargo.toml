@@ -9,6 +9,7 @@ edition = "2021"
 async-std = "1.12.0"
 bincode = "1.3.3"
 cached = "0.47.0"
+chrono = "0.4.34"
 dioxus = "0.4.3"
 dioxus-router = "0.4.3"
 dioxus-std = { version = "0.4.1", features = ["clipboard", "utils"] }

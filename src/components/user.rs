@@ -5,7 +5,7 @@ use dioxus_router::components::Link;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{ActivityTable, OreIcon},
+    components::{ActivityTable, Copyable, OreIcon},
     gateway::AsyncResult,
     hooks::{use_explorer_account_url, use_ore_balance, use_user_transfers},
 };
@@ -30,8 +30,8 @@ pub fn User(cx: Scope, id: String) -> Element {
 
     let container_class = "flex flex-row justify-between py-2 px-1";
     let title_class = "text-gray-300";
-    let value_class = "font-medium";
-    let link_class = "font-medium hover:underline";
+    let value_class = "font-medium px-2 py-1 rounded";
+    let link_class = "font-medium hover-100 active-200 px-2 py-1 rounded transition-colors";
 
     render! {
         div {
@@ -56,10 +56,13 @@ pub fn User(cx: Scope, id: String) -> Element {
                             class: "{title_class}",
                             "ID"
                         }
-                        Link {
-                            class: "{link_class} font-mono",
-                            to: "{explorer_url}",
-                            "{id}"
+                        Copyable {
+                            value: id.clone(),
+                            Link {
+                                class: "{link_class} font-mono",
+                                to: "{explorer_url}",
+                                "{id}"
+                            }
                         }
                     }
                     div {

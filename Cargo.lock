@@ -2996,6 +2996,7 @@ dependencies = [
  "async-std",
  "bincode",
  "cached",
+ "chrono",
  "dioxus",
  "dioxus-router",
  "dioxus-std",

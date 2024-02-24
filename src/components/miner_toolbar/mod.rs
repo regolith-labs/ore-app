@@ -35,13 +35,8 @@ pub enum MinerStatus {
 
 pub struct IsToolbarOpen(pub bool);
 
-#[derive(Props, PartialEq)]
-pub struct MinerToolbarProps {
-    pub hidden: bool,
-}
-
 #[component]
-pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
+pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let gateway = use_gateway(cx);
     let (treasury_rw, _) = use_treasury(cx);
     let treasury = *treasury_rw.read().unwrap();
@@ -111,7 +106,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>) -> Element {
         _ => "bg-gray-100 dark:bg-gray-900",
     };
 
-    let display = if cx.props.hidden { "hidden" } else { "" };
+    let display = if *hidden { "hidden" } else { "" };
 
     render! {
         div {

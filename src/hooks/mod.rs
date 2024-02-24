@@ -1,6 +1,7 @@
 mod use_account;
 mod use_appearance;
 mod use_clipboard;
+mod use_date;
 mod use_explorer;
 mod use_gateway;
 mod use_keypair;
@@ -19,6 +20,7 @@ mod use_window_width;
 pub use use_account::*;
 pub use use_appearance::*;
 pub use use_clipboard::*;
+pub use use_date::*;
 pub use use_explorer::*;
 pub use use_gateway::*;
 pub use use_keypair::*;

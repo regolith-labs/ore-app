@@ -4,7 +4,7 @@ use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pub
 use crate::{
     components::{IsToolbarOpen, MinerStatus},
     gateway::AsyncResult,
-    hooks::{use_pubkey, use_sol_balance},
+    hooks::{use_clipboard, use_pubkey, use_sol_balance},
 };
 
 #[component]
@@ -58,7 +58,7 @@ pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
 
 #[component]
 pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
-    // let clipboard = use_clipboard(cx);
+    let clipboard = use_clipboard(cx);
     let pubkey = use_pubkey(cx);
     let solana_pay_req = solana_pay_sol_request(pubkey, 0.1);
     let qrcode = qrcode_generator::to_svg_to_string(
@@ -95,10 +95,9 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 button {
                     class: "transition-colors text-center rounded p-2 hover-100 active-200",
                     onclick: move |_e| {
-                        // TODO Fix clipboard
-                        // if let Some(cb) = clipboard.clone() {
-                        //     let _ = cb.write_text(&pubkey.to_string());
-                        // }
+                        if let Some(cb) = clipboard.clone() {
+                            let _ = cb.write_text(&pubkey.to_string());
+                        }
                     },
                     "{pubkey}"
                 }

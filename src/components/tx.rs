@@ -7,13 +7,11 @@ use ore_types::TransferType;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::OreIcon,
+    components::{Copyable, OreIcon},
     gateway::AsyncResult,
-    hooks::{use_explorer_transaction_url, use_transfer},
+    hooks::{use_datetime, use_explorer_transaction_url, use_transfer},
     route::Route,
 };
-
-// TODO Not found
 
 #[component]
 pub fn Tx(cx: Scope, sig: String) -> Element {
@@ -29,10 +27,11 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             };
             let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
             let explorer_url = use_explorer_transaction_url(cx, &transfer.sig);
+            let date = use_datetime(transfer.ts);
             let container_class = "flex flex-row justify-between py-2 px-1";
             let title_class = "text-gray-300";
-            let value_class = "font-medium";
-            let link_class = "font-medium hover:underline";
+            let value_class = "font-medium px-2 py-1 rounded";
+            let link_class = "font-medium transition-colors px-2 py-1 hover-100 active-200 rounded";
             let from_name = if let Ok(from_address) = Pubkey::from_str(&transfer.from_address) {
                 if from_address.eq(&TREASURY_ADDRESS) {
                     "Treasury".to_string()
@@ -54,16 +53,20 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                     h2 {
                         class: "text-lg md:text-2xl font-bold",
                         "{title}"
-                    }                    div {
+                    }
+                    div {
                         class: "{container_class}",
                         p {
                             class: "{title_class}",
                             "Signature"
                         }
-                        Link {
-                            class: "{link_class} font-mono",
-                            to: "{explorer_url}",
-                            "{&transfer.sig.as_str()[..32]}"
+                        Copyable {
+                            value: transfer.sig.clone(),
+                            Link {
+                                class: "{link_class} font-mono",
+                                to: "{explorer_url}",
+                                "{&transfer.sig.as_str()[..32]}"
+                            }
                         }
                     }
                     div {
@@ -72,10 +75,13 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                             class: "{title_class}",
                             "To"
                         }
-                        Link {
-                            class: "{link_class} font-mono",
-                            to: Route::User { id: transfer.to_address.clone() },
-                            "{transfer.to_address}"
+                        Copyable {
+                            value: transfer.to_address.clone(),
+                            Link {
+                                class: "{link_class} font-mono",
+                                to: Route::User { id: transfer.to_address.clone() },
+                                "{transfer.to_address}"
+                            }
                         }
                     }
                     div {
@@ -84,10 +90,13 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                             class: "{title_class}",
                             "From"
                         }
-                        Link {
-                            class: "{link_class}",
-                            to: Route::User { id: transfer.from_address.clone() },
-                            "{from_name}"
+                        Copyable {
+                            value: transfer.from_address.clone(),
+                            Link {
+                                class: "{link_class}",
+                                to: Route::User { id: transfer.from_address.clone() },
+                                "{from_name}"
+                            }
                         }
                     }
                     div {
@@ -126,7 +135,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                         }
                         p {
                             class: "{value_class}",
-                            "{transfer.ts}"
+                            "{date}"
                         }
                     }
                 }
