@@ -1,6 +1,7 @@
 use std::{fmt, io, str::FromStr};
 
 use dioxus::prelude::*;
+use dioxus_router::components::Link;
 use serde::{Deserialize, Serialize};
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 use web_sys::window;
