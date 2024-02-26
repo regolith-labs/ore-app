@@ -1,7 +1,10 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::{use_rw, UseRw};
 use ore::utils::AccountDeserialize;
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{account::Account, pubkey::Pubkey};
+#[cfg(feature = "desktop")]
+use solana_sdk::{account::Account, pubkey::Pubkey};
 
 use crate::gateway::AsyncResult;
 
@@ -49,6 +52,7 @@ pub fn use_account_subscribe<
         let gateway = gateway.clone();
         let rw = rw.clone();
         async move {
+            #[cfg(feature = "web")]
             let _ = gateway
                 .rpc
                 .account_subscribe(address, move |account| {

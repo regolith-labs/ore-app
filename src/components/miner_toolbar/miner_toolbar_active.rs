@@ -9,10 +9,8 @@ use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 use web_sys::Worker;
 
 use crate::{
-    components::{
-        stop_mining, IsToolbarOpen, MinerStatus, OreIcon, PauseIcon, Tooltip, TooltipDirection,
-    },
-    gateway::{AsyncResult, WebworkerResponse},
+    components::{IsToolbarOpen, MinerStatus, OreIcon, Tooltip, TooltipDirection},
+    gateway::AsyncResult,
     route::Route,
 };
 
@@ -28,6 +26,7 @@ pub enum MinerChart {
     Supply,
 }
 
+#[cfg(feature = "web")]
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,
@@ -35,6 +34,14 @@ pub struct MinerToolbarActiveProps {
     pub ore_supply: AsyncResult<UiTokenAmount>,
     pub worker: UseState<Worker>,
     pub message: UseRef<Option<WebworkerResponse>>,
+}
+
+#[cfg(feature = "desktop")]
+#[derive(Props, PartialEq)]
+pub struct MinerToolbarActiveProps {
+    pub treasury: AsyncResult<Treasury>,
+    pub proof: AsyncResult<Proof>,
+    pub ore_supply: AsyncResult<UiTokenAmount>,
 }
 
 #[component]
@@ -120,10 +127,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         ClaimButton {
                             claimable_rewards: claimable_rewards
                         }
-                        StopButton {
-                            worker: cx.props.worker.clone(),
-                            message: cx.props.message.clone()
-                        }
+                        // StopButton {
+                        //     worker: cx.props.worker.clone(),
+                        //     message: cx.props.message.clone()
+                        // }
                     }
                 }
                 div {
@@ -297,10 +304,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     ClaimButton {
                         claimable_rewards: claimable_rewards
                     }
-                    StopButton {
-                        worker: cx.props.worker.clone(),
-                        message: cx.props.message.clone()
-                    }
+                    // StopButton {
+                    //     worker: cx.props.worker.clone(),
+                    //     message: cx.props.message.clone()
+                    // }
                 }
             }
         }
@@ -388,34 +395,6 @@ pub fn ActivityIndicator(cx: Scope) -> Element {
             }
             span {
                 class: "relative inline-flex rounded-full h-2 w-2 my-auto mx-auto bg-white"
-            }
-        }
-    }
-}
-
-#[component]
-pub fn StopButton(
-    cx: Scope,
-    worker: UseState<Worker>,
-    message: UseRef<Option<WebworkerResponse>>,
-) -> Element {
-    let status = use_shared_state::<MinerStatus>(cx).unwrap();
-    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    render! {
-        button {
-            class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-green-600 active:bg-green-700",
-            onclick: move |_e| {
-                let worker = worker.clone();
-                let status = status.clone();
-                let message = message.clone();
-                let is_toolbar_open = is_toolbar_open.clone();
-                async move {
-                    stop_mining(&status, &is_toolbar_open, &worker, &message);
-                    // stop_mining(&status, &is_toolbar_open);
-                }
-            },
-            PauseIcon {
-                class: "w-6 h-6 my-auto"
             }
         }
     }

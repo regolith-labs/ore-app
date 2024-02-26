@@ -10,8 +10,9 @@ mod gateway;
 mod hooks;
 mod route;
 
+#[cfg(feature = "web")]
+use crate::gateway::find_next_hash;
 use crate::{
-    gateway::find_next_hash,
     hooks::{use_appearance_persistant, use_explorer_persistant},
     route::Route,
 };
@@ -24,8 +25,12 @@ fn main() {
 
 #[cfg(feature = "desktop")]
 fn main() {
-    // TODO Logger
-    dioxus_desktop::launch(App);
+    env_logger::init();
+    dioxus_desktop::launch_cfg(
+        App,
+        dioxus_desktop::Config::new()
+            .with_custom_head(r#"<link rel="stylesheet" href="public/tailwind.css">"#.to_string()),
+    );
 }
 
 #[component]
@@ -45,4 +50,9 @@ fn App(cx: Scope) -> Element {
     render! {
         Router::<Route> {}
     }
+    // render! {
+    //     p {
+    //         "hello world"
+    //     }
+    // }
 }

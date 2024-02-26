@@ -1,5 +1,6 @@
 mod use_account;
 mod use_appearance;
+#[cfg(feature = "web")]
 mod use_clipboard;
 mod use_date;
 mod use_explorer;
@@ -20,6 +21,7 @@ mod use_window_width;
 
 pub use use_account::*;
 pub use use_appearance::*;
+#[cfg(feature = "web")]
 pub use use_clipboard::*;
 pub use use_date::*;
 pub use use_explorer::*;

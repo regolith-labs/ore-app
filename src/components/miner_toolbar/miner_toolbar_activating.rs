@@ -8,19 +8,26 @@ use crate::{
     hooks::{use_gateway, use_sol_balance},
 };
 
+#[cfg(feature = "web")]
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActivatingProps {
     pub worker: UseState<Worker>,
 }
 
+#[cfg(feature = "desktop")]
+#[derive(Props, PartialEq)]
+pub struct MinerToolbarActivatingProps {}
+
 #[component]
 pub fn MinerToolbarActivating(cx: Scope<MinerToolbarActivatingProps>) -> Element {
+    #[cfg(feature = "web")]
     let worker = &cx.props.worker;
     let gateway = use_gateway(cx);
     let sol_balance = use_sol_balance(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
 
+    #[cfg(feature = "web")]
     use_future(cx, &sol_balance.clone(), |_| {
         let worker = worker.clone();
         let miner_status = miner_status.clone();

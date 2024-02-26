@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::UseRw;
 use futures::StreamExt;
+#[cfg(feature = "web")]
 use gloo::net::websocket::{futures::WebSocket, Message, WebSocketError};
 use ore_types::Transfer;
 
@@ -26,6 +27,9 @@ pub fn use_transfers_websocket(
     limit: usize,
 ) {
     let pubkey = use_pubkey(cx).to_string();
+
+    // TODO Support desktop
+    #[cfg(feature = "web")]
     let _ws = use_coroutine(cx, |mut _rx: UnboundedReceiver<Message>| {
         let filter = filter.clone();
         let transfers = transfers.clone();

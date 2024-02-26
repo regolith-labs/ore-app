@@ -1,6 +1,10 @@
 use dioxus::prelude::*;
+#[cfg(feature = "desktop")]
+use dioxus_std::clipboard::use_clipboard;
 
-use crate::{components::CopyIcon, hooks::use_clipboard};
+use crate::components::CopyIcon;
+#[cfg(feature = "web")]
+use crate::hooks::use_clipboard;
 
 #[component]
 pub fn Copyable<'a>(cx: Scope, value: String, children: Element<'a>) -> Element {
@@ -21,9 +25,15 @@ pub fn Copyable<'a>(cx: Scope, value: String, children: Element<'a>) -> Element 
             button {
                 class: "flex px-2 py-1 rounded hover-100 active-200 transition-colors",
                 onclick: move |_e| {
+
+                    #[cfg(feature = "web")]
                     if let Some(cb) = clipboard.clone() {
                         let _ = cb.write_text(value);
                     }
+
+                    #[cfg(feature = "desktop")]
+                    clipboard.set(value.clone()).ok();
+
                     solid.set(true);
                 },
                 CopyIcon {

@@ -69,6 +69,7 @@ pub async fn find_next_hash(req: MineRequest) -> Option<WebworkerResponse> {
     })
 }
 
+#[cfg(feature = "web")]
 pub async fn mine(gateway: &Rc<Gateway>, worker: &UseState<Worker>) -> GatewayResult<()> {
     let signer = signer();
     let treasury = gateway.get_treasury().await?;
@@ -83,6 +84,7 @@ pub async fn mine(gateway: &Rc<Gateway>, worker: &UseState<Worker>) -> GatewayRe
     Ok(())
 }
 
+#[cfg(feature = "web")]
 pub async fn submit_solution(
     gateway: &Rc<Gateway>,
     res: &WebworkerResponse,

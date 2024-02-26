@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+#[cfg(feature = "web")]
 use gloo_storage::{LocalStorage, Storage};
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -17,11 +18,18 @@ pub fn use_persistent<T: Serialize + DeserializeOwned + Default + 'static>(
     let state = use_ref(cx, move || {
         // This closure will run when the hook is created
         let key = key.to_string();
+
+        #[cfg(feature = "web")]
         let value = LocalStorage::get(key.as_str()).ok().unwrap_or_else(|| {
             let x = init();
             LocalStorage::set(key.as_str(), &x).ok();
             x
         });
+
+        // TODO
+        #[cfg(feature = "desktop")]
+        let value = init();
+
         StorageEntry { key, value }
     });
 
@@ -51,8 +59,13 @@ impl<T: Serialize + DeserializeOwned + Clone + 'static> UsePersistent<T> {
     /// Sets the value
     pub fn set(&self, value: T) {
         let mut inner = self.inner.write();
+
         // Write the new value to local storage
+        #[cfg(feature = "web")]
         LocalStorage::set(inner.key.as_str(), &value).unwrap();
+
+        // TODO Handle desktop
+
         inner.value = value;
     }
 }

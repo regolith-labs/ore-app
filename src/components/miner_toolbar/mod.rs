@@ -16,11 +16,14 @@ pub use utils::*;
 
 use dioxus::prelude::*;
 
-#[cfg(feature = "web")]
-use crate::hooks::use_webworker;
 use crate::{
-    gateway::{mine, submit_solution, AsyncResult},
+    gateway::AsyncResult,
     hooks::{use_account_subscribe, use_gateway, use_ore_supply, use_proof, use_treasury},
+};
+#[cfg(feature = "web")]
+use crate::{
+    gateway::{mine, submit_solution},
+    hooks::use_webworker,
 };
 
 #[derive(Debug)]
@@ -43,14 +46,17 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let (proof_rw, proof_fut) = use_proof(cx);
     let proof = *proof_rw.read().unwrap();
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
-    let (worker, message) = use_webworker(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
+
+    #[cfg(feature = "web")]
+    let (worker, message) = use_webworker(cx);
 
     let _ = use_account_subscribe(cx, TREASURY_ADDRESS, treasury_rw);
 
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
 
+    #[cfg(feature = "web")]
     let _m = use_future(cx, message, |_| {
         let message = message.read().clone();
         let status = miner_status.clone();
@@ -122,13 +128,19 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                         }
                     }
                     MinerStatus::Activating => {
+                        #[cfg(feature = "web")]
                         render! {
                             MinerToolbarActivating {
                                 worker: worker.clone()
                             }
                         }
+                        #[cfg(feature = "desktop")]
+                        render! {
+                            MinerToolbarActivating {}
+                        }
                     }
                     MinerStatus::Active => {
+                        #[cfg(feature = "web")]
                         render! {
                             MinerToolbarActive {
                                 treasury: treasury,
@@ -136,6 +148,14 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                                 ore_supply: ore_supply,
                                 worker: worker.clone(),
                                 message: message.clone()
+                            }
+                        }
+                        #[cfg(feature = "desktop")]
+                        render! {
+                            MinerToolbarActive {
+                                treasury: treasury,
+                                proof: proof,
+                                ore_supply: ore_supply,
                             }
                         }
                     }

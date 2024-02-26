@@ -22,7 +22,9 @@ use spl_associated_token_account::{
 pub use webworker::*;
 
 use cached::proc_macro::cached;
+#[cfg(feature = "web")]
 use gloo::net::websocket::futures::WebSocket;
+#[cfg(feature = "web")]
 use gloo_storage::{LocalStorage, Storage};
 use ore::{
     state::{Proof, Treasury},
@@ -57,6 +59,8 @@ use solana_sdk::{
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
     "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+pub const RPC_WSS_URL: &str =
+    "wss://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 pub const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 pub struct Gateway {
@@ -65,7 +69,6 @@ pub struct Gateway {
     #[cfg(feature = "desktop")]
     pub rpc: RpcClient,
     api_url: String,
-    _wss: WebSocket,
 }
 
 impl Gateway {
@@ -76,7 +79,6 @@ impl Gateway {
             rpc: WasmClient::new(RPC_URL),
             #[cfg(feature = "desktop")]
             rpc: RpcClient::new(RPC_URL.to_string()),
-            _wss: WebSocket::open(WSS_URL).unwrap(),
         }
     }
 
@@ -240,6 +242,7 @@ impl Gateway {
     }
 }
 
+#[cfg(feature = "web")]
 pub fn signer() -> Keypair {
     let key = "keypair";
     let value = LocalStorage::get(key).ok().unwrap_or_else(|| {
@@ -248,6 +251,12 @@ pub fn signer() -> Keypair {
         x
     });
     Keypair::from_base58_string(&value)
+}
+
+#[cfg(feature = "desktop")]
+pub fn signer() -> Keypair {
+    // TODO
+    Keypair::new()
 }
 
 #[cached]
