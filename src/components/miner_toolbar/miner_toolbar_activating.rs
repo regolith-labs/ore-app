@@ -9,7 +9,7 @@ use crate::{
 
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActivatingProps {
-    pub worker: Worker,
+    pub worker: UseState<Worker>,
 }
 
 #[component]
@@ -26,7 +26,7 @@ pub fn MinerToolbarActivating(cx: Scope<MinerToolbarActivatingProps>) -> Element
         let gateway = gateway.clone();
         async move {
             if let AsyncResult::Ok(sol_balance) = sol_balance {
-                match try_start_mining(&gateway, sol_balance, &worker).await {
+                match try_start_mining(&gateway, sol_balance, worker).await {
                     Ok(did_start) => {
                         if did_start {
                             *miner_status.write() = MinerStatus::Active;

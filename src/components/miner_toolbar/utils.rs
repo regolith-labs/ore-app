@@ -1,17 +1,23 @@
 use std::rc::Rc;
 
-use dioxus::hooks::UseSharedState;
+use dioxus::{
+    hooks::UseSharedState,
+    prelude::{UseRef, UseState},
+};
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 use web_sys::Worker;
 
-use crate::gateway::{mine, Gateway, GatewayResult};
+use crate::{
+    gateway::{mine, Gateway, GatewayResult, WebworkerResponse},
+    hooks::ResetWorker,
+};
 
 use super::{IsToolbarOpen, MinerStatus};
 
 pub async fn try_start_mining(
     gateway: &Rc<Gateway>,
     balance: u64,
-    worker: &Worker,
+    worker: UseState<Worker>,
 ) -> GatewayResult<bool> {
     if balance.eq(&0) {
         return Ok(false);
@@ -30,18 +36,18 @@ pub async fn try_start_mining(
     gateway.register_ore().await?;
 
     // Start mining
-    mine(gateway, worker.clone()).await?;
+    mine(gateway, &worker).await?;
 
     Ok(true)
 }
 
-// TODO Handle webworker shutdown and restart gracefully
 pub fn stop_mining(
     status: &UseSharedState<MinerStatus>,
     is_toolbar_open: &UseSharedState<IsToolbarOpen>,
-    // worker: Arc<Worker>,
+    worker: &UseState<Worker>,
+    message: &UseRef<Option<WebworkerResponse>>,
 ) {
-    // worker.terminate();
+    worker.reset(message);
     *status.write() = MinerStatus::NotStarted;
     *is_toolbar_open.write() = IsToolbarOpen(false);
 }

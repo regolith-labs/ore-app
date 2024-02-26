@@ -10,36 +10,46 @@ use crate::{
     gateway::{WebworkerRequest, WebworkerResponse},
 };
 
-pub fn use_webworker(cx: &ScopeState) -> (&mut Worker, &UseRef<Option<WebworkerResponse>>) {
+pub trait ResetWorker {
+    fn reset(&self, message: &UseRef<Option<WebworkerResponse>>);
+}
+
+impl ResetWorker for &UseState<Worker> {
+    fn reset(&self, message: &UseRef<Option<WebworkerResponse>>) {
+        self.get().terminate();
+        self.set(create_worker(message))
+    }
+}
+
+pub fn use_webworker(cx: &ScopeState) -> (&UseState<Worker>, &UseRef<Option<WebworkerResponse>>) {
     let message = use_ref::<Option<WebworkerResponse>>(cx, || None);
+    let worker = use_state(cx, || create_worker(message));
+    (worker, message)
+}
 
-    let worker = cx.use_hook(|| {
-        let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
-        let message = message.clone();
+pub fn create_worker(message: &UseRef<Option<WebworkerResponse>>) -> Worker {
+    let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
+    let message = message.clone();
 
-        // On message
-        let f: Closure<dyn Fn(MessageEvent)> = Closure::new(move |event: MessageEvent| {
+    // On message
+    worker.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
+        Closure::<dyn Fn(MessageEvent)>::new(move |event: MessageEvent| {
             let res: WebworkerResponse = from_value(event.data()).unwrap();
             log::info!("Message from worker: {:?}", res);
             *message.write() = Some(res);
-        });
+        })
+        .into_js_value(),
+    )));
 
-        let val = f.into_js_value();
-        let f = js_sys::Function::unchecked_from_js(val);
-        worker.set_onmessage(Some(&f));
-
-        // On error
-        let e: Closure<dyn Fn(MessageEvent)> = Closure::new(move |e: MessageEvent| {
+    // On error
+    worker.set_onerror(Some(&js_sys::Function::unchecked_from_js(
+        Closure::<dyn Fn(MessageEvent)>::new(move |e: MessageEvent| {
             log::info!("Error from worker: {:?}", e.data());
-        });
-        let val = e.into_js_value();
-        let e = js_sys::Function::unchecked_from_js(val);
-        worker.set_onerror(Some(&e));
+        })
+        .into_js_value(),
+    )));
 
-        worker
-    });
-
-    (worker, message)
+    worker
 }
 
 #[wasm_bindgen]
@@ -49,17 +59,30 @@ pub fn start_webworker() {
     let self_ = js_sys::global();
     let js_value = self_.deref();
     let scope = DedicatedWorkerGlobalScope::unchecked_from_js_ref(js_value);
-    let _scope = scope.clone();
+    let scope_ = scope.clone();
 
-    let f: Closure<dyn Fn(MessageEvent)> = Closure::new(move |event: MessageEvent| {
-        let req: WebworkerRequest = from_value(event.data()).unwrap();
-        let res = find_next_hash(req);
-        _scope.post_message(&to_value(&res).unwrap()).unwrap();
-    });
-
-    let val = f.into_js_value();
-    let f = js_sys::Function::unchecked_from_js(val);
-    scope.set_onmessage(Some(&f))
+    scope.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
+        Closure::<dyn Fn(MessageEvent)>::new(move |event: MessageEvent| {
+            log::info!("Received message {:?}", event.data());
+            let req: WebworkerRequest = from_value(event.data()).unwrap();
+            match dbg!(req) {
+                WebworkerRequest::Mine(req) => {
+                    let scope_ = scope_.clone();
+                    wasm_bindgen_futures::spawn_local(async move {
+                        if let Some(res) = find_next_hash(req).await {
+                            scope_.post_message(&to_value(&res).unwrap()).unwrap();
+                        }
+                        log::info!("A");
+                    });
+                    log::info!("B");
+                }
+                WebworkerRequest::Pause => {
+                    // flag.store(true, std::sync::atomic::Ordering::Relaxed);
+                }
+            };
+        })
+        .into_js_value(),
+    )))
 }
 
 fn worker_options() -> WorkerOptions {

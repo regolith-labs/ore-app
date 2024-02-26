@@ -315,7 +315,7 @@ pub fn CopyIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
             svg {
                 fill: "none",
                 view_box: "0 0 24 24",
-                stroke_width: "1.5",
+                stroke_width: "2",
                 stroke: "currentColor",
                 class: "{class}",
                 path {

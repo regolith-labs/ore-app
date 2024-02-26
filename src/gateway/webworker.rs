@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use dioxus::prelude::UseState;
 use ore::EPOCH_DURATION;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
@@ -13,9 +14,15 @@ use web_sys::Worker;
 
 use super::{signer, Gateway, GatewayResult};
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum WebworkerRequest {
+    Pause,
+    Mine(MineRequest),
+}
+
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WebworkerRequest {
+pub struct MineRequest {
     pub hash: KeccakHash,
     pub difficulty: KeccakHash,
     pub pubkey: Pubkey,
@@ -29,7 +36,7 @@ pub struct WebworkerResponse {
 }
 
 /// Finds the a valid hash given the mining request.
-pub fn find_next_hash(req: WebworkerRequest) -> WebworkerResponse {
+pub async fn find_next_hash(req: MineRequest) -> Option<WebworkerResponse> {
     let mut next_hash: KeccakHash;
     let mut nonce = 0u64;
     loop {
@@ -46,23 +53,23 @@ pub fn find_next_hash(req: WebworkerRequest) -> WebworkerResponse {
         }
         nonce += 1;
     }
-    WebworkerResponse {
+    Some(WebworkerResponse {
         hash: next_hash,
         nonce,
-    }
+    })
 }
 
-pub async fn mine(gateway: &Rc<Gateway>, worker: Worker) -> GatewayResult<()> {
+pub async fn mine(gateway: &Rc<Gateway>, worker: &UseState<Worker>) -> GatewayResult<()> {
     let signer = signer();
     let treasury = gateway.get_treasury().await?;
     let proof = gateway.get_proof(signer.pubkey()).await?;
-    let req = WebworkerRequest {
+    let req = WebworkerRequest::Mine(MineRequest {
         hash: proof.hash.into(),
         difficulty: treasury.difficulty.into(),
         pubkey: signer.pubkey(),
-    };
+    });
     let msg = to_value(&req).unwrap();
-    worker.post_message(&msg).unwrap();
+    worker.get().post_message(&msg).unwrap();
     Ok(())
 }
 

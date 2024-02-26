@@ -2,12 +2,13 @@ use dioxus::prelude::*;
 use dioxus_router::components::Link;
 use ore::state::{Proof, Treasury};
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
+use web_sys::Worker;
 
 use crate::{
     components::{
         stop_mining, IsToolbarOpen, MinerStatus, OreIcon, PauseIcon, Tooltip, TooltipDirection,
     },
-    gateway::AsyncResult,
+    gateway::{AsyncResult, WebworkerResponse},
     route::Route,
 };
 
@@ -28,6 +29,8 @@ pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,
     pub proof: AsyncResult<Proof>,
     pub ore_supply: AsyncResult<UiTokenAmount>,
+    pub worker: UseState<Worker>,
+    pub message: UseRef<Option<WebworkerResponse>>,
 }
 
 #[component]
@@ -113,7 +116,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         ClaimButton {
                             claimable_rewards: claimable_rewards
                         }
-                        StopButton {}
+                        StopButton {
+                            worker: cx.props.worker.clone(),
+                            message: cx.props.message.clone()
+                        }
                     }
                 }
                 div {
@@ -287,7 +293,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     ClaimButton {
                         claimable_rewards: claimable_rewards
                     }
-                    StopButton {}
+                    StopButton {
+                        worker: cx.props.worker.clone(),
+                        message: cx.props.message.clone()
+                    }
                 }
             }
         }
@@ -381,19 +390,24 @@ pub fn ActivityIndicator(cx: Scope) -> Element {
 }
 
 #[component]
-pub fn StopButton(cx: Scope) -> Element {
+pub fn StopButton(
+    cx: Scope,
+    worker: UseState<Worker>,
+    message: UseRef<Option<WebworkerResponse>>,
+) -> Element {
     let status = use_shared_state::<MinerStatus>(cx).unwrap();
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     render! {
         button {
             class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-green-600 active:bg-green-700",
             onclick: move |_e| {
-                // let worker = worker.clone();
+                let worker = worker.clone();
                 let status = status.clone();
+                let message = message.clone();
                 let is_toolbar_open = is_toolbar_open.clone();
                 async move {
-                    // stop_mining(&status, &is_toolbar_open, worker);
-                    stop_mining(&status, &is_toolbar_open);
+                    stop_mining(&status, &is_toolbar_open, &worker, &message);
+                    // stop_mining(&status, &is_toolbar_open);
                 }
             },
             PauseIcon {

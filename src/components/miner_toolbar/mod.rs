@@ -63,7 +63,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                     Ok(_sig) => {
                         proof_fut.restart();
                         if let MinerStatus::Active = *status.read() {
-                            mine(&gateway, worker).await.ok();
+                            mine(&gateway, &worker).await.ok();
                         }
                     }
                     Err(err) => {
@@ -134,6 +134,8 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                                 treasury: treasury,
                                 proof: proof,
                                 ore_supply: ore_supply,
+                                worker: worker.clone(),
+                                message: message.clone()
                             }
                         }
                     }
