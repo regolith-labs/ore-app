@@ -16,9 +16,16 @@ use crate::{
     route::Route,
 };
 
+#[cfg(feature = "web")]
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
     dioxus_web::launch(App);
+}
+
+#[cfg(feature = "desktop")]
+fn main() {
+    // TODO Logger
+    dioxus_desktop::launch(App);
 }
 
 #[component]

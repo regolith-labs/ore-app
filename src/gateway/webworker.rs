@@ -3,13 +3,23 @@ use std::rc::Rc;
 use dioxus::prelude::UseState;
 use ore::EPOCH_DURATION;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "web")]
 use serde_wasm_bindgen::to_value;
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
     signature::Signature,
     signer::Signer,
 };
+#[cfg(feature = "desktop")]
+use solana_sdk::{
+    keccak::{hashv, Hash as KeccakHash},
+    pubkey::Pubkey,
+    signature::Signature,
+    signer::Signer,
+};
+#[cfg(feature = "web")]
 use web_sys::Worker;
 
 use super::{signer, Gateway, GatewayResult};

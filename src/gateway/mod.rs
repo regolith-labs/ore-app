@@ -6,7 +6,19 @@ mod webworker;
 pub use async_result::*;
 pub use error::*;
 pub use pubkey::*;
-use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
+#[cfg(feature = "desktop")]
+use solana_client::nonblocking::rpc_client::RpcClient;
+#[cfg(feature = "web")]
+use solana_extra_wasm::program::{
+    spl_associated_token_account::{
+        get_associated_token_address, instruction::create_associated_token_account,
+    },
+    spl_memo, spl_token,
+};
+#[cfg(feature = "desktop")]
+use spl_associated_token_account::{
+    get_associated_token_address, instruction::create_associated_token_account,
+};
 pub use webworker::*;
 
 use cached::proc_macro::cached;
@@ -18,6 +30,7 @@ use ore::{
     TREASURY_ADDRESS,
 };
 use ore_types::{response::GetTransfersResponse, Transfer};
+#[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
         clock::Clock,
@@ -30,6 +43,16 @@ use solana_client_wasm::{
     },
     WasmClient,
 };
+#[cfg(feature = "desktop")]
+use solana_sdk::{
+    clock::Clock,
+    instruction::Instruction,
+    pubkey::Pubkey,
+    signature::{Keypair, Signature},
+    signer::Signer,
+    sysvar,
+    transaction::Transaction,
+};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
@@ -37,7 +60,10 @@ pub const RPC_URL: &str =
 pub const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 pub struct Gateway {
+    #[cfg(feature = "web")]
     pub rpc: WasmClient,
+    #[cfg(feature = "desktop")]
+    pub rpc: RpcClient,
     api_url: String,
     _wss: WebSocket,
 }
@@ -46,7 +72,10 @@ impl Gateway {
     pub fn new() -> Self {
         Gateway {
             api_url: API_URL.to_string(),
+            #[cfg(feature = "web")]
             rpc: WasmClient::new(RPC_URL),
+            #[cfg(feature = "desktop")]
+            rpc: RpcClient::new(RPC_URL.to_string()),
             _wss: WebSocket::open(WSS_URL).unwrap(),
         }
     }
@@ -119,12 +148,9 @@ impl Gateway {
         let signer = signer();
         let from_token_account = ore_token_account_address(signer.pubkey());
         let to_token_account = ore_token_account_address(to);
-        let memo_ix = solana_extra_wasm::program::spl_memo::build_memo(
-            &memo.into_bytes(),
-            &[&signer.pubkey()],
-        );
-        let transfer_ix = solana_extra_wasm::program::spl_token::instruction::transfer(
-            &solana_extra_wasm::program::spl_token::ID,
+        let memo_ix = spl_memo::build_memo(&memo.into_bytes(), &[&signer.pubkey()]);
+        let transfer_ix = spl_token::instruction::transfer(
+            &spl_token::ID,
             &from_token_account,
             &to_token_account,
             &signer.pubkey(),
@@ -160,7 +186,7 @@ impl Gateway {
             &signer.pubkey(),
             &signer.pubkey(),
             &ore::MINT_ADDRESS,
-            &solana_extra_wasm::program::spl_token::id(),
+            &spl_token::id(),
         );
         self.send_and_confirm(&[ix]).await?;
 
@@ -226,8 +252,5 @@ pub fn signer() -> Keypair {
 
 #[cached]
 pub fn ore_token_account_address(pubkey: Pubkey) -> Pubkey {
-    solana_extra_wasm::program::spl_associated_token_account::get_associated_token_address(
-        &pubkey,
-        &ore::MINT_ADDRESS,
-    )
+    get_associated_token_address(&pubkey, &ore::MINT_ADDRESS)
 }

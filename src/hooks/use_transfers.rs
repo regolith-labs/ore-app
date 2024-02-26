@@ -1,7 +1,10 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::use_rw;
 use ore_types::Transfer;
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+#[cfg(feature = "desktop")]
+use solana_sdk::pubkey::Pubkey;
 
 use crate::{components::ActivityFilter, gateway::AsyncResult};
 

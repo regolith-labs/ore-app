@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+#[cfg(feature = "web")]
 use web_sys::Worker;
 
 use crate::{

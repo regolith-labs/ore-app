@@ -1,7 +1,11 @@
 use dioxus::prelude::*;
 use dioxus_router::components::Link;
 use ore::state::{Proof, Treasury};
+#[cfg(feature = "desktop")]
+use solana_account_decoder::parse_token::UiTokenAmount;
+#[cfg(feature = "web")]
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
+#[cfg(feature = "web")]
 use web_sys::Worker;
 
 use crate::{

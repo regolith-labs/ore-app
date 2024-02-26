@@ -4,7 +4,11 @@ use dioxus::{
     hooks::UseSharedState,
     prelude::{UseRef, UseState},
 };
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
+#[cfg(feature = "desktop")]
+use solana_sdk::native_token::LAMPORTS_PER_SOL;
+#[cfg(feature = "web")]
 use web_sys::Worker;
 
 use crate::{

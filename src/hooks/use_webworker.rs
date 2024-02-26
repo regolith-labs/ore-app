@@ -1,8 +1,11 @@
 use std::ops::Deref;
 
 use dioxus::prelude::*;
+#[cfg(feature = "web")]
 use serde_wasm_bindgen::{from_value, to_value};
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
+#[cfg(feature = "web")]
 use web_sys::{DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, WorkerType};
 
 use crate::{
@@ -10,10 +13,12 @@ use crate::{
     gateway::{WebworkerRequest, WebworkerResponse},
 };
 
+#[cfg(feature = "web")]
 pub trait ResetWorker {
     fn reset(&self, message: &UseRef<Option<WebworkerResponse>>);
 }
 
+#[cfg(feature = "web")]
 impl ResetWorker for &UseState<Worker> {
     fn reset(&self, message: &UseRef<Option<WebworkerResponse>>) {
         self.get().terminate();
@@ -21,12 +26,14 @@ impl ResetWorker for &UseState<Worker> {
     }
 }
 
+#[cfg(feature = "web")]
 pub fn use_webworker(cx: &ScopeState) -> (&UseState<Worker>, &UseRef<Option<WebworkerResponse>>) {
     let message = use_ref::<Option<WebworkerResponse>>(cx, || None);
     let worker = use_state(cx, || create_worker(message));
     (worker, message)
 }
 
+#[cfg(feature = "web")]
 pub fn create_worker(message: &UseRef<Option<WebworkerResponse>>) -> Worker {
     let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
     let message = message.clone();
@@ -52,6 +59,7 @@ pub fn create_worker(message: &UseRef<Option<WebworkerResponse>>) -> Worker {
     worker
 }
 
+#[cfg(feature = "web")]
 #[wasm_bindgen]
 pub fn start_webworker() {
     log::info!("Starting webworker");
@@ -72,9 +80,7 @@ pub fn start_webworker() {
                         if let Some(res) = find_next_hash(req).await {
                             scope_.post_message(&to_value(&res).unwrap()).unwrap();
                         }
-                        log::info!("A");
                     });
-                    log::info!("B");
                 }
                 WebworkerRequest::Pause => {
                     // flag.store(true, std::sync::atomic::Ordering::Relaxed);
@@ -85,6 +91,7 @@ pub fn start_webworker() {
     )))
 }
 
+#[cfg(feature = "web")]
 fn worker_options() -> WorkerOptions {
     let mut options = WorkerOptions::new();
     options.type_(WorkerType::Module);

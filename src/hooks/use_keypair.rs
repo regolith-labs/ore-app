@@ -1,5 +1,8 @@
 use dioxus::prelude::*;
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signature::Keypair, signature::Signer};
+#[cfg(feature = "desktop")]
+use solana_sdk::{pubkey::Pubkey, signature::Keypair, signature::Signer};
 
 use crate::hooks::use_persistent::{use_persistent, UsePersistent};
 

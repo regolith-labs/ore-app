@@ -4,6 +4,9 @@ use futures::StreamExt;
 use gloo::net::websocket::{futures::WebSocket, Message, WebSocketError};
 use ore_types::Transfer;
 
+#[cfg(feature = "web")]
+use wasm_bindgen_futures::spawn_local;
+
 use crate::{components::ActivityFilter, gateway::AsyncResult};
 
 use super::use_pubkey;
@@ -31,7 +34,7 @@ pub fn use_transfers_websocket(
         async move {
             let ws = WebSocket::open(URL).unwrap();
             let (mut _write, mut read) = ws.split();
-            wasm_bindgen_futures::spawn_local(async move {
+            spawn_local(async move {
                 while let Some(msg) = read.next().await {
                     if (*offset.current()).eq(&0) {
                         match msg {

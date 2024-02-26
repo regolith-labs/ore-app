@@ -1,3 +1,6 @@
+#[cfg(feature = "desktop")]
+use solana_client::client_error::ClientError;
+#[cfg(feature = "web")]
 use solana_client_wasm::ClientError;
 
 pub type GatewayResult<T> = Result<T, GatewayError>;

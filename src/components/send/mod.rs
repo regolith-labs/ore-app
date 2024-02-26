@@ -8,7 +8,10 @@ use dioxus::prelude::*;
 use send_confirm::*;
 use send_done::*;
 use send_edit::*;
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+#[cfg(feature = "desktop")]
+use solana_sdk::pubkey::Pubkey;
 
 pub enum SendStep {
     Edit,

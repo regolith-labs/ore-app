@@ -16,11 +16,11 @@ pub use utils::*;
 
 use dioxus::prelude::*;
 
+#[cfg(feature = "web")]
+use crate::hooks::use_webworker;
 use crate::{
     gateway::{mine, submit_solution, AsyncResult},
-    hooks::{
-        use_account_subscribe, use_gateway, use_ore_supply, use_proof, use_treasury, use_webworker,
-    },
+    hooks::{use_account_subscribe, use_gateway, use_ore_supply, use_proof, use_treasury},
 };
 
 #[derive(Debug)]

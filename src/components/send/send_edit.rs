@@ -2,7 +2,10 @@ use std::str::FromStr;
 
 use dioxus::prelude::*;
 use dioxus_router::hooks::use_navigator;
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+#[cfg(feature = "desktop")]
+use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::WarningIcon,

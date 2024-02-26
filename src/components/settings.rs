@@ -3,8 +3,10 @@ use std::{fmt, io, str::FromStr};
 use dioxus::prelude::*;
 use dioxus_router::components::Link;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
-use web_sys::window;
+#[cfg(feature = "desktop")]
+use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     components::Copyable,
@@ -35,11 +37,13 @@ pub fn Settings(cx: Scope) -> Element {
     let appearance = use_appearance(cx);
     let appearance_persistent = use_appearance_persistant(cx);
 
-    let cores = if let Some(window) = window() {
-        window.navigator().hardware_concurrency().to_string()
-    } else {
-        "Unknown".to_string()
-    };
+    // TODO use_concurrency()
+    let cores = "12".to_string();
+    // let cores = if let Some(window) = window() {
+    //     window.navigator().hardware_concurrency().to_string()
+    // } else {
+    //     "Unknown".to_string()
+    // };
 
     render! {
         div {
