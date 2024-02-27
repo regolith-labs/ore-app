@@ -6,6 +6,8 @@ use dioxus_router::prelude::*;
 use gateway::Gateway;
 
 mod components;
+#[cfg(feature = "desktop")]
+mod file;
 mod gateway;
 mod hooks;
 mod route;

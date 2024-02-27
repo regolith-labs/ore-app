@@ -724,6 +724,10 @@ h2:where(.dark, .dark *) {
   display: grid;
 }
 
+.contents {
+  display: contents;
+}
+
 .hidden {
   display: none;
 }

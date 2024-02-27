@@ -25,7 +25,6 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
 
-    #[cfg(feature = "web")]
     use_future(cx, &sol_balance.clone(), |_| {
         let miner = miner.clone();
         let miner_status = miner_status.clone();

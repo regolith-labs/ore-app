@@ -250,8 +250,19 @@ pub fn signer() -> Keypair {
 
 #[cfg(feature = "desktop")]
 pub fn signer() -> Keypair {
-    // TODO
-    Keypair::new()
+    use crate::file::{ensure_file_path_exists, get_value, set_key_value, FILEPATH};
+    use std::path::Path;
+    let key = "keypair";
+    let filepath = Path::new(FILEPATH);
+    ensure_file_path_exists(filepath).ok();
+    let value = get_value(filepath, key).ok().unwrap_or_else(|| {
+        let value = Keypair::new().to_base58_string();
+        if let Ok(v) = serde_json::to_value(&value) {
+            set_key_value(filepath, key, &v).ok();
+        }
+        value
+    });
+    Keypair::from_base58_string(&value)
 }
 
 #[cached]

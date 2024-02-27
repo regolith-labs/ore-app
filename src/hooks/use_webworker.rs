@@ -96,8 +96,6 @@ fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) -> M
         ]);
         if next_hash.le(&difficulty) {
             break;
-        } else {
-            println!("Invalid hash: {} Nonce: {:?}", next_hash, nonce);
         }
         nonce += 1;
     }
