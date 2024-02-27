@@ -8,7 +8,7 @@ use solana_sdk::{native_token::LAMPORTS_PER_SOL, signer::Signer};
 
 use crate::{
     gateway::{signer, Gateway, GatewayResult},
-    hooks::Miner,
+    miner::Miner,
 };
 
 use super::{IsToolbarOpen, MinerStatus};

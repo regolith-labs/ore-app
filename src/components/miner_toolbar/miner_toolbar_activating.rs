@@ -1,22 +1,11 @@
 use dioxus::prelude::*;
-// #[cfg(feature = "web")]
-// use web_sys::Worker;
 
 use crate::{
     components::{try_start_mining, IsToolbarOpen, MinerStatus},
     gateway::AsyncResult,
-    hooks::{use_gateway, use_sol_balance, Miner},
+    hooks::{use_gateway, use_sol_balance},
+    miner::Miner,
 };
-
-// #[cfg(feature = "web")]
-// #[derive(Props, PartialEq)]
-// pub struct MinerToolbarActivatingProps {
-//     pub worker: UseState<Worker>,
-// }
-
-// #[cfg(feature = "desktop")]
-// #[derive(Props, PartialEq)]
-// pub struct MinerToolbarActivatingProps {}
 
 #[component]
 pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {

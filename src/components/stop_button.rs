@@ -6,7 +6,7 @@ use web_sys::Worker;
 
 use crate::{
     components::{IsToolbarOpen, MinerStatus, PauseIcon},
-    hooks::MiningResult,
+    miner::MiningResult,
 };
 
 static BUTTON_CLASS: &str = "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-green-600 active:bg-green-700";

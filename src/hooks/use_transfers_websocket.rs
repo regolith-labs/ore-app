@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::UseRw;
+#[cfg(feature = "web")]
 use futures::StreamExt;
 #[cfg(feature = "web")]
 use gloo::net::websocket::{futures::WebSocket, Message, WebSocketError};

@@ -10,7 +10,9 @@ mod components;
 mod file;
 mod gateway;
 mod hooks;
+mod miner;
 mod route;
+mod worker;
 
 use crate::{
     hooks::{use_appearance_persistant, use_explorer_persistant},

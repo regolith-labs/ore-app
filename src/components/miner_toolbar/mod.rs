@@ -18,11 +18,12 @@ pub use utils::*;
 use dioxus::prelude::*;
 
 use crate::{
-    gateway::{submit_solution, AsyncResult},
+    gateway::AsyncResult,
     hooks::{
         use_account_subscribe, use_gateway, use_miner, use_ore_supply, use_proof, use_pubkey,
-        use_treasury, MiningResult,
+        use_treasury,
     },
+    miner::{submit_solution, MiningResult},
 };
 
 #[derive(Debug)]

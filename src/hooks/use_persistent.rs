@@ -1,13 +1,10 @@
-use std::path::Path;
-
 use dioxus::prelude::*;
 #[cfg(feature = "web")]
 use gloo_storage::{LocalStorage, Storage};
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::file::ensure_file_path_exists;
 #[cfg(feature = "desktop")]
-use crate::file::{get_value, set_key_value, FILEPATH};
+use crate::file::{get_value, set_key_value};
 
 // TODO Wrap this with a useState so all writes auto-update throughout the app
 
@@ -34,12 +31,10 @@ pub fn use_persistent<T: Serialize + DeserializeOwned + Default + 'static>(
 
         #[cfg(feature = "desktop")]
         let value = {
-            let filepath = Path::new(FILEPATH);
-            ensure_file_path_exists(filepath).ok();
-            get_value(filepath, key.as_str()).ok().unwrap_or_else(|| {
+            get_value(key.as_str()).ok().unwrap_or_else(|| {
                 let value = init();
                 if let Ok(v) = serde_json::to_value(&value) {
-                    set_key_value(filepath, key.as_str(), &v).ok();
+                    set_key_value(key.as_str(), &v).ok();
                 }
                 value
             })
@@ -82,8 +77,7 @@ impl<T: Serialize + DeserializeOwned + Clone + 'static> UsePersistent<T> {
         // TODO Handle desktop
         #[cfg(feature = "desktop")]
         {
-            let filepath = Path::new(FILEPATH);
-            set_key_value(filepath, inner.key.as_str(), &value).unwrap();
+            set_key_value(inner.key.as_str(), &value).unwrap();
         }
 
         inner.value = value;

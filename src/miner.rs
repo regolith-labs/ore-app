@@ -1,33 +1,28 @@
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc, Mutex,
+use std::{
+    rc::Rc,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
 };
 
-use dioxus::prelude::*;
 use dioxus_std::utils::channel::UseChannel;
+use ore::EPOCH_DURATION;
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "web")]
-use serde_wasm_bindgen::{from_value, to_value};
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
+    {signature::Signature, signer::Signer},
 };
 #[cfg(feature = "desktop")]
 use solana_sdk::{
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
+    {signature::Signature, signer::Signer},
 };
-#[cfg(feature = "web")]
-use wasm_bindgen::prelude::*;
-#[cfg(feature = "web")]
-use web_sys::{DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, WorkerType};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum WebworkerRequest {
-    Pause,
-    Mine(MineRequest),
-}
+use crate::gateway::{signer, Gateway, GatewayResult};
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -44,6 +39,7 @@ pub struct MiningResult {
     pub nonce: u64,
 }
 
+/// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
 #[derive(PartialEq)]
 pub struct Miner {
     #[cfg(feature = "web")]
@@ -74,12 +70,13 @@ impl Miner {
             self.worker.post_message(&msg).unwrap();
         }
 
+        // TODO Configurable power level
         #[cfg(feature = "desktop")]
         {
             let ch = self.ch.clone();
             let flag = Arc::new(AtomicBool::new(false));
             let result = Arc::new(Mutex::new(MiningResult::default()));
-            let concurrency = 4;
+            let concurrency = num_cpus::get() as u64;
             let handles: Vec<_> = (0..concurrency)
                 .map(|i| {
                     std::thread::spawn({
@@ -167,76 +164,43 @@ fn find_next_hash_par(
     })
 }
 
-pub fn use_miner<'a>(
-    cx: &'a ScopeState,
-    // message: &'a UseRef<Option<MiningResult>>,
-    ch: &'a UseChannel<MiningResult>,
-) -> &'a UseState<Miner> {
-    use_state(cx, || Miner::new(ch))
-}
+pub async fn submit_solution(
+    gateway: &Rc<Gateway>,
+    res: &MiningResult,
+) -> GatewayResult<Signature> {
+    // Submit mine tx.
+    let mut bus_id = 0;
+    let next_hash = res.hash;
+    let nonce = res.nonce;
+    let signer = signer();
+    loop {
+        // Check if epoch needs to be reset
+        let treasury = gateway.get_treasury().await?;
+        let clock = gateway.get_clock().await?;
+        let epoch_end_at = treasury.epoch_start_at.saturating_add(EPOCH_DURATION);
 
-#[cfg(feature = "web")]
-pub fn create_worker(ch: &UseChannel<MiningResult>) -> Worker {
-    let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
-    let ch = ch.clone();
+        // Submit restart epoch tx, if needed.
+        if clock.unix_timestamp.ge(&epoch_end_at) {
+            let ix = ore::instruction::reset(signer.pubkey());
+            gateway.send_and_confirm(&[ix]).await?;
+        }
 
-    // On message
-    worker.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
-        Closure::<dyn Fn(MessageEvent)>::new(move |event: MessageEvent| {
-            let res: MiningResult = from_value(event.data()).unwrap();
-            log::info!("Message from worker: {:?}", res);
-            wasm_bindgen_futures::spawn_local({
-                let ch = ch.clone();
-                async move {
-                    ch.send(res).await.ok();
+        // Submit mine tx
+        let ix = ore::instruction::mine(
+            signer.pubkey(),
+            ore::BUS_ADDRESSES[bus_id],
+            next_hash.into(),
+            nonce,
+        );
+        match gateway.send_and_confirm(&[ix]).await {
+            Ok(sig) => return Ok(sig),
+            Err(_err) => {
+                // Retry on different bus.
+                bus_id += 1;
+                if bus_id.ge(&ore::BUS_COUNT) {
+                    bus_id = 0;
                 }
-            });
-        })
-        .into_js_value(),
-    )));
-
-    // On error
-    worker.set_onerror(Some(&js_sys::Function::unchecked_from_js(
-        Closure::<dyn Fn(MessageEvent)>::new(move |e: MessageEvent| {
-            log::info!("Error from worker: {:?}", e.data());
-        })
-        .into_js_value(),
-    )));
-
-    worker
-}
-
-#[cfg(feature = "web")]
-#[wasm_bindgen]
-pub fn start_webworker() {
-    log::info!("Starting webworker");
-
-    let self_ = js_sys::global();
-    let js_value = std::ops::Deref::deref(&self_);
-    let scope = DedicatedWorkerGlobalScope::unchecked_from_js_ref(js_value);
-    let scope_ = scope.clone();
-
-    scope.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
-        Closure::<dyn Fn(MessageEvent)>::new(move |event: MessageEvent| {
-            log::info!("Received message {:?}", event.data());
-            let req: WebworkerRequest = from_value(event.data()).unwrap();
-            match req {
-                WebworkerRequest::Mine(req) => {
-                    let res = find_next_hash(req.hash, req.difficulty, req.pubkey);
-                    scope_.post_message(&to_value(&res).unwrap()).unwrap();
-                }
-                WebworkerRequest::Pause => {
-                    // flag.store(true, std::sync::atomic::Ordering::Relaxed);
-                }
-            };
-        })
-        .into_js_value(),
-    )))
-}
-
-#[cfg(feature = "web")]
-fn worker_options() -> WorkerOptions {
-    let mut options = WorkerOptions::new();
-    options.type_(WorkerType::Module);
-    options
+            }
+        }
+    }
 }

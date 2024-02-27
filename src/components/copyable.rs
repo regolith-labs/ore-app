@@ -7,7 +7,12 @@ use crate::components::CopyIcon;
 use crate::hooks::use_clipboard;
 
 #[component]
-pub fn Copyable<'a>(cx: Scope, value: String, children: Element<'a>) -> Element {
+pub fn Copyable<'a>(
+    cx: Scope,
+    class: Option<&'a str>,
+    value: String,
+    children: Element<'a>,
+) -> Element {
     let clipboard = use_clipboard(cx);
     let solid = use_state(cx, || false);
     let _ = use_future(cx, solid, |_| {
@@ -19,9 +24,10 @@ pub fn Copyable<'a>(cx: Scope, value: String, children: Element<'a>) -> Element 
             }
         }
     });
+    let class = class.unwrap_or("");
     render! {
         div {
-            class: "flex flex-row",
+            class: "flex flex-row {class}",
             button {
                 class: "flex px-2 py-1 rounded hover-100 active-200 transition-colors",
                 onclick: move |_e| {

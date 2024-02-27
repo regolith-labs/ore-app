@@ -81,11 +81,11 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-black text-lg",
-                    "Your miner needs SOL to interact with the Solana blockchain."
+                    "Scan the QR code with your wallet to top up your miner."
                 }
                 p {
                     class: "text-gray-300 text-sm",
-                    "Top up with at least 0.1 SOL to begin mining."
+                    "Your miner requires at least 0.1 SOL to begin mining."
                 }
             }
             div {
@@ -95,9 +95,10 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                     dangerous_inner_html: "{qrcode}",
                 }
                 Copyable {
+                    class: "mx-auto",
                     value: pubkey.to_string(),
                     p {
-                        class: "rounded p-2",
+                        class: "rounded p-2 font-mono font-medium",
                         "{pubkey}"
                     }
                 }

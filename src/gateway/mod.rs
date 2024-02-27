@@ -1,7 +1,6 @@
 mod async_result;
 mod error;
 mod pubkey;
-mod webworker;
 
 pub use async_result::*;
 use cached::proc_macro::cached;
@@ -51,11 +50,12 @@ use solana_sdk::{
 use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
 };
-pub use webworker::*;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
     "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+pub const RPC_WSS_URL: &str =
+    "wss://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 pub const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 pub struct Gateway {
@@ -250,15 +250,13 @@ pub fn signer() -> Keypair {
 
 #[cfg(feature = "desktop")]
 pub fn signer() -> Keypair {
-    use crate::file::{ensure_file_path_exists, get_value, set_key_value, FILEPATH};
-    use std::path::Path;
+    use crate::file::{get_value, set_key_value};
+
     let key = "keypair";
-    let filepath = Path::new(FILEPATH);
-    ensure_file_path_exists(filepath).ok();
-    let value = get_value(filepath, key).ok().unwrap_or_else(|| {
+    let value = get_value(key).ok().unwrap_or_else(|| {
         let value = Keypair::new().to_base58_string();
         if let Ok(v) = serde_json::to_value(&value) {
-            set_key_value(filepath, key, &v).ok();
+            set_key_value(key, &v).ok();
         }
         value
     });

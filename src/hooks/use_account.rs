@@ -1,12 +1,14 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::{use_rw, UseRw};
 use ore::utils::AccountDeserialize;
+use solana_account_decoder::UiAccountData;
+use solana_client::pubsub_client::PubsubClient;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{account::Account, pubkey::Pubkey};
 #[cfg(feature = "desktop")]
-use solana_sdk::{account::Account, pubkey::Pubkey};
+use solana_sdk::pubkey::Pubkey;
 
-use crate::gateway::AsyncResult;
+use crate::gateway::{AsyncResult, RPC_WSS_URL};
 
 use super::use_gateway;
 
@@ -47,8 +49,11 @@ pub fn use_account_subscribe<
     address: Pubkey,
     rw: &'a mut UseRw<AsyncResult<T>>,
 ) -> &'a Coroutine<()> {
+    #[cfg(feature = "web")]
     let gateway = use_gateway(cx);
+
     use_coroutine(cx, |mut _rx| {
+        #[cfg(feature = "web")]
         let gateway = gateway.clone();
         let rw = rw.clone();
         async move {
@@ -65,6 +70,28 @@ pub fn use_account_subscribe<
                     }
                 })
                 .await;
+
+            #[cfg(feature = "desktop")]
+            std::thread::spawn(move || {
+                match PubsubClient::account_subscribe(
+                    RPC_WSS_URL,
+                    &address,
+                    Some(solana_client::rpc_config::RpcAccountInfoConfig::default()),
+                ) {
+                    Ok((mut _sub, rx)) => {
+                        while let Ok(message) = rx.recv() {
+                            if let UiAccountData::LegacyBinary(data) = message.value.data {
+                                if let Ok(t) = T::try_from_bytes(data.into_bytes().as_ref()) {
+                                    rw.write(AsyncResult::Ok(*t)).ok();
+                                }
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        log::error!("Failed to subscribe to account: {:?}", err)
+                    }
+                };
+            });
         }
     })
 }

@@ -5,10 +5,14 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{self, ErrorKind, Read, Write};
 use std::path::{Path, PathBuf};
 
-pub static FILEPATH: &str = "~/.config/ore/config.json";
+fn filepath() -> PathBuf {
+    home::home_dir()
+        .unwrap_or_default()
+        .join(Path::new(".config/ore/config.json"))
+}
 
-fn read_storage(file_path: &Path) -> io::Result<Map<String, Value>> {
-    match fs::File::open(file_path) {
+fn read_storage() -> io::Result<Map<String, Value>> {
+    match fs::File::open(filepath().as_path()) {
         Ok(mut file) => {
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
@@ -20,33 +24,31 @@ fn read_storage(file_path: &Path) -> io::Result<Map<String, Value>> {
     }
 }
 
-fn write_storage(file_path: &Path, data: &Map<String, Value>) -> io::Result<()> {
+fn write_storage(data: &Map<String, Value>) -> io::Result<()> {
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)
-        .open(file_path)?;
+        .open(filepath().as_path())?;
     let contents = serde_json::to_string(data)?;
     file.write_all(contents.as_bytes())?;
     Ok(())
 }
 
 pub fn set_key_value<T: Serialize + DeserializeOwned + 'static>(
-    file_path: &Path,
     key: &str,
     value: &T,
 ) -> io::Result<()> {
+    ensure_filepath_exists().ok();
     let v = serde_json::to_value(value).unwrap();
-    let mut data = read_storage(file_path)?;
+    let mut data = read_storage()?;
     data.insert(key.to_string(), v);
-    write_storage(file_path, &data)
+    write_storage(&data)
 }
 
-pub fn get_value<T: Serialize + DeserializeOwned + 'static>(
-    file_path: &Path,
-    key: &str,
-) -> io::Result<T> {
-    let data = read_storage(file_path)?;
+pub fn get_value<T: Serialize + DeserializeOwned + 'static>(key: &str) -> io::Result<T> {
+    ensure_filepath_exists().ok();
+    let data = read_storage()?;
     if let Some(v) = data.get(key) {
         serde_json::from_value(v.clone()).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
     } else {
@@ -54,20 +56,21 @@ pub fn get_value<T: Serialize + DeserializeOwned + 'static>(
     }
 }
 
-pub fn ensure_file_path_exists(file_path: &Path) -> io::Result<PathBuf> {
+fn ensure_filepath_exists() -> io::Result<PathBuf> {
     // Check if the parent directory exists, and if not, create it
-    if let Some(parent_dir) = file_path.parent() {
+    let fp = filepath();
+    if let Some(parent_dir) = fp.parent() {
         if !parent_dir.exists() {
             fs::create_dir_all(parent_dir)?;
         }
     }
 
     // Check if the file itself exists, and if not, create it
-    match File::open(file_path) {
-        Ok(_) => Ok(file_path.to_path_buf()),
+    match File::open(fp.as_path()) {
+        Ok(_) => Ok(fp),
         Err(e) if e.kind() == ErrorKind::NotFound => {
-            File::create(file_path)?; // This will automatically create the file
-            Ok(file_path.to_path_buf())
+            File::create(fp.as_path())?; // This will automatically create the file
+            Ok(fp)
         }
         Err(e) => Err(e),
     }
