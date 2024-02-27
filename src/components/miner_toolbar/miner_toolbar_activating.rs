@@ -1,27 +1,25 @@
 use dioxus::prelude::*;
-#[cfg(feature = "web")]
-use web_sys::Worker;
+// #[cfg(feature = "web")]
+// use web_sys::Worker;
 
 use crate::{
     components::{try_start_mining, IsToolbarOpen, MinerStatus},
     gateway::AsyncResult,
-    hooks::{use_gateway, use_sol_balance},
+    hooks::{use_gateway, use_sol_balance, Miner},
 };
 
-#[cfg(feature = "web")]
-#[derive(Props, PartialEq)]
-pub struct MinerToolbarActivatingProps {
-    pub worker: UseState<Worker>,
-}
+// #[cfg(feature = "web")]
+// #[derive(Props, PartialEq)]
+// pub struct MinerToolbarActivatingProps {
+//     pub worker: UseState<Worker>,
+// }
 
-#[cfg(feature = "desktop")]
-#[derive(Props, PartialEq)]
-pub struct MinerToolbarActivatingProps {}
+// #[cfg(feature = "desktop")]
+// #[derive(Props, PartialEq)]
+// pub struct MinerToolbarActivatingProps {}
 
 #[component]
-pub fn MinerToolbarActivating(cx: Scope<MinerToolbarActivatingProps>) -> Element {
-    #[cfg(feature = "web")]
-    let worker = &cx.props.worker;
+pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     let gateway = use_gateway(cx);
     let sol_balance = use_sol_balance(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
@@ -29,12 +27,12 @@ pub fn MinerToolbarActivating(cx: Scope<MinerToolbarActivatingProps>) -> Element
 
     #[cfg(feature = "web")]
     use_future(cx, &sol_balance.clone(), |_| {
-        let worker = worker.clone();
+        let miner = miner.clone();
         let miner_status = miner_status.clone();
         let gateway = gateway.clone();
         async move {
             if let AsyncResult::Ok(sol_balance) = sol_balance {
-                match try_start_mining(&gateway, sol_balance, worker).await {
+                match try_start_mining(&gateway, sol_balance, miner.get()).await {
                     Ok(did_start) => {
                         if did_start {
                             *miner_status.write() = MinerStatus::Active;

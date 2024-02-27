@@ -4,26 +4,8 @@ mod pubkey;
 mod webworker;
 
 pub use async_result::*;
-pub use error::*;
-pub use pubkey::*;
-#[cfg(feature = "desktop")]
-use solana_client::nonblocking::rpc_client::RpcClient;
-#[cfg(feature = "web")]
-use solana_extra_wasm::program::{
-    spl_associated_token_account::{
-        get_associated_token_address, instruction::create_associated_token_account,
-    },
-    spl_memo, spl_token,
-};
-#[cfg(feature = "desktop")]
-use spl_associated_token_account::{
-    get_associated_token_address, instruction::create_associated_token_account,
-};
-pub use webworker::*;
-
 use cached::proc_macro::cached;
-#[cfg(feature = "web")]
-use gloo::net::websocket::futures::WebSocket;
+pub use error::*;
 #[cfg(feature = "web")]
 use gloo_storage::{LocalStorage, Storage};
 use ore::{
@@ -32,6 +14,9 @@ use ore::{
     TREASURY_ADDRESS,
 };
 use ore_types::{response::GetTransfersResponse, Transfer};
+pub use pubkey::*;
+#[cfg(feature = "desktop")]
+use solana_client::nonblocking::rpc_client::RpcClient;
 #[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
@@ -45,6 +30,13 @@ use solana_client_wasm::{
     },
     WasmClient,
 };
+#[cfg(feature = "web")]
+use solana_extra_wasm::program::{
+    spl_associated_token_account::{
+        get_associated_token_address, instruction::create_associated_token_account,
+    },
+    spl_memo, spl_token,
+};
 #[cfg(feature = "desktop")]
 use solana_sdk::{
     clock::Clock,
@@ -55,12 +47,15 @@ use solana_sdk::{
     sysvar,
     transaction::Transaction,
 };
+#[cfg(feature = "desktop")]
+use spl_associated_token_account::{
+    get_associated_token_address, instruction::create_associated_token_account,
+};
+pub use webworker::*;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
     "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
-pub const RPC_WSS_URL: &str =
-    "wss://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 pub const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 pub struct Gateway {

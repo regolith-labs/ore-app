@@ -26,17 +26,17 @@ pub enum MinerChart {
     Supply,
 }
 
-#[cfg(feature = "web")]
-#[derive(Props, PartialEq)]
-pub struct MinerToolbarActiveProps {
-    pub treasury: AsyncResult<Treasury>,
-    pub proof: AsyncResult<Proof>,
-    pub ore_supply: AsyncResult<UiTokenAmount>,
-    pub worker: UseState<Worker>,
-    pub message: UseRef<Option<WebworkerResponse>>,
-}
+// #[cfg(feature = "web")]
+// #[derive(Props, PartialEq)]
+// pub struct MinerToolbarActiveProps {
+//     pub treasury: AsyncResult<Treasury>,
+//     pub proof: AsyncResult<Proof>,
+//     pub ore_supply: AsyncResult<UiTokenAmount>,
+//     // pub worker: UseState<Worker>,
+//     // pub message: UseRef<Option<WebworkerResponse>>,
+// }
 
-#[cfg(feature = "desktop")]
+// #[cfg(feature = "desktop")]
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,

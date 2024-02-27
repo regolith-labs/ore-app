@@ -5,6 +5,7 @@ mod miner_toolbar_insufficient_sol;
 mod miner_toolbar_not_started;
 mod utils;
 
+use dioxus_std::utils::channel::use_channel;
 pub use miner_charts::*;
 pub use miner_toolbar_activating::*;
 pub use miner_toolbar_active::*;
@@ -17,13 +18,11 @@ pub use utils::*;
 use dioxus::prelude::*;
 
 use crate::{
-    gateway::AsyncResult,
-    hooks::{use_account_subscribe, use_gateway, use_ore_supply, use_proof, use_treasury},
-};
-#[cfg(feature = "web")]
-use crate::{
-    gateway::{mine, submit_solution},
-    hooks::use_webworker,
+    gateway::{submit_solution, AsyncResult},
+    hooks::{
+        use_account_subscribe, use_gateway, use_miner, use_ore_supply, use_proof, use_pubkey,
+        use_treasury, MiningResult,
+    },
 };
 
 #[derive(Debug)]
@@ -40,6 +39,8 @@ pub struct IsToolbarOpen(pub bool);
 
 #[component]
 pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
+    use_shared_state_provider(cx, || MinerStatus::NotStarted);
+    let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let gateway = use_gateway(cx);
     let (treasury_rw, _) = use_treasury(cx);
     let treasury = *treasury_rw.read().unwrap();
@@ -47,29 +48,34 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let proof = *proof_rw.read().unwrap();
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-
-    #[cfg(feature = "web")]
-    let (worker, message) = use_webworker(cx);
-
+    let ch = use_channel::<MiningResult>(cx, 1);
+    let miner = use_miner(cx, ch);
+    let pubkey = use_pubkey(cx);
     let _ = use_account_subscribe(cx, TREASURY_ADDRESS, treasury_rw);
 
-    use_shared_state_provider(cx, || MinerStatus::NotStarted);
-    let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
-
-    #[cfg(feature = "web")]
-    let _m = use_future(cx, message, |_| {
-        let message = message.read().clone();
+    // Listen for results from miner.
+    // Submit for validation and start mining next hash.
+    let _ = use_future(cx, (), |_| {
+        let mut rx = ch.clone().receiver();
         let status = miner_status.clone();
-        let worker = worker.clone();
+        let miner = miner.clone();
         let gateway = gateway.clone();
         let proof_fut = proof_fut.clone();
         async move {
-            if let Some(solution) = message {
-                match submit_solution(&gateway, &solution).await {
+            while let Ok(res) = rx.recv().await {
+                match submit_solution(&gateway, &res).await {
                     Ok(_sig) => {
                         proof_fut.restart();
                         if let MinerStatus::Active = *status.read() {
-                            mine(&gateway, &worker).await.ok();
+                            if let Ok(treasury) = gateway.get_treasury().await {
+                                if let Ok(proof) = gateway.get_proof(pubkey).await {
+                                    miner.start_mining(
+                                        proof.hash.into(),
+                                        treasury.difficulty.into(),
+                                        pubkey,
+                                    );
+                                }
+                            }
                         }
                     }
                     Err(err) => {
@@ -128,29 +134,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                         }
                     }
                     MinerStatus::Activating => {
-                        #[cfg(feature = "web")]
                         render! {
                             MinerToolbarActivating {
-                                worker: worker.clone()
+                                miner: miner.clone()
                             }
-                        }
-                        #[cfg(feature = "desktop")]
-                        render! {
-                            MinerToolbarActivating {}
                         }
                     }
                     MinerStatus::Active => {
-                        #[cfg(feature = "web")]
-                        render! {
-                            MinerToolbarActive {
-                                treasury: treasury,
-                                proof: proof,
-                                ore_supply: ore_supply,
-                                worker: worker.clone(),
-                                message: message.clone()
-                            }
-                        }
-                        #[cfg(feature = "desktop")]
                         render! {
                             MinerToolbarActive {
                                 treasury: treasury,

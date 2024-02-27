@@ -10,8 +10,6 @@ mod gateway;
 mod hooks;
 mod route;
 
-#[cfg(feature = "web")]
-use crate::gateway::find_next_hash;
 use crate::{
     hooks::{use_appearance_persistant, use_explorer_persistant},
     route::Route,
@@ -50,9 +48,4 @@ fn App(cx: Scope) -> Element {
     render! {
         Router::<Route> {}
     }
-    // render! {
-    //     p {
-    //         "hello world"
-    //     }
-    // }
 }

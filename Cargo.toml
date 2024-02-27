@@ -15,7 +15,7 @@ desktop = [
     "solana-sdk",
     "spl-memo",
     "spl-token",
-    "spl-associated-token-account"
+    "spl-associated-token-account",
 ]
 web = [
     "dioxus-web",
