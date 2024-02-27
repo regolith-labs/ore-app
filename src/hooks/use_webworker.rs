@@ -1,3 +1,8 @@
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc, Mutex,
+};
+
 use dioxus::prelude::*;
 use dioxus_std::utils::channel::UseChannel;
 use serde::{Deserialize, Serialize};
@@ -33,7 +38,7 @@ pub struct MineRequest {
 }
 
 /// Mining response from web workers
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct MiningResult {
     pub hash: KeccakHash,
     pub nonce: u64,
@@ -72,16 +77,40 @@ impl Miner {
         #[cfg(feature = "desktop")]
         {
             let ch = self.ch.clone();
-            std::thread::spawn(move || {
-                let res = find_next_hash(hash, difficulty, signer);
-                async_std::task::spawn(async move {
-                    ch.send(res).await.ok();
-                });
+            let flag = Arc::new(AtomicBool::new(false));
+            let result = Arc::new(Mutex::new(MiningResult::default()));
+            let concurrency = 4;
+            let handles: Vec<_> = (0..concurrency)
+                .map(|i| {
+                    std::thread::spawn({
+                        let flag = flag.clone();
+                        let result = result.clone();
+                        move || {
+                            let nonce = u64::MAX.saturating_div(concurrency).saturating_mul(i);
+                            if let Some(res) =
+                                find_next_hash_par(hash, difficulty, signer, nonce, flag.clone())
+                            {
+                                flag.store(true, Ordering::Relaxed);
+                                let mut w_result = result.lock().unwrap();
+                                *w_result = res;
+                            }
+                        }
+                    })
+                })
+                .collect();
+            for h in handles {
+                h.join().unwrap();
+            }
+            let r_result = result.lock().unwrap();
+            let res = r_result.clone();
+            async_std::task::spawn(async move {
+                ch.send(res).await.ok();
             });
         }
     }
 }
 
+#[cfg(feature = "web")]
 fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) -> MiningResult {
     let mut next_hash: KeccakHash;
     let mut nonce = 0u64;
@@ -103,6 +132,39 @@ fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) -> M
         hash: next_hash,
         nonce,
     }
+}
+
+#[cfg(feature = "desktop")]
+fn find_next_hash_par(
+    hash: KeccakHash,
+    difficulty: KeccakHash,
+    signer: Pubkey,
+    nonce: u64,
+    flag: Arc<AtomicBool>,
+) -> Option<MiningResult> {
+    let mut next_hash: KeccakHash;
+    let mut nonce = nonce;
+    loop {
+        if nonce % 10_000 == 0 {
+            if flag.load(Ordering::Relaxed) {
+                return None;
+            }
+            log::info!("Nonce: {:?}", nonce);
+        }
+        next_hash = hashv(&[
+            hash.to_bytes().as_slice(),
+            signer.to_bytes().as_slice(),
+            nonce.to_be_bytes().as_slice(),
+        ]);
+        if next_hash.le(&difficulty) {
+            break;
+        }
+        nonce += 1;
+    }
+    Some(MiningResult {
+        hash: next_hash,
+        nonce,
+    })
 }
 
 pub fn use_miner<'a>(
