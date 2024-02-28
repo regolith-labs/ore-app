@@ -12,6 +12,7 @@ mod gateway;
 mod hooks;
 mod miner;
 mod route;
+#[cfg(feature = "web")]
 mod worker;
 
 use crate::{

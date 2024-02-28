@@ -1,8 +1,11 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::use_rw;
+#[cfg(feature = "desktop")]
 use solana_client::pubsub_client::PubsubClient;
 
-use crate::gateway::{AsyncResult, RPC_WSS_URL};
+use crate::gateway::AsyncResult;
+#[cfg(feature = "desktop")]
+use crate::gateway::RPC_WSS_URL;
 
 use super::{use_gateway, use_pubkey};
 
@@ -33,7 +36,7 @@ pub fn use_sol_balance(cx: &ScopeState) -> AsyncResult<u64> {
             let _ = gateway
                 .rpc
                 .account_subscribe(address, move |account| {
-                    let lamports = data.value.unwrap().lamports;
+                    let lamports = account.value.unwrap().lamports;
                     balance.write(AsyncResult::Ok(lamports)).unwrap();
                 })
                 .await;

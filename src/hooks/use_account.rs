@@ -1,14 +1,18 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::{use_rw, UseRw};
 use ore::utils::AccountDeserialize;
+#[cfg(feature = "desktop")]
 use solana_account_decoder::UiAccountData;
+#[cfg(feature = "desktop")]
 use solana_client::pubsub_client::PubsubClient;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{account::Account, pubkey::Pubkey};
 #[cfg(feature = "desktop")]
 use solana_sdk::pubkey::Pubkey;
 
-use crate::gateway::{AsyncResult, RPC_WSS_URL};
+use crate::gateway::AsyncResult;
+#[cfg(feature = "desktop")]
+use crate::gateway::RPC_WSS_URL;
 
 use super::use_gateway;
 

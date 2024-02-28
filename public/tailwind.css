@@ -708,6 +708,10 @@ h2:where(.dark, .dark *) {
   margin-top: auto;
 }
 
+.mt-8 {
+  margin-top: 2rem;
+}
+
 .inline-block {
   display: inline-block;
 }
@@ -1039,6 +1043,16 @@ h2:where(.dark, .dark *) {
   border-radius: 9999px;
 }
 
+.rounded-l-full {
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+}
+
+.rounded-r-full {
+  border-top-right-radius: 9999px;
+  border-bottom-right-radius: 9999px;
+}
+
 .border-4 {
   border-width: 4px;
 }
@@ -1079,6 +1093,11 @@ h2:where(.dark, .dark *) {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
+}
+
+.bg-gray-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(214 214 216 / var(--tw-bg-opacity));
 }
 
 .p-2 {
@@ -1292,6 +1311,14 @@ h2:where(.dark, .dark *) {
 
 .opacity-80 {
   opacity: 0.8;
+}
+
+.opacity-20 {
+  opacity: 0.2;
+}
+
+.opacity-40 {
+  opacity: 0.4;
 }
 
 .outline-none {
@@ -1541,6 +1568,10 @@ h2:where(.dark, .dark *) {
 
 .hover\:underline:hover {
   text-decoration-line: underline;
+}
+
+.hover\:opacity-60:hover {
+  opacity: 0.6;
 }
 
 .focus\:ring-0:focus {

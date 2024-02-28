@@ -1,4 +1,10 @@
-#[cfg(feature = "web")]
+use dioxus_std::utils::channel::UseChannel;
+use serde_wasm_bindgen::{from_value, to_value};
+use wasm_bindgen::prelude::*;
+use web_sys::{DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, WorkerType};
+
+use crate::miner::{find_next_hash, MineRequest, MiningResult};
+
 pub fn create_worker(ch: &UseChannel<MiningResult>) -> Worker {
     let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
     let ch = ch.clone();
@@ -29,7 +35,6 @@ pub fn create_worker(ch: &UseChannel<MiningResult>) -> Worker {
     worker
 }
 
-#[cfg(feature = "web")]
 #[wasm_bindgen]
 pub fn start_worker() {
     log::info!("Starting webworker");
@@ -50,7 +55,6 @@ pub fn start_worker() {
     )))
 }
 
-#[cfg(feature = "web")]
 fn worker_options() -> WorkerOptions {
     let mut options = WorkerOptions::new();
     options.type_(WorkerType::Module);

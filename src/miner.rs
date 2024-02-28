@@ -10,6 +10,8 @@ use dioxus_std::utils::channel::UseChannel;
 use ore::EPOCH_DURATION;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "web")]
+use serde_wasm_bindgen::to_value;
+#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
@@ -21,8 +23,12 @@ use solana_sdk::{
     pubkey::Pubkey,
     {signature::Signature, signer::Signer},
 };
+#[cfg(feature = "web")]
+use web_sys::Worker;
 
 use crate::gateway::{signer, Gateway, GatewayResult};
+#[cfg(feature = "web")]
+use crate::worker::create_worker;
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -61,13 +67,18 @@ impl Miner {
     pub fn start_mining(&self, hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) {
         #[cfg(feature = "web")]
         {
-            let req = WebworkerRequest::Mine(MineRequest {
-                hash,
-                difficulty,
-                pubkey: signer,
-            });
-            let msg = to_value(&req).unwrap();
-            self.worker.post_message(&msg).unwrap();
+            self.worker
+                .post_message(
+                    &to_value(
+                        &(MineRequest {
+                            hash,
+                            difficulty,
+                            pubkey: signer,
+                        }),
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
         }
 
         // TODO Configurable power level
@@ -107,30 +118,6 @@ impl Miner {
     }
 }
 
-#[cfg(feature = "web")]
-fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) -> MiningResult {
-    let mut next_hash: KeccakHash;
-    let mut nonce = 0u64;
-    loop {
-        if nonce % 10_000 == 0 {
-            log::info!("Nonce: {:?}", nonce);
-        }
-        next_hash = hashv(&[
-            hash.to_bytes().as_slice(),
-            signer.to_bytes().as_slice(),
-            nonce.to_be_bytes().as_slice(),
-        ]);
-        if next_hash.le(&difficulty) {
-            break;
-        }
-        nonce += 1;
-    }
-    MiningResult {
-        hash: next_hash,
-        nonce,
-    }
-}
-
 #[cfg(feature = "desktop")]
 fn find_next_hash_par(
     hash: KeccakHash,
@@ -162,6 +149,30 @@ fn find_next_hash_par(
         hash: next_hash,
         nonce,
     })
+}
+
+#[cfg(feature = "web")]
+pub fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) -> MiningResult {
+    let mut next_hash: KeccakHash;
+    let mut nonce = 0u64;
+    loop {
+        if nonce % 10_000 == 0 {
+            log::info!("Nonce: {:?}", nonce);
+        }
+        next_hash = hashv(&[
+            hash.to_bytes().as_slice(),
+            signer.to_bytes().as_slice(),
+            nonce.to_be_bytes().as_slice(),
+        ]);
+        if next_hash.le(&difficulty) {
+            break;
+        }
+        nonce += 1;
+    }
+    MiningResult {
+        hash: next_hash,
+        nonce,
+    }
 }
 
 pub async fn submit_solution(

@@ -5,11 +5,9 @@ use ore::state::{Proof, Treasury};
 use solana_account_decoder::parse_token::UiTokenAmount;
 #[cfg(feature = "web")]
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
-#[cfg(feature = "web")]
-use web_sys::Worker;
 
 use crate::{
-    components::{IsToolbarOpen, MinerStatus, OreIcon, Tooltip, TooltipDirection},
+    components::{IsToolbarOpen, MinerStatus, OreIcon, PowerBar, Tooltip, TooltipDirection},
     gateway::AsyncResult,
     route::Route,
 };
@@ -25,16 +23,6 @@ pub enum MinerChart {
     Circulating,
     Supply,
 }
-
-// #[cfg(feature = "web")]
-// #[derive(Props, PartialEq)]
-// pub struct MinerToolbarActiveProps {
-//     pub treasury: AsyncResult<Treasury>,
-//     pub proof: AsyncResult<Proof>,
-//     pub ore_supply: AsyncResult<UiTokenAmount>,
-//     // pub worker: UseState<Worker>,
-//     // pub message: UseRef<Option<WebworkerResponse>>,
-// }
 
 // #[cfg(feature = "desktop")]
 #[derive(Props, PartialEq)]
@@ -115,7 +103,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col flex-grow justify-start gap-8 px-4 sm:px-8 py-8",
+                class: "flex flex-col grow gap-8 px-4 sm:px-8 py-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
@@ -289,6 +277,18 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                             }
                         }
                     }
+                }
+                div {
+                    class: "flex flex-col gap-8 mt-auto",
+                    h2 {
+                        class: "text-2xl text-white font-bold",
+                        "Power"
+                    }
+                    p {
+                        class: "text-sm text-white opacity-80",
+                        "Upon claiming, this amount will be immediately added to your balance in the dashboard."
+                    }
+                    PowerBar {}
                 }
             }
         }
