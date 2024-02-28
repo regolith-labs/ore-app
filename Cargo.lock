@@ -4277,7 +4277,6 @@ dependencies = [
  "spl-associated-token-account",
  "spl-memo",
  "spl-token",
- "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",

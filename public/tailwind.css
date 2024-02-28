@@ -929,6 +929,10 @@ h2:where(.dark, .dark *) {
   cursor: pointer;
 }
 
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
 .resize {
   resize: both;
 }
@@ -1333,6 +1337,14 @@ h2:where(.dark, .dark *) {
   opacity: 0.4;
 }
 
+.opacity-60 {
+  opacity: 0.6;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
 .outline-none {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -1556,6 +1568,10 @@ h2:where(.dark, .dark *) {
   font-weight: 900;
 
   font-style: normal;
+}
+
+.hover\:cursor-not-allowed:hover {
+  cursor: not-allowed;
 }
 
 .hover\:bg-gray-200:hover {

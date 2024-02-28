@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["web"]
+default = ["desktop"]
 desktop = [
     "dioxus-desktop",
     "env_logger",
@@ -18,7 +18,6 @@ desktop = [
     "spl-memo",
     "spl-token",
     "spl-associated-token-account",
-    "tokio"
 ]
 web = [
     "dioxus-web",
@@ -68,7 +67,6 @@ solana-sdk = { version = "1.17.4", optional = true }
 spl-memo = { version = "^4", features = ["no-entrypoint"], optional = true }
 spl-token = { version = "^4", features = ["no-entrypoint"], optional = true }
 spl-associated-token-account = { version = "^2.2", features = [ "no-entrypoint" ], optional = true }
-tokio = { version = "1.36.0", optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
 wasm-bindgen-futures = { version = "0.4.41", optional = true }
 wasm-logger = { version = "0.2.0", optional = true }

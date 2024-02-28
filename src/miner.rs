@@ -1,5 +1,11 @@
 use std::rc::Rc;
+#[cfg(feature = "desktop")]
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc, Mutex,
+};
 
+use dioxus::prelude::UseSharedState;
 use dioxus_std::utils::channel::UseChannel;
 use ore::EPOCH_DURATION;
 use serde::{Deserialize, Serialize};
@@ -20,9 +26,12 @@ use solana_sdk::{
 #[cfg(feature = "web")]
 use web_sys::Worker;
 
-use crate::gateway::{signer, Gateway, GatewayResult};
 #[cfg(feature = "web")]
 use crate::worker::create_worker;
+use crate::{
+    gateway::{signer, Gateway, GatewayResult},
+    hooks::PowerLevel,
+};
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -46,15 +55,17 @@ pub struct Miner {
     worker: Worker,
     #[cfg(feature = "desktop")]
     ch: UseChannel<MiningResult>,
+    power_level: UseSharedState<PowerLevel>,
 }
 
 impl Miner {
-    pub fn new(ch: &UseChannel<MiningResult>) -> Self {
+    pub fn new(ch: &UseChannel<MiningResult>, power_level: &UseSharedState<PowerLevel>) -> Self {
         Self {
             #[cfg(feature = "web")]
             worker: create_worker(ch),
             #[cfg(feature = "desktop")]
             ch: ch.clone(),
+            power_level: power_level.clone(),
         }
     }
 
@@ -85,14 +96,17 @@ impl Miner {
             let ch = self.ch.clone();
             let flag = Arc::new(AtomicBool::new(false));
             let result = Arc::new(Mutex::new(MiningResult::default()));
+            let power_percent = ((self.power_level.read().0 + 1) as f64) / 8f64;
             let concurrency = num_cpus::get() as u64;
-            let handles: Vec<_> = (0..concurrency)
+            let tuned_concurrency = ((concurrency as f64) * power_percent).round() as u64;
+            let handles: Vec<_> = (0..tuned_concurrency)
                 .map(|i| {
                     std::thread::spawn({
                         let flag = flag.clone();
                         let result = result.clone();
                         move || {
-                            let nonce = u64::MAX.saturating_div(concurrency).saturating_mul(i);
+                            let nonce =
+                                u64::MAX.saturating_div(tuned_concurrency).saturating_mul(i);
                             if let Some(res) =
                                 find_next_hash_par(hash, difficulty, signer, nonce, flag.clone())
                             {
@@ -104,6 +118,13 @@ impl Miner {
                     })
                 })
                 .collect();
+            log::info!(
+                "Power: {:?} Concurrency: {:?} Tuned concurrency: {:?} Threads: {:?}",
+                *self.power_level.read(),
+                concurrency,
+                tuned_concurrency,
+                handles.len(),
+            );
             for h in handles {
                 h.join().unwrap();
             }

@@ -4,7 +4,22 @@ use dioxus::prelude::*;
 
 use crate::{components::Explorer, hooks::use_persistent::use_persistent};
 
-use super::use_persistent::UsePersistent;
+const KEY: &str = "explorer";
+
+pub fn use_explorer(cx: &ScopeState) -> &UseSharedState<Explorer> {
+    let explorer = use_shared_state::<Explorer>(cx).unwrap();
+    let explorer_persistent = use_persistent(cx, KEY, || Explorer::Solana);
+    use_effect(cx, explorer, |_| {
+        explorer_persistent.set(*explorer.read());
+        async move {}
+    });
+    explorer
+}
+
+pub fn use_explorer_provider(cx: &ScopeState) {
+    let explorer = use_persistent(cx, KEY, || Explorer::Solana).get();
+    use_shared_state_provider(cx, || explorer);
+}
 
 pub fn use_explorer_account_url(cx: &ScopeState, address: &String) -> String {
     let explorer = use_explorer(cx);
@@ -24,12 +39,4 @@ pub fn use_explorer_transaction_url(cx: &ScopeState, signature: &String) -> Stri
         Explorer::Solscan => format!("https://solscan.io/tx/{}", signature),
         Explorer::Xray => format!("https://xray.helius.xyz/tx/{}", signature),
     }
-}
-
-pub fn use_explorer(cx: &ScopeState) -> &UseSharedState<Explorer> {
-    use_shared_state::<Explorer>(cx).unwrap()
-}
-
-pub fn use_explorer_persistant(cx: &ScopeState) -> &UsePersistent<Explorer> {
-    use_persistent(cx, "explorer", || Explorer::Solana)
 }

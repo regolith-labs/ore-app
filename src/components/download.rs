@@ -11,6 +11,9 @@ pub fn Download(cx: Scope) -> Element {
                 h1 {
                     "Download"
                 }
+                p {
+                    "Coming soon..."
+                }
             }
         }
     }

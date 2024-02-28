@@ -279,7 +279,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         }
                     }
                 }
-                MinerPower{}
+                MinerPower {}
             }
         }
     } else {

@@ -11,10 +11,7 @@ use solana_sdk::native_token::LAMPORTS_PER_SOL;
 use crate::{
     components::Copyable,
     gateway::AsyncResult,
-    hooks::{
-        use_appearance, use_appearance_persistant, use_explorer, use_explorer_persistant,
-        use_pubkey, use_sol_balance,
-    },
+    hooks::{use_appearance, use_explorer, use_pubkey, use_sol_balance},
     route::Route,
 };
 
@@ -33,9 +30,7 @@ pub fn Settings(cx: Scope) -> Element {
     let pubkey = use_pubkey(cx);
     let sol_balance = use_sol_balance(cx);
     let explorer = use_explorer(cx);
-    let explorer_persistent = use_explorer_persistant(cx);
     let appearance = use_appearance(cx);
-    let appearance_persistent = use_appearance_persistant(cx);
 
     // TODO use_concurrency()
     let cores = "12".to_string();
@@ -122,7 +117,6 @@ pub fn Settings(cx: Scope) -> Element {
                         onchange: move |e| {
                             if let Ok(a) = Appearance::from_str(e.value.as_str()) {
                                 *appearance.write() = a;
-                                appearance_persistent.set(a);
                             }
                         },
                         option { initial_selected: appearance.read().eq(&Appearance::Light), value: "{Appearance::Light}", "{Appearance::Light}" }
@@ -140,7 +134,6 @@ pub fn Settings(cx: Scope) -> Element {
                         onchange: move |e| {
                             if let Ok(e) = Explorer::from_str(e.value.as_str()) {
                                 *explorer.write() = e;
-                                explorer_persistent.set(e);
                             }
                         },
                         option { initial_selected: explorer.read().eq(&Explorer::Solana), value: "{Explorer::Solana}", "{Explorer::Solana}" }

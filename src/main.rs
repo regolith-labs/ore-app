@@ -16,7 +16,7 @@ mod route;
 mod worker;
 
 use crate::{
-    hooks::{use_appearance_persistant, use_explorer_persistant},
+    hooks::{use_appearance_provider, use_explorer_provider, use_power_level_provider},
     route::Route,
 };
 
@@ -38,13 +38,10 @@ fn main() {
 
 #[component]
 fn App(cx: Scope) -> Element {
-    // Appearance
-    let appearance = use_appearance_persistant(cx).get();
-    use_shared_state_provider(cx, || appearance);
-
-    // Explorer
-    let explorer = use_explorer_persistant(cx).get();
-    use_shared_state_provider(cx, || explorer);
+    // Global variables
+    use_appearance_provider(cx);
+    use_explorer_provider(cx);
+    use_power_level_provider(cx);
 
     // Gateway
     use_context_provider(cx, || Rc::new(Gateway::new()));
