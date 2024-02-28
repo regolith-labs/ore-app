@@ -145,7 +145,6 @@ fn find_next_hash_par(
             if flag.load(Ordering::Relaxed) {
                 return None;
             }
-            log::info!("Nonce: {:?}", nonce);
         }
         next_hash = hashv(&[
             hash.to_bytes().as_slice(),
@@ -168,9 +167,6 @@ pub fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) 
     let mut next_hash: KeccakHash;
     let mut nonce = 0u64;
     loop {
-        if nonce % 10_000 == 0 {
-            log::info!("Nonce: {:?}", nonce);
-        }
         next_hash = hashv(&[
             hash.to_bytes().as_slice(),
             signer.to_bytes().as_slice(),

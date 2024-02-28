@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::{ClaimButton, IsToolbarOpen, MinerToolbarInsufficientFunds, PlayIcon};
+use crate::components::{IsToolbarOpen, MinerToolbarInsufficientFunds, PlayIcon, Tutorial};
 
 #[component]
 pub fn MinerToolbarNotStarted(cx: Scope) -> Element {
@@ -15,15 +15,13 @@ pub fn MinerToolbarNotStarted(cx: Scope) -> Element {
                 class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
                 p {
                     class: "font-semibold my-auto",
-                    "Start mining"
+                    "Not mining"
                 }
                 div {
                     class: "flex flex-row gap-2 sm:gap-4",
-                    ClaimButton {
-                        claimable_rewards: f64::MAX // TODO Set this appropriately
-                    }
                     StartButton {}
                 }
+                Tutorial {}
             }
         }
     }

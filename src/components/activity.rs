@@ -131,7 +131,7 @@ pub fn ActivityTable<'a>(cx: Scope<'a, ActivityTableProps<'a>>) -> Element {
     } else {
         render! {
             div {
-                class: "flex flex-col gap-4",
+                class: "flex flex-col gap-4 px-1",
                 div {
                     class: "flex flex-col gap-0 justify-start grow h-full -mx-2",
                     ActivityTableHeader {}

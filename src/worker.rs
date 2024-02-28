@@ -13,7 +13,6 @@ pub fn create_worker(ch: &UseChannel<MiningResult>) -> Worker {
     worker.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
         Closure::<dyn Fn(MessageEvent)>::new(move |event: MessageEvent| {
             let res: MiningResult = from_value(event.data()).unwrap();
-            log::info!("Message from worker: {:?}", res);
             wasm_bindgen_futures::spawn_local({
                 let ch = ch.clone();
                 async move {
@@ -46,7 +45,6 @@ pub fn start_worker() {
 
     scope.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
         Closure::<dyn Fn(MessageEvent)>::new(move |event: MessageEvent| {
-            log::info!("Received message {:?}", event.data());
             let req: MineRequest = from_value(event.data()).unwrap();
             let res = find_next_hash(req.hash, req.difficulty, req.pubkey);
             scope_.post_message(&to_value(&res).unwrap()).unwrap();

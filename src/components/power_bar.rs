@@ -138,7 +138,7 @@ fn DownloadLink(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-sm text-nowrap my-auto",
-                    "You are mining from a web browser. For more power, "
+                    "You are mining from a web browser. For better performance, "
                     Link {
                         to: Route::Download {},
                         class: "font-medium underline",

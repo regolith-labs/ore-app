@@ -26,41 +26,42 @@ pub fn use_sol_balance(cx: &ScopeState) -> AsyncResult<u64> {
         }
     });
 
+    // TODO Wasm account subscribe does not support more than two accounts at a time
     // Stream balance changes.
-    let _: &Coroutine<()> = use_coroutine(cx, |mut _rx| {
-        #[cfg(feature = "web")]
-        let gateway = gateway.clone();
-        let balance = balance.clone();
-        async move {
-            #[cfg(feature = "web")]
-            let _ = gateway
-                .rpc
-                .account_subscribe(address, move |account| {
-                    let lamports = account.value.unwrap().lamports;
-                    balance.write(AsyncResult::Ok(lamports)).unwrap();
-                })
-                .await;
+    // let _: &Coroutine<()> = use_coroutine(cx, |mut _rx| {
+    //     #[cfg(feature = "web")]
+    //     let gateway = gateway.clone();
+    //     let balance = balance.clone();
+    //     async move {
+    //         #[cfg(feature = "web")]
+    //         let _ = gateway
+    //             .rpc
+    //             .account_subscribe(address, move |account| {
+    //                 let lamports = account.value.unwrap().lamports;
+    //                 balance.write(AsyncResult::Ok(lamports)).unwrap();
+    //             })
+    //             .await;
 
-            #[cfg(feature = "desktop")]
-            std::thread::spawn(move || {
-                match PubsubClient::account_subscribe(
-                    RPC_WSS_URL,
-                    &address,
-                    Some(solana_client::rpc_config::RpcAccountInfoConfig::default()),
-                ) {
-                    Ok((mut _sub, rx)) => {
-                        while let Ok(ui_account) = rx.recv() {
-                            let lamports = ui_account.value.lamports;
-                            balance.write(AsyncResult::Ok(lamports)).unwrap();
-                        }
-                    }
-                    Err(err) => {
-                        log::error!("Failed to subscribe to account: {:?}", err)
-                    }
-                };
-            });
-        }
-    });
+    //         #[cfg(feature = "desktop")]
+    //         std::thread::spawn(move || {
+    //             match PubsubClient::account_subscribe(
+    //                 RPC_WSS_URL,
+    //                 &address,
+    //                 Some(solana_client::rpc_config::RpcAccountInfoConfig::default()),
+    //             ) {
+    //                 Ok((mut _sub, rx)) => {
+    //                     while let Ok(ui_account) = rx.recv() {
+    //                         let lamports = ui_account.value.lamports;
+    //                         balance.write(AsyncResult::Ok(lamports)).unwrap();
+    //                     }
+    //                 }
+    //                 Err(err) => {
+    //                     log::error!("Failed to subscribe to account: {:?}", err)
+    //                 }
+    //             };
+    //         });
+    //     }
+    // });
 
     *balance.read().unwrap()
 }

@@ -52,93 +52,96 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             };
             render! {
                 div {
-                    class: "flex flex-col gap-2",
+                    class: "flex flex-col gap-4",
                     h2 {
                         class: "text-lg md:text-2xl font-bold",
                         "{title}"
                     }
                     div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "Signature"
-                        }
-                        Copyable {
-                            value: transfer.sig.clone(),
-                            Link {
-                                class: "{link_class} font-mono",
-                                to: "{explorer_url}",
-                                "{&transfer.sig.as_str()[..32]}"
+                        class: "flex flex-col gap-2",
+                        div {
+                            class: "{container_class}",
+                            p {
+                                class: "{title_class}",
+                                "Signature"
+                            }
+                            Copyable {
+                                value: transfer.sig.clone(),
+                                Link {
+                                    class: "{link_class} font-mono",
+                                    to: "{explorer_url}",
+                                    "{&transfer.sig.as_str()[..32]}"
+                                }
                             }
                         }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "To"
-                        }
-                        Copyable {
-                            value: transfer.to_address.clone(),
-                            Link {
-                                class: "{link_class} font-mono",
-                                to: Route::User { id: transfer.to_address.clone() },
-                                "{transfer.to_address}"
+                        div {
+                            class: "{container_class}",
+                            p {
+                                class: "{title_class}",
+                                "To"
+                            }
+                            Copyable {
+                                value: transfer.to_address.clone(),
+                                Link {
+                                    class: "{link_class} font-mono",
+                                    to: Route::User { id: transfer.to_address.clone() },
+                                    "{transfer.to_address}"
+                                }
                             }
                         }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "From"
-                        }
-                        Copyable {
-                            value: transfer.from_address.clone(),
-                            Link {
-                                class: "{link_class}",
-                                to: Route::User { id: transfer.from_address.clone() },
-                                "{from_name}"
+                        div {
+                            class: "{container_class}",
+                            p {
+                                class: "{title_class}",
+                                "From"
+                            }
+                            Copyable {
+                                value: transfer.from_address.clone(),
+                                Link {
+                                    class: "{link_class}",
+                                    to: Route::User { id: transfer.from_address.clone() },
+                                    "{from_name}"
+                                }
                             }
                         }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "Amount"
+                        div {
+                            class: "{container_class}",
+                            p {
+                                class: "{title_class}",
+                                "Amount"
+                            }
+                            span {
+                                class: "flex flex-row gap-1.5",
+                                OreIcon {
+                                    class: "w-3.5 h-3.5 my-auto",
+                                }
+                                p {
+                                    class: "{value_class}",
+                                    "{amount}"
+                                }
+                            }
                         }
-                        span {
-                            class: "flex flex-row gap-1.5",
-                            OreIcon {
-                                class: "w-3.5 h-3.5 my-auto",
+                        div {
+                            class: "{container_class}",
+                            p {
+                                class: "{title_class}",
+                                "Memo"
                             }
                             p {
                                 class: "{value_class}",
-                                "{amount}"
+                                "{transfer_memo}"
                             }
                         }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "Memo"
-                        }
-                        p {
-                            class: "{value_class}",
-                            "{transfer_memo}"
-                        }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "Timestamp"
-                        }
-                        p {
-                            class: "{value_class}",
-                            "{date}"
+                        div {
+                            class: "{container_class}",
+                            p {
+                                class: "{title_class}",
+                                "Timestamp"
+                            }
+                            p {
+                                class: "{value_class}",
+                                "{date}"
+                            }
                         }
                     }
                 }

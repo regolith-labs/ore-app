@@ -19,6 +19,7 @@ mod settings;
 mod spinner;
 mod stop_button;
 mod tooltip;
+mod tutorial;
 mod tx;
 mod user;
 
@@ -43,5 +44,6 @@ pub use settings::*;
 pub use spinner::*;
 pub use stop_button::*;
 pub use tooltip::*;
+pub use tutorial::*;
 pub use tx::*;
 pub use user::*;

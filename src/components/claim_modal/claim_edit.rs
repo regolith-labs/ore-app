@@ -44,7 +44,7 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
                 }
                 p {
                     class: "text-sm text-gray-300 dark:text-gray-700",
-                    "Upon claiming, this amount will be immediately added to your balance in the dashboard."
+                    "Upon claiming, this amount will be added to your balance in the dashboard."
                 }
             }
             div {

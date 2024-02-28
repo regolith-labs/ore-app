@@ -81,11 +81,11 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-black text-lg",
-                    "Scan the QR code with your wallet to top up your miner."
+                    "Scan the QR code from your wallet to fund your miner."
                 }
                 p {
                     class: "text-gray-300 text-sm",
-                    "Your miner requires at least 0.1 SOL to begin mining."
+                    "Top up with at least 0.1 SOL to begin mining."
                 }
             }
             div {
@@ -105,7 +105,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
             }
             a {
                 // TODO Get referal code
-                href: "https://coinbase.com",
+                href: "https://www.coinbase.com/price/solana",
                 target: "_blank",
                 class: "font-medium text-center text-sm text-gray-300 hover:underline",
                 "Help! I don't have any SOL."

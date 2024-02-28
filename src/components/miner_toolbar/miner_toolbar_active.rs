@@ -86,16 +86,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         }
     });
 
-    let container_class = "flex flex-col gap-1 shrink h-min";
-    let header_container_class = "flex flex-row justify-start gap-1.5";
-    let header_class = "font-medium text-xs z-0 text-nowrap opacity-80";
-    let mono_value_class = "font-mono font-medium text-white";
-    let value_class = "font-medium text-white";
-
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-8 px-4 sm:px-8 py-8",
+                class: "flex flex-col grow gap-4 px-4 sm:px-8 py-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
@@ -104,79 +98,33 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     }
                     div {
                         class: "flex flex-row gap-4",
-                        ClaimButton {
-                            claimable_rewards: claimable_rewards
-                        }
+                        // ClaimButton {
+                        //     hidden: claimable_rewards.eq(&0f64)
+                        // }
                         StopButton {
                             miner: cx.props.miner.clone()
                         }
                     }
                 }
                 div {
-                    class: "grid grid-cols-2 grid-rows-3 gap-y-8",
-                    // div {
-                    //     class: "{container_class} w-full md:w-3/4",
-                    //     onclick: |_| {
-                    //         chart.set(MinerChart::Hash);
-                    //     },
-                    //     div {
-                    //         class: "{header_container_class}",
-                    //         p {
-                    //             class: "{header_class}",
-                    //             "Hash"
-                    //         }
-                    //         Tooltip {
-                    //             text: "The calculation your miner is currently working on.",
-                    //             direction: TooltipDirection::Right
-                    //         }
-                    //     }
-                    //     p {
-                    //         class: "{mono_value_class} hidden lg:block",
-                    //         "{hash}"
-                    //     }
-                    //     p {
-                    //         class: "{mono_value_class} lg:hidden",
-                    //         "{hash_abbr}"
-                    //     }
-                    // }
-                    // div {
-                    //     class: "{container_class} w-full md:w-1/4",
-                    //     onclick: |_| {
-                    //         chart.set(MinerChart::Time);
-                    //     },
-                    //     div {
-                    //         class: "{header_container_class}",
-                    //         p {
-                    //             class: "{header_class}",
-                    //             "Time"
-                    //         }
-                    //         Tooltip {
-                    //             text: "The time your miner has spent on the current hash.",
-                    //             direction: TooltipDirection::Right
-                    //         }
-                    //     }
-                    //     p {
-                    //         class: "{value_class}",
-                    //         "{timer.current()} sec"
-                    //     }
-                    // }
+                    class: "grid grid-cols-2 grid-rows-3 gap-y-8 px-1",
                     MinerDataOre {
-                        title: "Rewards",
+                        title: "Your rewards",
                         tooltip: "The amount of Ore you have mined and may claim.",
                         amount: claimable_rewards.to_string()
                     }
                     MinerDataOre {
-                        title: "Rate",
-                        tooltip: "The amount of Ore you are earning per hash.",
+                        title: "Reward rate",
+                        tooltip: "The amount of Ore you are earning per valid hash.",
                         amount: reward_rate.to_string()
                     }
                     MinerDataOre {
-                        title: "Circulating",
+                        title: "Circulating supply",
                         tooltip: "The total amount of Ore that has ever been claimed.",
                         amount: circulating_supply.to_string()
                     }
                     MinerDataOre {
-                        title: "Supply",
+                        title: "Total supply",
                         tooltip: "The total amount of Ore that has ever been mined.",
                         amount: ore_supply
                     }
@@ -188,17 +136,17 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         render! {
             div {
                 class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
-                RewardsCounter {
-                    claimable_rewards: claimable_rewards,
-                }
                 div {
-                    class: "flex flex-row gap-2 sm:gap-4",
-                    ClaimButton {
-                        claimable_rewards: claimable_rewards
+                    class: "flex flex-row gap-4",
+                    RewardsCounter {
+                        claimable_rewards: claimable_rewards,
                     }
-                    StopButton {
-                        miner: cx.props.miner.clone()
-                    }
+                    // ClaimButton {
+                    //     hidden: claimable_rewards.eq(&0f64)
+                    // }
+                }
+                StopButton {
+                    miner: cx.props.miner.clone()
                 }
             }
         }
@@ -240,22 +188,17 @@ pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: Str
     }
 }
 
-#[derive(Props, PartialEq)]
-pub struct ClaimButtonProps {
-    pub claimable_rewards: f64,
-}
-
 #[component]
-pub fn ClaimButton(cx: Scope<ClaimButtonProps>) -> Element {
+pub fn ClaimButton(cx: Scope, hidden: bool) -> Element {
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let colors = match *miner_status.read() {
         MinerStatus::Active => "hover:bg-green-600 active:bg-green-700",
         _ => "hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
     };
-    let opacity = if cx.props.claimable_rewards.gt(&0f64) {
-        "opacity-100"
-    } else {
+    let opacity = if *hidden {
         "opacity-0 pointer-events-none"
+    } else {
+        "opacity-100"
     };
     render! {
         Link {
@@ -283,8 +226,9 @@ pub fn RewardsCounter(cx: Scope<RewardsCounterProps>) -> Element {
             div {
                 class: "flex flex-row gap-3 my-auto",
                 ActivityIndicator {}
-                div {
-                    class: "flex flex-row gap-1 my-auto text-white",
+                Link {
+                    class: "flex flex-row gap-1 my-auto px-2 py-1 text-white rounded hover:bg-green-600 active:bg-green-700 transition-colors",
+                    to: Route::Claim {},
                     OreIcon {
                         class: "h-3.5 w-3.5 my-auto",
                     }
