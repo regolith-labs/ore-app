@@ -15,10 +15,14 @@ pub fn Landing(cx: Scope) -> Element {
     }
 
     render! {
+        img {
+            class: "fixed top-0 left-0 w-screen -z-50",
+            src: "/smoke.png"
+        }
         div {
             class: "flex flex-col gap-y-8 my-auto pb-24",
-            h1 {
-                class: "text-center",
+            p {
+                class: "text-center text-8xl font-bold",
                 "It's time to "
                 span {
                     class: "inline-block text-white leading-relaxed bg-green-500 px-2",
@@ -26,7 +30,7 @@ pub fn Landing(cx: Scope) -> Element {
                 }
             }
             Link {
-                class: "mx-auto text-lg font-medium hover:underline",
+                class: "mx-auto text-4xl font-semibold hover:underline",
                 to: Route::Home {},
                 "Get started →"
             }

@@ -2,15 +2,8 @@ use dioxus::prelude::*;
 
 use crate::components::{Chart, DataPoint};
 
-use super::MinerChart;
-
-#[derive(Props)]
-pub struct MinerChartsProps<'a> {
-    pub chart: &'a UseState<MinerChart>,
-}
-
 #[component]
-pub fn MinerCharts<'a>(cx: Scope<'a, MinerChartsProps<'a>>) -> Element {
+pub fn MinerCharts(cx: Scope) -> Element {
     // let width = use_window_width(cx);
     let width = 0;
 
@@ -24,42 +17,11 @@ pub fn MinerCharts<'a>(cx: Scope<'a, MinerChartsProps<'a>>) -> Element {
     render! {
         div {
             class: "flex h-full",
-            match cx.props.chart.get() {
-                MinerChart::Hash => {
-                    render! {
-                        p { "*hash chart*" }
-                    }
-                }
-                MinerChart::Time => {
-                    render! {
-                        Chart {
-                            class: "h-48 w-full",
-                            data: data,
-                            width: (width - 32) as f64,
-                            height: 192f64,
-                        }
-                    }
-                }
-                MinerChart::Rewards => {
-                    render! {
-                        p { "*rewards chart*" }
-                    }
-                }
-                MinerChart::Rate => {
-                    render! {
-                        p { "*rate chart*" }
-                    }
-                }
-                MinerChart::Circulating => {
-                    render! {
-                        p { "*circulating chart*" }
-                    }
-                }
-                MinerChart::Supply => {
-                    render! {
-                        p { "*supply chart*" }
-                    }
-                }
+            Chart {
+                class: "h-48 w-full",
+                data: data,
+                width: (width - 32) as f64,
+                height: 192f64,
             }
         }
     }

@@ -32,16 +32,16 @@ fn PowerHeader(cx: Scope) -> Element {
                 class: "text-lg",
                 "Select how much computing power to dedicate to mining."
             }
-            p {
-                class: "text-sm text-white opacity-80",
-                "Higher power levels can earn more rewards but may impact your computer's battery life."
-            }
+            // p {
+            //     class: "text-sm text-white opacity-80",
+            //     "Higher power levels can earn more rewards but may impact your computer's battery life."
+            // }
         }
     }
 }
 
 #[component]
-fn PowerBar<'a>(cx: Scope) -> Element {
+fn PowerBar(cx: Scope) -> Element {
     let power_level = use_power_level(cx);
     let hover_level = use_state::<Option<u8>>(cx, || None);
     render! {

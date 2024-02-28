@@ -118,13 +118,6 @@ impl Miner {
                     })
                 })
                 .collect();
-            log::info!(
-                "Power: {:?} Concurrency: {:?} Tuned concurrency: {:?} Threads: {:?}",
-                *self.power_level.read(),
-                concurrency,
-                tuned_concurrency,
-                handles.len(),
-            );
             for h in handles {
                 h.join().unwrap();
             }

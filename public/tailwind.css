@@ -615,6 +615,10 @@ h2:where(.dark, .dark *) {
   position: static;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .absolute {
   position: absolute;
 }
@@ -658,6 +662,10 @@ h2:where(.dark, .dark *) {
 
 .z-\[100\] {
   z-index: 100;
+}
+
+.-z-50 {
+  z-index: -50;
 }
 
 .-mx-2 {
@@ -1255,6 +1263,16 @@ h2:where(.dark, .dark *) {
   line-height: 1rem;
 }
 
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
+.text-8xl {
+  font-size: 6rem;
+  line-height: 1;
+}
+
 .font-black {
   font-weight: 900;
 }
@@ -1343,6 +1361,14 @@ h2:where(.dark, .dark *) {
 
 .opacity-50 {
   opacity: 0.5;
+}
+
+.opacity-30 {
+  opacity: 0.3;
+}
+
+.opacity-10 {
+  opacity: 0.1;
 }
 
 .outline-none {

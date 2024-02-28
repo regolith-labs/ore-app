@@ -18,15 +18,6 @@ use crate::{
 // TODO Lifetime rewards
 // TODO Lifetime hashes
 
-pub enum MinerChart {
-    Hash,
-    Time,
-    Rewards,
-    Rate,
-    Circulating,
-    Supply,
-}
-
 // #[cfg(feature = "desktop")]
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
@@ -38,7 +29,6 @@ pub struct MinerToolbarActiveProps {
 
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
-    let chart = use_state(cx, || MinerChart::Hash);
     let timer = use_state(cx, || 0u64);
     let proof = cx.props.proof;
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
@@ -124,159 +114,71 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                 }
                 div {
                     class: "grid grid-cols-2 grid-rows-3 gap-y-8",
-                    div {
-                        class: "{container_class} w-full md:w-3/4",
-                        onclick: |_| {
-                            chart.set(MinerChart::Hash);
-                        },
-                        div {
-                            class: "{header_container_class}",
-                            p {
-                                class: "{header_class}",
-                                "Hash"
-                            }
-                            Tooltip {
-                                text: "The calculation your miner is currently working on.",
-                                direction: TooltipDirection::Right
-                            }
-                        }
-                        p {
-                            class: "{mono_value_class} hidden lg:block",
-                            "{hash}"
-                        }
-                        p {
-                            class: "{mono_value_class} lg:hidden",
-                            "{hash_abbr}"
-                        }
+                    // div {
+                    //     class: "{container_class} w-full md:w-3/4",
+                    //     onclick: |_| {
+                    //         chart.set(MinerChart::Hash);
+                    //     },
+                    //     div {
+                    //         class: "{header_container_class}",
+                    //         p {
+                    //             class: "{header_class}",
+                    //             "Hash"
+                    //         }
+                    //         Tooltip {
+                    //             text: "The calculation your miner is currently working on.",
+                    //             direction: TooltipDirection::Right
+                    //         }
+                    //     }
+                    //     p {
+                    //         class: "{mono_value_class} hidden lg:block",
+                    //         "{hash}"
+                    //     }
+                    //     p {
+                    //         class: "{mono_value_class} lg:hidden",
+                    //         "{hash_abbr}"
+                    //     }
+                    // }
+                    // div {
+                    //     class: "{container_class} w-full md:w-1/4",
+                    //     onclick: |_| {
+                    //         chart.set(MinerChart::Time);
+                    //     },
+                    //     div {
+                    //         class: "{header_container_class}",
+                    //         p {
+                    //             class: "{header_class}",
+                    //             "Time"
+                    //         }
+                    //         Tooltip {
+                    //             text: "The time your miner has spent on the current hash.",
+                    //             direction: TooltipDirection::Right
+                    //         }
+                    //     }
+                    //     p {
+                    //         class: "{value_class}",
+                    //         "{timer.current()} sec"
+                    //     }
+                    // }
+                    MinerDataOre {
+                        title: "Rewards",
+                        tooltip: "The amount of Ore you have mined and may claim.",
+                        amount: claimable_rewards.to_string()
                     }
-                    div {
-                        class: "{container_class} w-full md:w-1/4",
-                        onclick: |_| {
-                            chart.set(MinerChart::Time);
-                        },
-                        div {
-                            class: "{header_container_class}",
-                            p {
-                                class: "{header_class}",
-                                "Time"
-                            }
-                            Tooltip {
-                                text: "The time your miner has spent on the current hash.",
-                                direction: TooltipDirection::Right
-                            }
-                        }
-                        p {
-                            class: "{value_class}",
-                            "{timer.current()} sec"
-                        }
+                    MinerDataOre {
+                        title: "Rate",
+                        tooltip: "The amount of Ore you are earning per hash.",
+                        amount: reward_rate.to_string()
                     }
-                    div {
-                        class: "{container_class} w-full",
-                        onclick: |_| {
-                            chart.set(MinerChart::Rewards);
-                        },
-                        div {
-                            class: "{header_container_class}",
-                            p {
-                                class: "{header_class}",
-                                "Rewards"
-                            }
-                            Tooltip {
-                                text: "The amount of Ore you have mined and may claim.",
-                                direction: TooltipDirection::Right
-                            }
-                        }
-                        p {
-                            class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
-                            OreIcon {
-                                class: "w-4 h-4 my-auto",
-                            }
-                            span {
-                                class: "ml-1.5",
-                                "{claimable_rewards}"
-                            }
-                        }
+                    MinerDataOre {
+                        title: "Circulating",
+                        tooltip: "The total amount of Ore that has ever been claimed.",
+                        amount: circulating_supply.to_string()
                     }
-                    div {
-                        class: "{container_class} w-full",
-                        onclick: |_| {
-                            chart.set(MinerChart::Rate);
-                        },
-                        div {
-                            class: "{header_container_class}",
-                            p {
-                                class: "{header_class}",
-                                "Rate"
-                            }
-                            Tooltip {
-                                text: "The amount of Ore you are earning per hash.",
-                                direction: TooltipDirection::Right
-                            }
-                        }
-                        p {
-                            class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
-                            OreIcon {
-                                class: "w-4 h-4 my-auto",
-                            }
-                            span {
-                                class: "ml-1.5",
-                                "{reward_rate}"
-                            }
-                        }
-                    }
-                    div {
-                        class: "{container_class} w-full",
-                        onclick: |_| {
-                            chart.set(MinerChart::Circulating);
-                        },
-                        div {
-                            class: "{header_container_class}",
-                            p {
-                                class: "{header_class}",
-                                "Circulating"
-                            }
-                            Tooltip {
-                                text: "The total amount of Ore that has ever been claimed.",
-                                direction: TooltipDirection::Right
-                            }
-                        }
-                        p {
-                            class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
-                            OreIcon {
-                                class: "w-4 h-4 my-auto",
-                            }
-                            span {
-                                class: "ml-1.5",
-                                "{circulating_supply}"
-                            }
-                        }
-                    }
-                    div {
-                        class: "{container_class} w-full",
-                        onclick: |_| {
-                            chart.set(MinerChart::Supply);
-                        },
-                        div {
-                            class: "{header_container_class}",
-                            p {
-                                class: "{header_class}",
-                                "Supply"
-                            }
-                            Tooltip {
-                                text: "The total amount of Ore that has ever been mined.",
-                                direction: TooltipDirection::Right
-                            }
-                        }
-                        p {
-                            class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
-                            OreIcon {
-                                class: "w-4 h-4 my-auto",
-                            }
-                            span {
-                                class: "ml-1.5",
-                                "{ore_supply}"
-                            }
-                        }
+                    MinerDataOre {
+                        title: "Supply",
+                        tooltip: "The total amount of Ore that has ever been mined.",
+                        amount: ore_supply
                     }
                 }
                 MinerPower {}
@@ -297,6 +199,41 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     StopButton {
                         miner: cx.props.miner.clone()
                     }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: String) -> Element {
+    let container_class = "flex flex-col gap-1 shrink h-min";
+    let header_container_class = "flex flex-row justify-start gap-1.5";
+    let header_class = "font-medium text-xs z-0 text-nowrap opacity-80";
+    // let mono_value_class = "font-mono font-medium text-white";
+    let value_class = "font-medium text-white";
+    render! {
+        div {
+            class: "{container_class} w-full",
+            div {
+                class: "{header_container_class}",
+                p {
+                    class: "{header_class}",
+                    "{title}"
+                }
+                Tooltip {
+                    text: "{tooltip}",
+                    direction: TooltipDirection::Right
+                }
+            }
+            p {
+                class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
+                OreIcon {
+                    class: "w-4 h-4 my-auto",
+                }
+                span {
+                    class: "ml-1.5",
+                    "{amount}"
                 }
             }
         }
