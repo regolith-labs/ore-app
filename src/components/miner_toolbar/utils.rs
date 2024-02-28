@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use dioxus::hooks::UseSharedState;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, signer::Signer};
 #[cfg(feature = "desktop")]
@@ -11,7 +10,7 @@ use crate::{
     miner::Miner,
 };
 
-use super::{IsToolbarOpen, MinerStatus};
+// TODO Move this somewhere
 
 pub async fn try_start_mining(
     gateway: &Rc<Gateway>,
@@ -45,17 +44,4 @@ pub async fn try_start_mining(
     );
 
     Ok(true)
-}
-
-pub fn stop_mining(
-    status: &UseSharedState<MinerStatus>,
-    is_toolbar_open: &UseSharedState<IsToolbarOpen>,
-    // #[cfg(feature = "web")] worker: &UseState<Worker>,
-    // #[cfg(feature = "web")] message: &UseRef<Option<WebworkerResponse>>,
-) {
-    // TODO Pause
-    // #[cfg(feature = "web")]
-    // worker.reset(message);
-    *status.write() = MinerStatus::NotStarted;
-    *is_toolbar_open.write() = IsToolbarOpen(false);
 }

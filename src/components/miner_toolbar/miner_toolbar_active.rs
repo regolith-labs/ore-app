@@ -7,8 +7,11 @@ use solana_account_decoder::parse_token::UiTokenAmount;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
-    components::{IsToolbarOpen, MinerStatus, OreIcon, PowerBar, Tooltip, TooltipDirection},
+    components::{
+        IsToolbarOpen, MinerPower, MinerStatus, OreIcon, StopButton, Tooltip, TooltipDirection,
+    },
     gateway::AsyncResult,
+    miner::Miner,
     route::Route,
 };
 
@@ -30,6 +33,7 @@ pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,
     pub proof: AsyncResult<Proof>,
     pub ore_supply: AsyncResult<UiTokenAmount>,
+    pub miner: UseState<Miner>,
 }
 
 #[component]
@@ -92,8 +96,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         }
     });
 
-    // let container_class =
-    //     "flex flex-col gap-1 justify-between px-3 py-2 rounded hover:bg-green-600 active:bg-green-700 cursor-pointer transition transition-colors";
     let container_class = "flex flex-col gap-1 shrink h-min";
     let header_container_class = "flex flex-row justify-start gap-1.5";
     let header_class = "font-medium text-xs z-0 text-nowrap opacity-80";
@@ -115,10 +117,9 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         ClaimButton {
                             claimable_rewards: claimable_rewards
                         }
-                        // StopButton {
-                        //     worker: cx.props.worker.clone(),
-                        //     message: cx.props.message.clone()
-                        // }
+                        StopButton {
+                            miner: cx.props.miner.clone()
+                        }
                     }
                 }
                 div {
@@ -278,18 +279,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         }
                     }
                 }
-                div {
-                    class: "flex flex-col gap-8 mt-auto",
-                    h2 {
-                        class: "text-2xl text-white font-bold",
-                        "Power"
-                    }
-                    p {
-                        class: "text-sm text-white opacity-80",
-                        "Upon claiming, this amount will be immediately added to your balance in the dashboard."
-                    }
-                    PowerBar {}
-                }
+                MinerPower{}
             }
         }
     } else {
@@ -304,10 +294,9 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     ClaimButton {
                         claimable_rewards: claimable_rewards
                     }
-                    // StopButton {
-                    //     worker: cx.props.worker.clone(),
-                    //     message: cx.props.message.clone()
-                    // }
+                    StopButton {
+                        miner: cx.props.miner.clone()
+                    }
                 }
             }
         }

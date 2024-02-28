@@ -1,10 +1,4 @@
-use std::{
-    rc::Rc,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc, Mutex,
-    },
-};
+use std::rc::Rc;
 
 use dioxus_std::utils::channel::UseChannel;
 use ore::EPOCH_DURATION;
@@ -62,6 +56,10 @@ impl Miner {
             #[cfg(feature = "desktop")]
             ch: ch.clone(),
         }
+    }
+
+    pub fn stop(&self) {
+        // TODO interrupt current work (optimization)
     }
 
     pub fn start_mining(&self, hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) {

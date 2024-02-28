@@ -147,6 +147,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                                 treasury: treasury,
                                 proof: proof,
                                 ore_supply: ore_supply,
+                                miner: miner.clone()
                             }
                         }
                     }

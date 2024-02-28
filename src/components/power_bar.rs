@@ -1,11 +1,36 @@
 use dioxus::prelude::*;
 
 #[component]
+pub fn MinerPower(cx: Scope) -> Element {
+    render! {
+        div {
+            class: "flex flex-col gap-8 mt-auto",
+            div {
+                class: "flex flex-col gap-2",
+                h2 {
+                    class: "text-2xl text-white font-bold",
+                    "Power"
+                }
+                p {
+                    class: "text-lg",
+                    "Select how much of your computer should be dedicated to mining."
+                }
+                p {
+                    class: "text-sm text-white opacity-80",
+                    "Higher power levels will earn more rewards but may impact your computer's battery and/or performance."
+                }
+            }
+            PowerBar {}
+        }
+    }
+}
+
+#[component]
 pub fn PowerBar(cx: Scope) -> Element {
     let power_level = 4;
     render! {
         div {
-            class: "flex flex-row gap-2 w-full",
+            class: "flex flex-row gap-1 w-full",
             PowerBarLevel { id: 0, power_level: power_level }
             PowerBarLevel { id: 1, power_level: power_level }
             PowerBarLevel { id: 2, power_level: power_level }
