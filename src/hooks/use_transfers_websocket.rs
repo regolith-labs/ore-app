@@ -1,10 +1,15 @@
+#[cfg(feature = "desktop")]
+use async_tungstenite::async_std::connect_async;
 use dioxus::prelude::*;
-use dioxus_std::utils::rw::UseRw;
-#[cfg(feature = "web")]
+use dioxus_std::utils::{channel::use_channel, rw::UseRw};
 use futures::StreamExt;
 #[cfg(feature = "web")]
 use gloo::net::websocket::{futures::WebSocket, Message, WebSocketError};
 use ore_types::Transfer;
+#[cfg(feature = "desktop")]
+use solana_sdk::pubkey::Pubkey;
+#[cfg(feature = "desktop")]
+use url::Url;
 
 #[cfg(feature = "web")]
 use wasm_bindgen_futures::spawn_local;
@@ -27,57 +32,108 @@ pub fn use_transfers_websocket(
     has_more: &UseState<bool>,
     limit: usize,
 ) {
-    let pubkey = use_pubkey(cx).to_string();
+    let pubkey = use_pubkey(cx);
+    let ch = use_channel::<Transfer>(cx, 1);
 
-    // TODO Support desktop
-    #[cfg(feature = "web")]
-    let _ws = use_coroutine(cx, |mut _rx: UnboundedReceiver<Message>| {
+    let _ = use_future(cx, (), |_| {
+        let mut rx = ch.clone().receiver();
         let filter = filter.clone();
         let transfers = transfers.clone();
         let offset = offset.clone();
         let has_more = has_more.clone();
         async move {
-            let ws = WebSocket::open(URL).unwrap();
-            let (mut _write, mut read) = ws.split();
-            spawn_local(async move {
-                while let Some(msg) = read.next().await {
-                    if (*offset.current()).eq(&0) {
-                        match msg {
-                            Ok(Message::Text(text)) => {
-                                match serde_json::from_str::<Transfer>(&text) {
-                                    Ok(transfer) => {
-                                        let mut ts: Vec<Transfer> =
-                                            match transfers.read().unwrap().clone() {
-                                                AsyncResult::Ok(xx) => xx,
-                                                _ => vec![],
-                                            };
-                                        match *filter.current() {
-                                            ActivityFilter::Global => {
-                                                ts.insert(0, transfer);
-                                            }
-                                            ActivityFilter::Personal => {
-                                                if transfer.from_address.eq(&pubkey)
-                                                    || transfer.to_address.eq(&pubkey)
-                                                {
-                                                    ts.insert(0, transfer);
-                                                }
-                                            }
-                                        }
-                                        if ts.len().gt(&limit) {
-                                            has_more.set(true);
-                                            ts.truncate(limit);
-                                        }
-                                        transfers.write(AsyncResult::Ok(ts)).unwrap();
-                                    }
-                                    Err(e) => log::error!("Failed to deserialize transfer: {}", e),
-                                }
-                            }
-                            Ok(Message::Bytes(_)) => {}
-                            Err(WebSocketError::ConnectionClose(event)) => {
-                                log::info!("[WebSocket]: {:#?}", event);
-                            }
-                            Err(err) => log::error!("[WebSocket]: {:#?}", err),
+            while let Ok(transfer) = rx.recv().await {
+                if (*offset.current()).eq(&0) {
+                    let mut new_transfers: Vec<Transfer> = match transfers.read().unwrap().clone() {
+                        AsyncResult::Ok(xx) => xx,
+                        _ => vec![],
+                    };
+                    match *filter.current() {
+                        ActivityFilter::Global => {
+                            new_transfers.insert(0, transfer);
                         }
+                        ActivityFilter::Personal => {
+                            if transfer.from_address.eq(&pubkey.to_string())
+                                || transfer.to_address.eq(&pubkey.to_string())
+                            {
+                                new_transfers.insert(0, transfer);
+                            }
+                        }
+                    }
+                    if new_transfers.len().gt(&limit) {
+                        has_more.set(true);
+                        new_transfers.truncate(limit);
+                    }
+                    transfers.write(AsyncResult::Ok(new_transfers)).unwrap();
+                }
+            }
+        }
+    });
+
+    // TODO Support desktop
+    #[cfg(feature = "desktop")]
+    let _ws = use_future(cx, (), |_| {
+        let ch = ch.clone();
+        async move {
+            let url = Url::parse(URL).expect("Invalid WebSocket URL");
+            let (mut ws, _) = connect_async(url)
+                .await
+                .expect("Failed to connect to websocket server");
+
+            async_std::task::spawn({
+                async move {
+                    while let Some(msg) = ws.next().await {
+                        match msg {
+                            Ok(msg) => match msg {
+                                async_tungstenite::tungstenite::Message::Text(text) => {
+                                    match serde_json::from_str::<Transfer>(&text) {
+                                        Ok(transfer) => {
+                                            ch.send(transfer).await.ok();
+                                        }
+                                        Err(err) => {
+                                            log::error!("Failed to parse transfer: {:?}", err)
+                                        }
+                                    }
+                                }
+                                async_tungstenite::tungstenite::Message::Binary(_) => {}
+                                async_tungstenite::tungstenite::Message::Ping(_) => {}
+                                async_tungstenite::tungstenite::Message::Pong(_) => {}
+                                async_tungstenite::tungstenite::Message::Close(_) => {}
+                                async_tungstenite::tungstenite::Message::Frame(_) => {}
+                            },
+                            Err(e) => {
+                                log::error!("Error during receiving a message: {}", e);
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    #[cfg(feature = "web")]
+    let _ws = use_coroutine(cx, |mut _rx: UnboundedReceiver<Message>| {
+        let ch = ch.clone();
+        async move {
+            let ws = WebSocket::open(URL).unwrap();
+            let (mut _write, mut rx) = ws.split();
+            spawn_local(async move {
+                while let Some(msg) = rx.next().await {
+                    match msg {
+                        Ok(Message::Text(text)) => match serde_json::from_str::<Transfer>(&text) {
+                            Ok(transfer) => {
+                                ch.send(transfer).await.ok();
+                            }
+                            Err(err) => {
+                                log::error!("Failed to parse transfer: {:?}", err)
+                            }
+                        },
+                        Ok(Message::Bytes(_)) => {}
+                        Err(WebSocketError::ConnectionClose(event)) => {
+                            log::info!("[WebSocket]: {:#?}", event);
+                        }
+                        Err(err) => log::error!("[WebSocket]: {:#?}", err),
                     }
                 }
             });
