@@ -81,7 +81,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-black text-lg",
-                    "Scan the QR code from your crypto wallet to fund your miner."
+                    "Scan the QR code from your Solana wallet to fund your miner."
                 }
                 p {
                     class: "text-gray-300 text-sm",
