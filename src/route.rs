@@ -8,9 +8,10 @@ use crate::components::{
 #[rustfmt::skip]
 #[derive(Routable, Clone)]
 pub enum Route {
+    #[route("/")]
+    Landing {},
+
     #[layout(Navbar)]
-        #[route("/")]
-        Landing {},
         #[route("/download")]
         Download {},
         #[layout(Miner)]

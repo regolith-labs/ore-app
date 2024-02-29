@@ -627,6 +627,10 @@ h2:where(.dark, .dark *) {
   position: relative;
 }
 
+.sticky {
+  position: sticky;
+}
+
 .inset-x-0 {
   left: 0px;
   right: 0px;
@@ -678,6 +682,22 @@ h2:where(.dark, .dark *) {
 
 .-z-50 {
   z-index: -50;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.z-20 {
+  z-index: 20;
+}
+
+.z-30 {
+  z-index: 30;
+}
+
+.m-auto {
+  margin: auto;
 }
 
 .-mx-2 {
@@ -742,6 +762,14 @@ h2:where(.dark, .dark *) {
 
 .mb-16 {
   margin-bottom: 4rem;
+}
+
+.mt-32 {
+  margin-top: 8rem;
+}
+
+.ml-16 {
+  margin-left: 4rem;
 }
 
 .inline-block {
@@ -911,8 +939,28 @@ h2:where(.dark, .dark *) {
   width: 2rem;
 }
 
+.w-1\/2 {
+  width: 50%;
+}
+
 .max-w-44 {
   max-width: 11rem;
+}
+
+.max-w-32 {
+  max-width: 8rem;
+}
+
+.max-w-64 {
+  max-width: 16rem;
+}
+
+.max-w-80 {
+  max-width: 20rem;
+}
+
+.max-w-96 {
+  max-width: 24rem;
 }
 
 .shrink {
@@ -1177,6 +1225,10 @@ h2:where(.dark, .dark *) {
   padding: 1rem;
 }
 
+.p-16 {
+  padding: 4rem;
+}
+
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -1328,6 +1380,11 @@ h2:where(.dark, .dark *) {
   line-height: 1;
 }
 
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
+}
+
 .font-black {
   font-weight: 900;
 }
@@ -1342,6 +1399,10 @@ h2:where(.dark, .dark *) {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-normal {
+  font-weight: 400;
 }
 
 .leading-relaxed {
