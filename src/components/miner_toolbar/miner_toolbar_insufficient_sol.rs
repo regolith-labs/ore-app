@@ -49,7 +49,7 @@ pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
     } else {
         render! {
             div {
-                class: "flex flex-row font-semibold justify-end w-full h-full px-8 pt-5 {bg}",
+                class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 {bg}",
                 span {
                     class: "font-semibold",
                     "Insufficient funds →"
@@ -73,7 +73,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col grow gap-8 justify-between p-8 bg-white",
+            class: "flex flex-col grow gap-8 justify-between px-4 sm:px-8 py-8 bg-white",
             div {
                 class: "flex flex-col gap-3",
                 h1 {
@@ -81,7 +81,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-black text-lg",
-                    "Scan the QR code from your wallet to fund your miner."
+                    "Scan the QR code from your crypto wallet to fund your miner."
                 }
                 p {
                     class: "text-gray-300 text-sm",

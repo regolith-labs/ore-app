@@ -1,9 +1,9 @@
 use dioxus::prelude::*;
 use dioxus_router::components::Link;
-#[cfg(feature = "web")]
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAmount;
+#[cfg(feature = "web")]
+use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{components::OreIcon, gateway::AsyncResult, route::Route};
 
@@ -55,7 +55,7 @@ pub fn SendButton(cx: Scope) -> Element {
     render! {
         Link {
             to: Route::Send {},
-            class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-black transition-colors bg-black text-white dark:bg-white dark:text-black",
+            class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-black transition-all bg-black text-white hover:shadow hover:scale-110 dark:bg-white dark:text-black",
             span {
                 class: "my-auto bg-transparent",
                 "↑"
