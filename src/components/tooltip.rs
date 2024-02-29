@@ -28,7 +28,7 @@ pub fn Tooltip<'a>(cx: Scope<'a, TooltipProps<'a>>) -> Element<'a> {
                 class: "{info_icon_class}"
             }
             span {
-                class: "bottom-[100%] z-[100] absolute hidden group-hover:block w-max max-w-44 bg-gray-100 drop-shadow rounded py-1.5 px-2.5 text-xs text-black {direction_class}",
+                class: "bottom-[100%] z-[100] absolute hidden group-hover:block w-max max-w-44 bg-black drop-shadow rounded-sm py-1.5 px-2.5 text-xs text-white {direction_class}",
                 "{cx.props.text}"
             }
         }

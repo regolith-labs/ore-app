@@ -82,7 +82,8 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
         "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover-100 active-200 transition-colors";
     render! {
         div {
-            class: "flex flex-row gap-2 font-semibold -mx-4",
+            // class: "flex flex-row gap-2 font-semibold -mx-4",
+            class: "flex flex-row gap-2 font-semibold -mx-2",
             button {
                 class: "{button_class} {personal_class}",
                 onclick: move |_e| {
@@ -131,9 +132,10 @@ pub fn ActivityTable<'a>(cx: Scope<'a, ActivityTableProps<'a>>) -> Element {
     } else {
         render! {
             div {
-                class: "flex flex-col gap-4 px-1",
+                class: "flex flex-col gap-4",
                 div {
-                    class: "flex flex-col gap-0 justify-start grow h-full -mx-2",
+                    // class: "flex flex-col gap-0 justify-start grow h-full -mx-2",
+                    class: "flex flex-col gap-0 justify-start grow h-full",
                     ActivityTableHeader {}
                     for transfer in transfers {
                         render! {

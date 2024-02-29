@@ -15,6 +15,8 @@ use crate::{
     route::Route,
 };
 
+use super::MinerStatusMessage;
+
 // TODO Lifetime rewards
 // TODO Lifetime hashes
 
@@ -32,6 +34,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let timer = use_state(cx, || 0u64);
     let proof = cx.props.proof;
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
+    let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
 
     let hash = match proof {
         AsyncResult::Ok(proof) => proof.hash.to_string(),
@@ -98,21 +101,19 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     }
                     div {
                         class: "flex flex-row gap-4",
-                        // ClaimButton {
-                        //     hidden: claimable_rewards.eq(&0f64)
-                        // }
                         StopButton {
                             miner: cx.props.miner.clone()
                         }
                     }
                 }
                 div {
-                    class: "grid grid-cols-2 grid-rows-3 gap-y-8 px-1",
-                    MinerDataOre {
-                        title: "Your rewards",
-                        tooltip: "The amount of Ore you have mined and may claim.",
-                        amount: claimable_rewards.to_string()
-                    }
+                    class: "grid grid-cols-3 grid-rows-2 gap-y-8",
+                    // MinerDataOre {
+                    //     title: "Your rewards",
+                    //     tooltip: "The amount of Ore you have mined and may claim.",
+                    //     amount: claimable_rewards.to_string(),
+                    //     claimable_rewards: claimable_rewards
+                    // }
                     MinerDataOre {
                         title: "Reward rate",
                         tooltip: "The amount of Ore you are earning per valid hash.",
@@ -137,13 +138,12 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
             div {
                 class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
                 div {
-                    class: "flex flex-row gap-4",
-                    RewardsCounter {
-                        claimable_rewards: claimable_rewards,
+                    class: "flex flex-row gap-2 my-auto",
+                    ActivityIndicator {}
+                    p {
+                        class: "font-semibold text-white",
+                        "Mining"
                     }
-                    // ClaimButton {
-                    //     hidden: claimable_rewards.eq(&0f64)
-                    // }
                 }
                 StopButton {
                     miner: cx.props.miner.clone()
@@ -155,11 +155,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
 
 #[component]
 pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: String) -> Element {
-    let container_class = "flex flex-col gap-1 shrink h-min";
+    let container_class = "flex flex-col gap-0 shrink h-min";
     let header_container_class = "flex flex-row justify-start gap-1.5";
     let header_class = "font-medium text-xs z-0 text-nowrap opacity-80";
-    // let mono_value_class = "font-mono font-medium text-white";
-    let value_class = "font-medium text-white";
+    let value_class = "font-medium text-white h-8";
     render! {
         div {
             class: "{container_class} w-full",
@@ -174,79 +173,17 @@ pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: Str
                     direction: TooltipDirection::Right
                 }
             }
-            p {
-                class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
-                OreIcon {
-                    class: "w-4 h-4 my-auto",
-                }
-                span {
-                    class: "ml-1.5",
-                    "{amount}"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn ClaimButton(cx: Scope, hidden: bool) -> Element {
-    let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
-    let colors = match *miner_status.read() {
-        MinerStatus::Active => "hover:bg-green-600 active:bg-green-700",
-        _ => "hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
-    };
-    let opacity = if *hidden {
-        "opacity-0 pointer-events-none"
-    } else {
-        "opacity-100"
-    };
-    render! {
-        Link {
-            class: "flex transition transition-colors text-sm font-semibold px-4 h-10 rounded-full {colors} {opacity}",
-            to: Route::Claim {},
-            span {
-                class: "my-auto",
-                "Claim"
-            }
-        }
-    }
-}
-
-#[derive(Props, PartialEq)]
-pub struct RewardsCounterProps {
-    pub claimable_rewards: f64,
-}
-
-#[component]
-pub fn RewardsCounter(cx: Scope<RewardsCounterProps>) -> Element {
-    let claimable_rewards = cx.props.claimable_rewards;
-
-    if claimable_rewards.gt(&0f64) {
-        render! {
             div {
-                class: "flex flex-row gap-3 my-auto",
-                ActivityIndicator {}
-                Link {
-                    class: "flex flex-row gap-1 my-auto px-2 py-1 text-white rounded hover:bg-green-600 active:bg-green-700 transition-colors",
-                    to: Route::Claim {},
-                    OreIcon {
-                        class: "h-3.5 w-3.5 my-auto",
-                    }
-                    p {
-                        class: "font-medium",
-                        "{claimable_rewards}"
-                    }
-                }
-            }
-        }
-    } else {
-        render! {
-            div {
-                class: "flex flex-row gap-2 my-auto",
-                ActivityIndicator {}
+                class: "flex flex-row gap-8",
                 p {
-                    class: "font-medium text-white",
-                    "Mining"
+                    class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
+                    OreIcon {
+                        class: "w-4 h-4 my-auto",
+                    }
+                    span {
+                        class: "ml-1.5 my-auto",
+                        "{amount}"
+                    }
                 }
             }
         }

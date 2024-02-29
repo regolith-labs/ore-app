@@ -20,7 +20,18 @@ pub fn Landing(cx: Scope) -> Element {
             src: "/smoke.png"
         }
         div {
-            class: "sticky top-0 flex min-h-screen z-0",
+            class: "sticky top-0 flex flex-col min-h-screen z-0",
+            div {
+                class: "flex flex-row justify-between px-4 sm:px-8 py-6 w-full",
+                Link {
+                    to: Route::Landing {},
+                    class: "flex h-10",
+                    h1 {
+                        class: "text-xl font-black my-auto w-min",
+                        "ORE"
+                    }
+                }
+            }
             div {
                 class: "flex flex-col gap-y-8 justify-center mx-auto my-auto",
                 p {
@@ -59,10 +70,10 @@ pub fn Landing(cx: Scope) -> Element {
         div {
             class: "sticky top-0 flex flex-row w-full min-h-screen z-20",
             div {
-                class: "flex flex-col gap-4 bg-green-500 w-1/2 p-16",
+                class: "flex flex-col gap-4 bg-green-500 text-white w-1/2",
                 p {
-                    class: "text-white text-5xl font-medium",
-                    "A computer is all you need."
+                    class: "sticky top-0 text-5xl font-medium p-16",
+                    "How much will you mine?"
                 }
                 // p {
                 //     class: "text-white text-3xl",
@@ -70,20 +81,20 @@ pub fn Landing(cx: Scope) -> Element {
                 // }
             }
             div {
-                class: "bg-white w-1/2 flex flex-col gap-12 p-16",
+                class: "bg-white text-black w-1/2 flex flex-col gap-12 p-16 pb-32",
                 div {
                     class: "flex flex-col gap-4",
                     p {
-                        class: "text-black text-7xl font-bold",
+                        class: "text-7xl font-bold",
                         "Stable supply."
                     }
                     p {
-                        class: "text-black text-3xl leading-7",
+                        class: "text-3xl leading-7",
                         "Ore's global token supply grows at a constant linear rate, regardless of how much hashpower is on the network."
                     }
                 }
                 p {
-                    class: "flex flex-col text-black text-3xl font-bold mt-8",
+                    class: "flex flex-col text-3xl font-bold mt-8",
                     "1 ORE"
                     span {
                         class: "text-lg font-medium",
@@ -91,7 +102,7 @@ pub fn Landing(cx: Scope) -> Element {
                     }
                 }
                 p {
-                    class: "flex flex-col text-black text-3xl font-bold mt-8",
+                    class: "flex flex-col text-3xl font-bold mt-8",
                     "60 ORE"
                     span {
                         class: "text-lg font-medium",
@@ -99,7 +110,7 @@ pub fn Landing(cx: Scope) -> Element {
                     }
                 }
                 p {
-                    class: "flex flex-col text-black text-3xl font-bold mt-8",
+                    class: "flex flex-col text-3xl font-bold mt-8",
                     "1,440 ORE"
                     span {
                         class: "text-lg font-medium",
@@ -107,7 +118,7 @@ pub fn Landing(cx: Scope) -> Element {
                     }
                 }
                 p {
-                    class: "flex flex-col text-black text-3xl font-bold mt-8",
+                    class: "flex flex-col text-3xl font-bold mt-8",
                     "525,600 ORE"
                     span {
                         class: "text-lg font-medium",
@@ -115,7 +126,7 @@ pub fn Landing(cx: Scope) -> Element {
                     }
                 }
                 p {
-                    class: "flex flex-col text-black text-3xl font-bold mt-8",
+                    class: "flex flex-col text-3xl font-bold mt-8",
                     "5,256,000 ORE"
                     span {
                         class: "text-lg font-medium",

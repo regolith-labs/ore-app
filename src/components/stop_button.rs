@@ -12,6 +12,7 @@ pub fn StopButton(cx: Scope, miner: UseState<Miner>) -> Element {
     render! {
         button {
             class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-green-600 active:bg-green-700",
+            title: "Stop mining",
             onclick: move |_e| {
                 miner.get().stop();
                 *status.write() = MinerStatus::NotStarted;

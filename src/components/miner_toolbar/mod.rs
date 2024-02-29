@@ -36,12 +36,18 @@ pub enum MinerStatus {
     NetworkError,
 }
 
+// TODO A message bar
+#[derive(Debug)]
+pub struct MinerStatusMessage(String);
+
 pub struct IsToolbarOpen(pub bool);
 
 #[component]
 pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
+    use_shared_state_provider(cx, || MinerStatusMessage(String::new()));
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
+    let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
     let gateway = use_gateway(cx);
     let (treasury_rw, _) = use_treasury(cx);
     let treasury = *treasury_rw.read().unwrap();
@@ -62,8 +68,11 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         let miner = miner.clone();
         let gateway = gateway.clone();
         let proof_fut = proof_fut.clone();
+        let miner_status_message = miner_status_message.clone();
         async move {
             while let Ok(res) = rx.recv().await {
+                *miner_status_message.write() =
+                    MinerStatusMessage("Confirming transaction".to_string());
                 match submit_solution(&gateway, &res).await {
                     Ok(_sig) => {
                         proof_fut.restart();

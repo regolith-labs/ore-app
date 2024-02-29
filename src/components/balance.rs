@@ -5,7 +5,7 @@ use solana_account_decoder::parse_token::UiTokenAmount;
 #[cfg(feature = "web")]
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
-use crate::{components::OreIcon, gateway::AsyncResult, route::Route};
+use crate::{components::OreIcon, gateway::AsyncResult, hooks::use_proof, route::Route};
 
 #[component]
 pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
@@ -35,6 +35,7 @@ pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
                                 }
                                 SendButton {}
                             }
+                            UnclaimedRewards {}
                         }
                     }
                 }
@@ -51,14 +52,69 @@ pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
 }
 
 #[component]
+pub fn UnclaimedRewards(cx: Scope) -> Element {
+    let (proof, _) = use_proof(cx);
+    if let AsyncResult::Ok(proof) = *proof.read().unwrap() {
+        if proof.claimable_rewards.gt(&0) {
+            let rewards =
+                (proof.claimable_rewards as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
+            render! {
+                div {
+                    class: "flex flex-row grow justify-between mt-4 -mr-2",
+                    div {
+                        class: "flex flex-col gap-2",
+                        p {
+                            class: "font-medium text-xs text-gray-300",
+                            "Unclaimed rewards"
+                        }
+                        div {
+                            class: "flex flex-row gap-2",
+                            OreIcon {
+                                class: "my-auto w-4 h-4"
+                            }
+                            p {
+                                class: "font-semibold",
+                                "{rewards}"
+                            }
+                        }
+                    }
+                    span {
+                        class: "mt-auto",
+                        ClaimButton {}
+                    }
+                }
+            }
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
+
+#[component]
 pub fn SendButton(cx: Scope) -> Element {
     render! {
         Link {
             to: Route::Send {},
-            class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-black transition-all bg-black text-white hover:shadow hover:scale-110 dark:bg-white dark:text-black",
+            class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-bold transition-all bg-black text-white hover:shadow hover:scale-110 dark:bg-white dark:text-black",
             span {
                 class: "my-auto bg-transparent",
                 "↑"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn ClaimButton(cx: Scope) -> Element {
+    render! {
+        Link {
+            class: "flex transition transition-colors font-semibold px-3 h-10 rounded-full hover-100 active-200",
+            to: Route::Claim {},
+            span {
+                class: "my-auto",
+                "Claim"
             }
         }
     }

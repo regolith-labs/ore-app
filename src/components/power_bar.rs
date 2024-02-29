@@ -30,7 +30,7 @@ fn PowerHeader(cx: Scope) -> Element {
             }
             p {
                 class: "text-lg",
-                "Select how much computing power to dedicate to mining."
+                "Select how much of your computer to allocate to mining."
             }
             // p {
             //     class: "text-sm text-white opacity-80",

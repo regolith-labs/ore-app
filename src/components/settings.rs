@@ -40,18 +40,22 @@ pub fn Settings(cx: Scope) -> Element {
     //     "Unknown".to_string()
     // };
 
+    let section_title_class = "text-lg md:text-2xl font-bold";
+    let data_title_class = "font-semibold";
+
     render! {
         div {
             class: "flex flex-col gap-16",
             div {
                 class: "flex flex-col gap-4",
-                h1 {
+                h2 {
+                    class: "{section_title_class}",
                     "Account"
                 }
                 div {
                     class: "flex flex-row justify-between w-full",
                     p {
-                        class: "font-bold",
+                        class: "{data_title_class}",
                         "Address"
                     }
                     Copyable {
@@ -68,7 +72,7 @@ pub fn Settings(cx: Scope) -> Element {
                 div {
                     class: "flex flex-row justify-between w-full",
                     p {
-                        class: "font-bold text-nowrap",
+                        class: "{data_title_class}",
                         "Private key"
                     }
                     button {
@@ -79,7 +83,7 @@ pub fn Settings(cx: Scope) -> Element {
                 div {
                     class: "flex flex-row justify-between w-full",
                     p {
-                        class: "font-bold text-nowrap",
+                        class: "{data_title_class}",
                         "Solana balance"
                     }
                     match sol_balance {
@@ -103,17 +107,18 @@ pub fn Settings(cx: Scope) -> Element {
             }
             div {
                 class: "flex flex-col gap-4",
-                h1 {
+                h2 {
+                    class: "{section_title_class}",
                     "Display"
                 }
                 div {
                     class: "flex flex-row justify-between",
                     p {
-                        class: "font-bold",
+                        class: "{data_title_class}",
                         "Appearance"
                     }
                     select {
-                        class: "text-right dark:bg-black dark:text-white",
+                        class: "text-right dark:bg-black dark:text-white hover:cursor-pointer",
                         onchange: move |e| {
                             if let Ok(a) = Appearance::from_str(e.value.as_str()) {
                                 *appearance.write() = a;
@@ -126,11 +131,11 @@ pub fn Settings(cx: Scope) -> Element {
                 div {
                     class: "flex flex-row justify-between",
                     p {
-                        class: "font-bold",
+                        class: "{data_title_class}",
                         "Explorer"
                     }
                     select {
-                        class: "text-right dark:bg-black dark:text-white",
+                        class: "text-right dark:bg-black dark:text-white hover:cursor-pointer",
                         onchange: move |e| {
                             if let Ok(e) = Explorer::from_str(e.value.as_str()) {
                                 *explorer.write() = e;
@@ -145,13 +150,14 @@ pub fn Settings(cx: Scope) -> Element {
             }
             div {
                 class: "flex flex-col gap-4",
-                h1 {
+                h2 {
+                    class: "{section_title_class}",
                     "System"
                 }
                 div {
                     class: "flex flex-row justify-between gap-8",
                     p {
-                        class: "font-bold",
+                        class: "{data_title_class}",
                         "CPU"
                     }
                     p {
