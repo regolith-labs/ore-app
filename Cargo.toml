@@ -94,5 +94,5 @@ features = [
 ]
 
 [patch.crates-io]
-solana-client-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "master" }
-solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "master" }
+solana-client-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "hardhatchad/token-largest" }
+solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "hardhatchad/token-largest" }

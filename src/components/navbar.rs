@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{Banner, BannerType},
+    components::{Banner, BannerType, UserGroupIcon},
     gateway::AsyncResult,
     hooks::{use_appearance, use_is_onboarded, use_ping},
     route::Route,
@@ -42,7 +42,14 @@ pub fn Navbar(cx: Scope) -> Element {
                     }
                 }
                 div {
-                    class: "flex flex-row gap-8",
+                    class: "flex flex-row gap-12",
+                    Link {
+                        class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover-100 active-200",
+                        to: Route::Leaderboard {},
+                        UserGroupIcon {
+                            class: "w-6 h-6 my-auto"
+                        }
+                    }
                     Profile {}
                 }
             }

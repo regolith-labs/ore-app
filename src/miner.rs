@@ -198,7 +198,7 @@ pub async fn submit_solution(
         let clock = gateway.get_clock().await?;
         let epoch_end_at = treasury.epoch_start_at.saturating_add(EPOCH_DURATION);
 
-        // Submit restart epoch tx, if needed.
+        // Submit restart epoch tx, if needed
         if clock.unix_timestamp.ge(&epoch_end_at) {
             let ix = ore::instruction::reset(signer.pubkey());
             gateway.send_and_confirm(&[ix]).await?;

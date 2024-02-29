@@ -2,7 +2,8 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::components::{
-    Claim, Download, Home, Landing, Miner, Navbar, PageNotFound, Send, Settings, Tx, User,
+    Claim, Download, Home, Landing, Leaderboard, Miner, Navbar, PageNotFound, Send, Settings, Tx,
+    User,
 };
 
 #[rustfmt::skip]
@@ -19,6 +20,8 @@ pub enum Route {
             Home {},
             #[route("/claim")]
             Claim {},
+            #[route("/leaderboard")]
+            Leaderboard {},
             #[route("/me")]
             Settings {},
             #[route("/send")]

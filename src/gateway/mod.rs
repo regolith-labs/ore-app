@@ -15,7 +15,9 @@ use ore::{
 use ore_types::{response::GetTransfersResponse, Transfer};
 pub use pubkey::*;
 #[cfg(feature = "desktop")]
-use solana_client::nonblocking::rpc_client::RpcClient;
+use solana_account_decoder::parse_token::UiTokenAccount;
+#[cfg(feature = "desktop")]
+use solana_client::{nonblocking::rpc_client::RpcClient, rpc_response::RpcTokenAccountBalance};
 #[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
@@ -27,14 +29,18 @@ use solana_client_wasm::{
         sysvar,
         transaction::Transaction,
     },
+    utils::rpc_response::RpcTokenAccountBalance,
     WasmClient,
 };
 #[cfg(feature = "web")]
-use solana_extra_wasm::program::{
-    spl_associated_token_account::{
-        get_associated_token_address, instruction::create_associated_token_account,
+use solana_extra_wasm::{
+    account_decoder::parse_token::UiTokenAccount,
+    program::{
+        spl_associated_token_account::{
+            get_associated_token_address, instruction::create_associated_token_account,
+        },
+        spl_memo, spl_token,
     },
-    spl_memo, spl_token,
 };
 #[cfg(feature = "desktop")]
 use solana_sdk::{
@@ -102,6 +108,26 @@ impl Gateway {
             .await
             .or(Err(GatewayError::NetworkUnavailable))?;
         Ok(*Treasury::try_from_bytes(&data).expect("Failed to parse treasury account"))
+    }
+
+    pub async fn get_token_account(
+        &self,
+        pubkey: &Pubkey,
+    ) -> GatewayResult<Option<UiTokenAccount>> {
+        self.rpc
+            .get_token_account(pubkey)
+            .await
+            .or(Err(GatewayError::NetworkUnavailable))
+    }
+
+    pub async fn get_token_largest_accounts(
+        &self,
+        pubkey: &Pubkey,
+    ) -> GatewayResult<Vec<RpcTokenAccountBalance>> {
+        self.rpc
+            .get_token_largest_accounts(pubkey)
+            .await
+            .or(Err(GatewayError::NetworkUnavailable))
     }
 
     pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {

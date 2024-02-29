@@ -5895,7 +5895,7 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.17.4"
-source = "git+https://github.com/HardhatChad/solana-playground?branch=master#6fdf7ced1a42522ef6a93a0ab55cb3ad0af9680d"
+source = "git+https://github.com/HardhatChad/solana-playground?branch=hardhatchad/token-largest#1ca107dc2af0a16e6f444c0fbaef9e1bff85d675"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -5955,7 +5955,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.17.4"
-source = "git+https://github.com/HardhatChad/solana-playground?branch=master#6fdf7ced1a42522ef6a93a0ab55cb3ad0af9680d"
+source = "git+https://github.com/HardhatChad/solana-playground?branch=hardhatchad/token-largest#1ca107dc2af0a16e6f444c0fbaef9e1bff85d675"
 dependencies = [
  "Inflector",
  "arrayref",
