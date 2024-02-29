@@ -15,7 +15,7 @@ pub fn MinerToolbarNotStarted(cx: Scope) -> Element {
                 class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
                 p {
                     class: "font-semibold my-auto",
-                    "Not mining"
+                    "Stopped"
                 }
                 div {
                     class: "flex flex-row gap-2 sm:gap-4",

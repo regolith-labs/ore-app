@@ -22,7 +22,7 @@ pub fn Landing(cx: Scope) -> Element {
         div {
             class: "flex flex-col gap-y-8 my-auto pb-24",
             p {
-                class: "text-center text-8xl font-bold",
+                class: "text-center text-6xl font-bold",
                 "It's time to "
                 span {
                     class: "inline-block text-white leading-relaxed bg-green-500 px-2",
@@ -30,9 +30,9 @@ pub fn Landing(cx: Scope) -> Element {
                 }
             }
             Link {
-                class: "mx-auto text-4xl font-semibold hover:underline",
+                class: "mx-auto text-2xl font-semibold hover:underline",
                 to: Route::Home {},
-                "Get started →"
+                "Start →"
             }
         }
     }
