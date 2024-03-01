@@ -44,9 +44,10 @@ pub fn Landing(cx: Scope) -> Element {
 
     render! {
         img {
-            class: "fixed top-0 left-0 w-screen -z-50",
+            class: "fixed top-0 min-w-full min-h-full object-cover",
             src: "/smoke.png"
         }
+
         div {
             class: "flex flex-col",
             div {
@@ -65,7 +66,7 @@ pub fn Landing(cx: Scope) -> Element {
                 div {
                     class: "flex flex-col gap-y-8 justify-center mx-auto my-auto",
                     p {
-                        class: "text-center text-7xl font-bold",
+                        class: "text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold",
                         "It's time to "
                         span {
                             class: "inline-block text-white leading-relaxed bg-green-500 px-2",
@@ -73,29 +74,27 @@ pub fn Landing(cx: Scope) -> Element {
                         }
                     }
                     Link {
-                        class: "mx-auto text-3xl font-semibold hover:bg-black hover:text-white transition-colors rounded-full px-6 py-3",
+                        class: "mx-auto text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold hover:bg-black hover:text-white transition-colors rounded-full px-6 py-3",
                         to: Route::Home {},
                         "Get started →"
                     }
                 }
             }
             div {
-                class: "flex w-full h-screen p-8 z-20",
+                class: "flex w-full h-screen p-2 sm:p-4 md:p-8 z-20",
                 div {
-                    class: "flex flex-col justify-between bg-black text-white rounded-lg shadow-lg h-full w-full p-8",
+                    class: "flex flex-col gap-4 sm:gap-6 md:gap-8 bg-black text-white rounded-lg shadow-lg h-full w-full p-4 sm:p-8",
                     div {
-                        class: "flex flex-col gap-6",
+                        class: "flex flex-col",
                         p {
-                            class: "text-white text-7xl font-bold",
+                            class: "text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.55]",
                             "Proof of work."
-                        }
-                        p {
-                            class: "text-white text-7xl font-bold",
+                            br {}
                             "On Solana."
                         }
                     }
                     p {
-                        class: "text-white text-3xl mt-8 leading-[1.55] max-w-[48rem]",
+                        class: "text-white text-lg sm:text-xl md:text-2xl lg:text-3xl mt-8 leading-relaxed max-w-[48rem]",
                         "Ore is a cryptocurrency everyone can mine. Smaller miners are guaranteed to always earn rewards and can't get pushed out by larger players."
                     }
                 }

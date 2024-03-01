@@ -859,6 +859,10 @@ h2:where(.dark, .dark *) {
   min-height: 100vh;
 }
 
+.min-h-full {
+  min-height: 100%;
+}
+
 .w-1\/2 {
   width: 50%;
 }
@@ -929,6 +933,10 @@ h2:where(.dark, .dark *) {
   width: 100vw;
 }
 
+.w-lvw {
+  width: 100lvw;
+}
+
 .min-w-16 {
   min-width: 4rem;
 }
@@ -939,6 +947,10 @@ h2:where(.dark, .dark *) {
 
 .min-w-40 {
   min-width: 10rem;
+}
+
+.min-w-full {
+  min-width: 100%;
 }
 
 .max-w-44 {
@@ -1201,6 +1213,21 @@ h2:where(.dark, .dark *) {
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
 }
 
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.object-fill {
+  -o-object-fit: fill;
+     object-fit: fill;
+}
+
+.object-none {
+  -o-object-fit: none;
+     object-fit: none;
+}
+
 .p-16 {
   padding: 4rem;
 }
@@ -1215,6 +1242,10 @@ h2:where(.dark, .dark *) {
 
 .p-8 {
   padding: 2rem;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 .px-1 {
@@ -1354,6 +1385,11 @@ h2:where(.dark, .dark *) {
   line-height: 1rem;
 }
 
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
 .font-black {
   font-weight: 900;
 }
@@ -1384,6 +1420,18 @@ h2:where(.dark, .dark *) {
 
 .leading-relaxed {
   line-height: 1.625;
+}
+
+.leading-\[1\.64\] {
+  line-height: 1.64;
+}
+
+.leading-\[1\.7\] {
+  line-height: 1.7;
+}
+
+.leading-loose {
+  line-height: 2;
 }
 
 .text-black {
@@ -1793,6 +1841,18 @@ h2:where(.dark, .dark *) {
     gap: 1rem;
   }
 
+  .sm\:gap-6 {
+    gap: 1.5rem;
+  }
+
+  .sm\:p-4 {
+    padding: 1rem;
+  }
+
+  .sm\:p-8 {
+    padding: 2rem;
+  }
+
   .sm\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
@@ -1801,6 +1861,21 @@ h2:where(.dark, .dark *) {
   .sm\:text-4xl {
     font-size: 2.25rem;
     line-height: 2.5rem;
+  }
+
+  .sm\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .sm\:text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .sm\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
   }
 }
 
@@ -1817,6 +1892,14 @@ h2:where(.dark, .dark *) {
     gap: 1rem;
   }
 
+  .md\:gap-8 {
+    gap: 2rem;
+  }
+
+  .md\:p-8 {
+    padding: 2rem;
+  }
+
   .md\:text-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -1825,6 +1908,38 @@ h2:where(.dark, .dark *) {
   .md\:text-5xl {
     font-size: 3rem;
     line-height: 1;
+  }
+
+  .md\:text-7xl {
+    font-size: 4.5rem;
+    line-height: 1;
+  }
+
+  .md\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
+  }
+
+  .md\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:text-7xl {
+    font-size: 4.5rem;
+    line-height: 1;
+  }
+
+  .lg\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
+  .lg\:text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
   }
 }
 
