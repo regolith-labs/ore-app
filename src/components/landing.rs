@@ -44,10 +44,10 @@ pub fn Landing(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "fixed top-safe left-0 right-0 bottom-0 overflow-hidden",
+            class: "fixed top-safe left-0 right-0 bottom-0 overflow-hidden bg-white",
             img {
                 class: "object-cover h-full w-full",
-                src: "/smoke.png"
+                src: "/smoke-2.png"
             }
 
         }
@@ -67,7 +67,7 @@ pub fn Landing(cx: Scope) -> Element {
                     }
                 }
                 div {
-                    class: "flex flex-col gap-y-8 justify-center mx-auto my-auto",
+                    class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8 justify-center mx-auto my-auto pb-24",
                     p {
                         class: "text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold",
                         "It's time to "

@@ -754,6 +754,10 @@ h2:where(.dark, .dark *) {
   margin-top: auto;
 }
 
+.-mt-24 {
+  margin-top: -6rem;
+}
+
 .block {
   display: block;
 }
@@ -1115,6 +1119,14 @@ h2:where(.dark, .dark *) {
   row-gap: 2rem;
 }
 
+.gap-y-4 {
+  row-gap: 1rem;
+}
+
+.place-self-center {
+  place-self: center;
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -1315,6 +1327,14 @@ h2:where(.dark, .dark *) {
   padding-top: 1.25rem;
 }
 
+.pb-16 {
+  padding-bottom: 4rem;
+}
+
+.pb-24 {
+  padding-bottom: 6rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -1464,6 +1484,14 @@ h2:where(.dark, .dark *) {
 
 .opacity-80 {
   opacity: 0.8;
+}
+
+.opacity-70 {
+  opacity: 0.7;
+}
+
+.opacity-60 {
+  opacity: 0.6;
 }
 
 .shadow-lg {
@@ -1815,6 +1843,10 @@ h2:where(.dark, .dark *) {
     gap: 1rem;
   }
 
+  .sm\:gap-y-6 {
+    row-gap: 1.5rem;
+  }
+
   .sm\:p-4 {
     padding: 1rem;
   }
@@ -1864,6 +1896,10 @@ h2:where(.dark, .dark *) {
 
   .md\:gap-6 {
     gap: 1.5rem;
+  }
+
+  .md\:gap-y-8 {
+    row-gap: 2rem;
   }
 
   .md\:p-8 {
