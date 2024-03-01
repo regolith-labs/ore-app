@@ -19,7 +19,8 @@ mod worker;
 
 use crate::{
     hooks::{
-        use_appearance, use_appearance_provider, use_explorer_provider, use_power_level_provider,
+        use_appearance, use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
+        use_power_level_provider,
     },
     route::Route,
 };
@@ -46,6 +47,7 @@ fn App(cx: Scope) -> Element {
     use_appearance_provider(cx);
     use_explorer_provider(cx);
     use_power_level_provider(cx);
+    use_is_onboarded_provider(cx);
 
     // Gateway
     use_context_provider(cx, || Rc::new(Gateway::new()));

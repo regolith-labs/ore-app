@@ -15,9 +15,6 @@ pub fn Home(cx: Scope) -> Element {
             class: "flex flex-col gap-16 overflow-visible",
             Balance { balance: balance }
             Activity {}
-            // ClaimModal {
-            //     balance_handle: balance_
-            // }
         }
     }
 }

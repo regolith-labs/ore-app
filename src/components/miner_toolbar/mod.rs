@@ -48,13 +48,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     use_shared_state_provider(cx, || MinerStatusMessage(String::new()));
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
+    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let gateway = use_gateway(cx);
     let (treasury_rw, _) = use_treasury(cx);
     let treasury = *treasury_rw.read().unwrap();
     let (proof_rw, proof_fut) = use_proof(cx);
     let proof = *proof_rw.read().unwrap();
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
-    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let ch = use_channel::<MiningResult>(cx, 1);
     let miner = use_miner(cx, ch);
     let pubkey = use_pubkey(cx);

@@ -10,7 +10,7 @@ pub fn Landing(cx: Scope) -> Element {
     let nav = use_navigator(cx);
 
     // If the user is already onboarded, redirect to home.
-    if is_onboarded.get() {
+    if is_onboarded.read().0 {
         nav.replace(Route::Home {});
     }
 
@@ -45,7 +45,7 @@ pub fn Landing(cx: Scope) -> Element {
                 Link {
                     class: "mx-auto text-3xl font-semibold hover:underline",
                     to: Route::Home {},
-                    "Start →"
+                    "Get started →"
                 }
             }
         }

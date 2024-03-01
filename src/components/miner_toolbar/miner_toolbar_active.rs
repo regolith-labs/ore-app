@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
 use ore::state::{Proof, Treasury};
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAmount;
@@ -7,12 +6,9 @@ use solana_account_decoder::parse_token::UiTokenAmount;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
-    components::{
-        IsToolbarOpen, MinerPower, MinerStatus, OreIcon, StopButton, Tooltip, TooltipDirection,
-    },
+    components::{IsToolbarOpen, MinerPower, OreIcon, StopButton, Tooltip, TooltipDirection},
     gateway::AsyncResult,
     miner::Miner,
-    route::Route,
 };
 
 use super::MinerStatusMessage;
@@ -45,13 +41,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         hash[0..16].to_string()
     } else {
         "–".to_string()
-    };
-
-    let claimable_rewards = match cx.props.proof {
-        AsyncResult::Ok(proof) => {
-            (proof.claimable_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
-        }
-        _ => 0f64,
     };
 
     let circulating_supply = match cx.props.treasury {
@@ -108,12 +97,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                 }
                 div {
                     class: "grid grid-cols-3 grid-rows-2 gap-y-8",
-                    // MinerDataOre {
-                    //     title: "Your rewards",
-                    //     tooltip: "The amount of Ore you have mined and may claim.",
-                    //     amount: claimable_rewards.to_string(),
-                    //     claimable_rewards: claimable_rewards
-                    // }
                     MinerDataOre {
                         title: "Reward rate",
                         tooltip: "The amount of Ore you are earning per valid hash.",
@@ -192,7 +175,6 @@ pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: Str
 
 #[component]
 pub fn ActivityIndicator(cx: Scope) -> Element {
-    // let class = cx.props.class.unwrap_or("");
     render! {
         span {
             class: "relative flex h-3 w-3 justify center my-auto",

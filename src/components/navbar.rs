@@ -1,28 +1,18 @@
-use std::ops::Deref;
-
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
     components::{Banner, BannerType, UserGroupIcon},
     gateway::AsyncResult,
-    hooks::{use_appearance, use_is_onboarded, use_ping},
+    hooks::{use_is_onboarded, use_ping},
     route::Route,
 };
 
-use super::Appearance;
-
 #[component]
 pub fn Navbar(cx: Scope) -> Element {
-    // let appearance = use_appearance(cx);
     let ping = use_ping(cx);
-    // let dark = match appearance.read().deref() {
-    //     Appearance::Dark => "dark",
-    //     _ => "",
-    // };
     render! {
         div {
-            // class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white",
             if let AsyncResult::Error(_) = ping {
                 render! {
@@ -64,15 +54,10 @@ pub fn Navbar(cx: Scope) -> Element {
 
 #[component]
 pub fn Profile(cx: Scope) -> Element {
-    let is_onboarded = use_is_onboarded(cx);
-    if is_onboarded.get() {
-        render! {
-            Link {
-                to: Route::Settings {},
-                class: "bg-gray-100 dark:bg-gray-900 w-10 h-10 rounded-full"
-            }
+    render! {
+        Link {
+            to: Route::Settings {},
+            class: "bg-gray-100 dark:bg-gray-900 w-10 h-10 rounded-full"
         }
-    } else {
-        None
     }
 }

@@ -3,21 +3,13 @@ use dioxus_router::prelude::*;
 
 use crate::{
     components::{IsToolbarOpen, MinerToolbar},
-    hooks::use_is_onboarded,
     Route,
 };
 
 #[component]
 pub fn Miner(cx: Scope) -> Element {
     use_shared_state_provider(cx, || IsToolbarOpen(false));
-    let is_onboarded = use_is_onboarded(cx);
     let route = use_route::<Route>(cx);
-
-    // If the user is not onboarded, redirect to Landing.
-    use_effect(cx, (), |_| {
-        is_onboarded.set(true);
-        async move {}
-    });
 
     let hidden = if let Some(route) = route {
         !matches!(
