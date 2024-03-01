@@ -44,7 +44,7 @@ pub fn Landing(cx: Scope) -> Element {
 
     render! {
         img {
-            class: "fixed top-0 min-w-full min-h-full object-cover",
+            class: "fixed top-0 min-w-full min-h-full h-lvh w-lvh object-cover",
             src: "/smoke.png"
         }
 
@@ -83,7 +83,7 @@ pub fn Landing(cx: Scope) -> Element {
             div {
                 class: "flex w-full h-screen p-2 sm:p-4 md:p-8 z-20",
                 div {
-                    class: "flex flex-col gap-4 sm:gap-6 md:gap-8 bg-black text-white rounded-lg shadow-lg h-full w-full p-4 sm:p-8",
+                    class: "flex flex-col gap-2 sm:gap-4 md:gap-6 bg-black text-white rounded-lg shadow-lg h-full w-full p-4 sm:p-8",
                     div {
                         class: "flex flex-col",
                         p {

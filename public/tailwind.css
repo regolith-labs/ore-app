@@ -851,6 +851,10 @@ h2:where(.dark, .dark *) {
   height: 100vh;
 }
 
+.h-lvh {
+  height: 100lvh;
+}
+
 .min-h-16 {
   min-height: 4rem;
 }
@@ -1894,6 +1898,10 @@ h2:where(.dark, .dark *) {
 
   .md\:gap-8 {
     gap: 2rem;
+  }
+
+  .md\:gap-6 {
+    gap: 1.5rem;
   }
 
   .md\:p-8 {
