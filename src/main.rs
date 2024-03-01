@@ -1,9 +1,11 @@
 #![allow(non_snake_case)]
 use std::rc::Rc;
 
+use components::Appearance;
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use gateway::Gateway;
+use web_sys::window;
 
 mod components;
 #[cfg(feature = "desktop")]
@@ -16,7 +18,9 @@ mod route;
 mod worker;
 
 use crate::{
-    hooks::{use_appearance_provider, use_explorer_provider, use_power_level_provider},
+    hooks::{
+        use_appearance, use_appearance_provider, use_explorer_provider, use_power_level_provider,
+    },
     route::Route,
 };
 
@@ -45,6 +49,25 @@ fn App(cx: Scope) -> Element {
 
     // Gateway
     use_context_provider(cx, || Rc::new(Gateway::new()));
+
+    #[cfg(feature = "web")]
+    {
+        let appearance = use_appearance(cx);
+        use_effect(cx, appearance, |_| {
+            if let Some(window) = window() {
+                if let Some(document) = window.document() {
+                    if let Some(body) = document.body() {
+                        let classname = match *appearance.read() {
+                            Appearance::Dark => "dark",
+                            Appearance::Light => "",
+                        };
+                        body.set_class_name(classname);
+                    }
+                }
+            }
+            async move {}
+        });
+    }
 
     // Render
     render! {

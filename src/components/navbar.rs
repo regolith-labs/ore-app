@@ -14,15 +14,16 @@ use super::Appearance;
 
 #[component]
 pub fn Navbar(cx: Scope) -> Element {
-    let appearance = use_appearance(cx);
+    // let appearance = use_appearance(cx);
     let ping = use_ping(cx);
-    let dark = match appearance.read().deref() {
-        Appearance::Dark => "dark",
-        _ => "",
-    };
+    // let dark = match appearance.read().deref() {
+    //     Appearance::Dark => "dark",
+    //     _ => "",
+    // };
     render! {
         div {
-            class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
+            // class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
+            class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white",
             if let AsyncResult::Error(_) = ping {
                 render! {
                     Banner {
@@ -54,7 +55,7 @@ pub fn Navbar(cx: Scope) -> Element {
                 }
             }
             div {
-                class: "flex flex-col h-full py-4 px-4 sm:px-8 grow",
+                class: "flex flex-col h-full py-4 px-4 sm:px-8 grow w-full max-w-[80rem] mx-auto",
                 Outlet::<Route> {}
             }
         }

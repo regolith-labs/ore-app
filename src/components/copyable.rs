@@ -27,11 +27,10 @@ pub fn Copyable<'a>(
     let class = class.unwrap_or("");
     render! {
         div {
-            class: "flex flex-row {class}",
+            class: "flex flex-row-reverse sm:flex-row justify-end {class}",
             button {
                 class: "flex px-2 py-1 rounded hover-100 active-200 transition-colors",
                 onclick: move |_e| {
-
                     #[cfg(feature = "web")]
                     if let Some(cb) = clipboard.clone() {
                         let _ = cb.write_text(value);

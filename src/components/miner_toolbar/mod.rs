@@ -108,7 +108,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
 
     let is_open = is_toolbar_open.read().0;
     let class =
-        "absolute transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
+        "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
     let height = if is_open {
         "h-2/3 overflow-y-scroll"
     } else {

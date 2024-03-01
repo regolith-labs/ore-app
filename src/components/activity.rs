@@ -134,13 +134,15 @@ pub fn ActivityTable<'a>(cx: Scope<'a, ActivityTableProps<'a>>) -> Element {
             div {
                 class: "flex flex-col gap-4",
                 div {
-                    // class: "flex flex-col gap-0 justify-start grow h-full -mx-2",
-                    class: "flex flex-col gap-0 justify-start grow h-full",
-                    ActivityTableHeader {}
-                    for transfer in transfers {
-                        render! {
-                            ActivityRow {
-                                transfer: transfer
+                    class: "h-full w-full max-w-full overflow-x-scroll",
+                    table {
+                        class: "h-full w-full",
+                        ActivityTableHeader {}
+                        for transfer in transfers {
+                            render! {
+                                ActivityRow {
+                                    transfer: transfer
+                                }
                             }
                         }
                     }
@@ -198,22 +200,22 @@ pub fn ActivityTablePagination<'a>(cx: Scope<'a, ActivityTablePaginationProps<'a
 #[component]
 pub fn ActivityTableHeader(cx: Scope) -> Element {
     render! {
-        div {
-            class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 transition-colors text-xs font-medium text-gray-300",
-            p {
-                class: "text-left w-1/4",
+        thead {
+            class: "rounded transition-colors text-xs font-medium text-gray-300",
+            th {
+                class: "text-left py-2",
                 "Action"
             }
-            p {
-                class: "text-left w-1/4",
+            th {
+                class: "text-left",
                 "Amount"
             }
-            p {
-                class: "text-left w-1/4",
+            th {
+                class: "text-left",
                 "Memo"
             }
-            p {
-                class: "text-right w-1/4",
+            th {
+                class: "text-right",
                 "Time"
             }
         }
@@ -254,54 +256,58 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
     };
 
     render! {
-        Link {
-            to: Route::Tx {
-                sig: transfer.sig
-            },
-            class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 hover-100 active-200 transition-colors",
-            p {
-                class: "flex flex-row w-1/4 text-left font-mono font-medium",
-                "{address}"
+        tr {
+        // Link {
+            // to: Route::Tx {
+            //     sig: transfer.sig
+            // },
+            class: "rounded hover-100 active-200 transition-colors",
+            td {
+                class: "text-left py-2 font-mono min-w-32 font-medium text-nowrap",
                 span {
-                    class: "my-auto px-2",
+                    class: "flex flex-row gap-2",
                     match transfer.transfer_type {
                         TransferType::Claim => {
                             render! {
                                 CircleStackIcon {
-                                    class: "w-4 h-4"
+                                    class: "w-4 h-4 my-auto"
                                 }
                             }
                         }
                         TransferType::Mine => {
                             render! {
                                 CubeIcon {
-                                    class: "w-4 h-4"
+                                    class: "w-4 h-4 my-auto"
                                 }
                             }
                         }
                         TransferType::Spl => {
                             render! {
                                 PaperAirplaneIcon {
-                                    class: "w-4 h-4"
+                                    class: "w-4 h-4 my-auto"
                                 }
                             }
                         }
                     }
+                    "{address}"
                 }
             }
-            p {
-                class: "flex flex-row gap-1 w-1/4 text-left font-medium",
-                OreIcon {
-                    class: "w-3.5 h-3.5 my-auto"
+            td {
+                class: "text-left font-medium min-w-40 text-nowrap",
+                span {
+                    class: "flex flex-row gap-1",
+                    OreIcon {
+                        class: "w-3.5 h-3.5 my-auto"
+                    }
+                    "{amount}"
                 }
-                "{amount}"
             }
-            p {
-                class: "w-1/4 text-left",
+            td {
+                class: "text-left text-nowrap min-w-32",
                 "{memo}"
             }
-            p {
-                class: "w-1/4 text-right",
+            td {
+                class: "text-right text-nowrap min-w-16",
                 "{time_str}"
             }
         }

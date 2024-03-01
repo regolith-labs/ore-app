@@ -31,10 +31,10 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
             let explorer_url = use_explorer_transaction_url(cx, &transfer.sig);
             let date = use_datetime(transfer.ts);
-            let container_class = "flex flex-row justify-between py-2 px-1";
+            let container_class = "flex flex-col gap-1 sm:flex-row sm:justify-between py-2 px-1";
             let title_class = "text-gray-300";
             let value_class = "font-medium px-2 py-1 rounded";
-            let link_class = "font-medium transition-colors px-2 py-1 hover-100 active-200 rounded";
+            let link_class = "font-medium transition-colors -ml-2 sm:ml-0 px-2 py-1 hover-100 active-200 rounded";
             let from_name = if let Ok(from_address) = Pubkey::from_str(&transfer.from_address) {
                 if from_address.eq(&TREASURY_ADDRESS) {
                     "Treasury".to_string()
@@ -85,7 +85,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                                 Link {
                                     class: "{link_class} font-mono",
                                     to: Route::User { id: transfer.to_address.clone() },
-                                    "{transfer.to_address}"
+                                    "{&transfer.to_address[..32]}"
                                 }
                             }
                         }
