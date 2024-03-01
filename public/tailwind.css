@@ -967,6 +967,10 @@ h2:where(.dark, .dark *) {
   max-width: 100%;
 }
 
+.max-w-\[96rem\] {
+  max-width: 96rem;
+}
+
 .shrink {
   flex-shrink: 1;
 }
