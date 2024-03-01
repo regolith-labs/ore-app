@@ -34,8 +34,7 @@ module.exports = {
     // lineHeight: {
     //     'relaxed': '1.3',
     // },
-    extend: ({ extend }) => ({
-      ...extend,
+    extend: {
       fontFamily: {
         mono: ['GeistMono', 'ui-monospace', 'monospace'],
         sans: ['Geist', 'ui-sans-serif', 'system-ui'],
@@ -44,6 +43,6 @@ module.exports = {
       transitionProperty: {
         'height': 'height'
       },
-    }),
+    },
   },
 }

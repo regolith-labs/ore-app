@@ -46,7 +46,7 @@ html,
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: Geist, ui-sans-serif, system-ui;
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -135,7 +135,7 @@ code,
 kbd,
 samp,
 pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: GeistMono, ui-monospace, monospace;
   /* 1 */
   font-feature-settings: normal;
   /* 2 */
@@ -678,10 +678,6 @@ h2:where(.dark, .dark *) {
   top: 0px;
 }
 
-.-z-40 {
-  z-index: -40;
-}
-
 .-z-50 {
   z-index: -50;
 }
@@ -1103,12 +1099,12 @@ h2:where(.dark, .dark *) {
   gap: 1rem;
 }
 
-.gap-8 {
-  gap: 2rem;
-}
-
 .gap-6 {
   gap: 1.5rem;
+}
+
+.gap-8 {
+  gap: 2rem;
 }
 
 .gap-y-8 {
@@ -1315,7 +1311,7 @@ h2:where(.dark, .dark *) {
 }
 
 .font-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: GeistMono, ui-monospace, monospace;
 }
 
 .text-2xl {
@@ -1382,12 +1378,12 @@ h2:where(.dark, .dark *) {
   line-height: 1.75rem;
 }
 
-.leading-relaxed {
-  line-height: 1.625;
-}
-
 .leading-\[1\.55\] {
   line-height: 1.55;
+}
+
+.leading-relaxed {
+  line-height: 1.625;
 }
 
 .text-black {
@@ -1495,6 +1491,12 @@ h2:where(.dark, .dark *) {
 
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-height {
+  transition-property: height;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
