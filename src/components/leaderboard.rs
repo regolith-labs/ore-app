@@ -89,6 +89,7 @@ pub fn LeaderboardTable<'a>(cx: Scope, token_accounts: &'a Vec<UiTokenAccount>) 
 #[component]
 pub fn TokenBalanceRow<'a>(cx: Scope, i: usize, token_account: &'a UiTokenAccount) -> Element {
     let owner = &token_account.owner;
+    let owner_abbr = &owner[..5];
     let amount = &token_account.token_amount.ui_amount_string;
     render! {
         Link {
@@ -99,16 +100,20 @@ pub fn TokenBalanceRow<'a>(cx: Scope, i: usize, token_account: &'a UiTokenAccoun
                 "{i}"
             }
             p {
-                class: "flex flex-row w-full text-left font-mono font-medium",
+                class: "w-full text-left font-mono font-medium hidden sm:block",
                 "{owner}"
             }
+            p {
+                class: "w-full text-left font-mono font-medium block sm:hidden",
+                "{owner_abbr}"
+            }
             div {
-                class: "flex flex-row gap-2 w-1/4 text-left",
+                class: "flex flex-row gap-1 w-full text-right justify-end",
                 OreIcon {
                     class: "my-auto w-4 h-4"
                 }
                 p {
-                    class: "font-semibold",
+                    class: "font-medium",
                     "{amount}"
                 }
             }
@@ -130,7 +135,7 @@ pub fn LeaderboardTableHeader(cx: Scope) -> Element {
                 "User"
             }
             p {
-                class: "text-left w-1/4",
+                class: "text-right w-full",
                 "Amount"
             }
             // p {

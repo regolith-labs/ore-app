@@ -781,6 +781,10 @@ h2:where(.dark, .dark *) {
   margin-right: -0.5rem;
 }
 
+.block {
+  display: block;
+}
+
 .inline-block {
   display: inline-block;
 }
@@ -1236,6 +1240,11 @@ h2:where(.dark, .dark *) {
 .bg-\[\#000\] {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.bg-green-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 184 124 / var(--tw-bg-opacity));
 }
 
 .p-2 {
@@ -1868,6 +1877,14 @@ h2:where(.dark, .dark *) {
 }
 
 @media (min-width: 640px) {
+  .sm\:block {
+    display: block;
+  }
+
+  .sm\:hidden {
+    display: none;
+  }
+
   .sm\:h-8 {
     height: 2rem;
   }
