@@ -2,27 +2,18 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    hooks::use_gateway,
+    hooks::{use_gateway, BalanceHandle},
+    ProofHandle,
 };
 
 use super::ClaimStep;
 
-#[derive(Props)]
-pub struct ClaimConfirmProps<'a> {
-    pub claim_step: &'a UseState<ClaimStep>,
-    // pub balance_handle: &'a UseFuture<()>,
-    pub proof_handle: &'a UseFuture<()>,
-    pub amount: u64,
-}
-
 #[component]
-pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
+pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> Element {
     let is_busy = use_state(cx, || false);
-    let amount = cx.props.amount;
-    // let balance_ = cx.props.balance_handle;
-    let proof_ = cx.props.proof_handle;
-    let claim_step = cx.props.claim_step;
-    let amountf = (amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
+    let balance_ = use_context::<BalanceHandle>(cx).unwrap();
+    let proof_ = use_context::<ProofHandle>(cx).unwrap();
+    let amountf = (*amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
     let gateway = use_gateway(cx);
 
     render! {
@@ -67,17 +58,19 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                     disabled: *is_busy.get(),
                     onclick: move |_| {
                         is_busy.set(true);
-                        // let balance_ = balance_.clone();
+                        let balance_ = balance_.clone();
                         let proof_ = proof_.clone();
+                        let amount = *amount;
                         let claim_step = claim_step.clone();
                         let is_busy = is_busy.clone();
                         let gateway = gateway.clone();
-                        cx.spawn(async move {
+                        cx.spawn({
+                            async move {
                             match gateway.claim_ore(amount).await {
                                 Ok(_sig) => {
-                                    is_busy.set(false);
-                                    // balance_.restart();
+                                    balance_.restart();
                                     proof_.restart();
+                                    is_busy.set(false);
                                     claim_step.set(ClaimStep::Done);
                                 }
                                 Err(_err) => {
@@ -86,7 +79,7 @@ pub fn ClaimConfirm<'a>(cx: Scope<'a, ClaimConfirmProps<'a>>) -> Element {
                                     log::error!("Failed to claim!");
                                 }
                             }
-                        });
+                        }});
                     },
                     if *is_busy.get() {
                         render! {

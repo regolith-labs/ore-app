@@ -4,7 +4,7 @@ use dioxus_router::prelude::*;
 use crate::{
     components::{Banner, BannerType, UserGroupIcon},
     gateway::AsyncResult,
-    hooks::{use_is_onboarded, use_ping},
+    hooks::use_ping,
     route::Route,
 };
 

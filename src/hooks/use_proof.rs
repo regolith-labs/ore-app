@@ -1,13 +1,41 @@
 use dioxus::prelude::*;
-use dioxus_std::utils::rw::UseRw;
-use ore::state::Proof;
+use ore::{state::Proof, utils::AccountDeserialize};
 
 use crate::gateway::{proof_pubkey, AsyncResult};
 
-use super::{use_account, use_pubkey};
+use super::{use_gateway, use_pubkey};
 
-pub fn use_proof(cx: &ScopeState) -> (&mut UseRw<AsyncResult<Proof>>, &UseFuture<()>) {
+#[derive(Clone)]
+pub struct ProofHandle(UseFuture<()>);
+
+impl ProofHandle {
+    pub fn restart(&self) {
+        self.0.restart();
+    }
+}
+
+pub fn use_proof(cx: &ScopeState) -> &UseSharedState<AsyncResult<Proof>> {
+    use_shared_state::<AsyncResult<Proof>>(cx).unwrap()
+}
+
+pub fn use_proof_provider(cx: &ScopeState) {
+    use_shared_state_provider::<AsyncResult<Proof>>(cx, || AsyncResult::Loading);
+    let proof = use_shared_state::<AsyncResult<Proof>>(cx).unwrap();
     let pubkey = use_pubkey(cx);
     let proof_pubkey = proof_pubkey(pubkey);
-    use_account(cx, proof_pubkey)
+    let gateway = use_gateway(cx);
+
+    let f = use_future(cx, (), |_| {
+        let proof = proof.clone();
+        let gateway = gateway.clone();
+        async move {
+            if let Ok(data) = gateway.rpc.get_account_data(&proof_pubkey).await {
+                if let Ok(p) = Proof::try_from_bytes(data.as_ref()) {
+                    *proof.write() = AsyncResult::Ok(*p);
+                }
+            }
+        }
+    });
+
+    cx.provide_context(ProofHandle(f.clone()));
 }

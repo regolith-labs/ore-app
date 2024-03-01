@@ -26,6 +26,7 @@ pub fn use_account<
     let gateway = use_gateway(cx);
 
     let f = use_future(cx, (), |_| {
+        log::info!("Refetching account: {:?}", address);
         let acc = acc.clone();
         let gateway = gateway.clone();
         async move {

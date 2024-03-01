@@ -5,10 +5,16 @@ use solana_account_decoder::parse_token::UiTokenAmount;
 #[cfg(feature = "web")]
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
-use crate::{components::OreIcon, gateway::AsyncResult, hooks::use_proof, route::Route};
+use crate::{
+    components::OreIcon,
+    gateway::AsyncResult,
+    hooks::{use_ore_balance, use_proof},
+    route::Route,
+};
 
 #[component]
-pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
+pub fn Balance(cx: Scope) -> Element {
+    let balance = use_ore_balance(cx);
     render! {
         div {
             class: "flex flex-row w-full min-h-16 rounded justify-between",
@@ -53,8 +59,8 @@ pub fn Balance(cx: Scope, balance: AsyncResult<UiTokenAmount>) -> Element {
 
 #[component]
 pub fn UnclaimedRewards(cx: Scope) -> Element {
-    let (proof, _) = use_proof(cx);
-    if let AsyncResult::Ok(proof) = *proof.read().unwrap() {
+    let proof = use_proof(cx);
+    if let AsyncResult::Ok(proof) = *proof.read() {
         if proof.claimable_rewards.gt(&0) {
             let rewards =
                 (proof.claimable_rewards as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));

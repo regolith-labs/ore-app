@@ -10,7 +10,7 @@ use solana_sdk::pubkey::Pubkey;
 use crate::{
     components::{ActivityTable, Copyable, OreIcon},
     gateway::AsyncResult,
-    hooks::{use_explorer_account_url, use_ore_balance, use_user_transfers},
+    hooks::{use_explorer_account_url, use_ore_balance_user, use_user_transfers},
 };
 
 // TODO Not found
@@ -28,7 +28,7 @@ pub fn User(cx: Scope, id: String) -> Element {
     }
 
     let user_id = user_id.unwrap();
-    let (balance, _) = use_ore_balance(cx, user_id);
+    let balance = use_ore_balance_user(cx, user_id);
     let explorer_url = use_explorer_account_url(cx, id);
 
     let container_class = "flex flex-row justify-between py-2 px-1";

@@ -13,7 +13,6 @@ use crate::{
     },
     gateway::AsyncResult,
     hooks::{use_transfers, ACTIVITY_TABLE_PAGE_LIMIT},
-    route::Route,
 };
 
 #[derive(Debug)]

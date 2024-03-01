@@ -14,25 +14,16 @@ use crate::{
 };
 
 pub enum ClaimStep {
-    // Preview,
     Edit,
     Confirm,
     Done,
 }
 
-// #[derive(Props)]
-// pub struct ClaimProps<'a> {
-//     pub balance_handle: &'a UseFuture<()>,
-// }
-
 #[component]
 pub fn Claim(cx: Scope) -> Element {
-    // pub fn Claim<'a>(cx: Scope<'a, ClaimProps<'a>>) -> Element {
-    let (proof_rw, proof_) = use_proof(cx);
-    let proof = *proof_rw.read().unwrap();
+    let proof = *use_proof(cx).read();
     let claim_step = use_state(cx, || ClaimStep::Edit);
     let amount_input = use_state(cx, || "".to_string());
-    // let balance_ = cx.props.balance_handle;
 
     let parsed_amount: u64 = match amount_input.get().parse::<f64>() {
         Ok(n) => (n * 10f64.powf(ore::TOKEN_DECIMALS.into())) as u64,
@@ -58,10 +49,10 @@ pub fn Claim(cx: Scope) -> Element {
         ClaimStep::Confirm => {
             render! {
                 ClaimConfirm {
-                    claim_step: claim_step,
+                    claim_step: claim_step.clone(),
                     amount: parsed_amount,
                     // balance_handle: balance_,
-                    proof_handle: proof_,
+                    // proof_handle: proof_,
                 }
             }
         }

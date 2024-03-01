@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use ore::state::{Proof, Treasury};
+use ore::state::Treasury;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAmount;
 #[cfg(feature = "web")]
@@ -20,7 +20,7 @@ use super::MinerStatusMessage;
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,
-    pub proof: AsyncResult<Proof>,
+    // pub proof: AsyncResult<Proof>,
     pub ore_supply: AsyncResult<UiTokenAmount>,
     pub miner: UseState<Miner>,
 }
@@ -28,20 +28,20 @@ pub struct MinerToolbarActiveProps {
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let timer = use_state(cx, || 0u64);
-    let proof = cx.props.proof;
+    // let proof = cx.props.proof;
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
 
-    let hash = match proof {
-        AsyncResult::Ok(proof) => proof.hash.to_string(),
-        _ => "–".to_string(),
-    };
+    // let hash = match proof {
+    //     AsyncResult::Ok(proof) => proof.hash.to_string(),
+    //     _ => "–".to_string(),
+    // };
 
-    let hash_abbr = if hash.len().gt(&16) {
-        hash[0..16].to_string()
-    } else {
-        "–".to_string()
-    };
+    // let hash_abbr = if hash.len().gt(&16) {
+    //     hash[0..16].to_string()
+    // } else {
+    //     "–".to_string()
+    // };
 
     let circulating_supply = match cx.props.treasury {
         AsyncResult::Ok(treasury) => {
@@ -63,10 +63,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         _ => 0f64,
     };
 
-    use_effect(cx, &proof, |_| {
-        timer.set(0);
-        async move {}
-    });
+    // use_effect(cx, &proof, |_| {
+    //     timer.set(0);
+    //     async move {}
+    // });
 
     let _n = use_future(cx, (), |_| {
         let timer = timer.clone();

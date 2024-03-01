@@ -44,7 +44,7 @@ pub fn Landing(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "fixed safe-top left-0 right-0 bottom-0 overflow-hidden",
+            class: "fixed top-safe left-0 right-0 bottom-0 overflow-hidden",
             img {
                 class: "object-cover h-full w-full",
                 src: "/smoke.png"

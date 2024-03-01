@@ -30,7 +30,7 @@
   .skip-button {
     @apply bg-transparent text-black font-semibold px-6 py-3 w-fit hover:bg-gray-100;
   }
-  .safe-top {
+  .top-safe {
     top: env(safe-area-inset-top);
   }
 

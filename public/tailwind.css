@@ -617,7 +617,7 @@ h2:where(.dark, .dark *) {
   background-color: rgb(70 70 72 / var(--tw-bg-opacity));
 }
 
-.safe-top {
+.top-safe {
   top: env(safe-area-inset-top);
 }
 
@@ -670,6 +670,10 @@ h2:where(.dark, .dark *) {
   left: 50%;
 }
 
+.right-0 {
+  right: 0px;
+}
+
 .right-8 {
   right: 2rem;
 }
@@ -680,10 +684,6 @@ h2:where(.dark, .dark *) {
 
 .top-0 {
   top: 0px;
-}
-
-.right-0 {
-  right: 0px;
 }
 
 .z-0 {
@@ -850,10 +850,6 @@ h2:where(.dark, .dark *) {
   height: 100%;
 }
 
-.h-lvh {
-  height: 100lvh;
-}
-
 .h-min {
   height: -moz-min-content;
   height: min-content;
@@ -865,10 +861,6 @@ h2:where(.dark, .dark *) {
 
 .min-h-16 {
   min-height: 4rem;
-}
-
-.min-h-full {
-  min-height: 100%;
 }
 
 .min-h-screen {
@@ -955,10 +947,6 @@ h2:where(.dark, .dark *) {
 
 .min-w-40 {
   min-width: 10rem;
-}
-
-.min-w-full {
-  min-width: 100%;
 }
 
 .max-w-44 {

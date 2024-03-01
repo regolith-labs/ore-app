@@ -20,10 +20,10 @@ use dioxus::prelude::*;
 use crate::{
     gateway::AsyncResult,
     hooks::{
-        use_account_subscribe, use_gateway, use_miner, use_ore_supply, use_proof, use_pubkey,
-        use_treasury,
+        use_account_subscribe, use_gateway, use_miner, use_ore_supply, use_pubkey, use_treasury,
     },
     miner::{submit_solution, MiningResult},
+    ProofHandle,
 };
 
 #[derive(Debug)]
@@ -52,8 +52,10 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let gateway = use_gateway(cx);
     let (treasury_rw, _) = use_treasury(cx);
     let treasury = *treasury_rw.read().unwrap();
-    let (proof_rw, proof_fut) = use_proof(cx);
-    let proof = *proof_rw.read().unwrap();
+    // let (proof_rw, _) = use_proof(cx);
+    // let proof = *proof_rw.read().unwrap();
+    // let proof_ = use_context::<ProofHandle>(cx).unwrap();
+    let proof_ = cx.consume_context::<ProofHandle>().unwrap();
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
     let ch = use_channel::<MiningResult>(cx, 1);
     let miner = use_miner(cx, ch);
@@ -67,7 +69,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         let status = miner_status.clone();
         let miner = miner.clone();
         let gateway = gateway.clone();
-        let proof_fut = proof_fut.clone();
+        let proof_ = proof_.clone();
         let miner_status_message = miner_status_message.clone();
         async move {
             while let Ok(res) = rx.recv().await {
@@ -75,7 +77,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                     MinerStatusMessage("Confirming transaction".to_string());
                 match submit_solution(&gateway, &res).await {
                     Ok(_sig) => {
-                        proof_fut.restart();
+                        proof_.restart();
                         if let MinerStatus::Active = *status.read() {
                             if let Ok(treasury) = gateway.get_treasury().await {
                                 if let Ok(proof) = gateway.get_proof(pubkey).await {
@@ -154,7 +156,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                         render! {
                             MinerToolbarActive {
                                 treasury: treasury,
-                                proof: proof,
+                                // proof: proof,
                                 ore_supply: ore_supply,
                                 miner: miner.clone()
                             }
