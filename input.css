@@ -38,6 +38,43 @@
 }
 
 @font-face {
+    font-family: 'RoobertTRIAL';
+    src: url('/fonts/RoobertTRIAL-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'RoobertTRIAL';
+    src: url('/fonts/RoobertTRIAL-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'RoobertTRIAL';
+    src: url('/fonts/RoobertTRIAL-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'RoobertTRIAL';
+    src: url('/fonts/RoobertTRIAL-SemiBold.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'RoobertTRIAL';
+    src: url('/fonts/RoobertTRIAL-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'RoobertTRIAL';
+    src: url('/fonts/RoobertTRIAL-Heavy.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
     font-family: 'Geist';
     src: url('/fonts/Geist-Thin.otf') format('opentype');
     font-weight: 100;

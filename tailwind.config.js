@@ -32,13 +32,14 @@ module.exports = {
       },
     }),
     // lineHeight: {
-    //     'relaxed': '1.3',
+    //     'relaxed': '1.5',
     // },
     extend: {
       fontFamily: {
         mono: ['GeistMono', 'ui-monospace', 'monospace'],
         sans: ['Geist', 'ui-sans-serif', 'system-ui'],
         serif: ['ui-serif'],
+        hero: ['RoobertTRIAL', 'ui-sans-serif', 'system-ui']
       },
       transitionProperty: {
         'height': 'height'

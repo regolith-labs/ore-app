@@ -617,11 +617,6 @@ h2:where(.dark, .dark *) {
   background-color: rgb(70 70 72 / var(--tw-bg-opacity));
 }
 
-.top-safe {
-  top: 0;
-  padding-top: env(safe-area-inset-top);
-}
-
 .pointer-events-none {
   pointer-events: none;
 }
@@ -640,10 +635,6 @@ h2:where(.dark, .dark *) {
 
 .relative {
   position: relative;
-}
-
-.sticky {
-  position: sticky;
 }
 
 .inset-x-0 {
@@ -671,10 +662,6 @@ h2:where(.dark, .dark *) {
   left: 50%;
 }
 
-.right-0 {
-  right: 0px;
-}
-
 .right-8 {
   right: 2rem;
 }
@@ -695,12 +682,12 @@ h2:where(.dark, .dark *) {
   z-index: 20;
 }
 
-.z-\[100\] {
-  z-index: 100;
-}
-
 .z-50 {
   z-index: 50;
+}
+
+.z-\[100\] {
+  z-index: 100;
 }
 
 .-mx-2 {
@@ -751,20 +738,12 @@ h2:where(.dark, .dark *) {
   margin-top: 1rem;
 }
 
-.mt-8 {
-  margin-top: 2rem;
-}
-
 .mt-auto {
   margin-top: auto;
 }
 
 .block {
   display: block;
-}
-
-.inline-block {
-  display: inline-block;
 }
 
 .flex {
@@ -847,10 +826,6 @@ h2:where(.dark, .dark *) {
   height: 2rem;
 }
 
-.h-dvh {
-  height: 100dvh;
-}
-
 .h-full {
   height: 100%;
 }
@@ -862,6 +837,10 @@ h2:where(.dark, .dark *) {
 
 .h-screen {
   height: 100vh;
+}
+
+.h-svh {
+  height: 100svh;
 }
 
 .min-h-16 {
@@ -952,6 +931,10 @@ h2:where(.dark, .dark *) {
 
 .max-w-44 {
   max-width: 11rem;
+}
+
+.max-w-\[44rem\] {
+  max-width: 44rem;
 }
 
 .max-w-\[48rem\] {
@@ -1120,14 +1103,6 @@ h2:where(.dark, .dark *) {
   row-gap: 2rem;
 }
 
-.gap-y-6 {
-  row-gap: 1.5rem;
-}
-
-.overflow-hidden {
-  overflow: hidden;
-}
-
 .overflow-visible {
   overflow: visible;
 }
@@ -1156,10 +1131,6 @@ h2:where(.dark, .dark *) {
 
 .rounded-full {
   border-radius: 9999px;
-}
-
-.rounded-lg {
-  border-radius: 0.5rem;
 }
 
 .rounded-sm {
@@ -1226,17 +1197,8 @@ h2:where(.dark, .dark *) {
   background-size: cover;
 }
 
-.bg-fixed {
-  background-attachment: fixed;
-}
-
 .bg-center {
   background-position: center;
-}
-
-.object-cover {
-  -o-object-fit: cover;
-     object-fit: cover;
 }
 
 .p-2 {
@@ -1348,6 +1310,10 @@ h2:where(.dark, .dark *) {
   text-align: right;
 }
 
+.font-hero {
+  font-family: RoobertTRIAL, ui-sans-serif, system-ui;
+}
+
 .font-mono {
   font-family: GeistMono, ui-monospace, monospace;
 }
@@ -1403,16 +1369,8 @@ h2:where(.dark, .dark *) {
   font-weight: 600;
 }
 
-.leading-\[1\.55\] {
-  line-height: 1.55;
-}
-
 .leading-relaxed {
   line-height: 1.625;
-}
-
-.leading-\[1\.75\] {
-  line-height: 1.75;
 }
 
 .text-black {
@@ -1473,12 +1431,6 @@ h2:where(.dark, .dark *) {
   opacity: 0.8;
 }
 
-.shadow-lg {
-  --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
 .shadow-sm {
   --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
@@ -1534,6 +1486,66 @@ h2:where(.dark, .dark *) {
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL';
+
+  src: url('/fonts/RoobertTRIAL-Light.otf') format('opentype');
+
+  font-weight: 300;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL';
+
+  src: url('/fonts/RoobertTRIAL-Regular.otf') format('opentype');
+
+  font-weight: 400;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL';
+
+  src: url('/fonts/RoobertTRIAL-Medium.otf') format('opentype');
+
+  font-weight: 500;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL';
+
+  src: url('/fonts/RoobertTRIAL-SemiBold.otf') format('opentype');
+
+  font-weight: 600;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL';
+
+  src: url('/fonts/RoobertTRIAL-Bold.otf') format('opentype');
+
+  font-weight: 700;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL';
+
+  src: url('/fonts/RoobertTRIAL-Heavy.otf') format('opentype');
+
+  font-weight: 800;
+
+  font-style: normal;
 }
 
 @font-face {
@@ -1822,16 +1834,16 @@ h2:where(.dark, .dark *) {
     gap: 1rem;
   }
 
+  .sm\:gap-6 {
+    gap: 1.5rem;
+  }
+
+  .sm\:gap-y-10 {
+    row-gap: 2.5rem;
+  }
+
   .sm\:gap-y-6 {
     row-gap: 1.5rem;
-  }
-
-  .sm\:gap-y-8 {
-    row-gap: 2rem;
-  }
-
-  .sm\:p-4 {
-    padding: 1rem;
   }
 
   .sm\:p-8 {
@@ -1858,13 +1870,13 @@ h2:where(.dark, .dark *) {
     line-height: 1;
   }
 
-  .sm\:text-xl {
-    font-size: 1.25rem;
+  .sm\:text-lg {
+    font-size: 1.125rem;
     line-height: 1.75rem;
   }
 
-  .sm\:text-lg {
-    font-size: 1.125rem;
+  .sm\:text-xl {
+    font-size: 1.25rem;
     line-height: 1.75rem;
   }
 }
@@ -1882,20 +1894,16 @@ h2:where(.dark, .dark *) {
     gap: 1rem;
   }
 
-  .md\:gap-6 {
-    gap: 1.5rem;
-  }
-
-  .md\:gap-y-8 {
-    row-gap: 2rem;
+  .md\:gap-8 {
+    gap: 2rem;
   }
 
   .md\:gap-y-12 {
     row-gap: 3rem;
   }
 
-  .md\:p-8 {
-    padding: 2rem;
+  .md\:gap-y-8 {
+    row-gap: 2rem;
   }
 
   .md\:text-2xl {
@@ -1925,6 +1933,11 @@ h2:where(.dark, .dark *) {
 }
 
 @media (min-width: 1024px) {
+  .lg\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
   .lg\:text-3xl {
     font-size: 1.875rem;
     line-height: 2.25rem;
@@ -1935,14 +1948,14 @@ h2:where(.dark, .dark *) {
     line-height: 2.5rem;
   }
 
-  .lg\:text-7xl {
-    font-size: 4.5rem;
+  .lg\:text-6xl {
+    font-size: 3.75rem;
     line-height: 1;
   }
 
-  .lg\:text-2xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
+  .lg\:text-7xl {
+    font-size: 4.5rem;
+    line-height: 1;
   }
 }
 
