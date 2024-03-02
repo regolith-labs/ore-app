@@ -31,7 +31,8 @@
     @apply bg-transparent text-black font-semibold px-6 py-3 w-fit hover:bg-gray-100;
   }
   .top-safe {
-    top: env(safe-area-inset-top);
+    top: 0;
+    padding-top: env(safe-area-inset-top);
   }
 
 }
