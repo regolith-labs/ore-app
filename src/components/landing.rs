@@ -90,7 +90,7 @@ fn Hero(cx: Scope) -> Element {
             style: "background-image: url(/smoke-2.png)",
             Navbar {}
             div {
-                class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24",
+                class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",
                 div {
                     class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8",
                     p {
