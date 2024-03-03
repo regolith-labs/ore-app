@@ -92,7 +92,7 @@ fn Hero(cx: Scope) -> Element {
                     }
                     p {
                         class: "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center max-w-[44rem] font-hero leading-relaxed",
-                        "Ore is a cryptocurrency everyone can mine. From your home to your phone, turn any device into a miner."
+                        "Ore is a cryptocurrency everyone can mine. From your home to your phone, mine crypto on any device."
                     }
                 }
                 Link {
