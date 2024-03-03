@@ -149,9 +149,9 @@ fn Block<'a>(
     };
     render! {
         div {
-            class: "flex w-full min-h-svh h-full z-20",
+            class: "flex w-full min-h-svh h-full z-20 {colors}",
             div {
-                class: "flex flex-col h-full w-full py-16 gap-16 px-4 sm:px-8 {colors}",
+                class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
                     class: "flex flex-col gap-4 sm:gap-6 md:gap-8",
                     p {
@@ -315,7 +315,7 @@ fn SectionB(cx: Scope) -> Element {
     };
     render! {
         div {
-            class: "flex flex-col gap-8 my-auto",
+            class: "flex flex-col gap-12 my-auto",
             OreValue {
                 title: "Circulating supply".to_string(),
                 amount: circulating_supply
@@ -332,9 +332,9 @@ fn SectionB(cx: Scope) -> Element {
 fn OreValue(cx: Scope, title: String, amount: String) -> Element {
     render! {
         div {
-            class: "flex flex-col gap-2",
+            class: "flex flex-col gap-3",
             p {
-                class: "text-gray-300 text-sm",
+                class: "text-gray-300 text-sm font-medium",
                 "{title}"
             }
             div {
