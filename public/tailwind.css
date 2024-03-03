@@ -1475,6 +1475,11 @@ h2:where(.dark, .dark *) {
   color: rgb(245 245 247 / var(--tw-text-opacity));
 }
 
+.text-gray-200 {
+  --tw-text-opacity: 1;
+  color: rgb(214 214 216 / var(--tw-text-opacity));
+}
+
 .underline {
   text-decoration-line: underline;
 }

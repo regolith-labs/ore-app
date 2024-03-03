@@ -6,7 +6,10 @@ use solana_account_decoder::parse_token::UiTokenAmount;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
-    components::{IsToolbarOpen, MinerPower, OreIcon, StopButton, Tooltip, TooltipDirection},
+    components::{
+        ActivityIndicator, IsToolbarOpen, MinerPower, OreIcon, StopButton, Tooltip,
+        TooltipDirection,
+    },
     gateway::AsyncResult,
     miner::Miner,
 };
@@ -168,22 +171,6 @@ pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: Str
                         "{amount}"
                     }
                 }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn ActivityIndicator(cx: Scope) -> Element {
-    render! {
-        span {
-            class: "relative flex h-3 w-3 justify center my-auto",
-            span {
-                class: "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-white",
-                " "
-            }
-            span {
-                class: "relative inline-flex rounded-full h-2 w-2 my-auto mx-auto bg-white"
             }
         }
     }

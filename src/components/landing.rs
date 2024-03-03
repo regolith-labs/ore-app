@@ -1,13 +1,13 @@
 #![allow(non_snake_case)]
-use dioxus::{html::th, prelude::*};
+use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use ore_types::Transfer;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
-    components::{ActivityFilter, OreIcon},
+    components::{ActivityFilter, ActivityIndicator, OreIcon},
     gateway::AsyncResult,
-    hooks::{use_is_onboarded, use_transfers},
+    hooks::{use_is_onboarded, use_ore_supply, use_transfers, use_treasury},
     Route,
 };
 
@@ -86,6 +86,23 @@ pub fn Landing(cx: Scope) -> Element {
 }
 
 #[component]
+fn Navbar(cx: Scope) -> Element {
+    render! {
+        div {
+            class: "flex flex-row justify-between px-4 sm:px-8 py-4 w-full z-50",
+            Link {
+                to: Route::Landing {},
+                class: "flex flex-row h-10",
+                h1 {
+                    class: "text-xl font-black my-auto w-min",
+                    "ORE"
+                }
+            }
+        }
+    }
+}
+
+#[component]
 fn Hero(cx: Scope) -> Element {
     render! {
         div {
@@ -102,11 +119,10 @@ fn Hero(cx: Scope) -> Element {
                     }
                     p {
                         class: "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center max-w-[46rem] font-hero leading-relaxed",
-                        "Ore is a cryptocurrency everyone can mine. From your home to your phone, mine crypto on any device."
+                        "Ore is a cryptocurrency you can mine from anywhere, at home or on your phone."
                     }
                 }
                 Link {
-                    // class: "mx-auto text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold hover:bg-black hover:text-white transition-colors rounded-full px-6 py-3",
                     class: "mx-auto sm:text-lg md:text-xl lg:text-2xl font-semibold bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transition-colors rounded-full px-6 py-3",
                     to: Route::Home {},
                     "Get started →"
@@ -114,12 +130,6 @@ fn Hero(cx: Scope) -> Element {
             }
         }
     }
-}
-
-enum Section {
-    A,
-    B,
-    C,
 }
 
 #[component]
@@ -139,7 +149,7 @@ fn Block<'a>(
     };
     render! {
         div {
-            class: "flex w-full min-h-screen z-20",
+            class: "flex w-full min-h-svh h-full z-20",
             div {
                 class: "flex flex-col h-full w-full py-16 gap-16 px-4 sm:px-8 {colors}",
                 div {
@@ -184,13 +194,10 @@ fn Block<'a>(
     }
 }
 
-// TODO Sect
-#[component]
-fn SectionB(cx: Scope) -> Element {
-    render! {
-        div {}
-        // TODO Live current and circulating supply
-    }
+enum Section {
+    A,
+    B,
+    C,
 }
 
 #[component]
@@ -202,9 +209,13 @@ fn SectionA(cx: Scope) -> Element {
     render! {
         div {
             class: "flex flex-col w-full my-auto gap-4 max-w-[48rem]",
-            p {
-                class: "font-semibold text-xl opacity-50",
-                "Live transactions"
+            div {
+                class: "flex flex-row gap-2",
+                ActivityIndicator {}
+                p {
+                    class: "font-semibold text-xl opacity-50",
+                    "Live transactions"
+                }
             }
             div {
                 class: "flex flex-col w-full",
@@ -287,18 +298,56 @@ fn TransfersSection(cx: Scope, transfers: AsyncResult<Vec<Transfer>>) -> Element
 }
 
 #[component]
-fn Navbar(cx: Scope) -> Element {
+fn SectionB(cx: Scope) -> Element {
+    let (treasury, _) = use_treasury(cx);
+    let (supply, _) = use_ore_supply(cx);
+    let circulating_supply = match *treasury.read().unwrap() {
+        AsyncResult::Ok(treasury) => {
+            (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
+        }
+        _ => 0f64,
+    }
+    .to_string();
+    let ore_supply = match supply {
+        AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
+        AsyncResult::Loading => "-".to_string(),
+        AsyncResult::Error(_err) => "Err".to_string(),
+    };
     render! {
         div {
-            class: "flex flex-row justify-between px-4 sm:px-8 py-4 w-full z-50",
-            Link {
-                to: Route::Landing {},
-                class: "flex flex-row h-10",
-                h1 {
-                    class: "text-xl font-black my-auto w-min",
-                    "ORE"
+            class: "flex flex-col gap-8 my-auto",
+            OreValue {
+                title: "Circulating supply".to_string(),
+                amount: circulating_supply
+            }
+            OreValue {
+                title: "Total supply".to_string(),
+                amount: ore_supply
+            }
+        }
+    }
+}
+
+#[component]
+fn OreValue(cx: Scope, title: String, amount: String) -> Element {
+    render! {
+        div {
+            class: "flex flex-col gap-2",
+            p {
+                class: "text-gray-300 text-sm",
+                "{title}"
+            }
+            div {
+                class: "flex flex-row gap-2",
+                OreIcon {
+                    class: "w-8 h-8 my-auto"
+                }
+                p {
+                    class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
+                    "{amount}"
                 }
             }
         }
+
     }
 }

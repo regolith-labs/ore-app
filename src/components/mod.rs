@@ -1,4 +1,5 @@
 mod activity;
+mod activity_indicator;
 mod back_button;
 mod balance;
 mod banner;
@@ -25,6 +26,7 @@ mod tx;
 mod user;
 
 pub use activity::*;
+pub use activity_indicator::*;
 pub use back_button::*;
 pub use balance::*;
 pub use banner::*;
