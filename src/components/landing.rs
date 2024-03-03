@@ -1,8 +1,15 @@
 #![allow(non_snake_case)]
-use dioxus::prelude::*;
+use dioxus::{html::th, prelude::*};
 use dioxus_router::prelude::*;
+use ore_types::Transfer;
+use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
-use crate::{hooks::use_is_onboarded, Route};
+use crate::{
+    components::{ActivityFilter, OreIcon},
+    gateway::AsyncResult,
+    hooks::{use_is_onboarded, use_transfers},
+    Route,
+};
 
 // TODO Hero
 //      It's time to mine
@@ -52,6 +59,7 @@ pub fn Landing(cx: Scope) -> Element {
                 detail: "Ore uses a novel proof-of-work protocol designed for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
                 dark: true,
                 cta: ("Learn more", "https://github.com/hardhatchad/ore"),
+                section: Section::A
                 // TODO Live hashes? YES! Stream recently mined blocks and their reward amounts.
             }
             Block {
@@ -59,7 +67,8 @@ pub fn Landing(cx: Scope) -> Element {
                 title2: "Constant growth.",
                 detail: "Ore has an algorithmic supply programmed for steady linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
                 dark: false,
-                cta: ("Learn more", "https://github.com/hardhatchad/ore")
+                cta: ("Learn more", "https://github.com/hardhatchad/ore"),
+                section: Section::B
                 // TODO Current live supply
                 // TODO Circulating vs total
             }
@@ -68,7 +77,8 @@ pub fn Landing(cx: Scope) -> Element {
                 title2: "Immutable code.",
                 detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent future tampering or removal.",
                 dark: true,
-                cta: ("Checkout the code", "https://github.com/hardhatchad/ore")
+                cta: ("Checkout the code", "https://github.com/hardhatchad/ore"),
+                section: Section::C
                 //
             }
         }
@@ -91,7 +101,7 @@ fn Hero(cx: Scope) -> Element {
                         "It's time to mine."
                     }
                     p {
-                        class: "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center max-w-[44rem] font-hero leading-relaxed",
+                        class: "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center max-w-[46rem] font-hero leading-relaxed",
                         "Ore is a cryptocurrency everyone can mine. From your home to your phone, mine crypto on any device."
                     }
                 }
@@ -106,6 +116,12 @@ fn Hero(cx: Scope) -> Element {
     }
 }
 
+enum Section {
+    A,
+    B,
+    C,
+}
+
 #[component]
 fn Block<'a>(
     cx: Scope,
@@ -114,7 +130,7 @@ fn Block<'a>(
     detail: &'a str,
     cta: Option<(&'a str, &'a str)>,
     dark: bool,
-    img: Option<&'a str>,
+    section: Section,
 ) -> Element {
     let colors = if *dark {
         "bg-black text-white"
@@ -123,37 +139,140 @@ fn Block<'a>(
     };
     render! {
         div {
-            class: "flex w-full h-svh z-20",
+            class: "flex w-full min-h-screen z-20",
             div {
-                class: "flex flex-col gap-4 sm:gap-6 md:gap-8 h-full w-full py-8 px-4 sm:px-8 {colors}",
-                p {
-                    class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
-                    "{title}"
-                    if let Some(title2) = title2 {
+                class: "flex flex-col h-full w-full pt-8 pb-16 gap-16 px-4 sm:px-8 {colors}",
+                div {
+                    class: "flex flex-col gap-4 sm:gap-6 md:gap-8",
+                    p {
+                        class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
+                        "{title}"
+                        if let Some(title2) = title2 {
+                            render! {
+                                br{}
+                                span {
+                                    class: "opacity-50",
+                                    "{title2}"
+                                }
+                            }
+                        }
+                    }
+                    p {
+                        class: "text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed max-w-[48rem] font-hero",
+                        "{detail}"
+                    }
+                    if let Some((cta, to)) = cta {
                         render! {
-                            br{}
-                            span {
-                                class: "opacity-50",
-                                "{title2}"
+                            Link {
+                                class: "font-semibold mt-4",
+                                to: "{to}",
+                                "{cta} →"
                             }
                         }
                     }
                 }
-                p {
-                    class: "text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed max-w-[48rem] font-hero",
-                    "{detail}"
-                }
-                if let Some((cta, to)) = cta {
-                    render! {
-                        Link {
-                            class: "font-semibold mt-4",
-                            to: "{to}",
-                            "{cta} →"
-                        }
+                div {
+                    class: "flex h-full w-full",
+                    match section {
+                        Section::A => render! { SectionA {} },
+                        _ => None
                     }
                 }
             }
         }
+    }
+}
+
+#[component]
+fn SectionA(cx: Scope) -> Element {
+    let filter = use_state(cx, || ActivityFilter::Global);
+    let offset = use_state(cx, || 0);
+    let (transfers, _) = use_transfers(cx, filter, offset);
+
+    render! {
+        div {
+            class: "flex flex-col w-full my-auto gap-4 max-w-[48rem]",
+            p {
+                class: "font-semibold text-xl opacity-50",
+                "Live transactions"
+            }
+            div {
+                class: "flex flex-col w-full",
+                TransfersSection {
+                    transfers: transfers
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn TransfersSection(cx: Scope, transfers: AsyncResult<Vec<Transfer>>) -> Element {
+    match transfers {
+        AsyncResult::Ok(transfers) => {
+            render! {
+                for (i, transfer) in transfers.iter().enumerate() {
+                    if i.lt(&5) {
+                        let addr = transfer.to_address[..5].to_string();
+                        let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
+
+                        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+                        let ts = Duration::from_secs(transfer.ts as u64);
+                        let time = now.saturating_sub(ts);
+                        let t = time.as_secs();
+                        const ONE_MIN: u64 = 60;
+                        const ONE_HOUR: u64 = ONE_MIN * 60;
+                        const ONE_DAY: u64 = ONE_HOUR * 24;
+                        let time_str = if t.gt(&ONE_DAY) {
+                            format!("{}d ago", t.saturating_div(ONE_DAY))
+                        } else if t.gt(&ONE_HOUR) {
+                            format!("{}h ago", t.saturating_div(ONE_HOUR))
+                        } else if t.gt(&ONE_MIN) {
+                            format!("{}m ago", t.saturating_div(ONE_MIN))
+                        } else {
+                            format!("{}s ago", t)
+                        };
+
+                        render! {
+                            div {
+                                class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
+                                div {
+                                    class: "w-8 h-8 bg-white opacity-50 rounded-full",
+                                }
+                                div {
+                                    class: "flex flex-col pt-1",
+                                    p {
+                                        class: "flex flex-row gap-2",
+                                        span {
+                                            class: "font-mono font-bold",
+                                            "{addr}"
+                                        }
+                                        "mined "
+                                        span {
+                                            class: "flex flex-row font-semibold gap-0.5",
+                                            OreIcon {
+                                                class: "w-3.5 h-3.5 my-auto",
+                                            }
+                                            "{amount:.4}"
+                                        }
+                                    }
+                                }
+                                div {
+                                    class: "flex pt-1.5 ml-auto",
+                                    p {
+                                        class: "opacity-50 text-left text-nowrap text-sm",
+                                        "{time_str}"
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        None
+                    }
+                }
+            }
+        }
+        _ => None,
     }
 }
 
