@@ -57,7 +57,7 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Stable supply.",
                 title2: "Constant growth.",
-                detail: "Ore has an algorithmic supply programmed for linear growth. On average, one new Ore token is mined every minute across the globe.",
+                detail: "Ore has an algorithmic supply programmed for steady linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
                 dark: false,
                 cta: ("Learn more", "https://github.com/hardhatchad/ore")
                 // TODO Current live supply
@@ -92,7 +92,7 @@ fn Hero(cx: Scope) -> Element {
                     }
                     p {
                         class: "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center max-w-[44rem] font-hero leading-relaxed",
-                        "Ore is a cryptocurrency you can mine from home."
+                        "Ore is a cryptocurrency everyone can mine. From your home to your phone, turn any device into a miner."
                     }
                 }
                 Link {
