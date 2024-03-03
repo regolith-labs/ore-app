@@ -141,7 +141,7 @@ fn Block<'a>(
         div {
             class: "flex w-full min-h-screen z-20",
             div {
-                class: "flex flex-col h-full w-full pt-8 pb-16 gap-16 px-4 sm:px-8 {colors}",
+                class: "flex flex-col h-full w-full py-16 gap-16 px-4 sm:px-8 {colors}",
                 div {
                     class: "flex flex-col gap-4 sm:gap-6 md:gap-8",
                     p {
@@ -175,11 +175,21 @@ fn Block<'a>(
                     class: "flex h-full w-full",
                     match section {
                         Section::A => render! { SectionA {} },
+                        Section::B => render! { SectionB {} },
                         _ => None
                     }
                 }
             }
         }
+    }
+}
+
+// TODO Sect
+#[component]
+fn SectionB(cx: Scope) -> Element {
+    render! {
+        div {}
+        // TODO Live current and circulating supply
     }
 }
 
