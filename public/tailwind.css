@@ -843,6 +843,10 @@ h2:where(.dark, .dark *) {
   height: 100svh;
 }
 
+.h-96 {
+  height: 24rem;
+}
+
 .min-h-16 {
   min-height: 4rem;
 }
@@ -915,6 +919,14 @@ h2:where(.dark, .dark *) {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-96 {
+  width: 24rem;
+}
+
+.w-64 {
+  width: 16rem;
 }
 
 .min-w-16 {
@@ -1199,6 +1211,11 @@ h2:where(.dark, .dark *) {
 
 .bg-center {
   background-position: center;
+}
+
+.object-contain {
+  -o-object-fit: contain;
+     object-fit: contain;
 }
 
 .p-2 {

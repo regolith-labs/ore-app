@@ -52,9 +52,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let gateway = use_gateway(cx);
     let (treasury_rw, _) = use_treasury(cx);
     let treasury = *treasury_rw.read().unwrap();
-    // let (proof_rw, _) = use_proof(cx);
-    // let proof = *proof_rw.read().unwrap();
-    // let proof_ = use_context::<ProofHandle>(cx).unwrap();
     let proof_ = cx.consume_context::<ProofHandle>().unwrap();
     let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
     let ch = use_channel::<MiningResult>(cx, 1);

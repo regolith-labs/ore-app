@@ -49,34 +49,27 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Proof of work.",
                 title2: "On Solana.",
-                detail: "Ore introduces a novel proof-of-work protocol designed specifically for token distribution. It relies on Solana for consensus and speedy hash validation.",
+                detail: "Ore uses a novel proof-of-work protocol designed for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
                 dark: true,
-                cta: ("Learn more", "https://github.com/hardhatchad/ore")
-                // TODO Live hashes?
+                cta: ("Learn more", "https://github.com/hardhatchad/ore"),
+                // TODO Live hashes? YES! Stream recently mined blocks and their reward amounts.
             }
-            // Block {
-            //     title: "Guaranteed rewards.",
-            //     detail: "Ore is the only token in existence that guarantees every participating miner will earn rewards, regardless of how much hash power is active on the network.",
-            //     dark: false
-            //     // TODO Live reward rate
-            // }
             Block {
                 title: "Stable supply.",
-                title2: "Predictable growth.",
-                detail: "Ore has an algorithmic supply, programmed for constant linear growth. Every minute, one new Ore token is minted and distributed amongst active miners.",
+                title2: "Constant growth.",
+                detail: "Ore has an algorithmic supply programmed for linear growth. On average, one new Ore token is mined every minute across the globe.",
                 dark: false,
                 cta: ("Learn more", "https://github.com/hardhatchad/ore")
-                // TODO Live current supply
-                // TODO Claimed vs mined
-                // TODO Total holders
+                // TODO Current live supply
+                // TODO Circulating vs total
             }
             Block {
                 title: "Fair launch.",
                 title2: "Immutable code.",
-                detail: "Ore has no insider allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
+                detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent future tampering or removal.",
                 dark: true,
-                cta: ("Read the code", "https://github.com/hardhatchad/ore")
-                // TODO These should be blocks "No pre-mining." "No insider allocations" "Frozen contract." "Open source."
+                cta: ("Checkout the code", "https://github.com/hardhatchad/ore")
+                //
             }
         }
     }
@@ -99,7 +92,7 @@ fn Hero(cx: Scope) -> Element {
                     }
                     p {
                         class: "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center max-w-[44rem] font-hero leading-relaxed",
-                        "Ore is the only cryptocurrency in the world that guarantees every miner can earn rewards."
+                        "Ore is a cryptocurrency you can mine from home."
                     }
                 }
                 Link {
@@ -121,6 +114,7 @@ fn Block<'a>(
     detail: &'a str,
     cta: Option<(&'a str, &'a str)>,
     dark: bool,
+    img: Option<&'a str>,
 ) -> Element {
     let colors = if *dark {
         "bg-black text-white"
