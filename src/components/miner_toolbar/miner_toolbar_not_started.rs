@@ -33,8 +33,6 @@ pub fn StartButton(cx: Scope) -> Element {
     render! {
         button {
             class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
-            // class: "transition transition-colors flex w-10 h-10 justify-center rounded-full text-white bg-green-500 hover:bg-green-600 active:bg-green-700",
-            // class: "transition transition-colors flex w-10 h-10 justify-center rounded-full text-green-500 hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
             title: "Start mining",
             onclick: move |_e| {
                 *is_toolbar_open.write() = IsToolbarOpen(true);

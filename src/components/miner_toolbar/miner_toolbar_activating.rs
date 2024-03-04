@@ -43,7 +43,7 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-8 justify-between p-8",
+                class: "flex flex-col grow gap-8 justify-between px-4 py-6 sm:px-8 sm:py-8",
                 div {
                     class: "flex flex-col gap-3",
                     h2 {

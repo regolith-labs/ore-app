@@ -76,10 +76,10 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col grow gap-8 justify-between px-4 sm:px-8 py-8 bg-white",
+            class: "flex flex-col w-full grow gap-8 justify-between px-4 sm:px-8 py-8 bg-white",
             div {
                 class: "flex flex-col gap-3",
-                h1 {
+                h2 {
                     "Pay transaction fees"
                 }
                 p {
@@ -88,7 +88,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-gray-300 text-sm",
-                    "Top up with at least 0.1 SOL to begin mining."
+                    "Top up with 0.1 SOL to begin mining."
                 }
             }
             div {
@@ -98,10 +98,10 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                     dangerous_inner_html: "{qrcode}",
                 }
                 Copyable {
-                    class: "mx-auto",
+                    class: "mx-auto max-w-full",
                     value: pubkey.to_string(),
                     p {
-                        class: "rounded p-2 font-mono font-medium",
+                        class: "rounded p-2 font-mono font-medium truncate",
                         "{pubkey}"
                     }
                 }

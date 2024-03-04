@@ -26,7 +26,7 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                         claim_step.set(ClaimStep::Edit);
                     }
                 }
-                h1 {
+                h2 {
                     "Confirm claim"
                 }
                 p {

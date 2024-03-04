@@ -35,7 +35,6 @@ pub fn Leaderboard(cx: Scope) -> Element {
         div {
             class: "flex flex-col gap-4",
             h2 {
-                class: "text-lg md:text-2xl font-bold",
                 "Top holders"
             }
             match token_accounts.get() {
@@ -89,7 +88,6 @@ pub fn LeaderboardTable<'a>(cx: Scope, token_accounts: &'a Vec<UiTokenAccount>) 
 #[component]
 pub fn TokenBalanceRow<'a>(cx: Scope, i: usize, token_account: &'a UiTokenAccount) -> Element {
     let owner = &token_account.owner;
-    let owner_abbr = &owner[..5];
     let amount = &token_account.token_amount.ui_amount_string;
     render! {
         Link {
@@ -100,15 +98,11 @@ pub fn TokenBalanceRow<'a>(cx: Scope, i: usize, token_account: &'a UiTokenAccoun
                 "{i}"
             }
             p {
-                class: "w-full text-left font-mono font-medium hidden sm:block",
+                class: "w-full text-left font-mono font-medium truncate",
                 "{owner}"
             }
-            p {
-                class: "w-full text-left font-mono font-medium block sm:hidden",
-                "{owner_abbr}"
-            }
             div {
-                class: "flex flex-row gap-1 w-full text-right justify-end",
+                class: "flex flex-row gap-1 w-full text-right justify-end ml-8",
                 OreIcon {
                     class: "my-auto w-4 h-4"
                 }
@@ -132,21 +126,17 @@ pub fn LeaderboardTableHeader(cx: Scope) -> Element {
             }
             p {
                 class: "text-left w-full",
-                "User"
+                "Account"
             }
             p {
-                class: "text-right w-full",
-                "Amount"
+                class: "text-right w-full ml-8",
+                "Balance"
             }
-            // p {
-            //     class: "text-right w-1/4",
-            //     "Time"
-            // }
         }
     }
 }
 
-// TODO Impl clone in solana-client-wasm to get this
+// TODO Implement clone in solana-client-wasm to get this
 // #[cached]
 async fn fetch_top_accounts(gateway: Rc<Gateway>) -> Vec<UiTokenAccount> {
     let mut fetched_accounts = vec![];

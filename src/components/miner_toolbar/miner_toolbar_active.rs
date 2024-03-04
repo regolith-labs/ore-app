@@ -84,7 +84,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-4 px-4 sm:px-8 py-8",
+                class: "flex flex-col grow gap-4 px-4 py-6 sm:px-8 sm:py-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
@@ -99,22 +99,23 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     }
                 }
                 div {
-                    class: "grid grid-cols-3 grid-rows-2 gap-y-8",
+                    // class: "grid grid-cols-3 grid-rows-2 gap-y-8",
+                    class: "flex flex-col gap-6 md:flex-row",
                     MinerDataOre {
                         title: "Reward rate",
                         tooltip: "The amount of Ore you are earning per valid hash.",
                         amount: reward_rate.to_string()
                     }
-                    MinerDataOre {
-                        title: "Circulating supply",
-                        tooltip: "The total amount of Ore that has ever been claimed.",
-                        amount: circulating_supply.to_string()
-                    }
-                    MinerDataOre {
-                        title: "Total supply",
-                        tooltip: "The total amount of Ore that has ever been mined.",
-                        amount: ore_supply
-                    }
+                    // MinerDataOre {
+                    //     title: "Circulating supply",
+                    //     tooltip: "The total amount of Ore that has ever been claimed.",
+                    //     amount: circulating_supply.to_string()
+                    // }
+                    // MinerDataOre {
+                    //     title: "Total supply",
+                    //     tooltip: "The total amount of Ore that has ever been mined.",
+                    //     amount: ore_supply
+                    // }
                 }
                 MinerPower {}
             }

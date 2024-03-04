@@ -35,7 +35,7 @@ pub fn ClaimEdit<'a>(cx: Scope<'a, ClaimEditProps<'a>>) -> Element {
             class: "flex flex-col h-full grow justify-between",
             div {
                 class: "flex flex-col gap-3",
-                h1 {
+                h2 {
                     "Claim"
                 }
                 p {

@@ -31,72 +31,66 @@ pub fn User(cx: Scope, id: String) -> Element {
     let balance = use_ore_balance_user(cx, user_id);
     let explorer_url = use_explorer_account_url(cx, id);
 
-    // let container_class = "flex flex-row justify-between py-2 px-1";
-    let container_class = "flex flex-col gap-1 sm:flex-row sm:justify-between py-2 sm:px-1";
-    // let title_class = "text-gray-300";
+    let container_class = "flex flex-row gap-8 justify-between py-2 sm:px-1";
     let title_class = "opacity-50 text-sm my-auto";
-    // let value_class = "font-medium px-2 py-1 rounded";
     let value_class = "font-medium sm:px-2 py-1 rounded";
-    // let link_class = "font-medium hover-100 active-200 px-2 py-1 rounded transition-colors";
     let link_class = "font-medium transition-colors -ml-2 sm:ml-0 px-2 py-1 hover-100 active-200 rounded truncate";
 
     render! {
         div {
             class: "flex flex-col gap-16",
             div {
-                class: "flex flex-col gap-4",
-                h2 {
-                    class: "text-lg md:text-2xl font-bold my-auto",
-                    "User"
-                }
+                class: "flex flex-col gap-1",
                 div {
-                    class: "flex flex-row gap-8",
+                    class: "flex flex-col gap-8",
                     div {
-                        class: "rounded-full w-16 h-16 bg-gray-100 dark:bg-gray-700",
+                        class: "my-auto rounded-full w-20 h-20 bg-gray-300 dark:bg-gray-700",
+                    }
+                    h2 {
+                        class: "my-auto",
+                        "User"
                     }
                 }
                 div {
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "ID"
-                        }
-                        Copyable {
-                            value: id.clone(),
-                            Link {
-                                class: "{link_class} font-mono",
-                                to: "{explorer_url}",
-                                "{id}"
-                            }
+                    class: "{container_class}",
+                    p {
+                        class: "{title_class}",
+                        "ID"
+                    }
+                    Copyable {
+                        value: id.clone(),
+                        Link {
+                            class: "{link_class} font-mono",
+                            to: "{explorer_url}",
+                            "{id}"
                         }
                     }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "Balance"
-                        }
-                        match balance {
-                            AsyncResult::Ok(balance) => {
-                                render! {
-                                    span {
-                                        class: "flex flex-row gap-1.5",
-                                        OreIcon {
-                                            class: "w-3.5 h-3.5 my-auto",
-                                        }
-                                        p {
-                                            class: "{value_class} truncate",
-                                            "{balance.real_number_string_trimmed()}"
-                                        }
+                }
+                div {
+                    class: "{container_class}",
+                    p {
+                        class: "{title_class}",
+                        "Balance"
+                    }
+                    match balance {
+                        AsyncResult::Ok(balance) => {
+                            render! {
+                                span {
+                                    class: "flex flex-row gap-1.5",
+                                    OreIcon {
+                                        class: "w-3.5 h-3.5 my-auto",
+                                    }
+                                    p {
+                                        class: "{value_class} truncate",
+                                        "{balance.real_number_string_trimmed()}"
                                     }
                                 }
                             }
-                            _ => {
-                                render! {
-                                    p {
-                                        class: "{value_class} w-16 h-8 loading rounded",
-                                    }
+                        }
+                        _ => {
+                            render! {
+                                p {
+                                    class: "{value_class} w-16 h-8 loading rounded",
                                 }
                             }
                         }

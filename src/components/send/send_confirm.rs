@@ -41,7 +41,7 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                         send_step.set(SendStep::Edit);
                     }
                 }
-                h1 {
+                h2 {
                     "Confirm transfer"
                 }
                 p {

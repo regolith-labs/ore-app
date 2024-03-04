@@ -34,7 +34,7 @@ pub fn Balance(cx: Scope) -> Element {
                                     OreIcon {
                                         class: "my-auto w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10"
                                     }
-                                    h1 {
+                                    h2 {
                                         class: "text-3xl sm:text-4xl md:text-5xl",
                                         "{b.real_number_string_trimmed()}"
                                     }

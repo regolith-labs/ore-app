@@ -31,7 +31,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
             let explorer_url = use_explorer_transaction_url(cx, &transfer.sig);
             let date = use_datetime(transfer.ts);
-            let container_class = "flex flex-col gap-1 sm:flex-row sm:justify-between py-2 sm:px-1";
+            let container_class = "flex gap-8 flex-row justify-between py-2 sm:px-1";
             let title_class = "opacity-50 text-sm my-auto";
             let value_class = "font-medium sm:px-2 py-1 rounded";
             let link_class = "font-medium transition-colors -ml-2 sm:ml-0 px-2 py-1 hover-100 active-200 rounded truncate";
@@ -53,12 +53,12 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             render! {
                 div {
                     class: "flex flex-col gap-4 w-full",
-                    h2 {
-                        class: "text-lg md:text-2xl font-bold",
+                    p {
+                        class: "text-3xl sm:text-4xl font-bold",
                         "{title}"
                     }
                     div {
-                        class: "flex flex-col gap-2",
+                        class: "flex flex-col gap-1",
                         div {
                             class: "{container_class}",
                             p {
@@ -125,22 +125,22 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                             class: "{container_class}",
                             p {
                                 class: "{title_class}",
-                                "Memo"
+                                "Timestamp"
                             }
                             p {
                                 class: "{value_class}",
-                                "{transfer_memo}"
+                                "{date}"
                             }
                         }
                         div {
                             class: "{container_class}",
                             p {
                                 class: "{title_class}",
-                                "Timestamp"
+                                "Memo"
                             }
                             p {
                                 class: "{value_class}",
-                                "{date}"
+                                "{transfer_memo}"
                             }
                         }
                     }

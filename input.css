@@ -10,7 +10,7 @@
     @apply text-4xl text-black dark:text-white font-bold;
   }
   h2 {
-    @apply text-xl text-black dark:text-white font-bold;
+    @apply text-3xl md:text-4xl lg:text-5xl text-black dark:text-white font-bold;
   }
 }
 

@@ -10,7 +10,7 @@ pub fn ClaimDone(cx: Scope) -> Element {
             class: "flex flex-col grow justify-between",
             div {
                 class: "flex flex-col gap-3",
-                h1 {
+                h2 {
                     "Success!"
                 }
                 p {

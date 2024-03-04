@@ -50,6 +50,9 @@ pub fn Settings(cx: Scope) -> Element {
             div {
                 class: "flex flex-col gap-4 w-full",
                 h2 {
+                    "Settings"
+                }
+                h2 {
                     class: "{section_title_class}",
                     "Account"
                 }

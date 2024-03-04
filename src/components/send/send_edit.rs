@@ -70,7 +70,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
             class: "flex flex-col h-full grow gap-12",
             div {
                 class: "flex flex-col gap-3",
-                h1 {
+                h2 {
                     "Transfer"
                 }
                 p {
