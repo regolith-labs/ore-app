@@ -56,7 +56,7 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Proof of work.",
                 title2: "On Solana.",
-                detail: "Ore uses a novel proof-of-work protocol designed for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
+                detail: "Ore uses a novel proof-of-work protocol optimized for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
                 cta: ("Learn more", "https://github.com/hardhatchad/ore"),
                 section: Section::A
             }
@@ -255,9 +255,6 @@ fn TransfersSection(cx: Scope, transfers: AsyncResult<Vec<Transfer>>) -> Element
                         render! {
                             div {
                                 class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
-                                // div {
-                                //     class: "w-8 h-8 bg-white opacity-50 rounded-full",
-                                // }
                                 div {
                                     class: "flex flex-col pt-1",
                                     p {
