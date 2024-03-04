@@ -82,15 +82,6 @@ pub fn Landing(cx: Scope) -> Element {
 }
 
 #[component]
-fn Logo(cx: Scope) -> Element {
-    render! {
-        OreLogoIcon {
-            class: "h-8"
-        }
-    }
-}
-
-#[component]
 fn Navbar(cx: Scope) -> Element {
     render! {
         div {
@@ -98,7 +89,9 @@ fn Navbar(cx: Scope) -> Element {
             Link {
                 to: Route::Landing {},
                 class: "flex flex-row h-10",
-                Logo {}
+                OreLogoIcon {
+                    class: "h-6 md:h-8"
+                }
             }
         }
     }
@@ -141,7 +134,6 @@ fn Block<'a>(
     title2: Option<&'a str>,
     detail: &'a str,
     cta: Option<(&'a str, &'a str)>,
-    // dark: bool,
     section: Section,
 ) -> Element {
     let colors = match section {
@@ -377,7 +369,7 @@ fn Footer(cx: Scope) -> Element {
         div {
             class: "flex flex-row bg-black text-white w-full py-16 px-4 sm:px-8 justify-between",
             OreLogoIcon {
-                class: "h-8"
+                class: "h-6 md:h-8"
             }
             div {
                 class: "flex flex-row gap-8",

@@ -1915,6 +1915,10 @@ h2:where(.dark, .dark *) {
     height: 1.75rem;
   }
 
+  .md\:h-8 {
+    height: 2rem;
+  }
+
   .md\:w-10 {
     width: 2.5rem;
   }
