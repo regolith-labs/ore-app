@@ -86,7 +86,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                                             class: "w-3.5 h-3.5 my-auto",
                                         }
                                         p {
-                                            class: "{value_class}",
+                                            class: "{value_class} truncate",
                                             "{balance.real_number_string_trimmed()}"
                                         }
                                     }

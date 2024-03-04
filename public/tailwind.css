@@ -674,6 +674,10 @@ h2:where(.dark, .dark *) {
   top: 0px;
 }
 
+.right-4 {
+  right: 1rem;
+}
+
 .z-0 {
   z-index: 0;
 }
@@ -1487,6 +1491,11 @@ h2:where(.dark, .dark *) {
   color: rgb(245 245 247 / var(--tw-text-opacity));
 }
 
+.text-green-500 {
+  --tw-text-opacity: 1;
+  color: rgb(10 207 134 / var(--tw-text-opacity));
+}
+
 .underline {
   text-decoration-line: underline;
 }
@@ -1900,6 +1909,10 @@ h2:where(.dark, .dark *) {
 }
 
 @media (min-width: 640px) {
+  .sm\:right-8 {
+    right: 2rem;
+  }
+
   .sm\:mx-0 {
     margin-left: 0px;
     margin-right: 0px;
