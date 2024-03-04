@@ -271,7 +271,10 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
             class: "flex flex-row py-3 gap-3 w-full px-2 rounded hover-100 active-200 transition-colors",
             to: Route::Tx { sig: transfer.sig },
             div {
-                class: "flex flex-col pt-1",
+                class: "w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full"
+            }
+            div {
+                class: "flex flex-col pt-1 my-auto",
                 p {
                     class: "flex flex-row gap-2",
                     span {
@@ -280,7 +283,7 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                     }
                     "{action} "
                     span {
-                        class: "flex flex-row font-semibold gap-[0.15rem]",
+                        class: "flex flex-row font-semibold gap-[0.16rem]",
                         OreIcon {
                             class: "w-3.5 h-3.5 my-auto",
                         }
@@ -298,7 +301,7 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                 }
             }
             div {
-                class: "flex pt-1.5 ml-auto",
+                class: "flex pt-1.5 my-auto ml-auto",
                 p {
                     class: "opacity-50 text-right text-nowrap text-sm",
                     "{time_str}"

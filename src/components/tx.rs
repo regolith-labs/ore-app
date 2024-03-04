@@ -70,7 +70,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                                 Link {
                                     class: "{link_class} font-mono",
                                     to: "{explorer_url}",
-                                    "{&transfer.sig.as_str()[..32]}"
+                                    "{&transfer.sig.as_str()}"
                                 }
                             }
                         }
@@ -85,7 +85,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                                 Link {
                                     class: "{link_class} font-mono",
                                     to: Route::User { id: transfer.to_address.clone() },
-                                    "{&transfer.to_address[..32]}"
+                                    "{&transfer.to_address}"
                                 }
                             }
                         }

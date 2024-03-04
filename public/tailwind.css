@@ -1225,6 +1225,16 @@ h2:where(.dark, .dark *) {
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
 }
 
+.bg-gray-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(214 214 216 / var(--tw-bg-opacity));
+}
+
+.bg-gray-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(176 176 178 / var(--tw-bg-opacity));
+}
+
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -2048,6 +2058,11 @@ h2:where(.dark, .dark *) {
 .dark\:bg-white:where(.dark, .dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
+}
+
+.dark\:bg-gray-800:where(.dark, .dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(70 70 72 / var(--tw-bg-opacity));
 }
 
 .dark\:text-black:where(.dark, .dark *) {
