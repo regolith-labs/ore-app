@@ -29,7 +29,6 @@ pub struct SendEditProps<'a> {
 #[component]
 pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
     let nav = use_navigator(cx);
-    let pubkey = use_pubkey(cx);
     let ore_balance = use_ore_balance(cx);
     let amount_input = cx.props.amount_input;
     let recipient_input = cx.props.recipient_input;

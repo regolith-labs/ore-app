@@ -123,16 +123,16 @@ pub fn ActivityTable<'a>(cx: Scope<'a, ActivityTableProps<'a>>) -> Element {
     if transfers.is_empty() {
         render! {
             p {
-                class: "text-sm text-gray-300 py-2 px-1",
+                class: "text-sm text-gray-300 py-2 sm:px-1",
                 "No transactions found"
             }
         }
     } else {
         render! {
             div {
-                class: "flex flex-col gap-4",
+                class: "flex flex-col gap-4 -mx-2 sm:mx-0",
                 div {
-                    class: "h-full w-full max-w-full -px-4",
+                    class: "h-full w-full max-w-full",
                     for transfer in transfers {
                         render! {
                             ActivityRow {

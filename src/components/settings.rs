@@ -40,20 +40,21 @@ pub fn Settings(cx: Scope) -> Element {
     //     "Unknown".to_string()
     // };
 
+    let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
-    let data_title_class = "font-semibold";
+    let data_title_class = "font-medium text-sm opacity-50 my-auto";
 
     render! {
         div {
-            class: "flex flex-col gap-16",
+            class: "flex flex-col gap-16 w-full",
             div {
-                class: "flex flex-col gap-4",
+                class: "flex flex-col gap-4 w-full",
                 h2 {
                     class: "{section_title_class}",
                     "Account"
                 }
                 div {
-                    class: "flex flex-row justify-between w-full",
+                    class: "{container_class}",
                     p {
                         class: "{data_title_class}",
                         "Address"
@@ -61,7 +62,7 @@ pub fn Settings(cx: Scope) -> Element {
                     Copyable {
                         value: pubkey.to_string(),
                         Link {
-                            class: "font-mono px-2 py-1 rounded hover-100 active-200 transition-colors",
+                            class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
                             to: Route::User {
                                 id: pubkey.to_string()
                             },
@@ -70,18 +71,18 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                 }
                 div {
-                    class: "flex flex-row justify-between w-full",
+                    class: "{container_class}",
                     p {
                         class: "{data_title_class}",
                         "Private key"
                     }
                     button {
-                        class: "font-medium shrink px-2 py-1 text-nowrap hover-100 active-200 rounded",
+                        class: "flex flex-row shrink font-medium px-2 py-1 text-nowrap hover-100 active-200 rounded",
                         "Export"
                     }
                 }
                 div {
-                    class: "flex flex-row justify-between w-full",
+                    class: "{container_class}",
                     p {
                         class: "{data_title_class}",
                         "Solana balance"
@@ -112,13 +113,13 @@ pub fn Settings(cx: Scope) -> Element {
                     "Display"
                 }
                 div {
-                    class: "flex flex-row justify-between",
+                    class: "{container_class}",
                     p {
                         class: "{data_title_class}",
                         "Appearance"
                     }
                     select {
-                        class: "text-right dark:bg-black dark:text-white hover:cursor-pointer",
+                        class: "text-right bg-transparent dark:text-white hover:cursor-pointer py-1",
                         onchange: move |e| {
                             if let Ok(a) = Appearance::from_str(e.value.as_str()) {
                                 *appearance.write() = a;
@@ -129,13 +130,13 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                 }
                 div {
-                    class: "flex flex-row justify-between",
+                    class: "{container_class}",
                     p {
                         class: "{data_title_class}",
                         "Explorer"
                     }
                     select {
-                        class: "text-right dark:bg-black dark:text-white hover:cursor-pointer",
+                        class: "text-right bg-transparent dark:text-white hover:cursor-pointer py-1",
                         onchange: move |e| {
                             if let Ok(e) = Explorer::from_str(e.value.as_str()) {
                                 *explorer.write() = e;
@@ -155,7 +156,7 @@ pub fn Settings(cx: Scope) -> Element {
                     "System"
                 }
                 div {
-                    class: "flex flex-row justify-between gap-8",
+                    class: "{container_class}",
                     p {
                         class: "{data_title_class}",
                         "CPU"

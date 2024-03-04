@@ -27,7 +27,7 @@ pub fn Copyable<'a>(
     let class = class.unwrap_or("");
     render! {
         div {
-            class: "flex flex-row-reverse sm:flex-row justify-end {class}",
+            class: "flex flex-row-reverse sm:flex-row justify-end {class} truncate",
             button {
                 class: "flex px-2 py-1 rounded hover-100 active-200 transition-colors",
                 onclick: move |_e| {

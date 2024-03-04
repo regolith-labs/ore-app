@@ -34,7 +34,7 @@ pub fn Navbar(cx: Scope) -> Element {
                 div {
                     class: "flex flex-row gap-4 md:gap-6 lg:gap-8",
                     Link {
-                        class: "transition-colors transition-opacity flex w-10 h-10 justify-center rounded-full opacity-50 hover:opacity-100",
+                        class: "transition-colors flex w-10 h-10 justify-center rounded-full text-gray-300 dark:text-gray-700 hover:bg-text-black",
                         to: Route::Leaderboard {},
                         UserGroupIcon {
                             class: "w-6 h-6 my-auto"
