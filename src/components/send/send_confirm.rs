@@ -6,7 +6,7 @@ use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    hooks::use_gateway,
+    hooks::{use_gateway, use_ore_balance, use_ore_balance_handle},
 };
 
 use super::SendStep;
@@ -29,6 +29,7 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
     let memo_ = memo.clone();
     let amountf = (cx.props.amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
     let gateway = use_gateway(cx);
+    let balance_ = use_ore_balance_handle(cx);
 
     render! {
         div {
@@ -98,7 +99,7 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                     disabled: *is_busy.get(),
                     onclick: move |_| {
                         is_busy.set(true);
-                        // let balance_ = balance_.clone();
+                        let balance_ = balance_.clone();
                         let memo = memo.clone();
                         let send_step = send_step.clone();
                         let is_busy = is_busy.clone();
@@ -107,13 +108,14 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                             match gateway.transfer_ore(amount, recipient, memo).await {
                                 Ok(sig) => {
                                     log::info!("Transfer: {:?}", sig);
+                                    balance_.restart();
                                     is_busy.set(false);
                                     send_step.set(SendStep::Done);
                                 }
-                                Err(_err) => {
+                                Err(err) => {
                                     // TODO Handle error
                                     is_busy.set(false);
-                                    log::error!("Failed to claim!");
+                                    log::error!("Failed to send: {:?}", err);
                                 }
                             }
                         });

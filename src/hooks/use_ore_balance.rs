@@ -65,6 +65,10 @@ pub fn use_ore_balance_provider(cx: &ScopeState) {
     cx.provide_context(BalanceHandle(f.clone()));
 }
 
+pub fn use_ore_balance_handle(cx: &ScopeState) -> BalanceHandle {
+    cx.consume_context::<BalanceHandle>().unwrap()
+}
+
 pub fn use_ore_balance(cx: &ScopeState) -> AsyncResult<UiTokenAmount> {
     use_shared_state::<AsyncResult<UiTokenAmount>>(cx)
         .unwrap()

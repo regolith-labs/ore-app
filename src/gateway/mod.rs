@@ -181,6 +181,7 @@ impl Gateway {
             amount,
         )
         .unwrap();
+        // TODO Create recipient token account if necessary
         self.send_and_confirm(&[memo_ix, transfer_ix]).await
     }
 

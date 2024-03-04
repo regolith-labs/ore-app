@@ -13,6 +13,7 @@ use crate::{
     },
     gateway::AsyncResult,
     hooks::{use_transfers, ACTIVITY_TABLE_PAGE_LIMIT},
+    route::Route,
 };
 
 #[derive(Debug)]
@@ -136,7 +137,7 @@ pub fn ActivityTable<'a>(cx: Scope<'a, ActivityTableProps<'a>>) -> Element {
                     class: "h-full w-full max-w-full overflow-x-scroll",
                     table {
                         class: "h-full w-full",
-                        ActivityTableHeader {}
+                        // ActivityTableHeader {}
                         for transfer in transfers {
                             render! {
                                 ActivityRow {
@@ -249,66 +250,111 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
         format!("{}s ago", t)
     };
 
-    let address = match transfer.transfer_type {
+    let addr_a = match transfer.transfer_type {
         TransferType::Claim | TransferType::Mine => transfer.to_address[..5].to_string(),
         TransferType::Spl => transfer.from_address[..5].to_string(),
     };
 
+    let action = match transfer.transfer_type {
+        TransferType::Claim => "claimed",
+        TransferType::Mine => "mined",
+        TransferType::Spl => "sent",
+    };
+
+    let addr_b = match transfer.transfer_type {
+        TransferType::Claim | TransferType::Mine => "".to_string(),
+        TransferType::Spl => transfer.to_address[..5].to_string(),
+    };
+
     render! {
-        tr {
-        // Link {
-            // to: Route::Tx {
-            //     sig: transfer.sig
-            // },
-            class: "rounded hover-100 active-200 transition-colors",
-            td {
-                class: "text-left py-2 font-mono min-w-32 font-medium text-nowrap",
-                span {
+        Link {
+            class: "flex flex-row py-3 gap-3 w-full px-2 rounded hover-100 active-200 transition-colors",
+            to: Route::Tx { sig: transfer.sig },
+            div {
+                class: "flex flex-col pt-1",
+                p {
                     class: "flex flex-row gap-2",
-                    match transfer.transfer_type {
-                        TransferType::Claim => {
-                            render! {
-                                CircleStackIcon {
-                                    class: "w-4 h-4 my-auto"
-                                }
-                            }
+                    span {
+                        class: "font-mono font-bold",
+                        "{addr_a}"
+                    }
+                    "{action} "
+                    span {
+                        class: "flex flex-row font-semibold gap-[0.15rem]",
+                        OreIcon {
+                            class: "w-3.5 h-3.5 my-auto",
                         }
-                        TransferType::Mine => {
-                            render! {
-                                CubeIcon {
-                                    class: "w-4 h-4 my-auto"
-                                }
-                            }
-                        }
-                        TransferType::Spl => {
-                            render! {
-                                PaperAirplaneIcon {
-                                    class: "w-4 h-4 my-auto"
-                                }
+                        "{amount}"
+                    }
+                    if let TransferType::Spl = transfer.transfer_type {
+                        render! {
+                            "to"
+                            span {
+                                class: "font-mono font-bold",
+                                "{addr_b}"
                             }
                         }
                     }
-                    "{address}"
                 }
             }
-            td {
-                class: "text-left font-medium min-w-40 text-nowrap",
-                span {
-                    class: "flex flex-row gap-1",
-                    OreIcon {
-                        class: "w-3.5 h-3.5 my-auto"
-                    }
-                    "{amount}"
+            div {
+                class: "flex pt-1.5 ml-auto",
+                p {
+                    class: "opacity-50 text-right text-nowrap text-sm",
+                    "{time_str}"
                 }
-            }
-            td {
-                class: "text-left text-nowrap min-w-32",
-                "{memo}"
-            }
-            td {
-                class: "text-right text-nowrap min-w-16",
-                "{time_str}"
             }
         }
+
+
+            // td {
+            //     class: "text-left py-2 font-mono min-w-32 font-medium text-nowrap",
+            //     span {
+            //         class: "flex flex-row gap-2",
+            //         match transfer.transfer_type {
+            //             TransferType::Claim => {
+            //                 render! {
+            //                     CircleStackIcon {
+            //                         class: "w-4 h-4 my-auto"
+            //                     }
+            //                 }
+            //             }
+            //             TransferType::Mine => {
+            //                 render! {
+            //                     CubeIcon {
+            //                         class: "w-4 h-4 my-auto"
+            //                     }
+            //                 }
+            //             }
+            //             TransferType::Spl => {
+            //                 render! {
+            //                     PaperAirplaneIcon {
+            //                         class: "w-4 h-4 my-auto"
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //         "{address}"
+            //     }
+            // }
+            // td {
+            //     class: "text-left font-medium min-w-40 text-nowrap",
+            //     span {
+            //         class: "flex flex-row gap-1",
+            //         OreIcon {
+            //             class: "w-3.5 h-3.5 my-auto"
+            //         }
+            //         "{amount}"
+            //     }
+            // }
+            // td {
+            //     class: "text-left text-nowrap min-w-32",
+            //     "{memo}"
+            // }
+            // td {
+            //     class: "text-right text-nowrap min-w-16",
+            //     "{time_str}"
+            // }
+        // }
     }
 }
