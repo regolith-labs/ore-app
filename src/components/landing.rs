@@ -5,7 +5,7 @@ use ore_types::Transfer;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
-    components::{ActivityFilter, ActivityIndicator, OreIcon},
+    components::{ActivityFilter, ActivityIndicator, GithubIcon, OreIcon, OreLogoIcon, XIcon},
     gateway::AsyncResult,
     hooks::{use_is_onboarded, use_ore_supply, use_transfers, use_treasury},
     Route,
@@ -73,7 +73,7 @@ pub fn Landing(cx: Scope) -> Element {
                 title: "Fair launch.",
                 title2: "Immutable code.",
                 detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
-                cta: ("Checkout the code", "https://github.com/hardhatchad/ore"),
+                cta: ("Read the code", "https://github.com/hardhatchad/ore"),
                 section: Section::C
             }
             Footer {}
@@ -82,17 +82,23 @@ pub fn Landing(cx: Scope) -> Element {
 }
 
 #[component]
+fn Logo(cx: Scope) -> Element {
+    render! {
+        OreLogoIcon {
+            class: "h-8"
+        }
+    }
+}
+
+#[component]
 fn Navbar(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-row justify-between px-4 sm:px-8 py-4 w-full z-50",
+            class: "flex flex-row justify-between px-4 sm:px-8 py-8 w-full z-50",
             Link {
                 to: Route::Landing {},
                 class: "flex flex-row h-10",
-                h1 {
-                    class: "text-xl font-black my-auto w-min",
-                    "ORE"
-                }
+                Logo {}
             }
         }
     }
@@ -369,16 +375,26 @@ fn QuestionBreak(cx: Scope) -> Element {
 fn Footer(cx: Scope) -> Element {
     render! {
         div {
-            class: "bg-black text-white w-full py-16",
-            p {
-                // class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero text-center",
-                // "How much will you mine?"
-                "Github"
+            class: "flex flex-row bg-black text-white w-full py-16 px-4 sm:px-8 justify-between",
+            OreLogoIcon {
+                class: "h-8"
             }
-            p {
-                // class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero text-center",
-                // "How much will you mine?"
-                "X"
+            div {
+                class: "flex flex-row gap-8",
+                Link {
+                    to: "https://github.com/hardhatchad/ore",
+                    class: "flex h-10 w-10 hover:bg-gray-900 active:bg-gray-800 transition-colors rounded-full text-white",
+                    GithubIcon {
+                        class: "w-6 h-6 m-auto"
+                    }
+                }
+                Link {
+                    to: "https://x.com/oresupply",
+                    class: "flex h-10 w-10 hover:bg-gray-900 active:bg-gray-800 transition-colors rounded-full text-white",
+                    XIcon {
+                        class: "w-5 h-5 m-auto"
+                    }
+                }
             }
         }
     }
