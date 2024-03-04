@@ -57,16 +57,13 @@ pub fn Landing(cx: Scope) -> Element {
                 title: "Proof of work.",
                 title2: "On Solana.",
                 detail: "Ore uses a novel proof-of-work protocol designed for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
-                dark: true,
                 cta: ("Learn more", "https://github.com/hardhatchad/ore"),
                 section: Section::A
-                // TODO Live hashes? YES! Stream recently mined blocks and their reward amounts.
             }
             Block {
                 title: "Stable supply.",
                 title2: "Constant growth.",
                 detail: "Ore has an algorithmic supply programmed for steady linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
-                dark: false,
                 cta: ("Learn more", "https://github.com/hardhatchad/ore"),
                 section: Section::B
                 // TODO Current live supply
@@ -75,12 +72,11 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Fair launch.",
                 title2: "Immutable code.",
-                detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent future tampering or removal.",
-                dark: true,
+                detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
                 cta: ("Checkout the code", "https://github.com/hardhatchad/ore"),
                 section: Section::C
-                //
             }
+            Footer {}
         }
     }
 }
@@ -106,8 +102,8 @@ fn Navbar(cx: Scope) -> Element {
 fn Hero(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col w-full h-screen z-20 bg-cover bg-center bg-opacity-80",
-            style: "background-image: url(/smoke-2.png)",
+            class: "flex flex-col w-full h-screen z-20 bg-cover bg-center bg-opacity-50",
+            style: "background-image: url(/smoke-7.jpg)",
             Navbar {}
             div {
                 class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",
@@ -139,17 +135,21 @@ fn Block<'a>(
     title2: Option<&'a str>,
     detail: &'a str,
     cta: Option<(&'a str, &'a str)>,
-    dark: bool,
+    // dark: bool,
     section: Section,
 ) -> Element {
-    let colors = if *dark {
-        "bg-black text-white"
-    } else {
-        "bg-white text-black"
+    let colors = match section {
+        Section::A => "bg-black text-white",
+        Section::B => "bg-white text-black",
+        Section::C => "bg-green-500 text-white",
+    };
+    let height = match section {
+        Section::A | Section::B => "min-h-svh h-full",
+        Section::C => "",
     };
     render! {
         div {
-            class: "flex w-full min-h-svh h-full z-20 {colors}",
+            class: "flex w-full z-20 {colors} {height}",
             div {
                 class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
@@ -257,9 +257,9 @@ fn TransfersSection(cx: Scope, transfers: AsyncResult<Vec<Transfer>>) -> Element
                         render! {
                             div {
                                 class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
-                                div {
-                                    class: "w-8 h-8 bg-white opacity-50 rounded-full",
-                                }
+                                // div {
+                                //     class: "w-8 h-8 bg-white opacity-50 rounded-full",
+                                // }
                                 div {
                                     class: "flex flex-col pt-1",
                                     p {
@@ -281,7 +281,7 @@ fn TransfersSection(cx: Scope, transfers: AsyncResult<Vec<Transfer>>) -> Element
                                 div {
                                     class: "flex pt-1.5 ml-auto",
                                     p {
-                                        class: "opacity-50 text-left text-nowrap text-sm",
+                                        class: "opacity-50 text-right text-nowrap text-sm",
                                         "{time_str}"
                                     }
                                 }
@@ -340,14 +340,46 @@ fn OreValue(cx: Scope, title: String, amount: String) -> Element {
             div {
                 class: "flex flex-row gap-2",
                 OreIcon {
-                    class: "w-8 h-8 my-auto"
+                    class: "w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 my-auto"
                 }
                 p {
-                    class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
+                    class: "text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
                     "{amount}"
                 }
             }
         }
 
+    }
+}
+
+#[component]
+fn QuestionBreak(cx: Scope) -> Element {
+    render! {
+        div {
+            class: "bg-green-500 text-white w-full py-16",
+            p {
+                class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero text-center",
+                "How much will you mine?"
+            }
+        }
+    }
+}
+
+#[component]
+fn Footer(cx: Scope) -> Element {
+    render! {
+        div {
+            class: "bg-black text-white w-full py-16",
+            p {
+                // class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero text-center",
+                // "How much will you mine?"
+                "Github"
+            }
+            p {
+                // class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero text-center",
+                // "How much will you mine?"
+                "X"
+            }
+        }
     }
 }
