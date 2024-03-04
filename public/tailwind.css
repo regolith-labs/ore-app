@@ -714,6 +714,11 @@ h2:where(.dark, .dark *) {
   margin-bottom: auto;
 }
 
+.-mx-1 {
+  margin-left: -0.25rem;
+  margin-right: -0.25rem;
+}
+
 .-ml-2 {
   margin-left: -0.5rem;
 }
@@ -748,6 +753,22 @@ h2:where(.dark, .dark *) {
 
 .mt-auto {
   margin-top: auto;
+}
+
+.-ml-4 {
+  margin-left: -1rem;
+}
+
+.-mr-4 {
+  margin-right: -1rem;
+}
+
+.ml-0 {
+  margin-left: 0px;
+}
+
+.ml-0\.5 {
+  margin-left: 0.125rem;
 }
 
 .block {
@@ -1363,6 +1384,14 @@ h2:where(.dark, .dark *) {
   padding-top: 1.25rem;
 }
 
+.pl-0 {
+  padding-left: 0px;
+}
+
+.pl-0\.5 {
+  padding-left: 0.125rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -1826,6 +1855,10 @@ h2:where(.dark, .dark *) {
   text-decoration-line: underline;
 }
 
+.hover\:opacity-100:hover {
+  opacity: 1;
+}
+
 .hover\:shadow:hover {
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
@@ -1943,6 +1976,11 @@ h2:where(.dark, .dark *) {
 }
 
 @media (min-width: 768px) {
+  .md\:-mx-2 {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
+
   .md\:h-10 {
     height: 2.5rem;
   }
@@ -1955,12 +1993,28 @@ h2:where(.dark, .dark *) {
     height: 2rem;
   }
 
+  .md\:h-5 {
+    height: 1.25rem;
+  }
+
+  .md\:h-6 {
+    height: 1.5rem;
+  }
+
+  .md\:h-4 {
+    height: 1rem;
+  }
+
   .md\:w-10 {
     width: 2.5rem;
   }
 
   .md\:w-7 {
     width: 1.75rem;
+  }
+
+  .md\:w-5 {
+    width: 1.25rem;
   }
 
   .md\:gap-4 {
@@ -1971,12 +2025,25 @@ h2:where(.dark, .dark *) {
     gap: 2rem;
   }
 
+  .md\:gap-2 {
+    gap: 0.5rem;
+  }
+
+  .md\:gap-6 {
+    gap: 1.5rem;
+  }
+
   .md\:gap-y-12 {
     row-gap: 3rem;
   }
 
   .md\:gap-y-8 {
     row-gap: 2rem;
+  }
+
+  .md\:px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 
   .md\:text-2xl {
@@ -2003,6 +2070,11 @@ h2:where(.dark, .dark *) {
     font-size: 1.25rem;
     line-height: 1.75rem;
   }
+
+  .md\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -2012,6 +2084,10 @@ h2:where(.dark, .dark *) {
 
   .lg\:w-8 {
     width: 2rem;
+  }
+
+  .lg\:gap-8 {
+    gap: 2rem;
   }
 
   .lg\:text-2xl {

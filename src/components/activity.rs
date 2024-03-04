@@ -8,11 +8,9 @@ use dioxus::prelude::*;
 use ore_types::{Transfer, TransferType};
 
 use crate::{
-    components::{
-        icons::CubeIcon, CircleStackIcon, GlobeIcon, OreIcon, PaperAirplaneIcon, UserIcon,
-    },
+    components::{GlobeIcon, OreIcon, UserIcon},
     gateway::AsyncResult,
-    hooks::{use_transfers, ACTIVITY_TABLE_PAGE_LIMIT},
+    hooks::{use_pubkey, use_transfers, ACTIVITY_TABLE_PAGE_LIMIT},
     route::Route,
 };
 
@@ -35,7 +33,7 @@ pub fn Activity(cx: Scope) -> Element {
                     div {
                         class: "flex flex-row justify-between",
                         h2 {
-                            class: "text-lg md:text-2xl font-bold",
+                            class: "text-lg md:text-2xl font-bold my-auto",
                             "Activity"
                         }
                         FilterButtons {
@@ -79,11 +77,11 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
         ActivityFilter::Personal => (unselected_class, selected_class),
     };
     let button_class =
-        "flex flex-row gap-2 px-3 py-2 rounded-full text-sm hover-100 active-200 transition-colors";
+        "flex flex-row gap-2 px-2 md:px-3 py-2 rounded-full text-xs md:text-sm hover-100 active-200 transition-colors";
+    let icon_class = "w-4 h-4 md:w-5 md:h-5 my-auto";
     render! {
         div {
-            // class: "flex flex-row gap-2 font-semibold -mx-4",
-            class: "flex flex-row gap-2 font-semibold -mx-2",
+            class: "flex flex-row gap-1 md:gap-2 font-semibold -mx-1 md:-mx-2",
             button {
                 class: "{button_class} {personal_class}",
                 onclick: move |_e| {
@@ -91,7 +89,7 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
                     offset.set(0);
                 },
                 UserIcon {
-                    class: "w-5 h-5 my-auto",
+                    class: "{icon_class}"
                 }
                 "Personal"
             }
@@ -102,7 +100,7 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
                     offset.set(0);
                 },
                 GlobeIcon {
-                    class: "w-5 h-5 my-auto",
+                    class: "{icon_class}"
                 }
                 "Global"
             }
@@ -134,15 +132,11 @@ pub fn ActivityTable<'a>(cx: Scope<'a, ActivityTableProps<'a>>) -> Element {
             div {
                 class: "flex flex-col gap-4",
                 div {
-                    class: "h-full w-full max-w-full overflow-x-scroll",
-                    table {
-                        class: "h-full w-full",
-                        // ActivityTableHeader {}
-                        for transfer in transfers {
-                            render! {
-                                ActivityRow {
-                                    transfer: transfer
-                                }
+                    class: "h-full w-full max-w-full -px-4",
+                    for transfer in transfers {
+                        render! {
+                            ActivityRow {
+                                transfer: transfer
                             }
                         }
                     }
@@ -197,31 +191,6 @@ pub fn ActivityTablePagination<'a>(cx: Scope<'a, ActivityTablePaginationProps<'a
     }
 }
 
-#[component]
-pub fn ActivityTableHeader(cx: Scope) -> Element {
-    render! {
-        thead {
-            class: "rounded transition-colors text-xs font-medium text-gray-300",
-            th {
-                class: "text-left py-2",
-                "Action"
-            }
-            th {
-                class: "text-left",
-                "Amount"
-            }
-            th {
-                class: "text-left",
-                "Memo"
-            }
-            th {
-                class: "text-right",
-                "Time"
-            }
-        }
-    }
-}
-
 #[derive(Props, PartialEq)]
 pub struct ActivityRowProps {
     pub transfer: Transfer,
@@ -231,7 +200,7 @@ pub struct ActivityRowProps {
 pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
     let transfer = cx.props.transfer.clone();
     let amount = (transfer.amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64);
-    let memo = transfer.memo.unwrap_or("–".into());
+    let pubkey = use_pubkey(cx);
 
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let ts = Duration::from_secs(transfer.ts as u64);
@@ -250,20 +219,46 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
         format!("{}s ago", t)
     };
 
-    let addr_a = match transfer.transfer_type {
-        TransferType::Claim | TransferType::Mine => transfer.to_address[..5].to_string(),
-        TransferType::Spl => transfer.from_address[..5].to_string(),
-    };
-
     let action = match transfer.transfer_type {
         TransferType::Claim => "claimed",
         TransferType::Mine => "mined",
         TransferType::Spl => "sent",
     };
 
-    let addr_b = match transfer.transfer_type {
-        TransferType::Claim | TransferType::Mine => "".to_string(),
-        TransferType::Spl => transfer.to_address[..5].to_string(),
+    let addr_a = match transfer.transfer_type {
+        TransferType::Claim | TransferType::Mine => {
+            if transfer.to_address.eq(&pubkey.to_string()) {
+                "You".to_string()
+            } else {
+                transfer.to_address[..5].to_string()
+            }
+        }
+        TransferType::Spl => {
+            if transfer.from_address.eq(&pubkey.to_string()) {
+                "You".to_string()
+            } else {
+                transfer.from_address[..5].to_string()
+            }
+        }
+    };
+    let addr_a_class = if addr_a.eq(&"You".to_string()) {
+        "font-bold"
+    } else {
+        "font-mono font-bold"
+    };
+
+    let addr_b = if transfer.to_address.eq(&pubkey.to_string()) {
+        "You".to_string()
+    } else {
+        match transfer.transfer_type {
+            TransferType::Claim | TransferType::Mine => "".to_string(),
+            TransferType::Spl => transfer.to_address[..5].to_string(),
+        }
+    };
+    let addr_b_class = if addr_b.eq(&"You".to_string()) {
+        "font-bold"
+    } else {
+        "font-mono font-bold"
     };
 
     render! {
@@ -274,90 +269,46 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                 class: "w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full"
             }
             div {
-                class: "flex flex-col pt-1 my-auto",
-                p {
-                    class: "flex flex-row gap-2",
-                    span {
-                        class: "font-mono font-bold",
-                        "{addr_a}"
-                    }
-                    "{action} "
-                    span {
-                        class: "flex flex-row font-semibold gap-[0.16rem]",
-                        OreIcon {
-                            class: "w-3.5 h-3.5 my-auto",
+                class: "flex flex-col gap-2",
+                div {
+                    class: "flex flex-col gap-0.5 pt-1.5",
+                    p {
+                        class: "flex flex-row gap-1.5",
+                        span {
+                            class: "{addr_a_class}",
+                            "{addr_a}"
                         }
-                        "{amount}"
-                    }
-                    if let TransferType::Spl = transfer.transfer_type {
-                        render! {
-                            "to"
-                            span {
-                                class: "font-mono font-bold",
-                                "{addr_b}"
+                        "{action} "
+                        span {
+                            class: "flex flex-row font-semibold gap-[0.16rem]",
+                            OreIcon {
+                                class: "ml-0.5 w-3.5 h-3.5 my-auto",
+                            }
+                            "{amount}"
+                        }
+                        if let TransferType::Spl = transfer.transfer_type {
+                            render! {
+                                "to"
+                                span {
+                                    class: "{addr_b_class}",
+                                    "{addr_b}"
+                                }
                             }
                         }
                     }
+                    p {
+                        class: "opacity-50 text-nowrap text-sm",
+                        "{time_str}"
+                    }
                 }
-            }
-            div {
-                class: "flex pt-1.5 my-auto ml-auto",
-                p {
-                    class: "opacity-50 text-right text-nowrap text-sm",
-                    "{time_str}"
+                if let Some(memo) = transfer.memo {
+                    render! {
+                        p {
+                            "{memo}"
+                        }
+                    }
                 }
             }
         }
-
-
-            // td {
-            //     class: "text-left py-2 font-mono min-w-32 font-medium text-nowrap",
-            //     span {
-            //         class: "flex flex-row gap-2",
-            //         match transfer.transfer_type {
-            //             TransferType::Claim => {
-            //                 render! {
-            //                     CircleStackIcon {
-            //                         class: "w-4 h-4 my-auto"
-            //                     }
-            //                 }
-            //             }
-            //             TransferType::Mine => {
-            //                 render! {
-            //                     CubeIcon {
-            //                         class: "w-4 h-4 my-auto"
-            //                     }
-            //                 }
-            //             }
-            //             TransferType::Spl => {
-            //                 render! {
-            //                     PaperAirplaneIcon {
-            //                         class: "w-4 h-4 my-auto"
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //         "{address}"
-            //     }
-            // }
-            // td {
-            //     class: "text-left font-medium min-w-40 text-nowrap",
-            //     span {
-            //         class: "flex flex-row gap-1",
-            //         OreIcon {
-            //             class: "w-3.5 h-3.5 my-auto"
-            //         }
-            //         "{amount}"
-            //     }
-            // }
-            // td {
-            //     class: "text-left text-nowrap min-w-32",
-            //     "{memo}"
-            // }
-            // td {
-            //     class: "text-right text-nowrap min-w-16",
-            //     "{time_str}"
-            // }
-        // }
     }
 }

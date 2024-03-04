@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{Banner, BannerType, UserGroupIcon},
+    components::{Banner, BannerType, OreWordmarkIcon, UserGroupIcon},
     gateway::AsyncResult,
     hooks::use_ping,
     route::Route,
@@ -27,15 +27,14 @@ pub fn Navbar(cx: Scope) -> Element {
                 Link {
                     to: Route::Home {},
                     class: "flex h-10",
-                    h1 {
-                        class: "text-xl font-black my-auto w-min",
-                        "ORE"
+                    OreWordmarkIcon {
+                        class: "h-3 md:h-4 my-auto"
                     }
                 }
                 div {
-                    class: "flex flex-row gap-12",
+                    class: "flex flex-row gap-4 md:gap-6 lg:gap-8",
                     Link {
-                        class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover-100 active-200",
+                        class: "transition-colors transition-opacity flex w-10 h-10 justify-center rounded-full opacity-50 hover:opacity-100",
                         to: Route::Leaderboard {},
                         UserGroupIcon {
                             class: "w-6 h-6 my-auto"
@@ -57,7 +56,7 @@ pub fn Profile(cx: Scope) -> Element {
     render! {
         Link {
             to: Route::Settings {},
-            class: "bg-gray-100 dark:bg-gray-900 w-10 h-10 rounded-full"
+            class: "bg-gray-300 dark:bg-gray-700 w-10 h-10 rounded-full"
         }
     }
 }
