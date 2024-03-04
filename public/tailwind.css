@@ -1303,6 +1303,16 @@ h2:where(.dark, .dark *) {
   padding-bottom: 2rem;
 }
 
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.py-10 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
 .pb-20 {
   padding-bottom: 5rem;
 }

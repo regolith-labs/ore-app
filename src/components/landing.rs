@@ -367,9 +367,9 @@ fn QuestionBreak(cx: Scope) -> Element {
 fn Footer(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-row bg-black text-white w-full py-16 px-4 sm:px-8 justify-between",
+            class: "flex flex-row bg-black text-white w-full py-10 px-4 sm:px-8 justify-between",
             OreLogoIcon {
-                class: "h-6 md:h-8"
+                class: "h-6 md:h-8 my-auto"
             }
             div {
                 class: "flex flex-row gap-8",
