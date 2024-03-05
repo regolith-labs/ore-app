@@ -33,11 +33,11 @@ pub async fn try_start_mining(
     }
 
     // Create token account, if needed
-    *status_message.write() = MinerStatusMessage("Checking ...".to_string());
+    *status_message.write() = MinerStatusMessage("Creating token account...".to_string());
     gateway.create_token_account_ore().await?;
 
     // Create proof account, if needed
-    *status_message.write() = MinerStatusMessage("Putting on hardhat...".to_string());
+    *status_message.write() = MinerStatusMessage("Generating challenge...".to_string());
     gateway.register_ore().await?;
 
     // Start mining

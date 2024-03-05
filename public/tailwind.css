@@ -796,6 +796,18 @@ h2:where(.dark, .dark *) {
   margin-bottom: 0.5rem;
 }
 
+.mt-16 {
+  margin-top: 4rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
 .flex {
   display: flex;
 }
@@ -887,6 +899,10 @@ h2:where(.dark, .dark *) {
 
 .h-screen {
   height: 100vh;
+}
+
+.max-h-\[80vh\] {
+  max-height: 80vh;
 }
 
 .min-h-16 {
@@ -1885,6 +1901,10 @@ h2:where(.dark, .dark *) {
     margin-bottom: 1rem;
   }
 
+  .sm\:mt-4 {
+    margin-top: 1rem;
+  }
+
   .sm\:h-6 {
     height: 1.5rem;
   }
@@ -1911,6 +1931,18 @@ h2:where(.dark, .dark *) {
 
   .sm\:gap-6 {
     gap: 1.5rem;
+  }
+
+  .sm\:gap-16 {
+    gap: 4rem;
+  }
+
+  .sm\:gap-8 {
+    gap: 2rem;
+  }
+
+  .sm\:gap-3 {
+    gap: 0.75rem;
   }
 
   .sm\:gap-y-10 {

@@ -75,7 +75,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow w-full gap-4 px-4 py-6 sm:px-8 sm:py-8",
+                class: "flex flex-col grow w-full sm:gap-4 px-4 py-6 sm:px-8 sm:py-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
@@ -90,16 +90,18 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     }
                 }
                 div {
-                    class: "flex flex-col gap-4 w-full",
+                    class: "flex flex-col gap-2 sm:gap-3 w-full",
                     div {
                         class: "flex flex-row gap-4",
                         p {
-                            class: "text-lg text-white my-auto",
+                            class: "text-lg text-white",
                             "{status_message}"
                         }
                         if status_message.eq("Submitting hash for validation..." ) {
                             render! {
-                                Spinner {}
+                                Spinner {
+                                    class: "my-auto"
+                                }
                             }
                         }
                     }
@@ -108,7 +110,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         "{display_hash}"
                     }
                 }
-                // MinerPower {}
+                div {
+                    class: "mt-16",
+                    MinerPower {}
+                }
             }
         }
     } else {

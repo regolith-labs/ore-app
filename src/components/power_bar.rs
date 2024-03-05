@@ -11,10 +11,16 @@ use crate::{
 pub fn MinerPower(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col gap-8 mt-auto",
+            class: "flex flex-col gap-4 mt-auto",
             PowerHeader {}
-            PowerBar {}
-            DownloadLink {}
+            div {
+                class: "mt-1",
+                PowerBar {}
+            }
+            div {
+                class: "mt-2 sm:mt-4",
+                DownloadLink {}
+            }
         }
     }
 }
@@ -25,12 +31,11 @@ fn PowerHeader(cx: Scope) -> Element {
         div {
             class: "flex flex-col gap-2",
             h2 {
-                class: "text-2xl text-white font-bold",
+                class: "text-xl text-white font-semibold",
                 "Power level"
             }
             p {
-                class: "text-lg",
-                "Select how much of your computer to allocate to mining."
+                "Select how much power to allocate to mining."
             }
             // p {
             //     class: "text-sm text-white opacity-80",

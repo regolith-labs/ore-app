@@ -76,7 +76,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col h-full w-full grow gap-8 justify-between px-4 sm:px-8 py-8 bg-white",
+            class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between px-4 sm:px-8 py-8 bg-white",
             div {
                 class: "flex flex-col gap-3",
                 h2 {
@@ -92,7 +92,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 }
             }
             div {
-                class: "flex flex-col gap-8",
+                class: "flex flex-col gap-4 sm:gap-6 md:gap-8",
                 div {
                     class: "text-center w-48 h-48 bg-gray-100 mx-auto",
                     dangerous_inner_html: "{qrcode}",
