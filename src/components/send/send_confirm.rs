@@ -122,7 +122,9 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                     },
                     if *is_busy.get() {
                         render! {
-                            Spinner {}
+                            Spinner {
+                                class: "mx-auto"
+                            }
                         }
                     } else {
                         render! {

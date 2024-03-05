@@ -11,8 +11,8 @@ use solana_sdk::keccak::Hash as KeccakHash;
 
 use crate::{
     components::{
-        ActivityIndicator, IsToolbarOpen, MinerPower, OreIcon, StopButton, Tooltip,
-        TooltipDirection,
+        ActivityIndicator, IsToolbarOpen, MinerDisplayHash, MinerPower, OreIcon, Spinner,
+        StopButton, Tooltip, TooltipDirection,
     },
     gateway::AsyncResult,
     miner::Miner,
@@ -33,12 +33,20 @@ pub struct MinerToolbarActiveProps {
 
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
-    let timer = use_state(cx, || 0u64);
+    // let timer = use_state(cx, || 0u64);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
-    let status_message = miner_status_message.read().0.to_string();
+    let status_message = use_shared_state::<MinerStatusMessage>(cx)
+        .unwrap()
+        .read()
+        .0
+        .to_string();
+    let display_hash = use_shared_state::<MinerDisplayHash>(cx)
+        .unwrap()
+        .read()
+        .0
+        .to_string();
+    // let display_hash = use_state(cx, KeccakHash::new_unique);
 
-    let hash = KeccakHash::new_unique();
     // let hash = match proof {
     //     AsyncResult::Ok(proof) => proof.hash.to_string(),
     //     _ => "–".to_string(),
@@ -64,16 +72,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         _ => 0f64,
     };
 
-    let _n = use_future(cx, (), |_| {
-        let timer = timer.clone();
-        async move {
-            loop {
-                async_std::task::sleep(std::time::Duration::from_secs(1)).await;
-                timer.set(*timer.current() + 1);
-            }
-        }
-    });
-
     if is_toolbar_open.read().0 {
         render! {
             div {
@@ -93,13 +91,21 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                 }
                 div {
                     class: "flex flex-col gap-4 w-full",
-                    p {
-                        class: "text-lg text-white",
-                        "{status_message}"
+                    div {
+                        class: "flex flex-row gap-4",
+                        p {
+                            class: "text-lg text-white",
+                            "{status_message}"
+                        }
+                        if status_message.eq("Submitting hash for validation..." ) {
+                            render! {
+                                Spinner {}
+                            }
+                        }
                     }
                     p {
                         class: "font-mono text-sm truncate opacity-60",
-                        "{hash}"
+                        "{display_hash}"
                     }
                 }
                 // MinerPower {}
@@ -115,6 +121,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     p {
                         class: "font-semibold text-white",
                         "Mining"
+                    }
+                    p {
+                        class: "text-sm text-white opacity-80 my-auto ml-2",
+                        "{status_message}"
                     }
                 }
                 StopButton {

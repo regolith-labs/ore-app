@@ -1,7 +1,10 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{try_start_mining, IsToolbarOpen, MinerStatus, MinerStatusMessage},
+    components::{
+        try_start_mining, IsToolbarOpen, MinerDisplayHashIsGrinding, MinerStatus,
+        MinerStatusMessage,
+    },
     gateway::AsyncResult,
     hooks::{use_gateway, use_sol_balance},
     miner::Miner,
@@ -14,17 +17,26 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
+    let miner_display_hash_is_grinding =
+        use_shared_state::<MinerDisplayHashIsGrinding>(cx).unwrap();
     let status_message = miner_status_message.read().0.to_string();
 
     use_future(cx, &sol_balance.clone(), |_| {
         let miner = miner.clone();
         let miner_status = miner_status.clone();
         let miner_status_message = miner_status_message.clone();
+        let miner_display_hash_is_grinding = miner_display_hash_is_grinding.clone();
         let gateway = gateway.clone();
         async move {
             if let AsyncResult::Ok(sol_balance) = sol_balance {
-                match try_start_mining(&gateway, sol_balance, miner.get(), &miner_status_message)
-                    .await
+                match try_start_mining(
+                    &gateway,
+                    sol_balance,
+                    miner.get(),
+                    &miner_status_message,
+                    &miner_display_hash_is_grinding,
+                )
+                .await
                 {
                     Ok(did_start) => {
                         if did_start {

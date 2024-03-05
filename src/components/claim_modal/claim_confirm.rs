@@ -83,7 +83,9 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                     },
                     if *is_busy.get() {
                         render! {
-                            Spinner {}
+                            Spinner {
+                                class: "mx-auto"
+                            }
                         }
                     } else {
                         render! {

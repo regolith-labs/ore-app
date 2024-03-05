@@ -780,6 +780,10 @@ h2:where(.dark, .dark *) {
   margin-top: auto;
 }
 
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
 .flex {
   display: flex;
 }
@@ -1183,6 +1187,10 @@ h2:where(.dark, .dark *) {
 
 .border-4 {
   border-width: 4px;
+}
+
+.border-2 {
+  border-width: 2px;
 }
 
 .border-white\/30 {
