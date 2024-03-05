@@ -44,7 +44,7 @@ pub async fn try_start_mining(
     let signer = signer();
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
-    *status_message.write() = MinerStatusMessage("Searching for valid hash...".to_string());
+    *status_message.write() = MinerStatusMessage("Searching for a valid hash...".to_string());
     *display_hash_is_grinding.write() = MinerDisplayHashIsGrinding(true);
     miner.start_mining(
         proof.hash.into(),

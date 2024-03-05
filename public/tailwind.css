@@ -756,6 +756,10 @@ h2:where(.dark, .dark *) {
   margin-left: 0.375rem;
 }
 
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
 .ml-8 {
   margin-left: 2rem;
 }
@@ -778,10 +782,6 @@ h2:where(.dark, .dark *) {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.ml-2 {
-  margin-left: 0.5rem;
 }
 
 .flex {
@@ -1187,10 +1187,6 @@ h2:where(.dark, .dark *) {
 
 .border-4 {
   border-width: 4px;
-}
-
-.border-2 {
-  border-width: 2px;
 }
 
 .border-white\/30 {

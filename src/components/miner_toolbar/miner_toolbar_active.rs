@@ -94,7 +94,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     div {
                         class: "flex flex-row gap-4",
                         p {
-                            class: "text-lg text-white",
+                            class: "text-lg text-white my-auto",
                             "{status_message}"
                         }
                         if status_message.eq("Submitting hash for validation..." ) {

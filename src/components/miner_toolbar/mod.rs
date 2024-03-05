@@ -78,7 +78,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         let is_grinding = miner_display_hash_is_grinding.clone();
         async move {
             loop {
-                async_std::task::sleep(std::time::Duration::from_millis(100)).await;
+                async_std::task::sleep(std::time::Duration::from_millis(75)).await;
                 if is_grinding.read().0 {
                     *display_hash.write() = MinerDisplayHash(KeccakHash::new_unique());
                 } else {
@@ -194,7 +194,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                         render! {
                             MinerToolbarActive {
                                 treasury: treasury,
-                                // proof: proof,
                                 ore_supply: ore_supply,
                                 miner: miner.clone()
                             }
