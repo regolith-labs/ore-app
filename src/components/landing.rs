@@ -57,14 +57,12 @@ pub fn Landing(cx: Scope) -> Element {
                 title: "Proof of work.",
                 title2: "On Solana.",
                 detail: "Ore uses a novel proof-of-work protocol optimized for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
-                cta: ("Learn more", "https://github.com/hardhatchad/ore"),
                 section: Section::A
             }
             Block {
                 title: "Stable supply.",
                 title2: "Constant growth.",
                 detail: "Ore has an algorithmic supply programmed for steady linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
-                cta: ("Learn more", "https://github.com/hardhatchad/ore"),
                 section: Section::B
                 // TODO Current live supply
                 // TODO Circulating vs total
@@ -73,7 +71,6 @@ pub fn Landing(cx: Scope) -> Element {
                 title: "Fair launch.",
                 title2: "Immutable code.",
                 detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
-                cta: ("Read the code", "https://github.com/hardhatchad/ore"),
                 section: Section::C
             }
             Footer {}
@@ -133,7 +130,6 @@ fn Block<'a>(
     title: &'a str,
     title2: Option<&'a str>,
     detail: &'a str,
-    cta: Option<(&'a str, &'a str)>,
     section: Section,
 ) -> Element {
     let colors = match section {
@@ -169,14 +165,8 @@ fn Block<'a>(
                         class: "text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed max-w-[48rem] font-hero",
                         "{detail}"
                     }
-                    if let Some((cta, to)) = cta {
-                        render! {
-                            Link {
-                                class: "font-semibold mt-4",
-                                to: "{to}",
-                                "{cta} →"
-                            }
-                        }
+                    BlockCta {
+                        section: section
                     }
                 }
                 div {
@@ -192,6 +182,34 @@ fn Block<'a>(
     }
 }
 
+#[component]
+fn BlockCta<'a>(cx: Scope, section: &'a Section) -> Element {
+    match section {
+        Section::A => render! {
+            Link {
+                class: "font-semibold mt-4",
+                to: Route::HowItWorks {},
+                "Learn more →"
+            }
+        },
+        Section::B => render! {
+            Link {
+                class: "font-semibold mt-4",
+                to: Route::Tokenomics {},
+                "Learn more →"
+            }
+        },
+        Section::C => render! {
+            Link {
+                class: "font-semibold mt-4",
+                to: "https://github.com/hardhatchad/ore",
+                "Read the code →"
+            }
+        },
+    }
+}
+
+#[derive(PartialEq, Eq)]
 enum Section {
     A,
     B,
