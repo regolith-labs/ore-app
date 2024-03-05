@@ -31,9 +31,6 @@ module.exports = {
         900: '#313133',
       },
     }),
-    // lineHeight: {
-    //     'relaxed': '1.5',
-    // },
     extend: {
       fontFamily: {
         mono: ['GeistMono', 'ui-monospace', 'monospace'],

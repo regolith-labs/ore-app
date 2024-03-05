@@ -60,7 +60,7 @@ pub fn Settings(cx: Scope) -> Element {
                     "Settings"
                 }
                 h2 {
-                    class: "{section_title_class}",
+                    class: "{section_title_class} mt-8",
                     "Account"
                 }
                 div {

@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{try_start_mining, IsToolbarOpen, MinerStatus},
+    components::{try_start_mining, IsToolbarOpen, MinerStatus, MinerStatusMessage},
     gateway::AsyncResult,
     hooks::{use_gateway, use_sol_balance},
     miner::Miner,
@@ -13,14 +13,19 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     let sol_balance = use_sol_balance(cx);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
+    let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
+    let status_message = miner_status_message.read().0.to_string();
 
     use_future(cx, &sol_balance.clone(), |_| {
         let miner = miner.clone();
         let miner_status = miner_status.clone();
+        let miner_status_message = miner_status_message.clone();
         let gateway = gateway.clone();
         async move {
             if let AsyncResult::Ok(sol_balance) = sol_balance {
-                match try_start_mining(&gateway, sol_balance, miner.get()).await {
+                match try_start_mining(&gateway, sol_balance, miner.get(), &miner_status_message)
+                    .await
+                {
                     Ok(did_start) => {
                         if did_start {
                             *miner_status.write() = MinerStatus::Active;
@@ -43,12 +48,18 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-8 justify-between px-4 py-6 sm:px-8 sm:py-8",
+                class: "flex flex-col grow gap-4 px-4 py-6 sm:px-8 sm:py-8",
                 div {
                     class: "flex flex-col gap-3",
                     h2 {
-                        class: "text-2xl font-bold",
                         "Starting"
+                    }
+                }
+                div {
+                    class: "flex flex-col gap-4 w-full",
+                    p {
+                        class: "text-lg",
+                        "{status_message}"
                     }
                 }
             }

@@ -36,6 +36,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let timer = use_state(cx, || 0u64);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
+    let status_message = miner_status_message.read().0.to_string();
 
     let hash = KeccakHash::new_unique();
     // let hash = match proof {
@@ -43,24 +44,18 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     //     _ => "–".to_string(),
     // };
 
-    // let hash_abbr = if hash.len().gt(&16) {
-    //     hash[0..16].to_string()
-    // } else {
-    //     "–".to_string()
+    // let circulating_supply = match cx.props.treasury {
+    //     AsyncResult::Ok(treasury) => {
+    //         (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
+    //     }
+    //     _ => 0f64,
     // };
 
-    let circulating_supply = match cx.props.treasury {
-        AsyncResult::Ok(treasury) => {
-            (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
-        }
-        _ => 0f64,
-    };
-
-    let ore_supply = match cx.props.ore_supply.clone() {
-        AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
-        AsyncResult::Loading => "-".to_string(),
-        AsyncResult::Error(_err) => "Err".to_string(),
-    };
+    // let ore_supply = match cx.props.ore_supply.clone() {
+    //     AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
+    //     AsyncResult::Loading => "-".to_string(),
+    //     AsyncResult::Error(_err) => "Err".to_string(),
+    // };
 
     let reward_rate = match &cx.props.treasury {
         AsyncResult::Ok(treasury) => {
@@ -68,11 +63,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         }
         _ => 0f64,
     };
-
-    // use_effect(cx, &proof, |_| {
-    //     timer.set(0);
-    //     async move {}
-    // });
 
     let _n = use_future(cx, (), |_| {
         let timer = timer.clone();
@@ -91,7 +81,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
-                        class: "text-4xl font-bold",
+                        class: "text-3xl md:text-4xl lg:text-5xl text-white font-bold",
                         "Mining"
                     }
                     div {
@@ -104,8 +94,8 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                 div {
                     class: "flex flex-col gap-4 w-full",
                     p {
-                        class: "text-lg",
-                        "Searching for a valid hash..."
+                        class: "text-lg text-white",
+                        "{status_message}"
                     }
                     p {
                         class: "font-mono text-sm truncate opacity-60",

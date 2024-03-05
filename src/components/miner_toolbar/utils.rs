@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use dioxus::prelude::UseSharedState;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, signer::Signer};
 #[cfg(feature = "desktop")]
@@ -10,12 +11,15 @@ use crate::{
     miner::Miner,
 };
 
+use super::MinerStatusMessage;
+
 // TODO Move this somewhere
 
 pub async fn try_start_mining(
     gateway: &Rc<Gateway>,
     balance: u64,
     miner: &Miner,
+    status_message: &UseSharedState<MinerStatusMessage>,
 ) -> GatewayResult<bool> {
     if balance.eq(&0) {
         return Ok(false);
@@ -28,15 +32,18 @@ pub async fn try_start_mining(
     }
 
     // Create token account, if needed
+    *status_message.write() = MinerStatusMessage("Creating token account".to_string());
     gateway.create_token_account_ore().await?;
 
     // Create proof account, if needed
+    *status_message.write() = MinerStatusMessage("Initializing challenge".to_string());
     gateway.register_ore().await?;
 
     // Start mining
     let signer = signer();
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
+    *status_message.write() = MinerStatusMessage("Searching for valid hash...".to_string());
     miner.start_mining(
         proof.hash.into(),
         treasury.difficulty.into(),

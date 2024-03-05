@@ -38,7 +38,7 @@ pub enum MinerStatus {
 
 // TODO A message bar
 #[derive(Debug)]
-pub struct MinerStatusMessage(String);
+pub struct MinerStatusMessage(pub String);
 
 pub struct IsToolbarOpen(pub bool);
 
@@ -71,9 +71,11 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         async move {
             while let Ok(res) = rx.recv().await {
                 *miner_status_message.write() =
-                    MinerStatusMessage("Confirming transaction".to_string());
+                    MinerStatusMessage("Submitting hash for validation".to_string());
                 match submit_solution(&gateway, &res).await {
                     Ok(_sig) => {
+                        *miner_status_message.write() =
+                            MinerStatusMessage("Success! Hash validated".to_string());
                         proof_.restart();
                         if let MinerStatus::Active = *status.read() {
                             if let Ok(treasury) = gateway.get_treasury().await {
@@ -88,6 +90,8 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                         }
                     }
                     Err(err) => {
+                        *miner_status_message.write() =
+                            MinerStatusMessage("Error validating hash".to_string());
                         log::error!("Failed to submit hash: {:?}", err);
                     }
                 }
