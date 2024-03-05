@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 #[cfg(feature = "desktop")]
 use solana_sdk::native_token::LAMPORTS_PER_SOL;
+#[cfg(feature = "web")]
+use web_sys::window;
 
 use crate::{
     components::Copyable,
@@ -33,12 +35,16 @@ pub fn Settings(cx: Scope) -> Element {
     let appearance = use_appearance(cx);
 
     // TODO use_concurrency()
-    let cores = "12".to_string();
-    // let cores = if let Some(window) = window() {
-    //     window.navigator().hardware_concurrency().to_string()
-    // } else {
-    //     "Unknown".to_string()
-    // };
+    #[cfg(feature = "web")]
+    let cores = if let Some(window) = window() {
+        window.navigator().hardware_concurrency().to_string()
+    } else {
+        "Unknown".to_string()
+    };
+
+    // TODO Fetch this value
+    #[cfg(feature = "desktop")]
+    let cores = 12;
 
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
@@ -50,6 +56,7 @@ pub fn Settings(cx: Scope) -> Element {
             div {
                 class: "flex flex-col gap-4 w-full",
                 h2 {
+                    class: "mb-8",
                     "Settings"
                 }
                 h2 {
@@ -168,37 +175,6 @@ pub fn Settings(cx: Scope) -> Element {
                         "{cores} core"
                     }
                 }
-                // div {
-                //     class: "flex flex-row justify-between",
-                //     p {
-                //         class: "font-bold",
-                //         "GPU"
-                //     }
-                //     p {
-                //         "Coming soon"
-                //     }
-                // }
-                // div {
-                //     class: "flex flex-col mt-16 w-full text-sm justify-center",
-                //     p {
-                //         "You are mining from a web browser. "
-                //         Link {
-                //             class: "font-semibold underline-offset-2 underline",
-                //             to: Route::Download {},
-                //             "Install the app. →"
-                //         }
-                //     }
-                // }
-                // div {
-                //     class: "flex flex-row justify-between",
-                //     p {
-                //         class: "font-bold",
-                //         "Power"
-                //     }
-                //     p {
-                //         "10%"
-                //     }
-                // }
             }
         }
     }

@@ -3,7 +3,7 @@ use dioxus_router::prelude::*;
 
 use crate::components::{
     Claim, Download, Home, HowItWorks, Landing, Leaderboard, Miner, Navbar, PageNotFound, Send,
-    Settings, Tokenomics, Tx, User,
+    Settings, SimpleNavbar, Tokenomics, Tx, User,
 };
 
 #[rustfmt::skip]
@@ -11,10 +11,13 @@ use crate::components::{
 pub enum Route {
     #[route("/")]
     Landing {},
-    #[route("/how-it-works")]
-    HowItWorks {},
-    #[route("/tokenomics")]
-    Tokenomics {},
+
+    #[layout(SimpleNavbar)]
+        #[route("/how-it-works")]
+        HowItWorks {},
+        #[route("/tokenomics")]
+        Tokenomics {},
+    #[end_layout]
 
     #[layout(Navbar)]
         #[route("/download")]

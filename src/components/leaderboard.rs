@@ -18,6 +18,18 @@ use crate::{
     route::Route,
 };
 
+// TODO Supply stats
+// MinerDataOre {
+//     title: "Circulating supply",
+//     tooltip: "The total amount of Ore that has ever been claimed.",
+//     amount: circulating_supply.to_string()
+// }
+// MinerDataOre {
+//     title: "Total supply",
+//     tooltip: "The total amount of Ore that has ever been mined.",
+//     amount: ore_supply
+// }
+
 #[component]
 pub fn Leaderboard(cx: Scope) -> Element {
     let token_accounts = use_state(cx, || AsyncResult::Loading);

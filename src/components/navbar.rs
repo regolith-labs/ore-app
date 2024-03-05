@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{Banner, BannerType, OreWordmarkIcon, UserGroupIcon},
+    components::{Banner, BannerType, OreLogoIcon, OreWordmarkIcon, UserGroupIcon},
     gateway::AsyncResult,
     hooks::use_ping,
     route::Route,
@@ -23,24 +23,27 @@ pub fn Navbar(cx: Scope) -> Element {
                 }
             }
             div {
-                class: "flex flex-row justify-between px-4 sm:px-8 py-6 w-full",
-                Link {
-                    to: Route::Home {},
-                    class: "flex h-10",
-                    OreWordmarkIcon {
-                        class: "h-3 md:h-4 my-auto"
-                    }
-                }
+                class: "flex w-full",
                 div {
-                    class: "flex flex-row gap-6 md:gap-8 lg:gap-10",
+                    class: "max-w-[96rem] w-full flex flex-row justify-between mx-auto px-4 sm:px-8 py-6",
                     Link {
-                        class: "transition-colors flex w-10 h-10 justify-center rounded-full text-gray-300 dark:text-gray-700 hover:text-black dark:hover:text-white",
-                        to: Route::Leaderboard {},
-                        UserGroupIcon {
-                            class: "w-5 h-5 sm:w-6 sm:h-6 my-auto"
+                        to: Route::Home {},
+                        class: "flex h-10",
+                        OreWordmarkIcon {
+                            class: "h-3 md:h-4 my-auto"
                         }
                     }
-                    Profile {}
+                    div {
+                        class: "flex flex-row gap-6 md:gap-8 lg:gap-10",
+                        Link {
+                            class: "transition-colors flex w-10 h-10 justify-center rounded-full text-gray-300 dark:text-gray-700 hover:text-black dark:hover:text-white",
+                            to: Route::Leaderboard {},
+                            UserGroupIcon {
+                                class: "w-5 h-5 sm:w-6 sm:h-6 my-auto"
+                            }
+                        }
+                        Profile {}
+                    }
                 }
             }
             div {
@@ -57,6 +60,29 @@ pub fn Profile(cx: Scope) -> Element {
         Link {
             to: Route::Settings {},
             class: "bg-gray-300 dark:bg-gray-700 w-10 h-10 rounded-full"
+        }
+    }
+}
+
+#[component]
+pub fn SimpleNavbar(cx: Scope) -> Element {
+    render! {
+        div {
+            class: "flex flex-col",
+            div {
+                class: "flex flex-row justify-between px-4 sm:px-8 py-8 w-full z-50",
+                Link {
+                    to: Route::Landing {},
+                    class: "flex flex-row h-10",
+                    OreLogoIcon {
+                        class: "h-6 md:h-8"
+                    }
+                }
+            }
+            div {
+                class: "py-4 px-4 sm:px-8 w-full max-w-[96rem] mx-auto",
+                Outlet::<Route> {}
+            }
         }
     }
 }

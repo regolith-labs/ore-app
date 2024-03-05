@@ -135,7 +135,8 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
             onclick: move |_e| {
                 *is_toolbar_open.write() = IsToolbarOpen(true);
             },
-            {
+            div {
+                class: "flex flex-row justify-between w-full max-w-[96rem] mx-auto",
                 match *miner_status.read() {
                     MinerStatus::NotStarted => {
                         render! {

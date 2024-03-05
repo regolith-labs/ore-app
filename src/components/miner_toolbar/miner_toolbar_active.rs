@@ -3,7 +3,11 @@ use ore::state::Treasury;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAmount;
 #[cfg(feature = "web")]
+use solana_client_wasm::solana_sdk::keccak::Hash as KeccakHash;
+#[cfg(feature = "web")]
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
+#[cfg(feature = "desktop")]
+use solana_sdk::keccak::Hash as KeccakHash;
 
 use crate::{
     components::{
@@ -23,7 +27,6 @@ use super::MinerStatusMessage;
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,
-    // pub proof: AsyncResult<Proof>,
     pub ore_supply: AsyncResult<UiTokenAmount>,
     pub miner: UseState<Miner>,
 }
@@ -31,10 +34,10 @@ pub struct MinerToolbarActiveProps {
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let timer = use_state(cx, || 0u64);
-    // let proof = cx.props.proof;
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
 
+    let hash = KeccakHash::new_unique();
     // let hash = match proof {
     //     AsyncResult::Ok(proof) => proof.hash.to_string(),
     //     _ => "–".to_string(),
@@ -84,11 +87,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-4 px-4 py-6 sm:px-8 sm:py-8",
+                class: "flex flex-col grow gap-6 px-4 py-6 sm:px-8 sm:py-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
-                        class: "text-2xl text-white font-bold",
                         "Mining"
                     }
                     div {
@@ -99,25 +101,17 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     }
                 }
                 div {
-                    // class: "grid grid-cols-3 grid-rows-2 gap-y-8",
-                    class: "flex flex-col gap-6 md:flex-row",
-                    MinerDataOre {
-                        title: "Reward rate",
-                        tooltip: "The amount of Ore you are earning per valid hash.",
-                        amount: reward_rate.to_string()
+                    class: "flex flex-col gap-4",
+                    p {
+                        class: "text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed",
+                        "Searching for a valid hash (10,000 attempts)"
                     }
-                    // MinerDataOre {
-                    //     title: "Circulating supply",
-                    //     tooltip: "The total amount of Ore that has ever been claimed.",
-                    //     amount: circulating_supply.to_string()
-                    // }
-                    // MinerDataOre {
-                    //     title: "Total supply",
-                    //     tooltip: "The total amount of Ore that has ever been mined.",
-                    //     amount: ore_supply
-                    // }
+                    p {
+                        class: "font-mono font-medium",
+                        "{hash}"
+                    }
                 }
-                MinerPower {}
+                // MinerPower {}
             }
         }
     } else {

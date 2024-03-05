@@ -776,6 +776,10 @@ h2:where(.dark, .dark *) {
   margin-left: 2rem;
 }
 
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
 .block {
   display: block;
 }
@@ -1262,6 +1266,10 @@ h2:where(.dark, .dark *) {
 
 .p-6 {
   padding: 1.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 .px-1 {
