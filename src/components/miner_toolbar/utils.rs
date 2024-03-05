@@ -36,7 +36,8 @@ pub async fn try_start_mining(
     gateway.create_token_account_ore().await?;
 
     // Create proof account, if needed
-    *status_message.write() = MinerStatusMessage("Initializing challenge".to_string());
+    *status_message.write() =
+        MinerStatusMessage("Initializing proof-of-work challenge".to_string());
     gateway.register_ore().await?;
 
     // Start mining
