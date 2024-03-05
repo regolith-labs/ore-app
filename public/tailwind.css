@@ -784,6 +784,18 @@ h2:where(.dark, .dark *) {
   margin-top: auto;
 }
 
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .flex {
   display: flex;
 }
@@ -1865,6 +1877,14 @@ h2:where(.dark, .dark *) {
     margin-left: 0px;
   }
 
+  .sm\:mb-6 {
+    margin-bottom: 1.5rem;
+  }
+
+  .sm\:mb-4 {
+    margin-bottom: 1rem;
+  }
+
   .sm\:h-6 {
     height: 1.5rem;
   }
@@ -1951,6 +1971,14 @@ h2:where(.dark, .dark *) {
   .md\:-mx-2 {
     margin-left: -0.5rem;
     margin-right: -0.5rem;
+  }
+
+  .md\:mb-8 {
+    margin-bottom: 2rem;
+  }
+
+  .md\:mb-6 {
+    margin-bottom: 1.5rem;
   }
 
   .md\:h-10 {
@@ -2047,6 +2075,10 @@ h2:where(.dark, .dark *) {
 }
 
 @media (min-width: 1024px) {
+  .lg\:mb-8 {
+    margin-bottom: 2rem;
+  }
+
   .lg\:h-8 {
     height: 2rem;
   }

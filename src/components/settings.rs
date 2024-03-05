@@ -56,7 +56,6 @@ pub fn Settings(cx: Scope) -> Element {
             div {
                 class: "flex flex-col gap-4 w-full",
                 h2 {
-                    class: "mb-8",
                     "Settings"
                 }
                 h2 {
