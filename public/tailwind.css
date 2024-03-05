@@ -881,6 +881,26 @@ h2:where(.dark, .dark *) {
   height: 5rem;
 }
 
+.h-\[70vh\] {
+  height: 70vh;
+}
+
+.h-\[80vh\] {
+  height: 80vh;
+}
+
+.max-h-\[90\%\] {
+  max-height: 90%;
+}
+
+.max-h-\[80\%\] {
+  max-height: 80%;
+}
+
+.max-h-\[80vh\] {
+  max-height: 80vh;
+}
+
 .min-h-16 {
   min-height: 4rem;
 }
@@ -891,6 +911,10 @@ h2:where(.dark, .dark *) {
 
 .min-h-svh {
   min-height: 100svh;
+}
+
+.min-h-\[66vh\] {
+  min-height: 66vh;
 }
 
 .w-1\/4 {
@@ -995,6 +1019,10 @@ h2:where(.dark, .dark *) {
   flex-shrink: 1;
 }
 
+.shrink-0 {
+  flex-shrink: 0;
+}
+
 .grow {
   flex-grow: 1;
 }
@@ -1071,6 +1099,10 @@ h2:where(.dark, .dark *) {
 
 .flex-col {
   flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
 }
 
 .flex-nowrap {
@@ -1165,6 +1197,14 @@ h2:where(.dark, .dark *) {
   row-gap: 2rem;
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-clip {
+  overflow: clip;
+}
+
 .overflow-visible {
   overflow: visible;
 }
@@ -1177,6 +1217,14 @@ h2:where(.dark, .dark *) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.text-clip {
+  text-overflow: clip;
+}
+
+.text-wrap {
+  text-wrap: wrap;
 }
 
 .text-nowrap {
@@ -1250,6 +1298,11 @@ h2:where(.dark, .dark *) {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
+}
+
+.bg-green-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 163 110 / var(--tw-bg-opacity));
 }
 
 .bg-cover {
@@ -1514,6 +1567,10 @@ h2:where(.dark, .dark *) {
 
 .opacity-80 {
   opacity: 0.8;
+}
+
+.opacity-60 {
+  opacity: 0.6;
 }
 
 .shadow-sm {

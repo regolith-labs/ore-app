@@ -87,10 +87,11 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-6 px-4 py-6 sm:px-8 sm:py-8",
+                class: "flex flex-col grow w-full gap-4 px-4 py-6 sm:px-8 sm:py-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
+                        class: "text-4xl font-bold",
                         "Mining"
                     }
                     div {
@@ -101,13 +102,13 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     }
                 }
                 div {
-                    class: "flex flex-col gap-4",
+                    class: "flex flex-col gap-4 w-full",
                     p {
-                        class: "text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed",
-                        "Searching for a valid hash (10,000 attempts)"
+                        class: "text-lg",
+                        "Searching for a valid hash..."
                     }
                     p {
-                        class: "font-mono font-medium",
+                        class: "font-mono text-sm truncate opacity-60",
                         "{hash}"
                     }
                 }

@@ -266,14 +266,14 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
             class: "flex flex-row py-3 gap-3 w-full px-2 rounded hover-100 active-200 transition-colors",
             to: Route::Tx { sig: transfer.sig },
             div {
-                class: "w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full"
+                class: "w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full shrink-0"
             }
             div {
                 class: "flex flex-col gap-2",
                 div {
                     class: "flex flex-col gap-0.5 pt-1.5",
                     p {
-                        class: "flex flex-row gap-1.5",
+                        class: "flex flex-row gap-1.5 text-wrap flex-wrap",
                         span {
                             class: "{addr_a_class}",
                             "{addr_a}"

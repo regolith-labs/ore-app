@@ -76,7 +76,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col w-full grow gap-8 justify-between px-4 sm:px-8 py-8 bg-white",
+            class: "flex flex-col h-full w-full grow gap-8 justify-between px-4 sm:px-8 py-8 bg-white",
             div {
                 class: "flex flex-col gap-3",
                 h2 {
