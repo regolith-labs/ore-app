@@ -71,7 +71,7 @@ pub fn UnclaimedRewards(cx: Scope) -> Element {
                         class: "flex flex-col gap-2",
                         p {
                             class: "font-medium text-xs text-gray-300",
-                            "Unclaimed rewards"
+                            "Mining rewards"
                         }
                         div {
                             class: "flex flex-row gap-2",

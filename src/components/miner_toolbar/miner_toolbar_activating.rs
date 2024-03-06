@@ -60,19 +60,14 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-4 px-4 py-6 sm:px-8 sm:py-8",
-                div {
-                    class: "flex flex-col gap-3",
-                    h2 {
-                        "Starting"
-                    }
+                class: "flex flex-col grow gap-1 px-4 py-6 sm:px-8 sm:py-8",
+                h2 {
+                    class: "text-3xl md:text-4xl lg:text-5xl font-bold",
+                    "Starting"
                 }
-                div {
-                    class: "flex flex-col gap-4 w-full",
-                    p {
-                        class: "text-lg",
-                        "{status_message}"
-                    }
+                p {
+                    class: "text-lg",
+                    "{status_message}"
                 }
             }
         }

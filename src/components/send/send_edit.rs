@@ -10,10 +10,12 @@ use solana_sdk::pubkey::Pubkey;
 use crate::{
     components::WarningIcon,
     gateway::AsyncResult,
-    hooks::{use_ore_balance, use_pubkey, UiTokenAmountBalance},
+    hooks::{use_ore_balance, UiTokenAmountBalance},
 };
 
 use super::SendStep;
+
+// TODO Break recipient, amount, and memo into sequential fullscreen steps
 
 #[derive(Props)]
 pub struct SendEditProps<'a> {
@@ -85,6 +87,32 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
             div {
                 class: "flex flex-col gap-12",
                 div {
+                    class: "flex flex-col gap-3",
+                    p {
+                        class: "font-semibold text-sm",
+                        "To"
+                    }
+                    input {
+                        class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl",
+                        placeholder: "Address",
+                        oninput: move |evt| {
+                            let s = evt.value.clone();
+                            recipient_input.set(s);
+                        },
+                    }
+                    if let Some(err) = recipient_error_text {
+                        render! {
+                            p {
+                                class: "flex flex-row flex-nowrap gap-1.5 w-min text-nowrap text-red-500 font-semibold text-sm",
+                                WarningIcon {
+                                    class: "w-4 h-4 my-auto"
+                                }
+                                "{err}"
+                            }
+                        }
+                    }
+                }
+                div {
                     class: "flex flex-col gap-2",
                     p {
                         class: "font-semibold text-sm",
@@ -115,32 +143,6 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                         }
                     }
                     if let Some(err) = amount_error_text {
-                        render! {
-                            p {
-                                class: "flex flex-row flex-nowrap gap-1.5 w-min text-nowrap text-red-500 font-semibold text-sm",
-                                WarningIcon {
-                                    class: "w-4 h-4 my-auto"
-                                }
-                                "{err}"
-                            }
-                        }
-                    }
-                }
-                div {
-                    class: "flex flex-col gap-3",
-                    p {
-                        class: "font-semibold text-sm",
-                        "To"
-                    }
-                    input {
-                        class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl",
-                        placeholder: "Address",
-                        oninput: move |evt| {
-                            let s = evt.value.clone();
-                            recipient_input.set(s);
-                        },
-                    }
-                    if let Some(err) = recipient_error_text {
                         render! {
                             p {
                                 class: "flex flex-row flex-nowrap gap-1.5 w-min text-nowrap text-red-500 font-semibold text-sm",

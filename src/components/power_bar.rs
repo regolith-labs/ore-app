@@ -12,15 +12,19 @@ pub fn MinerPower(cx: Scope) -> Element {
     render! {
         div {
             class: "flex flex-col gap-4 mt-auto",
-            PowerHeader {}
             div {
-                class: "mt-1",
-                PowerBar {}
+                class: "flex flex-row justify-between",
+
             }
-            div {
-                class: "mt-2 sm:mt-4",
-                DownloadLink {}
-            }
+            // PowerHeader {}
+            // div {
+            //     class: "mt-1",
+            //     PowerBar {}
+            // }
+            // div {
+            //     class: "mt-2 sm:mt-4",
+            //     DownloadLink {}
+            // }
         }
     }
 }
@@ -35,7 +39,7 @@ fn PowerHeader(cx: Scope) -> Element {
                 "Power level"
             }
             p {
-                "Select how much power to allocate to mining."
+                "Select how much power you would like to allocate to mining."
             }
             // p {
             //     class: "text-sm text-white opacity-80",

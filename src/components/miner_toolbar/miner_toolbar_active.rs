@@ -3,11 +3,7 @@ use ore::state::Treasury;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAmount;
 #[cfg(feature = "web")]
-use solana_client_wasm::solana_sdk::keccak::Hash as KeccakHash;
-#[cfg(feature = "web")]
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
-#[cfg(feature = "desktop")]
-use solana_sdk::keccak::Hash as KeccakHash;
 
 use crate::{
     components::{
@@ -20,10 +16,6 @@ use crate::{
 
 use super::MinerStatusMessage;
 
-// TODO Lifetime rewards
-// TODO Lifetime hashes
-
-// #[cfg(feature = "desktop")]
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
     pub treasury: AsyncResult<Treasury>,
@@ -33,7 +25,6 @@ pub struct MinerToolbarActiveProps {
 
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
-    // let timer = use_state(cx, || 0u64);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let status_message = use_shared_state::<MinerStatusMessage>(cx)
         .unwrap()
@@ -45,12 +36,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         .read()
         .0
         .to_string();
-    // let display_hash = use_state(cx, KeccakHash::new_unique);
-
-    // let hash = match proof {
-    //     AsyncResult::Ok(proof) => proof.hash.to_string(),
-    //     _ => "–".to_string(),
-    // };
 
     // let circulating_supply = match cx.props.treasury {
     //     AsyncResult::Ok(treasury) => {
@@ -75,7 +60,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow w-full sm:gap-4 px-4 py-6 sm:px-8 sm:py-8",
+                class: "flex flex-col grow w-full gap-1 px-4 py-6 sm:px-8 sm:py-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
