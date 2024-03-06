@@ -70,7 +70,7 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Fair launch.",
                 title2: "Immutable code.",
-                detail: "Ore has no insider token allocations nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
+                detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
                 section: Section::C
             }
             Footer {}
