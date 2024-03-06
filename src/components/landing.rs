@@ -61,8 +61,8 @@ pub fn Landing(cx: Scope) -> Element {
             }
             Block {
                 title: "Stable supply.",
-                title2: "Constant growth.",
-                detail: "Ore has an algorithmic supply programmed for steady linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
+                title2: "Steady growth.",
+                detail: "Ore has a programmatic supply coded for constant linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
                 section: Section::B
                 // TODO Current live supply
                 // TODO Circulating vs total
