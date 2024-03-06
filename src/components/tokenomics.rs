@@ -6,7 +6,7 @@ pub fn Tokenomics(cx: Scope) -> Element {
         div {
             class: "flex flex-col gap-4",
             h2 {
-                "Ore tokenomics"
+                "Ore economics"
             }
             p {
                 "Coming soon..."

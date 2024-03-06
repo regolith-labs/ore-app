@@ -13,9 +13,9 @@ pub enum Route {
     Landing {},
 
     #[layout(SimpleNavbar)]
-        #[route("/how-it-works")]
+        #[route("/what-is-mining")]
         HowItWorks {},
-        #[route("/tokenomics")]
+        #[route("/ore-economics")]
         Tokenomics {},
     #[end_layout]
 
