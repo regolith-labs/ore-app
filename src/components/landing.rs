@@ -56,7 +56,7 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Proof of work.",
                 title2: "On Solana.",
-                detail: "Ore uses a novel proof-of-work algorithm designed to equitably distribute tokens. It guarantees no miner can ever be starved out from earning rewards.",
+                detail: "Ore has a novel proof-of-work algorithm designed to equitably distribute tokens. It guarantees no miner can ever be starved out from earning rewards.",
                 section: Section::A
             }
             Block {
@@ -70,7 +70,7 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Fair launch.",
                 title2: "Immutable code.",
-                detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
+                detail: "Ore has no insider token allocations nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
                 section: Section::C
             }
             Footer {}
@@ -188,14 +188,14 @@ fn BlockCta<'a>(cx: Scope, section: &'a Section) -> Element {
         Section::A => render! {
             Link {
                 class: "font-semibold mt-4",
-                to: Route::HowItWorks {},
+                to: Route::WhatIsMining {},
                 "Learn more →"
             }
         },
         Section::B => render! {
             Link {
                 class: "font-semibold mt-4",
-                to: Route::Tokenomics {},
+                to: Route::OreEconomics {},
                 "Learn more →"
             }
         },

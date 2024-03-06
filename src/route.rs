@@ -2,8 +2,8 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::components::{
-    Claim, Download, Home, HowItWorks, Landing, Leaderboard, Miner, Navbar, PageNotFound, Send,
-    Settings, SimpleNavbar, Tokenomics, Tx, User,
+    Claim, Download, Home, Landing, Leaderboard, Miner, Navbar, OreEconomics, PageNotFound, Send,
+    Settings, SimpleNavbar, Tx, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -14,9 +14,9 @@ pub enum Route {
 
     #[layout(SimpleNavbar)]
         #[route("/what-is-mining")]
-        HowItWorks {},
+        WhatIsMining {},
         #[route("/ore-economics")]
-        Tokenomics {},
+        OreEconomics {},
     #[end_layout]
 
     #[layout(Navbar)]

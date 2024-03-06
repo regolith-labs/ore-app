@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn Tokenomics(cx: Scope) -> Element {
+pub fn OreEconomics(cx: Scope) -> Element {
     render! {
         div {
             class: "flex flex-col gap-4",

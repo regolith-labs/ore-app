@@ -22,9 +22,9 @@ pub fn Balance(cx: Scope) -> Element {
                 AsyncResult::Ok(b) => {
                     render! {
                         div {
-                            class: "flex flex-col grow gap-4",
+                            class: "flex flex-col grow gap-2 sm:gap-4",
                             h2 {
-                                class: "text-lg md:text-2xl font-bold",
+                                class: "text-lg sm:text-xl md:text-2xl font-bold",
                                 "Balance"
                             }
                             div {
