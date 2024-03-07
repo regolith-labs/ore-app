@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 pub fn WhatIsMining(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col gap-4 font-hero",
+            class: "flex flex-col gap-4 font-hero max-w-3xl w-full",
             h2 {
                 "What is mining?"
             }
@@ -12,21 +12,16 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "(Draft in progress...)"
             }
             p {
-                "Most people have heard of crypto mining, but few people truly underestand it and only a handful have ever done it. "
+                "Most people have heard of crypto mining, but not as many underestand what it is and only a handful have ever done it. "
                 "So what is mining and how does it work?"
             }
             p {
                 span {
                     class: "font-bold",
-                    "Mining is the act of producing tokens by burning energy. "
+                    "Mining is the process of producing tokens by consuming energy. "
                 }
-                // "When creating a mining algorithm, protocol designers have to decide what types of behaviors they are going to incentivize."
-                // "This can take many forms such or running an internet hotspot, giving a passenger a ride, or even counting your steps."
             }
             p {
-                // "The goal is to distribute tokens as fairly as possible. "
-                // "This requires us to define 'fairness'. "
-                // "There are many different ways to approach this question, but we shall limit ourselves only to those definitions which can computational be proved have happened."
                 "There's a bit to unpack here so we'll break it down one concept at a time."
             }
             p {
@@ -34,38 +29,47 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "Producing tokens"
             }
             p {
-                "Let's start with the tokens. "
+                "Let's start with tokens. "
                 "Tokens are just digital assets. "
-                "Like the coins you might carry in your pocket or the trading cards you might collect, tokens are digital objects you can own, trade, and transfer over the internet. "
+                "Like coins you might carry in your pocket or trading cards you might collect, tokens are digital objects you can own, trade, and transfer over the internet. "
             }
             p {
                 "Tokens come in many different shapes and sizes. "
-                "Some of the most familiar tokens are associated with popular blockchains such as Bitcoin (BTC), Ethereum (ETH), or Solana (SOL). "
+                "Some of the most familiar tokens are those associated with popular blockchains such as Bitcoin (BTC), Ethereum (ETH), or Solana (SOL). "
                 "However tokens can represent anything such as an ownership stake in a company or a product like a concert ticket. "
                 "Many tokens are associated with cultural symbols such as memes, celebrities, or even breeds of dog. "
             }
             p {
-                "When it comes to mining, the thing we care about is not what the tokens represent, but rather how they are produced. "
-                "Blockchains allow anyone with a computer to mint and distribute their own tokens. "
-                "Mining is a special kind of distribution process, managed by computer code, that mints and issues new tokens according to how much energy the user has provably burned. "
+                "When it comes to understanding mining, the thing we care about is not what the tokens represent per se, but rather how they are produced. "
+                "Blockchains allow anyone with a computer to mint and distribute tokens in whatever manner they like. "
+                "Mining is simply a special kind of token distribution process – managed by computer code – that mints and issues new tokens based on consuming energy. "
             }
             p {
                 class: "text-xl font-bold mt-4",
-                "Burning energy"
+                "Consuming energy"
             }
             p {
-                "At first glance, burning energy might seem a little counterintuitive. "
-                "Energy is scarce after all; we shouldn't waste it. "
-                "On deeper inspection, burning energy turns out to be an incredibly powerful mechanism for token distribution. "
+                "At first glance, spending energy to create tokens might seem a little alarming. "
+                "Energy is scarce after all; it can be expensive to generate and we shouldn't waste it. "
+                "However on deeper inspection, we will see that energy consumption can be helpful in determining the value of a token and guaranteeing it is distributed fairly."
             }
             p {
-                "TODO"
+                "Energy is the fundamental resource of the universe upon which all life and human economy depends. "
+                "Therefore, it is the consumption of energy that grounds tokens produced by mining to the physical world. "
+                "A tokens energetic opportunity cost of production helps define its value. "
+                // "All light, matter, and motion are energy. "
+                // "It is the fundamental re the physical universe. "
+                // "All mass, light, and motion are energy. "
+                // ""
             }
             p {
-                "For one, Burning energy "
-                "This grounds the tokens in the physical economy. "
-                "It creates a material opportunity cost for each one produced. "
-                "To logic goes like this: for a miner, the mined token must be worth at least the energy required to produce it, otherwise they wouldn't have spent that energy to produce the token."
+                // "When there is a material opportunity cost. "
+                // "This is basic economics 101. "
+                // "The logic goes something like this: for a miner, a token must be worth at least the energy required to produce it, otherwise the miner wouldn't have spent the energy required to produce it."
+                "For a miner, a token must be worth at least the energy required to produce it, otherwise the miner wouldn't have spent the energy required to produce it. "
+                "This comes from the basic market theory which says simply the value of a good is equal to that which a buyer is willing and able to exchange for it. "
+
+                // "The energetic opportuntity cost of mining is, in part, what gives token some material value."
             }
             p {
                 "So how do we burn energy? "
@@ -100,6 +104,21 @@ pub fn WhatIsMining(cx: Scope) -> Element {
             }
             p {
                 "The information produced by all these hashes is meaningless and unimportant. The output of the mining process is not the information; it's the token."
+            }
+            p {
+                class: "text-xl font-bold mt-4",
+                "Equal opportunity"
+            }
+            p {
+                "Everyone with access to a computer can mine. "
+                "This is about as fair as we can reasonably get. "
+            }
+            p {
+                "For sure, some people have access to more resources than others, but the important thing is that everyone can participate."
+            }
+            p {
+                "This is what makes Ore special. "
+                "For other mineable tokens such as Bitcoin, all miners are in a competition with one another. "
             }
             p {
                 class: "text-xl font-bold mt-4",

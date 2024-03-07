@@ -1007,6 +1007,22 @@ h2:where(.dark, .dark *) {
   max-width: 100%;
 }
 
+.max-w-96 {
+  max-width: 24rem;
+}
+
+.max-w-5xl {
+  max-width: 64rem;
+}
+
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+.max-w-3xl {
+  max-width: 48rem;
+}
+
 .shrink {
   flex-shrink: 1;
 }
