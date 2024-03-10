@@ -11,34 +11,6 @@ use crate::{
     Route,
 };
 
-// TODO Hero
-//      It's time to mine
-//      Ore is a cryptocurrency everyone can mine
-//      Get started
-//
-// TODO Proof of work. On Solana.
-//      Ore solves the starvation problem...
-//
-// TODO Stable supply
-//      Ore has a constant linear supply
-//      1 ORE / min
-//      60 ORE / hour
-//      1440 ORE / day
-//      525,600 ORE / year
-//      Current supply: (LIVE number) activity indicator
-//
-// TODO Fair launch
-//      The Ore program is frozen. There has been no pre-mining.
-//
-// TODO How much will you mine?
-//
-// TODO Footer
-//      Twitter
-//      Github
-//      Why Ore?
-//      What is proof-of-work?
-//      What is Solana?
-
 #[component]
 pub fn Landing(cx: Scope) -> Element {
     let is_onboarded = use_is_onboarded(cx);
@@ -56,7 +28,7 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Proof of work.",
                 title2: "On Solana.",
-                detail: "Ore has a novel proof-of-work algorithm designed to equitably distribute tokens. It guarantees no miner can ever be starved out from earning rewards.",
+                detail: "Ore uses a novel proof-of-work algorithm to equitably distribute tokens. It guarantees no miner can ever be starved out from earning rewards.",
                 section: Section::A
             }
             Block {
@@ -64,8 +36,6 @@ pub fn Landing(cx: Scope) -> Element {
                 title2: "Steady growth.",
                 detail: "Ore has a programmatic supply coded for constant linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
                 section: Section::B
-                // TODO Current live supply
-                // TODO Circulating vs total
             }
             Block {
                 title: "Fair launch.",
