@@ -1450,6 +1450,11 @@ h2:where(.dark, .dark *) {
   line-height: 1rem;
 }
 
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
+}
+
 .font-bold {
   font-weight: 700;
 }
@@ -2017,6 +2022,11 @@ h2:where(.dark, .dark *) {
     font-size: 1.25rem;
     line-height: 1.75rem;
   }
+
+  .sm\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
+  }
 }
 
 @media (min-width: 768px) {
@@ -2124,6 +2134,11 @@ h2:where(.dark, .dark *) {
     font-size: 1.25rem;
     line-height: 1.75rem;
   }
+
+  .md\:text-8xl {
+    font-size: 6rem;
+    line-height: 1;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -2170,6 +2185,13 @@ h2:where(.dark, .dark *) {
 
   .lg\:text-7xl {
     font-size: 4.5rem;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:text-8xl {
+    font-size: 6rem;
     line-height: 1;
   }
 }
