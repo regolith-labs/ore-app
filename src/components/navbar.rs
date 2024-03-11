@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{Banner, BannerType, OreLogoIcon, OreWordmarkIcon, UserGroupIcon},
+    components::{Banner, BannerType, Footer, OreLogoIcon, OreWordmarkIcon, UserGroupIcon},
     gateway::AsyncResult,
     hooks::use_ping,
     route::Route,
@@ -68,7 +68,7 @@ pub fn Profile(cx: Scope) -> Element {
 pub fn SimpleNavbar(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col",
+            class: "flex flex-col min-h-screen h-full",
             div {
                 class: "flex flex-row justify-between px-4 sm:px-8 py-8 w-full z-50",
                 Link {
@@ -83,6 +83,7 @@ pub fn SimpleNavbar(cx: Scope) -> Element {
                 class: "py-4 px-4 sm:px-8 w-full max-w-[96rem] mx-auto",
                 Outlet::<Route> {}
             }
+            Footer {}
         }
     }
 }

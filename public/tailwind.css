@@ -1395,6 +1395,10 @@ h2:where(.dark, .dark *) {
   padding-top: 1.25rem;
 }
 
+.pb-32 {
+  padding-bottom: 8rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -1858,6 +1862,11 @@ h2:where(.dark, .dark *) {
 .hover\:text-black:hover {
   --tw-text-opacity: 1;
   color: rgb(29 29 31 / var(--tw-text-opacity));
+}
+
+.hover\:text-green-500:hover {
+  --tw-text-opacity: 1;
+  color: rgb(10 207 134 / var(--tw-text-opacity));
 }
 
 .hover\:underline:hover {
