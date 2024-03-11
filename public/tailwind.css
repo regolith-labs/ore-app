@@ -1399,6 +1399,10 @@ h2:where(.dark, .dark *) {
   padding-bottom: 8rem;
 }
 
+.pb-16 {
+  padding-bottom: 4rem;
+}
+
 .text-left {
   text-align: left;
 }

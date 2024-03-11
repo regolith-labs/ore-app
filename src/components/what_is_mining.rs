@@ -4,12 +4,12 @@ use dioxus::prelude::*;
 pub fn WhatIsMining(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col gap-4 font-hero max-w-3xl w-full mx-auto pb-32",
+            class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20",
             h2 {
                 "What is mining?"
             }
             p {
-                "Many people have heard of crypto mining, but few truly understand how it works and only a handful of people have ever actually done it. "
+                "Many people have heard of crypto mining, but few truly understand how it works and only a handful have ever actually done it. "
                 "So what is mining and why should you care about it? "
             }
             p {
@@ -24,7 +24,7 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "Producing tokens"
             }
             p {
-                "Let's start with understanding tokens. "
+                "Let's start with tokens. "
                 "What are they? "
             }
             p {
@@ -39,7 +39,7 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "Tokens can come in many different shapes and sizes. "
                 "Many of the tokens people are most familiar with are those associated with popular blockchains such as Bitcoin (BTC), Ethereum (ETH), and Solana (SOL). "
                 "However tokens can represent anything of value such as an ownership stake in a company or a product like a concert ticket. "
-                "Many tokens are associated with cultural symbols such as memes, celebrities, and breeds of dog. "
+                "Many popular tokens are associated with cultural symbols such as memes, celebrities, and breeds of dog. "
             }
             p {
                 "Blockchains allow anyone with a computer to mint their own tokens and share them with the world in any way they like. "
@@ -59,24 +59,29 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "Let's first take a moment to recall some basic facts about energy. "
                 "For starters, our universe is made of energy. "
                 "Physics tells us that all light, all matter, and all motion are simply different forms of energy. "
-                "It is universally conserved resource – meaning, it can neither be created nor destroyed. "
-                "All energy existing in the universe today has been here since the very origin of the universe. "
+                "It is a universally conserved resource – meaning, it can neither be created nor destroyed. "
+                "All energy present in the universe today has been here since the very origin of the universe itself. "
             }
             p {
-                "As humans, we harness energy from the universe to do useful work. "
-                "We have a portfolio of technologies we use to tap into our planet's energy sources. "
-                "We burn oil, deploy solar cells, construct hydroelectric dams, stand up wind turbines, and operate nuclear reactors. "
-                "We tend to utilize every energy source we can find, and by all meaningful metrics, our demand for energy is infinite. "
-                "Energy is the foundational resource upon which all life and human economy depends. "
-                "It is with this perspective that we can begin to see why energy is so important for mining. "
+                "As humans, we harness a small fraction of the energy of the universe to do useful work. "
+                "We use energy to light up our cities, heat our homes, and power our cars. "
+                "By all meaningful metrics, our demand for energy is infinite. "
+                "It is the foundational resource upon which all life and human economy depends. "
+                "And so it is with this perspective that we can begin to see why energy is so important for mining. "
+                // "We have a portfolio of technologies we use to tap into our planet's energy resources. "
+                // "We burn oil, deploy solar cells, construct hydroelectric dams, stand up wind turbines, and operate nuclear reactors. "
             }
+            // p {
+                // "We tend to utilize every energy source we can find. "
+                // "It is with this perspective that we can begin to see why energy is so important for mining. "
+            // }
             p {
                 span {
                     class: "font-bold",
                     "Energy consumption has the power to ground tokens in the physical world. "
                 }
                 "When a token has a material production cost measured in energy, it is easier to estimate its value relative to other goods. "
-                "For the miner who spends energy on acquiring new tokens, a token must be worth at least the energy required to produce it, otherwise the miner simply wouldn't be mining. "
+                "For the miner who spends energy acquiring new tokens, a token must be worth at least the energy required to produce it, otherwise the miner simply wouldn't be mining. "
                 "This is the basic principle of exchange that underlies all human economic theory. "
             }
             p {
@@ -159,30 +164,29 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "Conclusion"
             }
             p {
-                "We now have everything we need to understand why mining is such a revolutionary new idea. "
+                "We now have everything we need to understand why mining is such a big and revolutionary idea. "
                 span {
                     class: "font-bold",
-                    "Mining presents an algorithmic alternative to discretionary monetary policy. "
+                    "Mining presents an algorithmic alternative to monetary policy. "
                 }
             }
             p {
                 "Monetary policy is the process by which central bankers control a nation's money supply. "
-                "These officials tend to be unelected, unpredictable, and subject to policitcal pressures. "
-                "Mining, on the other hand, is managed by computer code. "
-                "It is predictable, tested, impartial, an open-source. "
+                "Where these officials tend to be unelected, unpredictable, and subject to policitcal pressures, mining is a process managed by computer code. "
+                "It is predictable, testable, impartial, and open-source. "
+                "Mining offers a chance to level the playing field in a system currently biased in favor of large banks. "
             }
             p {
-                "Mining offers a chance to level the playing field where it has historically been biased in favor of large banks. "
-                "For example, when a central banks issues new currency, it tends to distribute it first to the accounts of the country's largest banks. "
-                "These entities are the first to benefit from the injection of new money and kickoff a new spending spree. "
-                "This money only trickles down to rest of the economy after the effects of inflation has already begun to kick in. "
+                "For example, when central bankers fear a recession may be looming, they often resort to issuing new currency. "
+                "This injection of cash is intended to kickstart the economy and spur a new spending spree. "
+                "While this practice does work if managed well, the money is often only distributed first to the nation's largest banks. "
+                "These entities get to benefit from the money first, before the effects of inflation kick in. "
+                "The money only trickles down to rest of the economy after prices have already begun to rise."
             }
             p {
-                "Mining offers everyday people the chance to earn new tokens directly from the source, without intermediaries. "
-                "It's programmatic nature promises to bring stability and predictability to a process that has historically been characterized by its inherent uncertainty. "
-            }
-            p {
-                "Where earlier cryptocurrency mining has traditionally been dominated by large well-resourced players, Ore promises a new world where mining is available to everyone. "
+                "Mining offers an alternative to this deeply unfair system. "
+                "It has the potential to bring equality, stability, and predictability to a process that has historically been characterized by its uncertainty and asymmetry. "
+                "And where other crypto mining projects have been dominated by an oligopoly of large firms, Ore represents a new mining opportunity where regular, everyday people can mine and win. "
             }
         }
     }
