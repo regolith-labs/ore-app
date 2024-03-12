@@ -6,7 +6,7 @@ use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    hooks::{use_gateway, use_ore_balance, use_ore_balance_handle},
+    hooks::{use_gateway, use_ore_balance_handle},
 };
 
 use super::SendStep;

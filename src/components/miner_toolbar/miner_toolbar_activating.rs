@@ -31,7 +31,7 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
             if let AsyncResult::Ok(sol_balance) = sol_balance {
                 match try_start_mining(
                     &gateway,
-                    sol_balance,
+                    sol_balance.0,
                     miner.get(),
                     &miner_status_message,
                     &miner_display_hash_is_grinding,

@@ -1,9 +1,5 @@
 use dioxus::prelude::*;
 use dioxus_router::components::Link;
-#[cfg(feature = "desktop")]
-use solana_account_decoder::parse_token::UiTokenAmount;
-#[cfg(feature = "web")]
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
     components::OreIcon,

@@ -22,7 +22,7 @@ pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
         let is_onboarded = is_onboarded.clone();
         async move {
             if let AsyncResult::Ok(sol_balance) = sol_balance {
-                if sol_balance.gt(&0) {
+                if sol_balance.0.gt(&0) {
                     *is_onboarded.write() = IsOnboarded(true);
                     *miner_status.write() = MinerStatus::Activating;
                 }
@@ -39,7 +39,7 @@ pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
     if is_toolbar_open.read().0 {
         match sol_balance {
             AsyncResult::Ok(sol_balance) => {
-                if sol_balance.lt(&LAMPORTS_PER_SOL.saturating_div(10)) {
+                if sol_balance.0.lt(&LAMPORTS_PER_SOL.saturating_div(10)) {
                     render! {
                         MinerToolbarInsufficientBalanceOpen { }
                     }

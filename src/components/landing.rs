@@ -5,9 +5,7 @@ use ore_types::Transfer;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
-    components::{
-        ActivityFilter, ActivityIndicator, Footer, GithubIcon, OreIcon, OreLogoIcon, XIcon,
-    },
+    components::{ActivityFilter, ActivityIndicator, Footer, OreIcon, OreLogoIcon},
     gateway::AsyncResult,
     hooks::{use_is_onboarded, use_ore_supply, use_transfers, use_treasury},
     Route,

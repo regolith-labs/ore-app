@@ -1,16 +1,10 @@
 use dioxus::prelude::*;
-use ore::state::Treasury;
-#[cfg(feature = "desktop")]
-use solana_account_decoder::parse_token::UiTokenAmount;
-#[cfg(feature = "web")]
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
     components::{
         ActivityIndicator, IsToolbarOpen, MinerDisplayHash, MinerPower, OreIcon, Spinner,
         StopButton, Tooltip, TooltipDirection,
     },
-    gateway::AsyncResult,
     miner::Miner,
 };
 
@@ -18,8 +12,6 @@ use super::MinerStatusMessage;
 
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
-    pub treasury: AsyncResult<Treasury>,
-    pub ore_supply: AsyncResult<UiTokenAmount>,
     pub miner: UseState<Miner>,
 }
 
@@ -36,26 +28,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         .read()
         .0
         .to_string();
-
-    // let circulating_supply = match cx.props.treasury {
-    //     AsyncResult::Ok(treasury) => {
-    //         (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
-    //     }
-    //     _ => 0f64,
-    // };
-
-    // let ore_supply = match cx.props.ore_supply.clone() {
-    //     AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
-    //     AsyncResult::Loading => "-".to_string(),
-    //     AsyncResult::Error(_err) => "Err".to_string(),
-    // };
-
-    let reward_rate = match &cx.props.treasury {
-        AsyncResult::Ok(treasury) => {
-            (treasury.reward_rate as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
-        }
-        _ => 0f64,
-    };
 
     if is_toolbar_open.read().0 {
         render! {

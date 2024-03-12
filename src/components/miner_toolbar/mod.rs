@@ -11,7 +11,6 @@ pub use miner_toolbar_activating::*;
 pub use miner_toolbar_active::*;
 pub use miner_toolbar_insufficient_sol::*;
 pub use miner_toolbar_not_started::*;
-use ore::TREASURY_ADDRESS;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::keccak::Hash as KeccakHash;
 #[cfg(feature = "desktop")]
@@ -22,10 +21,7 @@ pub use utils::*;
 use dioxus::prelude::*;
 
 use crate::{
-    gateway::AsyncResult,
-    hooks::{
-        use_account_subscribe, use_gateway, use_miner, use_ore_supply, use_pubkey, use_treasury,
-    },
+    hooks::{use_gateway, use_miner, use_pubkey},
     miner::{submit_solution, MiningResult},
     ProofHandle,
 };
@@ -64,14 +60,10 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         use_shared_state::<MinerDisplayHashIsGrinding>(cx).unwrap();
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let gateway = use_gateway(cx);
-    let (treasury_rw, _) = use_treasury(cx);
-    let treasury = *treasury_rw.read().unwrap();
     let proof_ = cx.consume_context::<ProofHandle>().unwrap();
-    let (ore_supply, refresh_ore_supply) = use_ore_supply(cx);
     let ch = use_channel::<MiningResult>(cx, 1);
     let miner = use_miner(cx, ch);
     let pubkey = use_pubkey(cx);
-    let _ = use_account_subscribe(cx, TREASURY_ADDRESS, treasury_rw);
 
     let _ = use_future(cx, miner_display_hash_is_grinding, |_| {
         let display_hash = miner_display_hash.clone();
@@ -135,16 +127,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         }
     });
 
-    // If epoch resets, refresh the total supply tracker.
-    let t = match &treasury {
-        AsyncResult::Ok(treasury) => treasury.epoch_start_at,
-        _ => 0,
-    };
-    let _o = use_future(cx, &t, |_| {
-        refresh_ore_supply.restart();
-        async move {}
-    });
-
     let is_open = is_toolbar_open.read().0;
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
@@ -193,8 +175,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                     MinerStatus::Active => {
                         render! {
                             MinerToolbarActive {
-                                treasury: treasury,
-                                ore_supply: ore_supply,
                                 miner: miner.clone()
                             }
                         }

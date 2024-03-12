@@ -98,7 +98,7 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                     match sol_balance {
                         AsyncResult::Ok(balance) => {
-                            let balance_f = (balance as f64) / (LAMPORTS_PER_SOL as f64);
+                            let balance_f = (balance.0 as f64) / (LAMPORTS_PER_SOL as f64);
                             render! {
                                 p {
                                     "{balance_f} SOL"

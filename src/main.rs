@@ -20,7 +20,8 @@ mod worker;
 use crate::{
     hooks::{
         use_appearance, use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
-        use_ore_balance_provider, use_power_level_provider, use_proof_provider, ProofHandle,
+        use_ore_balance_provider, use_power_level_provider, use_proof_provider,
+        use_sol_balance_provider, ProofHandle,
     },
     route::Route,
 };
@@ -52,16 +53,10 @@ fn App(cx: Scope) -> Element {
     // Gateway
     use_context_provider(cx, || Rc::new(Gateway::new()));
 
-    // Handles
-    // let pubkey = use_pubkey(cx);
-    // let (_, proof_) = use_proof(cx);
+    // Network variables
     use_proof_provider(cx);
     use_ore_balance_provider(cx);
-    // use_context_provider::<ProofHandle>(cx, || proof_.clone());
-    // cx.provide_context(proof_.clone());
-    // let (_, balance_) = use_ore_balance(cx, pubkey);
-    // cx.provide_context(balance_.clone());
-    // use_context_provider::<BalanceHandle>(cx, || balance_.clone());
+    use_sol_balance_provider(cx);
 
     // Dark mode appearance
     #[cfg(feature = "web")]

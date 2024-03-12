@@ -7,5 +7,5 @@ use crate::gateway::AsyncResult;
 use super::use_account;
 
 pub fn use_treasury(cx: &ScopeState) -> (&mut UseRw<AsyncResult<Treasury>>, &UseFuture<()>) {
-    use_account(cx, TREASURY_ADDRESS)
+    use_account(cx, TREASURY_ADDRESS, Some(60))
 }
