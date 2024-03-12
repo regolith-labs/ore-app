@@ -80,7 +80,7 @@ pub fn SimpleNavbar(cx: Scope) -> Element {
                 }
             }
             div {
-                class: "py-4 px-4 sm:px-8 w-full max-w-[96rem] mx-auto",
+                class: "py-4 px-4 sm:px-8 grow h-full w-full max-w-[96rem] mx-auto",
                 Outlet::<Route> {}
             }
             Footer {}

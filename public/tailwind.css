@@ -812,6 +812,10 @@ h2:where(.dark, .dark *) {
   margin-top: 0.75rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
 .flex {
   display: flex;
 }
@@ -919,6 +923,10 @@ h2:where(.dark, .dark *) {
 
 .min-h-svh {
   min-height: 100svh;
+}
+
+.min-h-full {
+  min-height: 100%;
 }
 
 .w-10 {
