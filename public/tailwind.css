@@ -1937,6 +1937,53 @@ h2:where(.dark, .dark *) {
   display: block;
 }
 
+@media (max-width: 540px) {
+  .max-\[540px\]\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 480px) {
+  .min-\[480px\]\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 500px) {
+  .min-\[500px\]\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 540px) {
+  .min-\[540px\]\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
+  }
+
+  .min-\[540px\]\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 580px) {
+  .min-\[580px\]\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 600px) {
+  .min-\[600px\]\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
+  }
+}
+
 @media (min-width: 640px) {
   .sm\:right-8 {
     right: 2rem;
@@ -2182,6 +2229,11 @@ h2:where(.dark, .dark *) {
     font-size: 6rem;
     line-height: 1;
   }
+
+  .md\:text-7xl {
+    font-size: 4.5rem;
+    line-height: 1;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -2228,6 +2280,11 @@ h2:where(.dark, .dark *) {
 
   .lg\:text-7xl {
     font-size: 4.5rem;
+    line-height: 1;
+  }
+
+  .lg\:text-8xl {
+    font-size: 6rem;
     line-height: 1;
   }
 }

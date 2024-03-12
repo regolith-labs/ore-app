@@ -78,7 +78,7 @@ fn Hero(cx: Scope) -> Element {
                 div {
                     class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8",
                     p {
-                        class: "text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-hero",
+                        class: "text-center text-4xl min-[480px]:text-5xl min-[600px]:text-6xl md:text-7xl lg:text-8xl font-bold font-hero",
                         "It's time to mine."
                     }
                     p {
