@@ -46,15 +46,11 @@ pub fn OreTokenomics(cx: Scope) -> Element {
                 }
                 li {
                     class: "ml-2",
-                    "Approximately ~42 million tokens will be mined in an average human lifetime."
+                    "Approximately ~42 million tokens will be mined during an average human lifetime."
                 }
                 li {
                     class: "ml-2",
-                    "This will be true for all future generations of people as it is today."
-                }
-                li {
-                    class: "ml-2",
-                    "Holders have an incentive to loan and spend while simultaneously being protecting from exponential inflation."
+                    "This will be true for future generations of users as it is today."
                 }
             }
         }

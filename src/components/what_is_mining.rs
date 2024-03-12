@@ -6,13 +6,9 @@ pub fn WhatIsMining(cx: Scope) -> Element {
         div {
             class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20 leading-7",
             p {
-                class: "text-4xl font-bold mb-8",
+                class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 font-hero",
                 "What is mining?"
             }
-            // p {
-            //     class: "text-xl font-bold mt-8",
-            //     "Introduction"
-            // }
             p {
                 span {
                     class: "font-bold",
@@ -22,11 +18,10 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "In this post, we'll drill down into details of mining and unpack what it means for you, one concept at a time."
             }
             p {
-                class: "text-xl font-bold mt-8",
+                class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                 "Producing tokens"
             }
             p {
-
                 span {
                     class: "font-bold",
                     "Tokens are digital assets. "
@@ -37,13 +32,8 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "When it comes to mining, the thing we care about is not so much what the tokens represent per se, but rather how they are produced. "
                 "Mining is a special process for producing tokens where issuance is managed by computer code and based on how much energy a user has provably consumed."
             }
-            // p {
-            //     "Tokens can represent anything – from concert tickets, to ownership in a company, to fun jokes or memes. "
-            //     "When it comes to mining, the thing we care about is not so much what the tokens represent per se, but rather how they are produced. "
-            //     "Mining is a special process for producing tokens where issuance is managed by computer code and based on how much energy a user has provably consumed."
-            // }
             p {
-                class: "text-xl font-bold mt-8",
+                class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                 "Consuming energy"
             }
             p {
@@ -56,18 +46,13 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "This is the basic principle of exchange that underlies all market theory. "
                 "Since energy has a universal value to the economy, a token's energy cost can be a useful reference point for estimating its value relative to other goods. "
             }
-            // p {
-            //     "To miners, a token must be worth at least the energy required to produce it – otherwise, they simply wouldn't be mining. "
-            //     "This is the basic principle of exchange that underlies all market theory. "
-            //     "Since energy has a universal value to the economy, a token's energy cost can be a useful reference point for estimating its value relative to other goods. "
-            // }
             p {
                 "It is important to remember that production costs are not the only factor that determine an asset's market price. "
                 "Prices are free floating values, subject to speculation, and set by the dynamic forces of supply and demand. "
                 "Mining simply helps market particpants reason about how much energy other people are willing to sacrifice in order to acquire a particular token. "
             }
             p {
-                class: "text-xl font-bold mt-8",
+                class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                 "Proof of work"
             }
             p {
@@ -82,15 +67,8 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "Simply by presenting a valid solution, you can prove your computer must have done the computational work to find it and therefore consumed energy. "
                 "This is where the phrase \"proof-of-work\" comes from. "
             }
-            // p {
-            //     "To do this, your computer is given a computational puzzle it can only solve by generating thousands of potential solutions and checking each one for correctness. "
-            //     "Each solution costs a small, known quantity of energy to generate. "
-            //     "Based on the difficulty of the puzzle, we can estimate how many potential solutions your computer will need to generate before it finds one that is valid. "
-            //     "Simply by presenting a valid solution, you can prove your computer must have done the computational work to find it and therefore consumed energy. "
-            //     "This is where the phrase \"proof-of-work\" comes from. "
-            // }
             p {
-                class: "text-xl font-bold mt-8",
+                class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                 "Fair distribution"
             }
             p {
@@ -104,11 +82,6 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "As long as you provide a valid solution to your own individual puzzle, Ore guarantees your will earn a piece of the supply. "
                 "Since no miner can be censored from the network and all valid solutions are non-exclusive, starvation is avoided. "
             }
-            // p {
-            //     "Rather than setting up every miner in a winner-take-all competition against one another, Ore gives each miner their own personalized computational challenge. "
-            //     "As long as you provide a valid solution to your own individual puzzle, Ore guarantees your will earn a piece of the supply. "
-            //     "Since no miner can be censored from the network and all valid solutions are non-exclusive, starvation is avoided. "
-            // }
             p {
                 "This algorithm is what makes Ore unique and unlike any other digital token in the world. "
                 "It has never been done before in the history of cryptocurrency and is only possible due to the recent breakthrough innovations of high performance blockchains like "
@@ -120,7 +93,7 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 ". "
             }
             p {
-                class: "text-xl font-bold mt-8",
+                class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                 "Conclusion"
             }
             p {

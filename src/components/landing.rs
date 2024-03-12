@@ -82,7 +82,7 @@ fn Hero(cx: Scope) -> Element {
                         "It's time to mine."
                     }
                     p {
-                        class: "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center max-w-[46rem] font-hero leading-relaxed",
+                        class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center max-w-[46rem] font-hero leading-7",
                         "Ore is a digital currency you can mine from anywhere, at home or on your phone."
                     }
                 }
