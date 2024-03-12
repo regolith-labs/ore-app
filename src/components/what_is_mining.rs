@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 pub fn WhatIsMining(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20",
+            class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20 leading-7",
             h2 {
                 "What is mining?"
             }
