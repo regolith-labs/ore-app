@@ -68,7 +68,7 @@ pub fn Profile(cx: Scope) -> Element {
 pub fn SimpleNavbar(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col min-h-screen h-full",
+            class: "flex flex-col min-h-screen h-full bg-white text-black",
             div {
                 class: "flex flex-row justify-between px-4 sm:px-8 py-8 w-full z-50",
                 Link {
