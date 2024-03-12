@@ -6,20 +6,20 @@ pub fn WhatIsMining(cx: Scope) -> Element {
         div {
             class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20 leading-7",
             p {
-                class: "text-4xl font-bold",
+                class: "text-4xl font-bold mb-8",
                 "What is mining?"
             }
-            p {
-                class: "text-xl font-bold mt-8",
-                "Introduction"
-            }
+            // p {
+            //     class: "text-xl font-bold mt-8",
+            //     "Introduction"
+            // }
             p {
                 span {
                     class: "font-bold",
                     "Crypto mining is the process of producing digital tokens by consuming energy. "
                 }
                 "This is a really big idea with major potential implications for the world economy. "
-                "In this post, we'll drill down into details and unpack what mining means for you, one concept at a time."
+                "In this post, we'll drill down into details of mining and unpack what it means for you, one concept at a time."
             }
             p {
                 class: "text-xl font-bold mt-8",
@@ -33,12 +33,15 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 }
                 "Like the coins you might carry in your pocket or trading cards you might collect, tokens are digital objects you can own, trade, and transfer over the internet. "
                 "Blockchains allow anyone with a computer to create their own tokens and share them with the world. "
-            }
-            p {
                 "Tokens can represent anything – from concert tickets, to ownership in a company, to fun jokes or memes. "
                 "When it comes to mining, the thing we care about is not so much what the tokens represent per se, but rather how they are produced. "
                 "Mining is a special process for producing tokens where issuance is managed by computer code and based on how much energy a user has provably consumed."
             }
+            // p {
+            //     "Tokens can represent anything – from concert tickets, to ownership in a company, to fun jokes or memes. "
+            //     "When it comes to mining, the thing we care about is not so much what the tokens represent per se, but rather how they are produced. "
+            //     "Mining is a special process for producing tokens where issuance is managed by computer code and based on how much energy a user has provably consumed."
+            // }
             p {
                 class: "text-xl font-bold mt-8",
                 "Consuming energy"
@@ -49,12 +52,15 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                     "Energy consumption grounds tokens in the physical world. "
                 }
                 "When a token has a material cost of production measured in energy, it means a miner has to sacrafice something of real economic value to acquire it. "
-            }
-            p {
                 "To miners, a token must be worth at least the energy required to produce it – otherwise, they simply wouldn't be mining. "
                 "This is the basic principle of exchange that underlies all market theory. "
                 "Since energy has a universal value to the economy, a token's energy cost can be a useful reference point for estimating its value relative to other goods. "
             }
+            // p {
+            //     "To miners, a token must be worth at least the energy required to produce it – otherwise, they simply wouldn't be mining. "
+            //     "This is the basic principle of exchange that underlies all market theory. "
+            //     "Since energy has a universal value to the economy, a token's energy cost can be a useful reference point for estimating its value relative to other goods. "
+            // }
             p {
                 "It is important to remember that production costs are not the only factor that determine an asset's market price. "
                 "Prices are free floating values, subject to speculation, and set by the dynamic forces of supply and demand. "
@@ -70,14 +76,19 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                     "Computation is a proxy measure for energy consumption. "
                 }
                 "If a token has real economic value – in part, because it has a real energy cost – it's important we can prove the energy cost has actually been paid. "
-            }
-            p {
                 "To do this, your computer is given a computational puzzle it can only solve by generating thousands of potential solutions and checking each one for correctness. "
                 "Each solution costs a small, known quantity of energy to generate. "
                 "Based on the difficulty of the puzzle, we can estimate how many potential solutions your computer will need to generate before it finds one that is valid. "
                 "Simply by presenting a valid solution, you can prove your computer must have done the computational work to find it and therefore consumed energy. "
                 "This is where the phrase \"proof-of-work\" comes from. "
             }
+            // p {
+            //     "To do this, your computer is given a computational puzzle it can only solve by generating thousands of potential solutions and checking each one for correctness. "
+            //     "Each solution costs a small, known quantity of energy to generate. "
+            //     "Based on the difficulty of the puzzle, we can estimate how many potential solutions your computer will need to generate before it finds one that is valid. "
+            //     "Simply by presenting a valid solution, you can prove your computer must have done the computational work to find it and therefore consumed energy. "
+            //     "This is where the phrase \"proof-of-work\" comes from. "
+            // }
             p {
                 class: "text-xl font-bold mt-8",
                 "Fair distribution"
@@ -89,15 +100,18 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 }
                 "It does this by using a novel fair mining protocol with non-exclusive rewards. "
                 "This means if one miner wins, it doesn't prevent another miner from winning also. "
-            }
-            p {
                 "Rather than setting up every miner in a winner-take-all competition against one another, Ore gives each miner their own personalized computational challenge. "
                 "As long as you provide a valid solution to your own individual puzzle, Ore guarantees your will earn a piece of the supply. "
                 "Since no miner can be censored from the network and all valid solutions are non-exclusive, starvation is avoided. "
             }
+            // p {
+            //     "Rather than setting up every miner in a winner-take-all competition against one another, Ore gives each miner their own personalized computational challenge. "
+            //     "As long as you provide a valid solution to your own individual puzzle, Ore guarantees your will earn a piece of the supply. "
+            //     "Since no miner can be censored from the network and all valid solutions are non-exclusive, starvation is avoided. "
+            // }
             p {
                 "This algorithm is what makes Ore unique and unlike any other digital token in the world. "
-                "It has never been done before in the history of cryptocurrency and is only possible due to the breakthrough innovations of high performance blockchains like "
+                "It has never been done before in the history of cryptocurrency and is only possible due to the recent breakthrough innovations of high performance blockchains like "
                 a {
                     class: "font-semibold hover:text-green-500 underline transition-colors",
                     href: "https://solana.com",
