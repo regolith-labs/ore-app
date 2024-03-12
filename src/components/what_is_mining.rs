@@ -58,7 +58,7 @@ pub fn WhatIsMining(cx: Scope) -> Element {
             p {
                 "It is important to remember that production costs are not the only factor that determine an asset's market price. "
                 "Prices are free floating values, subject to speculation, and set by the dynamic forces of supply and demand. "
-                "Mining simply helps market particpants reason about how much energy other people are willing to sacrafice in order to acquire a particular token. "
+                "Mining simply helps market particpants reason about how much energy other people are willing to sacrifice in order to acquire a particular token. "
             }
             p {
                 class: "text-xl font-bold mt-8",
@@ -69,16 +69,13 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                     class: "font-bold",
                     "Computation is a proxy measure for energy consumption. "
                 }
-                "If a token has real economic value – in part, because it has a real energy cost – it's important we can prove the energy cost is actually real. "
+                "If a token has real economic value – in part, because it has a real energy cost – it's important we can prove the energy cost has actually been paid. "
             }
             p {
-                "To prove energy has been consumed, we rely on a special form of computation. "
-                "Your computer is given a puzzle it can only solve by generating thousands of potential solutions and checking each one for correctness. "
-                "Based on the difficulty of the puzzle, we can estimate how many potential solutions on average your computer will need to generate before it finds one that is valid. "
-            }
-            p {
-                "Generating a potential solution costs a small, known quantity of energy. "
-                "Simply by presenting a valid solution, you can prove your computer must have generated some average number of invalid solutions – thereby doing computational work and consuming energy. "
+                "To do this, your computer is given a computational puzzle it can only solve by generating thousands of potential solutions and checking each one for correctness. "
+                "Each solution costs a small, known quantity of energy to generate. "
+                "Based on the difficulty of the puzzle, we can estimate how many potential solutions your computer will need to generate before it finds one that is valid. "
+                "Simply by presenting a valid solution, you can prove your computer must have done the computational work to find it and therefore consumed energy. "
                 "This is where the phrase \"proof-of-work\" comes from. "
             }
             p {
@@ -117,17 +114,9 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                     class: "font-bold",
                     "Mining is an algorithmic alternative to central banking. "
                 }
-                "Where traditional currencies are typically managed by unelected officials and opaque boards of central bankers, "
-                "mining offers an alternative form of currency control that is codified, predictable, testable, and open-source. "
-            }
-            p {
-                "This is an important development becauase human policy makers are generally subject to political pressures and have often choosen to inflate the currenies they manage – at the expense of those who use them. "
-                "Mining offers an opportunity to level the playing field for a system that has historically been biased in favor of the world's wealthiest banks and corporations. "
-            }
-            p {
-                "This is ultimately why Ore exists. "
-                "Crypto mining has the potential to be a game-changing innovation for the world economy, yet most people have been excluded from it by an oligopoly of large incumbents. "
-                "Ore opens the door to everyone and offers a token that regular, everyday people can mine and win. "
+                "Where traditional fiat currencies are managed by unelected officials and opaque boards of central bankers, mining offers an alternative form of currency control that is codified, predictable, testable, and open-source. "
+                "It promises to level the playing field in a system that has historically been biased in favor of the world's largest banks and corporations. "
+                "Ore opens the door to everyone and offers a digital currency that regular, everyday people can mine and win. "
             }
         }
     }
