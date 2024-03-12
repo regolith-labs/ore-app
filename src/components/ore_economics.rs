@@ -14,20 +14,24 @@ use dioxus::prelude::*;
 // TODO Claims
 
 #[component]
-pub fn OreEconomics(cx: Scope) -> Element {
+pub fn OreTokenomics(cx: Scope) -> Element {
     render! {
         div {
             class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20 leading-7",
             p {
                 class: "text-4xl font-bold",
-                "Ore economics"
+                "Ore tokenomics"
             }
             p {
                 "(Coming soon...)"
             }
             p {
                 // "(In short, 1 new ORE token is mined every 60 seconds on average no matter how many miners are active on the network)"
-                "In summary:"
+                "Here are the key points:"
+                li {
+                    class: "ml-2",
+                    "Ore has no maximum supply limit."
+                }
                 li {
                     class: "ml-2",
                     "Ore supply growth is linear with a target average of 1 ORE/min."
@@ -35,10 +39,6 @@ pub fn OreEconomics(cx: Scope) -> Element {
                 li {
                     class: "ml-2",
                     "Ore supply growth is strictly bounded to 0 ≤ R ≤ 2 ORE/min."
-                }
-                li {
-                    class: "ml-2",
-                    "Ore has no maximum supply limit."
                 }
                 li {
                     class: "ml-2",
@@ -50,7 +50,11 @@ pub fn OreEconomics(cx: Scope) -> Element {
                 }
                 li {
                     class: "ml-2",
-                    "This will be as true for the next generation as it is today."
+                    "This will be true for all future generations of people as it is today."
+                }
+                li {
+                    class: "ml-2",
+                    "Holders have an incentive to loan and spend while simultaneously being protecting from exponential inflation."
                 }
             }
         }

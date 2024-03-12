@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::components::{
-    Claim, Download, Home, Landing, Leaderboard, Miner, Navbar, OreEconomics, PageNotFound, Send,
+    Claim, Download, Home, Landing, Leaderboard, Miner, Navbar, OreTokenomics, PageNotFound, Send,
     Settings, SimpleNavbar, Tx, User, WhatIsMining,
 };
 
@@ -15,8 +15,8 @@ pub enum Route {
     #[layout(SimpleNavbar)]
         #[route("/what-is-mining")]
         WhatIsMining {},
-        #[route("/ore-economics")]
-        OreEconomics {},
+        #[route("/ore-tokenomics")]
+        OreTokenomics {},
     #[end_layout]
 
     #[layout(Navbar)]

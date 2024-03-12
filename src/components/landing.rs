@@ -167,7 +167,7 @@ fn BlockCta<'a>(cx: Scope, section: &'a Section) -> Element {
         Section::B => render! {
             Link {
                 class: "font-semibold mt-4",
-                to: Route::OreEconomics {},
+                to: Route::OreTokenomics {},
                 "Learn more →"
             }
         },
