@@ -2028,6 +2028,11 @@ h2:where(.dark, .dark *) {
     padding-bottom: 2rem;
   }
 
+  .sm\:py-10 {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
   .sm\:text-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
