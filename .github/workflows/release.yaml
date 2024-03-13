@@ -21,6 +21,7 @@ jobs:
 
       - name: Bundle
         run: |
+          cargo install cargo-bundle
           cargo bundle --release --features desktop --format osx
           zip -r ore-${{ github.event.inputs.version }}.zip ./target/release/bundle/osx/your_app.app
 
