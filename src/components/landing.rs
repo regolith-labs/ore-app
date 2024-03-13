@@ -1,7 +1,10 @@
-#![allow(non_snake_case)]
+#[cfg(feature = "desktop")]
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use ore_types::Transfer;
+#[cfg(feature = "web")]
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{

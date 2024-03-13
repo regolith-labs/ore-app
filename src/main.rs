@@ -1,10 +1,10 @@
 #![allow(non_snake_case)]
 use std::rc::Rc;
 
-use components::Appearance;
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use gateway::Gateway;
+#[cfg(feature = "web")]
 use web_sys::window;
 
 mod components;
@@ -19,7 +19,7 @@ mod worker;
 
 use crate::{
     hooks::{
-        use_appearance, use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
+        use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
         use_ore_balance_provider, use_power_level_provider, use_proof_provider,
         use_sol_balance_provider, ProofHandle,
     },
