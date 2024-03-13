@@ -28,7 +28,7 @@ jobs:
         run: |
           cargo install cargo-bundle
           cargo bundle --release --features desktop --format osx
-          zip -r ore-${{ github.event.inputs.version }}.zip ./target/release/bundle/osx/your_app.app
+          zip -r Ore-${{ github.event.inputs.version }}.zip ./target/release/bundle/osx/Ore.app
 
       - name: Create release
         id: create_release
@@ -47,6 +47,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ore-${{ github.event.inputs.version }}.zip
-          asset_name: ore-${{ github.event.inputs.version }}.zip
+          asset_path: ./Ore-${{ github.event.inputs.version }}.zip
+          asset_name: Ore-${{ github.event.inputs.version }}.zip
           asset_content_type: application/zip
