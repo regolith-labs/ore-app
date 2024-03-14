@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
     {signature::Signature, signer::Signer},
@@ -32,6 +33,9 @@ use crate::{
     gateway::{signer, Gateway, GatewayResult},
     hooks::PowerLevel,
 };
+
+/// The compute unit limit for mine transactions.
+const COMPUTE_UNIT_LIMIT: u32 = 3200;
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -186,6 +190,7 @@ pub fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) 
 pub async fn submit_solution(
     gateway: &Rc<Gateway>,
     res: &MiningResult,
+    priority_fee: u64,
 ) -> GatewayResult<Signature> {
     // Submit mine tx.
     let mut bus_id = 0;
@@ -205,13 +210,18 @@ pub async fn submit_solution(
         }
 
         // Submit mine tx
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(COMPUTE_UNIT_LIMIT);
+        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
         let ix = ore::instruction::mine(
             signer.pubkey(),
             ore::BUS_ADDRESSES[bus_id],
             next_hash.into(),
             nonce,
         );
-        match gateway.send_and_confirm(&[ix]).await {
+        match gateway
+            .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix])
+            .await
+        {
             Ok(sig) => return Ok(sig),
             Err(_err) => {
                 // Retry on different bus.

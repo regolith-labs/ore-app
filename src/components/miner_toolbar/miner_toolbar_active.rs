@@ -1,4 +1,8 @@
 use dioxus::prelude::*;
+#[cfg(feature = "web")]
+use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
+#[cfg(feature = "desktop")]
+use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     components::{
@@ -8,7 +12,7 @@ use crate::{
     miner::Miner,
 };
 
-use super::MinerStatusMessage;
+use super::{MinerPriorityFee, MinerStatusMessage};
 
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
@@ -18,8 +22,9 @@ pub struct MinerToolbarActiveProps {
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let status_message = *use_shared_state::<MinerStatusMessage>(cx).unwrap().read();
-    let display_hash = use_shared_state::<MinerDisplayHash>(cx)
+    let miner_status_message = *use_shared_state::<MinerStatusMessage>(cx).unwrap().read();
+    let miner_priority_fee = use_shared_state::<MinerPriorityFee>(cx).unwrap();
+    let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx)
         .unwrap()
         .read()
         .0
@@ -46,7 +51,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     class: "flex flex-col gap-2 sm:gap-3 w-full",
                     div {
                         class: "flex flex-row gap-4",
-                        match status_message {
+                        match miner_status_message {
                             MinerStatusMessage::Searching => {
                                 render! {
                                     p {
@@ -77,8 +82,43 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         }
                     }
                     p {
-                        class: "font-mono text-sm truncate opacity-60",
-                        "{display_hash}"
+                        class: "font-mono text-sm truncate opacity-80",
+                        "{miner_display_hash}"
+                    }
+                    div {
+                        class: "flex flex-row gap-8 justify-between mt-8",
+                        div {
+                            class: "flex flex-col gap-1",
+                            p {
+                                class: "text-white font-semibold",
+                                "Priority fee"
+                            }
+                            p {
+                                class: "text-white text-xs opacity-80 max-w-96",
+                                "When Solana is busy, priority fees can increase the chances of your transactions being accepted."
+                            }
+
+                        }
+                        div {
+                            class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+                            input {
+                                class: "bg-transparent text-white text-right px-1 mb-auto",
+                                step: 1,
+                                min: 0,
+                                max: LAMPORTS_PER_SOL as i64,
+                                r#type: "number",
+                                value: "{miner_priority_fee.read().0}",
+                                oninput: move |e| {
+                                    if let Ok(v) = e.value.parse::<u64>() {
+                                        *miner_priority_fee.write() = MinerPriorityFee(v);
+                                    }
+                                }
+                            }
+                            p {
+                                class: "my-auto",
+                                "lamports"
+                            }
+                        }
                     }
                 }
                 div {
@@ -98,12 +138,12 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         class: "font-semibold text-white",
                         "Mining"
                     }
-                    match status_message {
+                    match miner_status_message {
                         MinerStatusMessage::Searching => {
                             render! {
                                 p {
                                     class: "font-mono text-sm truncate opacity-80 my-auto ml-2",
-                                    "{display_hash}"
+                                    "{miner_display_hash}"
                                 }
                             }
                         }

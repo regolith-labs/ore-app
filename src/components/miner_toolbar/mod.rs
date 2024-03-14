@@ -49,14 +49,19 @@ pub struct MinerDisplayHash(pub KeccakHash);
 #[derive(Debug)]
 pub struct IsToolbarOpen(pub bool);
 
+#[derive(Debug)]
+pub struct MinerPriorityFee(pub u64);
+
 #[component]
 pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
     use_shared_state_provider(cx, || MinerStatusMessage::Searching);
     use_shared_state_provider(cx, || MinerDisplayHash(KeccakHash::new_unique()));
+    use_shared_state_provider(cx, || MinerPriorityFee(0));
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
     let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx).unwrap();
+    let miner_priority_fee = use_shared_state::<MinerPriorityFee>(cx).unwrap();
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let gateway = use_gateway(cx);
     let proof_ = cx.consume_context::<ProofHandle>().unwrap();
@@ -89,11 +94,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         let proof_ = proof_.clone();
         let miner_status_message = miner_status_message.clone();
         let miner_display_hash = miner_display_hash.clone();
+        let miner_priority_fee = miner_priority_fee.clone();
         async move {
             while let Ok(res) = rx.recv().await {
                 *miner_display_hash.write() = MinerDisplayHash(res.hash);
                 *miner_status_message.write() = MinerStatusMessage::Submitting;
-                match submit_solution(&gateway, &res).await {
+                let priority_fee = miner_priority_fee.read().0;
+                match submit_solution(&gateway, &res, priority_fee).await {
                     Ok(_sig) => {
                         proof_.restart();
                         if let MinerStatus::Active = *status.read() {
