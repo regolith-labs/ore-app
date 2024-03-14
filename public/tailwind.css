@@ -1437,6 +1437,10 @@ h2:where(.dark, .dark *) {
   line-height: 1.625;
 }
 
+.leading-8 {
+  line-height: 2rem;
+}
+
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(29 29 31 / var(--tw-text-opacity));

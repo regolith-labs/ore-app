@@ -44,10 +44,10 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                 "When a token has a material cost of production measured in energy, it means a miner has to sacrafice something of real economic value to acquire it. "
                 "To miners, a token must be worth at least the energy required to produce it – otherwise, they simply wouldn't be mining. "
                 "This is the basic principle of exchange that underlies all market theory. "
-                "Since energy has a universal value to the economy, a token's energy cost can be a useful reference point for estimating its value relative to other goods. "
             }
             p {
-                "It is important to remember that production costs are not the only factor that determine an asset's market price. "
+                "A token's cost of production can be a useful data point for estimating its value relative to other goods. "
+                "It is important to note that production costs are not the only factor which can influence an asset's market price. "
                 "Prices are free floating values, subject to speculation, and set by the dynamic forces of supply and demand. "
                 "Mining simply helps market particpants reason about how much energy other people are willing to sacrifice in order to acquire a particular token. "
             }
@@ -84,7 +84,7 @@ pub fn WhatIsMining(cx: Scope) -> Element {
             }
             p {
                 "This algorithm is what makes Ore unique and unlike any other digital token in the world. "
-                "It has never been done before in the history of cryptocurrency and is only possible due to the recent breakthrough innovations of high performance blockchains like "
+                "It has never been done before in the history of cryptocurrency and is only possible due to the recent breakthroughs of high performance blockchains like "
                 a {
                     class: "font-semibold hover:text-green-500 underline transition-colors",
                     href: "https://solana.com",

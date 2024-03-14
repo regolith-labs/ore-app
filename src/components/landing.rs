@@ -31,7 +31,7 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Proof of work.",
                 title2: "On Solana.",
-                detail: "Ore uses a novel proof-of-work protocol to equitably distribute rewards. It guarantees no miner can ever be starved out from winning.",
+                detail: "Ore uses a novel mining protocol designed for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
                 section: Section::A
             }
             Block {
