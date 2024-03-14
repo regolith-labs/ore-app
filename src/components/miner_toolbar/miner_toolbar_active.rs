@@ -18,11 +18,7 @@ pub struct MinerToolbarActiveProps {
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let status_message = use_shared_state::<MinerStatusMessage>(cx)
-        .unwrap()
-        .read()
-        .0
-        .to_string();
+    let status_message = *use_shared_state::<MinerStatusMessage>(cx).unwrap().read();
     let display_hash = use_shared_state::<MinerDisplayHash>(cx)
         .unwrap()
         .read()
@@ -32,7 +28,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow w-full gap-1 px-4 py-6 sm:px-8 sm:py-8",
+                class: "flex flex-col grow w-full gap-4 px-4 py-6 sm:px-8",
                 div {
                     class: "flex flex-row w-full justify-between",
                     h2 {
@@ -40,7 +36,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         "Mining"
                     }
                     div {
-                        class: "flex flex-row gap-4",
+                        class: "my-auto",
                         StopButton {
                             miner: cx.props.miner.clone()
                         }
@@ -50,14 +46,32 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     class: "flex flex-col gap-2 sm:gap-3 w-full",
                     div {
                         class: "flex flex-row gap-4",
-                        p {
-                            class: "text-lg text-white",
-                            "{status_message}"
-                        }
-                        if status_message.eq("Submitting hash for validation..." ) {
-                            render! {
-                                Spinner {
-                                    class: "my-auto"
+                        match status_message {
+                            MinerStatusMessage::Searching => {
+                                render! {
+                                    p {
+                                        class: "text-lg text-white",
+                                        "Searching for a valid hash..."
+                                    }
+                                }
+                            }
+                            MinerStatusMessage::Submitting => {
+                                render! {
+                                    p {
+                                        class: "text-lg text-white",
+                                        "Submitting hash for validation..."
+                                    }
+                                    Spinner {
+                                        class: "my-auto"
+                                    }
+                                }
+                            }
+                            MinerStatusMessage::Error => {
+                                render! {
+                                    p {
+                                        class: "text-lg text-white",
+                                        "Error submit transaction"
+                                    }
                                 }
                             }
                         }
@@ -84,9 +98,31 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         class: "font-semibold text-white",
                         "Mining"
                     }
-                    p {
-                        class: "text-sm text-white opacity-80 my-auto ml-2",
-                        "{status_message}"
+                    match status_message {
+                        MinerStatusMessage::Searching => {
+                            render! {
+                                p {
+                                    class: "font-mono text-sm truncate opacity-80 my-auto ml-2",
+                                    "{display_hash}"
+                                }
+                            }
+                        }
+                        MinerStatusMessage::Submitting => {
+                            render! {
+                                p {
+                                    class: "text-sm text-white opacity-80 my-auto ml-2",
+                                    "Submitting hash for validation..."
+                                }
+                            }
+                        }
+                        MinerStatusMessage::Error => {
+                            render! {
+                                p {
+                                    class: "text-sm text-white opacity-80 my-auto ml-2",
+                                    "Error submitting transaction"
+                                }
+                            }
+                        }
                     }
                 }
                 StopButton {

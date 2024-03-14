@@ -36,28 +36,27 @@ pub enum MinerStatus {
     NetworkError,
 }
 
-// TODO A message bar
-#[derive(Debug)]
-pub struct MinerStatusMessage(pub String);
+#[derive(Copy, Clone, Debug)]
+pub enum MinerStatusMessage {
+    Searching,
+    Submitting,
+    Error,
+}
 
 #[derive(Debug)]
 pub struct MinerDisplayHash(pub KeccakHash);
 
-pub struct MinerDisplayHashIsGrinding(pub bool);
-
+#[derive(Debug)]
 pub struct IsToolbarOpen(pub bool);
 
 #[component]
 pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
-    use_shared_state_provider(cx, || MinerStatusMessage(String::new()));
+    use_shared_state_provider(cx, || MinerStatusMessage::Searching);
     use_shared_state_provider(cx, || MinerDisplayHash(KeccakHash::new_unique()));
-    use_shared_state_provider(cx, || MinerDisplayHashIsGrinding(false));
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
     let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx).unwrap();
-    let miner_display_hash_is_grinding =
-        use_shared_state::<MinerDisplayHashIsGrinding>(cx).unwrap();
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let gateway = use_gateway(cx);
     let proof_ = cx.consume_context::<ProofHandle>().unwrap();
@@ -65,13 +64,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let miner = use_miner(cx, ch);
     let pubkey = use_pubkey(cx);
 
-    let _ = use_future(cx, miner_display_hash_is_grinding, |_| {
+    let _ = use_future(cx, miner_status_message, |_| {
         let display_hash = miner_display_hash.clone();
-        let is_grinding = miner_display_hash_is_grinding.clone();
+        let msg = miner_status_message.clone();
         async move {
             loop {
                 async_std::task::sleep(std::time::Duration::from_millis(75)).await;
-                if is_grinding.read().0 {
+                if let MinerStatusMessage::Searching = *msg.read() {
                     *display_hash.write() = MinerDisplayHash(KeccakHash::new_unique());
                 } else {
                     break;
@@ -90,13 +89,10 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         let proof_ = proof_.clone();
         let miner_status_message = miner_status_message.clone();
         let miner_display_hash = miner_display_hash.clone();
-        let miner_display_hash_is_grinding = miner_display_hash_is_grinding.clone();
         async move {
             while let Ok(res) = rx.recv().await {
                 *miner_display_hash.write() = MinerDisplayHash(res.hash);
-                *miner_display_hash_is_grinding.write() = MinerDisplayHashIsGrinding(false);
-                *miner_status_message.write() =
-                    MinerStatusMessage("Submitting hash for validation...".to_string());
+                *miner_status_message.write() = MinerStatusMessage::Submitting;
                 match submit_solution(&gateway, &res).await {
                     Ok(_sig) => {
                         proof_.restart();
@@ -108,18 +104,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                                         treasury.difficulty.into(),
                                         pubkey,
                                     );
-                                    *miner_display_hash_is_grinding.write() =
-                                        MinerDisplayHashIsGrinding(true);
-                                    *miner_status_message.write() = MinerStatusMessage(
-                                        "Searching for a valid hash...".to_string(),
-                                    );
+                                    *miner_status_message.write() = MinerStatusMessage::Searching;
                                 }
                             }
                         }
                     }
                     Err(err) => {
-                        let msg = format!("Error validating hash: {:?}", err).to_string();
-                        *miner_status_message.write() = MinerStatusMessage(msg);
+                        *miner_status_message.write() = MinerStatusMessage::Error;
                         log::error!("Failed to submit hash: {:?}", err);
                     }
                 }
