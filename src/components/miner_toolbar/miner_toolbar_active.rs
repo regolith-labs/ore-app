@@ -9,10 +9,11 @@ use crate::{
         ActivityIndicator, IsToolbarOpen, MinerDisplayHash, MinerPower, OreIcon, Spinner,
         StopButton, Tooltip, TooltipDirection,
     },
+    hooks::{use_priority_fee, PriorityFee},
     miner::Miner,
 };
 
-use super::{MinerPriorityFee, MinerStatusMessage};
+use super::MinerStatusMessage;
 
 #[derive(Props, PartialEq)]
 pub struct MinerToolbarActiveProps {
@@ -23,12 +24,12 @@ pub struct MinerToolbarActiveProps {
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status_message = *use_shared_state::<MinerStatusMessage>(cx).unwrap().read();
-    let miner_priority_fee = use_shared_state::<MinerPriorityFee>(cx).unwrap();
     let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx)
         .unwrap()
         .read()
         .0
         .to_string();
+    let priority_fee = use_priority_fee(cx);
 
     if is_toolbar_open.read().0 {
         render! {
@@ -79,6 +80,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                     }
                                 }
                             }
+                            _ => None
                         }
                     }
                     p {
@@ -107,10 +109,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                 min: 0,
                                 max: LAMPORTS_PER_SOL as i64,
                                 r#type: "number",
-                                value: "{miner_priority_fee.read().0}",
+                                value: "{priority_fee.read().0}",
                                 oninput: move |e| {
                                     if let Ok(v) = e.value.parse::<u64>() {
-                                        *miner_priority_fee.write() = MinerPriorityFee(v);
+                                        *priority_fee.write() = PriorityFee(v);
                                     }
                                 }
                             }
@@ -163,6 +165,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                 }
                             }
                         }
+                        _ => None
                     }
                 }
                 StopButton {

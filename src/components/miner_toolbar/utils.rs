@@ -20,7 +20,6 @@ pub async fn try_start_mining(
     balance: u64,
     miner: &Miner,
     status_message: &UseSharedState<MinerStatusMessage>,
-    // display_hash_is_grinding: &UseSharedState<MinerDisplayHashIsGrinding>,
 ) -> GatewayResult<bool> {
     if balance.eq(&0) {
         return Ok(false);
@@ -33,11 +32,11 @@ pub async fn try_start_mining(
     }
 
     // Create token account, if needed
-    // *status_message.write() = MinerStatusMessage("Creating token account...".to_string());
+    *status_message.write() = MinerStatusMessage::CreatingTokenAccount;
     gateway.create_token_account_ore().await?;
 
     // Create proof account, if needed
-    // *status_message.write() = MinerStatusMessage("Generating challenge...".to_string());
+    *status_message.write() = MinerStatusMessage::GeneratingChallenge;
     gateway.register_ore().await?;
 
     // Start mining
@@ -45,7 +44,6 @@ pub async fn try_start_mining(
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
     *status_message.write() = MinerStatusMessage::Searching;
-    // *display_hash_is_grinding.write() = MinerDisplayHashIsGrinding(true);
     miner.start_mining(
         proof.hash.into(),
         treasury.difficulty.into(),

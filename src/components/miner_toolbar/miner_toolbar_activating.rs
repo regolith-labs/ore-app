@@ -47,10 +47,29 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     if is_toolbar_open.read().0 {
         render! {
             div {
-                class: "flex flex-col grow gap-1 px-4 py-6 sm:px-8 sm:py-8",
+                class: "flex flex-col grow gap-2 px-4 py-6 sm:px-8 sm:py-8",
                 h2 {
                     class: "text-3xl md:text-4xl lg:text-5xl font-bold",
                     "Starting"
+                }
+                match *miner_status_message.read() {
+                    MinerStatusMessage::CreatingTokenAccount => {
+                        render! {
+                            p {
+                                class: "text-lg",
+                                "Creating token account..."
+                            }
+                        }
+                    }
+                    MinerStatusMessage::GeneratingChallenge => {
+                        render! {
+                            p {
+                                class: "text-lg",
+                                "Generating challenge..."
+                            }
+                        }
+                    }
+                    _ => None
                 }
             }
         }

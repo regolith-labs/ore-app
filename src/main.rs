@@ -22,8 +22,8 @@ use crate::{components::Appearance, hooks::use_appearance};
 use crate::{
     hooks::{
         use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
-        use_ore_balance_provider, use_power_level_provider, use_proof_provider,
-        use_sol_balance_provider, ProofHandle,
+        use_ore_balance_provider, use_power_level_provider, use_priority_fee_provider,
+        use_proof_provider, use_sol_balance_provider, ProofHandle,
     },
     route::Route,
 };
@@ -51,6 +51,7 @@ fn App(cx: Scope) -> Element {
     use_explorer_provider(cx);
     use_power_level_provider(cx);
     use_is_onboarded_provider(cx);
+    use_priority_fee_provider(cx);
 
     // Gateway
     use_context_provider(cx, || Rc::new(Gateway::new()));
