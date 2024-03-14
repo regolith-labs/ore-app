@@ -47,7 +47,7 @@ pub fn ToolbarClose(cx: Scope, hidden: bool) -> Element {
     }
     render! {
         button {
-            class: "absolute transition-opacity flex flex-row left-0 top-0 h-screen w-screen bg-black {opacity}",
+            class: "fixed transition-opacity flex flex-row left-0 top-0 h-screen w-screen bg-black {opacity}",
             onclick: |_e| {
                 *is_toolbar_open.write() = IsToolbarOpen(false);
             }

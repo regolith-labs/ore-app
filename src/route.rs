@@ -17,11 +17,11 @@ pub enum Route {
         WhatIsMining {},
         #[route("/ore-tokenomics")]
         OreTokenomics {},
+        #[route("/download")]
+        Download {},
     #[end_layout]
 
     #[layout(Navbar)]
-        #[route("/download")]
-        Download {},
         #[layout(Miner)]
             #[route("/home")]
             Home {},

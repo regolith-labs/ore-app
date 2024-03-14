@@ -31,19 +31,19 @@ pub fn Landing(cx: Scope) -> Element {
             Block {
                 title: "Proof of work.",
                 title2: "On Solana.",
-                detail: "Ore uses a novel proof-of-work algorithm to equitably distribute tokens. It guarantees no miner can ever be starved out from earning rewards.",
+                detail: "Ore uses a novel proof-of-work protocol to equitably distribute rewards. It guarantees no miner can ever be starved out from winning.",
                 section: Section::A
             }
             Block {
                 title: "Stable supply.",
                 title2: "Steady growth.",
-                detail: "Ore has a programmatic supply coded for constant linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
+                detail: "Ore has an algorithmic supply programmed for constant linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
                 section: Section::B
             }
             Block {
                 title: "Fair launch.",
                 title2: "Immutable code.",
-                detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been open sourced and frozen to prevent tampering or removal.",
+                detail: "Ore has no insider token allocation nor pre-mined supply. The smart contract has been frozen and open-sourced to prevent tampering or removal.",
                 section: Section::C
             }
             Footer {}

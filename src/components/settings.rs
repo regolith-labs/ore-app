@@ -34,18 +34,6 @@ pub fn Settings(cx: Scope) -> Element {
     let explorer = use_explorer(cx);
     let appearance = use_appearance(cx);
 
-    // TODO use_concurrency()
-    #[cfg(feature = "web")]
-    let cores = if let Some(window) = window() {
-        window.navigator().hardware_concurrency().to_string()
-    } else {
-        "Unknown".to_string()
-    };
-
-    // TODO Fetch this value
-    #[cfg(feature = "desktop")]
-    let cores = 12;
-
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
     let data_title_class = "font-medium text-sm opacity-50 my-auto";
@@ -155,23 +143,6 @@ pub fn Settings(cx: Scope) -> Element {
                         option { initial_selected: explorer.read().eq(&Explorer::SolanaFm), value: "{Explorer::SolanaFm}", "{Explorer::SolanaFm}" }
                         option { initial_selected: explorer.read().eq(&Explorer::Solscan), value: "{Explorer::Solscan}", "{Explorer::Solscan}" }
                         option { initial_selected: explorer.read().eq(&Explorer::Xray), value: "{Explorer::Xray}", "{Explorer::Xray}" }
-                    }
-                }
-            }
-            div {
-                class: "flex flex-col gap-4",
-                h2 {
-                    class: "{section_title_class}",
-                    "System"
-                }
-                div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "CPU"
-                    }
-                    p {
-                        "{cores} core"
                     }
                 }
             }
