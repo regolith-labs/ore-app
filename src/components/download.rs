@@ -16,6 +16,15 @@ pub fn Download(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
+                    "Desktop"
+                }
+                p {
+                    "Coming soon..."
+                    // "Currently the only way to install the Ore miner desktop app is to compile the source code from scratch. "
+                    // "You can do this by downloading the code from the Github repository and following the build process described in the README."
+                }
+                p {
+                    class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                     "CLI"
                 }
                 p {
@@ -45,14 +54,6 @@ pub fn Download(cx: Scope) -> Element {
                 }
                 CodeBlock {
                     text: "ore mine"
-                }
-                p {
-                    class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
-                    "Desktop"
-                }
-                p {
-                    "Currently the only way to install the Ore miner desktop app is to compile the source code from scratch. "
-                    "You can do this by downloading the code from the Github repository and following the build process described in the README."
                 }
             }
         }

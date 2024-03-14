@@ -10,7 +10,7 @@ const KEY: &str = "power_level";
 
 pub fn use_power_level(cx: &ScopeState) -> &UseSharedState<PowerLevel> {
     let power_level = use_shared_state::<PowerLevel>(cx).unwrap();
-    let power_level_persistent = use_persistent(cx, KEY, || PowerLevel(0));
+    let power_level_persistent = use_persistent(cx, KEY, || PowerLevel(10));
     use_effect(cx, power_level, |_| {
         power_level_persistent.set(*power_level.read());
         async move {}
@@ -19,6 +19,6 @@ pub fn use_power_level(cx: &ScopeState) -> &UseSharedState<PowerLevel> {
 }
 
 pub fn use_power_level_provider(cx: &ScopeState) {
-    let power_level = use_persistent(cx, KEY, || PowerLevel(0)).get();
+    let power_level = use_persistent(cx, KEY, || PowerLevel(10)).get();
     use_shared_state_provider(cx, || power_level);
 }

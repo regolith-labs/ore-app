@@ -1,16 +1,14 @@
 use dioxus::prelude::*;
-#[cfg(feature = "web")]
-use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
-#[cfg(feature = "desktop")]
-use solana_sdk::native_token::LAMPORTS_PER_SOL;
+use dioxus_router::prelude::Link;
 
 use crate::{
     components::{
-        ActivityIndicator, IsToolbarOpen, MinerDisplayHash, MinerPower, OreIcon, Spinner,
-        StopButton, Tooltip, TooltipDirection,
+        ActivityIndicator, IsToolbarOpen, MinerDisplayHash, OreIcon, Spinner, StopButton, Tooltip,
+        TooltipDirection, WarningIcon,
     },
-    hooks::{use_priority_fee, PriorityFee},
+    hooks::{use_power_level, use_priority_fee, PowerLevel, PriorityFee},
     miner::Miner,
+    route::Route,
 };
 
 use super::MinerStatusMessage;
@@ -29,7 +27,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         .read()
         .0
         .to_string();
-    let priority_fee = use_priority_fee(cx);
 
     if is_toolbar_open.read().0 {
         render! {
@@ -87,45 +84,9 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         class: "font-mono text-sm truncate opacity-80",
                         "{miner_display_hash}"
                     }
-                    div {
-                        class: "flex flex-row gap-8 justify-between mt-8",
-                        div {
-                            class: "flex flex-col gap-1",
-                            p {
-                                class: "text-white font-semibold",
-                                "Priority fee"
-                            }
-                            p {
-                                class: "text-white text-xs opacity-80 max-w-96",
-                                "When Solana is busy, priority fees can increase the chances of your transactions being accepted."
-                            }
-
-                        }
-                        div {
-                            class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                            input {
-                                class: "bg-transparent text-white text-right px-1 mb-auto",
-                                step: 1,
-                                min: 0,
-                                max: LAMPORTS_PER_SOL as i64,
-                                r#type: "number",
-                                value: "{priority_fee.read().0}",
-                                oninput: move |e| {
-                                    if let Ok(v) = e.value.parse::<u64>() {
-                                        *priority_fee.write() = PriorityFee(v);
-                                    }
-                                }
-                            }
-                            p {
-                                class: "my-auto",
-                                "lamports"
-                            }
-                        }
-                    }
-                }
-                div {
-                    class: "mt-16",
-                    MinerPower {}
+                    PriorityFeeConfig {}
+                    PowerLevelConfig {}
+                    DownloadLink {}
                 }
             }
         }
@@ -177,6 +138,91 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
 }
 
 #[component]
+pub fn PriorityFeeConfig(cx: Scope) -> Element {
+    let priority_fee = use_priority_fee(cx);
+    render! {
+        div {
+            class: "flex flex-row gap-8 justify-between mt-8",
+            div {
+                class: "flex flex-col gap-1",
+                p {
+                    class: "text-white font-semibold",
+                    "Priority fee"
+                }
+                p {
+                    class: "text-white text-xs opacity-80 max-w-96",
+                    "When Solana is busy, priority fees can increase the chances of your transactions being accepted."
+                }
+
+            }
+            div {
+                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+                input {
+                    class: "bg-transparent text-white text-right px-1 mb-auto",
+                    step: 1,
+                    min: 0,
+                    max: 1000,
+                    r#type: "number",
+                    value: "{priority_fee.read().0}",
+                    oninput: move |e| {
+                        if let Ok(v) = e.value.parse::<u64>() {
+                            *priority_fee.write() = PriorityFee(v);
+                        }
+                    }
+                }
+                p {
+                    class: "my-auto",
+                    "lamports"
+                }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn PowerLevelConfig(cx: Scope) -> Element {
+    let power_level = use_power_level(cx);
+    render! {
+        div {
+            class: "flex flex-row gap-8 justify-between mt-8",
+            div {
+                class: "flex flex-col gap-1",
+                p {
+                    class: "text-white font-semibold",
+                    "Power level"
+                }
+                p {
+                    class: "text-white text-xs opacity-80 max-w-96",
+                    "Configure how much of your device's computing capacity your miner can utilize."
+                }
+
+            }
+            div {
+                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+                input {
+                    class: "bg-transparent text-white text-right px-1 mb-auto",
+                    disabled: cfg!(feature = "web"),
+                    step: 10,
+                    min: 10,
+                    max: 100,
+                    r#type: "number",
+                    value: "{power_level.read().0}",
+                    oninput: move |e| {
+                        if let Ok(v) = e.value.parse::<u64>() {
+                            *power_level.write() = PowerLevel(v as u8);
+                        }
+                    }
+                }
+                p {
+                    class: "my-auto",
+                    "%"
+                }
+            }
+        }
+    }
+}
+
+#[component]
 pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: String) -> Element {
     let container_class = "flex flex-col gap-0 shrink h-min";
     let header_container_class = "flex flex-row justify-start gap-1.5";
@@ -210,5 +256,30 @@ pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: Str
                 }
             }
         }
+    }
+}
+
+#[component]
+fn DownloadLink(cx: Scope) -> Element {
+    if cfg!(feature = "web") {
+        render! {
+            div {
+                class: "flex flex-row gap-2 mt-8",
+                // WarningIcon {
+                //     class: "w-5 h-5",
+                // }
+                p {
+                    class: "text-sm my-auto",
+                    "You are mining from a web browser. To access higher power levels, "
+                    Link {
+                        to: Route::Download {},
+                        class: "font-medium underline",
+                        "download the app."
+                    }
+                }
+            }
+        }
+    } else {
+        None
     }
 }

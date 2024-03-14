@@ -135,28 +135,3 @@ fn PowerBarLevel<'a>(
         }
     }
 }
-
-#[component]
-fn DownloadLink(cx: Scope) -> Element {
-    if cfg!(feature = "web") {
-        render! {
-            div {
-                class: "flex flex-row gap-2",
-                WarningIcon {
-                    class: "w-5 h-5",
-                }
-                p {
-                    class: "text-sm my-auto",
-                    "You are mining from a web browser. To access higher power levels, "
-                    Link {
-                        to: Route::Download {},
-                        class: "font-medium underline",
-                        "download the app."
-                    }
-                }
-            }
-        }
-    } else {
-        None
-    }
-}
