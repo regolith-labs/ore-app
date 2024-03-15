@@ -96,7 +96,6 @@ pub fn UnclaimedRewards(cx: Scope) -> Element {
 
 #[component]
 pub fn SendButton(cx: Scope, to: Option<String>) -> Element {
-    log::info!("What: {:?}", to);
     render! {
         Link {
             to: Route::Send { to: to.clone().unwrap_or("".to_string()) },

@@ -31,9 +31,9 @@ pub enum Route {
             Leaderboard {},
             #[route("/me")]
             Settings {},
-            #[route("/send")]
+            #[route("/send/:to")]
             Send {
-                to: String    
+                to: String
             },
             #[route("/tx/:sig")]
             Tx {

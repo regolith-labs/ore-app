@@ -77,7 +77,7 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "Select an amount and recipient to send Ore to."
+                    "Send Ore to another user."
                 }
                 // p {
                 //     class: "text-gray-300 text-sm",
@@ -94,7 +94,9 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                     }
                     input {
                         class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl",
+                        autofocus: recipient_input.get().eq(&""),
                         placeholder: "Address",
+                        value: "{recipient_input.get()}",
                         oninput: move |evt| {
                             let s = evt.value.clone();
                             recipient_input.set(s);
@@ -121,8 +123,8 @@ pub fn SendEdit<'a>(cx: Scope<'a, SendEditProps<'a>>) -> Element {
                     div {
                         class: "flex flex-row gap-3",
                         input {
-                            autofocus: true,
                             class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl font-medium",
+                            autofocus: !recipient_input.get().eq(&""),
                             value: "{amount_input}",
                             placeholder: "0",
                             oninput: move |evt| {

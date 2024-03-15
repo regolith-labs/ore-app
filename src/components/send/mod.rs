@@ -23,19 +23,8 @@ pub enum SendStep {
 pub fn Send(cx: Scope, to: Option<String>) -> Element {
     let send_step = use_state(cx, || SendStep::Edit);
     let amount_input = use_state(cx, || "".to_string());
-    let recipient_input = use_state(cx, || "".to_string());
+    let recipient_input = use_state(cx, || to.clone().unwrap_or("".to_string()));
     let memo_input = use_state(cx, || "".to_string());
-
-    log::info!("HELP: {:?}", to);
-
-    use_effect(cx, (), |_| {
-        log::info!("TO: {:?}", to);
-        if let Some(to) = to {
-            log::info!("TO2: {:?}", to);
-            recipient_input.set(to.clone())
-        }
-        async move {}
-    });
 
     let parsed_amount: u64 = match amount_input.get().parse::<f64>() {
         Ok(n) => (n * 10f64.powf(ore::TOKEN_DECIMALS.into())) as u64,
