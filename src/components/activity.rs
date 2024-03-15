@@ -241,6 +241,10 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
             }
         }
     };
+    let addr_a_link = match transfer.transfer_type {
+        TransferType::Claim | TransferType::Mine => transfer.to_address.clone(),
+        TransferType::Spl => transfer.from_address,
+    };
     let addr_a_class = if addr_a.eq(&"You".to_string()) {
         "font-bold"
     } else {
@@ -255,6 +259,10 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
             TransferType::Spl => transfer.to_address[..5].to_string(),
         }
     };
+    let addr_b_link = match transfer.transfer_type {
+        TransferType::Claim | TransferType::Mine => "".to_string(),
+        TransferType::Spl => transfer.to_address,
+    };
     let addr_b_class = if addr_b.eq(&"You".to_string()) {
         "font-bold"
     } else {
@@ -265,8 +273,12 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
         Link {
             class: "flex flex-row py-3 gap-3 w-full px-2 rounded hover-100 active-200 transition-colors",
             to: Route::Tx { sig: transfer.sig },
-            UserBubble {
-                class: "w-10 h-10"
+            Link {
+                class: "hover:opacity-80 transition-opacity",
+                to: Route::User { id: addr_a_link.clone() },
+                UserBubble {
+                    class: "w-10 h-10"
+                }
             }
             div {
                 class: "flex flex-col gap-2",
@@ -274,9 +286,12 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                     class: "flex flex-col gap-0.5 pt-1.5",
                     p {
                         class: "flex flex-row gap-1.5 text-wrap flex-wrap",
-                        span {
-                            class: "{addr_a_class}",
-                            "{addr_a}"
+                        Link {
+                            to: Route::User { id: addr_a_link },
+                            span {
+                                class: "{addr_a_class} hover:underline",
+                                "{addr_a}"
+                            }
                         }
                         "{action} "
                         span {
@@ -289,9 +304,12 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                         if let TransferType::Spl = transfer.transfer_type {
                             render! {
                                 "to"
-                                span {
-                                    class: "{addr_b_class}",
-                                    "{addr_b}"
+                                Link {
+                                    to: Route::User{ id: addr_b_link },
+                                    span {
+                                        class: "{addr_b_class}",
+                                        "{addr_b}"
+                                    }
                                 }
                             }
                         }
