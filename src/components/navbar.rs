@@ -2,7 +2,9 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{Banner, BannerType, Footer, OreLogoIcon, OreWordmarkIcon, UserGroupIcon},
+    components::{
+        Banner, BannerType, Footer, OreLogoIcon, OreWordmarkIcon, UserBubble, UserGroupIcon,
+    },
     gateway::AsyncResult,
     hooks::use_ping,
     route::Route,
@@ -59,7 +61,9 @@ pub fn Profile(cx: Scope) -> Element {
     render! {
         Link {
             to: Route::Settings {},
-            class: "bg-gray-300 dark:bg-gray-700 w-10 h-10 rounded-full"
+            UserBubble {
+                class: "w-10 h-10"
+            }
         }
     }
 }

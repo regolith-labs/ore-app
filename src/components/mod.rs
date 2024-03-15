@@ -27,6 +27,7 @@ mod tooltip;
 mod tutorial;
 mod tx;
 mod user;
+mod user_bubble;
 mod what_is_mining;
 
 pub use activity::*;
@@ -58,4 +59,5 @@ pub use tooltip::*;
 pub use tutorial::*;
 pub use tx::*;
 pub use user::*;
+pub use user_bubble::*;
 pub use what_is_mining::*;

@@ -8,7 +8,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{ActivityTable, Copyable, OreIcon},
+    components::{ActivityTable, Copyable, OreIcon, UserBubble},
     gateway::AsyncResult,
     hooks::{use_explorer_account_url, use_ore_balance_user, use_user_transfers},
 };
@@ -43,8 +43,8 @@ pub fn User(cx: Scope, id: String) -> Element {
                 class: "flex flex-col gap-1",
                 div {
                     class: "flex flex-col gap-8",
-                    div {
-                        class: "my-auto rounded-full w-20 h-20 bg-gray-300 dark:bg-gray-700",
+                    UserBubble {
+                        class: "my-auto w-20 h-20",
                     }
                     h2 {
                         class: "my-auto",

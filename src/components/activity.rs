@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ore_types::{Transfer, TransferType};
 
 use crate::{
-    components::{GlobeIcon, OreIcon, UserIcon},
+    components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
     gateway::AsyncResult,
     hooks::{use_pubkey, use_transfers, ACTIVITY_TABLE_PAGE_LIMIT},
     route::Route,
@@ -265,8 +265,8 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
         Link {
             class: "flex flex-row py-3 gap-3 w-full px-2 rounded hover-100 active-200 transition-colors",
             to: Route::Tx { sig: transfer.sig },
-            div {
-                class: "w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full shrink-0"
+            UserBubble {
+                class: "w-10 h-10"
             }
             div {
                 class: "flex flex-col gap-2",
