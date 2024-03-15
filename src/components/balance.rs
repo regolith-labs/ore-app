@@ -95,10 +95,11 @@ pub fn UnclaimedRewards(cx: Scope) -> Element {
 }
 
 #[component]
-pub fn SendButton(cx: Scope) -> Element {
+pub fn SendButton(cx: Scope, to: Option<String>) -> Element {
+    log::info!("What: {:?}", to);
     render! {
         Link {
-            to: Route::Send {},
+            to: Route::Send { to: to.clone().unwrap_or("".to_string()) },
             class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-bold transition-all bg-black text-white hover:shadow hover:scale-110 dark:bg-white dark:text-black",
             span {
                 class: "my-auto bg-transparent",

@@ -9,15 +9,21 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{ActivityTable, BusBubble, Copyable, OreIcon, TreasuryBubble, UserBubble},
+    components::{
+        ActivityTable, BusBubble, Copyable, OreIcon, SendButton, TreasuryBubble, UserBubble,
+    },
     gateway::AsyncResult,
-    hooks::{use_explorer_account_url, use_ore_balance_user, use_user_proof, use_user_transfers},
+    hooks::{
+        use_explorer_account_url, use_ore_balance_user, use_pubkey, use_user_proof,
+        use_user_transfers,
+    },
 };
 
 // TODO Not found
 
 #[component]
 pub fn User(cx: Scope, id: String) -> Element {
+    let pubkey = use_pubkey(cx);
     let user_id = Pubkey::from_str(id);
 
     if user_id.is_err() {
@@ -59,6 +65,8 @@ pub fn User(cx: Scope, id: String) -> Element {
         None
     };
 
+    let show_send_button = title.eq("User") && user_id.ne(&pubkey);
+
     let container_class = "flex flex-row gap-8 justify-between py-1 sm:px-1";
     let title_class = "opacity-50 text-sm my-auto";
     let value_class = "font-medium py-1 rounded";
@@ -90,9 +98,17 @@ pub fn User(cx: Scope, id: String) -> Element {
                             }
                         }
                     }
-                    h2 {
-                        class: "my-auto",
-                        "{title}"
+                    div {
+                        class: "flex flex-row justify-between",
+                        h2 {
+                            class: "my-auto",
+                            "{title}"
+                        }
+                        if show_send_button {
+                            render! {
+                                SendButton { to: id.clone() }
+                            }
+                        }
                     }
                 }
                 if let Some(description) = description {
@@ -106,7 +122,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                 div {
                     class: "flex flex-col gap-1",
                     div {
-                        class: "{container_class}",
+                        class: "{container_class} -mr-2",
                         p {
                             class: "{title_class}",
                             "ID"

@@ -32,7 +32,9 @@ pub enum Route {
             #[route("/me")]
             Settings {},
             #[route("/send")]
-            Send {},
+            Send {
+                to: String    
+            },
             #[route("/tx/:sig")]
             Tx {
                 sig: String,
