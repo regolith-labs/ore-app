@@ -7,6 +7,7 @@ use crate::{
         TooltipDirection, WarningIcon,
     },
     hooks::{use_power_level, use_priority_fee, PowerLevel, PriorityFee},
+    metrics::{track, AppEvent},
     miner::Miner,
     route::Route,
 };
@@ -166,6 +167,7 @@ pub fn PriorityFeeConfig(cx: Scope) -> Element {
                     value: "{priority_fee.read().0}",
                     oninput: move |e| {
                         if let Ok(v) = e.value.parse::<u64>() {
+                            track(AppEvent::SetPriorityFee, None);
                             *priority_fee.write() = PriorityFee(v);
                         }
                     }
