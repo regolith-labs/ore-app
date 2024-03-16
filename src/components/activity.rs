@@ -307,7 +307,7 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                                 Link {
                                     to: Route::User{ id: addr_b_link },
                                     span {
-                                        class: "{addr_b_class}",
+                                        class: "{addr_b_class} hover:underline",
                                         "{addr_b}"
                                     }
                                 }

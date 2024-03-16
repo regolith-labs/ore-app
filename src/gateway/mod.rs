@@ -57,6 +57,8 @@ use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
 };
 
+use crate::metrics::{track, AppEvent};
+
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
     "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
@@ -152,7 +154,13 @@ impl Gateway {
 
         // Sign and send transaction.
         let ix = ore::instruction::register(signer.pubkey());
-        self.send_and_confirm(&[ix]).await.map(|_| ())
+        match self.send_and_confirm(&[ix]).await {
+            Ok(_) => {
+                track(AppEvent::Register, None);
+                Ok(())
+            }
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn claim_ore(&self, amount: u64) -> GatewayResult<Signature> {
@@ -185,7 +193,6 @@ impl Gateway {
         self.send_and_confirm(&[memo_ix, transfer_ix]).await
     }
 
-    // TODO Result type
     pub async fn create_token_account_ore(&self) -> GatewayResult<Pubkey> {
         // Build instructions.
         let signer = signer();
@@ -212,7 +219,10 @@ impl Gateway {
             &ore::MINT_ADDRESS,
             &spl_token::id(),
         );
-        self.send_and_confirm(&[ix]).await?;
+        match self.send_and_confirm(&[ix]).await {
+            Ok(_) => track(AppEvent::CreateTokenAccount, None),
+            Err(err) => return Err(err),
+        }
 
         // Return token account address
         Ok(token_account_address)

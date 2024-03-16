@@ -2,9 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{
-        Banner, BannerType, Footer, OreLogoIcon, OreWordmarkIcon, UserBubble, UserGroupIcon,
-    },
+    components::{Banner, BannerType, Footer, OreLogoIcon, OreWordmarkIcon, PieIcon, UserBubble},
     gateway::AsyncResult,
     hooks::use_ping,
     route::Route,
@@ -40,7 +38,7 @@ pub fn Navbar(cx: Scope) -> Element {
                         Link {
                             class: "transition-colors flex w-10 h-10 justify-center rounded-full text-gray-300 dark:text-gray-700 hover:text-black dark:hover:text-white",
                             to: Route::Leaderboard {},
-                            UserGroupIcon {
+                            PieIcon {
                                 class: "w-5 h-5 sm:w-6 sm:h-6 my-auto"
                             }
                         }

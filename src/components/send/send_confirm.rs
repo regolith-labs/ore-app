@@ -7,6 +7,7 @@ use solana_sdk::pubkey::Pubkey;
 use crate::{
     components::{BackButton, OreIcon, Spinner},
     hooks::{use_gateway, use_ore_balance_handle},
+    metrics::{track, AppEvent},
 };
 
 use super::SendStep;
@@ -108,6 +109,7 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                             match gateway.transfer_ore(amount, recipient, memo).await {
                                 Ok(sig) => {
                                     log::info!("Transfer: {:?}", sig);
+                                    track(AppEvent::Transfer, None);
                                     balance_.restart();
                                     is_busy.set(false);
                                     send_step.set(SendStep::Done);

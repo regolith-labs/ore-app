@@ -3,6 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::{BackButton, OreIcon, Spinner},
     hooks::{use_gateway, BalanceHandle},
+    metrics::{track, AppEvent},
     ProofHandle,
 };
 
@@ -68,6 +69,7 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                             async move {
                             match gateway.claim_ore(amount).await {
                                 Ok(_sig) => {
+                                    track(AppEvent::Claim, None);
                                     balance_.restart();
                                     proof_.restart();
                                     is_busy.set(false);

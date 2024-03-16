@@ -12,6 +12,7 @@ mod components;
 mod file;
 mod gateway;
 mod hooks;
+mod metrics;
 mod miner;
 mod route;
 #[cfg(feature = "web")]

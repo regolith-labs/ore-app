@@ -8,6 +8,7 @@ use solana_sdk::{native_token::LAMPORTS_PER_SOL, signer::Signer};
 
 use crate::{
     gateway::{signer, Gateway, GatewayResult},
+    metrics::{track, AppEvent},
     miner::Miner,
 };
 
@@ -49,6 +50,9 @@ pub async fn try_start_mining(
         treasury.difficulty.into(),
         signer.pubkey(),
     );
+
+    // Record event for data
+    track(AppEvent::StartMiner, None);
 
     Ok(true)
 }
