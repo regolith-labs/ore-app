@@ -50,6 +50,7 @@ jobs:
           path: ./target/release/bundle/osx/
 
       - name: Install Apple Certificate
+        run: |
           echo ${{ secrets.MACOS_CERTIFICATE }} | base64 --decode > certificate.p12
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
