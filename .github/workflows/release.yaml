@@ -11,10 +11,10 @@ on:
         required: true
 
 jobs:
-  release:
-    name: Release
+  build: 
+    name: Build
     runs-on: ubuntu-latest
-    steps:
+    steps: 
       - uses: actions/checkout@v2
 
       - name: Setup Rust
@@ -31,6 +31,55 @@ jobs:
         run: |
           cargo install cargo-bundle
           cargo bundle --release --features desktop --format osx
+          # zip -r Ore-${{ github.event.inputs.version }}.zip ./target/release/bundle/osx/Ore.app
+
+      - name: Upload macOS Application Bundle
+        uses: actions/upload-artifact@v2
+        with:
+          name: Ore.app
+          path: ./target/release/bundle/osx/Ore.app
+
+  sign: 
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - name: Download macOS Application Bundle
+        uses: actions/download-artifact@v2
+        with:
+          name: Ore.app
+          path: ./target/release/bundle/osx/
+
+      - name: Install Apple Certificate
+          echo ${{ secrets.MACOS_CERTIFICATE }} | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P ${{ secrets.MACOS_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:-s -k "" build.keychain
+
+      - name: Sign the App
+        run: |
+          codesign --force --deep --sign "Developer ID Application: Nicholas Garfield (RP8738PY76)" --options runtime ./target/release/bundle/osx/Ore.app
+
+      - name: Upload macOS Application Bundle
+        uses: actions/upload-artifact@v2
+        with:
+          name: Ore.app
+          path: ./target/release/bundle/osx/Ore.app
+    
+  release:
+    needs: sign
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download macOS Application Bundle
+        uses: actions/download-artifact@v2
+        with:
+          name: Ore.app
+          path: ./target/release/bundle/osx/
+
+      - name: Bundle
+        run: |
           zip -r Ore-${{ github.event.inputs.version }}.zip ./target/release/bundle/osx/Ore.app
 
       - name: Create release
@@ -53,3 +102,4 @@ jobs:
           asset_path: ./Ore-${{ github.event.inputs.version }}.zip
           asset_name: Ore-${{ github.event.inputs.version }}.zip
           asset_content_type: application/zip
+
