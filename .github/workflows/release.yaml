@@ -61,6 +61,7 @@ jobs:
 
       - name: Sign the App
         run: |
+          security unlock-keychain -p "" build.keychain
           codesign --force --deep --sign "Developer ID Application: Nicholas Garfield (RP8738PY76)" --options runtime ./target/release/bundle/osx/Ore.app
 
       - name: Upload macOS Application Bundle
