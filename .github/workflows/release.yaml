@@ -48,7 +48,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: Ore.app
-          path: ./target/release/bundle/osx/
+          path: ./target/release/bundle/osx/Ore.app
 
       - name: Install Apple Certificate
         run: |
@@ -78,7 +78,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: Ore.app
-          path: ./target/release/bundle/osx/
+          path: ./target/release/bundle/osx/Ore.app
 
       - name: Bundle
         run: |
