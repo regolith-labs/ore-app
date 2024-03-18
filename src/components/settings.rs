@@ -17,16 +17,6 @@ use crate::{
     route::Route,
 };
 
-// Phase 1 (core)
-// TODO Export private key
-// TODO CPU benchmark
-
-// Phase 2 (social)
-// TODO Username
-// TODO Profile photo
-// TODO Bio
-// TODO Contacts
-
 #[component]
 pub fn Settings(cx: Scope) -> Element {
     let pubkey = use_pubkey(cx);
@@ -122,8 +112,8 @@ pub fn Settings(cx: Scope) -> Element {
                                 *appearance.write() = a;
                             }
                         },
-                        option { initial_selected: appearance.read().eq(&Appearance::Light), value: "{Appearance::Light}", "{Appearance::Light}" }
                         option { initial_selected: appearance.read().eq(&Appearance::Dark), value: "{Appearance::Dark}", "{Appearance::Dark}" }
+                        option { initial_selected: appearance.read().eq(&Appearance::Light), value: "{Appearance::Light}", "{Appearance::Light}" }
                     }
                 }
                 div {

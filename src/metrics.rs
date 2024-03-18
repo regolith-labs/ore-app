@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
 // TODO StopMiner
@@ -36,6 +37,7 @@ impl Display for AppEvent {
 }
 
 // Define a function that calls `fathom.trackEvent`
+#[cfg(feature = "web")]
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = fathom, catch)]
@@ -43,5 +45,6 @@ extern "C" {
 }
 
 pub fn track(event: AppEvent, value: Option<u32>) {
+    #[cfg(feature = "web")]
     trackEvent(event.to_string().as_str(), value).ok();
 }

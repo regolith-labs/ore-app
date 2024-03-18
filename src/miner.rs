@@ -20,6 +20,7 @@ use solana_client_wasm::solana_sdk::{
 };
 #[cfg(feature = "desktop")]
 use solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
     {signature::Signature, signer::Signer},

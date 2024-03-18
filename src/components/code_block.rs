@@ -34,7 +34,7 @@ pub fn CodeBlock<'a>(cx: Scope, text: &'a str) -> Element {
                     }
 
                     #[cfg(feature = "desktop")]
-                    clipboard.set(value.clone()).ok();
+                    clipboard.set(text.to_string()).ok();
 
                     solid.set(true);
                 },
