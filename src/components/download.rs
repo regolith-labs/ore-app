@@ -3,6 +3,9 @@ use dioxus::prelude::*;
 
 use crate::components::CodeBlock;
 
+const DESKTOP_DOWNLOAD_MAC: &str =
+    "https://github.com/HardhatChad/ore-app/releases/download/0.0.1/Ore-MacOS.zip";
+
 #[component]
 pub fn Download(cx: Scope) -> Element {
     render! {
@@ -24,7 +27,8 @@ pub fn Download(cx: Scope) -> Element {
                     // "You can do this by downloading the code from the Github repository and following the build process described in the README."
                 }
                 a {
-                    href: "https://github.com/HardhatChad/ore-app/releases/download/0.0.1/Ore-MacOS.zip",
+                    class: "font-semibold hover:underline",
+                    href: "{DESKTOP_DOWNLOAD_MAC}",
                     "Click here to download"
                 }
                 p {
