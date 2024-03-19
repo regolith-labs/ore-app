@@ -10,9 +10,6 @@ repository = "https://github.com/hardhatchad/ore-app"
 readme = "./README.md"
 keywords = ["solana", "crypto", "mining"]
 
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [features]
 default = []
 desktop = [
@@ -107,11 +104,12 @@ solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/
 
 [package.metadata.bundle]
 name = "Ore"
-identifier = "com.ore.miner"
+identifier = "com.ore.app"
 version = "0.0.1"
 resources = ["public"]
 copyright = "Copyright (c) Hardhat Chad 2024. All rights reserved."
 category = "Finance"
 short_description = "Ore miner"
 long_description = "Ore is a digital currency you can mine from anywhere, at home or on your phone."
-osx_url_schemes = ["com.ore.miner"]
+osx_url_schemes = ["com.ore.app"]
+info_plist = "Info.plist"
