@@ -113,3 +113,5 @@ short_description = "Ore miner"
 long_description = "Ore is a digital currency you can mine from anywhere, at home or on your phone."
 osx_url_schemes = ["com.ore.app"]
 info_plist = "Info.plist"
+icon = ["Icon.icns"]
+

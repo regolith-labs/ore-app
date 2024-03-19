@@ -23,6 +23,19 @@ pub fn Download(cx: Scope) -> Element {
                     // "Currently the only way to install the Ore miner desktop app is to compile the source code from scratch. "
                     // "You can do this by downloading the code from the Github repository and following the build process described in the README."
                 }
+                a {
+                    href: "https://github.com/HardhatChad/ore-app/releases/download/0.0.1/Ore-MacOS.zip",
+                    "Click here to download"
+                }
+                p {
+                    class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
+                    "Build from scratch"
+                }
+                p {
+                    "Coming soon..."
+                    // "Currently the only way to install the Ore miner desktop app is to compile the source code from scratch. "
+                    // "You can do this by downloading the code from the Github repository and following the build process described in the README."
+                }
                 p {
                     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                     "CLI"
