@@ -32,7 +32,7 @@ pub fn Download(cx: Scope) -> Element {
                     "Click here to download"
                 }
                 p {
-                    class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
+                    class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                     "Build from scratch"
                 }
                 p {
