@@ -11,7 +11,7 @@ readme = "./README.md"
 keywords = ["solana", "crypto", "mining"]
 
 [features]
-default = []
+default = ["desktop"]
 bundle = []
 desktop = [
     "async-tungstenite",

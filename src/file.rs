@@ -11,7 +11,7 @@ fn filepath() -> PathBuf {
         // This gives you a platform-specific config directory
         // For example, on Windows, this might be C:\Users\Username\AppData\Roaming\YourCompany\YourApp\config
         // On Linux, /home/username/.config/YourApp, and on macOS, /Users/username/Library/Application Support/com.YourCompany.YourApp
-        proj_dirs.config_dir().join("config.json");
+        proj_dirs.config_dir().join("config.json")
     } else {
         panic!("Can't load project directory")
     }
