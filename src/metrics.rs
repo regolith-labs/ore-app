@@ -44,7 +44,12 @@ extern "C" {
     fn trackEvent(name: &str, value: Option<u32>) -> Result<(), JsValue>;
 }
 
+#[cfg(feature = "web")]
 pub fn track(event: AppEvent, value: Option<u32>) {
-    #[cfg(feature = "web")]
     trackEvent(event.to_string().as_str(), value).ok();
+}
+
+#[cfg(feature = "desktop")]
+pub fn track(_event: AppEvent, _value: Option<u32>) {
+    // Noop
 }

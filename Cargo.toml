@@ -12,6 +12,7 @@ keywords = ["solana", "crypto", "mining"]
 
 [features]
 default = []
+bundle = []
 desktop = [
     "async-tungstenite",
     "dioxus-desktop",

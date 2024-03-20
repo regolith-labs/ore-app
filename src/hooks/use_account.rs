@@ -4,10 +4,6 @@ use std::time::Duration;
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::{use_rw, UseRw};
 use ore::utils::AccountDeserialize;
-#[cfg(feature = "desktop")]
-use solana_account_decoder::UiAccountData;
-#[cfg(feature = "desktop")]
-use solana_client::pubsub_client::PubsubClient;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 #[cfg(feature = "desktop")]

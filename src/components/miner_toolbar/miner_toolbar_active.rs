@@ -2,10 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::Link;
 
 use crate::{
-    components::{
-        ActivityIndicator, IsToolbarOpen, MinerDisplayHash, OreIcon, Spinner, StopButton, Tooltip,
-        TooltipDirection, WarningIcon,
-    },
+    components::{ActivityIndicator, IsToolbarOpen, MinerDisplayHash, Spinner, StopButton},
     hooks::{use_power_level, use_priority_fee, PowerLevel, PriorityFee},
     metrics::{track, AppEvent},
     miner::Miner,
@@ -218,43 +215,6 @@ pub fn PowerLevelConfig(cx: Scope) -> Element {
                 p {
                     class: "my-auto",
                     "%"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn MinerDataOre<'a>(cx: Scope, title: &'a str, tooltip: &'a str, amount: String) -> Element {
-    let container_class = "flex flex-col gap-0 shrink h-min";
-    let header_container_class = "flex flex-row justify-start gap-1.5";
-    let header_class = "font-medium text-xs z-0 text-nowrap opacity-80";
-    let value_class = "font-medium text-white h-8";
-    render! {
-        div {
-            class: "{container_class} w-full",
-            div {
-                class: "{header_container_class}",
-                p {
-                    class: "{header_class}",
-                    "{title}"
-                }
-                Tooltip {
-                    text: "{tooltip}",
-                    direction: TooltipDirection::Right
-                }
-            }
-            div {
-                class: "flex flex-row gap-8",
-                p {
-                    class: "{value_class} flex flex-row flex-nowrap text-nowrap place-items-baseline",
-                    OreIcon {
-                        class: "w-4 h-4 my-auto",
-                    }
-                    span {
-                        class: "ml-1.5 my-auto",
-                        "{amount}"
-                    }
                 }
             }
         }

@@ -7,8 +7,6 @@ use futures::StreamExt;
 use gloo::net::websocket::{futures::WebSocket, Message, WebSocketError};
 use ore_types::Transfer;
 #[cfg(feature = "desktop")]
-use solana_sdk::pubkey::Pubkey;
-#[cfg(feature = "desktop")]
 use url::Url;
 
 #[cfg(feature = "web")]

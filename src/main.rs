@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "bundle", windows_subsystem = "windows")]
 #![allow(non_snake_case)]
 use std::rc::Rc;
 
@@ -38,10 +39,8 @@ fn main() {
 #[cfg(feature = "desktop")]
 fn main() {
     env_logger::init();
-    // dioxus_desktop::launch_cfg(
-    dioxus_desktop::launch::launch(
+    dioxus_desktop::launch_cfg(
         App,
-        vec![],
         dioxus_desktop::Config::new()
             .with_custom_head(r#"<link rel="stylesheet" href="public/tailwind.css">"#.to_string()),
     );
