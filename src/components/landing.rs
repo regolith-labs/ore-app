@@ -72,7 +72,7 @@ fn Hero(cx: Scope) -> Element {
     render! {
         div {
             class: "flex flex-col w-full h-screen z-20 bg-cover bg-center",
-            style: "background-image: url(/smoke-9.jpg)",
+            style: "background-image: url(/smoke.jpg)",
             Navbar {}
             div {
                 class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",
