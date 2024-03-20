@@ -6,9 +6,15 @@ use std::io::{self, ErrorKind, Read, Write};
 use std::path::{Path, PathBuf};
 
 fn filepath() -> PathBuf {
-    home::home_dir()
-        .unwrap_or_default()
-        .join(Path::new(".config/ore/config.json"))
+    if let Some(proj_dirs) = ProjectDirs::from("com", "ore", "app") {
+        // This gives you a platform-specific config directory
+        // For example, on Windows, this might be C:\Users\Username\AppData\Roaming\YourCompany\YourApp\config
+        // On Linux, /home/username/.config/YourApp, and on macOS, /Users/username/Library/Application Support/com.YourCompany.YourApp
+        let config_path = proj_dirs.config_dir().join("config.json");
+        Some(config_path)
+    } else {
+        panic!("Can't load project directory")
+    }
 }
 
 fn read_storage() -> io::Result<Map<String, Value>> {
