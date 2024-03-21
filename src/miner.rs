@@ -207,7 +207,7 @@ pub async fn submit_solution(
         // Submit restart epoch tx, if needed
         if clock.unix_timestamp.ge(&epoch_end_at) {
             let ix = ore::instruction::reset(signer.pubkey());
-            gateway.send_and_confirm(&[ix]).await?;
+            gateway.send_and_confirm(&[ix]).await.ok();
         }
 
         // Submit mine tx
