@@ -1889,6 +1889,11 @@ h2:where(.dark, .dark *) {
   background-color: rgb(0 184 124 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-green-500:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(10 207 134 / var(--tw-bg-opacity));
+}
+
 .hover\:text-black:hover {
   --tw-text-opacity: 1;
   color: rgb(29 29 31 / var(--tw-text-opacity));

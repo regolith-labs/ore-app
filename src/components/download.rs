@@ -22,11 +22,11 @@ pub fn Download(cx: Scope) -> Element {
                     "Desktop"
                 }
                 p {
-                    "The Ore desktop app helps miners avoid the limitations of browser-based mining and get the most out of their machine. "
+                    "Use the Ore desktop app to avoid the limitations of browser-based mining and get the most out of your machine. "
                 }
                 li {
                     a {
-                        class: "font-semibold hover:underline",
+                        class: "font-semibold hover:underline hover:bg-green-500",
                         href: "{DESKTOP_DOWNLOAD_MAC}",
                         "Download for Mac"
                     }
@@ -39,20 +39,10 @@ pub fn Download(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
-                    "Build from scratch"
-                }
-                p {
-                    "Coming soon..."
-                    // "Currently the only way to install the Ore miner desktop app is to compile the source code from scratch. "
-                    // "You can do this by downloading the code from the Github repository and following the build process described in the README."
-                }
-                p {
-                    class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                     "CLI"
                 }
                 p {
-                    "The Ore command line interface (CLI) is designed for miners who want to get the most out of their machine. "
-                    "You can install it on any computer or server to run an Ore miner in the background. "
+                    "Use the Ore CLI to run a miner on any machine. "
                     "To get started, ensure you have Rust and cargo installed. "
                 }
                 CodeBlock {
