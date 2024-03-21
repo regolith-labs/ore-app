@@ -117,4 +117,3 @@ long_description = "Ore is a digital currency you can mine from anywhere, at hom
 osx_url_schemes = ["com.ore.app"]
 info_plist = "Info.plist"
 icon = ["Icon.icns"]
-
