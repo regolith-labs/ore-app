@@ -202,7 +202,7 @@ pub async fn submit_solution(
         // Check if epoch needs to be reset
         let treasury = gateway.get_treasury().await?;
         let clock = gateway.get_clock().await?;
-        let epoch_end_at = treasury.epoch_start_at.saturating_add(EPOCH_DURATION);
+        let epoch_end_at = treasury.last_reset_at.saturating_add(EPOCH_DURATION);
 
         // Submit restart epoch tx, if needed
         if clock.unix_timestamp.ge(&epoch_end_at) {
