@@ -22,14 +22,20 @@ pub fn Download(cx: Scope) -> Element {
                     "Desktop"
                 }
                 p {
-                    "Coming soon..."
-                    // "Currently the only way to install the Ore miner desktop app is to compile the source code from scratch. "
-                    // "You can do this by downloading the code from the Github repository and following the build process described in the README."
+                    "The Ore desktop app helps miners avoid the limitations of browser-based mining and get the most out of their machine. "
                 }
-                a {
-                    class: "font-semibold hover:underline",
-                    href: "{DESKTOP_DOWNLOAD_MAC}",
-                    "Click here to download"
+                li {
+                    a {
+                        class: "font-semibold hover:underline",
+                        href: "{DESKTOP_DOWNLOAD_MAC}",
+                        "Download for Mac"
+                    }
+                }
+                li {
+                    "Linux coming soon..."
+                }
+                li {
+                    "Windows coming soon..."
                 }
                 p {
                     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
