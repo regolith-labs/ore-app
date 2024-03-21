@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use crate::components::CodeBlock;
 
 const DESKTOP_DOWNLOAD_MAC: &str =
-    "https://github.com/HardhatChad/ore-app/releases/download/0.0.2/Ore-MacOS.zip";
+    "https://github.com/HardhatChad/ore-app/releases/download/0.0.3/Ore-MacOS.zip";
 
 #[component]
 pub fn Download(cx: Scope) -> Element {
@@ -32,10 +32,10 @@ pub fn Download(cx: Scope) -> Element {
                     }
                 }
                 li {
-                    "Linux coming soon..."
+                    "Linux (coming soon...)"
                 }
                 li {
-                    "Windows coming soon..."
+                    "Windows (coming soon...)"
                 }
                 p {
                     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
