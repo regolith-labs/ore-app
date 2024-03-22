@@ -137,10 +137,9 @@ impl Gateway {
         let mut transaction = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
         let recent_blockhash = self.rpc.get_latest_blockhash().await.unwrap();
         transaction.sign(&[&signer], recent_blockhash);
-        self.rpc
-            .send_and_confirm_transaction(&transaction)
-            .await
-            .or(Err(GatewayError::FailedTransaction))
+        let x = self.rpc.send_and_confirm_transaction(&transaction).await;
+        log::info!("X: {:?}", x);
+        x.or(Err(GatewayError::FailedTransaction))
     }
 
     // Ore

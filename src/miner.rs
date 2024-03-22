@@ -199,6 +199,7 @@ pub async fn submit_solution(
     let nonce = res.nonce;
     let signer = signer();
     loop {
+        log::info!("Looping...");
         // Check if epoch needs to be reset
         let treasury = gateway.get_treasury().await?;
         let clock = gateway.get_clock().await?;
