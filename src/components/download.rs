@@ -26,7 +26,7 @@ pub fn Download(cx: Scope) -> Element {
                 }
                 li {
                     a {
-                        class: "font-semibold hover:underline hover:bg-green-500",
+                        class: "font-semibold hover:underline hover:text-green-500",
                         href: "{DESKTOP_DOWNLOAD_MAC}",
                         "Download for Mac"
                     }
