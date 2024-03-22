@@ -76,19 +76,19 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between px-4 sm:px-8 py-8 bg-white",
+            class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between px-4 sm:px-8 py-8",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-2",
                 p {
-                    class: "text-3xl md:text-4xl lg:text-5xl text-black font-bold",
+                    class: "text-3xl md:text-4xl lg:text-5xl font-bold",
                     "Pay transaction fees"
                 }
                 p {
-                    class: "text-black text-lg",
+                    class: "text-lg",
                     "Scan the QR code from your Solana wallet to fund your miner."
                 }
                 p {
-                    class: "text-gray-300 text-sm",
+                    class: "text-sm text-gray-300 dark:text-gray-700",
                     "Top up with 0.1 SOL to begin mining."
                 }
             }
@@ -99,7 +99,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                     dangerous_inner_html: "{qrcode}",
                 }
                 Copyable {
-                    class: "mx-auto max-w-full text-black",
+                    class: "mx-auto max-w-full",
                     value: pubkey.to_string(),
                     p {
                         class: "rounded p-2 font-mono font-medium truncate",
@@ -111,7 +111,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 // TODO Get referal code
                 href: "https://www.coinbase.com/price/solana",
                 target: "_blank",
-                class: "font-medium text-center text-sm text-gray-300 hover:underline",
+                class: "font-medium text-center text-sm text-gray-300 dark:text-gray-700 hover:underline",
                 "Help! I don't have any SOL."
             }
         }

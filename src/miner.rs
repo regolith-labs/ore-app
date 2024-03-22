@@ -203,24 +203,18 @@ pub async fn submit_solution(
     let nonce = res.nonce;
     let signer = signer();
     loop {
-        log::info!("Looping...");
         // Check if epoch needs to be reset
         let treasury = gateway.get_treasury().await?;
-        log::info!("Got treasury: {:?}", treasury);
         let clock = gateway.get_clock().await?;
-        log::info!("Got clock: {:?}", clock);
         let epoch_end_at = treasury.last_reset_at.saturating_add(EPOCH_DURATION);
 
         // Submit restart epoch tx, if needed
         if clock.unix_timestamp.ge(&epoch_end_at) {
             let ix = ore::instruction::reset(signer.pubkey());
-            let x = gateway.send_and_confirm(&[ix]).await;
-            log::info!("Reset: {:?}", x);
-            x.ok();
+            gateway.send_and_confirm(&[ix]).await.ok();
         }
 
         // Submit mine tx
-        log::info!("Building min tx");
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(COMPUTE_UNIT_LIMIT);
         let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
         let ix = ore::instruction::mine(
@@ -229,7 +223,6 @@ pub async fn submit_solution(
             next_hash.into(),
             nonce,
         );
-        log::info!("IX: {:?}", ix);
         match gateway
             .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix])
             .await
@@ -237,7 +230,6 @@ pub async fn submit_solution(
             Ok(sig) => return Ok(sig),
             Err(_err) => {
                 // Retry on different bus.
-                log::info!("Err: {:?}", _err);
                 bus_id += 1;
                 if bus_id.ge(&ore::BUS_COUNT) {
                     bus_id = 0;

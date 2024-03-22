@@ -31,33 +31,33 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
             div {
                 class: "flex flex-col grow w-full gap-4 px-4 py-6 sm:px-8",
                 div {
-                    class: "flex flex-row w-full justify-between",
-                    h2 {
-                        class: "text-3xl md:text-4xl lg:text-5xl text-white font-bold",
-                        "Mining"
-                    }
+                    class: "flex flex-col w-full gap-2",
                     div {
-                        class: "my-auto",
-                        StopButton {
-                            miner: cx.props.miner.clone()
+                        class: "flex flex-row w-full justify-between",
+                        h2 {
+                            class: "text-3xl md:text-4xl lg:text-5xl text-white font-bold",
+                            "Mining"
+                        }
+                        div {
+                            class: "my-auto",
+                            StopButton {
+                                miner: cx.props.miner.clone()
+                            }
                         }
                     }
-                }
-                div {
-                    class: "flex flex-col gap-2 sm:gap-3 w-full",
-                    div {
-                        class: "flex flex-row gap-4",
-                        match miner_status_message {
-                            MinerStatusMessage::Searching => {
-                                render! {
-                                    p {
-                                        class: "text-lg text-white",
-                                        "Searching for a valid hash..."
-                                    }
+                    match miner_status_message {
+                        MinerStatusMessage::Searching => {
+                            render! {
+                                p {
+                                    class: "text-lg text-white",
+                                    "Searching for a valid hash..."
                                 }
                             }
-                            MinerStatusMessage::Submitting => {
-                                render! {
+                        }
+                        MinerStatusMessage::Submitting => {
+                            render! {
+                                div {
+                                    class: "flex flex-row gap-2",
                                     p {
                                         class: "text-lg text-white",
                                         "Submitting hash for validation..."
@@ -67,25 +67,25 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                     }
                                 }
                             }
-                            MinerStatusMessage::Error => {
-                                render! {
-                                    p {
-                                        class: "text-lg text-white",
-                                        "Error submit transaction"
-                                    }
+                        }
+                        MinerStatusMessage::Error => {
+                            render! {
+                                p {
+                                    class: "text-lg text-white",
+                                    "Error submit transaction"
                                 }
                             }
-                            _ => None
                         }
+                        _ => None
                     }
                     p {
                         class: "font-mono text-sm truncate opacity-80",
                         "{miner_display_hash}"
                     }
-                    PriorityFeeConfig {}
-                    PowerLevelConfig {}
-                    DownloadLink {}
                 }
+                PriorityFeeConfig {}
+                PowerLevelConfig {}
+                DownloadLink {}
             }
         }
     } else {
@@ -181,6 +181,9 @@ pub fn PriorityFeeConfig(cx: Scope) -> Element {
 #[component]
 pub fn PowerLevelConfig(cx: Scope) -> Element {
     let power_level = use_power_level(cx);
+    if cfg!(feature = "web") {
+        return None;
+    }
     render! {
         div {
             class: "flex flex-row gap-8 justify-between mt-8",
