@@ -4,8 +4,6 @@ use dioxus_std::utils::rw::use_rw;
 use solana_client::pubsub_client::PubsubClient;
 
 use crate::gateway::AsyncResult;
-#[cfg(feature = "desktop")]
-use crate::gateway::RPC_WSS_URL;
 
 use super::{use_gateway, use_pubkey};
 

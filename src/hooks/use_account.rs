@@ -12,8 +12,6 @@ use solana_sdk::pubkey::Pubkey;
 use web_time::Duration;
 
 use crate::gateway::AsyncResult;
-#[cfg(feature = "desktop")]
-use crate::gateway::RPC_WSS_URL;
 
 use super::use_gateway;
 
