@@ -4331,7 +4331,7 @@ dependencies = [
 
 [[package]]
 name = "ore-app"
-version = "0.0.1"
+version = "0.0.4"
 dependencies = [
  "async-std",
  "async-tungstenite",
