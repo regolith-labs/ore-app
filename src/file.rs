@@ -4,7 +4,7 @@ use serde::Serialize;
 use serde_json::{Map, Value};
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, ErrorKind, Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 fn filepath() -> PathBuf {
     if let Some(proj_dirs) = ProjectDirs::from("com", "ore", "app") {
