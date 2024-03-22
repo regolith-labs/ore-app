@@ -230,12 +230,9 @@ fn DownloadLink(cx: Scope) -> Element {
         render! {
             div {
                 class: "flex flex-row gap-2 mt-8",
-                // WarningIcon {
-                //     class: "w-5 h-5",
-                // }
                 p {
                     class: "text-sm my-auto",
-                    "You are mining from a web browser. To access higher power levels, "
+                    "You are mining from a web browser. To avoid background throttling, "
                     Link {
                         to: Route::Download {},
                         class: "font-medium underline",
