@@ -62,8 +62,9 @@ use crate::metrics::{track, AppEvent};
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
     "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
-pub const RPC_WSS_URL: &str =
-    "wss://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+// "https://emelia-3g4m0w-fast-devnet.helius-rpc.com/";
+
+#[cfg(feature = "desktop")]
 pub const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 pub struct Gateway {
@@ -134,10 +135,13 @@ impl Gateway {
 
     pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {
         let signer = signer();
-        let mut transaction = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
-        let recent_blockhash = self.rpc.get_latest_blockhash().await.unwrap();
-        transaction.sign(&[&signer], recent_blockhash);
-        let x = self.rpc.send_and_confirm_transaction(&transaction).await;
+        let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
+        let hash = self.rpc.get_latest_blockhash().await.unwrap();
+        log::info!("HASH: {:?}", hash);
+        tx.sign(&[&signer], hash);
+        log::info!("Signed...");
+        log::info!("TX: {:?}", tx);
+        let x = self.rpc.send_and_confirm_transaction(&tx).await;
         log::info!("X: {:?}", x);
         x.or(Err(GatewayError::FailedTransaction))
     }
