@@ -177,15 +177,11 @@ pub fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) 
             signer.as_ref(),
             nonce.to_le_bytes().as_slice(),
         ]);
-        if nonce % 10_000 == 0 {
-            log::info!("Nonce: {:?}", nonce);
-        }
         if next_hash.le(&difficulty) {
             break;
         }
         nonce += 1;
     }
-    log::info!("Got mining result: {:?}", next_hash);
     MiningResult {
         hash: next_hash,
         nonce,
