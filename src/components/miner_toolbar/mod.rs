@@ -95,32 +95,28 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         let priority_fee = priority_fee.clone();
         async move {
             while let Ok(res) = rx.recv().await {
-                'submit: loop {
-                    *miner_display_hash.write() = MinerDisplayHash(res.hash);
-                    *miner_status_message.write() = MinerStatusMessage::Submitting;
-                    let priority_fee = priority_fee.read().0;
-                    match submit_solution(&gateway, &res, priority_fee).await {
-                        Ok(_sig) => {
-                            proof_.restart();
-                            if let MinerStatus::Active = *status.read() {
-                                if let Ok(treasury) = gateway.get_treasury().await {
-                                    if let Ok(proof) = gateway.get_proof(pubkey).await {
-                                        miner.start_mining(
-                                            proof.hash.into(),
-                                            treasury.difficulty.into(),
-                                            pubkey,
-                                        );
-                                        *miner_status_message.write() =
-                                            MinerStatusMessage::Searching;
-                                        break 'submit;
-                                    }
+                *miner_display_hash.write() = MinerDisplayHash(res.hash);
+                *miner_status_message.write() = MinerStatusMessage::Submitting;
+                let priority_fee = priority_fee.read().0;
+                match submit_solution(&gateway, &res, priority_fee).await {
+                    Ok(_sig) => {
+                        proof_.restart();
+                        if let MinerStatus::Active = *status.read() {
+                            if let Ok(treasury) = gateway.get_treasury().await {
+                                if let Ok(proof) = gateway.get_proof(pubkey).await {
+                                    miner.start_mining(
+                                        proof.hash.into(),
+                                        treasury.difficulty.into(),
+                                        pubkey,
+                                    );
+                                    *miner_status_message.write() = MinerStatusMessage::Searching;
                                 }
                             }
                         }
-                        Err(err) => {
-                            *miner_status_message.write() = MinerStatusMessage::Error;
-                            log::error!("Failed to submit hash: {:?}", err);
-                        }
+                    }
+                    Err(err) => {
+                        *miner_status_message.write() = MinerStatusMessage::Error;
+                        log::error!("Failed to submit hash: {:?}", err);
                     }
                 }
             }
@@ -158,7 +154,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                 *is_toolbar_open.write() = IsToolbarOpen(true);
             },
             div {
-                class: "flex flex-row justify-between w-full max-w-[96rem] mx-auto",
+                class: "flex flex-row justify-between w-full max-w-[96rem] mx-auto h-full",
                 match *miner_status.read() {
                     MinerStatus::NotStarted => {
                         render! {

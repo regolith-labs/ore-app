@@ -79,7 +79,8 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
             class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between px-4 sm:px-8 py-8 bg-white",
             div {
                 class: "flex flex-col gap-3",
-                h2 {
+                p {
+                    class: "text-3xl md:text-4xl lg:text-5xl text-black font-bold",
                     "Pay transaction fees"
                 }
                 p {
@@ -98,7 +99,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                     dangerous_inner_html: "{qrcode}",
                 }
                 Copyable {
-                    class: "mx-auto max-w-full",
+                    class: "mx-auto max-w-full text-black",
                     value: pubkey.to_string(),
                     p {
                         class: "rounded p-2 font-mono font-medium truncate",
