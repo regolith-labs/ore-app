@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use crate::components::CodeBlock;
 
 const DESKTOP_DOWNLOAD_MAC: &str =
-    "https://github.com/HardhatChad/ore-app/releases/download/0.0.5/Ore-MacOS.zip";
+    "https://github.com/HardhatChad/ore-app/releases/download/0.0.6/Ore-MacOS.zip";
 
 #[component]
 pub fn Download(cx: Scope) -> Element {
