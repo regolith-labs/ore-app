@@ -79,7 +79,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         _ => None
                     }
                     p {
-                        class: "font-mono text-sm truncate opacity-80",
+                        class: "font-mono text-sm truncate shrink opacity-80",
                         "{miner_display_hash}"
                     }
                 }
@@ -91,19 +91,22 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
     } else {
         render! {
             div {
-                class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
+                class: "flex flex-row gap-2 max-w-screen w-screen justify-start my-auto px-4 sm:px-8 object-contain",
                 div {
-                    class: "flex flex-row gap-2 my-auto",
+                    class: "flex-shrink-0 flex-none my-auto",
                     ActivityIndicator {}
-                    p {
-                        class: "font-semibold text-white",
-                        "Mining"
-                    }
+                }
+                p {
+                    class: "font-semibold text-white flex-shrink-0 flex-none my-auto",
+                    "Mining"
+                }
+                div {
+                    class: "flex-shrink flex-auto truncate my-auto",
                     match miner_status_message {
                         MinerStatusMessage::Searching => {
                             render! {
                                 p {
-                                    class: "font-mono text-sm truncate opacity-80 my-auto ml-2",
+                                    class: "font-mono text-sm truncate flex-shrink flex-auto opacity-80 my-auto ml-2",
                                     "{miner_display_hash}"
                                 }
                             }
@@ -111,7 +114,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         MinerStatusMessage::Submitting => {
                             render! {
                                 p {
-                                    class: "text-sm text-white opacity-80 my-auto ml-2",
+                                    class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
                                     "Submitting hash for validation..."
                                 }
                             }
@@ -119,7 +122,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         MinerStatusMessage::Error => {
                             render! {
                                 p {
-                                    class: "text-sm text-white opacity-80 my-auto ml-2",
+                                    class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
                                     "Error submitting transaction"
                                 }
                             }
@@ -127,8 +130,11 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                         _ => None
                     }
                 }
-                StopButton {
-                    miner: cx.props.miner.clone()
+                div {
+                    class: "flex-shrink-0 flex-none ml-auto my-auto",
+                    StopButton {
+                        miner: cx.props.miner.clone()
+                    }
                 }
             }
         }

@@ -149,7 +149,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
 
     render! {
         div {
-            class: "{class} {height} {bg} {display}",
+            class: "{class} {height} {bg} {display} w-screen",
             onclick: move |_e| {
                 *is_toolbar_open.write() = IsToolbarOpen(true);
             },

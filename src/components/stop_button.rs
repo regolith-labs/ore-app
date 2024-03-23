@@ -12,7 +12,7 @@ pub fn StopButton(cx: Scope, miner: UseState<Miner>) -> Element {
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     render! {
         button {
-            class: "transition transition-colors flex w-10 h-10 justify-center rounded-full hover:bg-green-600 active:bg-green-700",
+            class: "transition transition-colors flex-shrink-0 flex w-10 h-10 justify-center rounded-full hover:bg-green-600 active:bg-green-700",
             title: "Stop mining",
             onclick: move |_e| {
                 track(AppEvent::StopMiner, None);

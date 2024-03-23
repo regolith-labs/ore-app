@@ -16,7 +16,6 @@ use crate::{components::ActivityFilter, gateway::AsyncResult};
 
 use super::use_pubkey;
 
-// const URL: &str = "ws://54.86.50.170:3001/ws";
 const URL: &str = "wss://ore-websockets.onrender.com/ws";
 
 // TODO Attempt reconnect if connection is lost
