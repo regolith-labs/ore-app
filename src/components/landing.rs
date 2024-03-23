@@ -11,6 +11,7 @@ use crate::{
     components::{ActivityFilter, ActivityIndicator, Footer, OreIcon, OreLogoIcon},
     gateway::AsyncResult,
     hooks::{use_is_onboarded, use_ore_supply, use_transfers, use_treasury},
+    utils::asset_path,
     Route,
 };
 
@@ -69,10 +70,11 @@ fn Navbar(cx: Scope) -> Element {
 
 #[component]
 fn Hero(cx: Scope) -> Element {
+    let bg_img = asset_path("smoke.jpg");
     render! {
         div {
             class: "flex flex-col w-full h-screen z-20 bg-cover bg-center",
-            style: "background-image: url(/smoke.jpg)",
+            style: "background-image: url({bg_img})",
             Navbar {}
             div {
                 class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",

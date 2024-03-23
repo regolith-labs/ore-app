@@ -16,6 +16,7 @@ mod hooks;
 mod metrics;
 mod miner;
 mod route;
+mod utils;
 #[cfg(feature = "web")]
 mod worker;
 
@@ -38,11 +39,13 @@ fn main() {
 
 #[cfg(feature = "desktop")]
 fn main() {
+    use utils::asset_path;
     env_logger::init();
+    let tailwind_path = asset_path("tailwind.css");
+    let custom_head = format!(r#"<link rel="stylesheet" href="{}">"#, tailwind_path);
     dioxus_desktop::launch_cfg(
         App,
-        dioxus_desktop::Config::new()
-            .with_custom_head(r#"<link rel="stylesheet" href="tailwind.css">"#.to_string()),
+        dioxus_desktop::Config::new().with_custom_head(custom_head),
     );
 }
 
