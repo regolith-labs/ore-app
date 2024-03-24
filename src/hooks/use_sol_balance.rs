@@ -32,43 +32,43 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
         }
     });
 
-    // // Subscribe to balance changes
-    // use_future(cx, (), |_| {
-    //     #[cfg(feature = "web")]
-    //     let gateway = gateway.clone();
-    //     let balance_ = balance_.clone();
-    //     async move {
-    //         #[cfg(feature = "web")]
-    //         let _ = gateway
-    //             .rpc
-    //             .account_subscribe(address, move |account| {
-    //                 let lamports = account.value.unwrap().lamports;
-    //                 balance_.write(AsyncResult::Ok(SolBalance(lamports))).ok();
-    //             })
-    //             .await;
+    // Subscribe to balance changes
+    use_future(cx, (), |_| {
+        #[cfg(feature = "web")]
+        let gateway = gateway.clone();
+        let balance_ = balance_.clone();
+        async move {
+            #[cfg(feature = "web")]
+            let _ = gateway
+                .rpc
+                .account_subscribe(address, move |account| {
+                    let lamports = account.value.unwrap().lamports;
+                    balance_.write(AsyncResult::Ok(SolBalance(lamports))).ok();
+                })
+                .await;
 
-    //         #[cfg(feature = "desktop")]
-    //         std::thread::spawn(move || {
-    //             match PubsubClient::account_subscribe(
-    //                 RPC_WSS_URL,
-    //                 &address,
-    //                 Some(solana_client::rpc_config::RpcAccountInfoConfig::default()),
-    //             ) {
-    //                 Ok((mut _sub, rx)) => {
-    //                     while let Ok(ui_account) = rx.recv() {
-    //                         let lamports = ui_account.value.lamports;
-    //                         balance_
-    //                             .write(AsyncResult::Ok(SolBalance(lamports)))
-    //                             .unwrap();
-    //                     }
-    //                 }
-    //                 Err(err) => {
-    //                     log::error!("Failed to subscribe to account: {:?}", err)
-    //                 }
-    //             };
-    //         });
-    //     }
-    // });
+            #[cfg(feature = "desktop")]
+            std::thread::spawn(move || {
+                match PubsubClient::account_subscribe(
+                    RPC_WSS_URL,
+                    &address,
+                    Some(solana_client::rpc_config::RpcAccountInfoConfig::default()),
+                ) {
+                    Ok((mut _sub, rx)) => {
+                        while let Ok(ui_account) = rx.recv() {
+                            let lamports = ui_account.value.lamports;
+                            balance_
+                                .write(AsyncResult::Ok(SolBalance(lamports)))
+                                .unwrap();
+                        }
+                    }
+                    Err(err) => {
+                        log::error!("Failed to subscribe to account: {:?}", err)
+                    }
+                };
+            });
+        }
+    });
 
     // Write balance_ changes to shared state
     let balance__ = *balance_.read().unwrap();

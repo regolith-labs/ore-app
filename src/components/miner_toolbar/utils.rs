@@ -18,19 +18,19 @@ use super::MinerStatusMessage;
 
 pub async fn try_start_mining(
     gateway: &Rc<Gateway>,
-    balance: u64,
+    // balance: u64,
     miner: &Miner,
     status_message: &UseSharedState<MinerStatusMessage>,
 ) -> GatewayResult<bool> {
-    if balance.eq(&0) {
-        return Ok(false);
-    }
+    // if balance.eq(&0) {
+    //     return Ok(false);
+    // }
 
     // Mark miner as inactive, if insufficient balance
-    const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(100);
-    if balance.ge(&0) && balance.lt(&MIN_BALANCE) {
-        return Ok(false);
-    }
+    // const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(100);
+    // if balance.ge(&0) && balance.lt(&MIN_BALANCE) {
+    //     return Ok(false);
+    // }
 
     // Create token account, if needed
     *status_message.write() = MinerStatusMessage::CreatingTokenAccount;
