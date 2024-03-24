@@ -1,6 +1,6 @@
 [package]
 name = "ore-app"
-version = "0.0.6"
+version = "0.0.7"
 description = "Ore is a digital currency you can mine from anywhere, at home or on your phone."
 edition = "2021"
 license = "Apache-2.0"
@@ -108,7 +108,7 @@ solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/
 [package.metadata.bundle]
 name = "Ore"
 identifier = "com.ore.app"
-version = "0.0.6"
+version = "0.0.7"
 resources = ["public"]
 copyright = "Copyright (c) Hardhat Chad 2024. All rights reserved."
 category = "Finance"
