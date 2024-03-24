@@ -73,26 +73,29 @@ fn Hero(cx: Scope) -> Element {
     let bg_img = asset_path("smoke.jpg");
     render! {
         div {
-            class: "flex flex-col w-full h-screen z-20 bg-cover bg-center",
-            style: "background-image: url({bg_img})",
-            Navbar {}
+            class: "bg-white",
             div {
-                class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",
+                class: "flex flex-col w-full h-screen z-20 bg-cover bg-center",
+                style: "background-image: url({bg_img})",
+                Navbar {}
                 div {
-                    class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8",
-                    p {
-                        class: "text-center text-4xl min-[480px]:text-5xl min-[600px]:text-6xl md:text-7xl lg:text-8xl font-bold font-hero",
-                        "It's time to mine."
+                    class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",
+                    div {
+                        class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8",
+                        p {
+                            class: "text-center text-4xl min-[480px]:text-5xl min-[600px]:text-6xl md:text-7xl lg:text-8xl font-bold font-hero",
+                            "It's time to mine."
+                        }
+                        p {
+                            class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center max-w-[46rem] font-hero leading-7",
+                            "Ore is a digital currency you can mine from anywhere, at home or on your phone."
+                        }
                     }
-                    p {
-                        class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center max-w-[46rem] font-hero leading-7",
-                        "Ore is a digital currency you can mine from anywhere, at home or on your phone."
+                    Link {
+                        class: "mx-auto sm:text-lg md:text-xl lg:text-2xl font-semibold bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transition-colors rounded-full px-6 py-3",
+                        to: Route::Home {},
+                        "Get started →"
                     }
-                }
-                Link {
-                    class: "mx-auto sm:text-lg md:text-xl lg:text-2xl font-semibold bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transition-colors rounded-full px-6 py-3",
-                    to: Route::Home {},
-                    "Get started →"
                 }
             }
         }
