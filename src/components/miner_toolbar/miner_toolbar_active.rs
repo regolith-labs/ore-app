@@ -201,7 +201,7 @@ pub fn PowerLevelConfig(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-white text-xs opacity-80 max-w-96",
-                    "Configure how much of your device's computing capacity your miner can utilize."
+                    "Configure how much of your device's computing capacity to utilize while mining."
                 }
 
             }
