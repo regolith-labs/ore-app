@@ -36,7 +36,7 @@ use crate::{
 };
 
 /// The compute unit limit for mine transactions.
-const COMPUTE_UNIT_LIMIT: u32 = 3230;
+const COMPUTE_UNIT_LIMIT: u32 = 3300;
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
