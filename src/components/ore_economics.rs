@@ -26,7 +26,6 @@ pub fn OreTokenomics(cx: Scope) -> Element {
                 "(Coming soon...)"
             }
             p {
-                // "(In short, 1 new ORE token is mined every 60 seconds on average no matter how many miners are active on the network)"
                 "Here are the key points:"
                 li {
                     class: "ml-2",
@@ -34,11 +33,7 @@ pub fn OreTokenomics(cx: Scope) -> Element {
                 }
                 li {
                     class: "ml-2",
-                    "Ore supply growth is linear with a target average of 1 ORE/min."
-                }
-                li {
-                    class: "ml-2",
-                    "Ore supply growth is strictly bounded to 0 ≤ R ≤ 2 ORE/min."
+                    "Ore supply grows at a linear rate of 1 ORE/min."
                 }
                 li {
                     class: "ml-2",
@@ -50,7 +45,7 @@ pub fn OreTokenomics(cx: Scope) -> Element {
                 }
                 li {
                     class: "ml-2",
-                    "This will be true for future generations of users as it is today."
+                    "This will be true for all future generations of users as it is today."
                 }
             }
         }
