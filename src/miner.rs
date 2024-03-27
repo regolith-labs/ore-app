@@ -36,7 +36,10 @@ use crate::{
 };
 
 /// The compute unit limit for mine transactions.
-const COMPUTE_UNIT_LIMIT: u32 = 3300;
+const CU_LIMIT_MINE: u32 = 3300;
+
+/// The compute unit limit for reset transactions.
+const CU_LIMIT_RESET: u32 = 15000;
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -206,12 +209,13 @@ pub async fn submit_solution(
 
         // Submit restart epoch tx, if needed
         if clock.unix_timestamp.ge(&epoch_end_at) {
+            let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_RESET);
             let ix = ore::instruction::reset(signer.pubkey());
-            gateway.send_and_confirm(&[ix]).await.ok();
+            gateway.send_and_confirm(&[cu_limit_ix, ix]).await.ok();
         }
 
         // Submit mine tx
-        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(COMPUTE_UNIT_LIMIT);
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
         let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
         let ix = ore::instruction::mine(
             signer.pubkey(),
