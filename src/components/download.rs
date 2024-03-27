@@ -52,8 +52,7 @@ pub fn Download(cx: Scope) -> Element {
                     "Next, install the Solana CLI and create a Solana keypair if you haven't done so already. "
                 }
                 CodeBlock {
-                    text: "sh -c \"$(curl -sSfL https://release.solana.com/v1.18.4/install)\"
-                    \nsolana-keygen new"
+                    text: "sh -c \"$(curl -sSfL https://release.solana.com/v1.18.4/install)\"\nsolana-keygen new"
                 }
                 p {
                     "Now, install the Ore CLI."
