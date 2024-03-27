@@ -26,7 +26,6 @@ pub fn use_account<
     let gateway = use_gateway(cx);
 
     let f = use_future(cx, (), |_| {
-        log::info!("Refetching account: {:?}", address);
         let acc = acc.clone();
         let gateway = gateway.clone();
         async move {
@@ -42,8 +41,10 @@ pub fn use_account<
         let f = f.clone();
         async move {
             if let Some(d) = poll {
-                async_std::task::sleep(Duration::from_secs(d)).await;
-                f.restart();
+                loop {
+                    async_std::task::sleep(Duration::from_secs(d)).await;
+                    f.restart();
+                }
             }
         }
     });

@@ -85,11 +85,11 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "Scan the QR code from your Solana wallet to fund your miner."
+                    "Scan the QR code from your Solana wallet to top up your miner."
                 }
                 p {
-                    class: "text-sm text-gray-300 dark:text-gray-700",
-                    "Top up with 0.1 SOL to begin mining."
+                    class: "text-sm text-gray-300",
+                    "Your miner keypair is stored on your local device and can be exported at anytime from settings."
                 }
             }
             div {
@@ -111,7 +111,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
                 // TODO Get referal code
                 href: "https://www.coinbase.com/price/solana",
                 target: "_blank",
-                class: "font-medium text-center text-sm text-gray-300 dark:text-gray-700 hover:underline",
+                class: "font-medium text-center text-sm text-gray-300 hover:underline",
                 "Help! I don't have any SOL."
             }
         }

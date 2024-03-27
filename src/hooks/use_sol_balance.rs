@@ -1,5 +1,9 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::use_rw;
+#[cfg(feature = "deskstop")]
+use std::time::Duration;
+#[cfg(feature = "web")]
+use web_time::Duration;
 
 use crate::gateway::AsyncResult;
 
@@ -22,7 +26,7 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
     let gateway = use_gateway(cx);
 
     // Fetch initial balance.
-    use_future(cx, (), |_| {
+    let f = use_future(cx, (), |_| {
         let balance = balance.clone();
         let gateway = gateway.clone();
         async move {
@@ -32,41 +36,15 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
         }
     });
 
-    // Subscribe to balance changes
+    // Poll for future balance changes
     use_future(cx, (), |_| {
-        #[cfg(feature = "web")]
-        let gateway = gateway.clone();
-        let balance_ = balance_.clone();
+        let f = f.clone();
+        let poll = 3;
         async move {
-            #[cfg(feature = "web")]
-            let _ = gateway
-                .rpc
-                .account_subscribe(address, move |account| {
-                    let lamports = account.value.unwrap().lamports;
-                    balance_.write(AsyncResult::Ok(SolBalance(lamports))).ok();
-                })
-                .await;
-
-            #[cfg(feature = "desktop")]
-            std::thread::spawn(move || {
-                match PubsubClient::account_subscribe(
-                    RPC_WSS_URL,
-                    &address,
-                    Some(solana_client::rpc_config::RpcAccountInfoConfig::default()),
-                ) {
-                    Ok((mut _sub, rx)) => {
-                        while let Ok(ui_account) = rx.recv() {
-                            let lamports = ui_account.value.lamports;
-                            balance_
-                                .write(AsyncResult::Ok(SolBalance(lamports)))
-                                .unwrap();
-                        }
-                    }
-                    Err(err) => {
-                        log::error!("Failed to subscribe to account: {:?}", err)
-                    }
-                };
-            });
+            loop {
+                async_std::task::sleep(Duration::from_secs(poll)).await;
+                f.restart();
+            }
         }
     });
 
