@@ -19,14 +19,22 @@ pub fn CodeBlock<'a>(cx: Scope, text: &'a str) -> Element {
             }
         }
     });
+    let strs = text.split('\n');
     render! {
         div {
             class: "flex flex-row justify-between py-2 pl-4 pr-2 bg-gray-100 text-black dark:bg-gray-900 dark:text-white font-mono rounded",
-            p {
-                "{text}"
+            div {
+                class: "flex flex-col",
+                for s in strs {
+                    render! {
+                        p {
+                            "{s}"
+                        }
+                    }
+                }
             }
             button {
-                class: "flex shrink-0 px-2 py-1 rounded hover-100 active-200 transition-colors",
+                class: "flex shrink-0 px-2 py-1 mb-auto rounded hover-100 active-200 transition-colors",
                 onclick: move |_e| {
                     #[cfg(feature = "web")]
                     if let Some(cb) = clipboard.clone() {

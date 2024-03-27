@@ -53,7 +53,7 @@ pub fn Download(cx: Scope) -> Element {
                 }
                 CodeBlock {
                     text: "sh -c \"$(curl -sSfL https://release.solana.com/v1.18.4/install)\"
-                    solana-keygen new"
+                    \nsolana-keygen new"
                 }
                 p {
                     "Now, install the Ore CLI."
