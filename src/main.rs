@@ -66,26 +66,6 @@ fn App(cx: Scope) -> Element {
     use_ore_balance_provider(cx);
     use_sol_balance_provider(cx);
 
-    // Dark mode appearance
-    #[cfg(feature = "web")]
-    {
-        let appearance = use_appearance(cx);
-        use_effect(cx, appearance, |_| {
-            if let Some(window) = window() {
-                if let Some(document) = window.document() {
-                    if let Some(body) = document.body() {
-                        let classname = match *appearance.read() {
-                            Appearance::Dark => "dark",
-                            Appearance::Light => "",
-                        };
-                        body.set_class_name(classname);
-                    }
-                }
-            }
-            async move {}
-        });
-    }
-
     // Render
     render! {
         Router::<Route> {}

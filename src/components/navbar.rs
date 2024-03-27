@@ -4,16 +4,23 @@ use dioxus_router::prelude::*;
 use crate::{
     components::{Banner, BannerType, Footer, OreLogoIcon, OreWordmarkIcon, PieIcon, UserBubble},
     gateway::AsyncResult,
-    hooks::use_ping,
+    hooks::{use_appearance, use_ping},
     route::Route,
 };
+
+use super::Appearance;
 
 #[component]
 pub fn Navbar(cx: Scope) -> Element {
     let ping = use_ping(cx);
+    let appearance = use_appearance(cx);
+    let dark = match *appearance.read() {
+        Appearance::Dark => "dark",
+        Appearance::Light => "",
+    };
     render! {
         div {
-            class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white",
+            class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
             if let AsyncResult::Error(_) = ping {
                 render! {
                     Banner {

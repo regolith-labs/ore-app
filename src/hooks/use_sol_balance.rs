@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::use_rw;
-#[cfg(feature = "deskstop")]
+#[cfg(feature = "desktop")]
 use std::time::Duration;
 #[cfg(feature = "web")]
 use web_time::Duration;
