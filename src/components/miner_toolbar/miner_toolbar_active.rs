@@ -2,7 +2,9 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::Link;
 
 use crate::{
-    components::{ActivityIndicator, IsToolbarOpen, MinerDisplayHash, Spinner, StopButton},
+    components::{
+        ActivityIndicator, IsToolbarOpen, MinerDisplayHash, Spinner, StopButton, WarningIcon,
+    },
     hooks::{use_power_level, use_priority_fee, PowerLevel, PriorityFee},
     metrics::{track, AppEvent},
     miner::Miner,
@@ -236,9 +238,12 @@ fn DownloadLink(cx: Scope) -> Element {
         render! {
             div {
                 class: "flex flex-row gap-2 mt-8",
+                WarningIcon {
+                    class: "w-4 h-4 mt-2 shrink-0"
+                }
                 p {
                     class: "text-sm my-auto",
-                    "You are mining from a web browser. To avoid background throttling, "
+                    "You are mining from a web browser which can lead to inconsistent results when this tab moves into the background. For better performance, "
                     Link {
                         to: Route::Download {},
                         class: "font-medium underline",
