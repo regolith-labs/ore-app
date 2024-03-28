@@ -239,7 +239,7 @@ fn DownloadLink(cx: Scope) -> Element {
             div {
                 class: "flex flex-row gap-2 mt-8",
                 WarningIcon {
-                    class: "w-4 h-4 mt-2 shrink-0"
+                    class: "w-4 h-4 mt-1 shrink-0"
                 }
                 p {
                     class: "text-sm my-auto",
