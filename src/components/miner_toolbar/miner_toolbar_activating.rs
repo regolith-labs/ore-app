@@ -5,7 +5,7 @@ use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
-    components::{try_start_mining, IsToolbarOpen, MinerStatus, MinerStatusMessage},
+    components::{try_start_mining, IsToolbarOpen, MinerStatus, MinerStatusMessage, Spinner},
     gateway::AsyncResult,
     hooks::{use_gateway, use_sol_balance},
     miner::Miner,
@@ -69,17 +69,29 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
                 match *miner_status_message.read() {
                     MinerStatusMessage::CreatingTokenAccount => {
                         render! {
-                            p {
-                                class: "text-lg",
-                                "Creating token account..."
+                            div {
+                                class: "flex flex-row gap-2",
+                                p {
+                                    class: "text-lg",
+                                    "Creating token account..."
+                                }
+                                Spinner {
+                                    class: "my-auto text-white"
+                                }
                             }
                         }
                     }
                     MinerStatusMessage::GeneratingChallenge => {
                         render! {
-                            p {
-                                class: "text-lg",
-                                "Generating challenge..."
+                            div {
+                                class: "flex flex-row gap-2",
+                                p {
+                                    class: "text-lg",
+                                    "Generating challenge..."
+                                }
+                                Spinner {
+                                    class: "my-auto text-white"
+                                }
                             }
                         }
                     }
