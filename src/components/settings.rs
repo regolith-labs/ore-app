@@ -63,7 +63,8 @@ pub fn Settings(cx: Scope) -> Element {
                         class: "{data_title_class}",
                         "Private key"
                     }
-                    button {
+                    Link {
+                        to: Route::ExportKeyWarning {},
                         class: "flex flex-row shrink font-medium px-2 py-1 text-nowrap hover-100 active-200 rounded",
                         "Export"
                     }

@@ -29,7 +29,7 @@ pub fn Copyable<'a>(
         div {
             class: "flex flex-row justify-end truncate max-w-full {class}",
             button {
-                class: "flex shrink-0 px-2 py-1 rounded transition-colors hover-100 active-200",
+                class: "flex shrink-0 p-2 rounded transition-colors hover-100 active-200",
                 onclick: move |_e| {
                     #[cfg(feature = "web")]
                     if let Some(cb) = clipboard.clone() {

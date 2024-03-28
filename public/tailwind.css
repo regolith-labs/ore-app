@@ -947,6 +947,10 @@ h2:where(.dark, .dark *) {
   width: 100vw;
 }
 
+.w-8 {
+  width: 2rem;
+}
+
 .max-w-3xl {
   max-width: 48rem;
 }
