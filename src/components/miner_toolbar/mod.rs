@@ -104,6 +104,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                         if let MinerStatus::Active = *status.read() {
                             if let Ok(treasury) = gateway.get_treasury().await {
                                 if let Ok(proof) = gateway.get_proof(pubkey).await {
+                                    *miner_status_message.write() = MinerStatusMessage::Searching;
                                     miner
                                         .start_mining(
                                             proof.hash.into(),
@@ -111,7 +112,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                                             pubkey,
                                         )
                                         .await;
-                                    *miner_status_message.write() = MinerStatusMessage::Searching;
                                 }
                             }
                         }
