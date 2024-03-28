@@ -237,13 +237,13 @@ fn DownloadLink(cx: Scope) -> Element {
     if cfg!(feature = "web") {
         render! {
             div {
-                class: "flex flex-row gap-2 mt-8",
+                class: "flex flex-row gap-2 mt-8 p-8 rounded bg-green-400",
                 WarningIcon {
                     class: "w-4 h-4 mt-1 shrink-0"
                 }
                 p {
                     class: "text-sm my-auto",
-                    "You are mining from a web browser which can lead to inconsistent results when this tab moves into the background. For better performance, "
+                    "You are mining from a web browser. This can throttle your performance and lead to inconsistent results. To get the most out of your machine, "
                     Link {
                         to: Route::Download {},
                         class: "font-medium underline",
