@@ -20,8 +20,6 @@ mod utils;
 #[cfg(feature = "web")]
 mod worker;
 
-#[cfg(feature = "web")]
-use crate::{components::Appearance, hooks::use_appearance};
 use crate::{
     hooks::{
         use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
