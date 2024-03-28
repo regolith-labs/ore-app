@@ -870,6 +870,10 @@ h2:where(.dark, .dark *) {
   height: 100vh;
 }
 
+.h-12 {
+  height: 3rem;
+}
+
 .max-h-\[80vh\] {
   max-height: 80vh;
 }
@@ -949,6 +953,10 @@ h2:where(.dark, .dark *) {
 
 .w-8 {
   width: 2rem;
+}
+
+.w-12 {
+  width: 3rem;
 }
 
 .max-w-3xl {

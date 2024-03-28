@@ -10,7 +10,7 @@ use crate::{
 pub fn ExportKeyWarning(cx: Scope) -> Element {
     render! {
         div {
-            class: "flex flex-col gap-16 w-full h-full",
+            class: "flex flex-col gap-16 grow w-full h-full",
             div {
                 class: "flex flex-col gap-3 justify-start",
                 h2 {
@@ -35,7 +35,7 @@ pub fn ExportKeyWarning(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "Never share your private key or enter it into an app or website."
+                    "Never share your private key or enter it into another app or website."
                 }
             }
             div {

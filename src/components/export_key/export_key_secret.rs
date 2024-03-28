@@ -1,14 +1,18 @@
 use dioxus::prelude::*;
 use dioxus_router::prelude::Link;
 
-use crate::{components::EyeSlashIcon, hooks::use_keypair, route::Route};
+use crate::{
+    components::{Copyable, EyeSlashIcon},
+    hooks::use_keypair,
+    route::Route,
+};
 
 #[component]
 pub fn ExportKeySecret(cx: Scope) -> Element {
     let keypair = use_keypair(cx);
     render! {
         div {
-            class: "flex flex-col gap-16 w-full h-full",
+            class: "flex flex-col gap-16 grow w-full h-full",
             div {
                 class: "flex flex-col gap-3 justify-start",
                 h2 {
@@ -21,10 +25,13 @@ pub fn ExportKeySecret(cx: Scope) -> Element {
                 }
             }
             EyeSlashIcon {
-                class: "w-6 h-6"
+                class: "w-12 h-12 mx-auto opacity-50"
             }
-            div {
+            Copyable {
+                class: "mx-auto",
+                value: keypair.to_base58_string(),
                 p {
+                    class: "p-2",
                     "{keypair.to_base58_string()}"
                 }
             }
