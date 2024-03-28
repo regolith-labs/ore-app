@@ -37,13 +37,18 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
     });
 
     // Poll for future balance changes
-    use_future(cx, (), |_| {
+    use_future(cx, balance, |_| {
         let f = f.clone();
         let poll = 3;
+        let b = *balance.read();
         async move {
-            loop {
-                async_std::task::sleep(Duration::from_secs(poll)).await;
-                f.restart();
+            if let AsyncResult::Ok(b) = b {
+                if b.0.eq(&0) {
+                    loop {
+                        async_std::task::sleep(Duration::from_secs(poll)).await;
+                        f.restart();
+                    }
+                }
             }
         }
     });

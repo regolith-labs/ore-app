@@ -90,8 +90,9 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
     } else {
         render! {
             div {
+                class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
                 p {
-                    class: "font-medium my-auto",
+                    class: "font-semibold my-auto",
                     "Starting"
                 }
             }

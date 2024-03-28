@@ -104,11 +104,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                         if let MinerStatus::Active = *status.read() {
                             if let Ok(treasury) = gateway.get_treasury().await {
                                 if let Ok(proof) = gateway.get_proof(pubkey).await {
-                                    miner.start_mining(
-                                        proof.hash.into(),
-                                        treasury.difficulty.into(),
-                                        pubkey,
-                                    );
+                                    miner
+                                        .start_mining(
+                                            proof.hash.into(),
+                                            treasury.difficulty.into(),
+                                            pubkey,
+                                        )
+                                        .await;
                                     *miner_status_message.write() = MinerStatusMessage::Searching;
                                 }
                             }
@@ -127,7 +129,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
     let height = if is_open {
-        "max-h-[80vh] h-fit overflow-y-scroll"
+        "max-h-[80vh] shrink overflow-y-scroll"
     } else {
         "h-16 cursor-pointer"
     };
