@@ -1204,7 +1204,7 @@ h2:where(.dark, .dark *) {
 
 .bg-green-500 {
   --tw-bg-opacity: 1;
-  background-color: rgb(21 209 128 / var(--tw-bg-opacity));
+  background-color: rgb(10 207 134 / var(--tw-bg-opacity));
 }
 
 .bg-red-500 {
@@ -1783,7 +1783,7 @@ h2:where(.dark, .dark *) {
 
 .hover\:text-green-500:hover {
   --tw-text-opacity: 1;
-  color: rgb(21 209 128 / var(--tw-text-opacity));
+  color: rgb(10 207 134 / var(--tw-text-opacity));
 }
 
 .hover\:underline:hover {

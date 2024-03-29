@@ -100,74 +100,40 @@ impl Miner {
 
         #[cfg(feature = "desktop")]
         {
-            async_std::task::spawn({
-                let ch = self.ch.clone();
-                let flag = Arc::new(AtomicBool::new(false));
-                let result = Arc::new(Mutex::new(MiningResult::default()));
-                let power_percent = ((self.power_level.read().0 + 1) as f64) / 8f64;
-                let concurrency = num_cpus::get() as u64;
-                let tuned_concurrency = ((concurrency as f64) * power_percent).round() as u64;
-                let mut tasks = Vec::new();
-                async move {
-                    for i in 0..tuned_concurrency {
+            let ch = self.ch.clone();
+            let flag = Arc::new(AtomicBool::new(false));
+            let result = Arc::new(Mutex::new(MiningResult::default()));
+            let power_percent = ((self.power_level.read().0 + 1) as f64) / 8f64;
+            let concurrency = num_cpus::get() as u64;
+            let tuned_concurrency = ((concurrency as f64) * power_percent).round() as u64;
+            let handles: Vec<_> = (0..tuned_concurrency)
+                .map(|i| {
+                    std::thread::spawn({
                         let flag = flag.clone();
                         let result = result.clone();
-                        let task = async_std::task::spawn({
-                            let flag = flag.clone();
-                            let result = result.clone();
-                            async move {
-                                let nonce =
-                                    u64::MAX.saturating_div(tuned_concurrency).saturating_mul(i);
-                                if let Some(res) = find_next_hash_par(
-                                    hash,
-                                    difficulty,
-                                    signer,
-                                    nonce,
-                                    flag.clone(),
-                                ) {
-                                    flag.store(true, Ordering::Relaxed);
-                                    let mut w_result = result.lock().unwrap();
-                                    *w_result = res;
-                                }
+                        move || {
+                            let nonce =
+                                u64::MAX.saturating_div(tuned_concurrency).saturating_mul(i);
+                            if let Some(res) =
+                                find_next_hash_par(hash, difficulty, signer, nonce, flag.clone())
+                            {
+                                flag.store(true, Ordering::Relaxed);
+                                let mut w_result = result.lock().unwrap();
+                                *w_result = res;
                             }
-                        });
-                        tasks.push(task);
-                    }
-
-                    // let handles: Vec<_> = (0..tuned_concurrency)
-                    //     .map(|i| {
-                    //         std::thread::spawn({
-                    //             let flag = flag.clone();
-                    //             let result = result.clone();
-                    //             move || {
-                    //                 let nonce =
-                    //                     u64::MAX.saturating_div(tuned_concurrency).saturating_mul(i);
-                    //                 if let Some(res) =
-                    //                     find_next_hash_par(hash, difficulty, signer, nonce, flag.clone())
-                    //                 {
-                    //                     flag.store(true, Ordering::Relaxed);
-                    //                     let mut w_result = result.lock().unwrap();
-                    //                     *w_result = res;
-                    //                 }
-                    //             }
-                    //         })
-                    //     })
-                    //     .collect();
-                    // for h in handles {
-                    //     h.join().unwrap();
-                    // }
-
-                    // Await all tasks to complete
-                    for task in tasks {
-                        task.await;
-                    }
-
-                    let r_result = result.lock().unwrap();
-                    let res = r_result.clone();
-                    async_std::task::spawn(async move {
-                        ch.send(res).await.ok();
-                    });
+                        }
+                    })
+                })
+                .collect();
+            async_std::task::spawn(async move {
+                for h in handles {
+                    h.join().unwrap();
                 }
+                let res = {
+                    let r_result = result.lock().unwrap();
+                    r_result.clone()
+                };
+                ch.send(res).await.ok();
             });
         }
     }
