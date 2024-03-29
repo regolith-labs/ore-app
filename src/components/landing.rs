@@ -1,6 +1,7 @@
 #[cfg(feature = "desktop")]
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use chrono::{Duration as ChronoDuration, NaiveTime, Utc};
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use ore_types::Transfer;
@@ -15,8 +16,73 @@ use crate::{
     Route,
 };
 
+const LAUNCH_AT: i64 = 1711740240; //ore::START_AT;
+
 #[component]
 pub fn Landing(cx: Scope) -> Element {
+    // Calculate initial time until launch
+    let now_unix_timestamp = Utc::now().timestamp();
+    let seconds_until_launch = LAUNCH_AT - now_unix_timestamp;
+    let time = use_state(cx, || seconds_until_launch);
+
+    // Countdown until launch
+    use_future(cx, (), |_| {
+        let time = time.clone();
+        async move {
+            loop {
+                async_std::task::sleep(Duration::from_secs(1)).await;
+                let now_unix_timestamp = Utc::now().timestamp();
+                let seconds_until_launch = LAUNCH_AT - now_unix_timestamp;
+                time.set(seconds_until_launch);
+                if seconds_until_launch < 0 {
+                    break;
+                }
+            }
+        }
+    });
+
+    if time.gt(&0) {
+        let t = format_duration(*time.get());
+        let bg_img = asset_path("smoke.jpg");
+        render! {
+            div {
+                class: "bg-white",
+                div {
+                    class: "flex flex-col w-full h-screen z-20 bg-cover bg-center",
+                    style: "background-image: url({bg_img})",
+                    div {
+                        class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",
+                        div {
+                            class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8",
+                            p {
+                                class: "text-center text-4xl min-[480px]:text-5xl min-[600px]:text-6xl md:text-7xl lg:text-8xl font-bold font-hero",
+                                "{t}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        render! {
+            LandingRaw {}
+        }
+    }
+}
+
+fn format_duration(seconds: i64) -> String {
+    let duration = ChronoDuration::try_seconds(seconds).unwrap();
+    // let dummy_date = NaiveTime::from_hms_opt(0, 0, 0).unwrap();
+    // let target_date = dummy_date + duration;
+    let hours = duration.num_hours();
+    let minutes = duration.num_minutes() % 60;
+    let seconds = duration.num_seconds() % 60;
+    format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
+    // target_date.format("%d:%H:%M:%S").to_string()
+}
+
+#[component]
+pub fn LandingRaw(cx: Scope) -> Element {
     let is_onboarded = use_is_onboarded(cx);
     let nav = use_navigator(cx);
 
