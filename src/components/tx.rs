@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
+use dioxus_router::{components::Link, prelude::use_navigator};
 use ore::{BUS_ADDRESSES, TREASURY_ADDRESS};
 use ore_types::TransferType;
 #[cfg(feature = "web")]
@@ -10,7 +10,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{Copyable, OreIcon},
+    components::{BackButton, Copyable, OreIcon},
     gateway::AsyncResult,
     hooks::{use_datetime, use_explorer_transaction_url, use_transfer},
     route::Route,
@@ -18,6 +18,7 @@ use crate::{
 
 #[component]
 pub fn Tx(cx: Scope, sig: String) -> Element {
+    let nav = use_navigator(cx);
     let transfer = use_transfer(cx, sig.clone());
 
     match transfer {
@@ -52,7 +53,12 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             };
             render! {
                 div {
-                    class: "flex flex-col gap-4 w-full",
+                    class: "flex flex-col gap-3 w-full",
+                    BackButton {
+                        onclick: move |_| {
+                            nav.go_back()
+                        }
+                    }
                     p {
                         class: "text-3xl sm:text-4xl font-bold",
                         "{title}"

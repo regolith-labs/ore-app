@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
+use dioxus_router::{components::Link, prelude::use_navigator};
 use ore::BUS_ADDRESSES;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
@@ -10,7 +10,8 @@ use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{
-        ActivityTable, BusBubble, Copyable, OreIcon, SendButton, TreasuryBubble, UserBubble,
+        ActivityTable, BackButton, BusBubble, Copyable, OreIcon, SendButton, TreasuryBubble,
+        UserBubble,
     },
     gateway::AsyncResult,
     hooks::{
@@ -25,6 +26,7 @@ use crate::{
 pub fn User(cx: Scope, id: String) -> Element {
     let pubkey = use_pubkey(cx);
     let user_id = Pubkey::from_str(id);
+    let nav = use_navigator(cx);
 
     if user_id.is_err() {
         return render! {
@@ -76,7 +78,12 @@ pub fn User(cx: Scope, id: String) -> Element {
         div {
             class: "flex flex-col gap-16",
             div {
-                class: "flex flex-col gap-4",
+                class: "flex flex-col gap-3",
+                BackButton {
+                    onclick: move |_| {
+                        nav.go_back()
+                    }
+                }
                 div {
                     class: "flex flex-col gap-8",
                     if user_id.eq(&ore::TREASURY_ADDRESS) {
