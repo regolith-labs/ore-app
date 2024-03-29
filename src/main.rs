@@ -5,8 +5,6 @@ use std::rc::Rc;
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use gateway::Gateway;
-#[cfg(feature = "web")]
-use web_sys::window;
 
 mod components;
 #[cfg(feature = "desktop")]

@@ -78,7 +78,7 @@ pub fn User(cx: Scope, id: String) -> Element {
         div {
             class: "flex flex-col gap-16",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-3 -mt-4",
                 BackButton {
                     onclick: move |_| {
                         nav.go_back()

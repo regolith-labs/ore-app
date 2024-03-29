@@ -7,8 +7,6 @@ use serde::{Deserialize, Serialize};
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 #[cfg(feature = "desktop")]
 use solana_sdk::native_token::LAMPORTS_PER_SOL;
-#[cfg(feature = "web")]
-use web_sys::window;
 
 use crate::{
     components::Copyable,

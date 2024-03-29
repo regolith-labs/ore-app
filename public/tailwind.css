@@ -764,6 +764,26 @@ h2:where(.dark, .dark *) {
   margin-top: auto;
 }
 
+.mt-0 {
+  margin-top: 0px;
+}
+
+.mt-0\.5 {
+  margin-top: 0.125rem;
+}
+
+.-mt-10 {
+  margin-top: -2.5rem;
+}
+
+.-mt-8 {
+  margin-top: -2rem;
+}
+
+.-mt-4 {
+  margin-top: -1rem;
+}
+
 .flex {
   display: flex;
 }
@@ -1244,6 +1264,14 @@ h2:where(.dark, .dark *) {
 
 .p-8 {
   padding: 2rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
+.p-2\.5 {
+  padding: 0.625rem;
 }
 
 .px-1 {
