@@ -14,24 +14,93 @@ use solana_sdk::pubkey::Pubkey;
 use crate::{
     components::OreIcon,
     gateway::{AsyncResult, Gateway},
-    hooks::use_gateway,
+    hooks::{use_gateway, use_ore_supply, use_treasury},
     route::Route,
 };
 
-// TODO Supply stats
-// MinerDataOre {
-//     title: "Circulating supply",
-//     tooltip: "The total amount of Ore that has ever been claimed.",
-//     amount: circulating_supply.to_string()
-// }
-// MinerDataOre {
-//     title: "Total supply",
-//     tooltip: "The total amount of Ore that has ever been mined.",
-//     amount: ore_supply
-// }
+#[component]
+pub fn Stats(cx: Scope) -> Element {
+    render! {
+        div {
+            class: "flex flex-col gap-16 pb-16",
+            SupplyStats {}
+            TopHolders {}
+        }
+    }
+}
 
 #[component]
-pub fn Leaderboard(cx: Scope) -> Element {
+pub fn SupplyStats(cx: Scope) -> Element {
+    let (treasury, _) = use_treasury(cx);
+    let (supply, _) = use_ore_supply(cx);
+    let circulating_supply = match *treasury.read().unwrap() {
+        AsyncResult::Ok(treasury) => {
+            (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
+        }
+        _ => 0f64,
+    }
+    .to_string();
+    let ore_supply = match supply {
+        AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
+        AsyncResult::Loading => "-".to_string(),
+        AsyncResult::Error(_err) => "Err".to_string(),
+    };
+    render! {
+        div {
+            class: "flex flex-col gap-6",
+            h2 {
+                "Supply"
+            }
+            div {
+                class: "flex flex-col gap-8 my-auto",
+                OreValue {
+                    title: "Circulating supply".to_string(),
+                    detail: "The total amount of Ore that has been mined and claimed.".to_string(),
+                    amount: circulating_supply
+                }
+                OreValue {
+                    title: "Total supply".to_string(),
+                    detail: "The total amount of Ore that has ever been mined.".to_string(),
+                    amount: ore_supply
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn OreValue(cx: Scope, title: String, detail: String, amount: String) -> Element {
+    render! {
+        div {
+            class: "flex flex-row justify-between grow gap-8",
+            div {
+                class: "flex flex-col gap-1 my-auto",
+                p {
+                    class: "text-gray-300 font-medium my-auto text-black dark:text-white",
+                    "{title}"
+                }
+                p {
+                    class: "text-gray-300 text-sm",
+                    "{detail}"
+                }
+            }
+            div {
+                class: "flex flex-row gap-1.5",
+                OreIcon {
+                    class: "w-4 h-4 my-auto"
+                }
+                p {
+                    class: "font-medium my-auto",
+                    "{amount}"
+                }
+            }
+        }
+
+    }
+}
+
+#[component]
+pub fn TopHolders(cx: Scope) -> Element {
     let token_accounts = use_state(cx, || AsyncResult::Loading);
     let gateway = use_gateway(cx);
 
