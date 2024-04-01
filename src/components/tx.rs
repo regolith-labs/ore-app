@@ -53,7 +53,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             };
             render! {
                 div {
-                    class: "flex flex-col gap-3 w-full -mt-4",
+                    class: "flex flex-col gap-3 w-full -mt-3.5",
                     BackButton {
                         onclick: move |_| {
                             nav.go_back()

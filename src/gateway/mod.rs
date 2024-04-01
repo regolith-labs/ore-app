@@ -28,7 +28,7 @@ use solana_client::{
 use solana_client_wasm::{
     solana_sdk::{
         clock::Clock,
-        commitment_config::CommitmentConfig,
+        commitment_config::{CommitmentConfig, CommitmentLevel},
         compute_budget::ComputeBudgetInstruction,
         instruction::Instruction,
         pubkey::Pubkey,
@@ -54,7 +54,7 @@ use solana_extra_wasm::{
 #[cfg(feature = "desktop")]
 use solana_sdk::{
     clock::Clock,
-    commitment_config::CommitmentConfig,
+    commitment_config::{CommitmentConfig, CommitmetnLevel},
     compute_budget::ComputeBudgetInstruction,
     instruction::Instruction,
     pubkey::Pubkey,
@@ -156,16 +156,20 @@ impl Gateway {
 
     pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {
         let signer = signer();
-        let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
-        let mut hash = self.rpc.get_latest_blockhash().await.unwrap();
-        tx.sign(&[&signer], hash);
-        let cfg = RpcSendTransactionConfig {
+        let (mut hash, mut slot) = self
+            .rpc
+            .get_latest_blockhash_with_config(CommitmentConfig::confirmed())
+            .await
+            .unwrap();
+        let mut cfg = RpcSendTransactionConfig {
             skip_preflight: true,
-            preflight_commitment: None,
+            preflight_commitment: Some(CommitmentLevel::Confirmed),
             encoding: Some(UiTransactionEncoding::Base64),
             max_retries: Some(RPC_RETRIES),
-            min_context_slot: None,
+            min_context_slot: Some(slot),
         };
+        let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
+        tx.sign(&[&signer], hash);
         let mut attempts = 0;
         loop {
             log::info!("Attempt: {:?}", attempts);
@@ -195,7 +199,18 @@ impl Gateway {
 
             // Retry
             async_std::task::sleep(Duration::from_millis(200)).await;
-            hash = self.rpc.get_latest_blockhash().await.unwrap();
+            (hash, slot) = self
+                .rpc
+                .get_latest_blockhash_with_config(CommitmentConfig::confirmed())
+                .await
+                .unwrap();
+            cfg = RpcSendTransactionConfig {
+                skip_preflight: true,
+                preflight_commitment: Some(CommitmentLevel::Confirmed),
+                encoding: Some(UiTransactionEncoding::Base64),
+                max_retries: Some(RPC_RETRIES),
+                min_context_slot: Some(slot),
+            };
             tx.sign(&[&signer], hash);
             attempts += 1;
             if attempts > GATEWAY_RETRIES {
