@@ -2,6 +2,9 @@ mod async_result;
 mod error;
 mod pubkey;
 
+#[cfg(feature = "desktop")]
+use std::time::Duration;
+
 pub use async_result::*;
 use cached::proc_macro::cached;
 pub use error::*;
@@ -17,11 +20,15 @@ pub use pubkey::*;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAccount;
 #[cfg(feature = "desktop")]
-use solana_client::{nonblocking::rpc_client::RpcClient, rpc_response::RpcTokenAccountBalance};
+use solana_client::{
+    nonblocking::rpc_client::RpcClient, rpc_config::RpcSendTransactionConfig,
+    rpc_response::RpcTokenAccountBalance,
+};
 #[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
         clock::Clock,
+        commitment_config::CommitmentConfig,
         compute_budget::ComputeBudgetInstruction,
         instruction::Instruction,
         pubkey::Pubkey,
@@ -30,7 +37,7 @@ use solana_client_wasm::{
         sysvar,
         transaction::Transaction,
     },
-    utils::rpc_response::RpcTokenAccountBalance,
+    utils::{rpc_config::RpcSendTransactionConfig, rpc_response::RpcTokenAccountBalance},
     WasmClient,
 };
 #[cfg(feature = "web")]
@@ -42,10 +49,12 @@ use solana_extra_wasm::{
         },
         spl_memo, spl_token,
     },
+    transaction_status::UiTransactionEncoding,
 };
 #[cfg(feature = "desktop")]
 use solana_sdk::{
     clock::Clock,
+    commitment_config::CommitmentConfig,
     compute_budget::ComputeBudgetInstruction,
     instruction::Instruction,
     pubkey::Pubkey,
@@ -55,19 +64,29 @@ use solana_sdk::{
     transaction::Transaction,
 };
 #[cfg(feature = "desktop")]
+use solana_transaction_status::UiTransactionEncoding;
+#[cfg(feature = "desktop")]
 use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
 };
+#[cfg(feature = "web")]
+use web_time::Duration;
 
 use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
-    // "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
-    "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+    "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+// "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 
-const CU_LIMIT_CREATE_ATA: u32 = 24_000;
+const CU_LIMIT_ATA: u32 = 24_000;
 const CU_LIMIT_REGISTER: u32 = 7_000; // 11_000;
+const CU_LIMIT_CLAIM: u32 = 14_000; // 11_000;
+const CU_LIMIT_TRANSFER: u32 = 21_000; // 11_000;
+const CU_PRICE: u64 = 1000;
+
+const RPC_RETRIES: usize = 3;
+const GATEWAY_RETRIES: usize = 5;
 
 pub struct Gateway {
     #[cfg(feature = "web")]
@@ -138,11 +157,51 @@ impl Gateway {
     pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {
         let signer = signer();
         let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
-        let hash = self.rpc.get_latest_blockhash().await.unwrap();
+        let mut hash = self.rpc.get_latest_blockhash().await.unwrap();
         tx.sign(&[&signer], hash);
-        let x = self.rpc.send_and_confirm_transaction(&tx).await;
-        log::info!("{:?}", x);
-        x.or(Err(GatewayError::FailedTransaction))
+        let cfg = RpcSendTransactionConfig {
+            skip_preflight: true,
+            preflight_commitment: None,
+            encoding: Some(UiTransactionEncoding::Base64),
+            max_retries: Some(RPC_RETRIES),
+            min_context_slot: None,
+        };
+        let mut attempts = 0;
+        loop {
+            log::info!("Attempt: {:?}", attempts);
+            match self.rpc.send_transaction_with_config(&tx, cfg).await {
+                Ok(sig) => {
+                    log::info!("{:?}", sig);
+                    match self
+                        .rpc
+                        .confirm_transaction_with_commitment(&sig, CommitmentConfig::confirmed())
+                        .await
+                    {
+                        Ok(confirmed) => {
+                            if confirmed {
+                                return Ok(sig);
+                            }
+                        }
+                        Err(err) => {
+                            log::error!("Error: {:?}", err);
+                        }
+                    }
+                }
+                Err(err) => {
+                    log::error!("Error {:?}", err);
+                    return Err(GatewayError::TransactionFailed);
+                }
+            }
+
+            // Retry
+            async_std::task::sleep(Duration::from_millis(200)).await;
+            hash = self.rpc.get_latest_blockhash().await.unwrap();
+            tx.sign(&[&signer], hash);
+            attempts += 1;
+            if attempts > GATEWAY_RETRIES {
+                return Err(GatewayError::TransactionTimeout);
+            }
+        }
     }
 
     // Ore
@@ -155,10 +214,10 @@ impl Gateway {
         }
 
         // Sign and send transaction.
-        log::info!("B");
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_REGISTER);
+        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let ix = ore::instruction::register(signer.pubkey());
-        match self.send_and_confirm(&[cu_limit_ix, ix]).await {
+        match self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix]).await {
             Ok(_) => {
                 track(AppEvent::Register, None);
                 Ok(())
@@ -170,8 +229,10 @@ impl Gateway {
     pub async fn claim_ore(&self, amount: u64) -> GatewayResult<Signature> {
         let signer = signer();
         let beneficiary = ore_token_account_address(signer.pubkey());
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_CLAIM);
+        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let ix = ore::instruction::claim(signer.pubkey(), beneficiary, amount);
-        self.send_and_confirm(&[ix]).await
+        self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix]).await
     }
 
     pub async fn transfer_ore(
@@ -180,9 +241,15 @@ impl Gateway {
         to: Pubkey,
         memo: String,
     ) -> GatewayResult<Signature> {
+        // Create recipient token account, if necessary
+        self.create_token_account_ore(to).await?;
+
+        // Submit transfer ix
         let signer = signer();
         let from_token_account = ore_token_account_address(signer.pubkey());
         let to_token_account = ore_token_account_address(to);
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_TRANSFER);
+        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let memo_ix = spl_memo::build_memo(&memo.into_bytes(), &[&signer.pubkey()]);
         let transfer_ix = spl_token::instruction::transfer(
             &spl_token::ID,
@@ -193,16 +260,16 @@ impl Gateway {
             amount,
         )
         .unwrap();
-        // TODO Create recipient token account if necessary
-        self.send_and_confirm(&[memo_ix, transfer_ix]).await
+        self.send_and_confirm(&[cu_limit_ix, cu_price_ix, memo_ix, transfer_ix])
+            .await
     }
 
-    pub async fn create_token_account_ore(&self) -> GatewayResult<Pubkey> {
+    pub async fn create_token_account_ore(&self, owner: Pubkey) -> GatewayResult<Pubkey> {
         // Build instructions.
         let signer = signer();
 
         // Check if account already exists.
-        let token_account_address = ore_token_account_address(signer.pubkey());
+        let token_account_address = ore_token_account_address(owner);
         match self.rpc.get_token_account(&token_account_address).await {
             Ok(token_account) => {
                 if token_account.is_some() {
@@ -210,6 +277,7 @@ impl Gateway {
                 }
             }
             Err(err) => {
+                log::info!("Err: {:?}", err);
                 if let GatewayError::AccountNotFound = GatewayError::from(err) {
                     // Noop
                 }
@@ -217,15 +285,15 @@ impl Gateway {
         }
 
         // Sign and send transaction.
-        log::info!("A");
-        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_CREATE_ATA);
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_ATA);
+        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let ix = create_associated_token_account(
             &signer.pubkey(),
-            &signer.pubkey(),
+            &owner,
             &ore::MINT_ADDRESS,
             &spl_token::id(),
         );
-        match self.send_and_confirm(&[cu_limit_ix, ix]).await {
+        match self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix]).await {
             Ok(_) => track(AppEvent::CreateTokenAccount, None),
             Err(err) => return Err(err),
         }

@@ -11,7 +11,7 @@ readme = "./README.md"
 keywords = ["solana", "crypto", "mining"]
 
 [features]
-default = []
+default = ["web"]
 bundle = []
 desktop = [
     "async-tungstenite",
@@ -23,6 +23,7 @@ desktop = [
     "solana-account-decoder",
     "solana-client",
     "solana-sdk",
+    "solana-transaction-status",
     "spl-memo",
     "spl-token",
     "spl-associated-token-account",
@@ -74,6 +75,7 @@ solana-client = { verison = "1.17.4", optional = true }
 solana-client-wasm = { version = "1.17.4", features = ["pubsub"], optional = true }
 solana-extra-wasm = { version = "1.17.4", optional = true }
 solana-sdk = { version = "1.17.4", optional = true }
+solana-transaction-status = { version = "1.17.4", optional = true }
 spl-memo = { version = "^4", features = ["no-entrypoint"], optional = true }
 spl-token = { version = "^4", features = ["no-entrypoint"], optional = true }
 spl-associated-token-account = { version = "^2.2", features = [ "no-entrypoint" ], optional = true }

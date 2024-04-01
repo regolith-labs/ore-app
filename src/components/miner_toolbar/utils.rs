@@ -18,20 +18,19 @@ use super::MinerStatusMessage;
 
 pub async fn try_start_mining(
     gateway: &Rc<Gateway>,
-    // balance: u64,
     miner: &Miner,
     status_message: &UseSharedState<MinerStatusMessage>,
 ) -> GatewayResult<bool> {
     // Create token account, if needed
+    let signer = signer();
     *status_message.write() = MinerStatusMessage::CreatingTokenAccount;
-    gateway.create_token_account_ore().await?;
+    gateway.create_token_account_ore(signer.pubkey()).await?;
 
     // Create proof account, if needed
     *status_message.write() = MinerStatusMessage::GeneratingChallenge;
     gateway.register_ore().await?;
 
     // Start mining
-    let signer = signer();
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
     *status_message.write() = MinerStatusMessage::Searching;
