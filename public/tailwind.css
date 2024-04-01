@@ -1181,6 +1181,10 @@ h2:where(.dark, .dark *) {
   text-wrap: nowrap;
 }
 
+.break-words {
+  overflow-wrap: break-word;
+}
+
 .rounded {
   border-radius: 0.25rem;
 }

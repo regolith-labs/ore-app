@@ -28,10 +28,10 @@ pub fn ExportKeySecret(cx: Scope) -> Element {
                 class: "w-12 h-12 mx-auto opacity-50"
             }
             Copyable {
-                class: "mx-auto",
+                class: "mx-auto w-full",
                 value: keypair.to_base58_string(),
                 p {
-                    class: "p-2",
+                    class: "p-2 text-wrap break-words max-w-full",
                     "{keypair.to_base58_string()}"
                 }
             }

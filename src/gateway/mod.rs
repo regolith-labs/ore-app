@@ -22,6 +22,7 @@ use solana_client::{nonblocking::rpc_client::RpcClient, rpc_response::RpcTokenAc
 use solana_client_wasm::{
     solana_sdk::{
         clock::Clock,
+        compute_budget::ComputeBudgetInstruction,
         instruction::Instruction,
         pubkey::Pubkey,
         signature::{Keypair, Signature},
@@ -45,6 +46,7 @@ use solana_extra_wasm::{
 #[cfg(feature = "desktop")]
 use solana_sdk::{
     clock::Clock,
+    compute_budget::ComputeBudgetInstruction,
     instruction::Instruction,
     pubkey::Pubkey,
     signature::{Keypair, Signature},
@@ -61,10 +63,11 @@ use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
+    // "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
     "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 
-// #[cfg(feature = "desktop")]
-// pub const WSS_URL: &str = "wss://ore-websockets.onrender.com/ws";
+const CU_LIMIT_CREATE_ATA: u32 = 24_000;
+const CU_LIMIT_REGISTER: u32 = 7_000; // 11_000;
 
 pub struct Gateway {
     #[cfg(feature = "web")]
@@ -138,6 +141,7 @@ impl Gateway {
         let hash = self.rpc.get_latest_blockhash().await.unwrap();
         tx.sign(&[&signer], hash);
         let x = self.rpc.send_and_confirm_transaction(&tx).await;
+        log::info!("{:?}", x);
         x.or(Err(GatewayError::FailedTransaction))
     }
 
@@ -151,8 +155,10 @@ impl Gateway {
         }
 
         // Sign and send transaction.
+        log::info!("B");
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_REGISTER);
         let ix = ore::instruction::register(signer.pubkey());
-        match self.send_and_confirm(&[ix]).await {
+        match self.send_and_confirm(&[cu_limit_ix, ix]).await {
             Ok(_) => {
                 track(AppEvent::Register, None);
                 Ok(())
@@ -211,13 +217,15 @@ impl Gateway {
         }
 
         // Sign and send transaction.
+        log::info!("A");
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_CREATE_ATA);
         let ix = create_associated_token_account(
             &signer.pubkey(),
             &signer.pubkey(),
             &ore::MINT_ADDRESS,
             &spl_token::id(),
         );
-        match self.send_and_confirm(&[ix]).await {
+        match self.send_and_confirm(&[cu_limit_ix, ix]).await {
             Ok(_) => track(AppEvent::CreateTokenAccount, None),
             Err(err) => return Err(err),
         }

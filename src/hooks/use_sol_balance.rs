@@ -12,6 +12,18 @@ use super::{use_gateway, use_pubkey};
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct SolBalance(pub u64);
 
+#[derive(Clone)]
+pub struct SolBalanceHandle(UseFuture<()>);
+
+impl SolBalanceHandle {
+    pub fn restart(&self) {
+        self.0.restart();
+    }
+    pub fn cancel(&self, cx: &ScopeState) {
+        self.0.cancel(cx);
+    }
+}
+
 pub fn use_sol_balance(cx: &ScopeState) -> AsyncResult<SolBalance> {
     *use_shared_state::<AsyncResult<SolBalance>>(cx)
         .unwrap()
@@ -37,7 +49,7 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
     });
 
     // Poll for future balance changes
-    use_future(cx, balance, |_| {
+    let sub = use_future(cx, balance, |_| {
         let f = f.clone();
         let poll = 3;
         let b = *balance.read();
@@ -52,6 +64,9 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
             }
         }
     });
+
+    cx.provide_context(SolBalanceHandle(sub.clone()));
+    sub.cancel(cx);
 
     // Write balance_ changes to shared state
     let balance__ = *balance_.read().unwrap();

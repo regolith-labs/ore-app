@@ -7,27 +7,28 @@ use solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pubkey};
 use crate::{
     components::{Copyable, IsToolbarOpen, MinerStatus},
     gateway::AsyncResult,
-    hooks::{use_is_onboarded, use_pubkey, use_sol_balance, IsOnboarded},
+    hooks::{use_is_onboarded, use_pubkey, use_sol_balance, IsOnboarded, SolBalanceHandle},
 };
 
 #[component]
 pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
     let sol_balance = use_sol_balance(cx);
+    let sol_balance_ = use_context::<SolBalanceHandle>(cx).unwrap();
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let is_onboarded = use_is_onboarded(cx);
 
     use_future(cx, &sol_balance, |_| {
-        let miner_status = miner_status.clone();
-        let is_onboarded = is_onboarded.clone();
-        async move {
-            if let AsyncResult::Ok(sol_balance) = sol_balance {
-                if sol_balance.0.gt(&0) {
-                    *is_onboarded.write() = IsOnboarded(true);
-                    *miner_status.write() = MinerStatus::Activating;
-                }
+        if let AsyncResult::Ok(sol_balance) = sol_balance {
+            if sol_balance.0.gt(&0) {
+                sol_balance_.cancel(cx);
+                *is_onboarded.write() = IsOnboarded(true);
+                *miner_status.write() = MinerStatus::Activating;
+            } else {
+                sol_balance_.restart();
             }
         }
+        async move {}
     });
 
     let bg = if is_toolbar_open.read().0 {
