@@ -14,7 +14,7 @@ pub fn WhatIsMining(cx: Scope) -> Element {
                     class: "font-bold",
                     "Crypto mining is the process of producing digital tokens by consuming energy. "
                 }
-                "In this post, we'll drill down into details and unpack what mining means for you, one concept at a time."
+                "In this post, we'll dig into details and unpack what mining means for you, one concept at a time."
             }
             p {
                 class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
