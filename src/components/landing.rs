@@ -70,15 +70,12 @@ pub fn Landing(cx: Scope) -> Element {
     }
 }
 
-fn format_duration(seconds: i64) -> String {
+pub fn format_duration(seconds: i64) -> String {
     let duration = ChronoDuration::try_seconds(seconds).unwrap();
-    // let dummy_date = NaiveTime::from_hms_opt(0, 0, 0).unwrap();
-    // let target_date = dummy_date + duration;
     let hours = duration.num_hours();
     let minutes = duration.num_minutes() % 60;
     let seconds = duration.num_seconds() % 60;
     format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
-    // target_date.format("%d:%H:%M:%S").to_string()
 }
 
 #[component]

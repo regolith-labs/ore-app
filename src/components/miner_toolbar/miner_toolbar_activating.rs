@@ -39,19 +39,13 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
         async move {
             if sufficient_balance {
                 match try_start_mining(&gateway, miner.get(), &miner_status_message).await {
-                    Ok(did_start) => {
-                        if did_start {
-                            *miner_status.write() = MinerStatus::Active;
-                        } else {
-                            // TODO Insufficient balance... Set appropriate error
-                            log::error!("Insufficient balance to start mining");
-                            *miner_status.write() = MinerStatus::NetworkError;
-                        };
+                    Ok(()) => {
+                        *miner_status.write() = MinerStatus::Active;
                     }
                     Err(err) => {
-                        // TODO Present error to user
                         log::error!("Failed to start mining: {:?}", err);
-                        *miner_status.write() = MinerStatus::NetworkError;
+                        *miner_status.write() = MinerStatus::Error;
+                        *miner_status_message.write() = MinerStatusMessage::Error
                     }
                 }
             }

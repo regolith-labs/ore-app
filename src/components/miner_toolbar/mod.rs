@@ -1,6 +1,7 @@
 mod miner_charts;
 mod miner_toolbar_activating;
 mod miner_toolbar_active;
+mod miner_toolbar_error;
 mod miner_toolbar_insufficient_sol;
 mod miner_toolbar_not_started;
 mod utils;
@@ -9,6 +10,7 @@ use dioxus_std::utils::channel::use_channel;
 pub use miner_charts::*;
 pub use miner_toolbar_activating::*;
 pub use miner_toolbar_active::*;
+pub use miner_toolbar_error::*;
 pub use miner_toolbar_insufficient_sol::*;
 pub use miner_toolbar_not_started::*;
 #[cfg(feature = "web")]
@@ -33,13 +35,14 @@ pub enum MinerStatus {
     Active,
 
     // TODO Add error field
-    NetworkError,
+    Error,
 }
 
 #[derive(Copy, Clone, Debug)]
 pub enum MinerStatusMessage {
     CreatingTokenAccount,
     GeneratingChallenge,
+    Waiting,
     Searching,
     Submitting,
     Error,
@@ -136,7 +139,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
 
     let bg = match *miner_status.read() {
         MinerStatus::Active => "bg-green-500 text-white",
-        MinerStatus::NetworkError => "bg-red-500 text-white",
+        MinerStatus::Error => "bg-red-500 text-white",
         MinerStatus::NotStarted => {
             if is_open {
                 "bg-white dark:bg-gray-900"
@@ -177,9 +180,10 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                             }
                         }
                     }
-                    MinerStatus::NetworkError => {
-                        // TODO
-                        None
+                    MinerStatus::Error => {
+                        render! {
+                            MinerToolbarError {}
+                        }
                     }
                 }
             }

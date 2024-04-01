@@ -8,6 +8,8 @@ pub type GatewayResult<T> = Result<T, GatewayError>;
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GatewayError {
     FailedDeserialization,
+    FailedAta,
+    FailedRegister,
     TransactionFailed,
     TransactionTimeout,
     NetworkUnavailable,

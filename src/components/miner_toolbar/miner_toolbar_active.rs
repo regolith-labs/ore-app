@@ -1,9 +1,17 @@
+#[cfg(feature = "desktop")]
+use std::time::Duration;
+
+use chrono::Utc;
 use dioxus::prelude::*;
 use dioxus_router::prelude::Link;
+use ore::START_AT;
+#[cfg(feature = "web")]
+use web_time::Duration;
 
 use crate::{
     components::{
-        ActivityIndicator, IsToolbarOpen, MinerDisplayHash, Spinner, StopButton, WarningIcon,
+        format_duration, ActivityIndicator, IsToolbarOpen, MinerDisplayHash, Spinner, StopButton,
+        WarningIcon,
     },
     hooks::{use_power_level, use_priority_fee, PowerLevel, PriorityFee},
     metrics::{track, AppEvent},
@@ -74,15 +82,36 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                             render! {
                                 p {
                                     class: "text-lg text-white",
-                                    "Error submit transaction"
+                                    "Error submitting transaction"
+                                }
+                            }
+                        }
+                        MinerStatusMessage::Waiting => {
+                            render! {
+                                div {
+                                    class: "flex flex-row gap-1",
+                                    p {
+                                        class: "text-lg text-white my-auto",
+                                        "Mining will start in"
+                                    }
+                                    CountdownTimer {
+                                        class: "text-lg text-white my-auto"
+                                    }
                                 }
                             }
                         }
                         _ => None
                     }
-                    p {
-                        class: "font-mono text-sm truncate shrink opacity-80",
-                        "{miner_display_hash}"
+                    match miner_status_message {
+                        MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
+                            render! {
+                                p {
+                                    class: "font-mono text-sm truncate shrink opacity-80",
+                                    "{miner_display_hash}"
+                                }
+                            }
+                        }
+                        _ => None
                     }
                 }
                 PriorityFeeConfig {}
@@ -129,6 +158,20 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                 }
                             }
                         }
+                        MinerStatusMessage::Waiting => {
+                            render! {
+                                div {
+                                    class: "flex flex-row gap-1 shrink w-min justify-start",
+                                    p {
+                                        class: "truncate w-min shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
+                                        "Mining will start in "
+                                    }
+                                    CountdownTimer {
+                                        class: "text-sm text-white opacity-80 my-auto"
+                                    }
+                                }
+                            }
+                        }
                         _ => None
                     }
                 }
@@ -139,6 +182,42 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                     }
                 }
             }
+        }
+    }
+}
+
+#[component]
+pub fn CountdownTimer<'a>(cx: Scope, class: Option<&'a str>) -> Element {
+    let class = class.unwrap_or("");
+
+    let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
+    let now_unix_timestamp = Utc::now().timestamp();
+    let seconds_until_launch = START_AT - now_unix_timestamp;
+    let time = use_state(cx, || seconds_until_launch);
+    let t = format_duration(*time.get());
+
+    // Countdown until launch
+    use_future(cx, (), |_| {
+        let miner_status_message = miner_status_message.clone();
+        let time = time.clone();
+        async move {
+            loop {
+                async_std::task::sleep(Duration::from_secs(1)).await;
+                let now_unix_timestamp = Utc::now().timestamp();
+                let seconds_until_launch = START_AT - now_unix_timestamp;
+                time.set(seconds_until_launch);
+                if seconds_until_launch < 0 {
+                    *miner_status_message.write() = MinerStatusMessage::Searching;
+                    break;
+                }
+            }
+        }
+    });
+
+    render! {
+        p {
+            class: "{class}",
+            "{t}"
         }
     }
 }
@@ -243,7 +322,7 @@ fn DownloadLink(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-sm my-auto",
-                    "You are mining from a web browser which can throttle performance and lead to inconsistent results. To get the most out of your machine, "
+                    "You are mining from a web browser which can lead to inconsistent results. For better performance, "
                     Link {
                         to: Route::Download {},
                         class: "font-medium underline",

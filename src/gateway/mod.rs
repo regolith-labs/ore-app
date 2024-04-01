@@ -76,13 +76,13 @@ use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
-    "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
-// "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+    // "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+    "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 
 const CU_LIMIT_ATA: u32 = 24_000;
-const CU_LIMIT_REGISTER: u32 = 7_000; // 11_000;
-const CU_LIMIT_CLAIM: u32 = 14_000; // 11_000;
-const CU_LIMIT_TRANSFER: u32 = 21_000; // 11_000;
+const CU_LIMIT_REGISTER: u32 = 7_000;
+const CU_LIMIT_CLAIM: u32 = 14_000;
+const CU_LIMIT_TRANSFER: u32 = 21_000;
 const CU_PRICE: u64 = 1000;
 
 const RPC_RETRIES: usize = 3;
@@ -222,7 +222,7 @@ impl Gateway {
                 track(AppEvent::Register, None);
                 Ok(())
             }
-            Err(err) => Err(err),
+            Err(_) => Err(GatewayError::FailedRegister),
         }
     }
 
@@ -295,7 +295,7 @@ impl Gateway {
         );
         match self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix]).await {
             Ok(_) => track(AppEvent::CreateTokenAccount, None),
-            Err(err) => return Err(err),
+            Err(_) => return Err(GatewayError::FailedAta),
         }
 
         // Return token account address

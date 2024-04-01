@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
+use chrono::Utc;
 use dioxus::prelude::UseSharedState;
+use ore::START_AT;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::signer::Signer;
 #[cfg(feature = "desktop")]
@@ -20,7 +22,7 @@ pub async fn try_start_mining(
     gateway: &Rc<Gateway>,
     miner: &Miner,
     status_message: &UseSharedState<MinerStatusMessage>,
-) -> GatewayResult<bool> {
+) -> GatewayResult<()> {
     // Create token account, if needed
     let signer = signer();
     *status_message.write() = MinerStatusMessage::CreatingTokenAccount;
@@ -29,6 +31,13 @@ pub async fn try_start_mining(
     // Create proof account, if needed
     *status_message.write() = MinerStatusMessage::GeneratingChallenge;
     gateway.register_ore().await?;
+
+    // Wait for mining to begin if necessary
+    let now_unix_timestamp = Utc::now().timestamp();
+    if START_AT.gt(&now_unix_timestamp) {
+        *status_message.write() = MinerStatusMessage::Waiting;
+        return Ok(());
+    }
 
     // Start mining
     let treasury = gateway.get_treasury().await.unwrap();
@@ -45,5 +54,5 @@ pub async fn try_start_mining(
     // Record event for data
     track(AppEvent::StartMiner, None);
 
-    Ok(true)
+    Ok(())
 }

@@ -63,13 +63,13 @@ pub fn Download(cx: Scope) -> Element {
                 p {
                     "The Ore CLI uses your default Solana CLI config and identity. "
                     "Ensure you have enough SOL topped up on this account to pay for transaction fees. "
-                    "To begin mining, simply use the mine command."
+                    "To begin mining, use the mine command."
                 }
                 CodeBlock {
                     text: "ore mine"
                 }
                 p {
-                    "To mine in detached mode, you can use nohup."
+                    "To mine in detached mode, use nohup."
                 }
                 CodeBlock {
                     text: "nohup ore mine > output.log 2>&1 &"
