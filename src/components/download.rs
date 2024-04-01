@@ -68,6 +68,12 @@ pub fn Download(cx: Scope) -> Element {
                 CodeBlock {
                     text: "ore mine"
                 }
+                p {
+                    "To mine in detached mode, you can use nohup."
+                }
+                CodeBlock {
+                    text: "nohup ore mine > output.log 2>&1 &"
+                }
             }
         }
     }
