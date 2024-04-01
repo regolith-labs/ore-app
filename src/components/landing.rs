@@ -16,7 +16,7 @@ use crate::{
     Route,
 };
 
-const LAUNCH_AT: i64 = 1711740240; //ore::START_AT;
+const LAUNCH_AT: i64 = 1711740240; // 1712070000; //ore::START_AT;
 
 #[component]
 pub fn Landing(cx: Scope) -> Element {
