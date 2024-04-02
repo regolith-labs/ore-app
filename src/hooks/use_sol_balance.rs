@@ -66,7 +66,6 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
     });
 
     cx.provide_context(SolBalanceHandle(sub.clone()));
-    sub.cancel(cx);
 
     // Write balance_ changes to shared state
     let balance__ = *balance_.read().unwrap();

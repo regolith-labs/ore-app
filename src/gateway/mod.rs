@@ -85,7 +85,8 @@ pub const RPC_URL: &str =
 
 const RPC_RETRIES: usize = 1;
 const GATEWAY_RETRIES: usize = 5;
-const CONFIRM_RETRIES: usize = 10;
+const CONFIRM_RETRIES: usize = 0;
+const DEFAULT_PRIORITY_FEE: u64 = 100;
 
 pub struct Gateway {
     #[cfg(feature = "web")]
@@ -199,6 +200,8 @@ impl Gateway {
             #[cfg(feature = "web")]
             let sim_err = sim_res.err;
 
+            log::info!("Sim: {:?}", sim_err);
+
             match sim_err {
                 Some(err) => match err {
                     TransactionError::InstructionError(_, InstructionError::Custom(e)) => {
@@ -236,10 +239,10 @@ impl Gateway {
 
         let mut attempts = 0;
         loop {
-            // log::info!("Attempt: {:?}", attempts);
+            log::info!("Attempt: {:?}", attempts);
             match self.rpc.send_transaction_with_config(&tx, send_cfg).await {
                 Ok(sig) => {
-                    // log::info!("{:?}", sig);
+                    log::info!("{:?}", sig);
                     let mut confirm_check = 0;
                     'confirm: loop {
                         match self
@@ -253,7 +256,7 @@ impl Gateway {
                             Ok(confirmed) => {
                                 #[cfg(feature = "desktop")]
                                 let confirmed = confirmed.value;
-                                // log::info!("Confirm check {:?}: {:?}", confirm_check, confirmed);
+                                log::info!("Confirm check {:?}: {:?}", confirm_check, confirmed);
                                 if confirmed {
                                     return Ok(sig);
                                 }
@@ -309,7 +312,7 @@ impl Gateway {
 
         // Sign and send transaction.
         let ix = ore::instruction::register(signer.pubkey());
-        match self.send_and_confirm(&[ix], 10).await {
+        match self.send_and_confirm(&[ix], DEFAULT_PRIORITY_FEE).await {
             Ok(_) => {
                 track(AppEvent::Register, None);
                 Ok(())
@@ -322,7 +325,7 @@ impl Gateway {
         let signer = signer();
         let beneficiary = ore_token_account_address(signer.pubkey());
         let ix = ore::instruction::claim(signer.pubkey(), beneficiary, amount);
-        self.send_and_confirm(&[ix], 10).await
+        self.send_and_confirm(&[ix], DEFAULT_PRIORITY_FEE).await
     }
 
     pub async fn transfer_ore(
@@ -348,7 +351,8 @@ impl Gateway {
             amount,
         )
         .unwrap();
-        self.send_and_confirm(&[memo_ix, transfer_ix], 10).await
+        self.send_and_confirm(&[memo_ix, transfer_ix], DEFAULT_PRIORITY_FEE)
+            .await
     }
 
     pub async fn create_token_account_ore(&self, owner: Pubkey) -> GatewayResult<Pubkey> {
@@ -378,7 +382,7 @@ impl Gateway {
             &ore::MINT_ADDRESS,
             &spl_token::id(),
         );
-        match self.send_and_confirm(&[ix], 10).await {
+        match self.send_and_confirm(&[ix], DEFAULT_PRIORITY_FEE).await {
             Ok(_) => track(AppEvent::CreateTokenAccount, None),
             Err(_) => return Err(GatewayError::FailedAta),
         }
