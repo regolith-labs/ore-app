@@ -39,7 +39,7 @@ use solana_client_wasm::{
         transaction::{Transaction, TransactionError},
     },
     utils::{
-        rpc_config::{RpcSendTransactionConfig, RpcSimulationTransactionConfig},
+        rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
         rpc_response::RpcTokenAccountBalance,
     },
     WasmClient,
