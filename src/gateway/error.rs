@@ -10,7 +10,7 @@ pub enum GatewayError {
     FailedDeserialization,
     FailedAta,
     FailedRegister,
-    TransactionFailed,
+    SimulationFailed,
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,

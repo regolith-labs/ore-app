@@ -16,7 +16,7 @@ use crate::{
     Route,
 };
 
-const LAUNCH_AT: i64 = 1712070000;
+const LAUNCH_AT: i64 = 0; // 1712070000;
 
 #[component]
 pub fn Landing(cx: Scope) -> Element {
@@ -288,61 +288,70 @@ fn SectionA(cx: Scope) -> Element {
 fn TransfersSection(cx: Scope, transfers: AsyncResult<Vec<Transfer>>) -> Element {
     match transfers {
         AsyncResult::Ok(transfers) => {
-            render! {
-                for (i, transfer) in transfers.iter().enumerate() {
-                    if i.lt(&5) {
-                        let addr = transfer.to_address[..5].to_string();
-                        let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
+            if transfers.is_empty() {
+                render! {
+                    p {
+                        class: "text-sm opacity-50",
+                        "No transactions yet"
+                    }
+                }
+            } else {
+                render! {
+                    for (i, transfer) in transfers.iter().enumerate() {
+                        if i.lt(&5) {
+                            let addr = transfer.to_address[..5].to_string();
+                            let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
 
-                        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-                        let ts = Duration::from_secs(transfer.ts as u64);
-                        let time = now.saturating_sub(ts);
-                        let t = time.as_secs();
-                        const ONE_MIN: u64 = 60;
-                        const ONE_HOUR: u64 = ONE_MIN * 60;
-                        const ONE_DAY: u64 = ONE_HOUR * 24;
-                        let time_str = if t.gt(&ONE_DAY) {
-                            format!("{}d ago", t.saturating_div(ONE_DAY))
-                        } else if t.gt(&ONE_HOUR) {
-                            format!("{}h ago", t.saturating_div(ONE_HOUR))
-                        } else if t.gt(&ONE_MIN) {
-                            format!("{}m ago", t.saturating_div(ONE_MIN))
-                        } else {
-                            format!("{}s ago", t)
-                        };
+                            let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+                            let ts = Duration::from_secs(transfer.ts as u64);
+                            let time = now.saturating_sub(ts);
+                            let t = time.as_secs();
+                            const ONE_MIN: u64 = 60;
+                            const ONE_HOUR: u64 = ONE_MIN * 60;
+                            const ONE_DAY: u64 = ONE_HOUR * 24;
+                            let time_str = if t.gt(&ONE_DAY) {
+                                format!("{}d ago", t.saturating_div(ONE_DAY))
+                            } else if t.gt(&ONE_HOUR) {
+                                format!("{}h ago", t.saturating_div(ONE_HOUR))
+                            } else if t.gt(&ONE_MIN) {
+                                format!("{}m ago", t.saturating_div(ONE_MIN))
+                            } else {
+                                format!("{}s ago", t)
+                            };
 
-                        render! {
-                            div {
-                                class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
+                            render! {
                                 div {
-                                    class: "flex flex-col pt-1",
-                                    p {
-                                        class: "flex flex-row gap-2",
-                                        span {
-                                            class: "font-mono font-bold",
-                                            "{addr}"
-                                        }
-                                        "mined "
-                                        span {
-                                            class: "flex flex-row font-semibold gap-0.5",
-                                            OreIcon {
-                                                class: "w-3.5 h-3.5 my-auto",
+                                    class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
+                                    div {
+                                        class: "flex flex-col pt-1",
+                                        p {
+                                            class: "flex flex-row gap-2",
+                                            span {
+                                                class: "font-mono font-bold",
+                                                "{addr}"
                                             }
-                                            "{amount:.4}"
+                                            "mined "
+                                            span {
+                                                class: "flex flex-row font-semibold gap-0.5",
+                                                OreIcon {
+                                                    class: "w-3.5 h-3.5 my-auto",
+                                                }
+                                                "{amount:.4}"
+                                            }
                                         }
                                     }
-                                }
-                                div {
-                                    class: "flex pt-1.5 ml-auto",
-                                    p {
-                                        class: "opacity-50 text-right text-nowrap text-sm",
-                                        "{time_str}"
+                                    div {
+                                        class: "flex pt-1.5 ml-auto",
+                                        p {
+                                            class: "opacity-50 text-right text-nowrap text-sm",
+                                            "{time_str}"
+                                        }
                                     }
                                 }
                             }
+                        } else {
+                            None
                         }
-                    } else {
-                        None
                     }
                 }
             }

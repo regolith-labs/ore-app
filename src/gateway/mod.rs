@@ -20,10 +20,7 @@ pub use pubkey::*;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAccount;
 #[cfg(feature = "desktop")]
-use solana_client::{
-    nonblocking::rpc_client::RpcClient, rpc_config::RpcSendTransactionConfig,
-    rpc_response::RpcTokenAccountBalance,
-};
+use solana_client::{nonblocking::rpc_client::RpcClient, rpc_response::RpcTokenAccountBalance};
 #[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
@@ -54,7 +51,6 @@ use solana_extra_wasm::{
 #[cfg(feature = "desktop")]
 use solana_sdk::{
     clock::Clock,
-    commitment_config::{CommitmentConfig, CommitmentLevel},
     compute_budget::ComputeBudgetInstruction,
     instruction::Instruction,
     pubkey::Pubkey,
@@ -63,8 +59,6 @@ use solana_sdk::{
     sysvar,
     transaction::Transaction,
 };
-#[cfg(feature = "desktop")]
-use solana_transaction_status::UiTransactionEncoding;
 #[cfg(feature = "desktop")]
 use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
@@ -79,13 +73,8 @@ pub const RPC_URL: &str =
     // "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
     "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 
-const CU_LIMIT_ATA: u32 = 24_000;
-const CU_LIMIT_REGISTER: u32 = 7_000;
-const CU_LIMIT_CLAIM: u32 = 14_000;
-const CU_LIMIT_TRANSFER: u32 = 21_000;
-const CU_PRICE: u64 = 1000;
-
-const RPC_RETRIES: usize = 3;
+#[cfg(feature = "web")]
+const RPC_RETRIES: usize = 1;
 const GATEWAY_RETRIES: usize = 5;
 
 pub struct Gateway {
@@ -155,8 +144,10 @@ impl Gateway {
     }
 
     pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {
+        let priority_fee = 0;
         let signer = signer();
         let mut hash = self.rpc.get_latest_blockhash().await.unwrap();
+        #[cfg(feature = "web")]
         let mut cfg = RpcSendTransactionConfig {
             skip_preflight: true,
             preflight_commitment: Some(CommitmentLevel::Confirmed),
@@ -164,51 +155,69 @@ impl Gateway {
             max_retries: Some(RPC_RETRIES),
             min_context_slot: None,
         };
+
+        // Build tx
         let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
         tx.sign(&[&signer], hash);
+
+        // Simulate
+        let sim_res = self.rpc.simulate_transaction(&tx).await;
+        if let Ok(sim_res) = sim_res {
+            // Rebuild tx with new dynamic cu ixs
+            #[cfg(feature = "desktop")]
+            let units_consumed = sim_res.value.units_consumed.unwrap() as u32;
+            #[cfg(feature = "web")]
+            let units_consumed = sim_res.units_consumed.unwrap() as u32;
+            let cu_budget_ix =
+                ComputeBudgetInstruction::set_compute_unit_limit(units_consumed + 1000);
+            let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+            let mut final_ixs = vec![];
+            final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
+            final_ixs.extend_from_slice(ixs);
+            tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
+            tx.sign(&[&signer], hash);
+        } else {
+            return Err(GatewayError::SimulationFailed);
+        };
+
         let mut attempts = 0;
         loop {
             log::info!("Attempt: {:?}", attempts);
-            match self.rpc.send_transaction_with_config(&tx, cfg).await {
+            #[cfg(feature = "web")]
+            let res = self
+                .rpc
+                .send_and_confirm_transaction_with_config(&tx, CommitmentConfig::confirmed(), cfg)
+                .await;
+
+            #[cfg(feature = "desktop")]
+            let res = self.rpc.send_and_confirm_transaction(&tx).await;
+
+            match res {
                 Ok(sig) => {
                     log::info!("{:?}", sig);
-                    match self
-                        .rpc
-                        .confirm_transaction_with_commitment(&sig, CommitmentConfig::confirmed())
-                        .await
-                    {
-                        Ok(confirmed) => {
-                            #[cfg(feature = "desktop")]
-                            let confirmed = confirmed.value;
-                            if confirmed {
-                                return Ok(sig);
-                            }
-                        }
-                        Err(err) => {
-                            log::error!("Error: {:?}", err);
-                        }
-                    }
+                    return Ok(sig);
                 }
                 Err(err) => {
+                    // Retry
                     log::error!("Error {:?}", err);
-                    return Err(GatewayError::TransactionFailed);
+                    async_std::task::sleep(Duration::from_millis(200)).await;
+                    hash = self.rpc.get_latest_blockhash().await.unwrap();
+                    #[cfg(feature = "web")]
+                    {
+                        cfg = RpcSendTransactionConfig {
+                            skip_preflight: true,
+                            preflight_commitment: Some(CommitmentLevel::Confirmed),
+                            encoding: Some(UiTransactionEncoding::Base64),
+                            max_retries: Some(RPC_RETRIES),
+                            min_context_slot: None,
+                        };
+                    }
+                    tx.sign(&[&signer], hash);
+                    attempts += 1;
+                    if attempts > GATEWAY_RETRIES {
+                        return Err(GatewayError::TransactionTimeout);
+                    }
                 }
-            }
-
-            // Retry
-            async_std::task::sleep(Duration::from_millis(200)).await;
-            hash = self.rpc.get_latest_blockhash().await.unwrap();
-            cfg = RpcSendTransactionConfig {
-                skip_preflight: true,
-                preflight_commitment: Some(CommitmentLevel::Confirmed),
-                encoding: Some(UiTransactionEncoding::Base64),
-                max_retries: Some(RPC_RETRIES),
-                min_context_slot: None,
-            };
-            tx.sign(&[&signer], hash);
-            attempts += 1;
-            if attempts > GATEWAY_RETRIES {
-                return Err(GatewayError::TransactionTimeout);
             }
         }
     }
@@ -223,10 +232,8 @@ impl Gateway {
         }
 
         // Sign and send transaction.
-        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_REGISTER);
-        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let ix = ore::instruction::register(signer.pubkey());
-        match self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix]).await {
+        match self.send_and_confirm(&[ix]).await {
             Ok(_) => {
                 track(AppEvent::Register, None);
                 Ok(())
@@ -238,10 +245,8 @@ impl Gateway {
     pub async fn claim_ore(&self, amount: u64) -> GatewayResult<Signature> {
         let signer = signer();
         let beneficiary = ore_token_account_address(signer.pubkey());
-        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_CLAIM);
-        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let ix = ore::instruction::claim(signer.pubkey(), beneficiary, amount);
-        self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix]).await
+        self.send_and_confirm(&[ix]).await
     }
 
     pub async fn transfer_ore(
@@ -257,8 +262,6 @@ impl Gateway {
         let signer = signer();
         let from_token_account = ore_token_account_address(signer.pubkey());
         let to_token_account = ore_token_account_address(to);
-        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_TRANSFER);
-        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let memo_ix = spl_memo::build_memo(&memo.into_bytes(), &[&signer.pubkey()]);
         let transfer_ix = spl_token::instruction::transfer(
             &spl_token::ID,
@@ -269,8 +272,7 @@ impl Gateway {
             amount,
         )
         .unwrap();
-        self.send_and_confirm(&[cu_limit_ix, cu_price_ix, memo_ix, transfer_ix])
-            .await
+        self.send_and_confirm(&[memo_ix, transfer_ix]).await
     }
 
     pub async fn create_token_account_ore(&self, owner: Pubkey) -> GatewayResult<Pubkey> {
@@ -294,15 +296,13 @@ impl Gateway {
         }
 
         // Sign and send transaction.
-        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_ATA);
-        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(CU_PRICE);
         let ix = create_associated_token_account(
             &signer.pubkey(),
             &owner,
             &ore::MINT_ADDRESS,
             &spl_token::id(),
         );
-        match self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix]).await {
+        match self.send_and_confirm(&[ix]).await {
             Ok(_) => track(AppEvent::CreateTokenAccount, None),
             Err(_) => return Err(GatewayError::FailedAta),
         }
