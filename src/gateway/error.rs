@@ -14,6 +14,9 @@ pub enum GatewayError {
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
+    HashInvalid,
+    BusRewardsInsufficient,
+    NeedsReset,
     Unknown,
 }
 

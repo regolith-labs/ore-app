@@ -1,8 +1,11 @@
 use std::rc::Rc;
 #[cfg(feature = "desktop")]
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc, Mutex,
+use std::{
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
+    time::Duration,
 };
 
 use dioxus::prelude::UseSharedState;
@@ -13,10 +16,9 @@ use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
-    compute_budget::ComputeBudgetInstruction,
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
-    {signature::Signature, signer::Signer},
+    signer::Signer,
 };
 #[cfg(feature = "desktop")]
 use solana_sdk::{
@@ -27,19 +29,15 @@ use solana_sdk::{
 };
 #[cfg(feature = "web")]
 use web_sys::Worker;
+#[cfg(feature = "web")]
+use web_time::Duration;
 
 #[cfg(feature = "web")]
 use crate::worker::create_worker;
 use crate::{
-    gateway::{signer, Gateway, GatewayResult},
+    gateway::{signer, Gateway, GatewayError, GatewayResult},
     hooks::PowerLevel,
 };
-
-/// The compute unit limit for mine transactions.
-const CU_LIMIT_MINE: u32 = 3300;
-
-/// The compute unit limit for reset transactions.
-const CU_LIMIT_RESET: u32 = 15000;
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -194,12 +192,13 @@ pub async fn submit_solution(
     gateway: &Rc<Gateway>,
     res: &MiningResult,
     priority_fee: u64,
-) -> GatewayResult<Signature> {
+) -> GatewayResult<()> {
     // Submit mine tx.
     let mut bus_id = 0;
     let next_hash = res.hash;
     let nonce = res.nonce;
     let signer = signer();
+    let mut needs_reset = false;
     loop {
         // Check if epoch needs to be reset
         let treasury = gateway.get_treasury().await?;
@@ -207,9 +206,10 @@ pub async fn submit_solution(
         let epoch_end_at = treasury.last_reset_at.saturating_add(EPOCH_DURATION);
 
         // Submit restart epoch tx, if needed
-        if clock.unix_timestamp.ge(&epoch_end_at) {
+        if clock.unix_timestamp.ge(&epoch_end_at) || needs_reset {
             let ix = ore::instruction::reset(signer.pubkey());
             gateway.send_and_confirm(&[ix], priority_fee).await.ok();
+            needs_reset = false;
         }
 
         // Submit mine tx
@@ -220,12 +220,22 @@ pub async fn submit_solution(
             nonce,
         );
         match gateway.send_and_confirm(&[ix], priority_fee).await {
-            Ok(sig) => return Ok(sig),
-            Err(_err) => {
-                // Retry on different bus.
-                bus_id += 1;
-                if bus_id.ge(&ore::BUS_COUNT) {
-                    bus_id = 0;
+            Ok(_sig) => return Ok(()),
+            Err(err) => {
+                match err {
+                    // Retry on different bus.
+                    GatewayError::HashInvalid => return Ok(()),
+                    GatewayError::NeedsReset => {
+                        needs_reset = true;
+                    }
+                    GatewayError::BusRewardsInsufficient => {
+                        bus_id += 1;
+                        if bus_id.ge(&ore::BUS_COUNT) {
+                            async_std::task::sleep(Duration::from_secs(1)).await;
+                            bus_id = 0;
+                        }
+                    }
+                    _ => return Err(err),
                 }
             }
         }

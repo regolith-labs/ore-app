@@ -20,21 +20,28 @@ pub use pubkey::*;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAccount;
 #[cfg(feature = "desktop")]
-use solana_client::{nonblocking::rpc_client::RpcClient, rpc_response::RpcTokenAccountBalance};
+use solana_client::{
+    nonblocking::rpc_client::RpcClient,
+    rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
+    rpc_response::RpcTokenAccountBalance,
+};
 #[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
         clock::Clock,
         commitment_config::{CommitmentConfig, CommitmentLevel},
         compute_budget::ComputeBudgetInstruction,
-        instruction::Instruction,
+        instruction::{Instruction, InstructionError},
         pubkey::Pubkey,
         signature::{Keypair, Signature},
         signer::Signer,
         sysvar,
-        transaction::Transaction,
+        transaction::{Transaction, TransactionError},
     },
-    utils::{rpc_config::RpcSendTransactionConfig, rpc_response::RpcTokenAccountBalance},
+    utils::{
+        rpc_config::{RpcSendTransactionConfig, RpcSimulationTransactionConfig},
+        rpc_response::RpcTokenAccountBalance,
+    },
     WasmClient,
 };
 #[cfg(feature = "web")]
@@ -53,13 +60,15 @@ use solana_sdk::{
     clock::Clock,
     commitment_config::{CommitmentConfig, CommitmentLevel},
     compute_budget::ComputeBudgetInstruction,
-    instruction::Instruction,
+    instruction::{Instruction, InstructionError},
     pubkey::Pubkey,
     signature::{Keypair, Signature},
     signer::Signer,
     sysvar,
-    transaction::Transaction,
+    transaction::{Transaction, TransactionError},
 };
+#[cfg(feature = "desktop")]
+use solana_transaction_status::UiTransactionEncoding;
 #[cfg(feature = "desktop")]
 use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
@@ -71,10 +80,9 @@ use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str =
-    "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
-// "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+    // "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+    "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
 
-#[cfg(feature = "web")]
 const RPC_RETRIES: usize = 1;
 const GATEWAY_RETRIES: usize = 5;
 const CONFIRM_RETRIES: usize = 10;
@@ -151,13 +159,18 @@ impl Gateway {
         priority_fee: u64,
     ) -> GatewayResult<Signature> {
         let signer = signer();
-        let mut hash = self.rpc.get_latest_blockhash().await.unwrap();
-        let mut cfg = RpcSendTransactionConfig {
+        // let mut hash = self.rpc.get_latest_blockhash().await.unwrap();
+        let (mut hash, mut slot) = self
+            .rpc
+            .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
+            .await
+            .unwrap();
+        let mut send_cfg = RpcSendTransactionConfig {
             skip_preflight: true,
             preflight_commitment: Some(CommitmentLevel::Confirmed),
             encoding: Some(UiTransactionEncoding::Base64),
             max_retries: Some(RPC_RETRIES),
-            min_context_slot: None,
+            min_context_slot: Some(slot),
         };
 
         // Build tx
@@ -165,14 +178,42 @@ impl Gateway {
         tx.sign(&[&signer], hash);
 
         // Simulate
-        let sim_res = self.rpc.simulate_transaction(&tx).await;
+        let sim_res = self
+            .rpc
+            .simulate_transaction_with_config(
+                &tx,
+                RpcSimulateTransactionConfig {
+                    sig_verify: false,
+                    replace_recent_blockhash: false,
+                    commitment: Some(CommitmentConfig::confirmed()),
+                    encoding: Some(UiTransactionEncoding::Base64),
+                    accounts: None,
+                    min_context_slot: Some(slot),
+                },
+            )
+            .await;
         if let Ok(sim_res) = sim_res {
             // Rebuild tx with new dynamic cu ixs
-            match sim_res.err {
-                Some(err) => {
-                    log::info!("Err: {:?}", err);
-                    return Err(GatewayError::SimulationFailed);
-                }
+            #[cfg(feature = "desktop")]
+            let sim_err = sim_res.value.err;
+            #[cfg(feature = "web")]
+            let sim_err = sim_res.err;
+
+            match sim_err {
+                Some(err) => match err {
+                    TransactionError::InstructionError(_, InstructionError::Custom(e)) => {
+                        if e == 1 {
+                            return Err(GatewayError::NeedsReset);
+                        } else if e == 3 {
+                            return Err(GatewayError::HashInvalid);
+                        } else if e == 5 {
+                            return Err(GatewayError::BusRewardsInsufficient);
+                        } else {
+                            return Err(GatewayError::SimulationFailed);
+                        }
+                    }
+                    _ => return Err(GatewayError::SimulationFailed),
+                },
                 None => {
                     #[cfg(feature = "desktop")]
                     let units_consumed = sim_res.value.units_consumed.unwrap() as u32;
@@ -195,10 +236,10 @@ impl Gateway {
 
         let mut attempts = 0;
         loop {
-            log::info!("Attempt: {:?}", attempts);
-            match self.rpc.send_transaction_with_config(&tx, cfg).await {
+            // log::info!("Attempt: {:?}", attempts);
+            match self.rpc.send_transaction_with_config(&tx, send_cfg).await {
                 Ok(sig) => {
-                    log::info!("{:?}", sig);
+                    // log::info!("{:?}", sig);
                     let mut confirm_check = 0;
                     'confirm: loop {
                         match self
@@ -212,7 +253,7 @@ impl Gateway {
                             Ok(confirmed) => {
                                 #[cfg(feature = "desktop")]
                                 let confirmed = confirmed.value;
-                                log::info!("Confirm check {:?}: {:?}", confirm_check, confirmed);
+                                // log::info!("Confirm check {:?}: {:?}", confirm_check, confirmed);
                                 if confirmed {
                                     return Ok(sig);
                                 }
@@ -237,13 +278,17 @@ impl Gateway {
 
             // Retry
             async_std::task::sleep(Duration::from_millis(200)).await;
-            hash = self.rpc.get_latest_blockhash().await.unwrap();
-            cfg = RpcSendTransactionConfig {
+            (hash, slot) = self
+                .rpc
+                .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
+                .await
+                .unwrap();
+            send_cfg = RpcSendTransactionConfig {
                 skip_preflight: true,
                 preflight_commitment: Some(CommitmentLevel::Confirmed),
                 encoding: Some(UiTransactionEncoding::Base64),
                 max_retries: Some(RPC_RETRIES),
-                min_context_slot: None,
+                min_context_slot: Some(slot),
             };
             tx.sign(&[&signer], hash);
             attempts += 1;
