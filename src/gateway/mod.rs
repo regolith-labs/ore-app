@@ -54,7 +54,7 @@ use solana_extra_wasm::{
 #[cfg(feature = "desktop")]
 use solana_sdk::{
     clock::Clock,
-    commitment_config::{CommitmentConfig, CommitmetnLevel},
+    commitment_config::{CommitmentConfig, CommitmentLevel},
     compute_budget::ComputeBudgetInstruction,
     instruction::Instruction,
     pubkey::Pubkey,
@@ -156,17 +156,13 @@ impl Gateway {
 
     pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {
         let signer = signer();
-        let (mut hash, mut slot) = self
-            .rpc
-            .get_latest_blockhash_with_config(CommitmentConfig::confirmed())
-            .await
-            .unwrap();
+        let mut hash = self.rpc.get_latest_blockhash().await.unwrap();
         let mut cfg = RpcSendTransactionConfig {
             skip_preflight: true,
             preflight_commitment: Some(CommitmentLevel::Confirmed),
             encoding: Some(UiTransactionEncoding::Base64),
             max_retries: Some(RPC_RETRIES),
-            min_context_slot: Some(slot),
+            min_context_slot: None,
         };
         let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
         tx.sign(&[&signer], hash);
@@ -182,6 +178,8 @@ impl Gateway {
                         .await
                     {
                         Ok(confirmed) => {
+                            #[cfg(feature = "desktop")]
+                            let confirmed = confirmed.value;
                             if confirmed {
                                 return Ok(sig);
                             }
@@ -199,17 +197,13 @@ impl Gateway {
 
             // Retry
             async_std::task::sleep(Duration::from_millis(200)).await;
-            (hash, slot) = self
-                .rpc
-                .get_latest_blockhash_with_config(CommitmentConfig::confirmed())
-                .await
-                .unwrap();
+            hash = self.rpc.get_latest_blockhash().await.unwrap();
             cfg = RpcSendTransactionConfig {
                 skip_preflight: true,
                 preflight_commitment: Some(CommitmentLevel::Confirmed),
                 encoding: Some(UiTransactionEncoding::Base64),
                 max_retries: Some(RPC_RETRIES),
-                min_context_slot: Some(slot),
+                min_context_slot: None,
             };
             tx.sign(&[&signer], hash);
             attempts += 1;
