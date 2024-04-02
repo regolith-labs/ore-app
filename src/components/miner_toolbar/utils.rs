@@ -33,11 +33,11 @@ pub async fn try_start_mining(
     gateway.register_ore().await?;
 
     // Wait for mining to begin if necessary
-    let now_unix_timestamp = Utc::now().timestamp();
-    if START_AT.gt(&now_unix_timestamp) {
-        *status_message.write() = MinerStatusMessage::Waiting;
-        return Ok(());
-    }
+    // let now_unix_timestamp = Utc::now().timestamp();
+    // if START_AT.gt(&now_unix_timestamp) {
+    //     *status_message.write() = MinerStatusMessage::Waiting;
+    //     return Ok(());
+    // }
 
     // Start mining
     let treasury = gateway.get_treasury().await.unwrap();

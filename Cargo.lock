@@ -4378,9 +4378,9 @@ dependencies = [
 
 [[package]]
 name = "ore-program"
-version = "1.1.0"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "391d25b5538a98e1bfce54526b54b622578aed6f127c92ea2d9f217f1e17af50"
+checksum = "d1438154357d3952bd1d8f683d7ded7977a317b86495031313a6a8799afe2ec8"
 dependencies = [
  "bs58 0.5.1",
  "bytemuck",

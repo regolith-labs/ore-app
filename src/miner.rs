@@ -208,24 +208,18 @@ pub async fn submit_solution(
 
         // Submit restart epoch tx, if needed
         if clock.unix_timestamp.ge(&epoch_end_at) {
-            let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_RESET);
             let ix = ore::instruction::reset(signer.pubkey());
-            gateway.send_and_confirm(&[cu_limit_ix, ix]).await.ok();
+            gateway.send_and_confirm(&[ix], priority_fee).await.ok();
         }
 
         // Submit mine tx
-        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
-        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
         let ix = ore::instruction::mine(
             signer.pubkey(),
             ore::BUS_ADDRESSES[bus_id],
             next_hash.into(),
             nonce,
         );
-        match gateway
-            .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix])
-            .await
-        {
+        match gateway.send_and_confirm(&[ix], priority_fee).await {
             Ok(sig) => return Ok(sig),
             Err(_err) => {
                 // Retry on different bus.
