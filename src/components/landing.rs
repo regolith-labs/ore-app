@@ -16,7 +16,7 @@ use crate::{
     Route,
 };
 
-const LAUNCH_AT: i64 = 0; // 1712070000;
+const LAUNCH_AT: i64 = 1712070000;
 
 #[component]
 pub fn Landing(cx: Scope) -> Element {
