@@ -31,7 +31,7 @@ pub fn ExportKeySecret(cx: Scope) -> Element {
                 class: "mx-auto w-full",
                 value: keypair.to_base58_string(),
                 p {
-                    class: "p-2 text-wrap break-words max-w-full",
+                    class: "p-2 text-wrap break-words",
                     "{keypair.to_base58_string()}"
                 }
             }
