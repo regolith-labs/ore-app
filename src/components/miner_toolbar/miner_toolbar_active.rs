@@ -92,7 +92,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                     class: "flex flex-row gap-1",
                                     p {
                                         class: "text-lg text-white my-auto",
-                                        "Mining will start in"
+                                        "Mining will begin in"
                                     }
                                     CountdownTimer {
                                         class: "text-lg text-white my-auto"
@@ -164,7 +164,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                     class: "flex flex-row gap-1 shrink w-min justify-start",
                                     p {
                                         class: "truncate w-min shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
-                                        "Mining will start in "
+                                        "Mining will begin in "
                                     }
                                     CountdownTimer {
                                         class: "text-sm text-white opacity-80 my-auto"
@@ -189,7 +189,6 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
 #[component]
 pub fn CountdownTimer<'a>(cx: Scope, class: Option<&'a str>) -> Element {
     let class = class.unwrap_or("");
-
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
     let now_unix_timestamp = Utc::now().timestamp();
     let seconds_until_launch = START_AT - now_unix_timestamp;
