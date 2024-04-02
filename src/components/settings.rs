@@ -2,6 +2,7 @@ use std::{fmt, io, str::FromStr};
 
 use dioxus::prelude::*;
 use dioxus_router::components::Link;
+use is_url::is_url;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
@@ -10,8 +11,8 @@ use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     components::Copyable,
-    gateway::AsyncResult,
-    hooks::{use_appearance, use_explorer, use_pubkey, use_sol_balance},
+    gateway::{AsyncResult, RPC_URL},
+    hooks::{use_appearance, use_explorer, use_pubkey, use_rpc_url, use_sol_balance, RpcUrl},
     route::Route,
 };
 
@@ -21,6 +22,11 @@ pub fn Settings(cx: Scope) -> Element {
     let sol_balance = use_sol_balance(cx);
     let explorer = use_explorer(cx);
     let appearance = use_appearance(cx);
+
+    let rpc_url = use_rpc_url(cx);
+    let rpc_url_input = use_state(cx, || rpc_url.read().0.clone());
+    let is_rpc_url_edited = rpc_url.read().0.ne(rpc_url_input.get());
+    let rpc_url_error = use_state::<Option<String>>(cx, || None);
 
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
@@ -132,6 +138,73 @@ pub fn Settings(cx: Scope) -> Element {
                         option { initial_selected: explorer.read().eq(&Explorer::SolanaFm), value: "{Explorer::SolanaFm}", "{Explorer::SolanaFm}" }
                         option { initial_selected: explorer.read().eq(&Explorer::Solscan), value: "{Explorer::Solscan}", "{Explorer::Solscan}" }
                         option { initial_selected: explorer.read().eq(&Explorer::Xray), value: "{Explorer::Xray}", "{Explorer::Xray}" }
+                    }
+                }
+            }
+            div {
+                class: "flex flex-col gap-4",
+                h2 {
+                    class: "{section_title_class}",
+                    "System"
+                }
+                div {
+                    class: "{container_class}",
+                    p {
+                        class: "{data_title_class} mb-auto py-1",
+                        "RPC"
+                    }
+                    div {
+                        class: "flex flex-col gap-2",
+                        input {
+                            autofocus: false,
+                            class: "w-full max-w-96 text-right placeholder-gray-300 dark:placeholder-gray-800 bg-transparent",
+                            value: "{rpc_url_input}",
+                            placeholder: "{RPC_URL}",
+                            oninput: move |evt| {
+                                let s = evt.value.clone();
+                                rpc_url_input.set(s.clone());
+                                if !is_url(&s) {
+                                    rpc_url_error.set(Some("Invalid url".to_string()));
+                                } else {
+                                    rpc_url_error.set(None);
+                                }
+                            },
+                        }
+                        if let Some(err_str) = rpc_url_error.get() {
+                            render!{
+                                p {
+                                    class: "text-sm text-red-500 text-right",
+                                    "{err_str}"
+                                }
+                            }
+                        }
+                        div {
+                            class: "flex flex-row gap-2",
+                            if rpc_url.read().0.ne(RPC_URL) {
+                                render! {
+                                    button {
+                                        class: "hover-100 active-200 rounded shrink ml-auto transition-colors px-2 py-1",
+                                        onclick: move |_| {
+                                            *rpc_url.write() = RpcUrl(RPC_URL.to_string());
+                                            rpc_url_input.set(RPC_URL.to_string());
+                                            rpc_url_error.set(None);
+                                        },
+                                        "Default"
+                                    }
+                                }
+                            }
+                            if is_rpc_url_edited && rpc_url_error.is_none() {
+                                render! {
+                                    button {
+                                        class: "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded shrink ml-auto transition-colors px-2 py-1",
+                                        onclick: move |_| {
+                                            *rpc_url.write() = RpcUrl(rpc_url_input.get().clone());
+                                        },
+                                        "Save"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

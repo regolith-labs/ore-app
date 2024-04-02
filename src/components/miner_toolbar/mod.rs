@@ -42,7 +42,6 @@ pub enum MinerStatus {
 pub enum MinerStatusMessage {
     CreatingTokenAccount,
     GeneratingChallenge,
-    Waiting,
     Searching,
     Submitting,
     Error,

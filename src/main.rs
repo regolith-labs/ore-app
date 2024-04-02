@@ -1,10 +1,8 @@
 #![cfg_attr(feature = "bundle", windows_subsystem = "windows")]
 #![allow(non_snake_case)]
-use std::rc::Rc;
 
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
-use gateway::Gateway;
 
 mod components;
 #[cfg(feature = "desktop")]
@@ -22,7 +20,7 @@ use crate::{
     hooks::{
         use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
         use_ore_balance_provider, use_power_level_provider, use_priority_fee_provider,
-        use_proof_provider, use_sol_balance_provider, ProofHandle,
+        use_proof_provider, use_rpc_url_provider, use_sol_balance_provider, ProofHandle,
     },
     route::Route,
 };
@@ -53,9 +51,7 @@ fn App(cx: Scope) -> Element {
     use_power_level_provider(cx);
     use_is_onboarded_provider(cx);
     use_priority_fee_provider(cx);
-
-    // Gateway
-    use_context_provider(cx, || Rc::new(Gateway::new()));
+    use_rpc_url_provider(cx);
 
     // Network variables
     use_proof_provider(cx);

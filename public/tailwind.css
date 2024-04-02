@@ -1510,6 +1510,16 @@ h2:where(.dark, .dark *) {
   color: rgb(214 214 216 / var(--tw-placeholder-opacity));
 }
 
+.placeholder-gray-300::-moz-placeholder {
+  --tw-placeholder-opacity: 1;
+  color: rgb(176 176 178 / var(--tw-placeholder-opacity));
+}
+
+.placeholder-gray-300::placeholder {
+  --tw-placeholder-opacity: 1;
+  color: rgb(176 176 178 / var(--tw-placeholder-opacity));
+}
+
 .opacity-0 {
   opacity: 0;
 }

@@ -95,13 +95,13 @@ pub struct Gateway {
 }
 
 impl Gateway {
-    pub fn new() -> Self {
+    pub fn new(api_url: String, rpc_url: String) -> Self {
         Gateway {
-            api_url: API_URL.to_string(),
+            api_url,
             #[cfg(feature = "web")]
-            rpc: WasmClient::new(RPC_URL),
+            rpc: WasmClient::new(&rpc_url),
             #[cfg(feature = "desktop")]
-            rpc: RpcClient::new(RPC_URL.to_string()),
+            rpc: RpcClient::new(rpc_url),
         }
     }
 
