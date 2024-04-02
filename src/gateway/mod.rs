@@ -79,9 +79,7 @@ use web_time::Duration;
 use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-pub const RPC_URL: &str =
-    // "https://devnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
-    "https://mainnet.helius-rpc.com/?api-key=bb9df66a-8cba-404d-b17a-e739fe6a480c";
+pub const RPC_URL: &str = "https://amaleta-5y8tse-fast-mainnet.helius-rpc.com/";
 
 const RPC_RETRIES: usize = 1;
 const GATEWAY_RETRIES: usize = 5;
