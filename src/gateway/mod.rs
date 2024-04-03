@@ -141,7 +141,7 @@ impl Gateway {
         let bus_address = BUS_ADDRESSES.get(id).unwrap();
         let data = self
             .rpc
-            .get_account_data(&bus_address)
+            .get_account_data(bus_address)
             .await
             .or(Err(GatewayError::NetworkUnavailable))?;
         Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
