@@ -17,7 +17,7 @@ pub fn use_ping(cx: &ScopeState) -> AsyncResult<u64> {
                     Ok(slot) => ping_status.set(AsyncResult::Ok(slot)),
                     Err(err) => ping_status.set(AsyncResult::Error(err.into())),
                 }
-                async_std::task::sleep(std::time::Duration::from_secs(60)).await;
+                async_std::task::sleep(std::time::Duration::from_secs(180)).await;
             }
         }
     });

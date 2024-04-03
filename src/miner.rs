@@ -198,7 +198,7 @@ async fn find_open_bus(gateway: &Rc<Gateway>, reward_rate: u64) -> usize {
     loop {
         let bus_id = rng.gen_range(0..BUS_COUNT);
         if let Ok(bus) = gateway.get_bus(bus_id).await {
-            if bus.rewards.gt(&reward_rate) {
+            if bus.rewards.gt(&reward_rate.saturating_mul(4)) {
                 return bus_id;
             }
         }
@@ -247,6 +247,7 @@ pub async fn submit_solution(
 
         // Submit mine tx
         let bus_id = find_open_bus(gateway, treasury.reward_rate).await;
+        log::info!("Using bus {}", bus_id);
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
         let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
         let ix = ore::instruction::mine(

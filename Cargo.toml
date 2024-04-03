@@ -106,8 +106,10 @@ features = [
 ]
 
 [patch.crates-io]
-solana-client-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", rev = "91367320c2f76d9d6e24e55f48eb14b7947b1c8f" }
-solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", rev = "91367320c2f76d9d6e24e55f48eb14b7947b1c8f" }
+solana-client-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "hardhatchad/token-largest" }
+solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", branch = "hardhatchad/token-largest" }
+# solana-client-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", rev = "91367320c2f76d9d6e24e55f48eb14b7947b1c8f" }
+# solana-extra-wasm = { version = "1.17.4", git = "https://github.com/HardhatChad/solana-playground", rev = "91367320c2f76d9d6e24e55f48eb14b7947b1c8f" }
 
 [package.metadata.bundle]
 name = "Ore"
