@@ -81,10 +81,10 @@ pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01HTD8PP
 pub const JITO_URL: &str = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
 
 pub const CU_LIMIT_REGISTER: u32 = 7660;
-pub const CU_LIMIT_CLAIM: u32 = 11_00;
+pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_TRANSFER: u32 = 30_000; // TODO
 pub const CU_LIMIT_ATA: u32 = 24_000;
-pub const CU_LIMIT_RESET: u32 = 12_700;
+pub const CU_LIMIT_RESET: u32 = 12_200;
 pub const CU_LIMIT_MINE: u32 = 3200;
 
 const RPC_RETRIES: usize = 0;
@@ -200,7 +200,7 @@ impl Gateway {
             log::info!("Attempt: {:?}", attempts);
 
             // Submit tx
-            match self.jito.send_transaction_with_config(&tx, send_cfg).await {
+            match self.rpc.send_transaction_with_config(&tx, send_cfg).await {
                 Ok(sig) => {
                     sigs.push(sig);
                     log::info!("{:?}", sig);
