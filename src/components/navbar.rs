@@ -24,7 +24,7 @@ pub fn Navbar(cx: Scope) -> Element {
             if let AsyncResult::Error(_) = ping {
                 render! {
                     Banner {
-                        text: "Please check your internet connection.".to_string(),
+                        text: "Error connecting to Solana...".to_string(),
                         banner_type: BannerType::Error
                     }
                 }
