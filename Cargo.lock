@@ -4366,6 +4366,7 @@ dependencies = [
  "ore-program",
  "ore-types",
  "qrcode-generator",
+ "rand 0.8.5",
  "reqwest",
  "serde",
  "serde-wasm-bindgen 0.6.5",

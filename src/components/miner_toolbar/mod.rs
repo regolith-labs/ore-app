@@ -23,7 +23,7 @@ pub use utils::*;
 use dioxus::prelude::*;
 
 use crate::{
-    hooks::{use_gateway, use_miner, use_priority_fee, use_pubkey},
+    hooks::{use_gateway, use_miner, use_priority_fee, use_pubkey, use_treasury},
     miner::{submit_solution, MiningResult},
     ProofHandle,
 };
@@ -68,6 +68,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let ch = use_channel::<MiningResult>(cx, 1);
     let miner = use_miner(cx, ch);
     let pubkey = use_pubkey(cx);
+    let (treasury, _) = use_treasury(cx);
 
     let _ = use_future(cx, miner_status_message, |_| {
         let display_hash = miner_display_hash.clone();
@@ -89,6 +90,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let _ = use_future(cx, (), |_| {
         let mut rx = ch.clone().receiver();
         let status = miner_status.clone();
+        let treasury = treasury.clone();
         let miner = miner.clone();
         let gateway = gateway.clone();
         let proof_ = proof_.clone();
@@ -100,10 +102,11 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                 *miner_display_hash.write() = MinerDisplayHash(res.hash);
                 *miner_status_message.write() = MinerStatusMessage::Submitting;
                 let priority_fee = priority_fee.read().0;
-                match submit_solution(&gateway, &res, priority_fee).await {
+                match submit_solution(&gateway, &res, priority_fee, treasury.clone()).await {
                     Ok(_sig) => {
                         proof_.restart();
                         if let MinerStatus::Active = *status.read() {
+                            // TODO Read difficulty from passed in treasury rather than refetching
                             if let Ok(treasury) = gateway.get_treasury().await {
                                 if let Ok(proof) = gateway.get_proof(pubkey).await {
                                     *miner_status_message.write() = MinerStatusMessage::Searching;

@@ -11,9 +11,9 @@ pub use error::*;
 #[cfg(feature = "web")]
 use gloo_storage::{LocalStorage, Storage};
 use ore::{
-    state::{Proof, Treasury},
+    state::{Bus, Proof, Treasury},
     utils::AccountDeserialize,
-    TREASURY_ADDRESS,
+    BUS_ADDRESSES, TREASURY_ADDRESS,
 };
 use ore_types::{response::GetTransfersResponse, Transfer};
 pub use pubkey::*;
@@ -135,6 +135,16 @@ impl Gateway {
             .await
             .or(Err(GatewayError::NetworkUnavailable))?;
         Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
+    }
+
+    pub async fn get_bus(&self, id: usize) -> GatewayResult<Bus> {
+        let bus_address = BUS_ADDRESSES.get(id).unwrap();
+        let data = self
+            .rpc
+            .get_account_data(&bus_address)
+            .await
+            .or(Err(GatewayError::NetworkUnavailable))?;
+        Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
     }
 
     pub async fn get_treasury(&self) -> GatewayResult<Treasury> {

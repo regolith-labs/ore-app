@@ -9,8 +9,9 @@ use std::{
 };
 
 use dioxus::prelude::UseSharedState;
-use dioxus_std::utils::channel::UseChannel;
-use ore::EPOCH_DURATION;
+use dioxus_std::utils::{channel::UseChannel, rw::UseRw};
+use ore::{state::Treasury, BUS_COUNT, EPOCH_DURATION};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "web")]
 use serde_wasm_bindgen::to_value;
@@ -36,7 +37,9 @@ use web_time::Duration;
 #[cfg(feature = "web")]
 use crate::worker::create_worker;
 use crate::{
-    gateway::{signer, Gateway, GatewayResult, CU_LIMIT_MINE, CU_LIMIT_RESET},
+    gateway::{
+        signer, AsyncResult, Gateway, GatewayError, GatewayResult, CU_LIMIT_MINE, CU_LIMIT_RESET,
+    },
     hooks::PowerLevel,
 };
 
@@ -189,34 +192,61 @@ pub fn find_next_hash(hash: KeccakHash, difficulty: KeccakHash, signer: Pubkey) 
     }
 }
 
+async fn find_open_bus(gateway: &Rc<Gateway>, reward_rate: u64) -> usize {
+    // Find a valid bus
+    let mut rng = rand::thread_rng();
+    loop {
+        let bus_id = rng.gen_range(0..BUS_COUNT);
+        if let Ok(bus) = gateway.get_bus(bus_id).await {
+            if bus.rewards.gt(&reward_rate) {
+                return bus_id;
+            }
+        }
+        async_std::task::sleep(Duration::from_secs(1)).await;
+    }
+}
+
 pub async fn submit_solution(
     gateway: &Rc<Gateway>,
     res: &MiningResult,
     priority_fee: u64,
+    treasury_rw: UseRw<AsyncResult<Treasury>>,
 ) -> GatewayResult<()> {
     // Submit mine tx.
-    let mut bus_id = 0;
     let next_hash = res.hash;
     let nonce = res.nonce;
     let signer = signer();
+
+    // Read current treasury value
+    let treasury = match *treasury_rw.read().unwrap() {
+        AsyncResult::Ok(treasury) => treasury,
+        _ => return Err(GatewayError::Unknown), // TODO
+    };
+
+    // Find a valid bus
+    let mut rng = rand::thread_rng();
     loop {
         // Check if epoch needs to be reset
-        let treasury = gateway.get_treasury().await?;
         let clock = gateway.get_clock().await?;
         let epoch_end_at = treasury.last_reset_at.saturating_add(EPOCH_DURATION);
 
         // Submit restart epoch tx, if needed
         if clock.unix_timestamp.ge(&epoch_end_at) {
-            let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_RESET);
-            let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-            let ix = ore::instruction::reset(signer.pubkey());
-            gateway
-                .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix])
-                .await
-                .ok();
+            // There are a lot of miners right now, randomize who tries the reset
+            let selected_to_reset = rng.gen_range(0..10).eq(&0);
+            if selected_to_reset {
+                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_RESET);
+                let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+                let ix = ore::instruction::reset(signer.pubkey());
+                gateway
+                    .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix])
+                    .await
+                    .ok();
+            }
         }
 
         // Submit mine tx
+        let bus_id = find_open_bus(gateway, treasury.reward_rate).await;
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
         let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
         let ix = ore::instruction::mine(
@@ -230,12 +260,10 @@ pub async fn submit_solution(
             .await
         {
             Ok(_sig) => return Ok(()),
-            Err(_err) => {
-                bus_id += 1;
-                if bus_id.ge(&ore::BUS_COUNT) {
-                    async_std::task::sleep(Duration::from_secs(1)).await;
-                    bus_id = 0;
-                }
+            Err(err) => {
+                // TODO Retry
+                // TODO It seems this can error can occur sometimes, even while tx was submitted
+                log::error!("Error submitting: {:?}", err);
             }
         }
     }
