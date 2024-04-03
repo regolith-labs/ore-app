@@ -67,34 +67,34 @@ pub fn use_transfers(
     let transfers = use_rw::<AsyncResult<Vec<Transfer>>>(cx, || AsyncResult::Loading);
     let has_more = use_state(cx, || false);
 
-    // use_transfers_websocket(
-    //     cx,
-    //     filter,
-    //     transfers,
-    //     offset,
-    //     has_more,
-    //     ACTIVITY_TABLE_PAGE_LIMIT,
-    // );
+    use_transfers_websocket(
+        cx,
+        filter,
+        transfers,
+        offset,
+        has_more,
+        ACTIVITY_TABLE_PAGE_LIMIT,
+    );
 
-    // let _ = use_future(cx, (&filter.clone(), &offset.clone()), |_| {
-    //     let gateway = gateway.clone();
-    //     let transfers = transfers.clone();
-    //     let has_more = has_more.clone();
-    //     let offset = *offset.current();
-    //     let user = match filter.get() {
-    //         ActivityFilter::Global => None,
-    //         ActivityFilter::Personal => Some(pubkey),
-    //     };
-    //     async move {
-    //         if let Some(res) = gateway
-    //             .list_transfers(user, offset, ACTIVITY_TABLE_PAGE_LIMIT)
-    //             .await
-    //         {
-    //             transfers.write(AsyncResult::Ok(res.data)).unwrap();
-    //             has_more.set(res.has_more);
-    //         };
-    //     }
-    // });
+    let _ = use_future(cx, (&filter.clone(), &offset.clone()), |_| {
+        let gateway = gateway.clone();
+        let transfers = transfers.clone();
+        let has_more = has_more.clone();
+        let offset = *offset.current();
+        let user = match filter.get() {
+            ActivityFilter::Global => None,
+            ActivityFilter::Personal => Some(pubkey),
+        };
+        async move {
+            if let Some(res) = gateway
+                .list_transfers(user, offset, ACTIVITY_TABLE_PAGE_LIMIT)
+                .await
+            {
+                transfers.write(AsyncResult::Ok(res.data)).unwrap();
+                has_more.set(res.has_more);
+            };
+        }
+    });
 
     (transfers.read().unwrap().clone(), *has_more.get())
 }
