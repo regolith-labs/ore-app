@@ -77,7 +77,7 @@ use web_time::Duration;
 use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-pub const RPC_URL: &str = "https://amaleta-5y8tse-fast-mainnet.helius-rpc.com/";
+pub const RPC_URL: &str = "https://rpc-proxy.hardhatchad.workers.dev";
 pub const JITO_URL: &str = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
 
 pub const CU_LIMIT_REGISTER: u32 = 7660;
@@ -124,7 +124,7 @@ impl Gateway {
             .rpc
             .get_account_data(&sysvar::clock::ID)
             .await
-            .or(Err(GatewayError::NetworkUnavailable))?;
+            .map_err(GatewayError::from)?;
         bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
     }
 
@@ -133,7 +133,7 @@ impl Gateway {
             .rpc
             .get_account_data(&proof_pubkey(authority))
             .await
-            .or(Err(GatewayError::NetworkUnavailable))?;
+            .map_err(GatewayError::from)?;
         Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
     }
 
@@ -143,7 +143,7 @@ impl Gateway {
             .rpc
             .get_account_data(bus_address)
             .await
-            .or(Err(GatewayError::NetworkUnavailable))?;
+            .map_err(GatewayError::from)?;
         Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
     }
 
@@ -152,7 +152,7 @@ impl Gateway {
             .rpc
             .get_account_data(&TREASURY_ADDRESS)
             .await
-            .or(Err(GatewayError::NetworkUnavailable))?;
+            .map_err(GatewayError::from)?;
         Ok(*Treasury::try_from_bytes(&data).expect("Failed to parse treasury account"))
     }
 
@@ -163,7 +163,7 @@ impl Gateway {
         self.rpc
             .get_token_account(pubkey)
             .await
-            .or(Err(GatewayError::NetworkUnavailable))
+            .map_err(GatewayError::from)
     }
 
     pub async fn get_token_largest_accounts(
@@ -173,7 +173,7 @@ impl Gateway {
         self.rpc
             .get_token_largest_accounts(pubkey)
             .await
-            .or(Err(GatewayError::NetworkUnavailable))
+            .map_err(GatewayError::from)
     }
 
     pub async fn send_and_confirm(&self, ixs: &[Instruction]) -> GatewayResult<Signature> {
@@ -182,7 +182,7 @@ impl Gateway {
             .rpc
             .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
             .await
-            .unwrap();
+            .map_err(GatewayError::from)?;
         let mut send_cfg = RpcSendTransactionConfig {
             skip_preflight: true,
             preflight_commitment: Some(CommitmentLevel::Confirmed),
@@ -256,7 +256,7 @@ impl Gateway {
                 .rpc
                 .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
                 .await
-                .unwrap();
+                .map_err(GatewayError::from)?;
             send_cfg = RpcSendTransactionConfig {
                 skip_preflight: true,
                 preflight_commitment: Some(CommitmentLevel::Confirmed),
@@ -339,7 +339,12 @@ impl Gateway {
 
         // Check if account already exists.
         let token_account_address = ore_token_account_address(owner);
-        match self.rpc.get_token_account(&token_account_address).await {
+        match self
+            .rpc
+            .get_token_account(&token_account_address)
+            .await
+            .map_err(GatewayError::from)
+        {
             Ok(token_account) => {
                 if token_account.is_some() {
                     return Ok(token_account_address);
@@ -347,8 +352,9 @@ impl Gateway {
             }
             Err(err) => {
                 log::info!("Err: {:?}", err);
-                if let GatewayError::AccountNotFound = GatewayError::from(err) {
-                    // Noop
+                match err {
+                    GatewayError::AccountNotFound => {}
+                    _ => return Err(err),
                 }
             }
         }
