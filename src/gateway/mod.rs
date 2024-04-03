@@ -77,7 +77,7 @@ use web_time::Duration;
 use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-pub const RPC_URL: &str = "https://rpc-proxy.hardhatchad.workers.dev";
+pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01HTD8PPGDM1JBVQVEVJKXZ47F";
 pub const JITO_URL: &str = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
 
 pub const CU_LIMIT_REGISTER: u32 = 7660;
@@ -117,43 +117,6 @@ impl Gateway {
             #[cfg(feature = "desktop")]
             jito: RpcClient::new(jito_url.to_string()),
         }
-    }
-
-    pub async fn get_clock(&self) -> GatewayResult<Clock> {
-        let data = self
-            .rpc
-            .get_account_data(&sysvar::clock::ID)
-            .await
-            .map_err(GatewayError::from)?;
-        bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
-    }
-
-    pub async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
-        let data = self
-            .rpc
-            .get_account_data(&proof_pubkey(authority))
-            .await
-            .map_err(GatewayError::from)?;
-        Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
-    }
-
-    pub async fn get_bus(&self, id: usize) -> GatewayResult<Bus> {
-        let bus_address = BUS_ADDRESSES.get(id).unwrap();
-        let data = self
-            .rpc
-            .get_account_data(bus_address)
-            .await
-            .map_err(GatewayError::from)?;
-        Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
-    }
-
-    pub async fn get_treasury(&self) -> GatewayResult<Treasury> {
-        let data = self
-            .rpc
-            .get_account_data(&TREASURY_ADDRESS)
-            .await
-            .map_err(GatewayError::from)?;
-        Ok(*Treasury::try_from_bytes(&data).expect("Failed to parse treasury account"))
     }
 
     pub async fn get_token_account(
@@ -421,6 +384,43 @@ impl Gateway {
             }
         }
     }
+}
+
+pub async fn get_clock() -> GatewayResult<Clock> {
+    let rpc = WasmClient::new(RPC_URL);
+    let data = rpc
+        .get_account_data(&sysvar::clock::ID)
+        .await
+        .map_err(GatewayError::from)?;
+    bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
+}
+
+pub async fn get_proof(authority: Pubkey) -> GatewayResult<Proof> {
+    let rpc = WasmClient::new(RPC_URL);
+    let data = rpc
+        .get_account_data(&proof_pubkey(authority))
+        .await
+        .map_err(GatewayError::from)?;
+    Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
+}
+
+pub async fn get_bus(id: usize) -> GatewayResult<Bus> {
+    let rpc = WasmClient::new(RPC_URL);
+    let bus_address = BUS_ADDRESSES.get(id).unwrap();
+    let data = rpc
+        .get_account_data(bus_address)
+        .await
+        .map_err(GatewayError::from)?;
+    Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
+}
+
+pub async fn get_treasury() -> GatewayResult<Treasury> {
+    let rpc = WasmClient::new(RPC_URL);
+    let data = rpc
+        .get_account_data(&TREASURY_ADDRESS)
+        .await
+        .map_err(GatewayError::from)?;
+    Ok(*Treasury::try_from_bytes(&data).expect("Failed to parse treasury account"))
 }
 
 #[cfg(feature = "web")]

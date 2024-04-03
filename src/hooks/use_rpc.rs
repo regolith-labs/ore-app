@@ -9,6 +9,7 @@ const KEY: &str = "rpc";
 pub struct RpcUrl(pub String);
 
 const OLD_RPC_URL: &str = "https://amaleta-5y8tse-fast-mainnet.helius-rpc.com/";
+const OLD_RPC_URL_2: &str = "https://rpc-proxy.hardhatchad.workers.dev";
 
 pub fn use_rpc_url(cx: &ScopeState) -> &UseSharedState<RpcUrl> {
     let rpc = use_shared_state::<RpcUrl>(cx).unwrap();
@@ -25,7 +26,7 @@ pub fn use_rpc_url_provider(cx: &ScopeState) {
     let rpc = use_persistent(cx, KEY, || RpcUrl(RPC_URL.to_string()));
 
     use_effect(cx, (), |_| {
-        if rpc.get().0.eq(&OLD_RPC_URL) {
+        if rpc.get().0.eq(&OLD_RPC_URL) || rpc.get().0.eq(&OLD_RPC_URL_2) {
             rpc.set(RpcUrl(RPC_URL.to_string()));
         }
         async move {}
