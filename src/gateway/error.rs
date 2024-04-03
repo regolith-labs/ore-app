@@ -10,13 +10,9 @@ pub enum GatewayError {
     FailedDeserialization,
     FailedAta,
     FailedRegister,
-    SimulationFailed,
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
-    HashInvalid,
-    BusRewardsInsufficient,
-    NeedsReset,
     Unknown,
 }
 
