@@ -78,7 +78,6 @@ use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01HTD8PPGDM1JBVQVEVJKXZ47F";
-pub const JITO_URL: &str = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
 
 pub const CU_LIMIT_REGISTER: u32 = 7660;
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
@@ -95,12 +94,8 @@ const DEFAULT_PRIORITY_FEE: u64 = 1000;
 pub struct Gateway {
     #[cfg(feature = "web")]
     pub rpc: WasmClient,
-    #[cfg(feature = "web")]
-    pub jito: WasmClient,
     #[cfg(feature = "desktop")]
     pub rpc: RpcClient,
-    #[cfg(feature = "desktop")]
-    pub jito: RpcClient,
     api_url: String,
 }
 
@@ -110,12 +105,8 @@ impl Gateway {
             api_url,
             #[cfg(feature = "web")]
             rpc: WasmClient::new(&rpc_url),
-            #[cfg(feature = "web")]
-            jito: WasmClient::new(JITO_URL),
             #[cfg(feature = "desktop")]
             rpc: RpcClient::new(rpc_url),
-            #[cfg(feature = "desktop")]
-            jito: RpcClient::new(jito_url.to_string()),
         }
     }
 

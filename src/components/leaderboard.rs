@@ -168,11 +168,15 @@ pub fn LeaderboardTable<'a>(cx: Scope, token_accounts: &'a Vec<UiTokenAccount>) 
 
 #[component]
 pub fn TokenBalanceRow<'a>(cx: Scope, i: usize, token_account: &'a UiTokenAccount) -> Element {
-    let owner = &token_account.owner;
+    let owner = if token_account.owner.eq(&ore::TREASURY_ADDRESS.to_string()) {
+        "Ore Treasury".to_string()
+    } else {
+        token_account.owner.clone()
+    };
     let amount = &token_account.token_amount.ui_amount_string;
     render! {
         Link {
-            to: Route::User { id: owner.clone() },
+            to: Route::User { id: token_account.owner.clone() },
             class: "flex flex-row shrink w-full justify-between rounded px-2 py-2 hover-100 active-200 transition-colors",
             p {
                 class: "w-32 text-left",
