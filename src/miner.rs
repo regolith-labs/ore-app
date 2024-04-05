@@ -239,7 +239,7 @@ pub async fn submit_solution(
                 let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
                 let ix = ore::instruction::reset(signer.pubkey());
                 gateway
-                    .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix])
+                    .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, true)
                     .await
                     .ok();
             }
@@ -257,7 +257,7 @@ pub async fn submit_solution(
             nonce,
         );
         match gateway
-            .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix])
+            .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, false)
             .await
         {
             Ok(_sig) => return Ok(()),
