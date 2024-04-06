@@ -198,11 +198,11 @@ impl Gateway {
                         &tx,
                         RpcSimulateTransactionConfig {
                             sig_verify: false,
-                            replace_recent_blockhash: false,
+                            replace_recent_blockhash: true,
                             commitment: Some(CommitmentConfig::confirmed()),
                             encoding: Some(UiTransactionEncoding::Base64),
                             accounts: None,
-                            min_context_slot: Some(slot),
+                            min_context_slot: None,
                         },
                     )
                     .await;
