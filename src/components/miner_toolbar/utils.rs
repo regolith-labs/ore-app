@@ -24,11 +24,23 @@ pub async fn try_start_mining(
     // Create token account, if needed
     let signer = signer();
     *status_message.write() = MinerStatusMessage::CreatingTokenAccount;
-    gateway.create_token_account_ore(signer.pubkey()).await?;
+    'ata: loop {
+        if gateway
+            .create_token_account_ore(signer.pubkey())
+            .await
+            .is_ok()
+        {
+            break 'ata;
+        }
+    }
 
     // Create proof account, if needed
     *status_message.write() = MinerStatusMessage::GeneratingChallenge;
-    gateway.register_ore().await?;
+    'register: loop {
+        if gateway.register_ore().await.is_ok() {
+            break 'register;
+        }
+    }
 
     // Start mining
     let treasury = gateway.get_treasury().await.unwrap();
