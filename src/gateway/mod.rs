@@ -86,6 +86,7 @@ pub const CU_LIMIT_MINE: u32 = 3200;
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
 const CONFIRM_RETRIES: usize = 4;
+const SIMULATION_RETRIES: usize = 4;
 const DEFAULT_PRIORITY_FEE: u64 = 1000;
 
 pub struct Gateway {
@@ -189,35 +190,54 @@ impl Gateway {
 
         // Simulate tx, if necessary
         if dynamic_cus {
-            let sim_res = self
-                .rpc
-                .simulate_transaction_with_config(
-                    &tx,
-                    RpcSimulateTransactionConfig {
-                        sig_verify: false,
-                        replace_recent_blockhash: false,
-                        commitment: Some(CommitmentConfig::confirmed()),
-                        encoding: Some(UiTransactionEncoding::Base64),
-                        accounts: None,
-                        min_context_slot: Some(slot),
-                    },
-                )
-                .await;
-            if let Ok(sim_res) = sim_res {
-                #[cfg(feature = "web")]
-                let units_consumed = sim_res.units_consumed;
-                #[cfg(feature = "desktop")]
-                let units_consumed = sim_res.value.units_consumed;
-                if let Some(units_consumed) = units_consumed {
-                    let cu_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(
-                        units_consumed as u32 + 1000,
-                    );
-                    let cu_price_ix =
-                        ComputeBudgetInstruction::set_compute_unit_price(DEFAULT_PRIORITY_FEE);
-                    let mut final_ixs = vec![];
-                    final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
-                    final_ixs.extend_from_slice(ixs);
-                    tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
+            let mut sim_attempts = 0;
+            'simulate: loop {
+                let sim_res = self
+                    .rpc
+                    .simulate_transaction_with_config(
+                        &tx,
+                        RpcSimulateTransactionConfig {
+                            sig_verify: false,
+                            replace_recent_blockhash: false,
+                            commitment: Some(CommitmentConfig::confirmed()),
+                            encoding: Some(UiTransactionEncoding::Base64),
+                            accounts: None,
+                            min_context_slot: Some(slot),
+                        },
+                    )
+                    .await;
+                match sim_res {
+                    Ok(sim_res) => {
+                        #[cfg(feature = "desktop")]
+                        let sim_res = sim_res.value;
+                        if let Some(err) = sim_res.err {
+                            println!("Simulaton error: {:?}", err);
+                            sim_attempts += 1;
+                            if sim_attempts.gt(&SIMULATION_RETRIES) {
+                                return Err(GatewayError::SimulationFailed);
+                            }
+                        } else if let Some(units_consumed) = sim_res.units_consumed {
+                            println!("Dynamic CUs: {:?}", units_consumed);
+                            let cu_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(
+                                units_consumed as u32 + 1000,
+                            );
+                            let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(
+                                DEFAULT_PRIORITY_FEE,
+                            );
+                            let mut final_ixs = vec![];
+                            final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
+                            final_ixs.extend_from_slice(ixs);
+                            tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
+                            break 'simulate;
+                        }
+                    }
+                    Err(err) => {
+                        println!("Simulaton error: {:?}", err);
+                        sim_attempts += 1;
+                        if sim_attempts.gt(&SIMULATION_RETRIES) {
+                            return Err(GatewayError::SimulationFailed);
+                        }
+                    }
                 }
             }
         }

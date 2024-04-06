@@ -13,6 +13,7 @@ pub enum GatewayError {
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
+    SimulationFailed,
     Unknown,
 }
 
