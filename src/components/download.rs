@@ -66,7 +66,7 @@ pub fn Download(cx: Scope) -> Element {
                     "To begin mining, use the mine command."
                 }
                 CodeBlock {
-                    text: "ore \\\n    --rpc https://api.mainnet-beta.solana.com \\\n    --keypair ~/.config/solana/id.json \\\n    --priority-fee 1 \\\n    mine \\\n    --threads 4"
+                    text: "ore \\\n    --rpc <RPC_URL> \\\n    --keypair <KEYPAIR_FILEPATH> \\\n    --priority-fee <MICROLAMPORTS> \\\n    mine \\\n    --threads <TRHEAD_COUNT>"
                 }
                 p {
                     "To mine in detached mode, use nohup."

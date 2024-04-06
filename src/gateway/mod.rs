@@ -282,7 +282,7 @@ impl Gateway {
             }
 
             // Retry
-            async_std::task::sleep(Duration::from_millis(1000)).await;
+            async_std::task::sleep(Duration::from_millis(2000)).await;
             (hash, slot) = self
                 .rpc
                 .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
