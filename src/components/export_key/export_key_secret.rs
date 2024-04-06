@@ -21,19 +21,17 @@ pub fn ExportKeySecret(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "Never give out your private key."
+                    "Never give your private key to anyone."
                 }
             }
             EyeSlashIcon {
                 class: "w-12 h-12 mx-auto opacity-50"
             }
             Copyable {
-                class: "mx-auto w-full",
+                class: "mx-auto break-all text-wrap text-center",
                 value: keypair.to_base58_string(),
-                p {
-                    class: "p-2 text-wrap break-words",
-                    "{keypair.to_base58_string()}"
-                }
+                large_button: true,
+                "{keypair.to_base58_string()}"
             }
             Link {
                 to: Route::Settings {},

@@ -10,9 +10,12 @@ use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
-    components::Copyable,
+    components::{BackupKeypairWarning, Copyable},
     gateway::{AsyncResult, RPC_URL},
-    hooks::{use_appearance, use_explorer, use_pubkey, use_rpc_url, use_sol_balance, RpcUrl},
+    hooks::{
+        use_appearance, use_explorer, use_pubkey, use_rpc_url, use_show_backup_warning,
+        use_sol_balance, RpcUrl,
+    },
     route::Route,
 };
 
@@ -22,6 +25,7 @@ pub fn Settings(cx: Scope) -> Element {
     let sol_balance = use_sol_balance(cx);
     let explorer = use_explorer(cx);
     let appearance = use_appearance(cx);
+    let show_backup_warning = use_show_backup_warning(cx);
 
     let rpc_url = use_rpc_url(cx);
     let rpc_url_input = use_state(cx, || rpc_url.read().0.clone());
@@ -34,11 +38,19 @@ pub fn Settings(cx: Scope) -> Element {
 
     render! {
         div {
-            class: "flex flex-col gap-16 w-full",
+            class: "flex flex-col gap-16 w-full pb-24",
             div {
                 class: "flex flex-col gap-4 w-full",
                 h2 {
                     "Settings"
+                }
+                if cfg!(feature = "web") && show_backup_warning.read().0 {
+                    render! {
+                        div {
+                            class: "mt-8",
+                            BackupKeypairWarning {}
+                        }
+                    }
                 }
                 h2 {
                     class: "{section_title_class} mt-8",
@@ -65,19 +77,7 @@ pub fn Settings(cx: Scope) -> Element {
                     class: "{container_class}",
                     p {
                         class: "{data_title_class}",
-                        "Private key"
-                    }
-                    Link {
-                        to: Route::ExportKeyWarning {},
-                        class: "flex flex-row shrink font-medium px-2 py-1 text-nowrap hover-100 active-200 rounded",
-                        "Export"
-                    }
-                }
-                div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "Solana balance"
+                        "Balance"
                     }
                     match sol_balance {
                         AsyncResult::Ok(balance) => {
@@ -94,6 +94,26 @@ pub fn Settings(cx: Scope) -> Element {
                                     class: "flex w-32 loading rounded",
                                 }
                             }
+                        }
+                    }
+                }
+                div {
+                    class: "{container_class}",
+                    p {
+                        class: "{data_title_class}",
+                        "Keypair"
+                    }
+                    div {
+                        class: "flex flex-row gap-2 -mr-2",
+                        Link {
+                            to: Route::ImportKey {},
+                            class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
+                            "Import"
+                        }
+                        Link {
+                            to: Route::ExportKey {},
+                            class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
+                            "Export"
                         }
                     }
                 }
@@ -145,7 +165,7 @@ pub fn Settings(cx: Scope) -> Element {
                 class: "flex flex-col gap-4",
                 h2 {
                     class: "{section_title_class}",
-                    "System"
+                    "Network"
                 }
                 div {
                     class: "{container_class}",

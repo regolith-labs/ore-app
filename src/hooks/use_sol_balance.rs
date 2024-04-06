@@ -1,11 +1,15 @@
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::use_rw;
+#[cfg(feature = "web")]
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+#[cfg(feature = "desktop")]
+use solana_sdk::pubkey::Pubkey;
 #[cfg(feature = "desktop")]
 use std::time::Duration;
 #[cfg(feature = "web")]
 use web_time::Duration;
 
-use crate::gateway::AsyncResult;
+use crate::gateway::{AsyncResult, GatewayError};
 
 use super::{use_gateway, use_pubkey};
 
@@ -74,4 +78,23 @@ pub fn use_sol_balance_provider(cx: &ScopeState) {
         *balance.write() = balance__;
         async move {}
     });
+}
+
+pub fn _use_sol_account_balance(cx: &ScopeState, address: Pubkey) -> AsyncResult<SolBalance> {
+    let balance = use_state::<AsyncResult<SolBalance>>(cx, || AsyncResult::Loading);
+    let gateway = use_gateway(cx);
+
+    use_future(cx, (), |_| {
+        let balance = balance.clone();
+        let gateway = gateway.clone();
+        async move {
+            // TODO Handle error
+            match gateway.rpc.get_balance(&address).await {
+                Ok(b) => balance.set(AsyncResult::Ok(SolBalance(b))),
+                Err(err) => balance.set(AsyncResult::Error(GatewayError::from(err))),
+            }
+        }
+    });
+
+    *balance.get()
 }
