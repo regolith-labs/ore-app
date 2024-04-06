@@ -227,21 +227,24 @@ pub async fn submit_solution(
     let mut rng = rand::thread_rng();
     loop {
         // Check if epoch needs to be reset
-        let clock = gateway.get_clock().await?;
-        let epoch_end_at = treasury.last_reset_at.saturating_add(EPOCH_DURATION);
+        if let Ok(clock) = gateway.get_clock().await {
+            let epoch_end_at = treasury.last_reset_at.saturating_add(EPOCH_DURATION);
 
-        // Submit restart epoch tx, if needed
-        if clock.unix_timestamp.ge(&epoch_end_at) {
-            // There are a lot of miners right now, randomize who tries the reset
-            let selected_to_reset = rng.gen_range(0..10).eq(&0);
-            if selected_to_reset {
-                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_RESET);
-                let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-                let ix = ore::instruction::reset(signer.pubkey());
-                gateway
-                    .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, true)
-                    .await
-                    .ok();
+            // Submit restart epoch tx, if needed
+            if clock.unix_timestamp.ge(&epoch_end_at) {
+                // There are a lot of miners right now, randomize who tries the reset
+                let selected_to_reset = rng.gen_range(0..10).eq(&0);
+                if selected_to_reset {
+                    let cu_limit_ix =
+                        ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_RESET);
+                    let cu_price_ix =
+                        ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+                    let ix = ore::instruction::reset(signer.pubkey());
+                    gateway
+                        .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, true)
+                        .await
+                        .ok();
+                }
             }
         }
 

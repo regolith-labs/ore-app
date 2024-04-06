@@ -172,9 +172,9 @@ pub fn PriorityFeeConfig(cx: Scope) -> Element {
                 class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
                 input {
                     class: "bg-transparent text-white text-right px-1 mb-auto",
-                    step: 1,
+                    step: 1000,
                     min: 0,
-                    max: 1000,
+                    max: 500_000,
                     r#type: "number",
                     value: "{priority_fee.read().0}",
                     oninput: move |e| {
