@@ -14,7 +14,7 @@ pub fn BackupKeypairWarning(cx: Scope) -> Element {
         div {
             class: "flex flex-col gap-3 bg-orange-500 w-full rounded px-4 py-5 text-white",
             p {
-                class: "font-bold text-xl",
+                class: "font-bold text-2xl",
                 "Backup your keypair!"
             }
             ul {
