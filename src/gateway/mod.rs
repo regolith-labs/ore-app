@@ -87,7 +87,7 @@ const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
 const CONFIRM_RETRIES: usize = 4;
 const SIMULATION_RETRIES: usize = 4;
-const DEFAULT_PRIORITY_FEE: u64 = 1000;
+const DEFAULT_PRIORITY_FEE: u64 = 10_000;
 
 pub struct Gateway {
     #[cfg(feature = "web")]
