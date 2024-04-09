@@ -87,7 +87,7 @@ const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
 const CONFIRM_RETRIES: usize = 4;
 const SIMULATION_RETRIES: usize = 4;
-const DEFAULT_PRIORITY_FEE: u64 = 10_000;
+const DEFAULT_PRIORITY_FEE: u64 = 4_000_000;
 
 pub struct Gateway {
     #[cfg(feature = "web")]
@@ -398,9 +398,11 @@ impl Gateway {
                 }
             }
             Err(err) => {
-                log::info!("Err: {:?}", err);
                 match err {
-                    GatewayError::AccountNotFound => {}
+                    GatewayError::AccountNotFound => {
+                        // Noop, continue on to account creation
+                        log::info!("Token account not found")
+                    }
                     _ => return Err(err),
                 }
             }

@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    hooks::{use_gateway, BalanceHandle},
+    hooks::{use_gateway, use_pubkey, BalanceHandle},
     metrics::{track, AppEvent},
     ProofHandle,
 };
@@ -13,6 +13,7 @@ use super::ClaimStep;
 pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> Element {
     let is_busy = use_state(cx, || false);
     let balance_ = use_context::<BalanceHandle>(cx).unwrap();
+    let pubkey = use_pubkey(cx);
     let proof_ = use_context::<ProofHandle>(cx).unwrap();
     let amountf = (*amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
     let gateway = use_gateway(cx);
@@ -67,21 +68,34 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                         let gateway = gateway.clone();
                         cx.spawn({
                             async move {
-                            match gateway.claim_ore(amount).await {
-                                Ok(_sig) => {
-                                    track(AppEvent::Claim, None);
-                                    balance_.restart();
-                                    proof_.restart();
-                                    is_busy.set(false);
-                                    claim_step.set(ClaimStep::Done);
+                                // Create associated token account, if needed
+                                'ata: loop {
+                                    match gateway
+                                        .create_token_account_ore(pubkey)
+                                        .await
+                                    {
+                                            Ok(_) => break 'ata,
+                                            Err(err) => log::error!("Failed to create token account: {:?}", err),
+                                    }
                                 }
-                                Err(_err) => {
-                                    // TODO Handle error
-                                    is_busy.set(false);
-                                    log::error!("Failed to claim!");
+
+                                // Claim
+                                match gateway.claim_ore(amount).await {
+                                    Ok(_sig) => {
+                                        track(AppEvent::Claim, None);
+                                        balance_.restart();
+                                        proof_.restart();
+                                        is_busy.set(false);
+                                        claim_step.set(ClaimStep::Done);
+                                    }
+                                    Err(_err) => {
+                                        // TODO Handle error
+                                        is_busy.set(false);
+                                        log::error!("Failed to claim!");
+                                    }
                                 }
                             }
-                        }});
+                        });
                     },
                     if *is_busy.get() {
                         render! {

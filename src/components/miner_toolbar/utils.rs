@@ -21,19 +21,6 @@ pub async fn try_start_mining(
     miner: &Miner,
     status_message: &UseSharedState<MinerStatusMessage>,
 ) -> GatewayResult<()> {
-    // Create token account, if needed
-    let signer = signer();
-    *status_message.write() = MinerStatusMessage::CreatingTokenAccount;
-    'ata: loop {
-        if gateway
-            .create_token_account_ore(signer.pubkey())
-            .await
-            .is_ok()
-        {
-            break 'ata;
-        }
-    }
-
     // Create proof account, if needed
     *status_message.write() = MinerStatusMessage::GeneratingChallenge;
     'register: loop {
@@ -43,6 +30,7 @@ pub async fn try_start_mining(
     }
 
     // Start mining
+    let signer = signer();
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
     *status_message.write() = MinerStatusMessage::Searching;

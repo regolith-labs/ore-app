@@ -61,20 +61,6 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
                     "Starting"
                 }
                 match *miner_status_message.read() {
-                    MinerStatusMessage::CreatingTokenAccount => {
-                        render! {
-                            div {
-                                class: "flex flex-row gap-2",
-                                p {
-                                    class: "text-lg",
-                                    "Creating token account..."
-                                }
-                                Spinner {
-                                    class: "my-auto text-white"
-                                }
-                            }
-                        }
-                    }
                     MinerStatusMessage::GeneratingChallenge => {
                         render! {
                             div {

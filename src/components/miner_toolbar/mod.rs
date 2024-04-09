@@ -40,7 +40,6 @@ pub enum MinerStatus {
 
 #[derive(Copy, Clone, Debug)]
 pub enum MinerStatusMessage {
-    CreatingTokenAccount,
     GeneratingChallenge,
     Searching,
     Submitting,
