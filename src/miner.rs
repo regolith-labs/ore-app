@@ -15,9 +15,9 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "web")]
 use serde_wasm_bindgen::to_value;
-use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 #[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
     signer::Signer,
@@ -27,7 +27,7 @@ use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     keccak::{hashv, Hash as KeccakHash},
     pubkey::Pubkey,
-    {signature::Signature, signer::Signer},
+    signer::Signer,
 };
 #[cfg(feature = "web")]
 use web_sys::Worker;

@@ -2,6 +2,7 @@ mod async_result;
 mod error;
 mod pubkey;
 
+use std::str::FromStr;
 #[cfg(feature = "desktop")]
 use std::time::Duration;
 
@@ -17,6 +18,7 @@ use ore::{
 };
 use ore_types::{response::GetTransfersResponse, Transfer};
 pub use pubkey::*;
+use rand::Rng;
 #[cfg(feature = "desktop")]
 use solana_account_decoder::parse_token::UiTokenAccount;
 #[cfg(feature = "desktop")]
@@ -25,10 +27,10 @@ use solana_client::{
     rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
     rpc_response::RpcTokenAccountBalance,
 };
-use solana_client_wasm::utils::rpc_config::RpcSimulateTransactionConfig;
 #[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
+        self,
         clock::Clock,
         commitment_config::{CommitmentConfig, CommitmentLevel},
         compute_budget::ComputeBudgetInstruction,
@@ -39,7 +41,10 @@ use solana_client_wasm::{
         sysvar,
         transaction::Transaction,
     },
-    utils::{rpc_config::RpcSendTransactionConfig, rpc_response::RpcTokenAccountBalance},
+    utils::{
+        rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
+        rpc_response::RpcTokenAccountBalance,
+    },
     WasmClient,
 };
 #[cfg(feature = "web")]
@@ -58,15 +63,15 @@ use solana_sdk::{
     clock::Clock,
     commitment_config::{CommitmentConfig, CommitmentLevel},
     compute_budget::ComputeBudgetInstruction,
-    instruction::{Instruction, InstructionError},
+    instruction::Instruction,
     pubkey::Pubkey,
     signature::{Keypair, Signature},
     signer::Signer,
     sysvar,
-    transaction::{Transaction, TransactionError},
+    transaction::Transaction,
 };
 #[cfg(feature = "desktop")]
-use solana_transaction_status::UiTransactionEncoding;
+use solana_transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding};
 #[cfg(feature = "desktop")]
 use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
@@ -85,9 +90,11 @@ pub const CU_LIMIT_MINE: u32 = 3200;
 
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
-const CONFIRM_RETRIES: usize = 4;
+const CONFIRM_RETRIES: usize = 8;
 const SIMULATION_RETRIES: usize = 4;
 const DEFAULT_PRIORITY_FEE: u64 = 12_000_000;
+
+const JITO_TIP_AMOUNT: 100_000;
 
 pub struct Gateway {
     #[cfg(feature = "web")]
@@ -95,12 +102,14 @@ pub struct Gateway {
     #[cfg(feature = "desktop")]
     pub rpc: RpcClient,
     api_url: String,
+    rpc_url: String,
 }
 
 impl Gateway {
     pub fn new(api_url: String, rpc_url: String) -> Self {
         Gateway {
             api_url,
+            rpc_url: rpc_url.clone(),
             #[cfg(feature = "web")]
             rpc: WasmClient::new(&rpc_url),
             #[cfg(feature = "desktop")]
@@ -185,8 +194,31 @@ impl Gateway {
             min_context_slot: Some(slot),
         };
 
+        // If default rpc, add tip
+        let mut ixs = ixs.to_vec();
+        if self.rpc_url.eq(RPC_URL) {
+            let mut rng = rand::thread_rng();
+            let tip_accounts = &[
+                Pubkey::from_str("96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5").unwrap(),
+                Pubkey::from_str("HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe").unwrap(),
+                Pubkey::from_str("Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY").unwrap(),
+                Pubkey::from_str("ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49").unwrap(),
+                Pubkey::from_str("DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh").unwrap(),
+                Pubkey::from_str("ADuUkR4vqLUMWXxW9gh6D6L8pMSawimctcNZ5pGwDcEt").unwrap(),
+                Pubkey::from_str("DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL").unwrap(),
+                Pubkey::from_str("3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT").unwrap(),
+            ];
+            let i = rng.gen_range(0..tip_accounts.len());
+            let ix = solana_sdk::system_instruction::transfer(
+                &signer.pubkey(),
+                &tip_accounts[i],
+                JITO_TIP_AMOUNT,
+            );
+            ixs.push(ix);
+        }
+
         // Build tx
-        let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
+        let mut tx = Transaction::new_with_payer(ixs.as_slice(), Some(&signer.pubkey()));
 
         // Simulate tx, if necessary
         let mut sim_attempts = 0;
@@ -223,7 +255,7 @@ impl Gateway {
                             );
                             let mut final_ixs = vec![];
                             final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
-                            final_ixs.extend_from_slice(ixs);
+                            final_ixs.extend_from_slice(&ixs);
                             tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
                         }
                         break 'simulate;
@@ -259,6 +291,8 @@ impl Gateway {
                     for _ in 0..CONFIRM_RETRIES {
                         match self.rpc.get_signature_statuses(&[sig]).await {
                             Ok(signature_statuses) => {
+                                #[cfg(feature = "desktop")]
+                                let signature_statuses = signature_statuses.value;
                                 log::info!("Sig status: {:?}", signature_statuses[0]);
                                 for signature_status in signature_statuses {
                                     if let Some(signature_status) = signature_status.as_ref() {
