@@ -87,7 +87,7 @@ const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
 const CONFIRM_RETRIES: usize = 4;
 const SIMULATION_RETRIES: usize = 4;
-const DEFAULT_PRIORITY_FEE: u64 = 5_000_000;
+const DEFAULT_PRIORITY_FEE: u64 = 12_000_000;
 
 pub struct Gateway {
     #[cfg(feature = "web")]
@@ -172,12 +172,12 @@ impl Gateway {
         skip_confirm: bool,
     ) -> GatewayResult<Signature> {
         let signer = signer();
-        let (mut hash, mut slot) = self
+        let (hash, slot) = self
             .rpc
             .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
             .await
             .map_err(GatewayError::from)?;
-        let mut send_cfg = RpcSendTransactionConfig {
+        let send_cfg = RpcSendTransactionConfig {
             skip_preflight: true,
             preflight_commitment: Some(CommitmentLevel::Confirmed),
             encoding: Some(UiTransactionEncoding::Base64),
@@ -189,34 +189,31 @@ impl Gateway {
         let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
 
         // Simulate tx, if necessary
-        if dynamic_cus {
-            let mut sim_attempts = 0;
-            'simulate: loop {
-                let sim_res = self
-                    .rpc
-                    .simulate_transaction_with_config(
-                        &tx,
-                        RpcSimulateTransactionConfig {
-                            sig_verify: false,
-                            replace_recent_blockhash: true,
-                            commitment: Some(CommitmentConfig::confirmed()),
-                            encoding: Some(UiTransactionEncoding::Base64),
-                            accounts: None,
-                            min_context_slot: None,
-                        },
-                    )
-                    .await;
-                match sim_res {
-                    Ok(sim_res) => {
-                        #[cfg(feature = "desktop")]
-                        let sim_res = sim_res.value;
-                        if let Some(err) = sim_res.err {
-                            println!("Simulaton error: {:?}", err);
-                            sim_attempts += 1;
-                            if sim_attempts.gt(&SIMULATION_RETRIES) {
-                                return Err(GatewayError::SimulationFailed);
-                            }
-                        } else if let Some(units_consumed) = sim_res.units_consumed {
+        let mut sim_attempts = 0;
+        'simulate: loop {
+            let sim_res = self
+                .rpc
+                .simulate_transaction_with_config(
+                    &tx,
+                    RpcSimulateTransactionConfig {
+                        sig_verify: false,
+                        replace_recent_blockhash: true,
+                        commitment: Some(CommitmentConfig::confirmed()),
+                        encoding: Some(UiTransactionEncoding::Base64),
+                        accounts: None,
+                        min_context_slot: Some(slot),
+                    },
+                )
+                .await;
+            match sim_res {
+                Ok(sim_res) => {
+                    #[cfg(feature = "desktop")]
+                    let sim_res = sim_res.value;
+                    if let Some(err) = sim_res.err {
+                        println!("Simulaton error: {:?}", err);
+                        sim_attempts += 1;
+                    } else if let Some(units_consumed) = sim_res.units_consumed {
+                        if dynamic_cus {
                             println!("Dynamic CUs: {:?}", units_consumed);
                             let cu_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(
                                 units_consumed as u32 + 1000,
@@ -228,29 +225,31 @@ impl Gateway {
                             final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
                             final_ixs.extend_from_slice(ixs);
                             tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
-                            break 'simulate;
                         }
-                    }
-                    Err(err) => {
-                        println!("Simulaton error: {:?}", err);
-                        sim_attempts += 1;
-                        if sim_attempts.gt(&SIMULATION_RETRIES) {
-                            return Err(GatewayError::SimulationFailed);
-                        }
+                        break 'simulate;
                     }
                 }
+                Err(err) => {
+                    println!("Simulaton error: {:?}", err);
+                    sim_attempts += 1;
+                }
+            }
+
+            // Return if sim attempts exceeded
+            if sim_attempts.gt(&SIMULATION_RETRIES) {
+                return Err(GatewayError::SimulationFailed);
             }
         }
 
         // Submit tx
         tx.sign(&[&signer], hash);
-        let mut sigs = vec![];
+        // let mut sigs = vec![];
         let mut attempts = 0;
         loop {
             log::info!("Attempt: {:?}", attempts);
             match self.rpc.send_transaction_with_config(&tx, send_cfg).await {
                 Ok(sig) => {
-                    sigs.push(sig);
+                    // sigs.push(sig);
                     log::info!("{:?}", sig);
 
                     // Confirm tx
@@ -258,9 +257,9 @@ impl Gateway {
                         return Ok(sig);
                     }
                     for _ in 0..CONFIRM_RETRIES {
-                        match self.rpc.get_signature_statuses(&sigs).await {
+                        match self.rpc.get_signature_statuses(&[sig]).await {
                             Ok(signature_statuses) => {
-                                log::info!("Sig status: {:?}", signature_statuses);
+                                log::info!("Sig status: {:?}", signature_statuses[0]);
                                 for signature_status in signature_statuses {
                                     if let Some(signature_status) = signature_status.as_ref() {
                                         if signature_status.confirmation_status.is_some() {
@@ -303,19 +302,6 @@ impl Gateway {
 
             // Retry
             async_std::task::sleep(Duration::from_millis(2000)).await;
-            (hash, slot) = self
-                .rpc
-                .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
-                .await
-                .map_err(GatewayError::from)?;
-            send_cfg = RpcSendTransactionConfig {
-                skip_preflight: true,
-                preflight_commitment: Some(CommitmentLevel::Confirmed),
-                encoding: Some(UiTransactionEncoding::Base64),
-                max_retries: Some(RPC_RETRIES),
-                min_context_slot: Some(slot),
-            };
-            tx.sign(&[&signer], hash);
             attempts += 1;
             if attempts > GATEWAY_RETRIES {
                 return Err(GatewayError::TransactionTimeout);
@@ -343,11 +329,11 @@ impl Gateway {
         }
     }
 
-    pub async fn claim_ore(&self, amount: u64) -> GatewayResult<Signature> {
+    pub async fn claim_ore(&self, amount: u64, priority_fee: u64) -> GatewayResult<Signature> {
         let signer = signer();
         let beneficiary = ore_token_account_address(signer.pubkey());
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_CLAIM);
-        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(DEFAULT_PRIORITY_FEE);
+        let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
         let ix = ore::instruction::claim(signer.pubkey(), beneficiary, amount);
         self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, false)
             .await
