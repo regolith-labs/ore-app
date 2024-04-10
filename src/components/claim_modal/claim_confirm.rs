@@ -55,8 +55,43 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                 }
             }
             div {
-                class: "flex flex-col gap-3",
-                PriorityFeeConfig {}
+                class: "flex flex-col gap-8",
+                div {
+                    class: "flex flex-row gap-8 justify-between mt-8",
+                    div {
+                        class: "flex flex-col gap-1",
+                        p {
+                            class: "font-semibold",
+                            "Priority fee"
+                        }
+                        p {
+                            class: "text-xs opacity-80 max-w-96",
+                            "When Solana is busy, priority fees can increase the chances of your transactions being accepted."
+                        }
+                    }
+                    div {
+                        class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+                        input {
+                            disabled: *is_busy.get(),
+                            class: "bg-transparent text-right px-1 mb-auto",
+                            step: 100_000,
+                            min: 0,
+                            max: 50_000_000,
+                            r#type: "number",
+                            value: "{priority_fee.read().0}",
+                            oninput: move |e| {
+                                if let Ok(v) = e.value.parse::<u64>() {
+                                    track(AppEvent::SetPriorityFee, None);
+                                    *priority_fee.write() = PriorityFee(v);
+                                }
+                            }
+                        }
+                        p {
+                            class: "my-auto",
+                            "microlamports"
+                        }
+                    }
+                }
                 div {
                     class: "flex flex-col sm:flex-row gap-2",
                     button {
@@ -114,49 +149,6 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                             }
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn PriorityFeeConfig(cx: Scope) -> Element {
-    let priority_fee = use_priority_fee(cx);
-    render! {
-        div {
-            class: "flex flex-row gap-8 justify-between mt-8",
-            div {
-                class: "flex flex-col gap-1",
-                p {
-                    class: "font-semibold",
-                    "Priority fee"
-                }
-                p {
-                    class: "text-xs opacity-80 max-w-96",
-                    "When Solana is busy, priority fees can increase the chances of your transactions being accepted."
-                }
-
-            }
-            div {
-                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                input {
-                    class: "bg-transparent text-right px-1 mb-auto",
-                    step: 100_000,
-                    min: 0,
-                    max: 20_000_000,
-                    r#type: "number",
-                    value: "{priority_fee.read().0}",
-                    oninput: move |e| {
-                        if let Ok(v) = e.value.parse::<u64>() {
-                            track(AppEvent::SetPriorityFee, None);
-                            *priority_fee.write() = PriorityFee(v);
-                        }
-                    }
-                }
-                p {
-                    class: "my-auto",
-                    "microlamports"
                 }
             }
         }
