@@ -21,7 +21,6 @@ mod use_sol_balance;
 mod use_transfers;
 mod use_transfers_websocket;
 mod use_treasury;
-mod use_window_width;
 
 pub use use_account::*;
 pub use use_appearance::*;
@@ -45,4 +44,3 @@ pub use use_sol_balance::*;
 pub use use_transfers::*;
 pub use use_transfers_websocket::*;
 pub use use_treasury::*;
-pub use use_window_width::*;

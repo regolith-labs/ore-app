@@ -301,13 +301,13 @@ fn TransfersSection(cx: Scope, transfers: AsyncResult<Vec<Transfer>>) -> Element
 fn SectionB(cx: Scope) -> Element {
     let (treasury, _) = use_treasury(cx);
     let (supply, _) = use_ore_supply(cx);
-    let circulating_supply = match *treasury.read().unwrap() {
-        AsyncResult::Ok(treasury) => {
-            (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
-        }
-        _ => 0f64,
-    }
-    .to_string();
+    // let circulating_supply = match *treasury.read().unwrap() {
+    //     AsyncResult::Ok(treasury) => {
+    //         (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
+    //     }
+    //     _ => 0f64,
+    // }
+    // .to_string();
     let ore_supply = match supply {
         AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
         AsyncResult::Loading => "-".to_string(),
@@ -316,10 +316,10 @@ fn SectionB(cx: Scope) -> Element {
     render! {
         div {
             class: "flex flex-col gap-12 my-auto",
-            OreValue {
-                title: "Circulating supply".to_string(),
-                amount: circulating_supply
-            }
+            // OreValue {
+            //     title: "Circulating supply".to_string(),
+            //     amount: circulating_supply
+            // }
             OreValue {
                 title: "Total supply".to_string(),
                 amount: ore_supply

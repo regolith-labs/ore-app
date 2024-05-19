@@ -40,10 +40,8 @@ pub fn User(cx: Scope, id: String) -> Element {
     let balance = use_ore_balance_user(cx, user_id);
     let explorer_url = use_explorer_account_url(cx, id);
     let proof = use_user_proof(cx, user_id);
-    let claimable_rewards = match proof {
-        AsyncResult::Ok(proof) => {
-            (proof.claimable_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
-        }
+    let stake_balance = match proof {
+        AsyncResult::Ok(proof) => (proof.balance as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64),
         _ => 0.0,
     };
 
@@ -147,7 +145,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                         class: "{container_class}",
                         p {
                             class: "{title_class}",
-                            "Balance"
+                            "Staked"
                         }
                         match balance {
                             AsyncResult::Ok(balance) => {
@@ -173,7 +171,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                             }
                         }
                     }
-                    if claimable_rewards.gt(&0.0) {
+                    if stake_balance.gt(&0.0) {
                         render! {
                             div {
                                 class: "{container_class}",
@@ -188,7 +186,7 @@ pub fn User(cx: Scope, id: String) -> Element {
                                     }
                                     p {
                                         class: "{value_class} truncate",
-                                        "{claimable_rewards}"
+                                        "{stake_balance}"
                                    }
                                 }
                             }

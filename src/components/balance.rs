@@ -57,9 +57,8 @@ pub fn Balance(cx: Scope) -> Element {
 pub fn UnclaimedRewards(cx: Scope) -> Element {
     let proof = use_proof(cx);
     if let AsyncResult::Ok(proof) = *proof.read() {
-        if proof.claimable_rewards.gt(&0) {
-            let rewards =
-                (proof.claimable_rewards as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
+        if proof.balance.gt(&0) {
+            let rewards = (proof.balance as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
             render! {
                 div {
                     class: "flex flex-row grow justify-between mt-4 -mr-2",

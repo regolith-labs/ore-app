@@ -34,13 +34,7 @@ pub async fn try_start_mining(
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
     *status_message.write() = MinerStatusMessage::Searching;
-    miner
-        .start_mining(
-            proof.hash.into(),
-            treasury.difficulty.into(),
-            signer.pubkey(),
-        )
-        .await;
+    miner.start_mining(proof.challenge.into()).await;
 
     // Record event for data
     track(AppEvent::StartMiner, None);
