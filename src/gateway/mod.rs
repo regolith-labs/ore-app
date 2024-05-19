@@ -41,10 +41,7 @@ use solana_client_wasm::{
         sysvar,
         transaction::Transaction,
     },
-    utils::{
-        rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
-        rpc_response::RpcTokenAccountBalance,
-    },
+    utils::rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
     WasmClient,
 };
 #[cfg(feature = "web")]
@@ -160,16 +157,6 @@ impl Gateway {
     ) -> GatewayResult<Option<UiTokenAccount>> {
         self.rpc
             .get_token_account(pubkey)
-            .await
-            .map_err(GatewayError::from)
-    }
-
-    pub async fn get_token_largest_accounts(
-        &self,
-        pubkey: &Pubkey,
-    ) -> GatewayResult<Vec<RpcTokenAccountBalance>> {
-        self.rpc
-            .get_token_largest_accounts(pubkey)
             .await
             .map_err(GatewayError::from)
     }

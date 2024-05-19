@@ -3,7 +3,7 @@ use dioxus_router::prelude::*;
 
 use crate::components::{
     Claim, Download, ExportKey, Home, ImportKey, Landing, Miner, Navbar, OreTokenomics,
-    PageNotFound, Send, Settings, SimpleNavbar, Stats, Tx, User, WhatIsMining,
+    PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -27,8 +27,6 @@ pub enum Route {
             Home {},
             #[route("/claim")]
             Claim {},
-            #[route("/stats")]
-            Stats {},
             #[route("/settings")]
             Settings {},
             #[route("/settings/export-key")]

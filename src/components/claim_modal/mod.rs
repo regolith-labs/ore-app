@@ -31,7 +31,7 @@ pub fn Claim(cx: Scope) -> Element {
     };
 
     let amount = match &proof {
-        AsyncResult::Ok(proof) => proof.claimable_rewards,
+        AsyncResult::Ok(proof) => proof.balance,
         _ => 0,
     };
 

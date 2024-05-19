@@ -1,4 +1,3 @@
-mod miner_charts;
 mod miner_toolbar_activating;
 mod miner_toolbar_active;
 mod miner_toolbar_error;
@@ -7,7 +6,6 @@ mod miner_toolbar_not_started;
 mod utils;
 
 use dioxus_std::utils::channel::use_channel;
-pub use miner_charts::*;
 pub use miner_toolbar_activating::*;
 pub use miner_toolbar_active::*;
 pub use miner_toolbar_error::*;
@@ -89,7 +87,6 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     let _ = use_future(cx, (), |_| {
         let mut rx = ch.clone().receiver();
         let status = miner_status.clone();
-        let treasury = treasury.clone();
         let miner = miner.clone();
         let gateway = gateway.clone();
         let proof_ = proof_.clone();
@@ -101,22 +98,13 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
                 *miner_display_hash.write() = MinerDisplayHash(res.hash);
                 *miner_status_message.write() = MinerStatusMessage::Submitting;
                 let priority_fee = priority_fee.read().0;
-                match submit_solution(&gateway, &res, priority_fee, treasury.clone()).await {
+                match submit_solution(&gateway, &res, priority_fee).await {
                     Ok(_sig) => {
                         proof_.restart();
                         if let MinerStatus::Active = *status.read() {
-                            // TODO Read difficulty from passed in treasury rather than refetching
-                            if let Ok(treasury) = gateway.get_treasury().await {
-                                if let Ok(proof) = gateway.get_proof(pubkey).await {
-                                    *miner_status_message.write() = MinerStatusMessage::Searching;
-                                    miner
-                                        .start_mining(
-                                            proof.hash.into(),
-                                            treasury.difficulty.into(),
-                                            pubkey,
-                                        )
-                                        .await;
-                                }
+                            if let Ok(proof) = gateway.get_proof(pubkey).await {
+                                *miner_status_message.write() = MinerStatusMessage::Searching;
+                                miner.start_mining(proof.challenge.into()).await;
                             }
                         }
                     }
