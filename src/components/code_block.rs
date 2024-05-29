@@ -1,9 +1,6 @@
 use dioxus::prelude::*;
-#[cfg(feature = "desktop")]
-use dioxus_std::clipboard::use_clipboard;
 
 use crate::components::CopyIcon;
-#[cfg(feature = "web")]
 use crate::hooks::use_clipboard;
 
 #[component]

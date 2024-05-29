@@ -1,22 +1,8 @@
-#[cfg(feature = "desktop")]
-mod desktop;
-#[cfg(feature = "web")]
 mod web_worker;
 
-#[cfg(feature = "desktop")]
-pub use desktop::*;
-#[cfg(feature = "web")]
 pub use web_worker::*;
 
 use std::rc::Rc;
-#[cfg(feature = "desktop")]
-use std::{
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc, Mutex,
-    },
-    time::Duration,
-};
 
 use dioxus::prelude::UseSharedState;
 use dioxus_std::utils::{channel::UseChannel, rw::UseRw};
@@ -24,20 +10,9 @@ use drillx::{Hash, Solution};
 use ore::{state::Treasury, BUS_COUNT, EPOCH_DURATION};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "web")]
 use serde_wasm_bindgen::to_value;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{compute_budget::ComputeBudgetInstruction, pubkey::Pubkey};
-#[cfg(feature = "desktop")]
-use solana_sdk::{
-    compute_budget::ComputeBudgetInstruction,
-    keccak::{hashv, Hash as KeccakHash},
-    pubkey::Pubkey,
-    signer::Signer,
-};
-#[cfg(feature = "web")]
 use web_sys::Worker;
-#[cfg(feature = "web")]
 use web_time::Duration;
 
 use crate::{
@@ -53,10 +28,7 @@ use crate::{
 pub struct Miner {
     power_level: UseSharedState<PowerLevel>,
     priority_fee: UseSharedState<PriorityFee>,
-
-    #[cfg(feature = "web")]
     ch: UseChannel<WebWorkerResponse>,
-    #[cfg(feature = "web")]
     web_worker: Worker,
 }
 
@@ -66,7 +38,6 @@ pub struct Miner {
 // let ch = use_channel::<MiningResult>(cx, 1);
 
 impl Miner {
-    #[cfg(feature = "web")]
     pub fn new(
         ch: &UseChannel<WebWorkerResponse>,
         power_level: &UseSharedState<PowerLevel>,
@@ -82,32 +53,16 @@ impl Miner {
         }
     }
 
-    #[cfg(feature = "desktop")]
-    pub fn new(
-        power_level: &UseSharedState<PowerLevel>,
-        priority_fee: &UseSharedState<PriorityFee>,
-    ) -> Self {
-        Self {
-            power_level: power_level.clone(),
-            priority_fee: priority_fee.clone(),
-        }
-    }
-
     pub fn stop(&self) {
         // TODO interrupt current work (optimization)
     }
 
     // TODO
     pub async fn start_mining(&self, challenge: [u8; 32], cutoff_time: u64) {
-        #[cfg(feature = "web")]
         self.start_mining_web(challenge, cutoff_time).await;
-
-        #[cfg(feature = "desktop")]
-        self.start_mining_desktop(challenge).await;
     }
 
     // TODO Dispatch a difference nonce to each webworker (based on power level)
-    #[cfg(feature = "web")]
     pub async fn start_mining_web(&self, challenge: [u8; 32], cutoff_time: u64) {
         self.web_worker
             .post_message(
@@ -121,11 +76,6 @@ impl Miner {
                 .unwrap(),
             )
             .unwrap();
-    }
-
-    #[cfg(feature = "desktop")]
-    pub async fn start_mining_desktop(&self, challenge: [u8; 32]) {
-        // TODO
     }
 
     // pub async fn wait_for_solution(&self) {

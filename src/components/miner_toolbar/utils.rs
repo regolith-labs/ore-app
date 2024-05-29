@@ -1,10 +1,7 @@
 use std::rc::Rc;
 
 use dioxus::prelude::UseSharedState;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::signer::Signer;
-#[cfg(feature = "desktop")]
-use solana_sdk::signer::Signer;
 
 use crate::{
     gateway::{signer, Gateway, GatewayResult},

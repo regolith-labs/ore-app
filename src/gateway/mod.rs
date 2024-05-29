@@ -3,13 +3,10 @@ mod error;
 mod pubkey;
 
 use std::str::FromStr;
-#[cfg(feature = "desktop")]
-use std::time::Duration;
 
 pub use async_result::*;
 use cached::proc_macro::cached;
 pub use error::*;
-#[cfg(feature = "web")]
 use gloo_storage::{LocalStorage, Storage};
 use ore::{
     state::{Bus, Proof, Treasury},
@@ -19,15 +16,6 @@ use ore::{
 use ore_types::{response::GetTransfersResponse, Transfer};
 pub use pubkey::*;
 use rand::Rng;
-#[cfg(feature = "desktop")]
-use solana_account_decoder::parse_token::UiTokenAccount;
-#[cfg(feature = "desktop")]
-use solana_client::{
-    nonblocking::rpc_client::RpcClient,
-    rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
-    rpc_response::RpcTokenAccountBalance,
-};
-#[cfg(feature = "web")]
 use solana_client_wasm::{
     solana_sdk::{
         self,
@@ -44,7 +32,6 @@ use solana_client_wasm::{
     utils::rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
     WasmClient,
 };
-#[cfg(feature = "web")]
 use solana_extra_wasm::{
     account_decoder::parse_token::UiTokenAccount,
     program::{
@@ -55,25 +42,6 @@ use solana_extra_wasm::{
     },
     transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding},
 };
-#[cfg(feature = "desktop")]
-use solana_sdk::{
-    clock::Clock,
-    commitment_config::{CommitmentConfig, CommitmentLevel},
-    compute_budget::ComputeBudgetInstruction,
-    instruction::Instruction,
-    pubkey::Pubkey,
-    signature::{Keypair, Signature},
-    signer::Signer,
-    sysvar,
-    transaction::Transaction,
-};
-#[cfg(feature = "desktop")]
-use solana_transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding};
-#[cfg(feature = "desktop")]
-use spl_associated_token_account::{
-    get_associated_token_address, instruction::create_associated_token_account,
-};
-#[cfg(feature = "web")]
 use web_time::Duration;
 
 use crate::metrics::{track, AppEvent};
@@ -94,10 +62,7 @@ const DEFAULT_PRIORITY_FEE: u64 = 12_000_000;
 const JITO_TIP_AMOUNT: u64 = 100_000;
 
 pub struct Gateway {
-    #[cfg(feature = "web")]
     pub rpc: WasmClient,
-    #[cfg(feature = "desktop")]
-    pub rpc: RpcClient,
     api_url: String,
     rpc_url: String,
 }
@@ -107,10 +72,7 @@ impl Gateway {
         Gateway {
             api_url,
             rpc_url: rpc_url.clone(),
-            #[cfg(feature = "web")]
             rpc: WasmClient::new(&rpc_url),
-            #[cfg(feature = "desktop")]
-            rpc: RpcClient::new(rpc_url),
         }
     }
 
@@ -203,8 +165,6 @@ impl Gateway {
                 .await;
             match sim_res {
                 Ok(sim_res) => {
-                    #[cfg(feature = "desktop")]
-                    let sim_res = sim_res.value;
                     if let Some(err) = sim_res.err {
                         println!("Simulaton error: {:?}", err);
                         sim_attempts += 1;
@@ -255,8 +215,6 @@ impl Gateway {
                     for _ in 0..CONFIRM_RETRIES {
                         match self.rpc.get_signature_statuses(&[sig]).await {
                             Ok(signature_statuses) => {
-                                #[cfg(feature = "desktop")]
-                                let signature_statuses = signature_statuses.value;
                                 log::info!("Sig status: {:?}", signature_statuses[0]);
                                 for signature_status in signature_statuses {
                                     if let Some(signature_status) = signature_status.as_ref() {
@@ -454,28 +412,12 @@ impl Gateway {
     }
 }
 
-#[cfg(feature = "web")]
 pub fn signer() -> Keypair {
     let key = "keypair";
     let value = LocalStorage::get(key).ok().unwrap_or_else(|| {
         let x = Keypair::new().to_base58_string();
         LocalStorage::set(key, &x).ok();
         x
-    });
-    Keypair::from_base58_string(&value)
-}
-
-#[cfg(feature = "desktop")]
-pub fn signer() -> Keypair {
-    use crate::file::{get_value, set_key_value};
-
-    let key = "keypair";
-    let value = get_value(key).ok().unwrap_or_else(|| {
-        let value = Keypair::new().to_base58_string();
-        if let Ok(v) = serde_json::to_value(&value) {
-            set_key_value(key, &v).ok();
-        }
-        value
     });
     Keypair::from_base58_string(&value)
 }

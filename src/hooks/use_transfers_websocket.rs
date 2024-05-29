@@ -1,15 +1,8 @@
-#[cfg(feature = "desktop")]
-use async_tungstenite::async_std::connect_async;
 use dioxus::prelude::*;
 use dioxus_std::utils::{channel::use_channel, rw::UseRw};
 use futures::StreamExt;
-#[cfg(feature = "web")]
 use gloo::net::websocket::{futures::WebSocket, Message, WebSocketError};
 use ore_types::Transfer;
-#[cfg(feature = "desktop")]
-use url::Url;
-
-#[cfg(feature = "web")]
 use wasm_bindgen_futures::spawn_local;
 
 use crate::{components::ActivityFilter, gateway::AsyncResult};
@@ -67,49 +60,6 @@ pub fn use_transfers_websocket(
         }
     });
 
-    // TODO Support desktop
-    #[cfg(feature = "desktop")]
-    let _ws = use_future(cx, (), |_| {
-        let ch = ch.clone();
-        async move {
-            let url = Url::parse(URL).expect("Invalid WebSocket URL");
-            let (mut ws, _) = connect_async(url)
-                .await
-                .expect("Failed to connect to websocket server");
-
-            async_std::task::spawn({
-                async move {
-                    while let Some(msg) = ws.next().await {
-                        match msg {
-                            Ok(msg) => match msg {
-                                async_tungstenite::tungstenite::Message::Text(text) => {
-                                    match serde_json::from_str::<Transfer>(&text) {
-                                        Ok(transfer) => {
-                                            ch.send(transfer).await.ok();
-                                        }
-                                        Err(err) => {
-                                            log::error!("Failed to parse transfer: {:?}", err)
-                                        }
-                                    }
-                                }
-                                async_tungstenite::tungstenite::Message::Binary(_) => {}
-                                async_tungstenite::tungstenite::Message::Ping(_) => {}
-                                async_tungstenite::tungstenite::Message::Pong(_) => {}
-                                async_tungstenite::tungstenite::Message::Close(_) => {}
-                                async_tungstenite::tungstenite::Message::Frame(_) => {}
-                            },
-                            Err(e) => {
-                                log::error!("Error during receiving a message: {}", e);
-                                break;
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    });
-
-    #[cfg(feature = "web")]
     let _ws = use_coroutine(cx, |mut _rx: UnboundedReceiver<Message>| {
         let ch = ch.clone();
         async move {

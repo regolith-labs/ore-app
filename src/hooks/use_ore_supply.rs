@@ -1,7 +1,4 @@
 use dioxus::prelude::*;
-#[cfg(feature = "desktop")]
-use solana_account_decoder::parse_token::UiTokenAmount;
-#[cfg(feature = "web")]
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::gateway::AsyncResult;

@@ -4,10 +4,7 @@ use dioxus::prelude::*;
 use dioxus_router::{components::Link, prelude::use_navigator};
 use ore::{BUS_ADDRESSES, TREASURY_ADDRESS};
 use ore_types::TransferType;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
-#[cfg(feature = "desktop")]
-use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{BackButton, Copyable, OreIcon},

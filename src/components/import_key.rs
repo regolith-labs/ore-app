@@ -1,11 +1,8 @@
 use dioxus::prelude::*;
 use dioxus_router::prelude::use_navigator;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
     bs58, native_token::LAMPORTS_PER_SOL, signature::Keypair, signer::Signer,
 };
-#[cfg(feature = "desktop")]
-use solana_sdk::{bs58, native_token::LAMPORTS_PER_SOL, signature::Keypair, signer::Signer};
 
 use crate::{
     components::EyeSlashIcon,

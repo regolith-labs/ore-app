@@ -1,9 +1,6 @@
 use dioxus::prelude::*;
 use ore::{state::Proof, utils::AccountDeserialize};
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
-#[cfg(feature = "desktop")]
-use solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{proof_pubkey, AsyncResult};
 

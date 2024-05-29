@@ -1,14 +1,7 @@
-#[cfg(feature = "desktop")]
-use std::time::Duration;
-
 use dioxus::prelude::*;
 use dioxus_std::utils::rw::{use_rw, UseRw};
 use ore::utils::AccountDeserialize;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
-#[cfg(feature = "desktop")]
-use solana_sdk::pubkey::Pubkey;
-#[cfg(feature = "web")]
 use web_time::Duration;
 
 use crate::gateway::AsyncResult;

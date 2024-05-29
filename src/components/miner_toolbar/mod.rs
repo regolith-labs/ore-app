@@ -11,10 +11,7 @@ pub use miner_toolbar_active::*;
 pub use miner_toolbar_error::*;
 pub use miner_toolbar_insufficient_sol::*;
 pub use miner_toolbar_not_started::*;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
-#[cfg(feature = "desktop")]
-use solana_sdk::blake3::Hash as Blake3Hash;
 
 pub use utils::*;
 
