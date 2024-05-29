@@ -23,9 +23,9 @@ pub async fn try_start_mining(
 ) -> GatewayResult<()> {
     // Create proof account, if needed
     *status_message.write() = MinerStatusMessage::GeneratingChallenge;
-    'register: loop {
+    loop {
         if gateway.register_ore().await.is_ok() {
-            break 'register;
+            break;
         }
     }
 
@@ -33,8 +33,17 @@ pub async fn try_start_mining(
     let signer = signer();
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
+    let clock = gateway.get_clock().await.unwrap();
+    let cutoff_time = proof
+        .last_hash_at
+        .saturating_add(60)
+        .saturating_sub(clock.unix_timestamp)
+        .max(0) as u64;
+
     *status_message.write() = MinerStatusMessage::Searching;
-    miner.start_mining(proof.challenge.into()).await;
+    miner
+        .start_mining(proof.challenge.into(), cutoff_time)
+        .await;
 
     // Record event for data
     track(AppEvent::StartMiner, None);

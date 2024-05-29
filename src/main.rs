@@ -13,8 +13,6 @@ mod metrics;
 mod miner;
 mod route;
 mod utils;
-#[cfg(feature = "web")]
-mod worker;
 
 use crate::{
     hooks::{

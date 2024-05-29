@@ -1,11 +1,13 @@
 use dioxus::prelude::*;
 use dioxus_router::prelude::Link;
+use solana_client_wasm::solana_sdk::signer::Signer;
 
 use crate::{
     components::{
         ActivityIndicator, IsToolbarOpen, MinerDisplayHash, Spinner, StopButton, WarningIcon,
     },
-    hooks::{use_power_level, use_priority_fee, PowerLevel, PriorityFee},
+    gateway::signer,
+    hooks::{use_gateway, use_power_level, use_priority_fee, PowerLevel, PriorityFee},
     metrics::{track, AppEvent},
     miner::Miner,
     route::Route,
@@ -20,6 +22,8 @@ pub struct MinerToolbarActiveProps {
 
 #[component]
 pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
+    let gateway = use_gateway(cx);
+    let time_remaining = use_state(cx, || 0);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
     let miner_status_message = *use_shared_state::<MinerStatusMessage>(cx).unwrap().read();
     let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx)
@@ -27,6 +31,22 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         .read()
         .0
         .to_string();
+
+    use_future(cx, (), |_| {
+        let signer = signer();
+        let gateway = gateway.clone();
+        let time_remaining = time_remaining.clone();
+        async move {
+            let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
+            let clock = gateway.get_clock().await.unwrap();
+            let cutoff_time = proof
+                .last_hash_at
+                .saturating_add(60)
+                .saturating_sub(clock.unix_timestamp)
+                .max(0) as u64;
+            time_remaining.set(cutoff_time);
+        }
+    });
 
     if is_toolbar_open.read().0 {
         render! {
@@ -53,6 +73,10 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                                 p {
                                     class: "text-lg text-white",
                                     "Searching for a valid hash..."
+                                }
+                                p {
+                                    class: "text-lg text-white",
+                                    "{time_remaining} sec"
                                 }
                             }
                         }
@@ -250,7 +274,7 @@ fn DownloadLink(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-sm my-auto",
-                    "You are mining from a web browser which can lead to inconsistent results. For better performance, "
+                    "You are mining from a web browser. For better performance, "
                     Link {
                         to: Route::Download {},
                         class: "font-medium underline",

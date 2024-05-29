@@ -181,31 +181,8 @@ impl Gateway {
             min_context_slot: Some(slot),
         };
 
-        // If default rpc, add tip
-        let mut ixs = ixs.to_vec();
-        if self.rpc_url.eq(RPC_URL) {
-            let mut rng = rand::thread_rng();
-            let tip_accounts = &[
-                Pubkey::from_str("96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5").unwrap(),
-                Pubkey::from_str("HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe").unwrap(),
-                Pubkey::from_str("Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY").unwrap(),
-                Pubkey::from_str("ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49").unwrap(),
-                Pubkey::from_str("DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh").unwrap(),
-                Pubkey::from_str("ADuUkR4vqLUMWXxW9gh6D6L8pMSawimctcNZ5pGwDcEt").unwrap(),
-                Pubkey::from_str("DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL").unwrap(),
-                Pubkey::from_str("3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT").unwrap(),
-            ];
-            let i = rng.gen_range(0..tip_accounts.len());
-            let ix = solana_sdk::system_instruction::transfer(
-                &signer.pubkey(),
-                &tip_accounts[i],
-                JITO_TIP_AMOUNT,
-            );
-            ixs.push(ix);
-        }
-
         // Build tx
-        let mut tx = Transaction::new_with_payer(ixs.as_slice(), Some(&signer.pubkey()));
+        let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
 
         // Simulate tx, if necessary
         let mut sim_attempts = 0;
