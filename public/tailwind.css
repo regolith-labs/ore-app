@@ -744,10 +744,6 @@ h2:where(.dark, .dark *) {
   margin-left: 0.5rem;
 }
 
-.ml-8 {
-  margin-left: 2rem;
-}
-
 .ml-auto {
   margin-left: auto;
 }
@@ -774,10 +770,6 @@ h2:where(.dark, .dark *) {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.-mt-8 {
-  margin-top: -2rem;
 }
 
 .flex {
@@ -830,10 +822,6 @@ h2:where(.dark, .dark *) {
 
 .h-3\.5 {
   height: 0.875rem;
-}
-
-.h-32 {
-  height: 8rem;
 }
 
 .h-4 {
@@ -913,6 +901,10 @@ h2:where(.dark, .dark *) {
   width: 5rem;
 }
 
+.w-24 {
+  width: 6rem;
+}
+
 .w-3 {
   width: 0.75rem;
 }
@@ -956,10 +948,6 @@ h2:where(.dark, .dark *) {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-24 {
-  width: 6rem;
 }
 
 .max-w-3xl {
@@ -1057,10 +1045,6 @@ h2:where(.dark, .dark *) {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.list-inside {
-  list-style-position: inside;
 }
 
 .list-outside {
@@ -1201,10 +1185,6 @@ h2:where(.dark, .dark *) {
   text-wrap: nowrap;
 }
 
-.break-words {
-  overflow-wrap: break-word;
-}
-
 .break-all {
   word-break: break-all;
 }
@@ -1295,10 +1275,6 @@ h2:where(.dark, .dark *) {
   padding: 0.625rem;
 }
 
-.p-4 {
-  padding: 1rem;
-}
-
 .p-6 {
   padding: 1.5rem;
 }
@@ -1353,6 +1329,11 @@ h2:where(.dark, .dark *) {
   padding-bottom: 1rem;
 }
 
+.py-5 {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
 .py-6 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
@@ -1361,15 +1342,6 @@ h2:where(.dark, .dark *) {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
-}
-
-.py-5 {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
-}
-
-.pb-16 {
-  padding-bottom: 4rem;
 }
 
 .pb-20 {
@@ -1400,20 +1372,12 @@ h2:where(.dark, .dark *) {
   padding-top: 1.25rem;
 }
 
-.text-left {
-  text-align: left;
-}
-
 .text-center {
   text-align: center;
 }
 
 .text-right {
   text-align: right;
-}
-
-.-indent-4 {
-  text-indent: -1rem;
 }
 
 .font-hero {
@@ -1924,11 +1888,6 @@ h2:where(.dark, .dark *) {
 .active\:bg-red-600:active {
   --tw-bg-opacity: 1;
   background-color: rgb(220 38 38 / var(--tw-bg-opacity));
-}
-
-.active\:bg-red-400:active {
-  --tw-bg-opacity: 1;
-  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
 }
 
 .active\:enabled\:bg-green-700:enabled:active {

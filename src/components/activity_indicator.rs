@@ -1,8 +1,7 @@
 use dioxus::prelude::*;
 
-#[component]
-pub fn ActivityIndicator(cx: Scope) -> Element {
-    render! {
+pub fn ActivityIndicator() -> Element {
+    rsx! {
         span {
             class: "relative flex h-3 w-3 justify center my-auto",
             span {

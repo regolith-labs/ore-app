@@ -1,22 +1,10 @@
 use dioxus::prelude::*;
 
-#[derive(Props)]
-pub struct IconProps<'a> {
-    pub class: Option<&'a str>,
-    pub solid: Option<bool>,
-}
-
-// <svg width="216" height="216" viewBox="0 0 216 216" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <path fill-rule="evenodd" clip-rule="evenodd" d="M0.279729 192.083C-0.0932429 191.71 -0.0932429 191.105 0.279729 190.732L28.4516 162.56C28.7938 162.218 28.8414 161.68 28.5687 161.28C18.1262 145.969 12.0208 127.463 12.0208 107.532C12.0208 54.7824 54.7823 12.0209 107.531 12.0209C127.463 12.0209 145.969 18.1262 161.28 28.569C161.68 28.8417 162.218 28.7941 162.56 28.4519L190.732 0.279816C191.105 -0.0932721 191.71 -0.0932721 192.083 0.279816L215.72 23.9178C216.093 24.2908 216.093 24.8953 215.72 25.2683L187.365 53.6242C187.026 53.9626 186.975 54.493 187.239 54.8921C197.227 69.9845 203.042 88.0792 203.042 107.532C203.042 160.281 160.28 203.042 107.531 203.042C88.0788 203.042 69.9844 197.226 54.8921 187.24C54.4929 186.976 53.9625 187.026 53.6241 187.365L25.2681 215.721C24.8952 216.094 24.2904 216.094 23.9174 215.721L0.279729 192.083ZM107.531 167.703C97.5942 167.703 88.2198 165.294 79.96 161.029C69.2678 155.507 60.4434 146.875 54.6844 136.327C50.0141 127.774 47.3597 117.963 47.3597 107.532C47.3597 74.2996 74.2995 47.3598 107.531 47.3598C117.963 47.3598 127.774 50.0144 136.327 54.6845C146.874 60.4431 155.507 69.2685 161.029 79.9603C165.294 88.2205 167.703 97.5943 167.703 107.532C167.703 140.763 140.763 167.703 107.531 167.703Z" fill="#1D1D1F"/>
-// </svg>
-
 #[component]
-pub fn OreIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn OreIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
-            // view_box: "0 0 48 48",
-            // view_box: "0 0 218 218",
             view_box: "0 0 216 216",
             fill: "currentColor",
             class: "{class}",
@@ -24,17 +12,15 @@ pub fn OreIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
                 fill_rule: "evenodd",
                 clip_rule: "evenodd",
                 d: "M0.279729 192.083C-0.0932429 191.71 -0.0932429 191.105 0.279729 190.732L28.4516 162.56C28.7938 162.218 28.8414 161.68 28.5687 161.28C18.1262 145.969 12.0208 127.463 12.0208 107.532C12.0208 54.7824 54.7823 12.0209 107.531 12.0209C127.463 12.0209 145.969 18.1262 161.28 28.569C161.68 28.8417 162.218 28.7941 162.56 28.4519L190.732 0.279816C191.105 -0.0932721 191.71 -0.0932721 192.083 0.279816L215.72 23.9178C216.093 24.2908 216.093 24.8953 215.72 25.2683L187.365 53.6242C187.026 53.9626 186.975 54.493 187.239 54.8921C197.227 69.9845 203.042 88.0792 203.042 107.532C203.042 160.281 160.28 203.042 107.531 203.042C88.0788 203.042 69.9844 197.226 54.8921 187.24C54.4929 186.976 53.9625 187.026 53.6241 187.365L25.2681 215.721C24.8952 216.094 24.2904 216.094 23.9174 215.721L0.279729 192.083ZM107.531 167.703C97.5942 167.703 88.2198 165.294 79.96 161.029C69.2678 155.507 60.4434 146.875 54.6844 136.327C50.0141 127.774 47.3597 117.963 47.3597 107.532C47.3597 74.2996 74.2995 47.3598 107.531 47.3598C117.963 47.3598 127.774 50.0144 136.327 54.6845C146.874 60.4431 155.507 69.2685 161.029 79.9603C165.294 88.2205 167.703 97.5943 167.703 107.532C167.703 140.763 140.763 167.703 107.531 167.703Z"
-                // d: "M0.292923 192.626C-0.097641 192.235 -0.097641 191.603 0.292923 191.212L25.6202 165.884C25.9615 165.543 26.0099 165.007 25.7392 164.607C14.911 148.626 8.58583 129.345 8.58583 108.586C8.58583 53.3574 53.3573 8.58594 108.586 8.58594C129.344 8.58594 148.626 14.9114 164.608 25.739C165.007 26.0096 165.543 25.9612 165.884 25.6199L191.212 0.292969C191.602 -0.0976562 192.235 -0.0976562 192.626 0.292969L217.375 25.042C217.765 25.4326 217.765 26.0654 217.375 26.4561L191.95 51.88C191.611 52.2194 191.561 52.7516 191.827 53.1508C202.414 69.0175 208.586 88.0805 208.586 108.586C208.586 163.814 163.814 208.586 108.586 208.586C88.0807 208.586 69.0171 202.414 53.1511 191.827C52.7519 191.561 52.2197 191.611 51.8803 191.95L26.4559 217.375C26.0653 217.766 25.4321 217.766 25.0416 217.375L0.292923 192.626ZM108.586 171.586C98.0533 171.586 88.1245 169.001 79.3989 164.432C68.2422 158.589 59.0526 149.501 53.0841 138.421C48.3004 129.54 45.5858 119.38 45.5858 108.586C45.5858 73.792 73.7919 45.5859 108.586 45.5859C119.38 45.5859 129.54 48.3008 138.42 53.084C149.501 59.0527 158.589 68.2422 164.432 79.3994C169.001 88.124 171.586 98.0537 171.586 108.586C171.586 143.38 143.38 171.586 108.586 171.586Z",
-                // d: "M0.00527625 42.1406C-0.010802 42.0669 0.00987002 41.9866 0.0672362 41.9293L4.91651 37.0801C4.9946 37.002 5.0059 36.8794 4.94428 36.7878C2.48729 33.1337 1.0535 28.7342 1.0535 23.9999C1.0535 11.3269 11.327 1.05343 24 1.05343C28.7343 1.05343 33.1338 2.48717 36.7878 4.94421C36.8794 5.00584 37.002 4.99454 37.0801 4.91645L41.9293 0.0672259C42.0189 -0.0224086 42.1642 -0.0224086 42.2538 0.0672259L47.9327 5.74625C48.0224 5.83588 48.0224 5.98109 47.9327 6.07073L43.0835 10.9199C43.0054 10.998 42.9941 11.1206 43.0557 11.2122C45.5127 14.8661 46.9464 19.2655 46.9464 23.9999C46.9464 36.6729 36.6729 46.9463 24 46.9463C19.2657 46.9463 14.8663 45.5126 11.2122 43.0556C11.1206 42.9939 10.998 43.0052 10.92 43.0833L6.07068 47.9328C5.9811 48.0224 5.83578 48.0224 5.7462 47.9328L0.0672362 42.2537C0.0349677 42.2215 0.0143518 42.182 0.00527625 42.1406ZM24 38.4562C21.5532 38.4562 19.2483 37.8482 17.2282 36.7753C14.6769 35.4202 12.5798 33.323 11.2247 30.7718C10.1516 28.7516 9.54369 26.4467 9.54369 23.9999C9.54369 16.0159 16.016 9.54362 24 9.54362C26.4469 9.54362 28.7518 10.1516 30.7719 11.2245C33.3232 12.5798 35.4202 14.6768 36.7753 17.228C37.8483 19.2481 38.4562 21.5531 38.4562 23.9999C38.4562 31.9839 31.9839 38.4562 24 38.4562Z"
             }
         }
     }
 }
 
 #[component]
-pub fn QrCodeIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn QrCodeIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             fill: "none",
             view_box: "0 0 24 24",
@@ -56,9 +42,9 @@ pub fn QrCodeIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn SearchIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn SearchIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             fill: "currentColor",
             view_box: "0 0 24 24",
@@ -73,9 +59,9 @@ pub fn SearchIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn CubeIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn CubeIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -88,9 +74,9 @@ pub fn CubeIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn CubeTransparentIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn CubeTransparentIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -105,9 +91,9 @@ pub fn CubeTransparentIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn AdjustmentsHorizontalIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn AdjustmentsHorizontalIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -121,9 +107,9 @@ pub fn AdjustmentsHorizontalIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn PauseIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn PauseIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -138,9 +124,9 @@ pub fn PauseIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn PlayIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn PlayIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -155,9 +141,9 @@ pub fn PlayIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn PlusIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn PlusIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 20 20",
             fill: "currentColor",
@@ -170,9 +156,9 @@ pub fn PlusIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn InfoIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn InfoIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 16 16",
             fill: "currentColor",
@@ -187,9 +173,9 @@ pub fn InfoIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn WarningIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn WarningIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -204,9 +190,9 @@ pub fn WarningIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn CheckIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn CheckIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -221,9 +207,9 @@ pub fn CheckIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn UserIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn UserIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -238,9 +224,9 @@ pub fn UserIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn UserGroupIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn UserGroupIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -259,15 +245,10 @@ pub fn UserGroupIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
     }
 }
 
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z" clip-rule="evenodd" />
-//   <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z" />
-// </svg>
-
 #[component]
-pub fn GlobeIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn GlobeIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -281,9 +262,9 @@ pub fn GlobeIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn CircleStackIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn CircleStackIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -309,9 +290,9 @@ pub fn CircleStackIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn PaperAirplaneIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn PaperAirplaneIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -325,10 +306,10 @@ pub fn PaperAirplaneIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn CopyIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    if cx.props.solid.unwrap_or_default() {
-        render! {
+pub fn CopyIcon(class: Option<String>, solid: bool) -> Element {
+    let class = class.unwrap_or("".to_string());
+    if solid {
+        rsx! {
             svg {
                 view_box: "0 0 24 24",
                 fill: "currentColor",
@@ -344,7 +325,7 @@ pub fn CopyIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
             }
         }
     } else {
-        render! {
+        rsx! {
             svg {
                 fill: "none",
                 view_box: "0 0 24 24",
@@ -362,9 +343,9 @@ pub fn CopyIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn ChartIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn ChartIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -378,9 +359,9 @@ pub fn ChartIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn GithubIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn GithubIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 1024 1024",
             fill: "currentColor",
@@ -396,9 +377,9 @@ pub fn GithubIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component(no_case_check)]
-pub fn XIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn XIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 300 300",
             fill: "currentColor",
@@ -410,9 +391,10 @@ pub fn XIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
     }
 }
 
-pub fn OreLogoIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+#[component]
+pub fn OreLogoIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 416 142",
             fill: "currentColor",
@@ -435,9 +417,10 @@ pub fn OreLogoIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
     }
 }
 
-pub fn OreWordmarkIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+#[component]
+pub fn OreWordmarkIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 234 88",
             fill: "currentColor",
@@ -457,9 +440,10 @@ pub fn OreWordmarkIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
     }
 }
 
-pub fn TreasuryIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+#[component]
+pub fn TreasuryIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -479,9 +463,10 @@ pub fn TreasuryIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
     }
 }
 
-pub fn BusIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+#[component]
+pub fn BusIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -499,31 +484,10 @@ pub fn BusIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
     }
 }
 
-pub fn PieIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
-        svg {
-            view_box: "0 0 24 24",
-            fill: "currentColor",
-            class: "{class}",
-            path {
-                fill_rule: "evenodd",
-                clip_rule: "evenodd",
-                d: "M2.25 13.5a8.25 8.25 0 0 1 8.25-8.25.75.75 0 0 1 .75.75v6.75H18a.75.75 0 0 1 .75.75 8.25 8.25 0 0 1-16.5 0Z"
-            }
-            path {
-                fill_rule: "evenodd",
-                clip_rule: "evenodd",
-                d: "M12.75 3a.75.75 0 0 1 .75-.75 8.25 8.25 0 0 1 8.25 8.25.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75V3Z"
-            }
-        }
-    }
-}
-
 #[component]
-pub fn LockOpenIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn LockOpenIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -538,9 +502,9 @@ pub fn LockOpenIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn ChatButtonRightLeftIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn ChatButtonRightLeftIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -560,9 +524,9 @@ pub fn ChatButtonRightLeftIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn FlagIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn FlagIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -577,9 +541,9 @@ pub fn FlagIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
 }
 
 #[component]
-pub fn EyeSlashIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
-    let class = cx.props.class.unwrap_or("");
-    render! {
+pub fn EyeSlashIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         svg {
             view_box: "0 0 24 24",
             fill: "currentColor",
@@ -598,52 +562,3 @@ pub fn EyeSlashIcon<'a>(cx: Scope<'a, IconProps<'a>>) -> Element {
         }
     }
 }
-
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
-//   <path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
-//   <path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
-// </svg>
-
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
-// </svg>
-
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path d="M4.913 2.658c2.075-.27 4.19-.408 6.337-.408 2.147 0 4.262.139 6.337.408 1.922.25 3.291 1.861 3.405 3.727a4.403 4.403 0 0 0-1.032-.211 50.89 50.89 0 0 0-8.42 0c-2.358.196-4.04 2.19-4.04 4.434v4.286a4.47 4.47 0 0 0 2.433 3.984L7.28 21.53A.75.75 0 0 1 6 21v-4.03a48.527 48.527 0 0 1-1.087-.128C2.905 16.58 1.5 14.833 1.5 12.862V6.638c0-1.97 1.405-3.718 3.413-3.979Z" />
-//   <path d="M15.75 7.5c-1.376 0-2.739.057-4.086.169C10.124 7.797 9 9.103 9 10.609v4.285c0 1.507 1.128 2.814 2.67 2.94 1.243.102 2.5.157 3.768.165l2.782 2.781a.75.75 0 0 0 1.28-.53v-2.39l.33-.026c1.542-.125 2.67-1.433 2.67-2.94v-4.286c0-1.505-1.125-2.811-2.664-2.94A49.392 49.392 0 0 0 15.75 7.5Z" />
-// </svg>
-
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 0 1-1.5 0V6.75a3.75 3.75 0 1 0-7.5 0v3a3 3 0 0 1 3 3v6.75a3 3 0 0 1-3 3H3.75a3 3 0 0 1-3-3v-6.75a3 3 0 0 1 3-3h9v-3c0-2.9 2.35-5.25 5.25-5.25Z" />
-// </svg>
-
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path fill-rule="evenodd" d="M2.25 13.5a8.25 8.25 0 0 1 8.25-8.25.75.75 0 0 1 .75.75v6.75H18a.75.75 0 0 1 .75.75 8.25 8.25 0 0 1-16.5 0Z" clip-rule="evenodd" />
-//   <path fill-rule="evenodd" d="M12.75 3a.75.75 0 0 1 .75-.75 8.25 8.25 0 0 1 8.25 8.25.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75V3Z" clip-rule="evenodd" />
-// </svg>
-
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path d="M3.375 4.5C2.339 4.5 1.5 5.34 1.5 6.375V13.5h12V6.375c0-1.036-.84-1.875-1.875-1.875h-8.25ZM13.5 15h-12v2.625c0 1.035.84 1.875 1.875 1.875h.375a3 3 0 1 1 6 0h3a.75.75 0 0 0 .75-.75V15Z" />
-//   <path d="M8.25 19.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0ZM15.75 6.75a.75.75 0 0 0-.75.75v11.25c0 .087.015.17.042.248a3 3 0 0 1 5.958.464c.853-.175 1.522-.935 1.464-1.883a18.659 18.659 0 0 0-3.732-10.104 1.837 1.837 0 0 0-1.47-.725H15.75Z" />
-//   <path d="M19.5 19.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
-// </svg>
-
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-//   <path d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832 1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z" />
-//   <path fill-rule="evenodd" d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z" clip-rule="evenodd" />
-//   <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
-// </svg>
-
-// <svg width="234" height="88" viewBox="0 0 234 88" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <path d="M175.14 86V2H233.864V20.24H197.82V34.32H232.18V52.44H197.82V67.76H233.86V86H175.14Z" fill="#1D1D1F"/>
-// <path d="M95.618 86V2H133.778C149.978 2 163.538 13.76 163.538 31.4C163.538 43.58 157.238 53 147.818 57.74L166.658 86H140.978L126.938 62.96H118.298V86H95.618ZM129.458 22.76H118.298V42.44H129.458C137.258 42.44 141.218 38.36 141.218 32.48C141.218 26.6 137.258 22.76 129.458 22.76Z" fill="#1D1D1F"/>
-// <path d="M43.6361 87.5C16.7931 87.5 0.136078 66.5247 0.136078 44C0.136078 21.4753 16.7931 0.5 43.6361 0.5C70.4791 0.5 87.1361 21.4753 87.1361 44C87.1361 66.5247 70.4791 87.5 43.6361 87.5ZM43.6361 65.5712C56.4584 65.5712 64.3675 55.3219 64.3675 44C64.3675 32.6781 56.4584 22.4288 43.6361 22.4288C30.8138 22.4288 22.9047 32.6781 22.9047 44C22.9047 55.3219 30.8138 65.5712 43.6361 65.5712Z" fill="#1D1D1F"/>
-// </svg>
-
-// <svg width="416" height="142" viewBox="0 0 416 142" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <path fill-rule="evenodd" clip-rule="evenodd" d="M0.356988 125.663C0.102196 125.409 0.102196 124.996 0.356988 124.741L16.8797 108.218C17.1024 107.995 17.134 107.645 16.9574 107.385C9.89339 96.9593 5.76703 84.3807 5.76703 70.8382C5.76703 34.8088 34.9746 5.60121 71.004 5.60121C84.5463 5.60121 97.1249 9.72777 107.551 16.7913C107.812 16.9679 108.161 16.9363 108.384 16.7137L124.907 0.191124C125.161 -0.063708 125.574 -0.063708 125.829 0.191124L141.975 16.3366C142.229 16.5915 142.229 17.0043 141.975 17.2591L125.388 33.845C125.167 34.0663 125.134 34.4135 125.308 34.674C132.215 45.025 136.241 57.4611 136.241 70.8382C136.241 106.868 107.033 136.075 71.004 136.075C57.6271 136.075 45.1906 132.049 34.8401 125.142C34.5796 124.968 34.2324 125.001 34.011 125.222L17.4249 141.809C17.1701 142.064 16.7571 142.064 16.5023 141.809L0.356988 125.663ZM71.004 111.937C64.1329 111.937 57.6556 110.251 51.9634 107.27C44.685 103.459 38.69 97.5299 34.7964 90.3016C31.6756 84.508 29.9047 77.8798 29.9047 70.8382C29.9047 48.1397 48.3055 29.7389 71.004 29.7389C78.0457 29.7389 84.6738 31.51 90.4672 34.6304C97.6956 38.5242 103.624 44.5191 107.436 51.7978C110.417 57.4894 112.103 63.9673 112.103 70.8382C112.103 93.5367 93.7025 111.937 71.004 111.937Z" fill="#1D1D1F"/>
-// <path d="M359.135 111.552V30.4483H415.834V48.0593H381.033V61.6538H414.208V79.149H381.033V93.9407H415.83V111.552H359.135Z" fill="#1D1D1F"/>
-// <path d="M282.355 111.552V30.4483H319.199C334.84 30.4483 347.933 41.8028 347.933 58.8345C347.933 70.5945 341.85 79.6897 332.755 84.2662L350.945 111.552H326.151L312.595 89.3062H304.253V111.552H282.355ZM315.028 50.4924H304.253V69.4938H315.028C322.559 69.4938 326.383 65.5545 326.383 59.8772C326.383 54.2 322.559 50.4924 315.028 50.4924Z" fill="#1D1D1F"/>
-// <path d="M232.166 113C206.248 113 190.166 92.7479 190.166 71C190.166 49.2521 206.248 29 232.166 29C258.083 29 274.166 49.2521 274.166 71C274.166 92.7479 258.083 113 232.166 113ZM232.166 91.8274C244.546 91.8274 252.182 81.9315 252.182 71C252.182 60.0685 244.546 50.1726 232.166 50.1726C219.785 50.1726 212.149 60.0685 212.149 71C212.149 81.9315 219.785 91.8274 232.166 91.8274Z" fill="#1D1D1F"/>
-// </svg>

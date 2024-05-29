@@ -5,7 +5,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{components::ActivityFilter, gateway::AsyncResult};
 
-use super::{use_gateway, use_pubkey, use_transfers_websocket};
+use super::{use_gateway, use_pubkey};
 
 pub const ACTIVITY_TABLE_PAGE_LIMIT: usize = 8;
 
@@ -63,15 +63,6 @@ pub fn use_transfers(
     let pubkey = use_pubkey(cx);
     let transfers = use_rw::<AsyncResult<Vec<Transfer>>>(cx, || AsyncResult::Loading);
     let has_more = use_state(cx, || false);
-
-    use_transfers_websocket(
-        cx,
-        filter,
-        transfers,
-        offset,
-        has_more,
-        ACTIVITY_TABLE_PAGE_LIMIT,
-    );
 
     let _ = use_future(cx, (&filter.clone(), &offset.clone()), |_| {
         let gateway = gateway.clone();
