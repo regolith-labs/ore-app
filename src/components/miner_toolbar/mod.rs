@@ -12,9 +12,9 @@ pub use miner_toolbar_error::*;
 pub use miner_toolbar_insufficient_sol::*;
 pub use miner_toolbar_not_started::*;
 #[cfg(feature = "web")]
-use solana_client_wasm::solana_sdk::keccak::Hash as KeccakHash;
+use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 #[cfg(feature = "desktop")]
-use solana_sdk::keccak::Hash as KeccakHash;
+use solana_sdk::blake3::Hash as Blake3Hash;
 
 pub use utils::*;
 
@@ -22,7 +22,6 @@ use dioxus::prelude::*;
 
 use crate::{
     hooks::{use_gateway, use_miner, use_priority_fee, use_pubkey, use_treasury},
-    miner::{submit_solution, MiningResult},
     ProofHandle,
 };
 
@@ -45,7 +44,7 @@ pub enum MinerStatusMessage {
 }
 
 #[derive(Debug)]
-pub struct MinerDisplayHash(pub KeccakHash);
+pub struct MinerDisplayHash(pub Blake3Hash);
 
 #[derive(Debug)]
 pub struct IsToolbarOpen(pub bool);
@@ -54,19 +53,17 @@ pub struct IsToolbarOpen(pub bool);
 pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
     use_shared_state_provider(cx, || MinerStatus::NotStarted);
     use_shared_state_provider(cx, || MinerStatusMessage::Searching);
-    use_shared_state_provider(cx, || MinerDisplayHash(KeccakHash::new_unique()));
+    use_shared_state_provider(cx, || MinerDisplayHash(Blake3Hash::new_unique()));
     let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
     let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
     let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx).unwrap();
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let priority_fee = use_priority_fee(cx);
     let gateway = use_gateway(cx);
-    let proof_ = cx.consume_context::<ProofHandle>().unwrap();
-    let ch = use_channel::<MiningResult>(cx, 1);
-    let miner = use_miner(cx, ch);
     let pubkey = use_pubkey(cx);
     let (treasury, _) = use_treasury(cx);
+    let miner = use_miner(cx, miner_display_hash, miner_status, miner_status_message);
 
+    // Animate the hash in the miner toolbar to visualize mining
     let _ = use_future(cx, miner_status_message, |_| {
         let display_hash = miner_display_hash.clone();
         let msg = miner_status_message.clone();
@@ -74,7 +71,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
             loop {
                 async_std::task::sleep(std::time::Duration::from_millis(75)).await;
                 if let MinerStatusMessage::Searching = *msg.read() {
-                    *display_hash.write() = MinerDisplayHash(KeccakHash::new_unique());
+                    *display_hash.write() = MinerDisplayHash(Blake3Hash::new_unique());
                 } else {
                     break;
                 }
@@ -82,40 +79,42 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         }
     });
 
+    // TODO This should be in miner.rs
+    // TODO Listen for results from miner and display updated info
     // Listen for results from miner.
     // Submit for validation and start mining next hash.
-    let _ = use_future(cx, (), |_| {
-        let mut rx = ch.clone().receiver();
-        let status = miner_status.clone();
-        let miner = miner.clone();
-        let gateway = gateway.clone();
-        let proof_ = proof_.clone();
-        let miner_status_message = miner_status_message.clone();
-        let miner_display_hash = miner_display_hash.clone();
-        let priority_fee = priority_fee.clone();
-        async move {
-            while let Ok(res) = rx.recv().await {
-                *miner_display_hash.write() = MinerDisplayHash(res.hash);
-                *miner_status_message.write() = MinerStatusMessage::Submitting;
-                let priority_fee = priority_fee.read().0;
-                match submit_solution(&gateway, &res, priority_fee).await {
-                    Ok(_sig) => {
-                        proof_.restart();
-                        if let MinerStatus::Active = *status.read() {
-                            if let Ok(proof) = gateway.get_proof(pubkey).await {
-                                *miner_status_message.write() = MinerStatusMessage::Searching;
-                                miner.start_mining(proof.challenge.into()).await;
-                            }
-                        }
-                    }
-                    Err(err) => {
-                        *miner_status_message.write() = MinerStatusMessage::Error;
-                        log::error!("Failed to submit hash: {:?}", err);
-                    }
-                }
-            }
-        }
-    });
+    // let _ = use_future(cx, (), |_| {
+    //     let mut rx = ch.clone().receiver();
+    //     let status = miner_status.clone();
+    //     let miner = miner.clone();
+    //     let gateway = gateway.clone();
+    //     let proof_handle = proof_handle.clone();
+    //     let miner_status_message = miner_status_message.clone();
+    //     let miner_display_hash = miner_display_hash.clone();
+    //     let priority_fee = priority_fee.clone();
+    //     async move {
+    //         while let Ok(res) = rx.recv().await {
+    //             *miner_display_hash.write() = MinerDisplayHash(res.hash);
+    //             *miner_status_message.write() = MinerStatusMessage::Submitting;
+    //             let priority_fee = priority_fee.read().0;
+    //             match submit_solution(&gateway, &res, priority_fee).await {
+    //                 Ok(_sig) => {
+    //                     proof_handle.restart();
+    //                     if let MinerStatus::Active = *status.read() {
+    //                         if let Ok(proof) = gateway.get_proof(pubkey).await {
+    //                             *miner_status_message.write() = MinerStatusMessage::Searching;
+    //                             miner.start_mining(proof.challenge.into()).await;
+    //                         }
+    //                     }
+    //                 }
+    //                 Err(err) => {
+    //                     *miner_status_message.write() = MinerStatusMessage::Error;
+    //                     log::error!("Failed to submit hash: {:?}", err);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // });
 
     let is_open = is_toolbar_open.read().0;
     let class =
