@@ -1,7 +1,4 @@
 use dioxus_router::components::Link;
-#[cfg(feature = "desktop")]
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-#[cfg(feature = "web")]
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use dioxus::prelude::*;

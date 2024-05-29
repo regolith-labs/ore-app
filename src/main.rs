@@ -1,12 +1,9 @@
-#![cfg_attr(feature = "bundle", windows_subsystem = "windows")]
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 mod components;
-#[cfg(feature = "desktop")]
-mod file;
 mod gateway;
 mod hooks;
 mod metrics;
@@ -24,22 +21,9 @@ use crate::{
     route::Route,
 };
 
-#[cfg(feature = "web")]
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
     dioxus_web::launch(App);
-}
-
-#[cfg(feature = "desktop")]
-fn main() {
-    use utils::asset_path;
-    env_logger::init();
-    let tailwind_path = asset_path("tailwind.css");
-    let custom_head = format!(r#"<link rel="stylesheet" href="{}">"#, tailwind_path);
-    dioxus_desktop::launch_cfg(
-        App,
-        dioxus_desktop::Config::new().with_custom_head(custom_head),
-    );
 }
 
 #[component]

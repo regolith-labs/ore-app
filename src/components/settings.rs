@@ -4,10 +4,7 @@ use dioxus::prelude::*;
 use dioxus_router::components::Link;
 use is_url::is_url;
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
-#[cfg(feature = "desktop")]
-use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     components::{BackupKeypairWarning, Copyable},

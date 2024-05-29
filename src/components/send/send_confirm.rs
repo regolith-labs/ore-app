@@ -1,8 +1,5 @@
 use dioxus::prelude::*;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
-#[cfg(feature = "desktop")]
-use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},

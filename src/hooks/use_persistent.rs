@@ -1,10 +1,6 @@
 use dioxus::prelude::*;
-#[cfg(feature = "web")]
 use gloo_storage::{LocalStorage, Storage};
 use serde::{de::DeserializeOwned, Serialize};
-
-#[cfg(feature = "desktop")]
-use crate::file::{get_value, set_key_value};
 
 // TODO Wrap this with a useState so all writes auto-update throughout the app
 
@@ -22,23 +18,11 @@ pub fn use_persistent<T: Serialize + DeserializeOwned + Default + 'static>(
         // This closure will run when the hook is created
         let key = key.to_string();
 
-        #[cfg(feature = "web")]
         let value = LocalStorage::get(key.as_str()).ok().unwrap_or_else(|| {
             let value = init();
             LocalStorage::set(key.as_str(), &value).ok();
             value
         });
-
-        #[cfg(feature = "desktop")]
-        let value = {
-            get_value(key.as_str()).ok().unwrap_or_else(|| {
-                let value = init();
-                if let Ok(v) = serde_json::to_value(&value) {
-                    set_key_value(key.as_str(), &v).ok();
-                }
-                value
-            })
-        };
 
         StorageEntry { key, value }
     });
@@ -69,17 +53,7 @@ impl<T: Serialize + DeserializeOwned + Clone + 'static> UsePersistent<T> {
     /// Sets the value
     pub fn set(&self, value: T) {
         let mut inner = self.inner.write();
-
-        // Write the new value to local storage
-        #[cfg(feature = "web")]
         LocalStorage::set(inner.key.as_str(), &value).unwrap();
-
-        // TODO Handle desktop
-        #[cfg(feature = "desktop")]
-        {
-            set_key_value(inner.key.as_str(), &value).unwrap();
-        }
-
         inner.value = value;
     }
 }

@@ -20,13 +20,8 @@ pub fn use_miner<'a>(
     let proof_handle = cx.consume_context::<ProofHandle>().unwrap();
     let priority_fee = use_priority_fee(cx);
 
-    #[cfg(feature = "web")]
     let ch = use_channel::<WebWorkerResponse>(cx, 1);
-    #[cfg(feature = "web")]
     let miner = use_state(cx, || Miner::new(ch, power_level, priority_fee));
-
-    #[cfg(feature = "desktop")]
-    let miner = use_state(cx, || Miner::new(power_level, priority_fee));
 
     // Listen for results from miner.
     let _ = use_future(cx, (), |_| {

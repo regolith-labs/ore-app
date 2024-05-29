@@ -1,8 +1,5 @@
 use dioxus::prelude::*;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
-#[cfg(feature = "desktop")]
-use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     components::{try_start_mining, IsToolbarOpen, MinerStatus, MinerStatusMessage, Spinner},
