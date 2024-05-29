@@ -3,9 +3,8 @@ use dioxus_router::prelude::Link;
 
 use crate::components::{GithubIcon, OreLogoIcon, XIcon};
 
-#[component]
-pub fn Footer(cx: Scope) -> Element {
-    render! {
+pub fn Footer() -> Element {
+    rsx! {
         div {
             class: "flex flex-row bg-black text-white w-full py-6 sm:py-10 px-4 sm:px-8 justify-between",
             OreLogoIcon {

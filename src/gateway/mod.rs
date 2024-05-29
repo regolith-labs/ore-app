@@ -59,8 +59,6 @@ const CONFIRM_RETRIES: usize = 8;
 const SIMULATION_RETRIES: usize = 4;
 const DEFAULT_PRIORITY_FEE: u64 = 12_000_000;
 
-const JITO_TIP_AMOUNT: u64 = 100_000;
-
 pub struct Gateway {
     pub rpc: WasmClient,
     api_url: String,

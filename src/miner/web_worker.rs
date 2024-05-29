@@ -82,6 +82,7 @@ pub fn find_next_hash(challenge: [u8; 32], mut nonce: u64, cutoff_time: u64) -> 
     let mut best_nonce = 0u64;
     let mut best_difficulty = 0u32;
     loop {
+        println!("Asdf");
         if let Ok(hash) = drillx::hash(&challenge, &nonce.to_le_bytes()) {
             let difficulty = hash.difficulty();
             if difficulty.gt(&best_difficulty) {

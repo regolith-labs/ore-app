@@ -72,11 +72,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
                             render! {
                                 p {
                                     class: "text-lg text-white",
-                                    "Searching for a valid hash..."
-                                }
-                                p {
-                                    class: "text-lg text-white",
-                                    "{time_remaining} sec"
+                                    "Searching for a valid hash... ({time_remaining} sec)"
                                 }
                             }
                         }

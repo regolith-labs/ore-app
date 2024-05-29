@@ -43,7 +43,5 @@ extern "C" {
 }
 
 pub fn track(event: AppEvent, value: Option<u32>) {
-    unsafe {
-        trackEvent(event.to_string().as_str(), value).ok();
-    }
+    trackEvent(event.to_string().as_str(), value).ok();
 }
