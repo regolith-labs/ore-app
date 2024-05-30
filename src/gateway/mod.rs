@@ -2,8 +2,6 @@ mod async_result;
 mod error;
 mod pubkey;
 
-use std::str::FromStr;
-
 pub use async_result::*;
 use cached::proc_macro::cached;
 pub use error::*;
@@ -15,10 +13,8 @@ use ore::{
 };
 use ore_types::{response::GetTransfersResponse, Transfer};
 pub use pubkey::*;
-use rand::Rng;
 use solana_client_wasm::{
     solana_sdk::{
-        self,
         clock::Clock,
         commitment_config::{CommitmentConfig, CommitmentLevel},
         compute_budget::ComputeBudgetInstruction,
@@ -43,8 +39,6 @@ use solana_extra_wasm::{
     transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding},
 };
 use web_time::Duration;
-
-use crate::metrics::{track, AppEvent};
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01HTD8PPGDM1JBVQVEVJKXZ47F";
@@ -275,10 +269,7 @@ impl Gateway {
         // Sign and send transaction.
         let ix = ore::instruction::register(signer.pubkey());
         match self.send_and_confirm(&[ix], true, false).await {
-            Ok(_) => {
-                track(AppEvent::Register, None);
-                Ok(())
-            }
+            Ok(_) => Ok(()),
             Err(_) => Err(GatewayError::FailedRegister),
         }
     }
@@ -356,7 +347,7 @@ impl Gateway {
             &spl_token::id(),
         );
         match self.send_and_confirm(&[ix], true, false).await {
-            Ok(_) => track(AppEvent::CreateTokenAccount, None),
+            Ok(_) => {}
             Err(_) => return Err(GatewayError::FailedAta),
         }
 

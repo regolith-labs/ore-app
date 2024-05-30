@@ -2,44 +2,43 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 
 use crate::{
-    components::{Banner, BannerType, Footer, OreLogoIcon, OreWordmarkIcon, UserBubble},
+    components::{Footer, OreLogoIcon, OreWordmarkIcon, UserBubble},
     gateway::AsyncResult,
-    hooks::{use_appearance, use_ping},
+    hooks::use_appearance,
     route::Route,
 };
 
 use super::Appearance;
 
-#[component]
-pub fn Navbar(cx: Scope) -> Element {
-    let ping = use_ping(cx);
-    let appearance = use_appearance(cx);
+pub fn Navbar() -> Element {
+    // let ping = use_ping(cx);
+    let appearance = use_appearance();
     let dark = match *appearance.read() {
         Appearance::Dark => "dark",
         Appearance::Light => "",
     };
-    render! {
+    rsx! {
         div {
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
-            if let AsyncResult::Error(_) = ping {
-                render! {
-                    Banner {
-                        text: "Error connecting to Solana...".to_string(),
-                        banner_type: BannerType::Error
-                    }
-                }
-            }
+            // if let AsyncResult::Error(_) = ping {
+            //     rsx! {
+            //         Banner {
+            //             text: "Error connecting to Solana...".to_string(),
+            //             banner_type: BannerType::Error
+            //         }
+            //     }
+            // }
             div {
                 class: "flex w-full",
                 div {
                     class: "max-w-[96rem] w-full flex flex-row justify-between mx-auto px-4 sm:px-8 py-6",
-                    Link {
-                        to: Route::Home {},
-                        class: "flex h-10",
-                        OreWordmarkIcon {
-                            class: "h-3 md:h-4 my-auto"
-                        }
-                    }
+                    // Link {
+                    //     to: Route::Home {},
+                    //     class: "flex h-10",
+                    //     OreWordmarkIcon {
+                    //         class: "h-3 md:h-4 my-auto"
+                    //     }
+                    // }
                     div {
                         class: "flex flex-row gap-6 md:gap-8 lg:gap-10",
                         // Link {
@@ -61,21 +60,19 @@ pub fn Navbar(cx: Scope) -> Element {
     }
 }
 
-#[component]
-pub fn Profile(cx: Scope) -> Element {
-    render! {
-        Link {
-            to: Route::Settings {},
-            UserBubble {
-                class: "w-10 h-10"
-            }
-        }
+pub fn Profile() -> Element {
+    rsx! {
+        // Link {
+        //     to: Route::Settings {},
+        //     UserBubble {
+        //         class: "w-10 h-10"
+        //     }
+        // }
     }
 }
 
-#[component]
-pub fn SimpleNavbar(cx: Scope) -> Element {
-    render! {
+pub fn SimpleNavbar() -> Element {
+    rsx! {
         div {
             class: "flex flex-col min-h-screen h-full bg-white text-black",
             div {

@@ -1,11 +1,10 @@
 use dioxus::prelude::*;
-use dioxus_std::utils::rw::UseRw;
 use ore::{state::Treasury, TREASURY_ADDRESS};
 
 use crate::gateway::AsyncResult;
 
 use super::use_account;
 
-pub fn use_treasury(cx: &ScopeState) -> (&mut UseRw<AsyncResult<Treasury>>, &UseFuture<()>) {
-    use_account(cx, TREASURY_ADDRESS, Some(60))
+pub fn use_treasury() -> Signal<AsyncResult<Treasury>> {
+    use_account(TREASURY_ADDRESS, Some(60)).0
 }

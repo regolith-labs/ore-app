@@ -46,7 +46,7 @@ fn worker_options() -> WorkerOptions {
     options
 }
 
-pub fn create_web_worker(ch: &UseChannel<WebWorkerResponse>) -> Worker {
+pub fn create_web_worker(ch: UseChannel<WebWorkerResponse>) -> Worker {
     let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
     let ch = ch.clone();
 

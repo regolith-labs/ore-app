@@ -1,11 +1,12 @@
 use dioxus::prelude::*;
-use dioxus_router::prelude::*;
 
 // use crate::components::{
 //     Claim, Download, ExportKey, Home, ImportKey, Landing, Miner, Navbar, OreTokenomics,
 //     PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
 // };
-use crate::components::Landing;
+use crate::components::{
+    Home, Landing, MinerToolbarLayout, Navbar, OreTokenomics, SimpleNavbar, WhatIsMining,
+};
 
 #[rustfmt::skip]
 #[derive(Routable, Clone)]
@@ -13,19 +14,18 @@ pub enum Route {
     #[route("/")]
     Landing {},
 
-    // #[layout(SimpleNavbar)]
-    //     #[route("/what-is-mining")]
-    //     WhatIsMining {},
-    //     #[route("/ore-tokenomics")]
-    //     OreTokenomics {},
+    #[layout(SimpleNavbar)]
+        #[route("/what-is-mining")]
+        WhatIsMining {},
+        #[route("/ore-tokenomics")]
+        OreTokenomics {},
     //     #[route("/download")]
     //     Download {},
-    // #[end_layout]
 
-    // #[layout(Navbar)]
-    //     #[layout(Miner)]
-    //         #[route("/home")]
-    //         Home {},
+    #[layout(Navbar)]
+        #[layout(MinerToolbarLayout)]
+            #[route("/home")]
+            Home {},
     //         #[route("/claim")]
     //         Claim {},
     //         #[route("/settings")]
