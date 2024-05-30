@@ -13,14 +13,15 @@ mod utils;
 use crate::{
     hooks::{
         use_appearance_provider,
-        // use_explorer_provider,
+        use_explorer_provider,
         use_is_onboarded_provider,
         //         use_ore_balance_provider,
         use_power_level_provider,
         use_priority_fee_provider,
-        //         use_proof_provider, use_show_backup_warning_provider,
+        use_proof_provider,
         //         use_sol_balance_provider, ProofHandle,
         use_rpc_url_provider,
+        use_show_backup_warning_provider,
     },
     route::Route,
 };
@@ -33,15 +34,15 @@ fn main() {
 pub fn App() -> Element {
     // Global variables
     use_appearance_provider();
-    // use_explorer_provider(cx);
+    use_explorer_provider();
     use_power_level_provider();
     use_is_onboarded_provider();
     use_priority_fee_provider();
-    // use_show_backup_warning_provider(cx);
+    use_show_backup_warning_provider();
     use_rpc_url_provider();
 
     // Network variables
-    // use_proof_provider(cx);
+    use_proof_provider();
     // use_ore_balance_provider(cx);
     // use_sol_balance_provider(cx);
 
