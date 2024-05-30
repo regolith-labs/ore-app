@@ -1,119 +1,57 @@
-mod miner_toolbar_activating;
-mod miner_toolbar_active;
-mod miner_toolbar_error;
-mod miner_toolbar_insufficient_sol;
-mod miner_toolbar_not_started;
+// mod activating;
+// mod active;
+// mod error;
+// mod insufficient_sol;
+mod layout;
+// mod not_started;
 mod utils;
 
-use dioxus_std::utils::channel::use_channel;
-pub use miner_toolbar_activating::*;
-pub use miner_toolbar_active::*;
-pub use miner_toolbar_error::*;
-pub use miner_toolbar_insufficient_sol::*;
-pub use miner_toolbar_not_started::*;
-use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
-
+// pub use activating::*;
+// pub use active::*;
+// pub use error::*;
+// pub use insufficient_sol::*;
+pub use layout::*;
+// pub use not_started::*;
 pub use utils::*;
 
 use dioxus::prelude::*;
+use dioxus_std::utils::channel::use_channel;
+use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 
-use crate::{
-    hooks::{use_gateway, use_miner, use_priority_fee, use_pubkey, use_treasury},
-    ProofHandle,
+use crate::hooks::{
+    use_gateway, use_miner, use_miner_toolbar_state, use_miner_toolbar_state_provider,
+    use_priority_fee, use_pubkey, use_treasury, MinerStatus, MinerStatusMessage, ProofHandle,
+    ReadMinerToolbarState, UpdateMinerToolbarState,
 };
 
-#[derive(Debug)]
-pub enum MinerStatus {
-    NotStarted,
-    Activating,
-    Active,
-
-    // TODO Add error field
-    Error,
-}
-
-#[derive(Copy, Clone, Debug)]
-pub enum MinerStatusMessage {
-    GeneratingChallenge,
-    Searching,
-    Submitting,
-    Error,
-}
-
-#[derive(Debug)]
-pub struct MinerDisplayHash(pub Blake3Hash);
-
-#[derive(Debug)]
-pub struct IsToolbarOpen(pub bool);
-
 #[component]
-pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
-    use_shared_state_provider(cx, || MinerStatus::NotStarted);
-    use_shared_state_provider(cx, || MinerStatusMessage::Searching);
-    use_shared_state_provider(cx, || MinerDisplayHash(Blake3Hash::new_unique()));
-    let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
-    let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
-    let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx).unwrap();
-    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let gateway = use_gateway(cx);
-    let pubkey = use_pubkey(cx);
-    let (treasury, _) = use_treasury(cx);
-    let miner = use_miner(cx, miner_display_hash, miner_status, miner_status_message);
+pub fn MinerToolbar(hidden: bool) -> Element {
+    // use_context_provider(|| Signal::new(MinerStatus::NotStarted));
+    // use_context_provider(|| Signal::new(MinerStatusMessage::Searching));
+    // use_context_provider(|| Signal::new(MinerDisplayHash(Blake3Hash::new_unique())));
+    // let mut miner_status = use_context::<Signal<MinerStatus>>();
+    // let mut miner_status_message = use_context::<Signal<MinerStatusMessage>>();
+    // let mut miner_display_hash = use_context::<Signal<MinerDisplayHash>>();
+    // let mut is_toolbar_open = use_context::<Signal<IsToolbarOpen>>();
+    let mut toolbar_state = use_miner_toolbar_state();
+    let gateway = use_gateway();
+    let pubkey = use_pubkey();
+    let treasury = use_treasury();
+    let miner = use_miner();
 
     // Animate the hash in the miner toolbar to visualize mining
-    let _ = use_future(cx, miner_status_message, |_| {
-        let display_hash = miner_display_hash.clone();
-        let msg = miner_status_message.clone();
-        async move {
-            loop {
-                async_std::task::sleep(std::time::Duration::from_millis(75)).await;
-                if let MinerStatusMessage::Searching = *msg.read() {
-                    *display_hash.write() = MinerDisplayHash(Blake3Hash::new_unique());
-                } else {
-                    break;
-                }
+    use_future(move || async move {
+        loop {
+            async_std::task::sleep(std::time::Duration::from_millis(75)).await;
+            if let MinerStatusMessage::Searching = toolbar_state.status_message() {
+                toolbar_state.set_display_hash(Blake3Hash::new_unique());
+            } else {
+                break;
             }
         }
     });
 
-    // TODO This should be in miner.rs
-    // TODO Listen for results from miner and display updated info
-    // Listen for results from miner.
-    // Submit for validation and start mining next hash.
-    // let _ = use_future(cx, (), |_| {
-    //     let mut rx = ch.clone().receiver();
-    //     let status = miner_status.clone();
-    //     let miner = miner.clone();
-    //     let gateway = gateway.clone();
-    //     let proof_handle = proof_handle.clone();
-    //     let miner_status_message = miner_status_message.clone();
-    //     let miner_display_hash = miner_display_hash.clone();
-    //     let priority_fee = priority_fee.clone();
-    //     async move {
-    //         while let Ok(res) = rx.recv().await {
-    //             *miner_display_hash.write() = MinerDisplayHash(res.hash);
-    //             *miner_status_message.write() = MinerStatusMessage::Submitting;
-    //             let priority_fee = priority_fee.read().0;
-    //             match submit_solution(&gateway, &res, priority_fee).await {
-    //                 Ok(_sig) => {
-    //                     proof_handle.restart();
-    //                     if let MinerStatus::Active = *status.read() {
-    //                         if let Ok(proof) = gateway.get_proof(pubkey).await {
-    //                             *miner_status_message.write() = MinerStatusMessage::Searching;
-    //                             miner.start_mining(proof.challenge.into()).await;
-    //                         }
-    //                     }
-    //                 }
-    //                 Err(err) => {
-    //                     *miner_status_message.write() = MinerStatusMessage::Error;
-    //                     log::error!("Failed to submit hash: {:?}", err);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // });
-
-    let is_open = is_toolbar_open.read().0;
+    let is_open = toolbar_state.read().is_open;
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
     let height = if is_open {
@@ -122,7 +60,7 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         "h-16 cursor-pointer"
     };
 
-    let bg = match *miner_status.read() {
+    let bg = match toolbar_state.read().status {
         MinerStatus::Active => "bg-green-500 text-white",
         MinerStatus::Error => "bg-red-500 text-white",
         MinerStatus::NotStarted => {
@@ -135,42 +73,43 @@ pub fn MinerToolbar(cx: Scope<MinerToolbarProps>, hidden: bool) -> Element {
         _ => "bg-gray-100 dark:bg-gray-900",
     };
 
-    let display = if *hidden { "hidden" } else { "" };
+    let display = if hidden { "hidden" } else { "" };
 
-    render! {
+    rsx! {
         div {
             class: "{class} {height} {bg} {display}",
             onclick: move |_e| {
-                *is_toolbar_open.write() = IsToolbarOpen(true);
+                toolbar_state.set_is_open(true);
             },
             div {
                 class: "flex flex-row justify-between w-full max-w-[96rem] mx-auto h-full",
-                match *miner_status.read() {
-                    MinerStatus::NotStarted => {
-                        render! {
-                            MinerToolbarNotStarted {}
-                        }
-                    }
-                    MinerStatus::Activating => {
-                        render! {
-                            MinerToolbarActivating {
-                                miner: miner.clone()
-                            }
-                        }
-                    }
-                    MinerStatus::Active => {
-                        render! {
-                            MinerToolbarActive {
-                                miner: miner.clone()
-                            }
-                        }
-                    }
-                    MinerStatus::Error => {
-                        render! {
-                            MinerToolbarError {}
-                        }
-                    }
-                }
+                // match *miner_status.read() {
+                    // MinerStatus::NotStarted => {
+                    //     rsx! {
+                    //         MinerToolbarNotStarted {}
+                    //     }
+                    // }
+                    // MinerStatus::Activating => {
+                    //     rsx! {
+                    //         MinerToolbarActivating {
+                    //             miner: miner.clone()
+                    //         }
+                    //     }
+                    // }
+                    // MinerStatus::Active => {
+                    //     rsx! {
+                    //         MinerToolbarActive {
+                    //             miner: miner.clone()
+                    //         }
+                    //     }
+                    // }
+                    // MinerStatus::Error => {
+                    //     rsx! {
+                    //         MinerToolbarError {}
+                    //     }
+                    // }
+                    // _ => None
+                // }
             }
         }
     }

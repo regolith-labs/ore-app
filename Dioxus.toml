@@ -43,7 +43,7 @@ script = ["/worker.js"]
 # serve: [dev-server] only
 
 # CSS style file
-style = []
+# style = []
 
 # Javascript code file
-script = []
+# script = []

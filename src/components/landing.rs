@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use dioxus_router::prelude::*;
 use ore_types::Transfer;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -116,6 +115,7 @@ fn Block(title: String, title2: String, detail: String, section: Section) -> Ele
                     p {
                         class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
                         "{title}"
+                        br {}
                         span {
                             class: "opacity-50",
                             "{title2}"
@@ -278,7 +278,7 @@ fn SectionA() -> Element {
 // }
 
 fn SectionB() -> Element {
-    // let (treasury, _) = use_treasury(cx);
+    // let treasury = use_treasury();
     // let (supply, _) = use_ore_supply(cx);
     // let circulating_supply = match *treasury.read().unwrap() {
     //     AsyncResult::Ok(treasury) => {

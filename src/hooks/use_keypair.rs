@@ -7,16 +7,16 @@ use super::use_persistent::UsePersistent;
 
 const KEY: &str = "keypair";
 
-pub fn use_pubkey(cx: &ScopeState) -> Pubkey {
-    let kp = use_keypair(cx);
+pub fn use_pubkey() -> Pubkey {
+    let kp = use_keypair();
     kp.pubkey()
 }
 
-pub fn use_keypair(cx: &ScopeState) -> Keypair {
-    let kp_str = use_persistent(cx, KEY, || Keypair::new().to_base58_string());
+pub fn use_keypair() -> Keypair {
+    let kp_str = use_persistent(KEY, || Keypair::new().to_base58_string());
     Keypair::from_base58_string(&kp_str.get())
 }
 
-pub fn use_keypair_persistent(cx: &ScopeState) -> &UsePersistent<String> {
-    use_persistent(cx, KEY, || Keypair::new().to_base58_string())
+pub fn use_keypair_persistent() -> UsePersistent<String> {
+    use_persistent(KEY, || Keypair::new().to_base58_string())
 }

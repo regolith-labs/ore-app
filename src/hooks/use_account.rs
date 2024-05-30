@@ -1,41 +1,39 @@
 use dioxus::prelude::*;
-use dioxus_std::utils::rw::{use_rw, UseRw};
 use ore::utils::AccountDeserialize;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use web_time::Duration;
 
-use crate::gateway::AsyncResult;
+use crate::gateway::{self, AsyncResult};
 
 use super::use_gateway;
 
 pub fn use_account<
     T: AccountDeserialize + Send + Sync + Clone + Copy + std::fmt::Debug + 'static,
 >(
-    cx: &ScopeState,
     address: Pubkey,
     poll: Option<u64>,
-) -> (&mut UseRw<AsyncResult<T>>, &UseFuture<()>) {
-    let acc = use_rw::<AsyncResult<T>>(cx, || AsyncResult::Loading);
-    let gateway = use_gateway(cx);
+) -> (Signal<AsyncResult<T>>, UseFuture) {
+    let acc = use_signal::<AsyncResult<T>>(|| AsyncResult::Loading);
+    let gateway = use_gateway();
 
-    let f = use_future(cx, (), |_| {
-        let acc = acc.clone();
+    let f = use_future(move || {
+        let mut acc = acc.clone();
         let gateway = gateway.clone();
         async move {
             if let Ok(data) = gateway.rpc.get_account_data(&address).await {
                 if let Ok(t) = T::try_from_bytes(data.as_ref()) {
-                    acc.write(AsyncResult::Ok(*t)).unwrap();
+                    acc.set(AsyncResult::Ok(*t));
                 }
             }
         }
     });
 
-    use_future(cx, (), |_| {
-        let f = f.clone();
+    use_future(move || {
+        let mut f = f.clone();
         async move {
-            if let Some(d) = poll {
+            if let Some(poll) = poll {
                 loop {
-                    async_std::task::sleep(Duration::from_secs(d)).await;
+                    async_std::task::sleep(Duration::from_secs(poll)).await;
                     f.restart();
                 }
             }

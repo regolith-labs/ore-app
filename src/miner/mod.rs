@@ -4,8 +4,8 @@ pub use web_worker::*;
 
 use std::rc::Rc;
 
-use dioxus::prelude::UseSharedState;
-use dioxus_std::utils::{channel::UseChannel, rw::UseRw};
+use dioxus::prelude::*;
+use dioxus_std::utils::channel::UseChannel;
 use drillx::{Hash, Solution};
 use ore::{state::Treasury, BUS_COUNT, EPOCH_DURATION};
 use rand::Rng;
@@ -26,8 +26,8 @@ use crate::{
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
 #[derive(PartialEq)]
 pub struct Miner {
-    power_level: UseSharedState<PowerLevel>,
-    priority_fee: UseSharedState<PriorityFee>,
+    power_level: Signal<PowerLevel>,
+    priority_fee: Signal<PriorityFee>,
     ch: UseChannel<WebWorkerResponse>,
     web_worker: Worker,
 }
@@ -39,9 +39,9 @@ pub struct Miner {
 
 impl Miner {
     pub fn new(
-        ch: &UseChannel<WebWorkerResponse>,
-        power_level: &UseSharedState<PowerLevel>,
-        priority_fee: &UseSharedState<PriorityFee>,
+        ch: UseChannel<WebWorkerResponse>,
+        power_level: Signal<PowerLevel>,
+        priority_fee: Signal<PriorityFee>,
     ) -> Self {
         Self {
             power_level: power_level.clone(),

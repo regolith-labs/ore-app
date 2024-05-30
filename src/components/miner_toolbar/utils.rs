@@ -1,25 +1,24 @@
 use std::rc::Rc;
 
-use dioxus::prelude::UseSharedState;
+use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::signer::Signer;
 
 use crate::{
     gateway::{signer, Gateway, GatewayResult},
-    metrics::{track, AppEvent},
+    hooks::{MinerStatusMessage, MinerToolbarState, UpdateMinerToolbarState},
     miner::Miner,
 };
-
-use super::MinerStatusMessage;
 
 // TODO Move this somewhere
 
 pub async fn try_start_mining(
-    gateway: &Rc<Gateway>,
-    miner: &Miner,
-    status_message: &UseSharedState<MinerStatusMessage>,
+    gateway: Rc<Gateway>,
+    miner: Signal<Miner>,
+    toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<()> {
     // Create proof account, if needed
-    *status_message.write() = MinerStatusMessage::GeneratingChallenge;
+
+    toolbar_state.set_status_message(MinerStatusMessage::GeneratingChallenge);
     loop {
         if gateway.register_ore().await.is_ok() {
             break;
@@ -37,13 +36,11 @@ pub async fn try_start_mining(
         .saturating_sub(clock.unix_timestamp)
         .max(0) as u64;
 
-    *status_message.write() = MinerStatusMessage::Searching;
+    toolbar_state.set_status_message(MinerStatusMessage::Searching);
     miner
+        .read()
         .start_mining(proof.challenge.into(), cutoff_time)
         .await;
-
-    // Record event for data
-    track(AppEvent::StartMiner, None);
 
     Ok(())
 }

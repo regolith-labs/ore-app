@@ -15,13 +15,7 @@ use crate::{
 
 use super::MinerStatusMessage;
 
-#[derive(Props, PartialEq)]
-pub struct MinerToolbarActiveProps {
-    pub miner: UseState<Miner>,
-}
-
-#[component]
-pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
+pub fn MinerToolbarActive() -> Element {
     let gateway = use_gateway(cx);
     let time_remaining = use_state(cx, || 0);
     let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
@@ -32,7 +26,7 @@ pub fn MinerToolbarActive(cx: Scope<MinerToolbarActiveProps>) -> Element {
         .0
         .to_string();
 
-    use_future(cx, (), |_| {
+    use_future(|_| {
         let signer = signer();
         let gateway = gateway.clone();
         let time_remaining = time_remaining.clone();

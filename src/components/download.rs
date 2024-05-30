@@ -17,26 +17,26 @@ pub fn Download(cx: Scope) -> Element {
                     class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
                     "Download"
                 }
-                p {
-                    class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
-                    "Desktop"
-                }
-                p {
-                    "Use the Ore desktop app to avoid the limitations of browser-based mining and get the most out of your machine. "
-                }
-                li {
-                    a {
-                        class: "font-semibold hover:underline hover:text-green-500",
-                        href: "{DESKTOP_DOWNLOAD_MAC}",
-                        "Download for Mac"
-                    }
-                }
-                li {
-                    "Linux (coming soon...)"
-                }
-                li {
-                    "Windows (coming soon...)"
-                }
+                // p {
+                //     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
+                //     "Desktop"
+                // }
+                // p {
+                //     "Use the Ore desktop app to avoid the limitations of browser-based mining and get the most out of your machine. "
+                // }
+                // li {
+                //     a {
+                //         class: "font-semibold hover:underline hover:text-green-500",
+                //         href: "{DESKTOP_DOWNLOAD_MAC}",
+                //         "Download for Mac"
+                //     }
+                // }
+                // li {
+                //     "Linux (coming soon...)"
+                // }
+                // li {
+                //     "Windows (coming soon...)"
+                // }
                 p {
                     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
                     "CLI"

@@ -13,9 +13,8 @@ use dioxus::prelude::*;
 // TODO 21 million new supply every ~40 years.
 // TODO Claims
 
-#[component]
-pub fn OreTokenomics(cx: Scope) -> Element {
-    render! {
+pub fn OreTokenomics() -> Element {
+    rsx! {
         div {
             class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20 leading-7",
             p {
