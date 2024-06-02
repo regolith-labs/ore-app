@@ -56,7 +56,7 @@ pub fn use_explorer_provider() {
     use_context_provider(|| Signal::new(explorer));
 }
 
-pub fn use_explorer_account_url(address: &String) -> String {
+pub fn use_explorer_account_url(address: String) -> String {
     let explorer = use_explorer();
     let e = *explorer.read();
     match e {
@@ -67,7 +67,7 @@ pub fn use_explorer_account_url(address: &String) -> String {
     }
 }
 
-pub fn use_explorer_transaction_url(signature: &String) -> String {
+pub fn use_explorer_transaction_url(signature: String) -> String {
     let explorer = use_explorer();
     let e = *explorer.read();
     match e {
