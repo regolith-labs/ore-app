@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 // };
 use crate::components::{
     Claim, ExportKey, Home, Landing, MinerToolbarLayout, Navbar, OreTokenomics, Send, Settings,
-    SimpleNavbar, WhatIsMining,
+    SimpleNavbar, Tx, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -39,14 +39,14 @@ pub enum Route {
             Send {
                 to: String
             },
-    //         #[route("/tx/:sig")]
-    //         Tx {
-    //             sig: String,
-    //         },
-    //         #[route("/u/:id")]
-    //         User {
-    //             id: String,
-    //         },
+            #[route("/tx/:sig")]
+            Tx {
+                sig: String,
+            },
+            #[route("/u/:id")]
+            User {
+                id: String,
+            },
     //     #[end_layout]
     // #[end_layout]
 

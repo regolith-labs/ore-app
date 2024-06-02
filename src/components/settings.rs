@@ -58,13 +58,13 @@ pub fn Settings() -> Element {
                     }
                     Copyable {
                         value: pubkey.to_string(),
-                        // Link {
-                        //     class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
-                        //     to: Route::User {
-                        //         id: pubkey.to_string()
-                        //     },
-                        //     "{pubkey}"
-                        // }
+                        Link {
+                            class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
+                            to: Route::User {
+                                id: pubkey.to_string()
+                            },
+                            "{pubkey}"
+                        }
                     }
                 }
                 div {

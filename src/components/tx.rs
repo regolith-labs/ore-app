@@ -5,6 +5,7 @@ use dioxus_router::{components::Link, prelude::use_navigator};
 use ore::{BUS_ADDRESSES, TREASURY_ADDRESS};
 use ore_types::TransferType;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{BackButton, Copyable, OreIcon},
@@ -14,11 +15,11 @@ use crate::{
 };
 
 #[component]
-pub fn Tx(cx: Scope, sig: String) -> Element {
-    let nav = use_navigator(cx);
-    let transfer = use_transfer(cx, sig.clone());
+pub fn Tx(sig: String) -> Element {
+    let nav = navigator();
+    let transfer = use_transfer(sig.clone());
 
-    match transfer {
+    let e = match transfer.read().clone() {
         AsyncResult::Ok(transfer) => {
             let transfer_memo = transfer.memo.unwrap_or("–".to_string());
             let title = match transfer.transfer_type {
@@ -26,8 +27,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                 TransferType::Mine => "Mine",
                 TransferType::Spl => "Transfer",
             };
-            let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
-            let explorer_url = use_explorer_transaction_url(cx, &transfer.sig);
+            let explorer_url = use_explorer_transaction_url(transfer.sig.clone());
             let date = use_datetime(transfer.ts);
             let container_class = "flex gap-8 flex-row justify-between py-2 sm:px-1";
             let title_class = "opacity-50 text-sm my-auto";
@@ -48,7 +48,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             } else {
                 transfer.from_address.clone()
             };
-            render! {
+            rsx! {
                 div {
                     class: "flex flex-col gap-3 w-full -mt-3.5",
                     BackButton {
@@ -120,7 +120,7 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
                                 }
                                 p {
                                     class: "{value_class}",
-                                    "{amount}"
+                                    "{amount_to_ui_amount(transfer.amount as u64, ore::TOKEN_DECIMALS)}"
                                 }
                             }
                         }
@@ -151,12 +151,14 @@ pub fn Tx(cx: Scope, sig: String) -> Element {
             }
         }
         AsyncResult::Loading => {
-            render! {
+            rsx! {
                 p {
                     "Loading"
                 }
             }
         }
         _ => None,
-    }
+    };
+
+    e
 }
