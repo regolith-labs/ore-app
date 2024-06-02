@@ -11,12 +11,6 @@ use crate::{
     route::Route,
 };
 
-#[derive(Debug)]
-pub enum ActivityFilter {
-    Global,
-    Personal,
-}
-
 #[component]
 pub fn Activity(cx: Scope) -> Element {
     let filter = use_state(cx, || ActivityFilter::Global);
