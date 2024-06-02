@@ -1,32 +1,33 @@
+use std::borrow::BorrowMut;
+
 use dioxus::prelude::*;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
     hooks::{use_gateway, use_priority_fee, use_pubkey, BalanceHandle, PriorityFee},
-    metrics::{track, AppEvent},
     ProofHandle,
 };
 
 use super::ClaimStep;
 
 #[component]
-pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> Element {
-    let is_busy = use_state(cx, || false);
-    let balance_ = use_context::<BalanceHandle>(cx).unwrap();
-    let pubkey = use_pubkey(cx);
-    let proof_ = use_context::<ProofHandle>(cx).unwrap();
-    let amountf = (*amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
-    let gateway = use_gateway(cx);
-    let priority_fee = use_priority_fee(cx);
+pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
+    let mut is_busy = use_signal(|| false);
+    let mut priority_fee = use_priority_fee();
+    let balance_handle = use_context::<BalanceHandle>();
+    let proof_handle = use_context::<ProofHandle>();
+    let pubkey = use_pubkey();
+    let gateway = use_gateway();
 
-    render! {
+    rsx! {
         div {
             class: "flex flex-col h-full grow justify-between",
             div {
                 class: "flex flex-col gap-3",
                 BackButton {
                     onclick: move |_| {
-                        claim_step.set(ClaimStep::Edit);
+                        claim_step.borrow_mut().set(ClaimStep::Edit);
                     }
                 }
                 h2 {
@@ -50,7 +51,7 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                     }
                     p {
                         class: "text-3xl sm:text-4xl md:text-5xl font-semibold",
-                        "{amountf}"
+                        "{amount_to_ui_amount(amount, ore::TOKEN_DECIMALS)}"
                     }
                 }
             }
@@ -72,7 +73,7 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                     div {
                         class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
                         input {
-                            disabled: *is_busy.get(),
+                            disabled: *is_busy.read(),
                             class: "bg-transparent text-right px-1 mb-auto",
                             step: 100_000,
                             min: 0,
@@ -80,9 +81,8 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                             r#type: "number",
                             value: "{priority_fee.read().0}",
                             oninput: move |e| {
-                                if let Ok(v) = e.value.parse::<u64>() {
-                                    track(AppEvent::SetPriorityFee, None);
-                                    *priority_fee.write() = PriorityFee(v);
+                                if let Ok(v) = e.value().parse::<u64>() {
+                                    priority_fee.set(PriorityFee(v));
                                 }
                             }
                         }
@@ -96,17 +96,13 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                     class: "flex flex-col sm:flex-row gap-2",
                     button {
                         class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
-                        disabled: *is_busy.get(),
+                        disabled: *is_busy.read(),
                         onclick: move |_| {
                             is_busy.set(true);
-                            let balance_ = balance_.clone();
-                            let proof_ = proof_.clone();
-                            let amount = *amount;
-                            let claim_step = claim_step.clone();
-                            let is_busy = is_busy.clone();
                             let gateway = gateway.clone();
-                            let priority_fee = priority_fee.clone();
-                            cx.spawn({
+                            let mut balance_handle = balance_handle.clone();
+                            let mut proof_handle = proof_handle.clone();
+                            spawn({
                                 async move {
                                     // Create associated token account, if needed
                                     'ata: loop {
@@ -122,9 +118,8 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                                     // Claim
                                     match gateway.claim_ore(amount, priority_fee.read().0).await {
                                         Ok(_sig) => {
-                                            track(AppEvent::Claim, None);
-                                            balance_.restart();
-                                            proof_.restart();
+                                            balance_handle.restart();
+                                            proof_handle.restart();
                                             is_busy.set(false);
                                             claim_step.set(ClaimStep::Done);
                                         }
@@ -137,16 +132,12 @@ pub fn ClaimConfirm(cx: Scope, amount: u64, claim_step: UseState<ClaimStep>) -> 
                                 }
                             });
                         },
-                        if *is_busy.get() {
-                            render! {
-                                Spinner {
-                                    class: "mx-auto"
-                                }
+                        if *is_busy.read() {
+                            Spinner {
+                                class: "mx-auto"
                             }
                         } else {
-                            render! {
-                                "Confirm"
-                            }
+                            "Confirm"
                         }
                     }
                 }

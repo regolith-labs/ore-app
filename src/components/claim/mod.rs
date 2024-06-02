@@ -1,17 +1,16 @@
-mod claim_confirm;
-mod claim_done;
-mod claim_edit;
-mod claim_preview;
+mod confirm;
+mod done;
+mod edit;
+mod preview;
+
+use confirm::*;
+use done::*;
+use edit::*;
+use preview::*;
 
 use dioxus::prelude::*;
 
-use crate::{
-    components::claim_modal::{
-        claim_confirm::ClaimConfirm, claim_done::ClaimDone, claim_edit::ClaimEdit,
-    },
-    gateway::AsyncResult,
-    hooks::use_proof,
-};
+use crate::{gateway::AsyncResult, hooks::use_proof};
 
 pub enum ClaimStep {
     Edit,
@@ -19,13 +18,11 @@ pub enum ClaimStep {
     Done,
 }
 
-#[component]
-pub fn Claim(cx: Scope) -> Element {
-    let proof = *use_proof(cx).read();
-    let claim_step = use_state(cx, || ClaimStep::Edit);
-    let amount_input = use_state(cx, || "".to_string());
-
-    let parsed_amount: u64 = match amount_input.get().parse::<f64>() {
+pub fn Claim() -> Element {
+    let proof = *use_proof().read();
+    let claim_step = use_signal(|| ClaimStep::Edit);
+    let amount_input = use_signal(|| "".to_string());
+    let parsed_amount: u64 = match amount_input.read().parse::<f64>() {
         Ok(n) => (n * 10f64.powf(ore::TOKEN_DECIMALS.into())) as u64,
         Err(_) => 0,
     };
@@ -35,9 +32,9 @@ pub fn Claim(cx: Scope) -> Element {
         _ => 0,
     };
 
-    match claim_step.get() {
+    let e = match *claim_step.read() {
         ClaimStep::Edit => {
-            render! {
+            rsx! {
                 ClaimEdit {
                     claim_step: claim_step,
                     amount_input: amount_input,
@@ -47,19 +44,19 @@ pub fn Claim(cx: Scope) -> Element {
             }
         }
         ClaimStep::Confirm => {
-            render! {
+            rsx! {
                 ClaimConfirm {
                     claim_step: claim_step.clone(),
                     amount: parsed_amount,
-                    // balance_handle: balance_,
-                    // proof_handle: proof_,
                 }
             }
         }
         ClaimStep::Done => {
-            render! {
+            rsx! {
                 ClaimDone {}
             }
         }
-    }
+    };
+
+    e
 }
