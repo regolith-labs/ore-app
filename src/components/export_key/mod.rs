@@ -1,29 +1,31 @@
-mod export_key_secret;
-mod export_key_warning;
+mod secret;
+mod warning;
+
+pub use secret::*;
+pub use warning::*;
 
 use dioxus::prelude::*;
-pub use export_key_secret::*;
-pub use export_key_warning::*;
 
 pub enum ExportKeyStep {
     Warning,
     Secret,
 }
 
-#[component]
-pub fn ExportKey(cx: Scope) -> Element {
-    let step = use_state(cx, || ExportKeyStep::Warning);
+pub fn ExportKey() -> Element {
+    let step = use_signal(|| ExportKeyStep::Warning);
 
-    match step.get() {
+    let e = match *step.read() {
         ExportKeyStep::Warning => {
-            render! {
-                ExportKeyWarning { step: step }
+            rsx! {
+                ExportKeyWarning { step }
             }
         }
         ExportKeyStep::Secret => {
-            render! {
+            rsx! {
                 ExportKeySecret {}
             }
         }
-    }
+    };
+
+    e
 }
