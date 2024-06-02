@@ -1,33 +1,26 @@
+use std::borrow::BorrowMut;
+
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
     hooks::{use_gateway, use_ore_balance_handle},
-    metrics::{track, AppEvent},
 };
 
 use super::SendStep;
 
-#[derive(Props)]
-pub struct SendConfirmProps<'a> {
-    pub send_step: &'a UseState<SendStep>,
-    pub amount: u64,
-    pub recipient: Pubkey,
-    pub memo: String,
-}
-
 #[component]
-pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
-    let is_busy = use_state(cx, || false);
-    let recipient = cx.props.recipient;
-    let amount = cx.props.amount;
-    let send_step = cx.props.send_step;
-    let memo = cx.props.memo.clone();
-    let memo_ = memo.clone();
-    let amountf = (cx.props.amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS.into());
-    let gateway = use_gateway(cx);
-    let balance_ = use_ore_balance_handle(cx);
+pub fn SendConfirm(
+    send_step: Signal<SendStep>,
+    amount: u64,
+    recipient: Pubkey,
+    memo: String,
+) -> Element {
+    let mut is_busy = use_signal(|| false);
+    let gateway = use_gateway();
+    let balance_handle = use_ore_balance_handle();
 
     render! {
         div {
@@ -36,7 +29,7 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                 class: "flex flex-col gap-3",
                 BackButton {
                     onclick: move |_| {
-                        send_step.set(SendStep::Edit);
+                        send_step.borrow_mut().set(SendStep::Edit);
                     }
                 }
                 h2 {
@@ -65,8 +58,8 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                         }
                         p {
                             class: "text-2xl",
-                            "{amountf}"
-                        }
+                            "{amount_to_ui_amount(amount, ore::TOKEN_DECIMALS)}"
+                       }
                     }
                 }
                 div {
@@ -86,7 +79,7 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                     }
                     p {
                         class: "text-2xl",
-                        "{memo_}"
+                        "{memo}"
                     }
                 }
             }
@@ -94,20 +87,17 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                 class: "flex flex-col mt-auto sm:flex-row gap-2",
                 button {
                     class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
-                    disabled: *is_busy.get(),
+                    disabled: *is_busy.read(),
                     onclick: move |_| {
-                        is_busy.set(true);
-                        let balance_ = balance_.clone();
-                        let memo = memo.clone();
-                        let send_step = send_step.clone();
-                        let is_busy = is_busy.clone();
                         let gateway = gateway.clone();
-                        cx.spawn(async move {
+                        let mut balance_handle = balance_handle.clone();
+                        let memo = memo.clone();
+                        is_busy.set(true);
+                        spawn(async move {
                             match gateway.transfer_ore(amount, recipient, memo).await {
                                 Ok(sig) => {
                                     log::info!("Transfer: {:?}", sig);
-                                    track(AppEvent::Transfer, None);
-                                    balance_.restart();
+                                    balance_handle.restart();
                                     is_busy.set(false);
                                     send_step.set(SendStep::Done);
                                 }
@@ -119,16 +109,12 @@ pub fn SendConfirm<'a>(cx: Scope<'a, SendConfirmProps<'a>>) -> Element {
                             }
                         });
                     },
-                    if *is_busy.get() {
-                        render! {
-                            Spinner {
-                                class: "mx-auto"
-                            }
+                    if *is_busy.read() {
+                        Spinner {
+                            class: "mx-auto"
                         }
                     } else {
-                        render! {
-                            "Confirm"
-                        }
+                        "Confirm"
                     }
                 }
             }

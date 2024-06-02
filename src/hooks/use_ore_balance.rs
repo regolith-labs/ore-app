@@ -64,7 +64,7 @@ pub fn use_ore_balance_handle() -> BalanceHandle {
     use_context::<BalanceHandle>()
 }
 
-pub fn use_ore_balance(cx: &ScopeState) -> Signal<AsyncResult<UiTokenAmount>> {
+pub fn use_ore_balance() -> Signal<AsyncResult<UiTokenAmount>> {
     use_context::<Signal<AsyncResult<UiTokenAmount>>>()
 }
 

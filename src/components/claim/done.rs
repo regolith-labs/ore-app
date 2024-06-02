@@ -3,9 +3,8 @@ use dioxus_router::components::Link;
 
 use crate::route::Route;
 
-#[component]
-pub fn SendDone(cx: Scope) -> Element {
-    render! {
+pub fn ClaimDone() -> Element {
+    rsx! {
         div {
             class: "flex flex-col grow justify-between",
             div {
@@ -15,12 +14,12 @@ pub fn SendDone(cx: Scope) -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "You have sent Ore."
+                    "You have claimed your mining rewards."
                 }
-                // p {
-                //     class: "text-sm text-gray-300 dark:text-gray-700",
-                //     "You can now spend and transfer your Ore from the dashboard."
-                // }
+                p {
+                    class: "text-sm text-gray-300 dark:text-gray-700",
+                    "You can now spend and transfer your Ore from the dashboard."
+                }
             }
             div {
                 class: "flex flex-col gap-3",

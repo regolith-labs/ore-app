@@ -2,15 +2,9 @@ use dioxus::prelude::*;
 
 use crate::components::ClaimStep;
 
-#[derive(Props)]
-pub struct ClaimPreviewProps<'a> {
-    pub claim_step: &'a UseState<ClaimStep>,
-}
-
 #[component]
-pub fn ClaimPreview<'a>(cx: Scope<'a, ClaimPreviewProps<'a>>) -> Element {
-    let claim_step = cx.props.claim_step;
-    render! {
+pub fn ClaimPreview(claim_step: Signal<ClaimStep>) -> Element {
+    rsx! {
         div {
             class: "flex flex-col gap-24 p-6",
             div {
@@ -29,7 +23,7 @@ pub fn ClaimPreview<'a>(cx: Scope<'a, ClaimPreviewProps<'a>>) -> Element {
             }
             button {
                 class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:bg-green-700",
-                onclick: |_| {
+                onclick: move |_| {
                     claim_step.set(ClaimStep::Edit);
                 },
                 "Continue"

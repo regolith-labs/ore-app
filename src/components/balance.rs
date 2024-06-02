@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_router::components::Link;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::OreIcon,
@@ -8,15 +9,14 @@ use crate::{
     route::Route,
 };
 
-#[component]
-pub fn Balance(cx: Scope) -> Element {
-    let balance = use_ore_balance(cx);
-    render! {
+pub fn Balance() -> Element {
+    let balance = use_ore_balance();
+    rsx! {
         div {
             class: "flex flex-row w-full min-h-16 rounded justify-between",
-            match balance {
+            match balance.read().clone() {
                 AsyncResult::Ok(b) => {
-                    render! {
+                    rsx! {
                         div {
                             class: "flex flex-col grow gap-2 sm:gap-4",
                             h2 {
@@ -42,7 +42,7 @@ pub fn Balance(cx: Scope) -> Element {
                     }
                 }
                 _ => {
-                    render! {
+                    rsx! {
                         div {
                             class: "flex flex-row grow loading rounded",
                         }
@@ -53,13 +53,12 @@ pub fn Balance(cx: Scope) -> Element {
     }
 }
 
-#[component]
-pub fn UnclaimedRewards(cx: Scope) -> Element {
-    let proof = use_proof(cx);
+pub fn UnclaimedRewards() -> Element {
+    let proof = use_proof();
+
     if let AsyncResult::Ok(proof) = *proof.read() {
         if proof.balance.gt(&0) {
-            let rewards = (proof.balance as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
-            render! {
+            return rsx! {
                 div {
                     class: "flex flex-row grow justify-between mt-4 -mr-2",
                     div {
@@ -75,7 +74,7 @@ pub fn UnclaimedRewards(cx: Scope) -> Element {
                             }
                             p {
                                 class: "font-semibold",
-                                "{rewards}"
+                                "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
                             }
                         }
                     }
@@ -84,18 +83,16 @@ pub fn UnclaimedRewards(cx: Scope) -> Element {
                         ClaimButton {}
                     }
                 }
-            }
-        } else {
-            None
+            };
         }
-    } else {
-        None
     }
+
+    None
 }
 
 #[component]
-pub fn SendButton(cx: Scope, to: Option<String>) -> Element {
-    render! {
+pub fn SendButton(to: Option<String>) -> Element {
+    rsx! {
         Link {
             to: Route::Send { to: to.clone().unwrap_or("".to_string()) },
             class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-bold transition-all bg-black text-white hover:shadow hover:scale-110 dark:bg-white dark:text-black",
@@ -107,9 +104,8 @@ pub fn SendButton(cx: Scope, to: Option<String>) -> Element {
     }
 }
 
-#[component]
-pub fn ClaimButton(cx: Scope) -> Element {
-    render! {
+pub fn ClaimButton() -> Element {
+    rsx! {
         Link {
             class: "flex transition transition-colors font-semibold px-3 h-10 rounded-full hover-100 active-200",
             to: Route::Claim {},

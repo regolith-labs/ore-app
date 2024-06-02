@@ -5,7 +5,8 @@ use dioxus::prelude::*;
 //     PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
 // };
 use crate::components::{
-    Home, Landing, MinerToolbarLayout, Navbar, OreTokenomics, SimpleNavbar, WhatIsMining,
+    Claim, Home, Landing, MinerToolbarLayout, Navbar, OreTokenomics, Send, SimpleNavbar,
+    WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -26,18 +27,18 @@ pub enum Route {
         #[layout(MinerToolbarLayout)]
             #[route("/home")]
             Home {},
-    //         #[route("/claim")]
-    //         Claim {},
+            #[route("/claim")]
+            Claim {},
     //         #[route("/settings")]
     //         Settings {},
     //         #[route("/settings/export-key")]
     //         ExportKey {},
     //         #[route("/settings/import-key")]
     //         ImportKey {},
-    //         #[route("/send/:to")]
-    //         Send {
-    //             to: String
-    //         },
+            #[route("/send/:to")]
+            Send {
+                to: String
+            },
     //         #[route("/tx/:sig")]
     //         Tx {
     //             sig: String,
