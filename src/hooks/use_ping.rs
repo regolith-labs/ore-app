@@ -4,12 +4,11 @@ use crate::gateway::AsyncResult;
 
 use super::use_gateway;
 
-pub fn use_ping(cx: &ScopeState) -> AsyncResult<u64> {
-    let gateway = use_gateway(cx);
-    let ping_status = use_state(cx, || AsyncResult::Loading);
+pub fn use_ping() -> Signal<AsyncResult<u64>> {
+    let gateway = use_gateway();
+    let mut ping_status = use_signal(|| AsyncResult::Loading);
 
-    use_future(cx, (), |_| {
-        let ping_status = ping_status.clone();
+    use_future(move || {
         let gateway = gateway.clone();
         async move {
             loop {
@@ -22,5 +21,5 @@ pub fn use_ping(cx: &ScopeState) -> AsyncResult<u64> {
         }
     });
 
-    *ping_status.get()
+    ping_status
 }

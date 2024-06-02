@@ -5,23 +5,16 @@ use dioxus::prelude::*;
 mod components;
 mod gateway;
 mod hooks;
-// mod metrics;
 mod miner;
 mod route;
 mod utils;
 
 use crate::{
     hooks::{
-        use_appearance_provider,
-        use_explorer_provider,
-        use_is_onboarded_provider,
-        //         use_ore_balance_provider,
-        use_power_level_provider,
-        use_priority_fee_provider,
-        use_proof_provider,
-        //         use_sol_balance_provider, ProofHandle,
-        use_rpc_url_provider,
-        use_show_backup_warning_provider,
+        use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
+        use_ore_balance_provider, use_power_level_provider, use_priority_fee_provider,
+        use_proof_provider, use_rpc_url_provider, use_show_backup_warning_provider,
+        use_sol_balance_provider, ProofHandle,
     },
     route::Route,
 };
@@ -43,8 +36,8 @@ pub fn App() -> Element {
 
     // Network variables
     use_proof_provider();
-    // use_ore_balance_provider(cx);
-    // use_sol_balance_provider(cx);
+    use_ore_balance_provider();
+    use_sol_balance_provider();
 
     // Render
     rsx! {
