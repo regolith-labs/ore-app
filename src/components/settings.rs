@@ -4,36 +4,35 @@ use dioxus::prelude::*;
 use dioxus_router::components::Link;
 use is_url::is_url;
 use serde::{Deserialize, Serialize};
-use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
+use solana_client_wasm::solana_sdk::native_token::{lamports_to_sol, LAMPORTS_PER_SOL};
 
 use crate::{
-    components::{BackupKeypairWarning, Copyable},
+    components::{Appearance, BackupKeypairWarning, Copyable},
     gateway::{AsyncResult, RPC_URL},
     hooks::{
         use_appearance, use_explorer, use_pubkey, use_rpc_url, use_show_backup_warning,
-        use_sol_balance, RpcUrl,
+        use_sol_balance, Explorer, RpcUrl,
     },
     route::Route,
 };
 
-#[component]
-pub fn Settings(cx: Scope) -> Element {
-    let pubkey = use_pubkey(cx);
-    let sol_balance = use_sol_balance(cx);
-    let explorer = use_explorer(cx);
-    let appearance = use_appearance(cx);
-    let show_backup_warning = use_show_backup_warning(cx);
+pub fn Settings() -> Element {
+    let mut explorer = use_explorer();
+    let mut appearance = use_appearance();
+    let mut show_backup_warning = use_show_backup_warning();
+    let pubkey = use_pubkey();
+    let sol_balance = use_sol_balance();
 
-    let rpc_url = use_rpc_url(cx);
-    let rpc_url_input = use_state(cx, || rpc_url.read().0.clone());
-    let is_rpc_url_edited = rpc_url.read().0.ne(rpc_url_input.get());
-    let rpc_url_error = use_state::<Option<String>>(cx, || None);
+    let mut rpc_url = use_rpc_url();
+    let mut rpc_url_input = use_signal(|| rpc_url.read().0.clone());
+    let mut rpc_url_error = use_signal::<Option<String>>(|| None);
+    let is_rpc_url_edited = rpc_url.read().0.ne(&*rpc_url_input.read());
 
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
     let data_title_class = "font-medium text-sm opacity-50 my-auto";
 
-    render! {
+    rsx! {
         div {
             class: "flex flex-col gap-16 w-full pb-24",
             div {
@@ -42,11 +41,9 @@ pub fn Settings(cx: Scope) -> Element {
                     "Settings"
                 }
                 if cfg!(feature = "web") && show_backup_warning.read().0 {
-                    render! {
-                        div {
-                            class: "mt-8",
-                            BackupKeypairWarning {}
-                        }
+                    div {
+                        class: "mt-8",
+                        BackupKeypairWarning {}
                     }
                 }
                 h2 {
@@ -61,13 +58,13 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                     Copyable {
                         value: pubkey.to_string(),
-                        Link {
-                            class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
-                            to: Route::User {
-                                id: pubkey.to_string()
-                            },
-                            "{pubkey}"
-                        }
+                        // Link {
+                        //     class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
+                        //     to: Route::User {
+                        //         id: pubkey.to_string()
+                        //     },
+                        //     "{pubkey}"
+                        // }
                     }
                 }
                 div {
@@ -76,17 +73,16 @@ pub fn Settings(cx: Scope) -> Element {
                         class: "{data_title_class}",
                         "Balance"
                     }
-                    match sol_balance {
+                    match *sol_balance.read() {
                         AsyncResult::Ok(balance) => {
-                            let balance_f = (balance.0 as f64) / (LAMPORTS_PER_SOL as f64);
-                            render! {
+                            rsx! {
                                 p {
-                                    "{balance_f} SOL"
+                                    "{lamports_to_sol(balance.0)} SOL"
                                 }
                             }
                         }
                         _ => {
-                            render! {
+                            rsx! {
                                 div {
                                     class: "flex w-32 loading rounded",
                                 }
@@ -102,11 +98,11 @@ pub fn Settings(cx: Scope) -> Element {
                     }
                     div {
                         class: "flex flex-row gap-2 -mr-2",
-                        Link {
-                            to: Route::ImportKey {},
-                            class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
-                            "Import"
-                        }
+                        // Link {
+                        //     to: Route::ImportKey {},
+                        //     class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
+                        //     "Import"
+                        // }
                         Link {
                             to: Route::ExportKey {},
                             class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
@@ -130,8 +126,8 @@ pub fn Settings(cx: Scope) -> Element {
                     select {
                         class: "text-right bg-transparent dark:text-white hover:cursor-pointer py-1",
                         onchange: move |e| {
-                            if let Ok(a) = Appearance::from_str(e.value.as_str()) {
-                                *appearance.write() = a;
+                            if let Ok(a) = Appearance::from_str(&e.value()) {
+                                appearance.set(a);
                             }
                         },
                         option { initial_selected: appearance.read().eq(&Appearance::Dark), value: "{Appearance::Dark}", "{Appearance::Dark}" }
@@ -147,8 +143,8 @@ pub fn Settings(cx: Scope) -> Element {
                     select {
                         class: "text-right bg-transparent dark:text-white hover:cursor-pointer py-1",
                         onchange: move |e| {
-                            if let Ok(e) = Explorer::from_str(e.value.as_str()) {
-                                *explorer.write() = e;
+                            if let Ok(e) = Explorer::from_str(&e.value()) {
+                                explorer.set(e);
                             }
                         },
                         option { initial_selected: explorer.read().eq(&Explorer::Solana), value: "{Explorer::Solana}", "{Explorer::Solana}" }
@@ -178,7 +174,7 @@ pub fn Settings(cx: Scope) -> Element {
                             value: "{rpc_url_input}",
                             placeholder: "{RPC_URL}",
                             oninput: move |evt| {
-                                let s = evt.value.clone();
+                                let s = evt.value();
                                 rpc_url_input.set(s.clone());
                                 if !is_url(&s) {
                                     rpc_url_error.set(Some("Invalid url".to_string()));
@@ -187,38 +183,32 @@ pub fn Settings(cx: Scope) -> Element {
                                 }
                             },
                         }
-                        if let Some(err_str) = rpc_url_error.get() {
-                            render!{
-                                p {
-                                    class: "text-sm text-red-500 text-right",
-                                    "{err_str}"
-                                }
+                        if let Some(err_str) = rpc_url_error.read().clone() {
+                            p {
+                                class: "text-sm text-red-500 text-right",
+                                "{err_str}"
                             }
                         }
                         div {
                             class: "flex flex-row gap-2",
                             if rpc_url.read().0.ne(RPC_URL) {
-                                render! {
-                                    button {
-                                        class: "hover-100 active-200 rounded shrink ml-auto transition-colors px-2 py-1",
-                                        onclick: move |_| {
-                                            *rpc_url.write() = RpcUrl(RPC_URL.to_string());
-                                            rpc_url_input.set(RPC_URL.to_string());
-                                            rpc_url_error.set(None);
-                                        },
-                                        "Default"
-                                    }
+                                button {
+                                    class: "hover-100 active-200 rounded shrink ml-auto transition-colors px-2 py-1",
+                                    onclick: move |_| {
+                                        rpc_url.set(RpcUrl(RPC_URL.to_string()));
+                                        rpc_url_input.set(RPC_URL.to_string());
+                                        rpc_url_error.set(None);
+                                    },
+                                    "Default"
                                 }
                             }
-                            if is_rpc_url_edited && rpc_url_error.is_none() {
-                                render! {
-                                    button {
-                                        class: "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded shrink ml-auto transition-colors px-2 py-1",
-                                        onclick: move |_| {
-                                            *rpc_url.write() = RpcUrl(rpc_url_input.get().clone());
-                                        },
-                                        "Save"
-                                    }
+                            if is_rpc_url_edited && rpc_url_error.read().is_none() {
+                                button {
+                                    class: "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded shrink ml-auto transition-colors px-2 py-1",
+                                    onclick: move |_| {
+                                        rpc_url.set(RpcUrl(rpc_url_input.read().clone()));
+                                    },
+                                    "Save"
                                 }
                             }
                         }

@@ -7,10 +7,9 @@ use crate::{
     route::Route,
 };
 
-#[component]
-pub fn BackupKeypairWarning(cx: Scope) -> Element {
-    let show_backup_warning = use_show_backup_warning(cx);
-    render! {
+pub fn BackupKeypairWarning() -> Element {
+    let mut show_backup_warning = use_show_backup_warning();
+    rsx! {
         div {
             class: "flex flex-col gap-3 bg-orange-500 w-full rounded px-4 py-5 text-white",
             p {
@@ -38,7 +37,7 @@ pub fn BackupKeypairWarning(cx: Scope) -> Element {
                 class: "flex flex-row justify-end",
                 button {
                     onclick: move |_| {
-                        *show_backup_warning.write() = ShowBackupWarning(false);
+                        show_backup_warning.set(ShowBackupWarning(false));
                     },
                     class: "flex flex-row gap-2 hover:bg-orange-600 active:bg-orange-700 text-white px-3 py-2 rounded font-semibold transition-colors",
                     EyeSlashIcon {
