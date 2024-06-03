@@ -20,38 +20,20 @@ pub fn MinerToolbarInsufficientFunds() -> Element {
     use_effect(move || {
         if let AsyncResult::Ok(sol_balance) = *sol_balance.read() {
             if sol_balance.0.gt(&0) {
-                sol_balance_handle.cancel();
                 is_onboarded.set(IsOnboarded(true));
-                toolbar_state.set_status(MinerStatus::Activating);
+                sol_balance_handle.cancel();
             } else {
                 sol_balance_handle.restart();
             }
         }
     });
 
-    let bg = if toolbar_state.is_open() {
-        ""
-    } else {
-        "pointer-events-none"
-    };
-
-    if toolbar_state.is_open() {
-        match *sol_balance.read() {
-            AsyncResult::Ok(sol_balance) => {
-                if sol_balance.0.lt(&LAMPORTS_PER_SOL.saturating_div(10)) {
-                    rsx! {
-                        MinerToolbarInsufficientBalanceOpen { }
-                    }
-                } else {
-                    None
-                }
-            }
-            _ => None,
-        }
-    } else {
-        rsx! {
+    rsx! {
+        if toolbar_state.is_open() {
+            MinerToolbarInsufficientBalanceOpen {}
+        } else {
             div {
-                class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 {bg}",
+                class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
                 span {
                     class: "font-semibold",
                     "Insufficient funds →"

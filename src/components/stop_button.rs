@@ -2,21 +2,23 @@ use dioxus::prelude::*;
 
 use crate::{
     components::PauseIcon,
-    hooks::{use_miner, MinerStatus, MinerToolbarState, UpdateMinerToolbarState},
+    hooks::{
+        use_miner, use_miner_toolbar_state, MinerStatus, MinerToolbarState, UpdateMinerToolbarState,
+    },
     miner::Miner,
 };
 
 pub fn StopButton() -> Element {
     let miner = use_miner();
-    let mut toolbar_state = use_context::<Signal<MinerToolbarState>>();
+    let mut toolbar_state = use_miner_toolbar_state();
     rsx! {
         button {
             class: "transition transition-colors flex-shrink-0 flex w-10 h-10 justify-center rounded-full hover:bg-green-600 active:bg-green-700",
             title: "Stop mining",
-            onclick: move |_e| {
+            onclick: move |e| {
+                toolbar_state.pause();
                 miner.read().stop();
-                toolbar_state.set_status(MinerStatus::NotStarted);
-                toolbar_state.set_is_open(false);
+                e.cancel_bubble();
             },
             PauseIcon {
                 class: "w-6 h-6 my-auto"
