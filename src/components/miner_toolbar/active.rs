@@ -3,12 +3,12 @@ use dioxus_router::prelude::Link;
 use solana_client_wasm::solana_sdk::signer::Signer;
 
 use crate::{
-    components::{
-        ActivityIndicator, IsToolbarOpen, MinerDisplayHash, Spinner, StopButton, WarningIcon,
-    },
+    components::{ActivityIndicator, Spinner, StopButton, WarningIcon},
     gateway::signer,
-    hooks::{use_gateway, use_power_level, use_priority_fee, PowerLevel, PriorityFee},
-    metrics::{track, AppEvent},
+    hooks::{
+        use_gateway, use_miner, use_miner_toolbar_state, use_power_level, use_priority_fee,
+        MinerToolbarState, PowerLevel, PriorityFee, ReadMinerToolbarState,
+    },
     miner::Miner,
     route::Route,
 };
@@ -16,20 +16,14 @@ use crate::{
 use super::MinerStatusMessage;
 
 pub fn MinerToolbarActive() -> Element {
-    let gateway = use_gateway(cx);
-    let time_remaining = use_state(cx, || 0);
-    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let miner_status_message = *use_shared_state::<MinerStatusMessage>(cx).unwrap().read();
-    let miner_display_hash = use_shared_state::<MinerDisplayHash>(cx)
-        .unwrap()
-        .read()
-        .0
-        .to_string();
+    let gateway = use_gateway();
+    let miner = use_miner();
+    let mut time_remaining = use_signal(|| 0);
+    let mut toolbar_state = use_miner_toolbar_state();
 
-    use_future(|_| {
+    use_future(move || {
         let signer = signer();
         let gateway = gateway.clone();
-        let time_remaining = time_remaining.clone();
         async move {
             let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
             let clock = gateway.get_clock().await.unwrap();
@@ -42,8 +36,8 @@ pub fn MinerToolbarActive() -> Element {
         }
     });
 
-    if is_toolbar_open.read().0 {
-        render! {
+    if toolbar_state.is_open() {
+        rsx! {
             div {
                 class: "flex flex-col grow w-full gap-4 px-4 py-6 sm:px-8",
                 div {
@@ -56,14 +50,12 @@ pub fn MinerToolbarActive() -> Element {
                         }
                         div {
                             class: "my-auto",
-                            StopButton {
-                                miner: cx.props.miner.clone()
-                            }
+                            StopButton {}
                         }
                     }
-                    match miner_status_message {
+                    match toolbar_state.status_message() {
                         MinerStatusMessage::Searching => {
-                            render! {
+                            rsx! {
                                 p {
                                     class: "text-lg text-white",
                                     "Searching for a valid hash... ({time_remaining} sec)"
@@ -71,7 +63,7 @@ pub fn MinerToolbarActive() -> Element {
                             }
                         }
                         MinerStatusMessage::Submitting => {
-                            render! {
+                            rsx! {
                                 div {
                                     class: "flex flex-row gap-2",
                                     p {
@@ -85,7 +77,7 @@ pub fn MinerToolbarActive() -> Element {
                             }
                         }
                         MinerStatusMessage::Error => {
-                            render! {
+                            rsx! {
                                 p {
                                     class: "text-lg text-white",
                                     "Error submitting transaction"
@@ -94,12 +86,12 @@ pub fn MinerToolbarActive() -> Element {
                         }
                         _ => None
                     }
-                    match miner_status_message {
+                    match toolbar_state.status_message() {
                         MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
-                            render! {
+                            rsx! {
                                 p {
                                     class: "font-mono text-sm truncate shrink opacity-80",
-                                    "{miner_display_hash}"
+                                    "{toolbar_state.display_hash()}"
                                 }
                             }
                         }
@@ -112,7 +104,7 @@ pub fn MinerToolbarActive() -> Element {
             }
         }
     } else {
-        render! {
+        rsx! {
             div {
                 class: "flex flex-row gap-2 max-w-screen w-screen justify-start my-auto px-4 sm:px-8 object-contain",
                 div {
@@ -125,17 +117,17 @@ pub fn MinerToolbarActive() -> Element {
                 }
                 div {
                     class: "flex-shrink flex-auto truncate my-auto",
-                    match miner_status_message {
+                    match toolbar_state.status_message() {
                         MinerStatusMessage::Searching => {
-                            render! {
+                            rsx! {
                                 p {
                                     class: "font-mono text-sm truncate flex-shrink flex-auto opacity-80 my-auto ml-2",
-                                    "{miner_display_hash}"
+                                    "{toolbar_state.display_hash()}"
                                 }
                             }
                         }
                         MinerStatusMessage::Submitting => {
-                            render! {
+                            rsx! {
                                 p {
                                     class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
                                     "Submitting hash for validation..."
@@ -143,7 +135,7 @@ pub fn MinerToolbarActive() -> Element {
                             }
                         }
                         MinerStatusMessage::Error => {
-                            render! {
+                            rsx! {
                                 p {
                                     class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
                                     "Error submitting transaction"
@@ -155,19 +147,16 @@ pub fn MinerToolbarActive() -> Element {
                 }
                 div {
                     class: "flex-shrink-0 flex-none ml-auto my-auto",
-                    StopButton {
-                        miner: cx.props.miner.clone()
-                    }
+                    StopButton {}
                 }
             }
         }
     }
 }
 
-#[component]
-pub fn PriorityFeeConfig(cx: Scope) -> Element {
-    let priority_fee = use_priority_fee(cx);
-    render! {
+pub fn PriorityFeeConfig() -> Element {
+    let mut priority_fee = use_priority_fee();
+    rsx! {
         div {
             class: "flex flex-row gap-8 justify-between mt-8",
             div {
@@ -192,9 +181,8 @@ pub fn PriorityFeeConfig(cx: Scope) -> Element {
                     r#type: "number",
                     value: "{priority_fee.read().0}",
                     oninput: move |e| {
-                        if let Ok(v) = e.value.parse::<u64>() {
-                            track(AppEvent::SetPriorityFee, None);
-                            *priority_fee.write() = PriorityFee(v);
+                        if let Ok(v) = e.value().parse::<u64>() {
+                            priority_fee.set(PriorityFee(v));
                         }
                     }
                 }
@@ -207,13 +195,12 @@ pub fn PriorityFeeConfig(cx: Scope) -> Element {
     }
 }
 
-#[component]
-pub fn PowerLevelConfig(cx: Scope) -> Element {
-    let power_level = use_power_level(cx);
+pub fn PowerLevelConfig() -> Element {
+    let mut power_level = use_power_level();
     if cfg!(feature = "web") {
         return None;
     }
-    render! {
+    rsx! {
         div {
             class: "flex flex-row gap-8 justify-between mt-8",
             div {
@@ -239,8 +226,8 @@ pub fn PowerLevelConfig(cx: Scope) -> Element {
                     r#type: "number",
                     value: "{power_level.read().0}",
                     oninput: move |e| {
-                        if let Ok(v) = e.value.parse::<u64>() {
-                            *power_level.write() = PowerLevel(v as u8);
+                        if let Ok(v) = e.value().parse::<u64>() {
+                            power_level.set(PowerLevel(v as u8));
                         }
                     }
                 }
@@ -253,27 +240,27 @@ pub fn PowerLevelConfig(cx: Scope) -> Element {
     }
 }
 
-#[component]
-fn DownloadLink(cx: Scope) -> Element {
-    if cfg!(feature = "web") {
-        render! {
-            div {
-                class: "flex flex-row gap-2 mt-8 p-2.5 rounded bg-green-600",
-                WarningIcon {
-                    class: "w-4 h-4 mt-0.5 shrink-0"
-                }
-                p {
-                    class: "text-sm my-auto",
-                    "You are mining from a web browser. For better performance, "
-                    Link {
-                        to: Route::Download {},
-                        class: "font-medium underline",
-                        "download the app."
-                    }
-                }
-            }
-        }
-    } else {
-        None
-    }
+fn DownloadLink() -> Element {
+    // if cfg!(feature = "web") {
+    //     rsx! {
+    //         div {
+    //             class: "flex flex-row gap-2 mt-8 p-2.5 rounded bg-green-600",
+    //             WarningIcon {
+    //                 class: "w-4 h-4 mt-0.5 shrink-0"
+    //             }
+    //             p {
+    //                 class: "text-sm my-auto",
+    //                 "You are mining from a web browser. For better performance, "
+    //                 Link {
+    //                     to: Route::Download {},
+    //                     class: "font-medium underline",
+    //                     "download the app."
+    //                 }
+    //             }
+    //         }
+    //     }
+    // } else {
+    //     None
+    // }
+    None
 }

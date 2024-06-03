@@ -2,64 +2,58 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
-    components::{try_start_mining, IsToolbarOpen, MinerStatus, MinerStatusMessage, Spinner},
+    components::{try_start_mining, Spinner},
     gateway::AsyncResult,
-    hooks::{use_gateway, use_sol_balance},
+    hooks::{
+        use_gateway, use_miner, use_miner_toolbar_state, use_sol_balance, MinerStatus,
+        MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
+    },
     miner::Miner,
 };
 
 const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(100);
 
-#[component]
-pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
-    let gateway = use_gateway(cx);
-    let sufficient_balance = use_state(cx, || true);
-    let sol_balance = use_sol_balance(cx);
-    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
-    let miner_status_message = use_shared_state::<MinerStatusMessage>(cx).unwrap();
+pub fn MinerToolbarActivating() -> Element {
+    let miner = use_miner();
+    let gateway = use_gateway();
+    let sol_balance = use_sol_balance();
+    let mut sufficient_balance = use_signal(|| true);
+    let mut toolbar_state = use_miner_toolbar_state();
 
-    use_effect(cx, &sol_balance.clone(), |_| {
-        match sol_balance {
-            AsyncResult::Ok(balance) => sufficient_balance.set(balance.0.ge(&MIN_BALANCE)),
-            _ => sufficient_balance.set(false),
-        }
-        async move {}
+    use_effect(move || match *sol_balance.read() {
+        AsyncResult::Ok(balance) => sufficient_balance.set(balance.0.ge(&MIN_BALANCE)),
+        _ => sufficient_balance.set(false),
     });
 
-    use_future(cx, &sufficient_balance.clone(), |_| {
-        let miner = miner.clone();
-        let miner_status = miner_status.clone();
-        let miner_status_message = miner_status_message.clone();
-        let sufficient_balance = *sufficient_balance.get();
+    use_future(move || {
         let gateway = gateway.clone();
         async move {
-            if sufficient_balance {
-                match try_start_mining(&gateway, miner.get(), &miner_status_message).await {
+            if *sufficient_balance.read() {
+                match try_start_mining(gateway, miner, &mut toolbar_state).await {
                     Ok(()) => {
-                        *miner_status.write() = MinerStatus::Active;
+                        toolbar_state.set_status(MinerStatus::Active);
                     }
                     Err(err) => {
                         log::error!("Failed to start mining: {:?}", err);
-                        *miner_status.write() = MinerStatus::Error;
-                        *miner_status_message.write() = MinerStatusMessage::Error
+                        toolbar_state.set_status(MinerStatus::Error);
+                        toolbar_state.set_status_message(MinerStatusMessage::Error);
                     }
                 }
             }
         }
     });
 
-    if is_toolbar_open.read().0 {
-        render! {
+    if toolbar_state.is_open() {
+        rsx! {
             div {
                 class: "flex flex-col grow gap-2 px-4 py-6 sm:px-8 sm:py-8",
                 h2 {
                     class: "text-3xl md:text-4xl lg:text-5xl font-bold",
                     "Starting"
                 }
-                match *miner_status_message.read() {
+                match toolbar_state.status_message() {
                     MinerStatusMessage::GeneratingChallenge => {
-                        render! {
+                        rsx! {
                             div {
                                 class: "flex flex-row gap-2",
                                 p {
@@ -77,7 +71,7 @@ pub fn MinerToolbarActivating(cx: Scope, miner: UseState<Miner>) -> Element {
             }
         }
     } else {
-        render! {
+        rsx! {
             div {
                 class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
                 p {

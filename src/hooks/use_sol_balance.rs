@@ -12,12 +12,19 @@ pub struct SolBalance(pub u64);
 #[derive(Clone)]
 pub struct SolBalanceHandle(UseFuture);
 
-impl SolBalanceHandle {
-    pub fn restart(&mut self) {
-        self.0.restart();
+pub trait SolBalanceHandleOp {
+    fn restart(&mut self);
+    fn cancel(&mut self);
+}
+
+impl SolBalanceHandleOp for Signal<SolBalanceHandle> {
+    fn restart(&mut self) {
+        let mut h = self.read().0;
+        h.restart();
     }
-    pub fn cancel(&mut self) {
-        self.0.cancel();
+    fn cancel(&mut self) {
+        let mut h = self.read().0;
+        h.cancel();
     }
 }
 

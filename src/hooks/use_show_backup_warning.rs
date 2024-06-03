@@ -17,5 +17,5 @@ pub fn use_show_backup_warning() -> Signal<ShowBackupWarning> {
 
 pub fn use_show_backup_warning_provider() {
     let show_backup_warning = use_persistent(KEY, || ShowBackupWarning(true)).get();
-    use_context_provider(|| show_backup_warning);
+    use_context_provider(|| Signal::new(show_backup_warning));
 }
