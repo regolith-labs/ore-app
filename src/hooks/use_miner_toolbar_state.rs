@@ -71,9 +71,35 @@ pub trait UpdateMinerToolbarState {
     fn set_display_hash(&mut self, hash: Blake3Hash);
     fn set_status_message(&mut self, status_message: MinerStatusMessage);
     fn set_status(&mut self, status: MinerStatus);
+    fn start(&mut self);
+    fn pause(&mut self);
 }
 
 impl UpdateMinerToolbarState for Signal<MinerToolbarState> {
+    fn start(&mut self) {
+        let old = self.read();
+        let new = MinerToolbarState {
+            status: MinerStatus::Activating,
+            status_message: old.status_message,
+            display_hash: old.display_hash,
+            is_open: true,
+        };
+        drop(old);
+        self.set(new);
+    }
+
+    fn pause(&mut self) {
+        let old = self.read();
+        let new = MinerToolbarState {
+            status: MinerStatus::NotStarted,
+            status_message: old.status_message,
+            display_hash: old.display_hash,
+            is_open: false,
+        };
+        drop(old);
+        self.set(new);
+    }
+
     fn set_is_open(&mut self, is_open: bool) {
         let old = self.read();
         let new = MinerToolbarState {

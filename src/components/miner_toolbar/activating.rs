@@ -11,6 +11,8 @@ use crate::{
     miner::Miner,
 };
 
+use super::MinerToolbarInsufficientFunds;
+
 const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(100);
 
 pub fn MinerToolbarActivating() -> Element {
@@ -43,35 +45,34 @@ pub fn MinerToolbarActivating() -> Element {
         }
     });
 
-    if toolbar_state.is_open() {
-        rsx! {
+    if !*sufficient_balance.read() {
+        return rsx! {
+            MinerToolbarInsufficientFunds {}
+        };
+    }
+
+    rsx! {
+        if toolbar_state.is_open() {
             div {
                 class: "flex flex-col grow gap-2 px-4 py-6 sm:px-8 sm:py-8",
                 h2 {
                     class: "text-3xl md:text-4xl lg:text-5xl font-bold",
                     "Starting"
                 }
-                match toolbar_state.status_message() {
-                    MinerStatusMessage::GeneratingChallenge => {
-                        rsx! {
-                            div {
-                                class: "flex flex-row gap-2",
-                                p {
-                                    class: "text-lg",
-                                    "Generating challenge..."
-                                }
-                                Spinner {
-                                    class: "my-auto text-white"
-                                }
-                            }
+                if let MinerStatusMessage::GeneratingChallenge = toolbar_state.status_message() {
+                    div {
+                        class: "flex flex-row gap-2",
+                        p {
+                            class: "text-lg",
+                            "Generating challenge..."
+                        }
+                        Spinner {
+                            class: "my-auto text-white"
                         }
                     }
-                    _ => None
                 }
             }
-        }
-    } else {
-        rsx! {
+        } else {
             div {
                 class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
                 p {

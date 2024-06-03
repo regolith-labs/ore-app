@@ -1,13 +1,13 @@
 use dioxus::prelude::*;
 use dioxus_router::prelude::Link;
-use solana_client_wasm::solana_sdk::signer::Signer;
+use solana_client_wasm::solana_sdk::{blake3::Hash as Blake3Hash, signer::Signer};
 
 use crate::{
     components::{ActivityIndicator, Spinner, StopButton, WarningIcon},
     gateway::signer,
     hooks::{
         use_gateway, use_miner, use_miner_toolbar_state, use_power_level, use_priority_fee,
-        MinerToolbarState, PowerLevel, PriorityFee, ReadMinerToolbarState,
+        MinerToolbarState, PowerLevel, PriorityFee, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     miner::Miner,
     route::Route,
@@ -21,18 +21,33 @@ pub fn MinerToolbarActive() -> Element {
     let mut time_remaining = use_signal(|| 0);
     let mut toolbar_state = use_miner_toolbar_state();
 
+    // Animate countdown timer.
     use_future(move || {
         let signer = signer();
         let gateway = gateway.clone();
         async move {
-            let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
-            let clock = gateway.get_clock().await.unwrap();
-            let cutoff_time = proof
-                .last_hash_at
-                .saturating_add(60)
-                .saturating_sub(clock.unix_timestamp)
-                .max(0) as u64;
-            time_remaining.set(cutoff_time);
+            if let Ok(proof) = gateway.get_proof(signer.pubkey()).await {
+                if let Ok(clock) = gateway.get_clock().await {
+                    let cutoff_time = proof
+                        .last_hash_at
+                        .saturating_add(60)
+                        .saturating_sub(clock.unix_timestamp)
+                        .max(0) as u64;
+                    time_remaining.set(cutoff_time);
+                }
+            }
+        }
+    });
+
+    // Animate the hash in the miner toolbar to visualize mining.
+    use_future(move || async move {
+        loop {
+            async_std::task::sleep(std::time::Duration::from_millis(75)).await;
+            if let MinerStatusMessage::Searching = toolbar_state.status_message() {
+                toolbar_state.set_display_hash(Blake3Hash::new_unique());
+            } else {
+                break;
+            }
         }
     });
 
