@@ -98,11 +98,11 @@ pub fn Settings() -> Element {
                     }
                     div {
                         class: "flex flex-row gap-2 -mr-2",
-                        // Link {
-                        //     to: Route::ImportKey {},
-                        //     class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
-                        //     "Import"
-                        // }
+                        Link {
+                            to: Route::ImportKey {},
+                            class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
+                            "Import"
+                        }
                         Link {
                             to: Route::ExportKey {},
                             class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",

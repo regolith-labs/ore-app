@@ -5,8 +5,8 @@ use dioxus::prelude::*;
 //     PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
 // };
 use crate::components::{
-    Claim, ExportKey, Home, Landing, MinerToolbarLayout, Navbar, OreTokenomics, Send, Settings,
-    SimpleNavbar, Tx, User, WhatIsMining,
+    Claim, ExportKey, Home, ImportKey, Landing, MinerToolbarLayout, Navbar, OreTokenomics, Send,
+    Settings, SimpleNavbar, Tx, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -33,8 +33,8 @@ pub enum Route {
             Settings {},
             #[route("/settings/export-key")]
             ExportKey {},
-    //         #[route("/settings/import-key")]
-    //         ImportKey {},
+            #[route("/settings/import-key")]
+            ImportKey {},
             #[route("/send/:to")]
             Send {
                 to: String
