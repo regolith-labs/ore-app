@@ -1,16 +1,18 @@
 use dioxus::prelude::*;
 
-use crate::components::{IsToolbarOpen, MinerToolbarInsufficientFunds, StartButton};
+use crate::{
+    components::{MinerToolbarInsufficientFunds, StartButton},
+    hooks::{use_miner_toolbar_state, MinerToolbarState, ReadMinerToolbarState},
+};
 
-#[component]
-pub fn MinerToolbarError(cx: Scope) -> Element {
-    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    if is_toolbar_open.read().0 {
-        render! {
+pub fn MinerToolbarError() -> Element {
+    let miner_state = use_miner_toolbar_state();
+    if miner_state.is_open() {
+        rsx! {
             MinerToolbarInsufficientFunds {}
         }
     } else {
-        render! {
+        rsx! {
             div {
                 class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
                 p {

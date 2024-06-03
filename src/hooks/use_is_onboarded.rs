@@ -17,5 +17,5 @@ pub fn use_is_onboarded() -> Signal<IsOnboarded> {
 
 pub fn use_is_onboarded_provider() {
     let is_onboarded = use_persistent(KEY, || IsOnboarded(false)).get();
-    use_context_provider(|| is_onboarded);
+    use_context_provider(|| Signal::new(is_onboarded));
 }

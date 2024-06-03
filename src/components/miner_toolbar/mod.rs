@@ -1,17 +1,17 @@
-// mod activating;
-// mod active;
-// mod error;
-// mod insufficient_sol;
+mod activating;
+mod active;
+mod error;
+mod insufficient_sol;
 mod layout;
-// mod not_started;
+mod not_started;
 mod utils;
 
-// pub use activating::*;
-// pub use active::*;
-// pub use error::*;
-// pub use insufficient_sol::*;
+pub use activating::*;
+pub use active::*;
+pub use error::*;
+pub use insufficient_sol::*;
 pub use layout::*;
-// pub use not_started::*;
+pub use not_started::*;
 pub use utils::*;
 
 use dioxus::prelude::*;
@@ -26,13 +26,6 @@ use crate::hooks::{
 
 #[component]
 pub fn MinerToolbar(hidden: bool) -> Element {
-    // use_context_provider(|| Signal::new(MinerStatus::NotStarted));
-    // use_context_provider(|| Signal::new(MinerStatusMessage::Searching));
-    // use_context_provider(|| Signal::new(MinerDisplayHash(Blake3Hash::new_unique())));
-    // let mut miner_status = use_context::<Signal<MinerStatus>>();
-    // let mut miner_status_message = use_context::<Signal<MinerStatusMessage>>();
-    // let mut miner_display_hash = use_context::<Signal<MinerDisplayHash>>();
-    // let mut is_toolbar_open = use_context::<Signal<IsToolbarOpen>>();
     let mut toolbar_state = use_miner_toolbar_state();
     let gateway = use_gateway();
     let pubkey = use_pubkey();
@@ -51,7 +44,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
         }
     });
 
-    let is_open = toolbar_state.read().is_open;
+    let is_open = toolbar_state.is_open();
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
     let height = if is_open {
@@ -60,7 +53,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
         "h-16 cursor-pointer"
     };
 
-    let bg = match toolbar_state.read().status {
+    let bg = match toolbar_state.status() {
         MinerStatus::Active => "bg-green-500 text-white",
         MinerStatus::Error => "bg-red-500 text-white",
         MinerStatus::NotStarted => {
@@ -83,33 +76,29 @@ pub fn MinerToolbar(hidden: bool) -> Element {
             },
             div {
                 class: "flex flex-row justify-between w-full max-w-[96rem] mx-auto h-full",
-                // match *miner_status.read() {
-                    // MinerStatus::NotStarted => {
-                    //     rsx! {
-                    //         MinerToolbarNotStarted {}
-                    //     }
-                    // }
-                    // MinerStatus::Activating => {
-                    //     rsx! {
-                    //         MinerToolbarActivating {
-                    //             miner: miner.clone()
-                    //         }
-                    //     }
-                    // }
-                    // MinerStatus::Active => {
-                    //     rsx! {
-                    //         MinerToolbarActive {
-                    //             miner: miner.clone()
-                    //         }
-                    //     }
-                    // }
-                    // MinerStatus::Error => {
-                    //     rsx! {
-                    //         MinerToolbarError {}
-                    //     }
-                    // }
-                    // _ => None
-                // }
+                match toolbar_state.status() {
+                    MinerStatus::NotStarted => {
+                        rsx! {
+                            MinerToolbarNotStarted {}
+                        }
+                    }
+                    MinerStatus::Activating => {
+                        rsx! {
+                            MinerToolbarActivating {}
+                        }
+                    }
+                    MinerStatus::Active => {
+                        rsx! {
+                            MinerToolbarActive {}
+                        }
+                    }
+                    MinerStatus::Error => {
+                        rsx! {
+                            MinerToolbarError {}
+                        }
+                    }
+                    _ => None
+                }
             }
         }
     }

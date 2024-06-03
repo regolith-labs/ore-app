@@ -2,12 +2,12 @@ use dioxus::prelude::*;
 
 use crate::{
     components::PauseIcon,
-    hooks::{MinerStatus, MinerToolbarState, UpdateMinerToolbarState},
+    hooks::{use_miner, MinerStatus, MinerToolbarState, UpdateMinerToolbarState},
     miner::Miner,
 };
 
-#[component]
-pub fn StopButton(miner: Signal<Miner>) -> Element {
+pub fn StopButton() -> Element {
+    let miner = use_miner();
     let mut toolbar_state = use_context::<Signal<MinerToolbarState>>();
     rsx! {
         button {

@@ -83,11 +83,11 @@ fn Hero() -> Element {
                             "Ore is a digital currency you can mine from anywhere, at home or on your phone."
                         }
                     }
-                    // Link {
-                    //     class: "mx-auto sm:text-lg md:text-xl lg:text-2xl font-semibold bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transition-colors rounded-full px-6 py-3",
-                    //     to: Route::Home {},
-                    //     "Get started →"
-                    // }
+                    Link {
+                        class: "mx-auto sm:text-lg md:text-xl lg:text-2xl font-semibold bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transition-colors rounded-full px-6 py-3",
+                        to: Route::Home {},
+                        "Get started →"
+                    }
                 }
             }
         }
@@ -146,25 +146,25 @@ fn Block(title: String, title2: String, detail: String, section: Section) -> Ele
 fn BlockCta(section: Section) -> Element {
     match section {
         Section::A => rsx! {
-            // Link {
-            //     class: "font-semibold mt-4",
-            //     to: Route::WhatIsMining {},
-            //     "Learn more →"
-            // }
+            Link {
+                class: "font-semibold mt-4",
+                to: Route::WhatIsMining {},
+                "Learn more →"
+            }
         },
         Section::B => rsx! {
-            // Link {
-            //     class: "font-semibold mt-4",
-            //     to: Route::OreTokenomics {},
-            //     "Learn more →"
-            // }
+            Link {
+                class: "font-semibold mt-4",
+                to: Route::OreTokenomics {},
+                "Learn more →"
+            }
         },
         Section::C => rsx! {
-            // Link {
-            //     class: "font-semibold mt-4",
-            //     to: "https://github.com/hardhatchad/ore",
-            //     "Read the code →"
-            // }
+            Link {
+                class: "font-semibold mt-4",
+                to: "https://github.com/regolith-labs/ore",
+                "Read the code →"
+            }
         },
     }
 }

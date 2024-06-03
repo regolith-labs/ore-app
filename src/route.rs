@@ -16,6 +16,7 @@ pub enum Route {
         WhatIsMining {},
         #[route("/ore-tokenomics")]
         OreTokenomics {},
+    #[end_layout]
     //     #[route("/download")]
     //     Download {},
 
@@ -43,6 +44,8 @@ pub enum Route {
             User {
                 id: String,
             },
+        #[end_layout]
+    #[end_layout]
 
     #[route("/:.._route")]
     PageNotFound { _route: Vec<String> }

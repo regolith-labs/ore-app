@@ -44,7 +44,7 @@ pub fn use_miner_toolbar_state_provider() {
 pub trait ReadMinerToolbarState {
     fn status(&self) -> MinerStatus;
     fn status_message(&self) -> MinerStatusMessage;
-    fn display_hash(&self) -> Blake3Hash;
+    fn display_hash(&self) -> String;
     fn is_open(&self) -> bool;
 }
 
@@ -57,8 +57,8 @@ impl ReadMinerToolbarState for Signal<MinerToolbarState> {
         self.read().status
     }
 
-    fn display_hash(&self) -> Blake3Hash {
-        self.read().display_hash
+    fn display_hash(&self) -> String {
+        self.read().display_hash.to_string()
     }
 
     fn is_open(&self) -> bool {
