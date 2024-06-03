@@ -1,9 +1,5 @@
 use dioxus::prelude::*;
 
-// use crate::components::{
-//     Claim, Download, ExportKey, Home, ImportKey, Landing, Miner, Navbar, OreTokenomics,
-//     PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
-// };
 use crate::components::{
     Claim, ExportKey, Home, ImportKey, Landing, MinerToolbarLayout, Navbar, OreTokenomics, Send,
     Settings, SimpleNavbar, Tx, User, WhatIsMining,
@@ -47,8 +43,6 @@ pub enum Route {
             User {
                 id: String,
             },
-    //     #[end_layout]
-    // #[end_layout]
 
     // #[route("/:.._route")]
     // PageNotFound { _route: Vec<String> }
