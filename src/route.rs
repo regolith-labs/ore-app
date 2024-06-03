@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::components::{
-    Claim, ExportKey, Home, ImportKey, Landing, MinerToolbarLayout, Navbar, OreTokenomics, Send,
-    Settings, SimpleNavbar, Tx, User, WhatIsMining,
+    Claim, ExportKey, Home, ImportKey, Landing, MinerToolbarLayout, Navbar, OreTokenomics,
+    PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -44,6 +44,6 @@ pub enum Route {
                 id: String,
             },
 
-    // #[route("/:.._route")]
-    // PageNotFound { _route: Vec<String> }
+    #[route("/:.._route")]
+    PageNotFound { _route: Vec<String> }
 }
