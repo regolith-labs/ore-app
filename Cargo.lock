@@ -3457,6 +3457,7 @@ dependencies = [
  "dioxus-std",
  "drillx",
  "futures",
+ "futures-util",
  "gloo 0.11.0",
  "gloo-storage 0.3.0",
  "is-url",
