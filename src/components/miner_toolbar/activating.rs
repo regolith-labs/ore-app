@@ -15,8 +15,8 @@ use super::MinerToolbarInsufficientFunds;
 
 const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(100);
 
-pub fn MinerToolbarActivating() -> Element {
-    let miner = use_miner();
+#[component]
+pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let gateway = use_gateway();
     let sol_balance = use_sol_balance();
     let mut sufficient_balance = use_signal(|| true);

@@ -15,29 +15,29 @@ use crate::{
 
 use super::MinerStatusMessage;
 
-pub fn MinerToolbarActive() -> Element {
+#[component]
+pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
     let gateway = use_gateway();
-    let miner = use_miner();
     let mut time_remaining = use_signal(|| 0);
     let mut toolbar_state = use_miner_toolbar_state();
 
     // Animate countdown timer.
-    use_future(move || {
-        let signer = signer();
-        let gateway = gateway.clone();
-        async move {
-            if let Ok(proof) = gateway.get_proof(signer.pubkey()).await {
-                if let Ok(clock) = gateway.get_clock().await {
-                    let cutoff_time = proof
-                        .last_hash_at
-                        .saturating_add(60)
-                        .saturating_sub(clock.unix_timestamp)
-                        .max(0) as u64;
-                    time_remaining.set(cutoff_time);
-                }
-            }
-        }
-    });
+    // use_future(move || {
+    //     let signer = signer();
+    //     let gateway = gateway.clone();
+    //     async move {
+    //         if let Ok(proof) = gateway.get_proof(signer.pubkey()).await {
+    //             if let Ok(clock) = gateway.get_clock().await {
+    //                 let cutoff_time = proof
+    //                     .last_hash_at
+    //                     .saturating_add(60)
+    //                     .saturating_sub(clock.unix_timestamp)
+    //                     .max(0) as u64;
+    //                 time_remaining.set(cutoff_time);
+    //             }
+    //         }
+    //     }
+    // });
 
     // Animate the hash in the miner toolbar to visualize mining.
     use_future(move || async move {
@@ -46,7 +46,7 @@ pub fn MinerToolbarActive() -> Element {
             if let MinerStatusMessage::Searching = toolbar_state.status_message() {
                 toolbar_state.set_display_hash(Blake3Hash::new_unique());
             } else {
-                break;
+                async_std::task::sleep(std::time::Duration::from_secs(1)).await;
             }
         }
     });
@@ -73,7 +73,10 @@ pub fn MinerToolbarActive() -> Element {
                             rsx! {
                                 p {
                                     class: "text-lg text-white",
-                                    "Searching for a valid hash... ({time_remaining} sec)"
+                                    "Searching for a valid hash... "
+                                    if time_remaining.read().gt(&0) {
+                                        "({time_remaining} sec)"
+                                    }
                                 }
                             }
                         }

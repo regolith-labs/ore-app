@@ -7,9 +7,9 @@ use cached::proc_macro::cached;
 pub use error::*;
 use gloo_storage::{LocalStorage, Storage};
 use ore::{
-    state::{Bus, Proof, Treasury},
+    state::{Bus, Config, Proof, Treasury},
     utils::AccountDeserialize,
-    BUS_ADDRESSES, TREASURY_ADDRESS,
+    BUS_ADDRESSES, CONFIG_ADDRESS, TREASURY_ADDRESS,
 };
 use ore_types::{response::GetTransfersResponse, Transfer};
 pub use pubkey::*;
@@ -45,7 +45,7 @@ pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01HTD8PP
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_RESET: u32 = 12_200;
-pub const CU_LIMIT_MINE: u32 = 3200;
+pub const CU_LIMIT_MINE: u32 = 500_000;
 
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
@@ -105,6 +105,15 @@ impl Gateway {
         Ok(*Treasury::try_from_bytes(&data).expect("Failed to parse treasury account"))
     }
 
+    pub async fn get_config(&self) -> GatewayResult<Config> {
+        let data = self
+            .rpc
+            .get_account_data(&CONFIG_ADDRESS)
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(*Config::try_from_bytes(&data).expect("Failed to parse config account"))
+    }
+
     pub async fn get_token_account(
         &self,
         pubkey: &Pubkey,
@@ -139,55 +148,55 @@ impl Gateway {
         let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
 
         // Simulate tx, if necessary
-        let mut sim_attempts = 0;
-        'simulate: loop {
-            let sim_res = self
-                .rpc
-                .simulate_transaction_with_config(
-                    &tx,
-                    RpcSimulateTransactionConfig {
-                        sig_verify: false,
-                        replace_recent_blockhash: true,
-                        commitment: Some(CommitmentConfig::confirmed()),
-                        encoding: Some(UiTransactionEncoding::Base64),
-                        accounts: None,
-                        min_context_slot: Some(slot),
-                    },
-                )
-                .await;
-            match sim_res {
-                Ok(sim_res) => {
-                    if let Some(err) = sim_res.err {
-                        println!("Simulaton error: {:?}", err);
-                        sim_attempts += 1;
-                    } else if let Some(units_consumed) = sim_res.units_consumed {
-                        if dynamic_cus {
-                            println!("Dynamic CUs: {:?}", units_consumed);
-                            let cu_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(
-                                units_consumed as u32 + 1000,
-                            );
-                            let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(
-                                DEFAULT_PRIORITY_FEE,
-                            );
-                            let mut final_ixs = vec![];
-                            final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
-                            final_ixs.extend_from_slice(&ixs);
-                            tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
-                        }
-                        break 'simulate;
-                    }
-                }
-                Err(err) => {
-                    println!("Simulaton error: {:?}", err);
-                    sim_attempts += 1;
-                }
-            }
+        // let mut sim_attempts = 0;
+        // 'simulate: loop {
+        //     let sim_res = self
+        //         .rpc
+        //         .simulate_transaction_with_config(
+        //             &tx,
+        //             RpcSimulateTransactionConfig {
+        //                 sig_verify: false,
+        //                 replace_recent_blockhash: true,
+        //                 commitment: Some(CommitmentConfig::confirmed()),
+        //                 encoding: Some(UiTransactionEncoding::Base64),
+        //                 accounts: None,
+        //                 min_context_slot: Some(slot),
+        //             },
+        //         )
+        //         .await;
+        //     match sim_res {
+        //         Ok(sim_res) => {
+        //             if let Some(err) = sim_res.err {
+        //                 println!("Simulaton error: {:?}", err);
+        //                 sim_attempts += 1;
+        //             } else if let Some(units_consumed) = sim_res.units_consumed {
+        //                 if dynamic_cus {
+        //                     println!("Dynamic CUs: {:?}", units_consumed);
+        //                     let cu_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(
+        //                         units_consumed as u32 + 1000,
+        //                     );
+        //                     let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(
+        //                         DEFAULT_PRIORITY_FEE,
+        //                     );
+        //                     let mut final_ixs = vec![];
+        //                     final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
+        //                     final_ixs.extend_from_slice(&ixs);
+        //                     tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
+        //                 }
+        //                 break 'simulate;
+        //             }
+        //         }
+        //         Err(err) => {
+        //             println!("Simulaton error: {:?}", err);
+        //             sim_attempts += 1;
+        //         }
+        //     }
 
-            // Return if sim attempts exceeded
-            if sim_attempts.gt(&SIMULATION_RETRIES) {
-                return Err(GatewayError::SimulationFailed);
-            }
-        }
+        //     // Return if sim attempts exceeded
+        //     if sim_attempts.gt(&SIMULATION_RETRIES) {
+        //         return Err(GatewayError::SimulationFailed);
+        //     }
+        // }
 
         // Submit tx
         tx.sign(&[&signer], hash);

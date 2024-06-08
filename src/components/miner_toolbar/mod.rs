@@ -16,16 +16,69 @@ pub use utils::*;
 
 use dioxus::prelude::*;
 use dioxus_std::utils::channel::use_channel;
+use futures_util::stream::StreamExt;
 use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 
-use crate::hooks::{
-    use_miner_toolbar_state, MinerStatus, MinerStatusMessage, ProofHandle, ReadMinerToolbarState,
-    UpdateMinerToolbarState,
+use crate::{
+    gateway,
+    hooks::{
+        use_gateway, use_miner, use_miner_toolbar_state, use_priority_fee, use_pubkey, MinerStatus,
+        MinerStatusMessage, ProofHandle, ReadMinerToolbarState, UpdateMinerToolbarState,
+    },
+    miner::{submit_solution, WebWorkerResponse},
 };
 
 #[component]
 pub fn MinerToolbar(hidden: bool) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
+    let priority_fee = use_priority_fee();
+    let mut proof_handle = use_context::<ProofHandle>();
+    let pubkey = use_pubkey();
+    let gateway = use_gateway();
+    let mut cx = use_channel::<WebWorkerResponse>(1);
+    let mut rx = cx.receiver();
+    let miner = use_miner(cx);
+
+    use_future(move || {
+        let mut rx = rx.clone();
+        let mut proof_handle = proof_handle.clone();
+        let gateway = gateway.clone();
+        async move {
+            while let Ok(res) = rx.recv().await {
+                toolbar_state.set_display_hash(Blake3Hash::new_from_array(res.hash));
+                toolbar_state.set_status_message(MinerStatusMessage::Submitting);
+                let priority_fee = priority_fee.read().0;
+                let solution = drillx::Solution::new(res.digest, res.nonce.to_le_bytes());
+                match submit_solution(&gateway, solution, priority_fee).await {
+                    Ok(sig) => {
+                        log::info!("Success: {}", sig);
+                        proof_handle.restart();
+                        if let MinerStatus::Active = toolbar_state.status() {
+                            toolbar_state.set_status_message(MinerStatusMessage::Searching);
+                            if let Ok(proof) = gateway.get_proof(pubkey).await {
+                                if let Ok(clock) = gateway.get_clock().await {
+                                    let cutoff_time = proof
+                                        .last_hash_at
+                                        .saturating_add(60)
+                                        .saturating_sub(clock.unix_timestamp)
+                                        .max(0)
+                                        as u64;
+                                    miner
+                                        .read()
+                                        .start_mining(proof.challenge.into(), cutoff_time)
+                                        .await;
+                                }
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        toolbar_state.set_status_message(MinerStatusMessage::Error);
+                        log::error!("Failed to submit hash: {:?}", err);
+                    }
+                }
+            }
+        }
+    });
 
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
@@ -67,12 +120,12 @@ pub fn MinerToolbar(hidden: bool) -> Element {
                     }
                     MinerStatus::Activating => {
                         rsx! {
-                            MinerToolbarActivating {}
+                            MinerToolbarActivating { miner }
                         }
                     }
                     MinerStatus::Active => {
                         rsx! {
-                            MinerToolbarActive {}
+                            MinerToolbarActive { miner }
                         }
                     }
                     MinerStatus::Error => {

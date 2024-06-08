@@ -11,7 +11,9 @@ use ore::{state::Treasury, BUS_COUNT, EPOCH_DURATION};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
-use solana_client_wasm::solana_sdk::{compute_budget::ComputeBudgetInstruction, pubkey::Pubkey};
+use solana_client_wasm::solana_sdk::{
+    compute_budget::ComputeBudgetInstruction, pubkey::Pubkey, signature::Signature, signer::Signer,
+};
 use web_sys::Worker;
 use web_time::Duration;
 
@@ -24,11 +26,11 @@ use crate::{
 
 // TODO Create channel for webworkers to send solutions on
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
-#[derive(PartialEq)]
+// #[derive(PartialEq)]
 pub struct Miner {
     power_level: Signal<PowerLevel>,
     priority_fee: Signal<PriorityFee>,
-    ch: UseChannel<WebWorkerResponse>,
+    // cx: Coroutine<WebWorkerResponse>,
     web_worker: Worker,
 }
 
@@ -39,7 +41,7 @@ pub struct Miner {
 
 impl Miner {
     pub fn new(
-        ch: UseChannel<WebWorkerResponse>,
+        cx: UseChannel<WebWorkerResponse>,
         power_level: Signal<PowerLevel>,
         priority_fee: Signal<PriorityFee>,
     ) -> Self {
@@ -48,8 +50,7 @@ impl Miner {
             priority_fee: priority_fee.clone(),
 
             // TODO Create as many webworkers as there are cores
-            ch: ch.clone(),
-            web_worker: create_web_worker(ch),
+            web_worker: create_web_worker(cx),
         }
     }
 
@@ -88,69 +89,58 @@ impl Miner {
     // }
 }
 
+// TODO Dispatch a difference nonce to each webworker (based on power level)
+pub async fn start_mining_web(web_worker: Worker, challenge: [u8; 32], cutoff_time: u64) {
+    web_worker
+        .post_message(
+            &to_value(
+                &(WebWorkerRequest {
+                    challenge,
+                    nonce: 0,
+                    cutoff_time,
+                }),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+}
+
 pub async fn submit_solution(
     gateway: &Rc<Gateway>,
-    solution: &Solution,
+    solution: Solution,
     priority_fee: u64,
-) -> GatewayResult<()> {
-    // Submit mine tx.
+) -> GatewayResult<Signature> {
     let signer = signer();
+    // Build ixs
+    let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
+    let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+    let mut ixs = vec![cu_limit_ix, cu_price_ix];
 
-    // TODO Get config
-    // Read current treasury value
-    // let treasury = match *treasury_rw.read().unwrap() {
-    //     AsyncResult::Ok(treasury) => treasury,
-    //     _ => return Err(GatewayError::Unknown), // TODO
-    // };
-
-    // Find a valid bus
-    loop {
-        // Check if epoch needs to be reset
-        // TODO Reset ix
-        // if let Ok(clock) = gateway.get_clock().await {
-        //     let epoch_end_at = treasury.last_reset_at.saturating_add(EPOCH_DURATION);
-        //     // Submit restart epoch tx, if needed
-        //     if clock.unix_timestamp.ge(&epoch_end_at) {
-        //         // There are a lot of miners right now, randomize who tries the reset
-        //         let selected_to_reset = rng.gen_range(0..10).eq(&0);
-        //         if selected_to_reset {
-        //             let cu_limit_ix =
-        //                 ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_RESET);
-        //             let cu_price_ix =
-        //                 ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-        //             let ix = ore::instruction::reset(signer.pubkey());
-        //             gateway
-        //                 .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, true)
-        //                 .await
-        //                 .ok();
-        //         }
-        //     }
-        // }
-
-        // Submit mine tx
-        let bus_id = pick_bus();
-        log::info!("Using bus {}", bus_id);
-        // TODO
-        // let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
-        // let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-        // let ix = ore::instruction::mine(
-        //     signer.pubkey(),
-        //     ore::BUS_ADDRESSES[bus_id],
-        //     next_hash.into(),
-        //     nonce,
-        // );
-        // match gateway
-        //     .send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, false)
-        //     .await
-        // {
-        //     Ok(_sig) => return Ok(()),
-        //     Err(err) => {
-        //         // TODO Retry
-        //         // TODO It seems this can error can occur sometimes, even while tx was submitted
-        //         log::error!("Error submitting: {:?}", err);
-        //     }
-        // }
+    // Reset if needed
+    if needs_reset(gateway).await {
+        ixs.push(ore::instruction::reset(signer.pubkey()));
     }
+
+    // Build mine tx
+    let bus_id = pick_bus();
+    let ix = ore::instruction::mine(signer.pubkey(), ore::BUS_ADDRESSES[bus_id], solution);
+    ixs.push(ix);
+
+    // Send and configm
+    gateway.send_and_confirm(&ixs, false, false).await
+}
+
+async fn needs_reset(gateway: &Rc<Gateway>) -> bool {
+    if let Ok(clock) = gateway.get_clock().await {
+        if let Ok(config) = gateway.get_config().await {
+            return config
+                .last_reset_at
+                .saturating_add(EPOCH_DURATION)
+                .saturating_sub(5) // Buffer
+                .le(&clock.unix_timestamp);
+        }
+    }
+    false
 }
 
 fn pick_bus() -> usize {
