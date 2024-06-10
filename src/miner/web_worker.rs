@@ -1,16 +1,20 @@
 use dioxus::hooks::Coroutine;
 use dioxus_std::utils::channel::UseChannel;
+use gloo_storage::{LocalStorage, Storage};
+use js_sys::{Int32Array, SharedArrayBuffer};
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
-use web_sys::{DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, WorkerType};
+use web_sys::{
+    window, DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, WorkerType,
+};
 use web_time::Instant;
 
 /// Mining request for web workers
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebWorkerRequest {
     pub challenge: [u8; 32],
-    pub nonce: u64,
+    pub nonce: [u8; 8],
     pub cutoff_time: u64,
 }
 
@@ -19,7 +23,7 @@ pub struct WebWorkerRequest {
 pub struct WebWorkerResponse {
     pub hash: [u8; 32],
     pub digest: [u8; 16],
-    pub nonce: u64,
+    pub nonce: [u8; 8],
     pub difficulty: u32,
 }
 
@@ -34,6 +38,7 @@ pub fn start_worker() {
 
     scope.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
         Closure::<dyn Fn(MessageEvent)>::new(move |e: MessageEvent| {
+            // LocalStorage::set("flag", true).ok();
             let req: WebWorkerRequest = from_value(e.data()).unwrap();
             let res = find_next_hash(req.challenge, req.nonce, req.cutoff_time);
             scope_.post_message(&to_value(&res).unwrap()).unwrap();
@@ -49,13 +54,13 @@ fn worker_options() -> WorkerOptions {
 }
 
 pub fn create_web_worker(cx: UseChannel<WebWorkerResponse>) -> Worker {
+    log::info!("Creating worker...");
     let worker = Worker::new_with_options("worker.js", &worker_options()).unwrap();
 
     // On message
     worker.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
         Closure::<dyn Fn(MessageEvent)>::new(move |e: MessageEvent| {
             let res: WebWorkerResponse = from_value(e.data()).unwrap();
-            log::info!("Res: {:?}", res);
             async_std::task::block_on({
                 let cx = cx.clone();
                 async move {
@@ -77,12 +82,12 @@ pub fn create_web_worker(cx: UseChannel<WebWorkerResponse>) -> Worker {
     worker
 }
 
-pub fn find_next_hash(challenge: [u8; 32], mut nonce: u64, cutoff_time: u64) -> WebWorkerResponse {
+pub fn find_next_hash(challenge: [u8; 32], nonce: [u8; 8], cutoff_time: u64) -> WebWorkerResponse {
     let timer = Instant::now();
-    let initial_nonce = nonce;
+    let mut nonce = u64::from_le_bytes(nonce);
     let mut best_hash = [0u8; 32];
     let mut best_digest = [0u8; 16];
-    let mut best_nonce = nonce;
+    let mut best_nonce = [0u8; 8];
     let mut best_difficulty = 0u32;
     loop {
         if let Ok(hash) = drillx::hash(&challenge, &nonce.to_le_bytes()) {
@@ -90,7 +95,7 @@ pub fn find_next_hash(challenge: [u8; 32], mut nonce: u64, cutoff_time: u64) -> 
             if difficulty.gt(&best_difficulty) {
                 best_digest = hash.d;
                 best_difficulty = difficulty;
-                best_nonce = nonce;
+                best_nonce = nonce.to_le_bytes();
                 best_hash = hash.h;
             }
         }
@@ -102,10 +107,19 @@ pub fn find_next_hash(challenge: [u8; 32], mut nonce: u64, cutoff_time: u64) -> 
                 best_difficulty,
                 timer.elapsed().as_secs()
             );
-            if timer.elapsed().as_secs().gt(&cutoff_time) {
-                if best_difficulty >= ore::MIN_DIFFICULTY {
-                    break;
-                }
+
+            // Break if flag is set
+            // if let Ok(value) = LocalStorage::get::<bool>("flag") {
+            //     // if value {
+            //     //     break;
+            //     // }
+            // }
+
+            // Break if time has elapsed and min difficulty is met
+            if timer.elapsed().as_secs().gt(&cutoff_time)
+                && best_difficulty.ge(&ore::MIN_DIFFICULTY)
+            {
+                break;
             }
         }
 
