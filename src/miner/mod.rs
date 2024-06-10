@@ -1,5 +1,6 @@
 mod web_worker;
 
+use gloo_storage::{LocalStorage, Storage};
 pub use web_worker::*;
 
 use std::rc::Rc;
@@ -12,7 +13,8 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{
-    compute_budget::ComputeBudgetInstruction, pubkey::Pubkey, signature::Signature, signer::Signer,
+    blake3::Hash as Blake3Hash, compute_budget::ComputeBudgetInstruction, pubkey::Pubkey,
+    signature::Signature, signer::Signer,
 };
 use web_sys::Worker;
 use web_time::Duration;
@@ -21,23 +23,20 @@ use crate::{
     gateway::{
         signer, AsyncResult, Gateway, GatewayError, GatewayResult, CU_LIMIT_MINE, CU_LIMIT_RESET,
     },
-    hooks::{PowerLevel, PriorityFee},
+    hooks::{
+        MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee, ProofHandle,
+        ReadMinerToolbarState, UpdateMinerToolbarState,
+    },
 };
 
-// TODO Create channel for webworkers to send solutions on
+pub const WEB_WORKERS: usize = 8;
+
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
-// #[derive(PartialEq)]
 pub struct Miner {
     power_level: Signal<PowerLevel>,
     priority_fee: Signal<PriorityFee>,
-    // cx: Coroutine<WebWorkerResponse>,
-    web_worker: Worker,
+    web_worker: [Worker; WEB_WORKERS],
 }
-
-// TODO Aggregate results from web workers
-
-// // TODO Create channel to receive results from webworker
-// let ch = use_channel::<MiningResult>(cx, 1);
 
 impl Miner {
     pub fn new(
@@ -48,61 +47,90 @@ impl Miner {
         Self {
             power_level: power_level.clone(),
             priority_fee: priority_fee.clone(),
-
-            // TODO Create as many webworkers as there are cores
-            web_worker: create_web_worker(cx),
+            web_worker: std::array::from_fn(|_| create_web_worker(cx.clone())),
         }
     }
 
-    pub fn stop(&self) {
-        // TODO interrupt current work (optimization)
-    }
-
-    // TODO
     pub async fn start_mining(&self, challenge: [u8; 32], cutoff_time: u64) {
         self.start_mining_web(challenge, cutoff_time).await;
     }
 
-    // TODO Dispatch a difference nonce to each webworker (based on power level)
     pub async fn start_mining_web(&self, challenge: [u8; 32], cutoff_time: u64) {
-        self.web_worker
-            .post_message(
-                &to_value(
-                    &(WebWorkerRequest {
-                        challenge,
-                        nonce: 0,
-                        cutoff_time,
-                    }),
+        LocalStorage::set("flag", false).ok();
+        let nonce = u64::MAX.saturating_div(self.web_worker.len() as u64);
+        for (i, web_worker) in self.web_worker.iter().enumerate() {
+            let nonce = nonce.saturating_mul(i as u64);
+            web_worker
+                .post_message(
+                    &to_value(
+                        &(WebWorkerRequest {
+                            challenge,
+                            nonce: nonce.to_le_bytes(),
+                            cutoff_time,
+                        }),
+                    )
+                    .unwrap(),
                 )
-                .unwrap(),
-            )
-            .unwrap();
+                .unwrap();
+        }
     }
 
-    // pub async fn wait_for_solution(&self) {
-    //     let mut messages = vec![];
-    //     for _ in 0..4 {
-    //         if let Some(message) = self.ch.receiver().recv().await {
-    //             messages.push(message);
-    //         }
-    //     }
-    // }
-}
+    pub async fn process_web_worker_results(
+        &self,
+        messages: &Vec<WebWorkerResponse>,
+        toolbar_state: &mut Signal<MinerToolbarState>,
+        priority_fee: Signal<PriorityFee>,
+        proof_handle: &mut ProofHandle,
+        gateway: Rc<Gateway>,
+        pubkey: Pubkey,
+    ) {
+        log::info!("Batch: {:?}", messages);
 
-// TODO Dispatch a difference nonce to each webworker (based on power level)
-pub async fn start_mining_web(web_worker: Worker, challenge: [u8; 32], cutoff_time: u64) {
-    web_worker
-        .post_message(
-            &to_value(
-                &(WebWorkerRequest {
-                    challenge,
-                    nonce: 0,
-                    cutoff_time,
-                }),
-            )
-            .unwrap(),
-        )
-        .unwrap();
+        // Get best solution
+        let mut best_difficulty = 0;
+        let mut best_solution = Solution::new([0; 16], [0; 8]);
+        let mut best_hash = [0u8; 32];
+        for msg in messages {
+            if msg.difficulty.gt(&best_difficulty) {
+                best_solution = drillx::Solution::new(msg.digest, msg.nonce);
+                best_difficulty = msg.difficulty;
+                best_hash = msg.hash;
+            }
+        }
+
+        // Update toolbar state
+        toolbar_state.set_display_hash(Blake3Hash::new_from_array(best_hash));
+        toolbar_state.set_status_message(MinerStatusMessage::Submitting);
+        let priority_fee = priority_fee.read().0;
+
+        // Submit solution
+        match submit_solution(&gateway, best_solution, priority_fee).await {
+            // Start mining again
+            Ok(sig) => {
+                log::info!("Success: {}", sig);
+                proof_handle.restart();
+                if let MinerStatus::Active = toolbar_state.status() {
+                    toolbar_state.set_status_message(MinerStatusMessage::Searching);
+                    if let Ok(proof) = gateway.get_proof(pubkey).await {
+                        if let Ok(clock) = gateway.get_clock().await {
+                            let cutoff_time = proof
+                                .last_hash_at
+                                .saturating_add(60)
+                                .saturating_sub(clock.unix_timestamp)
+                                .max(0) as u64;
+                            self.start_mining(proof.challenge.into(), cutoff_time).await;
+                        }
+                    }
+                }
+            }
+
+            // Display error
+            Err(err) => {
+                toolbar_state.set_status_message(MinerStatusMessage::Error);
+                log::error!("Failed to submit hash: {:?}", err);
+            }
+        }
+    }
 }
 
 pub async fn submit_solution(
