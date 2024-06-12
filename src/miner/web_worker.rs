@@ -38,7 +38,6 @@ pub fn start_worker() {
 
     scope.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
         Closure::<dyn Fn(MessageEvent)>::new(move |e: MessageEvent| {
-            // LocalStorage::set("flag", true).ok();
             let req: WebWorkerRequest = from_value(e.data()).unwrap();
             let res = find_next_hash(req.challenge, req.nonce, req.cutoff_time);
             scope_.post_message(&to_value(&res).unwrap()).unwrap();
@@ -89,8 +88,9 @@ pub fn find_next_hash(challenge: [u8; 32], nonce: [u8; 8], cutoff_time: u64) -> 
     let mut best_digest = [0u8; 16];
     let mut best_nonce = [0u8; 8];
     let mut best_difficulty = 0u32;
+    let mut memory = drillx::equix::SolverMemory::new();
     loop {
-        if let Ok(hash) = drillx::hash(&challenge, &nonce.to_le_bytes()) {
+        if let Ok(hash) = drillx::hash_with_memory(&mut memory, &challenge, &nonce.to_le_bytes()) {
             let difficulty = hash.difficulty();
             if difficulty.gt(&best_difficulty) {
                 best_digest = hash.d;
@@ -108,16 +108,9 @@ pub fn find_next_hash(challenge: [u8; 32], nonce: [u8; 8], cutoff_time: u64) -> 
                 timer.elapsed().as_secs()
             );
 
-            // Break if flag is set
-            // if let Ok(value) = LocalStorage::get::<bool>("flag") {
-            //     // if value {
-            //     //     break;
-            //     // }
-            // }
-
             // Break if time has elapsed and min difficulty is met
             if timer.elapsed().as_secs().gt(&cutoff_time)
-                && best_difficulty.ge(&ore::MIN_DIFFICULTY)
+            // && best_difficulty.ge(&ore::MIN_DIFFICULTY)
             {
                 break;
             }
