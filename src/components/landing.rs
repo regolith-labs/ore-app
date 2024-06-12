@@ -1,12 +1,13 @@
 use dioxus::prelude::*;
 use ore_types::Transfer;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
     components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon},
+    gateway::AsyncResult,
+    hooks::{use_transfers, ActivityFilter},
     route::Route,
-    // gateway::AsyncResult,
-    // hooks::{use_is_onboarded, use_ore_supply, use_transfers, use_treasury},
     utils::asset_path,
 };
 
@@ -177,9 +178,6 @@ enum Section {
 }
 
 fn SectionA() -> Element {
-    let offset = use_signal(|| 0);
-    // let (transfers, _) = use_transfers(cx, filter, offset);
-
     rsx! {
         div {
             class: "flex flex-col w-full my-auto gap-4 max-w-[48rem]",
@@ -193,89 +191,93 @@ fn SectionA() -> Element {
             }
             div {
                 class: "flex flex-col w-full",
-                // TransfersSection {
-                //     transfers: transfers
-                // }
+                TransfersSection {}
             }
         }
     }
 }
 
-// #[component]
-// fn TransfersSection(transfers: AsyncResult<Vec<Transfer>>) -> Element {
-//     match transfers {
-//         AsyncResult::Ok(transfers) => {
-//             if transfers.is_empty() {
-//                 rsx! {
-//                     p {
-//                         class: "text-sm opacity-50",
-//                         "No transactions yet"
-//                     }
-//                 }
-//             } else {
-//                 rsx! {
-//                     for (i, transfer) in transfers.iter().enumerate() {
-//                         if i.lt(&5) {
-//                             let addr = transfer.to_address[..5].to_string();
-//                             let amount = (transfer.amount as f64) / (10f64.powf(ore::TOKEN_DECIMALS as f64));
+fn TransfersSection() -> Element {
+    let filter = use_signal(|| ActivityFilter::Global);
+    let offset = use_signal(|| 0);
+    let (transfers, _) = use_transfers(filter, offset);
+    let e = match transfers.read().clone() {
+        AsyncResult::Ok(transfers) => {
+            rsx! {
+                if transfers.is_empty() {
+                    p {
+                        class: "text-sm opacity-50",
+                        "No transactions yet"
+                    }
+                }
+                for (i, transfer) in transfers.iter().enumerate() {
+                    if i.lt(&5) {
+                        SimpleTransferRow {
+                            transfer: transfer.clone()
+                        }
+                    } else {
+                        None
+                    }
+                }
+            }
+        }
+        _ => None,
+    };
+    e
+}
 
-//                             let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-//                             let ts = Duration::from_secs(transfer.ts as u64);
-//                             let time = now.saturating_sub(ts);
-//                             let t = time.as_secs();
-//                             const ONE_MIN: u64 = 60;
-//                             const ONE_HOUR: u64 = ONE_MIN * 60;
-//                             const ONE_DAY: u64 = ONE_HOUR * 24;
-//                             let time_str = if t.gt(&ONE_DAY) {
-//                                 format!("{}d ago", t.saturating_div(ONE_DAY))
-//                             } else if t.gt(&ONE_HOUR) {
-//                                 format!("{}h ago", t.saturating_div(ONE_HOUR))
-//                             } else if t.gt(&ONE_MIN) {
-//                                 format!("{}m ago", t.saturating_div(ONE_MIN))
-//                             } else {
-//                                 format!("{}s ago", t)
-//                             };
+#[component]
+fn SimpleTransferRow(transfer: Transfer) -> Element {
+    let addr = transfer.to_address[..5].to_string();
+    let amount = amount_to_ui_amount(transfer.amount as u64, ore::TOKEN_DECIMALS);
+    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let ts = Duration::from_secs(transfer.ts as u64);
+    let time = now.saturating_sub(ts);
+    let t = time.as_secs();
+    const ONE_MIN: u64 = 60;
+    const ONE_HOUR: u64 = ONE_MIN * 60;
+    const ONE_DAY: u64 = ONE_HOUR * 24;
+    let time_str = if t.gt(&ONE_DAY) {
+        format!("{}d ago", t.saturating_div(ONE_DAY))
+    } else if t.gt(&ONE_HOUR) {
+        format!("{}h ago", t.saturating_div(ONE_HOUR))
+    } else if t.gt(&ONE_MIN) {
+        format!("{}m ago", t.saturating_div(ONE_MIN))
+    } else {
+        format!("{}s ago", t)
+    };
 
-//                             rsx! {
-//                                 div {
-//                                     class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
-//                                     div {
-//                                         class: "flex flex-col pt-1",
-//                                         p {
-//                                             class: "flex flex-row gap-2",
-//                                             span {
-//                                                 class: "font-mono font-bold",
-//                                                 "{addr}"
-//                                             }
-//                                             "mined "
-//                                             span {
-//                                                 class: "flex flex-row font-semibold gap-0.5",
-//                                                 OreIcon {
-//                                                     class: "w-3.5 h-3.5 my-auto",
-//                                                 }
-//                                                 "{amount:.4}"
-//                                             }
-//                                         }
-//                                     }
-//                                     div {
-//                                         class: "flex pt-1.5 ml-auto",
-//                                         p {
-//                                             class: "opacity-50 text-right text-nowrap text-sm",
-//                                             "{time_str}"
-//                                         }
-//                                     }
-//                                 }
-//                             }
-//                         } else {
-//                             None
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//         _ => None,
-//     }
-// }
+    rsx! {
+        div {
+            class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
+            div {
+                class: "flex flex-col pt-1",
+                p {
+                    class: "flex flex-row gap-2",
+                    span {
+                        class: "font-mono font-bold",
+                        "{addr}"
+                    }
+                    "mined "
+                    span {
+                        class: "flex flex-row font-semibold gap-0.5",
+                        OreIcon {
+                            class: "w-3.5 h-3.5 my-auto",
+                        }
+                        "{amount:.4}"
+                    }
+                }
+            }
+            div {
+                class: "flex pt-1.5 ml-auto",
+                p {
+                    class: "opacity-50 text-right text-nowrap text-sm",
+                    "{time_str}"
+                }
+            }
+        }
+    }
+}
 
 fn SectionB() -> Element {
     // let treasury = use_treasury();
