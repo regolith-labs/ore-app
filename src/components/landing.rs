@@ -6,7 +6,7 @@ use web_time::{Duration, SystemTime, UNIX_EPOCH};
 use crate::{
     components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon},
     gateway::AsyncResult,
-    hooks::{use_transfers, ActivityFilter},
+    hooks::{use_ore_supply, use_transfers, ActivityFilter},
     route::Route,
     utils::asset_path,
 };
@@ -33,7 +33,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Stable supply.",
                 title2: &"Steady growth.",
-                detail: &"Ore has an algorithmic supply programmed for constant linear growth. On average, one new Ore token is mined every minute by miners around the globe.",
+                detail: &"Ore has a limited total supply of 21m tokens. It uses an algorithmic supply function meaning on average one new Ore token is mined every minute around the globe.",
                 section: Section::B
             }
             Block {
@@ -211,12 +211,8 @@ fn TransfersSection() -> Element {
                     }
                 }
                 for (i, transfer) in transfers.iter().enumerate() {
-                    if i.lt(&5) {
-                        SimpleTransferRow {
-                            transfer: transfer.clone()
-                        }
-                    } else {
-                        None
+                    SimpleTransferRow {
+                        transfer: transfer.clone()
                     }
                 }
             }
@@ -280,31 +276,23 @@ fn SimpleTransferRow(transfer: Transfer) -> Element {
 }
 
 fn SectionB() -> Element {
-    // let treasury = use_treasury();
-    // let (supply, _) = use_ore_supply(cx);
-    // let circulating_supply = match *treasury.read().unwrap() {
-    //     AsyncResult::Ok(treasury) => {
-    //         (treasury.total_claimed_rewards as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64)
-    //     }
-    //     _ => 0f64,
-    // }
-    // .to_string();
-    // let ore_supply = match supply {
-    //     AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
-    //     AsyncResult::Loading => "-".to_string(),
-    //     AsyncResult::Error(_err) => "Err".to_string(),
-    // };
+    let (supply, _) = use_ore_supply();
+    let circulating_supply = match supply.read().clone() {
+        AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
+        AsyncResult::Loading => "-".to_string(),
+        AsyncResult::Error(_err) => "Err".to_string(),
+    };
     rsx! {
         div {
             class: "flex flex-col gap-12 my-auto",
-            // OreValue {
-            //     title: "Circulating supply".to_string(),
-            //     amount: circulating_supply
-            // }
-            // OreValue {
-            //     title: "Total supply".to_string(),
-            //     amount: ore_supply
-            // }
+            OreValue {
+                title: "Current supply".to_string(),
+                amount: circulating_supply
+            }
+            OreValue {
+                title: "Total supply".to_string(),
+                amount: "21,000,000"
+            }
         }
     }
 }
