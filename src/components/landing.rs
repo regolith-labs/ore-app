@@ -6,19 +6,19 @@ use web_time::{Duration, SystemTime, UNIX_EPOCH};
 use crate::{
     components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon},
     gateway::AsyncResult,
-    hooks::{use_ore_supply, use_transfers, ActivityFilter},
+    hooks::{use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter},
     route::Route,
     utils::asset_path,
 };
 
 pub fn Landing() -> Element {
-    // let is_onboarded = use_is_onboarded(cx);
     let nav = navigator();
+    let is_onboarded = use_is_onboarded();
 
     // If the user is already onboarded, redirect to home.
-    // if is_onboarded.read().0 {
-    //     nav.replace(Route::Home {});
-    // }
+    if is_onboarded.read().0 {
+        nav.replace(Route::Home {});
+    }
 
     rsx! {
         div {
