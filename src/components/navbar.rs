@@ -32,13 +32,13 @@ pub fn Navbar() -> Element {
                 class: "flex w-full",
                 div {
                     class: "max-w-[96rem] w-full flex flex-row justify-between mx-auto px-4 sm:px-8 py-6",
-                    // Link {
-                    //     to: Route::Home {},
-                    //     class: "flex h-10",
-                    //     OreWordmarkIcon {
-                    //         class: "h-3 md:h-4 my-auto"
-                    //     }
-                    // }
+                    Link {
+                        to: Route::Home {},
+                        class: "flex h-10",
+                        OreWordmarkIcon {
+                            class: "h-3 md:h-4 my-auto"
+                        }
+                    }
                     div {
                         class: "flex flex-row gap-6 md:gap-8 lg:gap-10",
                         // Link {
@@ -62,12 +62,12 @@ pub fn Navbar() -> Element {
 
 pub fn Profile() -> Element {
     rsx! {
-        // Link {
-        //     to: Route::Settings {},
-        //     UserBubble {
-        //         class: "w-10 h-10"
-        //     }
-        // }
+        Link {
+            to: Route::Settings {},
+            UserBubble {
+                class: "w-10 h-10"
+            }
+        }
     }
 }
 

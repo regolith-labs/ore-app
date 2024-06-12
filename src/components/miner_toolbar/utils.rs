@@ -30,11 +30,14 @@ pub async fn try_start_mining(
     let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
     let clock = gateway.get_clock().await.unwrap();
-    let cutoff_time = proof
+    let mut cutoff_time = proof
         .last_hash_at
         .saturating_add(60)
         .saturating_sub(clock.unix_timestamp)
         .max(0) as u64;
+    if cutoff_time.eq(&0) {
+        cutoff_time = 60;
+    }
 
     toolbar_state.set_status_message(MinerStatusMessage::Searching);
     miner

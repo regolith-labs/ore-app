@@ -29,7 +29,7 @@ use crate::{
     },
 };
 
-pub const WEB_WORKERS: usize = 8;
+pub const WEB_WORKERS: usize = 1;
 
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
 pub struct Miner {
@@ -113,11 +113,14 @@ impl Miner {
                     toolbar_state.set_status_message(MinerStatusMessage::Searching);
                     if let Ok(proof) = gateway.get_proof(pubkey).await {
                         if let Ok(clock) = gateway.get_clock().await {
-                            let cutoff_time = proof
+                            let mut cutoff_time = proof
                                 .last_hash_at
                                 .saturating_add(60)
                                 .saturating_sub(clock.unix_timestamp)
                                 .max(0) as u64;
+                            if cutoff_time.eq(&0) {
+                                cutoff_time = 60;
+                            }
                             self.start_mining(proof.challenge.into(), cutoff_time).await;
                         }
                     }
