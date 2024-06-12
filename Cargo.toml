@@ -43,7 +43,8 @@ is-url = { version = "1.0.4" }
 js-sys = { version = "0.3.67", optional = true }
 log = "0.4.20"
 ore = { package = "ore-program", path = "../ore", features = ["no-entrypoint"] }
-ore-types = "0.0.5"
+ore-types = { path = "../ore-infra/types" }
+# ore-types = "0.0.5"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
 reqwest = "0.11.24"

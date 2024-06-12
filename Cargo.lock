@@ -3502,9 +3502,7 @@ dependencies = [
 
 [[package]]
 name = "ore-types"
-version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac63bfebb54b36bde67dda2015904c94d3dcde0eb0f77d8ff02f0b8d637ec85f"
+version = "0.0.1"
 dependencies = [
  "postgres-types",
  "serde",
