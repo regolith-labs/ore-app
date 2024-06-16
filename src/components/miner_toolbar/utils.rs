@@ -34,14 +34,11 @@ pub async fn try_start_mining(
         .saturating_add(60)
         .saturating_sub(clock.unix_timestamp)
         .max(0) as u64;
-    if cutoff_time.eq(&0) {
-        cutoff_time = 60;
-    }
 
     toolbar_state.set_status_message(MinerStatusMessage::Searching);
     miner
         .read()
-        .start_mining(proof.challenge.into(), cutoff_time)
+        .start_mining(proof.challenge.into(), 0, cutoff_time)
         .await;
 
     Ok(())
