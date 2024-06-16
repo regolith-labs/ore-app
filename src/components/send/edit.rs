@@ -23,12 +23,13 @@ pub fn SendEdit(
     parsed_amount: u64,
 ) -> Element {
     let nav = navigator();
-    let ore_balance = use_ore_balance();
+    let balance = use_ore_balance();
     let recipient = Pubkey::from_str(recipient_input.read().as_str());
-    let (max_amount, max_amount_str) = match ore_balance.read().clone() {
-        AsyncResult::Ok(balance) => (balance.balance(), balance.ui_amount_string),
-        _ => (0, "0".to_owned()),
-    };
+    let (max_amount, max_amount_str) = balance
+        .cloned()
+        .and_then(|b| b.ok())
+        .map(|b| (b.balance(), b.ui_amount_string))
+        .unwrap_or_else(|| (0, "0".to_owned()));
     let amount_error_text = if parsed_amount.gt(&max_amount) {
         Some("Amount too large".to_string())
     } else {

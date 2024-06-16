@@ -22,12 +22,17 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
     //     async move {
     //         if let Ok(proof) = gateway.get_proof(signer.pubkey()).await {
     //             if let Ok(clock) = gateway.get_clock().await {
-    //                 let cutoff_time = proof
+    //                 let mut cutoff_time = proof
     //                     .last_hash_at
     //                     .saturating_add(60)
     //                     .saturating_sub(clock.unix_timestamp)
     //                     .max(0) as u64;
     //                 time_remaining.set(cutoff_time);
+    //                 loop {
+    //                     async_std::task::sleep(std::time::Duration::from_secs(1)).await;
+    //                     cutoff_time -= 1;
+    //                     time_remaining.set(cutoff_time.min(0));
+    //                 }
     //             }
     //         }
     //     }

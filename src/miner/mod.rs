@@ -7,7 +7,7 @@ use std::rc::Rc;
 use dioxus::prelude::*;
 use dioxus_std::utils::channel::UseChannel;
 use drillx::Solution;
-use ore::{BUS_COUNT, EPOCH_DURATION};
+use ore::{state::Proof, BUS_COUNT, EPOCH_DURATION};
 use rand::Rng;
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{
@@ -19,7 +19,7 @@ use web_sys::Worker;
 use crate::{
     gateway::{signer, Gateway, GatewayResult, CU_LIMIT_MINE},
     hooks::{
-        MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee, ProofHandle,
+        MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
         ReadMinerToolbarState, UpdateMinerToolbarState,
     },
 };
@@ -75,7 +75,7 @@ impl Miner {
         messages: &Vec<WebWorkerResponse>,
         toolbar_state: &mut Signal<MinerToolbarState>,
         priority_fee: Signal<PriorityFee>,
-        proof_handle: &mut ProofHandle,
+        proof: &mut Resource<GatewayResult<Proof>>,
         gateway: Rc<Gateway>,
         pubkey: Pubkey,
     ) {
@@ -114,7 +114,7 @@ impl Miner {
             // Start mining again
             Ok(sig) => {
                 log::info!("Success: {}", sig);
-                proof_handle.restart();
+                proof.restart();
                 if let MinerStatus::Active = toolbar_state.status() {
                     toolbar_state.set_status_message(MinerStatusMessage::Searching);
                     if let Ok(proof) = gateway.get_proof(pubkey).await {

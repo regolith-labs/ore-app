@@ -2,11 +2,13 @@ use std::borrow::BorrowMut;
 
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
+use solana_extra_wasm::{
+    account_decoder::parse_token::UiTokenAmount, program::spl_token::amount_to_ui_amount,
+};
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    hooks::{use_gateway, use_ore_balance_handle},
+    hooks::{use_gateway, use_ore_balance},
 };
 
 use super::SendStep;
@@ -19,8 +21,8 @@ pub fn SendConfirm(
     memo: String,
 ) -> Element {
     let mut is_busy = use_signal(|| false);
+    let mut ore_balance = use_ore_balance();
     let gateway = use_gateway();
-    let balance_handle = use_ore_balance_handle();
 
     rsx! {
         div {
@@ -90,14 +92,13 @@ pub fn SendConfirm(
                     disabled: *is_busy.read(),
                     onclick: move |_| {
                         let gateway = gateway.clone();
-                        let mut balance_handle = balance_handle.clone();
                         let memo = memo.clone();
                         is_busy.set(true);
                         spawn(async move {
                             match gateway.transfer_ore(amount, recipient, memo).await {
                                 Ok(sig) => {
                                     log::info!("Transfer: {:?}", sig);
-                                    balance_handle.restart();
+                                    ore_balance.restart();
                                     is_busy.set(false);
                                     send_step.set(SendStep::Done);
                                 }

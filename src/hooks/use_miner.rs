@@ -2,17 +2,16 @@ use dioxus::prelude::*;
 use dioxus_std::utils::channel::use_channel;
 
 use super::{
-    use_gateway, use_miner_toolbar_state, use_power_level, use_priority_fee, use_pubkey,
-    ProofHandle,
+    use_gateway, use_miner_toolbar_state, use_power_level, use_priority_fee, use_proof, use_pubkey,
 };
 use crate::miner::{Miner, WebWorkerResponse, WEB_WORKERS};
 
 pub fn use_miner() -> Signal<Miner> {
     let mut cx = use_channel::<WebWorkerResponse>(WEB_WORKERS);
     let mut toolbar_state = use_miner_toolbar_state();
+    let mut proof = use_proof();
     let power_level = use_power_level();
     let priority_fee = use_priority_fee();
-    let proof_handle = use_context::<ProofHandle>();
     let pubkey = use_pubkey();
     let gateway = use_gateway();
     let miner = use_signal(|| Miner::new(cx.clone(), power_level, priority_fee));
@@ -20,7 +19,6 @@ pub fn use_miner() -> Signal<Miner> {
     // Process web worker results
     use_future(move || {
         let mut rx = cx.receiver();
-        let mut proof_handle = proof_handle.clone();
         let gateway = gateway.clone();
         async move {
             let mut messages = vec![];
@@ -33,7 +31,7 @@ pub fn use_miner() -> Signal<Miner> {
                             &messages,
                             &mut toolbar_state,
                             priority_fee,
-                            &mut proof_handle,
+                            &mut proof,
                             gateway.clone(),
                             pubkey,
                         )

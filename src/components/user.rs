@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
 use ore::BUS_ADDRESSES;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
@@ -128,27 +127,22 @@ pub fn User(id: String) -> Element {
                             class: "{title_class}",
                             "Staked"
                         }
-                        match balance.read().clone() {
-                            AsyncResult::Ok(balance) => {
-                                rsx! {
-                                    span {
-                                        class: "flex flex-row gap-1.5",
-                                        OreIcon {
-                                            class: "w-3.5 h-3.5 my-auto",
-                                        }
-                                        p {
-                                            class: "{value_class} truncate",
-                                            "{balance.real_number_string_trimmed()}"
-                                        }
+                        if let Some(balance) = balance.cloned() {
+                            if let Ok(balance) = balance {
+                                span {
+                                    class: "flex flex-row gap-1.5",
+                                    OreIcon {
+                                        class: "w-3.5 h-3.5 my-auto",
+                                    }
+                                    p {
+                                        class: "{value_class} truncate",
+                                        "{balance.real_number_string_trimmed()}"
                                     }
                                 }
                             }
-                            _ => {
-                                rsx! {
-                                    p {
-                                        class: "{value_class} w-16 h-8 loading rounded",
-                                    }
-                                }
+                        } else {
+                            p {
+                                class: "{value_class} w-16 h-8 loading rounded",
                             }
                         }
                     }
