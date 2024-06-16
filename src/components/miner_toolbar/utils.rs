@@ -29,7 +29,7 @@ pub async fn try_start_mining(
     let signer = signer();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
     let clock = gateway.get_clock().await.unwrap();
-    let mut cutoff_time = proof
+    let cutoff_time = proof
         .last_hash_at
         .saturating_add(60)
         .saturating_sub(clock.unix_timestamp)

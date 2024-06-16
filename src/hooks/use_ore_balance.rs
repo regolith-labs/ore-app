@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
-use crate::gateway::{ore_token_account_address, AsyncResult, GatewayError, GatewayResult};
+use crate::gateway::{ore_token_account_address, GatewayError, GatewayResult};
 
 use super::{use_gateway, use_pubkey};
 

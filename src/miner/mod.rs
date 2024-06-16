@@ -119,7 +119,7 @@ impl Miner {
                     toolbar_state.set_status_message(MinerStatusMessage::Searching);
                     if let Ok(proof) = gateway.get_proof(pubkey).await {
                         if let Ok(clock) = gateway.get_clock().await {
-                            let mut cutoff_time = proof
+                            let cutoff_time = proof
                                 .last_hash_at
                                 .saturating_add(60)
                                 .saturating_sub(clock.unix_timestamp)
