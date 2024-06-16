@@ -1,23 +1,17 @@
 use dioxus::prelude::*;
-use dioxus_router::prelude::Link;
-use solana_client_wasm::solana_sdk::{blake3::Hash as Blake3Hash, signer::Signer};
+use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 
 use crate::{
-    components::{ActivityIndicator, Spinner, StopButton, WarningIcon},
-    gateway::signer,
+    components::{ActivityIndicator, Spinner, StopButton},
     hooks::{
-        use_gateway, use_miner, use_miner_toolbar_state, use_power_level, use_priority_fee,
-        MinerToolbarState, PowerLevel, PriorityFee, ReadMinerToolbarState, UpdateMinerToolbarState,
+        use_miner_toolbar_state, use_power_level, use_priority_fee, MinerStatusMessage, PowerLevel,
+        PriorityFee, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     miner::Miner,
-    route::Route,
 };
-
-use super::MinerStatusMessage;
 
 #[component]
 pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
-    let gateway = use_gateway();
     let mut time_remaining = use_signal(|| 0);
     let mut toolbar_state = use_miner_toolbar_state();
 

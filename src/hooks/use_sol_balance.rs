@@ -34,7 +34,7 @@ pub fn use_sol_balance() -> Signal<AsyncResult<SolBalance>> {
 
 pub fn use_sol_balance_provider() {
     use_context_provider::<Signal<AsyncResult<SolBalance>>>(|| Signal::new(AsyncResult::Loading));
-    let mut balance = use_context::<Signal<AsyncResult<SolBalance>>>();
+    let balance = use_context::<Signal<AsyncResult<SolBalance>>>();
     let address = use_pubkey();
     let gateway = use_gateway();
 

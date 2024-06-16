@@ -1,20 +1,19 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pubkey};
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::Copyable,
     gateway::AsyncResult,
     hooks::{
         use_is_onboarded, use_miner_toolbar_state, use_pubkey, use_sol_balance, IsOnboarded,
-        MinerStatus, MinerToolbarState, ReadMinerToolbarState, SolBalanceHandle,
-        SolBalanceHandleOp, UpdateMinerToolbarState,
+        ReadMinerToolbarState, SolBalanceHandle, SolBalanceHandleOp,
     },
 };
 
 pub fn MinerToolbarInsufficientFunds() -> Element {
     let sol_balance = use_sol_balance();
     let mut sol_balance_handle = use_context::<Signal<SolBalanceHandle>>();
-    let mut toolbar_state = use_miner_toolbar_state();
+    let toolbar_state = use_miner_toolbar_state();
     let mut is_onboarded = use_is_onboarded();
 
     use_effect(move || {

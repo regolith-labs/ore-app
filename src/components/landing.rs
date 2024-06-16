@@ -212,8 +212,12 @@ fn TransfersSection() -> Element {
                         }
                     }
                     for (i, transfer) in transfers.data.iter().enumerate() {
-                        SimpleTransferRow {
-                            transfer: transfer.clone()
+                        if i.le(&5) {
+                            SimpleTransferRow {
+                                transfer: transfer.clone()
+                            }
+                        } else {
+                            div {}
                         }
                     }
                 }
@@ -322,17 +326,5 @@ fn OreValue(title: String, amount: String) -> Element {
             }
         }
 
-    }
-}
-
-fn QuestionBreak() -> Element {
-    rsx! {
-        div {
-            class: "bg-green-500 text-white w-full py-16",
-            p {
-                class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-hero text-center",
-                "How much will you mine?"
-            }
-        }
     }
 }

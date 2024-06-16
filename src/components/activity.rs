@@ -1,4 +1,3 @@
-use dioxus_router::components::Link;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -7,15 +6,14 @@ use ore_types::{response::ListTransfersResponse, Transfer, TransferType};
 
 use crate::{
     components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
-    gateway::AsyncResult,
     hooks::{use_pubkey, use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
     route::Route,
 };
 
 pub fn Activity() -> Element {
-    let mut filter = use_signal(|| ActivityFilter::Global);
-    let mut offset = use_signal(|| 0u64);
-    let transfers = use_transfers(filter.clone(), offset.clone());
+    let filter = use_signal(|| ActivityFilter::Global);
+    let offset = use_signal(|| 0u64);
+    let transfers = use_transfers(filter, offset);
     let e = if let Some(transfers) = transfers.read().clone() {
         match transfers {
             Ok(transfers) => {

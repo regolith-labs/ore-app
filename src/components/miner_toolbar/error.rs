@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{MinerToolbarInsufficientFunds, StartButton},
-    hooks::{use_miner_toolbar_state, MinerToolbarState, ReadMinerToolbarState},
+    hooks::{use_miner_toolbar_state, ReadMinerToolbarState},
 };
 
 pub fn MinerToolbarError() -> Element {

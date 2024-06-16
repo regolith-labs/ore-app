@@ -2,10 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     components::PauseIcon,
-    hooks::{
-        use_miner, use_miner_toolbar_state, MinerStatus, MinerToolbarState, UpdateMinerToolbarState,
-    },
-    miner::Miner,
+    hooks::{use_miner_toolbar_state, UpdateMinerToolbarState},
 };
 
 pub fn StopButton() -> Element {
@@ -17,7 +14,7 @@ pub fn StopButton() -> Element {
             onclick: move |e| {
                 // miner.read().stop();
                 toolbar_state.pause();
-                e.cancel_bubble();
+                e.stop_propagation();
             },
             PauseIcon {
                 class: "w-6 h-6 my-auto"

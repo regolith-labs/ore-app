@@ -10,13 +10,13 @@ pub enum GatewayError {
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
-    SimulationFailed,
+    // SimulationFailed,
     RequestFailed,
     Unknown,
 }
 
 impl From<reqwest::Error> for GatewayError {
-    fn from(value: reqwest::Error) -> Self {
+    fn from(_value: reqwest::Error) -> Self {
         GatewayError::RequestFailed
     }
 }

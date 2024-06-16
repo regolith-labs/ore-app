@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use dioxus_router::{components::Link, prelude::use_navigator};
+use dioxus_router::components::Link;
 use ore::BUS_ADDRESSES;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
@@ -223,35 +223,4 @@ pub fn UserActivity(user_id: Pubkey) -> Element {
         }
     };
     e
-    // let (transfers, has_more) = use_user_transfers(user_id, offset);
-    // let e = match transfers.read().clone() {
-    //     AsyncResult::Ok(transfers) => {
-    //         rsx! {
-    //             div {
-    //                 class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
-    //                 div {
-    //                     class: "flex flex-row justify-between",
-    //                     h2 {
-    //                         class: "text-lg md:text-2xl font-bold",
-    //                         "Activity"
-    //                     }
-    //                 }
-    //                 ActivityTable {
-    //                     offset,
-    //                     transfers,
-    //                     has_more
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     _ => {
-    //         rsx! {
-    //             div {
-    //                 class: "flex flex-row h-64 w-full loading rounded",
-    //             }
-    //         }
-    //     }
-    // };
-    // e
-    // None
 }

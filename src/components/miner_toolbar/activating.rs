@@ -5,8 +5,8 @@ use crate::{
     components::{try_start_mining, Spinner},
     gateway::AsyncResult,
     hooks::{
-        use_gateway, use_miner, use_miner_toolbar_state, use_sol_balance, MinerStatus,
-        MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
+        use_gateway, use_miner_toolbar_state, use_sol_balance, MinerStatus, MinerStatusMessage,
+        ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     miner::Miner,
 };

@@ -6,30 +6,18 @@ mod layout;
 mod not_started;
 mod utils;
 
-use std::rc::Rc;
-
 pub use activating::*;
 pub use active::*;
-use drillx::Solution;
 pub use error::*;
 pub use insufficient_sol::*;
 pub use layout::*;
 pub use not_started::*;
-use ore::process_instruction;
 pub use utils::*;
 
 use dioxus::prelude::*;
-use dioxus_std::utils::channel::use_channel;
-use futures_util::stream::StreamExt;
-use solana_client_wasm::solana_sdk::{blake3::Hash as Blake3Hash, pubkey::Pubkey};
 
-use crate::{
-    gateway::{self, Gateway},
-    hooks::{
-        use_miner, use_miner_toolbar_state, MinerStatus, MinerStatusMessage, MinerToolbarState,
-        PriorityFee, ProofHandle, ReadMinerToolbarState, UpdateMinerToolbarState,
-    },
-    miner::{submit_solution, WebWorkerResponse, WEB_WORKERS},
+use crate::hooks::{
+    use_miner, use_miner_toolbar_state, MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
 };
 
 #[component]
@@ -65,7 +53,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
             class: "{class} {height} {bg} {display}",
             onclick: move |e| {
                 toolbar_state.set_is_open(true);
-                e.cancel_bubble();
+                e.stop_propagation();
             },
             div {
                 class: "flex flex-row justify-between w-full max-w-[96rem] mx-auto h-full",
@@ -90,7 +78,6 @@ pub fn MinerToolbar(hidden: bool) -> Element {
                             MinerToolbarError {}
                         }
                     }
-                    _ => None
                 }
             }
         }

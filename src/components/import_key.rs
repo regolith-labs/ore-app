@@ -1,12 +1,7 @@
 use dioxus::prelude::*;
-use dioxus_router::prelude::use_navigator;
 use solana_client_wasm::solana_sdk::{
-    bs58,
-    native_token::{lamports_to_sol, LAMPORTS_PER_SOL},
-    signature::Keypair,
-    signer::Signer,
+    bs58, native_token::lamports_to_sol, signature::Keypair, signer::Signer,
 };
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::EyeSlashIcon,

@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use ore::{state::Proof, utils::AccountDeserialize};
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::gateway::{self, proof_pubkey, AsyncResult};
+use crate::gateway::{proof_pubkey, AsyncResult};
 
 use super::{use_gateway, use_pubkey};
 
