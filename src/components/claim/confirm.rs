@@ -5,8 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    hooks::{use_gateway, use_priority_fee, use_pubkey, BalanceHandle, PriorityFee},
-    ProofHandle,
+    hooks::{use_gateway, use_ore_balance, use_priority_fee, use_proof, use_pubkey, PriorityFee},
 };
 
 use super::ClaimStep;
@@ -15,8 +14,8 @@ use super::ClaimStep;
 pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
     let mut is_busy = use_signal(|| false);
     let mut priority_fee = use_priority_fee();
-    let balance_handle = use_context::<BalanceHandle>();
-    let proof_handle = use_context::<ProofHandle>();
+    let mut balance = use_ore_balance();
+    let mut proof = use_proof();
     let pubkey = use_pubkey();
     let gateway = use_gateway();
 
@@ -100,8 +99,6 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                         onclick: move |_| {
                             is_busy.set(true);
                             let gateway = gateway.clone();
-                            let mut balance_handle = balance_handle.clone();
-                            let mut proof_handle = proof_handle.clone();
                             spawn({
                                 async move {
                                     // Create associated token account, if needed
@@ -118,8 +115,8 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                                     // Claim
                                     match gateway.claim_ore(amount, priority_fee.read().0).await {
                                         Ok(_sig) => {
-                                            balance_handle.restart();
-                                            proof_handle.restart();
+                                            balance.restart();
+                                            proof.restart();
                                             is_busy.set(false);
                                             claim_step.set(ClaimStep::Done);
                                         }
