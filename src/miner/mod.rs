@@ -29,7 +29,7 @@ use crate::{
     },
 };
 
-pub const WEB_WORKERS: usize = 1;
+pub const WEB_WORKERS: usize = 8;
 
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
 pub struct Miner {

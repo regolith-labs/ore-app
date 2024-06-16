@@ -192,34 +192,35 @@ pub fn User(id: String) -> Element {
 #[component]
 pub fn UserActivity(user_id: Pubkey) -> Element {
     let offset = use_signal(|| 0u64);
-    let (transfers, has_more) = use_user_transfers(user_id, offset);
-    let e = match transfers.read().clone() {
-        AsyncResult::Ok(transfers) => {
-            rsx! {
-                div {
-                    class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
-                    div {
-                        class: "flex flex-row justify-between",
-                        h2 {
-                            class: "text-lg md:text-2xl font-bold",
-                            "Activity"
-                        }
-                    }
-                    ActivityTable {
-                        offset,
-                        transfers,
-                        has_more
-                    }
-                }
-            }
-        }
-        _ => {
-            rsx! {
-                div {
-                    class: "flex flex-row h-64 w-full loading rounded",
-                }
-            }
-        }
-    };
-    e
+    // let (transfers, has_more) = use_user_transfers(user_id, offset);
+    // let e = match transfers.read().clone() {
+    //     AsyncResult::Ok(transfers) => {
+    //         rsx! {
+    //             div {
+    //                 class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
+    //                 div {
+    //                     class: "flex flex-row justify-between",
+    //                     h2 {
+    //                         class: "text-lg md:text-2xl font-bold",
+    //                         "Activity"
+    //                     }
+    //                 }
+    //                 ActivityTable {
+    //                     offset,
+    //                     transfers,
+    //                     has_more
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     _ => {
+    //         rsx! {
+    //             div {
+    //                 class: "flex flex-row h-64 w-full loading rounded",
+    //             }
+    //         }
+    //     }
+    // };
+    // e
+    None
 }
