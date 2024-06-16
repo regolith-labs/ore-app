@@ -1,10 +1,8 @@
-use std::{fmt, io, str::FromStr};
+use std::str::FromStr;
 
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
 use is_url::is_url;
-use serde::{Deserialize, Serialize};
-use solana_client_wasm::solana_sdk::native_token::{lamports_to_sol, LAMPORTS_PER_SOL};
+use solana_client_wasm::solana_sdk::native_token::lamports_to_sol;
 
 use crate::{
     components::{Appearance, BackupKeypairWarning, Copyable},
@@ -19,7 +17,7 @@ use crate::{
 pub fn Settings() -> Element {
     let mut explorer = use_explorer();
     let mut appearance = use_appearance();
-    let mut show_backup_warning = use_show_backup_warning();
+    let show_backup_warning = use_show_backup_warning();
     let pubkey = use_pubkey();
     let sol_balance = use_sol_balance();
 

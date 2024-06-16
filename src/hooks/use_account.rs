@@ -3,7 +3,7 @@ use ore::utils::AccountDeserialize;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use web_time::Duration;
 
-use crate::gateway::{self, AsyncResult};
+use crate::gateway::AsyncResult;
 
 use super::use_gateway;
 

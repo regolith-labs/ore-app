@@ -1,13 +1,8 @@
-use dioxus::hooks::Coroutine;
 use dioxus_std::utils::channel::UseChannel;
-use gloo_storage::{LocalStorage, Storage};
-use js_sys::{Int32Array, SharedArrayBuffer};
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
-use web_sys::{
-    window, DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, WorkerType,
-};
+use web_sys::{DedicatedWorkerGlobalScope, MessageEvent, Worker, WorkerOptions, WorkerType};
 use web_time::Instant;
 
 /// Mining request for web workers

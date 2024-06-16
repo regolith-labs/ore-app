@@ -1,4 +1,4 @@
-use std::{fmt, io, ops::Deref, str::FromStr};
+use std::{fmt, io, str::FromStr};
 
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};

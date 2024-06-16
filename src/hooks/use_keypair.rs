@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signature::Keypair, signature::Signer};
 
 use crate::hooks::use_persistent::use_persistent;

@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use dioxus_router::{components::Link, prelude::use_navigator};
 use ore::{BUS_ADDRESSES, TREASURY_ADDRESS};
 use ore_types::TransferType;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
@@ -9,7 +8,6 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{BackButton, Copyable, OreIcon},
-    gateway::AsyncResult,
     hooks::{use_datetime, use_explorer_transaction_url, use_transfer},
     route::Route,
 };

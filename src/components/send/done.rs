@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
 
 use crate::route::Route;
 

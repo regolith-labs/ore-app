@@ -27,7 +27,6 @@ pub async fn try_start_mining(
 
     // Start mining
     let signer = signer();
-    let treasury = gateway.get_treasury().await.unwrap();
     let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
     let clock = gateway.get_clock().await.unwrap();
     let mut cutoff_time = proof

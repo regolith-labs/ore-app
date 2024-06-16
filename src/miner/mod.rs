@@ -7,22 +7,18 @@ use std::rc::Rc;
 
 use dioxus::prelude::*;
 use dioxus_std::utils::channel::UseChannel;
-use drillx::{Hash, Solution};
-use ore::{state::Treasury, BUS_COUNT, EPOCH_DURATION};
+use drillx::Solution;
+use ore::{BUS_COUNT, EPOCH_DURATION};
 use rand::Rng;
-use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{
     blake3::Hash as Blake3Hash, compute_budget::ComputeBudgetInstruction, pubkey::Pubkey,
     signature::Signature, signer::Signer,
 };
 use web_sys::Worker;
-use web_time::Duration;
 
 use crate::{
-    gateway::{
-        signer, AsyncResult, Gateway, GatewayError, GatewayResult, CU_LIMIT_MINE, CU_LIMIT_RESET,
-    },
+    gateway::{signer, Gateway, GatewayResult, CU_LIMIT_MINE},
     hooks::{
         MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee, ProofHandle,
         ReadMinerToolbarState, UpdateMinerToolbarState,

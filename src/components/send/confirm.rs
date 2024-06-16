@@ -22,7 +22,7 @@ pub fn SendConfirm(
     let gateway = use_gateway();
     let balance_handle = use_ore_balance_handle();
 
-    render! {
+    rsx! {
         div {
             class: "flex flex-col h-full grow gap-12",
             div {

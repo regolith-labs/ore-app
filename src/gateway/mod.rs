@@ -44,7 +44,7 @@ pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01HTD8PPGDM1JBVQVEVJKXZ47F";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
-pub const CU_LIMIT_RESET: u32 = 12_200;
+// pub const CU_LIMIT_RESET: u32 = 12_200;
 pub const CU_LIMIT_MINE: u32 = 500_000;
 
 const RPC_RETRIES: usize = 0;
@@ -86,7 +86,7 @@ impl Gateway {
         Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
     }
 
-    pub async fn get_bus(&self, id: usize) -> GatewayResult<Bus> {
+    pub async fn _get_bus(&self, id: usize) -> GatewayResult<Bus> {
         let bus_address = BUS_ADDRESSES.get(id).unwrap();
         let data = self
             .rpc
@@ -96,7 +96,7 @@ impl Gateway {
         Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
     }
 
-    pub async fn get_treasury(&self) -> GatewayResult<Treasury> {
+    pub async fn _get_treasury(&self) -> GatewayResult<Treasury> {
         let data = self
             .rpc
             .get_account_data(&TREASURY_ADDRESS)
@@ -114,7 +114,7 @@ impl Gateway {
         Ok(*Config::try_from_bytes(&data).expect("Failed to parse config account"))
     }
 
-    pub async fn get_token_account(
+    pub async fn _get_token_account(
         &self,
         pubkey: &Pubkey,
     ) -> GatewayResult<Option<UiTokenAccount>> {
@@ -366,8 +366,7 @@ impl Gateway {
 
     // API
     pub async fn get_transfer(&self, sig: String) -> GatewayResult<Transfer> {
-        let client = reqwest::Client::new();
-        match client
+        match reqwest::Client::new()
             .get(format!("{}/transfers/{}", self.api_url, sig))
             .send()
             .await
@@ -391,8 +390,7 @@ impl Gateway {
         if let Some(user_str) = user_ref {
             query.push(("user", user_str));
         };
-        let client = reqwest::Client::new();
-        match client
+        match reqwest::Client::new()
             .get(format!("{}/transfers", &self.api_url))
             .query(&query)
             .send()
