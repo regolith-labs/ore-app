@@ -192,6 +192,37 @@ pub fn User(id: String) -> Element {
 #[component]
 pub fn UserActivity(user_id: Pubkey) -> Element {
     let offset = use_signal(|| 0u64);
+    let transfers = use_user_transfers(user_id, offset);
+    let e = if let Some(transfers) = transfers.read().clone() {
+        match transfers {
+            Ok(transfers) => {
+                rsx! {
+                    div {
+                        class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
+                        div {
+                            class: "flex flex-row justify-between",
+                            h2 {
+                                class: "text-lg md:text-2xl font-bold",
+                                "Activity"
+                            }
+                        }
+                        ActivityTable {
+                            offset,
+                            transfers,
+                        }
+                    }
+                }
+            }
+            _ => None,
+        }
+    } else {
+        rsx! {
+            div {
+                class: "flex flex-row h-64 w-full loading rounded",
+            }
+        }
+    };
+    e
     // let (transfers, has_more) = use_user_transfers(user_id, offset);
     // let e = match transfers.read().clone() {
     //     AsyncResult::Ok(transfers) => {
@@ -222,5 +253,5 @@ pub fn UserActivity(user_id: Pubkey) -> Element {
     //     }
     // };
     // e
-    None
+    // None
 }

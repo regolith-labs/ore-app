@@ -200,28 +200,30 @@ fn SectionA() -> Element {
 fn TransfersSection() -> Element {
     let filter = use_signal(|| ActivityFilter::Global);
     let offset = use_signal(|| 0);
-    // TODO
-    // let (transfers, _) = use_transfers(filter, offset);
-    // let e = match transfers.read().clone() {
-    //     AsyncResult::Ok(transfers) => {
-    //         rsx! {
-    //             if transfers.is_empty() {
-    //                 p {
-    //                     class: "text-sm opacity-50",
-    //                     "No transactions yet"
-    //                 }
-    //             }
-    //             for (i, transfer) in transfers.iter().enumerate() {
-    //                 SimpleTransferRow {
-    //                     transfer: transfer.clone()
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     _ => None,
-    // };
-    // e
-    None
+    let transfers = use_transfers(filter, offset);
+    let e = if let Some(transfers) = transfers.read().clone() {
+        match transfers {
+            Ok(transfers) => {
+                rsx! {
+                    if transfers.data.is_empty() {
+                        p {
+                            class: "text-sm opacity-50",
+                            "No transactions yet"
+                        }
+                    }
+                    for (i, transfer) in transfers.data.iter().enumerate() {
+                        SimpleTransferRow {
+                            transfer: transfer.clone()
+                        }
+                    }
+                }
+            }
+            _ => None,
+        }
+    } else {
+        None
+    };
+    e
 }
 
 #[component]
