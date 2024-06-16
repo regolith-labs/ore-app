@@ -1,6 +1,5 @@
 mod web_worker;
 
-use gloo_storage::{LocalStorage, Storage};
 pub use web_worker::*;
 
 use std::rc::Rc;
@@ -47,21 +46,21 @@ impl Miner {
         }
     }
 
-    pub async fn start_mining(&self, challenge: [u8; 32], cutoff_time: u64) {
-        self.start_mining_web(challenge, cutoff_time).await;
+    pub async fn start_mining(&self, challenge: [u8; 32], offset: u64, cutoff_time: u64) {
+        self.start_mining_web(challenge, offset, cutoff_time).await;
     }
 
-    pub async fn start_mining_web(&self, challenge: [u8; 32], cutoff_time: u64) {
-        LocalStorage::set("flag", false).ok();
+    pub async fn start_mining_web(&self, challenge: [u8; 32], offset: u64, cutoff_time: u64) {
         let nonce = u64::MAX.saturating_div(self.web_worker.len() as u64);
         for (i, web_worker) in self.web_worker.iter().enumerate() {
-            let nonce = nonce.saturating_mul(i as u64);
+            let nonce = nonce.saturating_mul(i as u64).saturating_add(offset);
             web_worker
                 .post_message(
                     &to_value(
                         &(WebWorkerRequest {
                             challenge,
                             nonce: nonce.to_le_bytes(),
+                            offset,
                             cutoff_time,
                         }),
                     )
@@ -83,6 +82,8 @@ impl Miner {
         log::info!("Batch: {:?}", messages);
 
         // Get best solution
+        let mut challenge = [0; 32];
+        let mut offset = 0;
         let mut best_difficulty = 0;
         let mut best_solution = Solution::new([0; 16], [0; 8]);
         let mut best_hash = [0u8; 32];
@@ -91,7 +92,16 @@ impl Miner {
                 best_solution = drillx::Solution::new(msg.digest, msg.nonce);
                 best_difficulty = msg.difficulty;
                 best_hash = msg.hash;
+                offset = msg.offset;
+                challenge = msg.challenge;
             }
+        }
+
+        // Kickoff new batch
+        if best_difficulty.lt(&ore::MIN_DIFFICULTY) {
+            log::info!("New batch {:?}", offset);
+            self.start_mining(challenge, offset, 0).await;
+            return;
         }
 
         // Update toolbar state
@@ -114,10 +124,8 @@ impl Miner {
                                 .saturating_add(60)
                                 .saturating_sub(clock.unix_timestamp)
                                 .max(0) as u64;
-                            if cutoff_time.eq(&0) {
-                                cutoff_time = 60;
-                            }
-                            self.start_mining(proof.challenge.into(), cutoff_time).await;
+                            self.start_mining(proof.challenge.into(), 0, cutoff_time)
+                                .await;
                         }
                     }
                 }

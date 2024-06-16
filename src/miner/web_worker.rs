@@ -10,6 +10,7 @@ use web_time::Instant;
 pub struct WebWorkerRequest {
     pub challenge: [u8; 32],
     pub nonce: [u8; 8],
+    pub offset: u64,
     pub cutoff_time: u64,
 }
 
@@ -20,6 +21,8 @@ pub struct WebWorkerResponse {
     pub digest: [u8; 16],
     pub nonce: [u8; 8],
     pub difficulty: u32,
+    pub offset: u64,
+    pub challenge: [u8; 32],
 }
 
 #[wasm_bindgen]
@@ -34,7 +37,7 @@ pub fn start_worker() {
     scope.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
         Closure::<dyn Fn(MessageEvent)>::new(move |e: MessageEvent| {
             let req: WebWorkerRequest = from_value(e.data()).unwrap();
-            let res = find_next_hash(req.challenge, req.nonce, req.cutoff_time);
+            let res = find_next_hash(req.challenge, req.nonce, req.offset, req.cutoff_time);
             scope_.post_message(&to_value(&res).unwrap()).unwrap();
         })
         .into_js_value(),
@@ -76,8 +79,14 @@ pub fn create_web_worker(cx: UseChannel<WebWorkerResponse>) -> Worker {
     worker
 }
 
-pub fn find_next_hash(challenge: [u8; 32], nonce: [u8; 8], cutoff_time: u64) -> WebWorkerResponse {
+pub fn find_next_hash(
+    challenge: [u8; 32],
+    nonce: [u8; 8],
+    offset: u64,
+    cutoff_time: u64,
+) -> WebWorkerResponse {
     let timer = Instant::now();
+    let mut i = 0;
     let mut nonce = u64::from_le_bytes(nonce);
     let mut best_hash = [0u8; 32];
     let mut best_digest = [0u8; 16];
@@ -103,15 +112,16 @@ pub fn find_next_hash(challenge: [u8; 32], nonce: [u8; 8], cutoff_time: u64) -> 
                 timer.elapsed().as_secs()
             );
 
-            // Break if time has elapsed and min difficulty is met
-            if timer.elapsed().as_secs().gt(&cutoff_time)
-            // && best_difficulty.ge(&ore::MIN_DIFFICULTY)
-            {
-                break;
+            // Break if time has elapsed and batch size is processed
+            if timer.elapsed().as_secs().gt(&cutoff_time) {
+                if i.ge(&100) {
+                    break;
+                }
             }
         }
 
         nonce += 1;
+        i += 1;
     }
 
     WebWorkerResponse {
@@ -119,5 +129,7 @@ pub fn find_next_hash(challenge: [u8; 32], nonce: [u8; 8], cutoff_time: u64) -> 
         hash: best_hash,
         nonce: best_nonce,
         difficulty: best_difficulty,
+        offset: offset + i,
+        challenge,
     }
 }
