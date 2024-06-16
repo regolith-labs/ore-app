@@ -3,7 +3,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use dioxus::prelude::*;
-use ore_types::{Transfer, TransferType};
+use ore_types::{response::ListTransfersResponse, Transfer, TransferType};
 
 use crate::{
     components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
@@ -15,36 +15,37 @@ use crate::{
 pub fn Activity() -> Element {
     let mut filter = use_signal(|| ActivityFilter::Global);
     let mut offset = use_signal(|| 0u64);
-    let (transfers, has_more) = use_transfers(filter, offset);
-    let e = match transfers.read().clone() {
-        AsyncResult::Ok(transfers) => {
-            rsx! {
-                div {
-                    class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
+    let transfers = use_transfers(filter.clone(), offset.clone());
+    let e = if let Some(transfers) = transfers.read().clone() {
+        match transfers {
+            Ok(transfers) => {
+                rsx! {
                     div {
-                        class: "flex flex-row justify-between",
-                        h2 {
-                            class: "text-lg md:text-2xl font-bold my-auto",
-                            "Activity"
+                        class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
+                        div {
+                            class: "flex flex-row justify-between",
+                            h2 {
+                                class: "text-lg md:text-2xl font-bold my-auto",
+                                "Activity"
+                            }
+                            FilterButtons {
+                                filter,
+                                offset
+                            }
                         }
-                        FilterButtons {
-                            filter,
-                            offset
+                        ActivityTable {
+                            offset,
+                            transfers
                         }
-                    }
-                    ActivityTable{
-                        offset,
-                        transfers,
-                        has_more
                     }
                 }
             }
+            _ => None,
         }
-        _ => {
-            rsx! {
-                div {
-                    class: "flex flex-row h-64 w-full loading rounded",
-                }
+    } else {
+        rsx! {
+            div {
+                class: "flex flex-row h-64 w-full loading rounded",
             }
         }
     };
@@ -93,12 +94,8 @@ pub fn FilterButtons(filter: Signal<ActivityFilter>, offset: Signal<u64>) -> Ele
 }
 
 #[component]
-pub fn ActivityTable(
-    offset: Signal<u64>,
-    transfers: Vec<Transfer>,
-    has_more: Signal<bool>,
-) -> Element {
-    if transfers.is_empty() {
+pub fn ActivityTable(offset: Signal<u64>, transfers: ListTransfersResponse) -> Element {
+    if transfers.data.is_empty() {
         rsx! {
             p {
                 class: "text-sm text-gray-300 py-2 sm:px-1",
@@ -111,7 +108,7 @@ pub fn ActivityTable(
                 class: "flex flex-col gap-4 -mx-2 sm:mx-0",
                 div {
                     class: "h-full w-full max-w-full",
-                    for transfer in transfers {
+                    for transfer in transfers.data {
                         ActivityRow {
                             transfer
                         }
@@ -119,7 +116,7 @@ pub fn ActivityTable(
                 }
                 ActivityTablePagination {
                     offset,
-                    has_more
+                    has_more: transfers.has_more
                 }
             }
         }
@@ -127,7 +124,7 @@ pub fn ActivityTable(
 }
 
 #[component]
-pub fn ActivityTablePagination(offset: Signal<u64>, has_more: Signal<bool>) -> Element {
+pub fn ActivityTablePagination(offset: Signal<u64>, has_more: bool) -> Element {
     let should_show = offset.read().gt(&0);
     let mut offset = offset.clone();
     rsx! {
@@ -143,9 +140,9 @@ pub fn ActivityTablePagination(offset: Signal<u64>, has_more: Signal<bool>) -> E
                     "←"
                 }
             } else {
-                div{}
+                div {}
             }
-            if *has_more.read() {
+            if has_more {
                 button {
                     onclick: move |_| {
                         let page_up = offset.read().saturating_add(ACTIVITY_TABLE_PAGE_LIMIT as u64);

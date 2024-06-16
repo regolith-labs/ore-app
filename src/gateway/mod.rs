@@ -11,7 +11,7 @@ use ore::{
     utils::AccountDeserialize,
     BUS_ADDRESSES, CONFIG_ADDRESS, TREASURY_ADDRESS,
 };
-use ore_types::{response::GetTransfersResponse, Transfer};
+use ore_types::{response::ListTransfersResponse, Transfer};
 pub use pubkey::*;
 use solana_client_wasm::{
     solana_sdk::{
@@ -365,18 +365,15 @@ impl Gateway {
     }
 
     // API
-    pub async fn get_transfer(&self, sig: String) -> Option<Transfer> {
+    pub async fn get_transfer(&self, sig: String) -> GatewayResult<Transfer> {
         let client = reqwest::Client::new();
         match client
             .get(format!("{}/transfers/{}", self.api_url, sig))
             .send()
             .await
         {
-            Ok(res) => res.json::<Transfer>().await.ok(),
-            Err(e) => {
-                log::error!("{:?}", e);
-                None
-            }
+            Ok(res) => res.json::<Transfer>().await.map_err(GatewayError::from),
+            Err(e) => Err(e.into()),
         }
     }
 
@@ -385,7 +382,7 @@ impl Gateway {
         user: Option<Pubkey>,
         offset: u64,
         limit: usize,
-    ) -> Option<GetTransfersResponse> {
+    ) -> GatewayResult<ListTransfersResponse> {
         let offset = offset.to_string();
         let limit = limit.to_string();
         let mut query = vec![("offset", offset.as_str()), ("limit", limit.as_str())];
@@ -401,11 +398,11 @@ impl Gateway {
             .send()
             .await
         {
-            Ok(res) => res.json::<GetTransfersResponse>().await.ok(),
-            Err(e) => {
-                log::error!("{:?}", e);
-                None
-            }
+            Ok(res) => res
+                .json::<ListTransfersResponse>()
+                .await
+                .map_err(GatewayError::from),
+            Err(e) => Err(e.into()),
         }
     }
 }

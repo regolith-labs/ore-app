@@ -37,7 +37,7 @@ pub fn Balance() -> Element {
                                 }
                                 SendButton {}
                             }
-                            UnclaimedRewards {}
+                            StakeBalance {}
                         }
                     }
                 }
@@ -53,9 +53,8 @@ pub fn Balance() -> Element {
     }
 }
 
-pub fn UnclaimedRewards() -> Element {
+pub fn StakeBalance() -> Element {
     let proof = use_proof();
-
     if let AsyncResult::Ok(proof) = *proof.read() {
         if proof.balance.gt(&0) {
             return rsx! {
@@ -65,7 +64,7 @@ pub fn UnclaimedRewards() -> Element {
                         class: "flex flex-col gap-2",
                         p {
                             class: "font-medium text-xs text-gray-300",
-                            "Mining rewards"
+                            "Staking balance"
                         }
                         div {
                             class: "flex flex-row gap-2",
