@@ -24,8 +24,8 @@ pub fn ImportKey() -> Element {
     use_effect(move || {
         let current_step = *step.read();
         if let ImportKeyStep::Loading = current_step {
-            if let AsyncResult::Ok(sol_balance) = *sol_balance.read() {
-                if sol_balance.0.gt(&0) {
+            if let Some(Ok(sol_balance)) = *sol_balance.read() {
+                if sol_balance.gt(&0) {
                     step.set(ImportKeyStep::Warning)
                 } else {
                     step.set(ImportKeyStep::Import)
@@ -41,9 +41,9 @@ pub fn ImportKey() -> Element {
             }
         }
         ImportKeyStep::Warning => {
-            if let AsyncResult::Ok(sol_balance) = *sol_balance.read() {
+            if let Some(Ok(balance)) = *sol_balance.read() {
                 rsx! {
-                    ImportKeyWarning { step, balance: sol_balance.0 }
+                    ImportKeyWarning { step, balance }
                 }
             } else {
                 // TODO This should never happen. Display error

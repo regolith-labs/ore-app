@@ -3,7 +3,6 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::OreIcon,
-    gateway::AsyncResult,
     hooks::{use_ore_balance, use_proof},
     route::Route,
 };

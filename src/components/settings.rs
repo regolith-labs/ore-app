@@ -6,7 +6,7 @@ use solana_client_wasm::solana_sdk::native_token::lamports_to_sol;
 
 use crate::{
     components::{Appearance, BackupKeypairWarning, Copyable},
-    gateway::{AsyncResult, RPC_URL},
+    gateway::RPC_URL,
     hooks::{
         use_appearance, use_explorer, use_pubkey, use_rpc_url, use_show_backup_warning,
         use_sol_balance, Explorer, RpcUrl,
@@ -71,20 +71,13 @@ pub fn Settings() -> Element {
                         class: "{data_title_class}",
                         "Balance"
                     }
-                    match *sol_balance.read() {
-                        AsyncResult::Ok(balance) => {
-                            rsx! {
-                                p {
-                                    "{lamports_to_sol(balance.0)} SOL"
-                                }
-                            }
+                    if let Some(Ok(balance)) = *sol_balance.read() {
+                        p {
+                            "{lamports_to_sol(balance)} SOL"
                         }
-                        _ => {
-                            rsx! {
-                                div {
-                                    class: "flex w-32 loading rounded",
-                                }
-                            }
+                    } else {
+                        div {
+                            class: "flex w-32 loading rounded",
                         }
                     }
                 }

@@ -3,7 +3,6 @@ use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     components::{try_start_mining, Spinner},
-    gateway::AsyncResult,
     hooks::{
         use_gateway, use_miner_toolbar_state, use_sol_balance, MinerStatus, MinerStatusMessage,
         ReadMinerToolbarState, UpdateMinerToolbarState,
@@ -22,9 +21,12 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let mut sufficient_balance = use_signal(|| true);
     let mut toolbar_state = use_miner_toolbar_state();
 
-    use_effect(move || match *sol_balance.read() {
-        AsyncResult::Ok(balance) => sufficient_balance.set(balance.0.ge(&MIN_BALANCE)),
-        _ => sufficient_balance.set(false),
+    use_effect(move || {
+        if let Some(Ok(sol_balance)) = *sol_balance.read() {
+            sufficient_balance.set(sol_balance.ge(&MIN_BALANCE));
+        } else {
+            sufficient_balance.set(false);
+        }
     });
 
     use_future(move || {
@@ -45,7 +47,7 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
         }
     });
 
-    if !*sufficient_balance.read() {
+    if sol_balance.read().is_some() && !*sufficient_balance.read() {
         return rsx! {
             MinerToolbarInsufficientFunds {}
         };

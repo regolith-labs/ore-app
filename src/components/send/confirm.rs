@@ -2,9 +2,7 @@ use std::borrow::BorrowMut;
 
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
-use solana_extra_wasm::{
-    account_decoder::parse_token::UiTokenAmount, program::spl_token::amount_to_ui_amount,
-};
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},

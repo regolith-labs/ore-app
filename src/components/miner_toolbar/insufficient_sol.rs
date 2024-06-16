@@ -3,26 +3,23 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::Copyable,
-    gateway::AsyncResult,
     hooks::{
         use_is_onboarded, use_miner_toolbar_state, use_pubkey, use_sol_balance, IsOnboarded,
-        ReadMinerToolbarState, SolBalanceHandle, SolBalanceHandleOp,
+        ReadMinerToolbarState,
     },
 };
 
 pub fn MinerToolbarInsufficientFunds() -> Element {
     let sol_balance = use_sol_balance();
-    let mut sol_balance_handle = use_context::<Signal<SolBalanceHandle>>();
     let toolbar_state = use_miner_toolbar_state();
     let mut is_onboarded = use_is_onboarded();
 
+    // TODO Poll balance every 3 seconds
+
     use_effect(move || {
-        if let AsyncResult::Ok(sol_balance) = *sol_balance.read() {
-            if sol_balance.0.gt(&0) {
+        if let Some(Ok(sol_balance)) = *sol_balance.read() {
+            if sol_balance.gt(&0) {
                 is_onboarded.set(IsOnboarded(true));
-                sol_balance_handle.cancel();
-            } else {
-                sol_balance_handle.restart();
             }
         }
     });
