@@ -1,8 +1,6 @@
-mod async_result;
 mod error;
 mod pubkey;
 
-pub use async_result::*;
 use cached::proc_macro::cached;
 pub use error::*;
 use gloo_storage::{LocalStorage, Storage};
@@ -96,7 +94,7 @@ impl Gateway {
         Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
     }
 
-    pub async fn _get_treasury(&self) -> GatewayResult<Treasury> {
+    pub async fn get_treasury(&self) -> GatewayResult<Treasury> {
         let data = self
             .rpc
             .get_account_data(&TREASURY_ADDRESS)

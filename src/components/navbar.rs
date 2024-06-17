@@ -9,7 +9,6 @@ use crate::{
 use super::Appearance;
 
 pub fn Navbar() -> Element {
-    // let ping = use_ping(cx);
     let appearance = use_appearance();
     let dark = match *appearance.read() {
         Appearance::Dark => "dark",
@@ -18,14 +17,6 @@ pub fn Navbar() -> Element {
     rsx! {
         div {
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
-            // if let AsyncResult::Error(_) = ping {
-            //     rsx! {
-            //         Banner {
-            //             text: "Error connecting to Solana...".to_string(),
-            //             banner_type: BannerType::Error
-            //         }
-            //     }
-            // }
             div {
                 class: "flex w-full",
                 div {

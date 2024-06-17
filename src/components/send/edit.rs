@@ -5,7 +5,6 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::WarningIcon,
-    gateway::AsyncResult,
     hooks::{use_ore_balance, UiTokenAmountBalance},
 };
 
