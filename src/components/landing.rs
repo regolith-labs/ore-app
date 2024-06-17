@@ -5,7 +5,6 @@ use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
     components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon},
-    gateway::AsyncResult,
     hooks::{use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter},
     route::Route,
     utils::asset_path,
@@ -284,12 +283,12 @@ fn SimpleTransferRow(transfer: Transfer) -> Element {
 }
 
 fn SectionB() -> Element {
-    let (supply, _) = use_ore_supply();
-    let circulating_supply = match supply.read().clone() {
-        AsyncResult::Ok(token_amount) => token_amount.ui_amount.unwrap().to_string(),
-        AsyncResult::Loading => "-".to_string(),
-        AsyncResult::Error(_err) => "Err".to_string(),
-    };
+    let supply = use_ore_supply();
+    let circulating_supply = supply
+        .cloned()
+        .and_then(|s| s.ok())
+        .map(|s| s.ui_amount_string)
+        .unwrap_or_else(|| "Err".to_string());
     rsx! {
         div {
             class: "flex flex-col gap-12 my-auto",

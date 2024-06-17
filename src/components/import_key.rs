@@ -5,7 +5,6 @@ use solana_client_wasm::solana_sdk::{
 
 use crate::{
     components::EyeSlashIcon,
-    gateway::{AsyncResult, GatewayError},
     hooks::{use_gateway, use_keypair_persistent, use_sol_balance},
     route::Route,
 };
@@ -111,7 +110,7 @@ fn ImportKeyHeader() -> Element {
 const KEY_LENGTH: usize = 64;
 
 fn ImportKeyImport() -> Element {
-    let mut sol_balance = use_signal::<Option<AsyncResult<u64>>>(|| None);
+    let mut sol_balance = use_signal::<Option<u64>>(|| None);
     let mut keypair_persistent = use_keypair_persistent();
     let mut err_msg = use_signal::<Option<String>>(|| None);
     let mut enable_import_button = use_signal(|| false);
@@ -131,22 +130,21 @@ fn ImportKeyImport() -> Element {
                     if let Ok(kp) = Keypair::from_bytes(&bytes) {
                         enable_import_button.set(true);
                         match gateway.rpc.get_balance(&kp.pubkey()).await {
-                            Ok(b) => {
-                                sol_balance.set(Some(AsyncResult::Ok(b)));
-                            }
-                            Err(err) => {
-                                sol_balance.set(Some(AsyncResult::Error(GatewayError::from(err))));
-                            }
+                            Ok(b) => sol_balance.set(Some(b)),
+                            Err(err) => sol_balance.set(None),
                         }
                     }
                 } else if bytes.len().eq(&0) {
+                    sol_balance.set(None);
                     enable_import_button.set(false);
                     err_msg.set(None);
                 } else {
+                    sol_balance.set(None);
                     enable_import_button.set(false);
                     err_msg.set(Some("Invalid length".to_string()));
                 }
             } else {
+                sol_balance.set(None);
                 enable_import_button.set(false);
                 err_msg.set(Some("Invalid format".to_string()));
             }
@@ -179,23 +177,13 @@ fn ImportKeyImport() -> Element {
                 }
             }
             if let Some(sol_balance) = *sol_balance.read() {
-                match sol_balance {
-                    AsyncResult::Loading => {
-                        rsx! {
-                            div {
-                                class: "flex flex-row w-24 h-16 loading rounded-full",
-                            }
-                        }
-                    }
-                    AsyncResult::Ok(sol_balance) => {
-                        rsx! {
-                            p {
-                                class: "text-nowrap mx-auto text-center font-semibold",
-                                "Balance: {lamports_to_sol(sol_balance)} SOL"
-                            }
-                        }
-                    }
-                    _ => None
+                p {
+                    class: "text-nowrap mx-auto text-center font-semibold",
+                    "Balance: {lamports_to_sol(sol_balance)} SOL"
+                }
+            } else {
+                div {
+                    class: "flex flex-row w-24 h-16 loading rounded-full",
                 }
             }
             button {

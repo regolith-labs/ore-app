@@ -8,7 +8,7 @@ use edit::*;
 
 use dioxus::prelude::*;
 
-use crate::{gateway::AsyncResult, hooks::use_proof};
+use crate::hooks::use_proof;
 
 pub enum ClaimStep {
     Edit,

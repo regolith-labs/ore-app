@@ -1,10 +1,14 @@
 use dioxus::prelude::*;
-use ore::{state::Treasury, TREASURY_ADDRESS};
+use ore::state::Treasury;
 
-use crate::gateway::AsyncResult;
+use crate::gateway::GatewayResult;
 
-use super::use_account;
+use super::use_gateway;
 
-pub fn use_treasury() -> Signal<AsyncResult<Treasury>> {
-    use_account(TREASURY_ADDRESS, Some(60)).0
+pub fn use_treasury() -> Resource<GatewayResult<Treasury>> {
+    let gateway = use_gateway();
+    use_resource(move || {
+        let gateway = gateway.clone();
+        async move { gateway.get_treasury().await }
+    })
 }

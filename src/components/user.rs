@@ -10,7 +10,6 @@ use crate::{
         ActivityTable, BackButton, BusBubble, Copyable, OreIcon, SendButton, TreasuryBubble,
         UserBubble,
     },
-    gateway::AsyncResult,
     hooks::{
         use_explorer_account_url, use_ore_balance_user, use_pubkey, use_user_proof,
         use_user_transfers,
@@ -127,17 +126,15 @@ pub fn User(id: String) -> Element {
                             class: "{title_class}",
                             "Staked"
                         }
-                        if let Some(balance) = balance.cloned() {
-                            if let Ok(balance) = balance {
-                                span {
-                                    class: "flex flex-row gap-1.5",
-                                    OreIcon {
-                                        class: "w-3.5 h-3.5 my-auto",
-                                    }
-                                    p {
-                                        class: "{value_class} truncate",
-                                        "{balance.real_number_string_trimmed()}"
-                                    }
+                        if let Some(Ok(balance)) = balance.cloned() {
+                            span {
+                                class: "flex flex-row gap-1.5",
+                                OreIcon {
+                                    class: "w-3.5 h-3.5 my-auto",
+                                }
+                                p {
+                                    class: "{value_class} truncate",
+                                    "{balance.real_number_string_trimmed()}"
                                 }
                             }
                         } else {
@@ -146,32 +143,25 @@ pub fn User(id: String) -> Element {
                             }
                         }
                     }
-                    match *proof.read() {
-                        AsyncResult::Ok(proof) => {
-                            rsx! {
-                                if proof.balance.gt(&0) {
-                                    div {
-                                        class: "{container_class}",
-                                        p {
-                                            class: "{title_class}",
-                                            "Unclaimed rewards"
-                                        }
-                                        span {
-                                            class: "flex flex-row gap-1.5",
-                                            OreIcon {
-                                                class: "w-3.5 h-3.5 my-auto",
-                                            }
-                                            p {
-                                                class: "{value_class} truncate",
-                                                "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
-                                           }
-                                        }
+                    if let Some(Ok(proof)) = proof.cloned() {
+                        if proof.balance.gt(&0) {
+                            div {
+                                class: "{container_class}",
+                                p {
+                                    class: "{title_class}",
+                                    "Unclaimed rewards"
+                                }
+                                span {
+                                    class: "flex flex-row gap-1.5",
+                                    OreIcon {
+                                        class: "w-3.5 h-3.5 my-auto",
                                     }
+                                    p {
+                                        class: "{value_class} truncate",
+                                        "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
+                                   }
                                 }
                             }
-                        }
-                        _ => {
-                            rsx! {}
                         }
                     }
                 }
