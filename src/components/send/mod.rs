@@ -30,9 +30,6 @@ pub fn Send(to: Option<String>) -> Element {
         Err(_) => 0,
     };
 
-    // rsx! {
-    //     div {
-    //         class: "flex flex-col grow gap-y-8 my-auto",
     let e = match *send_step.read() {
         SendStep::Edit => {
             rsx! {
@@ -63,6 +60,4 @@ pub fn Send(to: Option<String>) -> Element {
     };
 
     e
-    //     }
-    // }
 }
