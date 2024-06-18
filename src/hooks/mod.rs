@@ -16,7 +16,7 @@ mod use_rpc;
 mod use_show_backup_warning;
 mod use_sol_balance;
 mod use_transfers;
-mod use_treasury;
+// mod use_treasury;
 
 pub use use_appearance::*;
 pub use use_date::*;
@@ -35,4 +35,4 @@ pub use use_rpc::*;
 pub use use_show_backup_warning::*;
 pub use use_sol_balance::*;
 pub use use_transfers::*;
-pub use use_treasury::*;
+// pub use use_treasury::*;

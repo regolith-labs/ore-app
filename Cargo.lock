@@ -3462,6 +3462,7 @@ dependencies = [
  "gloo-storage 0.3.0",
  "is-url",
  "js-sys",
+ "lazy_static",
  "log",
  "ore-program",
  "ore-types",

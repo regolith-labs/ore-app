@@ -46,7 +46,6 @@ pub fn ToolbarClose(hidden: bool) -> Element {
         button {
             class: "fixed transition-opacity flex flex-row left-0 top-0 h-screen w-screen bg-black {opacity}",
             onclick: move |_e| {
-                log::info!("Toolbar close");
                 toolbar_state.set_is_open(false);
             }
         }

@@ -7,7 +7,7 @@ use super::{
 use crate::miner::{Miner, WebWorkerResponse, WEB_WORKERS};
 
 pub fn use_miner() -> Signal<Miner> {
-    let mut cx = use_channel::<WebWorkerResponse>(WEB_WORKERS);
+    let mut cx = use_channel::<WebWorkerResponse>(*WEB_WORKERS);
     let mut toolbar_state = use_miner_toolbar_state();
     let mut proof = use_proof();
     let power_level = use_power_level();
@@ -30,7 +30,6 @@ pub fn use_miner() -> Signal<Miner> {
                         .process_web_worker_results(
                             &messages,
                             &mut toolbar_state,
-                            priority_fee,
                             &mut proof,
                             gateway.clone(),
                             pubkey,
