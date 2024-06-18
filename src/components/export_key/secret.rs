@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use dioxus_router::prelude::Link;
 
 use crate::{
     components::{Copyable, EyeSlashIcon},
@@ -7,10 +6,9 @@ use crate::{
     route::Route,
 };
 
-#[component]
-pub fn ExportKeySecret(cx: Scope) -> Element {
-    let keypair = use_keypair(cx);
-    render! {
+pub fn ExportKeySecret() -> Element {
+    let keypair = use_keypair();
+    rsx! {
         div {
             class: "flex flex-col gap-16 grow w-full h-full",
             div {

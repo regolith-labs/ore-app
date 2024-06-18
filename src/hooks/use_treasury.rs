@@ -1,11 +1,14 @@
 use dioxus::prelude::*;
-use dioxus_std::utils::rw::UseRw;
-use ore::{state::Treasury, TREASURY_ADDRESS};
+use ore::state::Treasury;
 
-use crate::gateway::AsyncResult;
+use crate::gateway::GatewayResult;
 
-use super::use_account;
+use super::use_gateway;
 
-pub fn use_treasury(cx: &ScopeState) -> (&mut UseRw<AsyncResult<Treasury>>, &UseFuture<()>) {
-    use_account(cx, TREASURY_ADDRESS, Some(60))
+pub fn use_treasury() -> Resource<GatewayResult<Treasury>> {
+    let gateway = use_gateway();
+    use_resource(move || {
+        let gateway = gateway.clone();
+        async move { gateway.get_treasury().await }
+    })
 }

@@ -8,17 +8,14 @@ static KEY: &str = "is_onboarded";
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct IsOnboarded(pub bool);
 
-pub fn use_is_onboarded(cx: &ScopeState) -> &UseSharedState<IsOnboarded> {
-    let is_onboarded = use_shared_state::<IsOnboarded>(cx).unwrap();
-    let is_onboarded_persistent = use_persistent(cx, KEY, || IsOnboarded(false));
-    use_effect(cx, is_onboarded, |_| {
-        is_onboarded_persistent.set(*is_onboarded.read());
-        async move {}
-    });
+pub fn use_is_onboarded() -> Signal<IsOnboarded> {
+    let is_onboarded = use_context::<Signal<IsOnboarded>>();
+    let mut is_onboarded_persistent = use_persistent(KEY, || IsOnboarded(false));
+    use_effect(move || is_onboarded_persistent.set(*is_onboarded.read()));
     is_onboarded
 }
 
-pub fn use_is_onboarded_provider(cx: &ScopeState) {
-    let is_onboarded = use_persistent(cx, KEY, || IsOnboarded(false)).get();
-    use_shared_state_provider(cx, || is_onboarded);
+pub fn use_is_onboarded_provider() {
+    let is_onboarded = use_persistent(KEY, || IsOnboarded(false)).get();
+    use_context_provider(|| Signal::new(is_onboarded));
 }

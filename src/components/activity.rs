@@ -1,91 +1,74 @@
-use dioxus_router::components::Link;
-#[cfg(feature = "desktop")]
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-#[cfg(feature = "web")]
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use dioxus::prelude::*;
-use ore_types::{Transfer, TransferType};
+use ore_types::{response::ListTransfersResponse, Transfer, TransferType};
 
 use crate::{
     components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
-    gateway::AsyncResult,
-    hooks::{use_pubkey, use_transfers, ACTIVITY_TABLE_PAGE_LIMIT},
+    hooks::{use_pubkey, use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
     route::Route,
 };
 
-#[derive(Debug)]
-pub enum ActivityFilter {
-    Global,
-    Personal,
-}
-
-#[component]
-pub fn Activity(cx: Scope) -> Element {
-    let filter = use_state(cx, || ActivityFilter::Global);
-    let offset = use_state(cx, || 0u64);
-    let (transfers, has_more) = use_transfers(cx, filter, offset);
-    match transfers {
-        AsyncResult::Ok(transfers) => {
-            render! {
-                div {
-                    class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
+pub fn Activity() -> Element {
+    let filter = use_signal(|| ActivityFilter::Global);
+    let offset = use_signal(|| 0u64);
+    let transfers = use_transfers(filter, offset);
+    let e = if let Some(transfers) = transfers.read().clone() {
+        match transfers {
+            Ok(transfers) => {
+                rsx! {
                     div {
-                        class: "flex flex-row justify-between",
-                        h2 {
-                            class: "text-lg md:text-2xl font-bold my-auto",
-                            "Activity"
+                        class: "flex flex-col gap-4 grow w-full h-2/3 pb-20 min-h-16 rounded justify-start",
+                        div {
+                            class: "flex flex-row justify-between",
+                            h2 {
+                                class: "text-lg md:text-2xl font-bold my-auto",
+                                "Activity"
+                            }
+                            FilterButtons {
+                                filter,
+                                offset
+                            }
                         }
-                        FilterButtons {
-                            filter: filter,
-                            offset: offset
+                        ActivityTable {
+                            offset,
+                            transfers
                         }
-                    }
-                    ActivityTable{
-                        offset: offset,
-                        transfers: transfers,
-                        has_more: has_more
                     }
                 }
             }
+            _ => None,
         }
-        _ => {
-            render! {
-                div {
-                    class: "flex flex-row h-64 w-full loading rounded",
-                }
+    } else {
+        rsx! {
+            div {
+                class: "flex flex-row h-64 w-full loading rounded",
             }
         }
-    }
-}
-
-#[derive(Props, PartialEq)]
-pub struct FilterButtonsProps<'a> {
-    pub filter: &'a UseState<ActivityFilter>,
-    pub offset: &'a UseState<u64>,
+    };
+    e
 }
 
 #[component]
-pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
-    let offset = cx.props.offset;
-    let filter = cx.props.filter.clone();
-    let filter_ = cx.props.filter;
+pub fn FilterButtons(filter: Signal<ActivityFilter>, offset: Signal<u64>) -> Element {
     let selected_class = "";
     let unselected_class = "text-gray-300 dark:text-gray-700";
-    let (global_class, personal_class) = match filter.get() {
+    let (global_class, personal_class) = match *filter.read() {
         ActivityFilter::Global => (selected_class, unselected_class),
         ActivityFilter::Personal => (unselected_class, selected_class),
     };
     let button_class =
         "flex flex-row gap-2 px-2 md:px-3 py-2 rounded-full text-xs md:text-sm hover-100 active-200 transition-colors";
     let icon_class = "w-4 h-4 md:w-5 md:h-5 my-auto";
-    render! {
+
+    rsx! {
         div {
             class: "flex flex-row gap-1 md:gap-2 font-semibold -mx-1 md:-mx-2",
             button {
                 class: "{button_class} {personal_class}",
                 onclick: move |_e| {
-                    filter_.set(ActivityFilter::Personal);
+                    filter.set(ActivityFilter::Personal);
                     offset.set(0);
                 },
                 UserIcon {
@@ -108,100 +91,72 @@ pub fn FilterButtons<'a>(cx: Scope<'a, FilterButtonsProps<'a>>) -> Element {
     }
 }
 
-#[derive(Props, PartialEq)]
-pub struct ActivityTableProps<'a> {
-    pub offset: &'a UseState<u64>,
-    pub transfers: Vec<Transfer>,
-    pub has_more: bool,
-}
-
 #[component]
-pub fn ActivityTable<'a>(cx: Scope<'a, ActivityTableProps<'a>>) -> Element {
-    let offset = cx.props.offset;
-    let transfers = cx.props.transfers.clone();
-    let has_more = cx.props.has_more;
-    if transfers.is_empty() {
-        render! {
+pub fn ActivityTable(offset: Signal<u64>, transfers: ListTransfersResponse) -> Element {
+    if transfers.data.is_empty() {
+        rsx! {
             p {
                 class: "text-sm text-gray-300 py-2 sm:px-1",
                 "No transactions found"
             }
         }
     } else {
-        render! {
+        rsx! {
             div {
                 class: "flex flex-col gap-4 -mx-2 sm:mx-0",
                 div {
                     class: "h-full w-full max-w-full",
-                    for transfer in transfers {
-                        render! {
-                            ActivityRow {
-                                transfer: transfer
-                            }
+                    for transfer in transfers.data {
+                        ActivityRow {
+                            transfer
                         }
                     }
                 }
                 ActivityTablePagination {
-                    offset: offset,
-                    has_more: has_more
+                    offset,
+                    has_more: transfers.has_more
                 }
             }
         }
     }
 }
 
-#[derive(Props, PartialEq)]
-pub struct ActivityTablePaginationProps<'a> {
-    pub offset: &'a UseState<u64>,
-    pub has_more: bool,
-}
-
 #[component]
-pub fn ActivityTablePagination<'a>(cx: Scope<'a, ActivityTablePaginationProps<'a>>) -> Element {
-    render! {
+pub fn ActivityTablePagination(offset: Signal<u64>, has_more: bool) -> Element {
+    let should_show = offset.read().gt(&0);
+    let mut offset = offset.clone();
+    rsx! {
         div {
             class: "flex flex-row justify-between",
-            if cx.props.offset.get().gt(&0) {
-                render! {
-                    button {
-                        onclick: move |_| {
-                            cx.props.offset.set(cx.props.offset.current().saturating_sub(ACTIVITY_TABLE_PAGE_LIMIT as u64));
-                        },
-                        class: "rounded-full h-10 w-10 font-semibold hover-100 active-200 transition-colors",
-                        "←"
-                    }
+            if should_show {
+                button {
+                    onclick: move |_| {
+                        let page_down = offset.read().saturating_sub(ACTIVITY_TABLE_PAGE_LIMIT as u64);
+                        offset.set(page_down);
+                    },
+                    class: "rounded-full h-10 w-10 font-semibold hover-100 active-200 transition-colors",
+                    "←"
                 }
             } else {
-                render! {
-                    div{}
-                }
+                div {}
             }
-            if cx.props.has_more {
-                render! {
-                    button {
-                        onclick: move |_| {
-                            cx.props.offset.set(cx.props.offset.current().saturating_add(ACTIVITY_TABLE_PAGE_LIMIT as u64));
-                        },
-                        class: "rounded-full h-10 w-10 font-semibold hover-100 active-200 transition-colors",
-                        "→"
-                    }
+            if has_more {
+                button {
+                    onclick: move |_| {
+                        let page_up = offset.read().saturating_add(ACTIVITY_TABLE_PAGE_LIMIT as u64);
+                        offset.set(page_up);
+                    },
+                    class: "rounded-full h-10 w-10 font-semibold hover-100 active-200 transition-colors",
+                    "→"
                 }
             }
         }
     }
 }
 
-#[derive(Props, PartialEq)]
-pub struct ActivityRowProps {
-    pub transfer: Transfer,
-}
-
 #[component]
-pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
-    let transfer = cx.props.transfer.clone();
-    let amount = (transfer.amount as f64) / 10f64.powf(ore::TOKEN_DECIMALS as f64);
-    let pubkey = use_pubkey(cx);
-
+pub fn ActivityRow(transfer: Transfer) -> Element {
+    let pubkey = use_pubkey();
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let ts = Duration::from_secs(transfer.ts as u64);
     let time = now.saturating_sub(ts);
@@ -269,7 +224,7 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
         "font-mono font-bold"
     };
 
-    render! {
+    rsx! {
         Link {
             class: "flex flex-row py-3 gap-3 w-full px-2 rounded hover-100 active-200 transition-colors",
             to: Route::Tx { sig: transfer.sig },
@@ -299,17 +254,15 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                             OreIcon {
                                 class: "ml-0.5 w-3.5 h-3.5 my-auto",
                             }
-                            "{amount}"
+                            "{amount_to_ui_amount(transfer.amount as u64, ore::TOKEN_DECIMALS)}"
                         }
                         if let TransferType::Spl = transfer.transfer_type {
-                            render! {
-                                "to"
-                                Link {
-                                    to: Route::User{ id: addr_b_link },
-                                    span {
-                                        class: "{addr_b_class} hover:underline",
-                                        "{addr_b}"
-                                    }
+                            "to"
+                            Link {
+                                to: Route::User{ id: addr_b_link },
+                                span {
+                                    class: "{addr_b_class} hover:underline",
+                                    "{addr_b}"
                                 }
                             }
                         }
@@ -320,10 +273,8 @@ pub fn ActivityRow(cx: Scope<ActivityRowProps>) -> Element {
                     }
                 }
                 if let Some(memo) = transfer.memo {
-                    render! {
-                        p {
-                            "{memo}"
-                        }
+                    p {
+                        "{memo}"
                     }
                 }
             }

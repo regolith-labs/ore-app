@@ -1,49 +1,46 @@
 use std::rc::Rc;
 
-use dioxus::prelude::UseSharedState;
-#[cfg(feature = "web")]
+use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::signer::Signer;
-#[cfg(feature = "desktop")]
-use solana_sdk::signer::Signer;
 
 use crate::{
     gateway::{signer, Gateway, GatewayResult},
-    metrics::{track, AppEvent},
+    hooks::{MinerStatusMessage, MinerToolbarState, UpdateMinerToolbarState},
     miner::Miner,
 };
-
-use super::MinerStatusMessage;
 
 // TODO Move this somewhere
 
 pub async fn try_start_mining(
-    gateway: &Rc<Gateway>,
-    miner: &Miner,
-    status_message: &UseSharedState<MinerStatusMessage>,
+    gateway: Rc<Gateway>,
+    miner: Signal<Miner>,
+    toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<()> {
     // Create proof account, if needed
-    *status_message.write() = MinerStatusMessage::GeneratingChallenge;
-    'register: loop {
+
+    toolbar_state.set_status_message(MinerStatusMessage::GeneratingChallenge);
+    loop {
         if gateway.register_ore().await.is_ok() {
-            break 'register;
+            break;
         }
     }
 
     // Start mining
     let signer = signer();
-    let treasury = gateway.get_treasury().await.unwrap();
-    let proof = gateway.get_proof(signer.pubkey()).await.unwrap();
-    *status_message.write() = MinerStatusMessage::Searching;
-    miner
-        .start_mining(
-            proof.hash.into(),
-            treasury.difficulty.into(),
-            signer.pubkey(),
-        )
-        .await;
-
-    // Record event for data
-    track(AppEvent::StartMiner, None);
+    if let Ok(proof) = gateway.get_proof(signer.pubkey()).await {
+        if let Ok(clock) = gateway.get_clock().await {
+            let cutoff_time = proof
+                .last_hash_at
+                .saturating_add(60)
+                .saturating_sub(clock.unix_timestamp)
+                .max(0) as u64;
+            toolbar_state.set_status_message(MinerStatusMessage::Searching);
+            miner
+                .read()
+                .start_mining(proof.challenge.into(), 0, cutoff_time)
+                .await;
+        }
+    }
 
     Ok(())
 }

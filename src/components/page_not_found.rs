@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn PageNotFound(cx: Scope, _route: Vec<String>) -> Element {
-    render! {
+pub fn PageNotFound(_route: Vec<String>) -> Element {
+    rsx! {
         p {
             "Page not found"
         }

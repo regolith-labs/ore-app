@@ -1,59 +1,35 @@
 use dioxus::prelude::*;
-#[cfg(feature = "web")]
-use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pubkey};
-#[cfg(feature = "desktop")]
-use solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pubkey};
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{Copyable, IsToolbarOpen, MinerStatus},
-    gateway::AsyncResult,
-    hooks::{use_is_onboarded, use_pubkey, use_sol_balance, IsOnboarded, SolBalanceHandle},
+    components::Copyable,
+    hooks::{
+        use_is_onboarded, use_miner_toolbar_state, use_pubkey, use_sol_balance, IsOnboarded,
+        ReadMinerToolbarState,
+    },
 };
 
-#[component]
-pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
-    let sol_balance = use_sol_balance(cx);
-    let sol_balance_ = use_context::<SolBalanceHandle>(cx).unwrap();
-    let miner_status = use_shared_state::<MinerStatus>(cx).unwrap();
-    let is_toolbar_open = use_shared_state::<IsToolbarOpen>(cx).unwrap();
-    let is_onboarded = use_is_onboarded(cx);
+pub fn MinerToolbarInsufficientFunds() -> Element {
+    let sol_balance = use_sol_balance();
+    let toolbar_state = use_miner_toolbar_state();
+    let mut is_onboarded = use_is_onboarded();
 
-    use_future(cx, &sol_balance, |_| {
-        if let AsyncResult::Ok(sol_balance) = sol_balance {
-            if sol_balance.0.gt(&0) {
-                sol_balance_.cancel(cx);
-                *is_onboarded.write() = IsOnboarded(true);
-                *miner_status.write() = MinerStatus::Activating;
-            } else {
-                sol_balance_.restart();
+    // TODO Poll balance every 3 seconds
+
+    use_effect(move || {
+        if let Some(Ok(sol_balance)) = *sol_balance.read() {
+            if sol_balance.gt(&0) {
+                is_onboarded.set(IsOnboarded(true));
             }
         }
-        async move {}
     });
 
-    let bg = if is_toolbar_open.read().0 {
-        ""
-    } else {
-        "pointer-events-none"
-    };
-
-    if is_toolbar_open.read().0 {
-        match sol_balance {
-            AsyncResult::Ok(sol_balance) => {
-                if sol_balance.0.lt(&LAMPORTS_PER_SOL.saturating_div(10)) {
-                    render! {
-                        MinerToolbarInsufficientBalanceOpen { }
-                    }
-                } else {
-                    None
-                }
-            }
-            _ => None,
-        }
-    } else {
-        render! {
+    rsx! {
+        if toolbar_state.is_open() {
+            MinerToolbarInsufficientBalanceOpen {}
+        } else {
             div {
-                class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 {bg}",
+                class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
                 span {
                     class: "font-semibold",
                     "Insufficient funds →"
@@ -63,9 +39,8 @@ pub fn MinerToolbarInsufficientFunds(cx: Scope) -> Element {
     }
 }
 
-#[component]
-pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
-    let pubkey = use_pubkey(cx);
+pub fn MinerToolbarInsufficientBalanceOpen() -> Element {
+    let pubkey = use_pubkey();
     let solana_pay_req = solana_pay_sol_request(pubkey, 0.1);
     let qrcode = qrcode_generator::to_svg_to_string(
         solana_pay_req,
@@ -75,7 +50,7 @@ pub fn MinerToolbarInsufficientBalanceOpen(cx: Scope) -> Element {
     )
     .unwrap();
 
-    render! {
+    rsx! {
         div {
             class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between px-4 sm:px-8 py-8",
             div {
