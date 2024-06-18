@@ -171,6 +171,7 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
 
 pub fn PriorityFeeConfig() -> Element {
     let mut priority_fee = use_priority_fee();
+
     rsx! {
         div {
             class: "flex flex-row gap-8 justify-between mt-8",
@@ -182,13 +183,14 @@ pub fn PriorityFeeConfig() -> Element {
                 }
                 p {
                     class: "text-white text-xs opacity-80 max-w-96",
+                    "Add a priority fee to increase your chances of landing a transaction."
                 }
-
            }
            div {
                 class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
                 input {
-                    class: "bg-transparent text-white text-right px-1 mb-auto font-medium",
+                    class: "bg-transparent text-white text-right px-1 mb-auto rounded font-semibold hover:bg-green-600 transition-colors",
+                    dir: "rtl",
                     step: 100_000,
                     min: 0,
                     max: 10_000_000,
@@ -211,7 +213,7 @@ pub fn PriorityFeeConfig() -> Element {
 
 pub fn PowerLevelConfig() -> Element {
     let mut power_level = use_power_level();
-    let max = *WEB_WORKERS as u64;
+    let max = *WEB_WORKERS as i64;
 
     rsx! {
         div {
@@ -224,17 +226,17 @@ pub fn PowerLevelConfig() -> Element {
                 }
                 p {
                     class: "text-white text-xs opacity-80 max-w-96",
-                    "Configure how much of your device's computing capacity to utilize while mining."
+                    "Select how many computer cores to dedicate to mining."
                 }
-
             }
             div {
                 class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
                 input {
-                    class: "bg-transparent text-white text-right px-1 mb-auto font-medium",
+                    class: "bg-transparent text-white text-right px-1 mb-auto rounded font-semibold hover:bg-green-600 transition-colors",
+                    dir: "rtl",
                     step: 1,
                     min: 1,
-                    max: 100,
+                    max: max,
                     r#type: "number",
                     value: "{power_level.read().0}",
                     oninput: move |e| {
