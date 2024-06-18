@@ -46,7 +46,7 @@ pub fn Balance() -> Element {
 
 pub fn StakeBalance() -> Element {
     let proof = use_proof();
-    log::info!("Proof: {:?}", proof.read());
+
     if let Some(proof) = *proof.read() {
         if let Ok(proof) = proof {
             if proof.balance.gt(&0) {

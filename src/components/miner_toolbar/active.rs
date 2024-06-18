@@ -7,7 +7,7 @@ use crate::{
         use_miner_toolbar_state, use_power_level, use_priority_fee, MinerStatusMessage, PowerLevel,
         PriorityFee, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
-    miner::Miner,
+    miner::{Miner, WEB_WORKERS},
 };
 
 #[component]
@@ -182,14 +182,13 @@ pub fn PriorityFeeConfig() -> Element {
                 }
                 p {
                     class: "text-white text-xs opacity-80 max-w-96",
-                    "When Solana is busy, priority fees can increase the chances of your transactions being accepted."
                 }
 
-            }
-            div {
+           }
+           div {
                 class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
                 input {
-                    class: "bg-transparent text-white text-right px-1 mb-auto",
+                    class: "bg-transparent text-white text-right px-1 mb-auto font-medium",
                     step: 100_000,
                     min: 0,
                     max: 10_000_000,
@@ -212,9 +211,8 @@ pub fn PriorityFeeConfig() -> Element {
 
 pub fn PowerLevelConfig() -> Element {
     let mut power_level = use_power_level();
-    if cfg!(feature = "web") {
-        return None;
-    }
+    let max = *WEB_WORKERS as u64;
+
     rsx! {
         div {
             class: "flex flex-row gap-8 justify-between mt-8",
@@ -233,22 +231,21 @@ pub fn PowerLevelConfig() -> Element {
             div {
                 class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
                 input {
-                    class: "bg-transparent text-white text-right px-1 mb-auto",
-                    disabled: cfg!(feature = "web"),
-                    step: 10,
-                    min: 10,
+                    class: "bg-transparent text-white text-right px-1 mb-auto font-medium",
+                    step: 1,
+                    min: 1,
                     max: 100,
                     r#type: "number",
                     value: "{power_level.read().0}",
                     oninput: move |e| {
                         if let Ok(v) = e.value().parse::<u64>() {
-                            power_level.set(PowerLevel(v as u8));
+                            power_level.set(PowerLevel(v));
                         }
                     }
                 }
                 p {
                     class: "my-auto",
-                    "%"
+                    "of {max} cores"
                 }
             }
         }

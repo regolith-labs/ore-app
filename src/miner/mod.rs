@@ -7,6 +7,7 @@ use std::rc::Rc;
 use dioxus::prelude::*;
 use dioxus_std::utils::channel::UseChannel;
 use drillx::Solution;
+use lazy_static::lazy_static;
 use ore::{state::Proof, BUS_COUNT, EPOCH_DURATION};
 use rand::Rng;
 use serde_wasm_bindgen::to_value;
@@ -14,7 +15,7 @@ use solana_client_wasm::solana_sdk::{
     blake3::Hash as Blake3Hash, compute_budget::ComputeBudgetInstruction, pubkey::Pubkey,
     signature::Signature, signer::Signer,
 };
-use web_sys::Worker;
+use web_sys::{window, Worker};
 
 use crate::{
     gateway::{signer, Gateway, GatewayResult, CU_LIMIT_MINE},
@@ -24,13 +25,22 @@ use crate::{
     },
 };
 
-pub const WEB_WORKERS: usize = 8;
+// Number of physical cores on machine
+lazy_static! {
+    pub static ref WEB_WORKERS: usize = fetch_logical_processors();
+}
+
+fn fetch_logical_processors() -> usize {
+    let window = window().expect("should have a window");
+    let navigator = window.navigator();
+    navigator.hardware_concurrency() as usize
+}
 
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
 pub struct Miner {
     power_level: Signal<PowerLevel>,
     priority_fee: Signal<PriorityFee>,
-    web_worker: [Worker; WEB_WORKERS],
+    web_workers: Vec<Worker>,
 }
 
 impl Miner {
@@ -42,7 +52,9 @@ impl Miner {
         Self {
             power_level: power_level.clone(),
             priority_fee: priority_fee.clone(),
-            web_worker: std::array::from_fn(|_| create_web_worker(cx.clone())),
+            web_workers: (0..*WEB_WORKERS)
+                .map(|_| create_web_worker(cx.clone()))
+                .collect(),
         }
     }
 
@@ -51,22 +63,25 @@ impl Miner {
     }
 
     pub async fn start_mining_web(&self, challenge: [u8; 32], offset: u64, cutoff_time: u64) {
-        let nonce = u64::MAX.saturating_div(self.web_worker.len() as u64);
-        for (i, web_worker) in self.web_worker.iter().enumerate() {
+        let nonce = u64::MAX.saturating_div(self.web_workers.len() as u64);
+        let power_level = self.power_level.read().0.saturating_sub(1) as usize;
+        for (i, web_worker) in self.web_workers.iter().enumerate() {
             let nonce = nonce.saturating_mul(i as u64).saturating_add(offset);
-            web_worker
-                .post_message(
-                    &to_value(
-                        &(WebWorkerRequest {
-                            challenge,
-                            nonce: nonce.to_le_bytes(),
-                            offset,
-                            cutoff_time,
-                        }),
+            if i.le(&power_level) {
+                web_worker
+                    .post_message(
+                        &to_value(
+                            &(WebWorkerRequest {
+                                challenge,
+                                nonce: nonce.to_le_bytes(),
+                                offset,
+                                cutoff_time,
+                            }),
+                        )
+                        .unwrap(),
                     )
-                    .unwrap(),
-                )
-                .unwrap();
+                    .unwrap();
+            }
         }
     }
 
@@ -74,7 +89,6 @@ impl Miner {
         &self,
         messages: &Vec<WebWorkerResponse>,
         toolbar_state: &mut Signal<MinerToolbarState>,
-        priority_fee: Signal<PriorityFee>,
         proof: &mut Resource<GatewayResult<Proof>>,
         gateway: Rc<Gateway>,
         pubkey: Pubkey,
@@ -99,7 +113,6 @@ impl Miner {
 
         // Kickoff new batch
         if best_difficulty.lt(&ore::MIN_DIFFICULTY) {
-            log::info!("New batch {:?}", offset);
             self.start_mining(challenge, offset, 0).await;
             return;
         }
@@ -107,13 +120,12 @@ impl Miner {
         // Update toolbar state
         toolbar_state.set_display_hash(Blake3Hash::new_from_array(best_hash));
         toolbar_state.set_status_message(MinerStatusMessage::Submitting);
-        let priority_fee = priority_fee.read().0;
+        let priority_fee = self.priority_fee.read().0;
 
         // Submit solution
         match submit_solution(&gateway, best_solution, priority_fee).await {
             // Start mining again
             Ok(sig) => {
-                log::info!("Success: {}", sig);
                 proof.restart();
                 if let MinerStatus::Active = toolbar_state.status() {
                     toolbar_state.set_status_message(MinerStatusMessage::Searching);

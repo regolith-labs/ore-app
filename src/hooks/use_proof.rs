@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use ore::{state::Proof, utils::AccountDeserialize};
+use ore::state::Proof;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::GatewayResult;
