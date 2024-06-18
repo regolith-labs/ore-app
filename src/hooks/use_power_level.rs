@@ -3,22 +3,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::hooks::use_persistent::use_persistent;
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
-pub struct PowerLevel(pub u8);
-
 const KEY: &str = "power_level";
 
-pub fn use_power_level(cx: &ScopeState) -> &UseSharedState<PowerLevel> {
-    let power_level = use_shared_state::<PowerLevel>(cx).unwrap();
-    let power_level_persistent = use_persistent(cx, KEY, || PowerLevel(10));
-    use_effect(cx, power_level, |_| {
-        power_level_persistent.set(*power_level.read());
-        async move {}
-    });
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
+pub struct PowerLevel(pub u64);
+
+pub fn use_power_level() -> Signal<PowerLevel> {
+    let power_level = use_context::<Signal<PowerLevel>>();
+    let mut power_level_persistent = use_persistent(KEY, || PowerLevel(1));
+    use_effect(move || power_level_persistent.set(*power_level.read()));
     power_level
 }
 
-pub fn use_power_level_provider(cx: &ScopeState) {
-    let power_level = use_persistent(cx, KEY, || PowerLevel(10)).get();
-    use_shared_state_provider(cx, || power_level);
+pub fn use_power_level_provider() {
+    let power_level = use_persistent(KEY, || PowerLevel(1)).get();
+    use_context_provider(|| Signal::new(power_level));
 }

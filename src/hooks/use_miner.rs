@@ -1,11 +1,45 @@
 use dioxus::prelude::*;
-use dioxus_std::utils::channel::UseChannel;
+use dioxus_std::utils::channel::use_channel;
 
-use crate::miner::{Miner, MiningResult};
+use super::{
+    use_gateway, use_miner_toolbar_state, use_power_level, use_priority_fee, use_proof, use_pubkey,
+};
+use crate::miner::{Miner, WebWorkerResponse, WEB_WORKERS};
 
-use super::use_power_level;
+pub fn use_miner() -> Signal<Miner> {
+    let mut cx = use_channel::<WebWorkerResponse>(*WEB_WORKERS);
+    let mut toolbar_state = use_miner_toolbar_state();
+    let mut proof = use_proof();
+    let power_level = use_power_level();
+    let priority_fee = use_priority_fee();
+    let pubkey = use_pubkey();
+    let gateway = use_gateway();
+    let miner = use_signal(|| Miner::new(cx.clone(), power_level, priority_fee));
 
-pub fn use_miner<'a>(cx: &'a ScopeState, ch: &'a UseChannel<MiningResult>) -> &'a UseState<Miner> {
-    let power_level = use_power_level(cx);
-    use_state(cx, || Miner::new(ch, power_level))
+    // Process web worker results
+    use_future(move || {
+        let mut rx = cx.receiver();
+        let gateway = gateway.clone();
+        async move {
+            let mut messages = vec![];
+            while let Ok(msg) = rx.recv().await {
+                messages.push(msg);
+                if messages.len().ge(&WEB_WORKERS) {
+                    miner
+                        .read()
+                        .process_web_worker_results(
+                            &messages,
+                            &mut toolbar_state,
+                            &mut proof,
+                            gateway.clone(),
+                            pubkey,
+                        )
+                        .await;
+                    messages.clear();
+                }
+            }
+        }
+    });
+
+    miner
 }

@@ -5,16 +5,13 @@ use crate::{
     hooks::use_show_backup_warning,
 };
 
-#[component]
-pub fn Home(cx: Scope) -> Element {
-    let show_backup_warning = use_show_backup_warning(cx);
-    render! {
+pub fn Home() -> Element {
+    let show_backup_warning = use_show_backup_warning();
+    rsx! {
         div {
             class: "flex flex-col gap-16 overflow-visible",
             if cfg!(feature = "web") && show_backup_warning.read().0 {
-                render! {
-                    BackupKeypairWarning {}
-                }
+                BackupKeypairWarning {}
             }
             Balance {}
             Activity {}

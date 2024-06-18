@@ -1,11 +1,9 @@
 use dioxus::prelude::*;
-use dioxus_router::components::Link;
 
 use crate::route::Route;
 
-#[component]
-pub fn SendDone(cx: Scope) -> Element {
-    render! {
+pub fn SendDone() -> Element {
+    rsx! {
         div {
             class: "flex flex-col grow justify-between",
             div {

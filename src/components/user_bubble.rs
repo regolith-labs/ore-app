@@ -3,9 +3,9 @@ use dioxus::prelude::*;
 use crate::components::{BusIcon, TreasuryIcon, UserIcon};
 
 #[component]
-pub fn UserBubble<'a>(cx: Scope, class: Option<&'a str>) -> Element {
-    let class = class.unwrap_or("");
-    render! {
+pub fn UserBubble(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         div {
             class: "flex rounded-full text-gray-300 bg-gray-200 dark:bg-gray-700 dark:text-gray-900 {class}",
             UserIcon {
@@ -16,9 +16,9 @@ pub fn UserBubble<'a>(cx: Scope, class: Option<&'a str>) -> Element {
 }
 
 #[component]
-pub fn TreasuryBubble<'a>(cx: Scope, class: Option<&'a str>) -> Element {
-    let class = class.unwrap_or("");
-    render! {
+pub fn TreasuryBubble(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         div {
             class: "flex rounded-full text-gray-300 bg-gray-200 dark:bg-gray-700 dark:text-gray-900 {class}",
             TreasuryIcon {
@@ -29,9 +29,9 @@ pub fn TreasuryBubble<'a>(cx: Scope, class: Option<&'a str>) -> Element {
 }
 
 #[component]
-pub fn BusBubble<'a>(cx: Scope, class: Option<&'a str>) -> Element {
-    let class = class.unwrap_or("");
-    render! {
+pub fn BusBubble(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
         div {
             class: "flex rounded-full text-gray-300 bg-gray-200 dark:bg-gray-700 dark:text-gray-900 {class}",
             BusIcon {

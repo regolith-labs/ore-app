@@ -5,8 +5,8 @@ use crate::components::{FlagIcon, LockOpenIcon};
 use super::ExportKeyStep;
 
 #[component]
-pub fn ExportKeyWarning<'a>(cx: Scope, step: &'a UseState<ExportKeyStep>) -> Element {
-    render! {
+pub fn ExportKeyWarning(step: Signal<ExportKeyStep>) -> Element {
+    rsx! {
         div {
             class: "flex flex-col gap-16 grow w-full h-full",
             div {
@@ -41,6 +41,7 @@ pub fn ExportKeyWarning<'a>(cx: Scope, step: &'a UseState<ExportKeyStep>) -> Ele
             }
             button {
                 onclick: move |_| {
+                    let mut step = step.clone();
                     step.set(ExportKeyStep::Secret)
                 },
                 class: "bg-green-500 hover:bg-green-600 active:bg-green-700 transition-colors text-white rounded text-center font-semibold py-3 mt-auto",

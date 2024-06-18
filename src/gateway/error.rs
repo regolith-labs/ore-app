@@ -1,6 +1,3 @@
-#[cfg(feature = "desktop")]
-use solana_client::client_error::ClientError;
-#[cfg(feature = "web")]
 use solana_client_wasm::ClientError;
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
@@ -13,13 +10,20 @@ pub enum GatewayError {
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
-    SimulationFailed,
+    // SimulationFailed,
+    RequestFailed,
     Unknown,
 }
 
+impl From<reqwest::Error> for GatewayError {
+    fn from(_value: reqwest::Error) -> Self {
+        GatewayError::RequestFailed
+    }
+}
+
 impl From<ClientError> for GatewayError {
-    fn from(err: ClientError) -> Self {
-        let msg = err.to_string();
+    fn from(value: ClientError) -> Self {
+        let msg = value.to_string();
         if msg.starts_with("Client error: Invalid param: could not find account")
             || msg.starts_with("Client error: AccountNotFound: ")
         {

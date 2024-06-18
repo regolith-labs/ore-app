@@ -4,17 +4,14 @@ use crate::{components::Appearance, hooks::use_persistent::use_persistent};
 
 const KEY: &str = "appearance";
 
-pub fn use_appearance(cx: &ScopeState) -> &UseSharedState<Appearance> {
-    let appearance = use_shared_state::<Appearance>(cx).unwrap();
-    let appearance_persistent = use_persistent(cx, KEY, || Appearance::Dark);
-    use_effect(cx, appearance, |_| {
-        appearance_persistent.set(*appearance.read());
-        async move {}
-    });
+pub fn use_appearance() -> Signal<Appearance> {
+    let appearance = use_context::<Signal<Appearance>>();
+    let mut appearance_persistent = use_persistent(KEY, || Appearance::Dark);
+    use_effect(move || appearance_persistent.set(*appearance.read()));
     appearance
 }
 
-pub fn use_appearance_provider(cx: &ScopeState) {
-    let appearance = use_persistent(cx, KEY, || Appearance::Dark).get();
-    use_shared_state_provider(cx, || appearance);
+pub fn use_appearance_provider() {
+    let appearance = use_persistent(KEY, || Appearance::Dark).get();
+    use_context_provider(|| Signal::new(appearance));
 }

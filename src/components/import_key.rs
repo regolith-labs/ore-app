@@ -1,53 +1,48 @@
 use dioxus::prelude::*;
-use dioxus_router::prelude::use_navigator;
-#[cfg(feature = "web")]
 use solana_client_wasm::solana_sdk::{
-    bs58, native_token::LAMPORTS_PER_SOL, signature::Keypair, signer::Signer,
+    bs58, native_token::lamports_to_sol, signature::Keypair, signer::Signer,
 };
-#[cfg(feature = "desktop")]
-use solana_sdk::{bs58, native_token::LAMPORTS_PER_SOL, signature::Keypair, signer::Signer};
 
 use crate::{
     components::EyeSlashIcon,
-    gateway::{AsyncResult, GatewayError},
     hooks::{use_gateway, use_keypair_persistent, use_sol_balance},
     route::Route,
 };
 
+#[derive(Copy, Clone)]
 pub enum ImportKeyStep {
     Loading,
     Warning,
     Import,
 }
 
-#[component]
-pub fn ImportKey(cx: Scope) -> Element {
-    let step = use_state(cx, || ImportKeyStep::Loading);
-    let sol_balance = use_sol_balance(cx);
+pub fn ImportKey() -> Element {
+    let mut step = use_signal(|| ImportKeyStep::Loading);
+    let sol_balance = use_sol_balance();
 
-    use_future(cx, &sol_balance, |_| {
-        if let ImportKeyStep::Loading = step.get() {
-            if let AsyncResult::Ok(sol_balance) = sol_balance {
-                if sol_balance.0.gt(&0) {
+    use_effect(move || {
+        let current_step = *step.read();
+        if let ImportKeyStep::Loading = current_step {
+            if let Some(Ok(sol_balance)) = *sol_balance.read() {
+                if sol_balance.gt(&0) {
                     step.set(ImportKeyStep::Warning)
                 } else {
                     step.set(ImportKeyStep::Import)
                 }
             }
         }
-        async move {}
     });
 
-    match step.get() {
+    let e = match *step.read() {
         ImportKeyStep::Loading => {
-            render! {
+            rsx! {
                 ImportKeyLoading {}
             }
         }
         ImportKeyStep::Warning => {
-            if let AsyncResult::Ok(sol_balance) = sol_balance {
-                render! {
-                    ImportKeyWarning { step: step, balance: sol_balance.0 }
+            if let Some(Ok(balance)) = *sol_balance.read() {
+                rsx! {
+                    ImportKeyWarning { step, balance }
                 }
             } else {
                 // TODO This should never happen. Display error
@@ -55,16 +50,17 @@ pub fn ImportKey(cx: Scope) -> Element {
             }
         }
         ImportKeyStep::Import => {
-            render! {
+            rsx! {
                 ImportKeyImport {}
             }
         }
-    }
+    };
+
+    e
 }
 
-#[component]
-fn ImportKeyLoading(cx: Scope) -> Element {
-    render! {
+fn ImportKeyLoading() -> Element {
+    rsx! {
         div {
             class: "flex flex-row h-64 w-full loading rounded",
         }
@@ -72,13 +68,13 @@ fn ImportKeyLoading(cx: Scope) -> Element {
 }
 
 #[component]
-fn ImportKeyWarning<'a>(cx: Scope, step: &'a UseState<ImportKeyStep>, balance: u64) -> Element {
-    render! {
+fn ImportKeyWarning(step: Signal<ImportKeyStep>, balance: u64) -> Element {
+    rsx! {
         div {
             class: "flex flex-col gap-16 grow w-full h-full",
             ImportKeyHeader {}
             LossOfFundsWarning {
-                balance: *balance
+                balance
             }
             button {
                 onclick: move |_| {
@@ -92,9 +88,8 @@ fn ImportKeyWarning<'a>(cx: Scope, step: &'a UseState<ImportKeyStep>, balance: u
     }
 }
 
-#[component]
-fn ImportKeyHeader(cx: Scope) -> Element {
-    render! {
+fn ImportKeyHeader() -> Element {
+    rsx! {
         div {
             class: "flex flex-col gap-3",
             h2 {
@@ -114,52 +109,49 @@ fn ImportKeyHeader(cx: Scope) -> Element {
 
 const KEY_LENGTH: usize = 64;
 
-#[component]
-fn ImportKeyImport(cx: Scope) -> Element {
-    let sol_balance = use_state::<Option<AsyncResult<u64>>>(cx, || None);
-    let keypair_persistent = use_keypair_persistent(cx);
-    let err_msg = use_state::<Option<String>>(cx, || None);
-    let enable_import_button = use_state(cx, || false);
-    let private_key_input = use_state(cx, || "".to_string());
-    let gateway = use_gateway(cx);
-    let nav = use_navigator(cx);
+fn ImportKeyImport() -> Element {
+    let mut sol_balance = use_signal::<Option<u64>>(|| None);
+    let mut keypair_persistent = use_keypair_persistent();
+    let mut err_msg = use_signal::<Option<String>>(|| None);
+    let mut enable_import_button = use_signal(|| false);
+    let mut private_key_input = use_signal(|| "".to_string());
+    let gateway = use_gateway();
+    let nav = navigator();
 
-    log::info!("OK: ... {}", private_key_input.get());
-
-    use_future(cx, private_key_input.get(), |_| {
-        let private_key_input = private_key_input.clone();
-        let sol_balance = sol_balance.clone();
-        let enable_import_button = enable_import_button.clone();
-        let err_msg = err_msg.clone();
+    use_future(move || {
+        // let private_key_input = private_key_input.clone();
+        // let sol_balance = sol_balance.clone();
+        // let enable_import_button = enable_import_button.clone();
+        // let err_msg = err_msg.clone();
+        let gateway = gateway.clone();
         async move {
-            if let Ok(bytes) = bs58::decode(private_key_input.get()).into_vec() {
+            if let Ok(bytes) = bs58::decode(private_key_input.read().clone()).into_vec() {
                 if bytes.len().eq(&KEY_LENGTH) {
                     if let Ok(kp) = Keypair::from_bytes(&bytes) {
                         enable_import_button.set(true);
                         match gateway.rpc.get_balance(&kp.pubkey()).await {
-                            Ok(b) => {
-                                sol_balance.set(Some(AsyncResult::Ok(b)));
-                            }
-                            Err(err) => {
-                                sol_balance.set(Some(AsyncResult::Error(GatewayError::from(err))));
-                            }
+                            Ok(b) => sol_balance.set(Some(b)),
+                            Err(err) => sol_balance.set(None),
                         }
                     }
                 } else if bytes.len().eq(&0) {
+                    sol_balance.set(None);
                     enable_import_button.set(false);
                     err_msg.set(None);
                 } else {
+                    sol_balance.set(None);
                     enable_import_button.set(false);
                     err_msg.set(Some("Invalid length".to_string()));
                 }
             } else {
+                sol_balance.set(None);
                 enable_import_button.set(false);
                 err_msg.set(Some("Invalid format".to_string()));
             }
         }
     });
 
-    render! {
+    rsx! {
         div {
             class: "flex flex-col gap-16 grow w-full h-full",
             ImportKeyHeader {}
@@ -172,47 +164,32 @@ fn ImportKeyImport(cx: Scope) -> Element {
                     class: "mx-auto w-full py-2 text-center placeholder-gray-200 dark:placeholder-gray-700 bg-transparent",
                     autofocus: true,
                     placeholder: "Private key",
-                    value: "{private_key_input.get()}",
-                    oninput: move |evt| {
-                        log::info!("Triggered: {:?}", evt.value.clone());
-                        let s = evt.value.clone();
-                        private_key_input.set(s);
+                    value: "{*private_key_input.read()}",
+                    oninput: move |e| {
+                        private_key_input.set(e.value());
                     },
                 }
-                if let Some(err_msg) = err_msg.get() {
-                    render! {
-                        p {
-                            class: "text-red-500 text-sm font-right",
-                            "{err_msg}"
-                        }
+                if let Some(err_msg) = err_msg.read().clone() {
+                    p {
+                        class: "text-red-500 text-sm font-right",
+                        "{err_msg}"
                     }
                 }
             }
-            if let Some(sol_balance) = sol_balance.get() {
-                match sol_balance {
-                    AsyncResult::Loading => {
-                        render! {
-                            div {
-                                class: "flex flex-row w-24 h-16 loading rounded-full",
-                            }
-                        }
-                    }
-                    AsyncResult::Ok(sol_balance) => {
-                        let balance_f = (*sol_balance as f64) / (LAMPORTS_PER_SOL as f64);
-                        render! {
-                            p {
-                                class: "text-nowrap mx-auto text-center font-semibold",
-                                "Balance: {balance_f} SOL"
-                            }
-                        }
-                    }
-                    _ => None
+            if let Some(sol_balance) = *sol_balance.read() {
+                p {
+                    class: "text-nowrap mx-auto text-center font-semibold",
+                    "Balance: {lamports_to_sol(sol_balance)} SOL"
+                }
+            } else {
+                div {
+                    class: "flex flex-row w-24 h-16 loading rounded-full",
                 }
             }
             button {
-                disabled: !enable_import_button.get(),
+                disabled: !*enable_import_button.read(),
                 onclick: move |_| {
-                    keypair_persistent.set(private_key_input.get().clone());
+                    keypair_persistent.set(private_key_input.read().clone());
                     nav.push(Route::Settings {});
                 },
                 class: "bg-green-500 disabled:opacity-50 hover:bg-green-600 active:bg-green-700 transition-colors text-white rounded text-center font-semibold py-3 mt-auto",
@@ -223,9 +200,8 @@ fn ImportKeyImport(cx: Scope) -> Element {
 }
 
 #[component]
-fn LossOfFundsWarning(cx: Scope, balance: u64) -> Element {
-    let balance_f = (*balance as f64) / (LAMPORTS_PER_SOL as f64);
-    render! {
+fn LossOfFundsWarning(balance: u64) -> Element {
+    rsx! {
         div {
             class: "flex flex-col gap-3 bg-red-500 w-full rounded px-4 py-5 mt-8 text-white",
             p {
@@ -235,7 +211,7 @@ fn LossOfFundsWarning(cx: Scope, balance: u64) -> Element {
             ul {
                 class: "list-disc list-outside pl-4 space-y-1.5",
                 li {
-                    "Your current keypair has a balance of {balance_f} SOL. "
+                    "Your current keypair has a balance of {lamports_to_sol(balance)} SOL. "
                 }
                 li {
                     "Importing a new keypair will replace your current one. "
