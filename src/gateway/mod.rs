@@ -198,37 +198,40 @@ impl Gateway {
 
         // Submit tx
         tx.sign(&[&signer], hash);
-        // let mut sigs = vec![];
         let mut attempts = 0;
         loop {
             log::info!("Attempt: {:?}", attempts);
             match self.rpc.send_transaction_with_config(&tx, send_cfg).await {
                 Ok(sig) => {
-                    // sigs.push(sig);
                     log::info!("{:?}", sig);
 
                     // Confirm tx
                     if skip_confirm {
                         return Ok(sig);
                     }
+
+                    // Confirm tx
                     for _ in 0..CONFIRM_RETRIES {
+                        // Delay before confirming
+                        async_std::task::sleep(Duration::from_millis(2000)).await;
+
+                        // Fetch transaction status
                         match self.rpc.get_signature_statuses(&[sig]).await {
                             Ok(signature_statuses) => {
-                                log::info!("Sig status: {:?}", signature_statuses[0]);
                                 for signature_status in signature_statuses {
                                     if let Some(signature_status) = signature_status.as_ref() {
                                         if signature_status.confirmation_status.is_some() {
-                                            let current_commitment = signature_status
-                                                .confirmation_status
-                                                .as_ref()
-                                                .unwrap();
-                                            log::info!("Commitment: {:?}", current_commitment);
-                                            match current_commitment {
-                                                TransactionConfirmationStatus::Processed => {}
-                                                TransactionConfirmationStatus::Confirmed
-                                                | TransactionConfirmationStatus::Finalized => {
-                                                    log::info!("Confirmed: true");
-                                                    return Ok(sig);
+                                            if let Some(current_commitment) =
+                                                signature_status.confirmation_status.as_ref()
+                                            {
+                                                log::info!("Commitment: {:?}", current_commitment);
+                                                match current_commitment {
+                                                    TransactionConfirmationStatus::Processed => {}
+                                                    TransactionConfirmationStatus::Confirmed
+                                                    | TransactionConfirmationStatus::Finalized => {
+                                                        log::info!("Confirmed: true");
+                                                        return Ok(sig);
+                                                    }
                                                 }
                                             }
                                         } else {
@@ -241,11 +244,11 @@ impl Gateway {
                             // Handle confirmation errors
                             Err(err) => {
                                 log::error!("Error confirming: {:?}", err);
-                                // TODO
                             }
                         }
-                        async_std::task::sleep(Duration::from_millis(2000)).await;
                     }
+
+                    // Failed to confirm tx
                     log::info!("Confirmed: false");
                 }
 
