@@ -48,9 +48,9 @@ pub fn User(id: String) -> Element {
     };
 
     let description = if user_id.eq(&ore::TREASURY_ADDRESS) {
-        Some("The treasury is a special program account responsible for minting and distributing the Ore supply.")
+        Some("This is a special program account responsible for minting and distributing the Ore token supply.")
     } else if BUS_ADDRESSES.contains(&user_id) {
-        Some("Busses are special program accounts responsible for issuing claimable rewards to miners.")
+        Some("This is a special program account responsible for issuing Ore to miners.")
     } else {
         None
     };
@@ -105,52 +105,29 @@ pub fn User(id: String) -> Element {
                 }
                 div {
                     class: "flex flex-col gap-1",
-                    div {
-                        class: "{container_class} -mr-2",
-                        p {
-                            class: "{title_class}",
-                            "ID"
-                        }
-                        Copyable {
-                            value: id.clone(),
-                            Link {
-                                class: "{link_class} font-mono",
-                                to: "{explorer_url}",
-                                "{id}"
-                            }
-                        }
-                    }
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{title_class}",
-                            "Staked"
-                        }
-                        if let Some(Ok(balance)) = balance.cloned() {
-                            span {
-                                class: "flex flex-row gap-1.5",
-                                OreIcon {
-                                    class: "w-3.5 h-3.5 my-auto",
-                                }
-                                p {
-                                    class: "{value_class} truncate",
-                                    "{balance.real_number_string_trimmed()}"
-                                }
-                            }
-                        } else {
+                    if !user_id.eq(&ore::TREASURY_ADDRESS) && !BUS_ADDRESSES.contains(&user_id) {
+                        div {
+                            class: "{container_class} -mr-2",
                             p {
-                                class: "{value_class} w-16 h-8 loading rounded",
+                                class: "{title_class}",
+                                "ID"
+                            }
+                            Copyable {
+                                value: id.clone(),
+                                Link {
+                                    class: "{link_class} font-mono",
+                                    to: "{explorer_url}",
+                                    "{id}"
+                                }
                             }
                         }
-                    }
-                    if let Some(Ok(proof)) = proof.cloned() {
-                        if proof.balance.gt(&0) {
-                            div {
-                                class: "{container_class}",
-                                p {
-                                    class: "{title_class}",
-                                    "Unclaimed rewards"
-                                }
+                        div {
+                            class: "{container_class}",
+                            p {
+                                class: "{title_class}",
+                                "Balance"
+                            }
+                            if let Some(Ok(balance)) = balance.cloned() {
                                 span {
                                     class: "flex flex-row gap-1.5",
                                     OreIcon {
@@ -158,8 +135,33 @@ pub fn User(id: String) -> Element {
                                     }
                                     p {
                                         class: "{value_class} truncate",
-                                        "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
-                                   }
+                                        "{balance.real_number_string_trimmed()}"
+                                    }
+                                }
+                            } else {
+                                p {
+                                    class: "{value_class} w-16 h-8 loading rounded",
+                                }
+                            }
+                        }
+                        if let Some(Ok(proof)) = proof.cloned() {
+                            if proof.balance.gt(&0) {
+                                div {
+                                    class: "{container_class}",
+                                    p {
+                                        class: "{title_class}",
+                                        "Staked"
+                                    }
+                                    span {
+                                        class: "flex flex-row gap-1.5",
+                                        OreIcon {
+                                            class: "w-3.5 h-3.5 my-auto",
+                                        }
+                                        p {
+                                            class: "{value_class} truncate",
+                                            "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
+                                       }
+                                    }
                                 }
                             }
                         }
