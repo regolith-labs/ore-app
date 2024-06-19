@@ -131,7 +131,7 @@ fn ImportKeyImport() -> Element {
                         enable_import_button.set(true);
                         match gateway.rpc.get_balance(&kp.pubkey()).await {
                             Ok(b) => sol_balance.set(Some(b)),
-                            Err(err) => sol_balance.set(None),
+                            Err(_err) => sol_balance.set(None),
                         }
                     }
                 } else if bytes.len().eq(&0) {
