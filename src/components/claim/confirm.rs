@@ -66,14 +66,15 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                         }
                         p {
                             class: "text-xs opacity-80 max-w-96",
-                            "When Solana is busy, priority fees can increase the chances of your transactions being accepted."
+                            "Add a priority fee to increase your chances of landing a transaction."
                         }
                     }
                     div {
                         class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
                         input {
                             disabled: *is_busy.read(),
-                            class: "bg-transparent text-right px-1 mb-auto",
+                            class: "bg-transparent text-right px-1 mb-auto font-semibold",
+                            dir: "rtl",
                             step: 100_000,
                             min: 0,
                             max: 50_000_000,

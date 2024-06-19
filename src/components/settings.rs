@@ -152,28 +152,34 @@ pub fn Settings() -> Element {
                     "Network"
                 }
                 div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class} mb-auto py-1",
-                        "RPC"
+                    class: "flex flex-col gap-2",
+                    div {
+                        class: "{container_class}",
+                        p {
+                            class: "{data_title_class}",
+                            "RPC"
+                        }
+                        div {
+                            class: "flex flex-col gap-2",
+                            input {
+                                autofocus: false,
+                                class: "w-full max-w-96 text-right placeholder-gray-300 dark:placeholder-gray-800 bg-transparent",
+                                value: "{rpc_url_input}",
+                                placeholder: "{RPC_URL}",
+                                oninput: move |evt| {
+                                    let s = evt.value();
+                                    rpc_url_input.set(s.clone());
+                                    if !is_url(&s) {
+                                        rpc_url_error.set(Some("Invalid url".to_string()));
+                                    } else {
+                                        rpc_url_error.set(None);
+                                    }
+                                },
+                            }
+                        }
                     }
                     div {
-                        class: "flex flex-col gap-2",
-                        input {
-                            autofocus: false,
-                            class: "w-full max-w-96 text-right placeholder-gray-300 dark:placeholder-gray-800 bg-transparent",
-                            value: "{rpc_url_input}",
-                            placeholder: "{RPC_URL}",
-                            oninput: move |evt| {
-                                let s = evt.value();
-                                rpc_url_input.set(s.clone());
-                                if !is_url(&s) {
-                                    rpc_url_error.set(Some("Invalid url".to_string()));
-                                } else {
-                                    rpc_url_error.set(None);
-                                }
-                            },
-                        }
+                        class: "flex flex-shrink gap-2 justify-end",
                         if let Some(err_str) = rpc_url_error.read().clone() {
                             p {
                                 class: "text-sm text-red-500 text-right",

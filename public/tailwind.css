@@ -772,6 +772,14 @@ h2:where(.dark, .dark *) {
   margin-top: auto;
 }
 
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
 .flex {
   display: flex;
 }
@@ -1378,6 +1386,10 @@ h2:where(.dark, .dark *) {
 
 .text-right {
   text-align: right;
+}
+
+.align-top {
+  vertical-align: top;
 }
 
 .font-hero {
