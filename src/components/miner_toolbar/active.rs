@@ -12,7 +12,7 @@ use crate::{
 
 #[component]
 pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
-    let mut time_remaining = use_signal(|| 0);
+    // let mut time_remaining = use_signal(|| 0);
     let mut toolbar_state = use_miner_toolbar_state();
 
     // Animate countdown timer.
@@ -71,9 +71,9 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                                 p {
                                     class: "text-lg text-white",
                                     "Searching for a valid hash... "
-                                    if time_remaining.read().gt(&0) {
-                                        "({time_remaining} sec)"
-                                    }
+                                    // if time_remaining.read().gt(&0) {
+                                    //     "({time_remaining} sec)"
+                                    // }
                                 }
                             }
                         }

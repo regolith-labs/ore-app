@@ -125,7 +125,7 @@ impl Miner {
         // Submit solution
         match submit_solution(&gateway, best_solution, priority_fee).await {
             // Start mining again
-            Ok(sig) => {
+            Ok(_sig) => {
                 proof.restart();
                 if let MinerStatus::Active = toolbar_state.status() {
                     toolbar_state.set_status_message(MinerStatusMessage::Searching);
