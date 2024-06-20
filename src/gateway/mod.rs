@@ -23,7 +23,7 @@ use solana_client_wasm::{
         sysvar,
         transaction::Transaction,
     },
-    utils::rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig},
+    utils::rpc_config::RpcSendTransactionConfig,
     WasmClient,
 };
 use solana_extra_wasm::{
@@ -48,20 +48,18 @@ pub const CU_LIMIT_MINE: u32 = 500_000;
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
 const CONFIRM_RETRIES: usize = 8;
-const SIMULATION_RETRIES: usize = 4;
-const DEFAULT_PRIORITY_FEE: u64 = 12_000_000;
+// const SIMULATION_RETRIES: usize = 4;
+// const DEFAULT_PRIORITY_FEE: u64 = 12_000_000;
 
 pub struct Gateway {
     pub rpc: WasmClient,
     api_url: String,
-    rpc_url: String,
 }
 
 impl Gateway {
     pub fn new(api_url: String, rpc_url: String) -> Self {
         Gateway {
             api_url,
-            rpc_url: rpc_url.clone(),
             rpc: WasmClient::new(&rpc_url),
         }
     }
@@ -125,7 +123,7 @@ impl Gateway {
     pub async fn send_and_confirm(
         &self,
         ixs: &[Instruction],
-        dynamic_cus: bool,
+        _dynamic_cus: bool,
         skip_confirm: bool,
     ) -> GatewayResult<Signature> {
         let signer = signer();
