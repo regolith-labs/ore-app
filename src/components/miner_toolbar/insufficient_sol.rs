@@ -10,11 +10,19 @@ use crate::{
 };
 
 pub fn MinerToolbarInsufficientFunds() -> Element {
-    let sol_balance = use_sol_balance();
-    let toolbar_state = use_miner_toolbar_state();
+    let mut sol_balance = use_sol_balance();
     let mut is_onboarded = use_is_onboarded();
+    let toolbar_state = use_miner_toolbar_state();
 
     // TODO Poll balance every 3 seconds
+    use_future(move || async move {
+        loop {
+            async_std::task::sleep(std::time::Duration::from_secs(2)).await;
+            if toolbar_state.is_open() {
+                sol_balance.restart();
+            }
+        }
+    });
 
     use_effect(move || {
         if let Some(Ok(sol_balance)) = *sol_balance.read() {

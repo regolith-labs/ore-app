@@ -127,7 +127,7 @@ pub fn User(id: String) -> Element {
                                 class: "{title_class}",
                                 "Balance"
                             }
-                            if let Some(Ok(balance)) = balance.cloned() {
+                            if let Some(balance) = balance.cloned() {
                                 span {
                                     class: "flex flex-row gap-1.5",
                                     OreIcon {
@@ -135,7 +135,7 @@ pub fn User(id: String) -> Element {
                                     }
                                     p {
                                         class: "{value_class} truncate",
-                                        "{balance.real_number_string_trimmed()}"
+                                        "{balance.map(|b| b.real_number_string_trimmed()).unwrap_or_else(|_| \"0.00\".to_owned())}"
                                     }
                                 }
                             } else {

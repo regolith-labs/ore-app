@@ -31,7 +31,6 @@ pub fn Balance() -> Element {
                             }
                             h2 {
                                 class: "text-3xl sm:text-4xl md:text-5xl",
-                                // "{balance.real_number_string_trimmed()}"
                                 "{amount}"
                             }
                         }
@@ -53,36 +52,34 @@ pub fn Balance() -> Element {
 pub fn StakeBalance() -> Element {
     let proof = use_proof();
 
-    if let Some(proof) = *proof.read() {
-        if let Ok(proof) = proof {
-            if proof.balance.gt(&0) {
-                return rsx! {
+    if let Some(Ok(proof)) = *proof.read() {
+        if proof.balance.gt(&0) {
+            return rsx! {
+                div {
+                    class: "flex flex-row grow justify-between mt-4 -mr-2",
                     div {
-                        class: "flex flex-row grow justify-between mt-4 -mr-2",
-                        div {
-                            class: "flex flex-col gap-2",
-                            p {
-                                class: "font-medium text-xs text-gray-300",
-                                "Staking balance"
-                            }
-                            div {
-                                class: "flex flex-row gap-2",
-                                OreIcon {
-                                    class: "my-auto w-4 h-4"
-                                }
-                                p {
-                                    class: "font-semibold",
-                                    "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
-                                }
-                            }
+                        class: "flex flex-col gap-2",
+                        p {
+                            class: "font-medium text-xs text-gray-300",
+                            "Staking balance"
                         }
-                        span {
-                            class: "mt-auto",
-                            ClaimButton {}
+                        div {
+                            class: "flex flex-row gap-2",
+                            OreIcon {
+                                class: "my-auto w-4 h-4"
+                            }
+                            p {
+                                class: "font-semibold",
+                                "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
+                            }
                         }
                     }
-                };
-            }
+                    span {
+                        class: "mt-auto",
+                        ClaimButton {}
+                    }
+                }
+            };
         }
     }
 

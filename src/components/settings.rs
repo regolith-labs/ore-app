@@ -5,11 +5,10 @@ use is_url::is_url;
 use solana_client_wasm::solana_sdk::native_token::lamports_to_sol;
 
 use crate::{
-    components::{Appearance, BackupKeypairWarning, Copyable},
+    components::{Appearance, Copyable},
     gateway::RPC_URL,
     hooks::{
-        use_appearance, use_explorer, use_pubkey, use_rpc_url, use_show_backup_warning,
-        use_sol_balance, Explorer, RpcUrl,
+        use_appearance, use_explorer, use_pubkey, use_rpc_url, use_sol_balance, Explorer, RpcUrl,
     },
     route::Route,
 };
@@ -17,7 +16,6 @@ use crate::{
 pub fn Settings() -> Element {
     let mut explorer = use_explorer();
     let mut appearance = use_appearance();
-    let show_backup_warning = use_show_backup_warning();
     let pubkey = use_pubkey();
     let sol_balance = use_sol_balance();
 
@@ -37,12 +35,6 @@ pub fn Settings() -> Element {
                 class: "flex flex-col gap-4 w-full",
                 h2 {
                     "Settings"
-                }
-                if cfg!(feature = "web") && show_backup_warning.read().0 {
-                    div {
-                        class: "mt-8",
-                        BackupKeypairWarning {}
-                    }
                 }
                 h2 {
                     class: "{section_title_class} mt-8",
