@@ -39,10 +39,10 @@ pub fn BackupKeypairWarning() -> Element {
                         show_backup_warning.set(ShowBackupWarning(false));
                     },
                     class: "flex flex-row gap-2 hover:bg-orange-600 active:bg-orange-700 text-white px-3 py-2 rounded font-semibold transition-colors",
-                    EyeSlashIcon {
-                        class: "w-4 h-4 my-auto"
-                    }
-                    "Hide"
+                    // EyeSlashIcon {
+                    //     class: "w-4 h-4 my-auto"
+                    // }
+                    "I have backed up my keypair"
                 }
             }
         }

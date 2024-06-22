@@ -61,12 +61,8 @@ pub fn SendEdit(
                 }
                 p {
                     class: "text-lg",
-                    "Send Ore to another user."
+                    "Transfer ORE to another user."
                 }
-                // p {
-                //     class: "text-gray-300 text-sm",
-                //     "This will transfer Ore from your account to another."
-                // }
             }
             div {
                 class: "flex flex-col gap-12",
