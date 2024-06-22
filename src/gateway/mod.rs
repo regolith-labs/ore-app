@@ -39,19 +39,14 @@ use solana_extra_wasm::{
 use web_time::Duration;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-pub const RPC_URL: &str =
-    "https://devnet.helius-rpc.com/?api-key=1de92644-323b-4900-9041-13c02730955c";
-// pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01HTD8PPGDM1JBVQVEVJKXZ47F";
+pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
-// pub const CU_LIMIT_RESET: u32 = 12_200;
 pub const CU_LIMIT_MINE: u32 = 500_000;
 
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
 const CONFIRM_RETRIES: usize = 8;
-// const SIMULATION_RETRIES: usize = 4;
-// const DEFAULT_PRIORITY_FEE: u64 = 12_000_000;
 
 pub struct Gateway {
     pub rpc: WasmClient,
