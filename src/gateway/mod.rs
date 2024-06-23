@@ -39,7 +39,8 @@ use solana_extra_wasm::{
 use web_time::Duration;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
+// pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
+pub const RPC_URL: &str = "http://localhost:8899";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
@@ -414,4 +415,9 @@ pub fn signer() -> Keypair {
 #[cached]
 pub fn ore_token_account_address(pubkey: Pubkey) -> Pubkey {
     get_associated_token_address(&pubkey, &ore::MINT_ADDRESS)
+}
+
+#[cached]
+pub fn ore_token_account_address_v1(pubkey: Pubkey) -> Pubkey {
+    get_associated_token_address(&pubkey, &ore::MINT_V1_ADDRESS)
 }
