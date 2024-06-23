@@ -655,10 +655,6 @@ h2:where(.dark, .dark *) {
   position: relative;
 }
 
-.inset-0 {
-  inset: 0px;
-}
-
 .inset-x-0 {
   left: 0px;
   right: 0px;
@@ -684,16 +680,16 @@ h2:where(.dark, .dark *) {
   top: 0px;
 }
 
+.z-0 {
+  z-index: 0;
+}
+
 .z-20 {
   z-index: 20;
 }
 
 .z-50 {
   z-index: 50;
-}
-
-.z-0 {
-  z-index: 0;
 }
 
 .m-auto {
@@ -718,11 +714,6 @@ h2:where(.dark, .dark *) {
 .my-auto {
   margin-top: auto;
   margin-bottom: auto;
-}
-
-.my-2 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .-ml-2 {
@@ -1064,6 +1055,10 @@ h2:where(.dark, .dark *) {
   scroll-snap-type: y var(--tw-scroll-snap-strictness);
 }
 
+.snap-both {
+  scroll-snap-type: both var(--tw-scroll-snap-strictness);
+}
+
 .snap-mandatory {
   --tw-scroll-snap-strictness: mandatory;
 }
@@ -1072,8 +1067,8 @@ h2:where(.dark, .dark *) {
   scroll-snap-align: start;
 }
 
-.snap-center {
-  scroll-snap-align: center;
+.snap-always {
+  scroll-snap-stop: always;
 }
 
 .list-outside {
@@ -1529,6 +1524,10 @@ h2:where(.dark, .dark *) {
   opacity: 0;
 }
 
+.opacity-100 {
+  opacity: 1;
+}
+
 .opacity-50 {
   opacity: 0.5;
 }
@@ -1539,10 +1538,6 @@ h2:where(.dark, .dark *) {
 
 .opacity-80 {
   opacity: 0.8;
-}
-
-.opacity-100 {
-  opacity: 1;
 }
 
 .shadow-sm {
@@ -1595,14 +1590,6 @@ h2:where(.dark, .dark *) {
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-}
-
-.duration-500 {
-  transition-duration: 500ms;
-}
-
-.duration-200 {
-  transition-duration: 200ms;
 }
 
 .duration-1000 {
