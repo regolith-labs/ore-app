@@ -45,7 +45,21 @@ pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element
                     class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
                     disabled: *is_busy.read(),
                     onclick: move |_| {
+                        let gateway = gateway.clone();
                         is_busy.set(true);
+                        spawn(async move {
+                            match gateway.upgrade_ore(amount).await {
+                                Ok(sig) => {
+                                    log::info!("Upgrade: {:?}", sig);
+                                    is_busy.set(false);
+                                }
+                                Err(err) => {
+                                    // TODO: Handle error
+                                    is_busy.set(false);
+                                    log::error!("Failed to send: {:?}", err);
+                                }
+                            }
+                        });
                     },
                     if *is_busy.read() {
                         Spinner { class: "mx-auto" }
