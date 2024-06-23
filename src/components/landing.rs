@@ -1,11 +1,14 @@
 use dioxus::prelude::*;
+use num_format::{Locale, ToFormattedString};
 use ore_types::Transfer;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
     components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon},
-    hooks::{use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter},
+    hooks::{
+        use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter, UiTokenAmountBalance,
+    },
     route::Route,
     utils::asset_path,
 };
@@ -26,19 +29,19 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Proof of work.",
                 title2: &"On Solana.",
-                detail: &"Ore uses a novel mining protocol designed for fair token distribution. It guarantees no miner can ever be starved out from earning rewards.",
+                detail: &"ORE uses a novel hash function designed for fairness so every miner can earn rewards.",
                 section: Section::A
             }
             Block {
-                title: &"Stable supply.",
+                title: &"Fixed supply.",
                 title2: &"Steady growth.",
-                detail: &"Ore has a limited total supply of 21m tokens. It uses an algorithmic supply function meaning on average one new Ore token is mined every minute around the globe.",
+                detail: &"ORE has a total supply limit of 21m tokens. On average, one new token is currently mined every minute by miners around the globe.",
                 section: Section::B
             }
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"Ore has no insider token allocation nor pre-mined supply. The smart contract has been frozen and open-sourced to prevent tampering or removal.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract has been frozen and open-sourced to prevent tampering or removal.",
                 section: Section::C
             }
             Footer {}
@@ -57,34 +60,45 @@ fn Navbar() -> Element {
                     class: "h-6 md:h-8"
                 }
             }
+            div {
+                class: "sm:text-sm md:text-base lg:text-lg",
+                // TODO Language translator
+                // TODO Buy link to Jupiter
+                // Link {
+                //     class: "font-semibold text-white bg-black hover:bg-gray-900 active:bg-gray-800 transition-colors px-4 py-3 rounded-full",
+                //     to: Route::Home {},
+                //     "Get started →"
+                // }
+            }
         }
     }
 }
 
 fn Hero() -> Element {
-    let bg_img = asset_path("smoke.jpg");
+    // let bg_img = asset_path("smoke.jpg");
+    let bg_img = asset_path("rock.png");
     rsx! {
         div {
             class: "bg-white",
             div {
                 class: "flex flex-col w-full h-screen z-20 bg-cover bg-center",
-                style: "background-image: url({bg_img})",
+                // style: "background-image: url({bg_img})",
                 Navbar {}
                 div {
-                    class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 mx-auto my-auto pb-24 px-4 sm:px-8",
+                    class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 w-full md:mx-auto my-auto pb-24 px-4 md:px-8",
                     div {
-                        class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8",
+                        class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8 text-black",
                         p {
-                            class: "text-center text-4xl min-[480px]:text-5xl min-[600px]:text-6xl md:text-7xl lg:text-8xl font-bold font-hero text-black",
+                            class: "text-left sm:text-center text-6xl md:text-7xl lg:text-8xl font-bold font-hero",
                             "It's time to mine."
                         }
                         p {
-                            class: "text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center max-w-[46rem] font-hero leading-7 text-black",
-                            "Ore is a digital currency you can mine from anywhere, at home or on your phone."
+                            class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-hero font-medium w-full",
+                            "ORE is a digital currency everyone can mine."//" Start mining at home or on your phone today."
                         }
                     }
                     Link {
-                        class: "mx-auto sm:text-lg md:text-xl lg:text-2xl font-semibold bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transition-colors rounded-full px-6 py-3",
+                        class: "mr-auto sm:mx-auto text-center sm:text-lg md:text-xl lg:text-2xl font-semibold bg-black hover:bg-gray-900 active:bg-gray-800 text-white transition-colors px-6 py-3 rounded-full",
                         to: Route::Home {},
                         "Get started →"
                     }
@@ -96,10 +110,17 @@ fn Hero() -> Element {
 
 #[component]
 fn Block(title: String, title2: String, detail: String, section: Section) -> Element {
+    let bg_img = match section {
+        Section::A => asset_path("rock-4.jpg"),
+        Section::B => asset_path("rock-8.png"),
+        Section::C => asset_path("rock-2.png"),
+    };
+
     let colors = match section {
-        Section::A => "bg-black text-white",
-        Section::B => "bg-white text-black",
-        Section::C => "bg-green-500 text-white",
+        _ => "bg-black text-white",
+        // Section::A => "bg-black text-white",
+        // Section::B => "bg-white text-black",
+        // Section::C => "bg-green-500 text-white",
     };
     let height = match section {
         Section::A | Section::B => "min-h-svh h-full",
@@ -107,7 +128,8 @@ fn Block(title: String, title2: String, detail: String, section: Section) -> Ele
     };
     rsx! {
         div {
-            class: "flex w-full z-20 {colors} {height}",
+            class: "flex w-full z-20 bg-cover bg-center {colors} {height}",
+            style: "background-image: url({bg_img})",
             div {
                 class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
@@ -132,7 +154,7 @@ fn Block(title: String, title2: String, detail: String, section: Section) -> Ele
                 div {
                     class: "flex h-full w-full",
                     match section {
-                        Section::A => rsx! { SectionA {} },
+                        // Section::A => rsx! { SectionA {} },
                         Section::B => rsx! { SectionB {} },
                         _ => None
                     }
@@ -287,8 +309,8 @@ fn SectionB() -> Element {
     let circulating_supply = supply
         .cloned()
         .and_then(|s| s.ok())
-        .map(|s| s.ui_amount_string)
-        .unwrap_or_else(|| "Err".to_string());
+        .map(|s| amount_to_ui_amount(s.balance(), s.decimals))
+        .unwrap_or_else(|| 0f64) as u64;
     rsx! {
         div {
             class: "flex flex-col gap-12 my-auto",
@@ -298,14 +320,14 @@ fn SectionB() -> Element {
             }
             OreValue {
                 title: "Total supply".to_string(),
-                amount: "21,000,000"
+                amount: 21_000_000
             }
         }
     }
 }
 
 #[component]
-fn OreValue(title: String, amount: String) -> Element {
+fn OreValue(title: String, amount: u64) -> Element {
     rsx! {
         div {
             class: "flex flex-col gap-3",
@@ -320,7 +342,7 @@ fn OreValue(title: String, amount: String) -> Element {
                 }
                 p {
                     class: "text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
-                    "{amount}"
+                    "{amount.to_formatted_string(&Locale::en)}"
                 }
             }
         }
