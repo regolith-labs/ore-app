@@ -24,7 +24,8 @@ pub fn Landing() -> Element {
         (asset_path("rock.png"), TextColor::Black),
         (asset_path("rock-2.jpg"), TextColor::White),
         (asset_path("rock-3.png"), TextColor::White),
-        // (asset_path("rock-4.png"), TextColor::White),
+        (asset_path("rock-4.jpg"), TextColor::White),
+        (asset_path("rock-5.jpg"), TextColor::White),
     ];
     let mut i = use_signal(|| 0usize);
     let nav = navigator();
@@ -45,15 +46,15 @@ pub fn Landing() -> Element {
     let len = themes.len();
     let text_color = themes[*i.read() % len].1;
     rsx! {
-        div {
-            class: "relative flex flex-col",
-            for (index, theme) in themes.iter().enumerate() {
-                BgImg {
-                    visible: *i.read() % len == index,
-                    bg_img: theme.0.clone(),
-                    index
-                }
+        for (index, theme) in themes.iter().enumerate() {
+            BgImg {
+                visible: *i.read() % len == index,
+                bg_img: theme.0.clone(),
+                index
             }
+        }
+        div {
+            class: "overflow-y-scroll z-50 snap-y snap-mandatory",
             Hero {
                 text_color
             }
