@@ -13,7 +13,7 @@ pub fn WhatIsMining() -> Element {
                     class: "font-bold",
                     "Crypto mining is the process of producing digital tokens by burning energy. "
                 }
-                "This is a big idea with far reaching implications. Let's break it all down, one concept at a time."
+                "This is a big idea with far reaching implications. Let's break it down, one concept at a time."
             }
             p {
                 class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
