@@ -1063,8 +1063,16 @@ h2:where(.dark, .dark *) {
   --tw-scroll-snap-strictness: mandatory;
 }
 
+.snap-proximity {
+  --tw-scroll-snap-strictness: proximity;
+}
+
 .snap-start {
   scroll-snap-align: start;
+}
+
+.snap-center {
+  scroll-snap-align: center;
 }
 
 .snap-always {

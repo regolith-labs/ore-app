@@ -24,8 +24,8 @@ pub fn Landing() -> Element {
         (asset_path("rock.png"), TextColor::Black),
         (asset_path("rock-2.jpg"), TextColor::White),
         (asset_path("rock-3.png"), TextColor::White),
-        (asset_path("rock-4.jpg"), TextColor::White),
-        (asset_path("rock-5.jpg"), TextColor::White),
+        (asset_path("rock-4.png"), TextColor::White),
+        // (asset_path("rock-5.jpg"), TextColor::White),
     ];
     let mut i = use_signal(|| 0usize);
     let nav = navigator();
@@ -54,7 +54,7 @@ pub fn Landing() -> Element {
             }
         }
         div {
-            class: "overflow-y-scroll z-50 snap-y snap-mandatory",
+            class: "absolute top-0 flex flex-col w-full h-full overflow-y-scroll z-50 snap-y snap-mandatory",
             Hero {
                 text_color
             }
@@ -139,7 +139,7 @@ fn Hero(text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col w-full h-screen z-50",
+            class: "flex flex-col min-h-svh h-full w-full snap-center snap-always",
             Navbar {
                 text_color
             }
@@ -185,13 +185,13 @@ fn Block(
     };
     rsx! {
         div {
-            class: "flex w-full z-20 min-h-svh h-full",
+            class: "flex min-h-svh h-full w-full snap-center snap-always",
             div {
                 class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
                     class: "flex flex-col gap-4 sm:gap-6 md:gap-8 transition-colors duration-1000 {copy_color}",
                     p {
-                        class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
+                        class: "text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
                         "{title}"
                         br {}
                         span {
@@ -200,7 +200,7 @@ fn Block(
                         }
                     }
                     p {
-                        class: "text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed max-w-[48rem] font-medium font-hero",
+                        class: "text-xl md:text-2xl lg:text-3xl leading-relaxed max-w-[48rem] font-medium font-hero",
                         "{detail}"
                     }
                     BlockCta {
