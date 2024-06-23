@@ -5,9 +5,15 @@ use crate::{
     hooks::{use_ore_balance_v1, UiTokenAmountBalance},
 };
 
+use super::UpgradeStep;
+
 #[component]
-pub fn UpgradeEdit(amount_input: Signal<String>, parsed_amount: u64) -> Element {
-    // let nav = navigator();
+pub fn UpgradeEdit(
+    upgrade_step: Signal<UpgradeStep>,
+    amount_input: Signal<String>,
+    parsed_amount: u64,
+) -> Element {
+    let nav = navigator();
     let balance = use_ore_balance_v1();
     let (max_amount, max_amount_str) = balance
         .cloned()
@@ -19,9 +25,9 @@ pub fn UpgradeEdit(amount_input: Signal<String>, parsed_amount: u64) -> Element 
     } else {
         None
     };
-    // let is_disabled = amount_input.read().len().eq(&0)
-    //     || amount_input.read().parse::<f64>().is_err()
-    //     || amount_error_text.is_some();
+    let is_disabled = amount_input.read().len().eq(&0)
+        || amount_input.read().parse::<f64>().is_err()
+        || amount_error_text.is_some();
     rsx! {
         div { class: "flex flex-col h-full grow gap-12",
             div { class: "flex flex-col gap-3",
@@ -57,6 +63,21 @@ pub fn UpgradeEdit(amount_input: Signal<String>, parsed_amount: u64) -> Element 
                         WarningIcon { class: "w-4 h-4 my-auto" }
                         "{err}"
                     }
+                }
+            }
+            div { class: "flex flex-col sm:flex-row gap-2 mt-auto",
+                button {
+                    class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
+                    onclick: move |_| {
+                        nav.go_back();
+                    },
+                    "Cancel"
+                }
+                button {
+                    class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
+                    disabled: is_disabled,
+                    onclick: move |_| { upgrade_step.set(UpgradeStep::Confirm) },
+                    "Review"
                 }
             }
         }
