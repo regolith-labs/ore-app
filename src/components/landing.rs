@@ -2,8 +2,6 @@ use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_types::Transfer;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
-use wasm_bindgen::{closure::Closure, JsCast};
-use web_sys::window;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{

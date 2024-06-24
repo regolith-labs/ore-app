@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::components::{
     Claim, Download, ExportKey, Home, ImportKey, Landing, MinerToolbarLayout, Navbar,
-    OreTokenomics, PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
+    OreTokenomics, PageNotFound, Send, Settings, SimpleNavbar, Tx, Upgrade, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
