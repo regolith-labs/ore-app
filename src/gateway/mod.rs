@@ -39,8 +39,8 @@ use solana_extra_wasm::{
 use web_time::Duration;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-// pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
-pub const RPC_URL: &str = "http://localhost:8899";
+pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
+// pub const RPC_URL: &str = "http://localhost:8899";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
@@ -126,7 +126,7 @@ impl Gateway {
         skip_confirm: bool,
     ) -> GatewayResult<Signature> {
         let signer = signer();
-        let (hash, _slot) = self
+        let (hash, slot) = self
             .rpc
             .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
             .await
@@ -136,8 +136,7 @@ impl Gateway {
             preflight_commitment: Some(CommitmentLevel::Confirmed),
             encoding: Some(UiTransactionEncoding::Base64),
             max_retries: Some(RPC_RETRIES),
-            // min_context_slot: Some(slot),
-            min_context_slot: None,
+            min_context_slot: Some(slot),
         };
 
         // Build tx
