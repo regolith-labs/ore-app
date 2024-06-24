@@ -126,7 +126,7 @@ impl Gateway {
         skip_confirm: bool,
     ) -> GatewayResult<Signature> {
         let signer = signer();
-        let (hash, slot) = self
+        let (hash, _slot) = self
             .rpc
             .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
             .await
@@ -136,7 +136,8 @@ impl Gateway {
             preflight_commitment: Some(CommitmentLevel::Confirmed),
             encoding: Some(UiTransactionEncoding::Base64),
             max_retries: Some(RPC_RETRIES),
-            min_context_slot: Some(slot),
+            // min_context_slot: Some(slot),
+            min_context_slot: None,
         };
 
         // Build tx
