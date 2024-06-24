@@ -23,6 +23,8 @@ enum TextColor {
 
 pub fn Landing() -> Element {
     // let mut current_page = use_signal(|| 0);
+    let nav = navigator();
+    let is_onboarded = use_is_onboarded();
     let mut i = use_signal(|| 0usize);
     let themes = [
         (asset_path("rock.png"), TextColor::Black),
@@ -31,39 +33,22 @@ pub fn Landing() -> Element {
         (asset_path("rock-4.png"), TextColor::White),
         // (asset_path("rock-5.jpg"), TextColor::White),
     ];
-    let nav = navigator();
-    let is_onboarded = use_is_onboarded();
+    let len = themes.len();
+    let text_color = themes[*i.read() % len].1;
 
-    // use_effect(move || {
-    //     let mut i_ = i.clone();
-    //     let window = window().unwrap();
-    //     let window_ = window.clone();
-    //     let closure = Closure::wrap(Box::new(move || {
-    //         let scroll_top = window_.scroll_y().unwrap();
-    //         let window_height = window_.inner_height().unwrap().as_f64().unwrap();
-    //         let new_page = get_current_page(scroll_top, window_height, 4);
-    //         i_.set(new_page);
-    //     }) as Box<dyn FnMut()>);
-    //     window
-    //         .add_event_listener_with_callback("scroll", closure.as_ref().unchecked_ref())
-    //         .unwrap();
-    //     closure.forget();
-    // });
-
-    // use_future(move || async move {
-    //     loop {
-    //         async_std::task::sleep(Duration::from_secs(8)).await;
-    //         i.set(i.cloned().saturating_add(1));
-    //     }
-    // });
+    // Change the background image every 8 sec
+    use_future(move || async move {
+        loop {
+            async_std::task::sleep(Duration::from_secs(8)).await;
+            i.set(i.cloned().saturating_add(1));
+        }
+    });
 
     // If the user is already onboarded, redirect to home.
     if is_onboarded.read().0 {
         nav.replace(Route::Home {});
     }
 
-    let len = themes.len();
-    let text_color = themes[*i.read() % len].1;
     rsx! {
         for (index, theme) in themes.iter().enumerate() {
             BgImg {
@@ -75,18 +60,20 @@ pub fn Landing() -> Element {
         div {
             class: "absolute top-0 flex flex-col w-full h-full overflow-y-scroll z-50 snap-y snap-mandatory",
             Hero {
-                text_color
+                text_color,
+                title: "It's time to mine.",
+                subtitle: &"ORE is a fair-launch, proof-of-work, cross-border digital currency everyone can mine."
             }
             Block {
                 title: &"Proof of work.",
                 title2: &"On Solana.",
-                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need advanced hardware to get started and earn tokens.",
+                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need any advanced hardware or a degree to get started.",
                 section: Section::A,
                 text_color
             }
             Block {
                 title: &"Limited supply.",
-                title2: &"Steady opportunity.",
+                title2: &"Predictable future.",
                 detail: &"ORE has a fixed total supply of 21m tokens. At a rate of one per minute, all ORE will be mined by the year 2064.",
                 section: Section::B,
                 text_color
@@ -94,23 +81,21 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart-contract is open-source and audited by world-class teams.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart-contract is open-source and audited by multiple world-class teams.",
                 section: Section::C,
                 text_color
+                // TODO Ottersec logo
+                // TODO Sec3
+                // TODO Neodyme
             }
+            // TODO Buy block (CTA link to Jupiter)
             // Footer {}
         }
     }
 }
 
-fn get_current_page(scroll_top: f64, window_height: f64, num_pages: usize) -> usize {
-    let page_height = window_height / num_pages as f64;
-    (scroll_top / page_height).floor() as usize
-}
-
 #[component]
 fn BgImg(visible: bool, bg_img: String, index: usize) -> Element {
-    // let visibility = if visible { "visible" } else { "hidden" };
     let visibility = if visible { "opacity-100" } else { "opacity-0" };
     rsx! {
         div {
@@ -140,7 +125,6 @@ fn Navbar(text_color: TextColor) -> Element {
             div {
                 class: "sm:text-sm md:text-base lg:text-lg",
                 // TODO Language translator
-                // TODO Buy link to Jupiter
                 // Link {
                 //     class: "font-semibold text-white bg-black hover:bg-gray-900 active:bg-gray-800 transition-colors px-4 py-3 rounded-full",
                 //     to: Route::Home {},
@@ -152,7 +136,7 @@ fn Navbar(text_color: TextColor) -> Element {
 }
 
 #[component]
-fn Hero(text_color: TextColor) -> Element {
+fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
     let copy_color = match text_color {
         TextColor::Black => "text-black",
         TextColor::White => "text-white",
@@ -173,11 +157,11 @@ fn Hero(text_color: TextColor) -> Element {
                     class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8 {copy_color} transition-colors duration-1000",
                     p {
                         class: "text-left sm:text-center text-6xl md:text-7xl lg:text-8xl font-bold font-hero",
-                        "It's time to mine."
+                        "{title}"
                     }
                     p {
-                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-hero font-medium w-full",
-                        "ORE is a cross-border digital currency everyone can mine."//" Start mining at home or on your phone today."
+                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl max-w-[960px] mx-auto font-hero font-medium",
+                        "{subtitle}"
                     }
                 }
                 Link {
@@ -257,7 +241,7 @@ fn BlockCta(section: Section, text_color: TextColor) -> Element {
             Link {
                 class: "{style} {cta_color}",
                 to: Route::WhatIsMining {},
-                "Learn more →"
+                "Download the app →"
             }
         },
         Section::B => rsx! {
@@ -271,7 +255,7 @@ fn BlockCta(section: Section, text_color: TextColor) -> Element {
             Link {
                 class: "{style} {cta_color}",
                 to: "https://github.com/regolith-labs/ore",
-                "Read the code →"
+                "Checkout the code →"
             }
         },
     }
