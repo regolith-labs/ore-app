@@ -6,8 +6,7 @@ use crate::components::CodeBlock;
 const DESKTOP_DOWNLOAD_MAC: &str =
     "https://github.com/HardhatChad/ore-app/releases/download/v1.0.1/Ore-MacOS.zip";
 
-#[component]
-pub fn Download(cx: Scope) -> Element {
+pub fn Download() -> Element {
     render! {
         div {
             class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20 leading-7",

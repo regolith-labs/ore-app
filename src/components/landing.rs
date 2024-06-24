@@ -7,7 +7,7 @@ use web_sys::window;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
-    components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon, XIcon},
+    components::{ActivityIndicator, DiscordIcon, Footer, GithubIcon, OreIcon, OreLogoIcon, XIcon},
     hooks::{
         use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter, UiTokenAmountBalance,
     },
@@ -62,12 +62,12 @@ pub fn Landing() -> Element {
             Hero {
                 text_color,
                 title: "It's time to mine.",
-                subtitle: &"ORE is a fair-launch, proof-of-work, cross-border digital currency anyone can mine."
+                subtitle: &"ORE is a fair-launch, proof-of-work, cross-border digital currency."
             }
             Block {
                 title: &"Proof of work.",
                 title2: &"On Solana.",
-                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need advanced hardware or any degree to get started.",
+                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need any advanced hardware or a degree to get started.",
                 section: Section::A,
                 text_color
             }
@@ -96,7 +96,6 @@ pub fn Landing() -> Element {
                 text_color
                 // TODO Current price (in USD, EUR, YUAN, YEN, BTC, SOL, ETH, etc.)
             }
-            // TODO Buy block (CTA link to Jupiter)
             // Footer {}
         }
     }
@@ -126,19 +125,36 @@ fn Navbar(text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-row justify-between px-4 sm:px-8 py-8 w-full transition-colors duration-1000 {copy_color}",
+            class: "flex flex-row justify-between px-4 sm:px-8 py-4 md:py-8 w-full transition-colors duration-1000 {copy_color}",
             Link {
                 to: Route::Landing {},
-                class: "flex flex-row h-10",
+                class: "flex flex-row h-10 my-auto",
                 OreLogoIcon {
-                    class: "h-6 md:h-8"
+                    class: "h-6 md:h-8 my-auto"
                 }
             }
             div {
-                class: "sm:text-sm md:text-base lg:text-lg",
+                class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-8",
+                Link {
+                    to: "https://discord.gg/ore-supply",
+                    class: "flex h-10 w-10 transition-colors rounded-full transition-colors duration-1000 {button_color}",
+                    new_tab: true,
+                    DiscordIcon {
+                        class: "w-6 h-6 m-auto"
+                    }
+                }
+                Link {
+                    to: "https://github.com/regolith-labs/ore",
+                    class: "flex h-10 w-10 transition-colors rounded-full transition-colors duration-1000 {button_color}",
+                    new_tab: true,
+                    GithubIcon {
+                        class: "w-6 h-6 m-auto"
+                    }
+                }
                 Link {
                     to: "https://x.com/oresupply",
                     class: "flex h-10 w-10 transition-colors rounded-full transition-colors duration-1000 {button_color}",
+                    new_tab: true,
                     XIcon {
                         class: "w-5 h-5 m-auto"
                     }
@@ -173,7 +189,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
                         "{title}"
                     }
                     p {
-                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl max-w-[960px] mx-auto font-hero font-medium",
+                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl mx-auto font-hero font-medium",
                         "{subtitle}"
                     }
                 }
@@ -248,7 +264,7 @@ fn BlockCta(section: Section, text_color: TextColor) -> Element {
         Section::A => rsx! {
             Link {
                 class: "{style} {cta_color}",
-                to: Route::WhatIsMining {},
+                to: Route::Download {},
                 "Download the app →"
             }
         },
