@@ -72,9 +72,9 @@ pub fn Landing() -> Element {
                 text_color
             }
             Block {
-                title: &"Limited supply.",
+                title: &"Fixed supply.",
                 title2: &"Predictable future.",
-                detail: &"ORE has a fixed total supply of 21m tokens. At a steady rate of one per minute, all tokens in existence will be mined by the year 2064.",
+                detail: &"ORE has a total supply limit of 21m tokens. At a steady rate of one per minute, all ORE in existence will be mined by the year 2064.",
                 section: Section::B,
                 text_color
             }
