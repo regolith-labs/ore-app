@@ -19,7 +19,7 @@ pub fn OreTokenomics() -> Element {
             class: "flex flex-col gap-4 h-full font-hero max-w-3xl w-full mx-auto pb-20 leading-7",
             p {
                 class: "text-4xl font-bold",
-                "Ore tokenomics"
+                "ORE Tokenomics"
             }
             p {
                 "(Coming soon...)"
@@ -28,23 +28,15 @@ pub fn OreTokenomics() -> Element {
                 "Here are the key points:"
                 li {
                     class: "ml-2",
-                    "Ore has no maximum supply limit."
+                    "ORE has a supply cap of 21 million tokens."
                 }
                 li {
                     class: "ml-2",
-                    "Ore supply grows at a linear rate of 1 ORE/min."
+                    "One new ORE token is mined every minute."
                 }
                 li {
                     class: "ml-2",
-                    "It will take ~40 years for the total Ore supply to reach 21 million tokens."
-                }
-                li {
-                    class: "ml-2",
-                    "Approximately ~42 million tokens will be mined during an average human lifetime."
-                }
-                li {
-                    class: "ml-2",
-                    "This will be true for all future generations of users as it is today."
+                    "It will take ~40 years until the total ORE supply is fully mined."
                 }
             }
         }

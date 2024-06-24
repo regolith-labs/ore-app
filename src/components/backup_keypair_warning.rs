@@ -1,7 +1,6 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::EyeSlashIcon,
     hooks::{use_show_backup_warning, ShowBackupWarning},
     route::Route,
 };
