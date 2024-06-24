@@ -2,7 +2,9 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
-use crate::gateway::{ore_token_account_address, GatewayError, GatewayResult};
+use crate::gateway::{
+    ore_token_account_address, ore_token_account_address_v1, GatewayError, GatewayResult,
+};
 
 use super::{use_gateway, use_pubkey};
 
@@ -22,9 +24,29 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     })
 }
 
+pub fn use_ore_balance_v1() -> Resource<GatewayResult<UiTokenAmount>> {
+    let pubkey = use_pubkey();
+    use_ore_balance_user_v1(pubkey)
+}
+
 pub fn use_ore_balance_user(pubkey: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
     let gateway = use_gateway();
     let token_account_address = ore_token_account_address(pubkey);
+    use_resource(move || {
+        let gateway = gateway.clone();
+        async move {
+            gateway
+                .rpc
+                .get_token_account_balance(&token_account_address)
+                .await
+                .map_err(GatewayError::from)
+        }
+    })
+}
+
+pub fn use_ore_balance_user_v1(pubkey: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
+    let gateway = use_gateway();
+    let token_account_address = ore_token_account_address_v1(pubkey);
     use_resource(move || {
         let gateway = gateway.clone();
         async move {
