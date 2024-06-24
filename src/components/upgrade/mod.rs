@@ -1,14 +1,18 @@
 mod confirm;
+mod done;
 mod edit;
 
 use confirm::*;
+use done::*;
 use edit::*;
 
 use dioxus::prelude::*;
+use solana_client_wasm::solana_sdk::signature::Signature;
 
 pub enum UpgradeStep {
     Edit,
     Confirm,
+    Done(Signature),
 }
 
 #[component]
@@ -34,6 +38,14 @@ pub fn Upgrade() -> Element {
             rsx! {
                 UpgradeConfirm {
                     upgrade_step: upgrade_step,
+                    amount: parsed_amount
+                }
+            }
+        }
+        UpgradeStep::Done(signature) => {
+            rsx! {
+                UpgradeDone {
+                    signature: signature,
                     amount: parsed_amount
                 }
             }

@@ -51,6 +51,7 @@ pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element
                             match gateway.upgrade_ore(amount).await {
                                 Ok(sig) => {
                                     log::info!("Upgrade: {:?}", sig);
+                                    upgrade_step.set(UpgradeStep::Done(sig));
                                     is_busy.set(false);
                                 }
                                 Err(err) => {
