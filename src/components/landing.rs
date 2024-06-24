@@ -2,6 +2,8 @@ use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_types::Transfer;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
+use wasm_bindgen::{closure::Closure, JsCast};
+use web_sys::window;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
@@ -20,6 +22,8 @@ enum TextColor {
 }
 
 pub fn Landing() -> Element {
+    // let mut current_page = use_signal(|| 0);
+    let mut i = use_signal(|| 0usize);
     let themes = [
         (asset_path("rock.png"), TextColor::Black),
         (asset_path("rock-2.jpg"), TextColor::White),
@@ -27,16 +31,31 @@ pub fn Landing() -> Element {
         (asset_path("rock-4.png"), TextColor::White),
         // (asset_path("rock-5.jpg"), TextColor::White),
     ];
-    let mut i = use_signal(|| 0usize);
     let nav = navigator();
     let is_onboarded = use_is_onboarded();
 
-    use_future(move || async move {
-        loop {
-            async_std::task::sleep(Duration::from_secs(8)).await;
-            i.set(i.cloned().saturating_add(1));
-        }
-    });
+    // use_effect(move || {
+    //     let mut i_ = i.clone();
+    //     let window = window().unwrap();
+    //     let window_ = window.clone();
+    //     let closure = Closure::wrap(Box::new(move || {
+    //         let scroll_top = window_.scroll_y().unwrap();
+    //         let window_height = window_.inner_height().unwrap().as_f64().unwrap();
+    //         let new_page = get_current_page(scroll_top, window_height, 4);
+    //         i_.set(new_page);
+    //     }) as Box<dyn FnMut()>);
+    //     window
+    //         .add_event_listener_with_callback("scroll", closure.as_ref().unchecked_ref())
+    //         .unwrap();
+    //     closure.forget();
+    // });
+
+    // use_future(move || async move {
+    //     loop {
+    //         async_std::task::sleep(Duration::from_secs(8)).await;
+    //         i.set(i.cloned().saturating_add(1));
+    //     }
+    // });
 
     // If the user is already onboarded, redirect to home.
     if is_onboarded.read().0 {
@@ -55,6 +74,15 @@ pub fn Landing() -> Element {
         }
         div {
             class: "absolute top-0 flex flex-col w-full h-full overflow-y-scroll z-50 snap-y snap-mandatory",
+            onscroll: move |e: Event<ScrollData>| {
+                log::info!("{:?}", e.data);
+                let target = e.target().unwrap();
+                let scroll_container = target.dyn_into::<HtmlElement>().unwrap();
+                let scroll_top = scroll_container.scroll_top() as f64;
+                let window_height = scroll_container.client_height() as f64;
+                let new_page = get_current_page(scroll_top, window_height, 4);
+                i.set(new_page);
+            },
             Hero {
                 text_color
             }
@@ -75,13 +103,18 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract has been frozen and open-sourced to prevent tampering or removal.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open-source and frozen to prevent tampering or removal.",
                 section: Section::C,
                 text_color
             }
             // Footer {}
         }
     }
+}
+
+fn get_current_page(scroll_top: f64, window_height: f64, num_pages: usize) -> usize {
+    let page_height = window_height / num_pages as f64;
+    (scroll_top / page_height).floor() as usize
 }
 
 #[component]
@@ -153,7 +186,7 @@ fn Hero(text_color: TextColor) -> Element {
                     }
                     p {
                         class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-hero font-medium w-full",
-                        "ORE is a borderless digital currency everyone can mine."//" Start mining at home or on your phone today."
+                        "ORE is a cross-border digital currency everyone can mine."//" Start mining at home or on your phone today."
                     }
                 }
                 Link {
@@ -185,7 +218,7 @@ fn Block(
     };
     rsx! {
         div {
-            class: "flex min-h-svh h-full w-full snap-center snap-always",
+            class: "flex min-h-svh h-full w-full snap-center",
             div {
                 class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
