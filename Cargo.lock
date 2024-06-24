@@ -1620,6 +1620,7 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 [[package]]
 name = "drillx"
 version = "0.2.0"
+source = "git+https://github.com/regolith-labs/drillx?branch=master#ce0330957a2153c9191bdbcbcf4acce031ccd6bf"
 dependencies = [
  "blake3",
  "equix",
@@ -3496,6 +3497,7 @@ dependencies = [
 [[package]]
 name = "ore-program"
 version = "2.0.0"
+source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#0b57e5bba48d9f8a1f52700127e1418d6d55307e"
 dependencies = [
  "array-const-fn-init",
  "bs58 0.5.1",
@@ -3515,6 +3517,8 @@ dependencies = [
 [[package]]
 name = "ore-types"
 version = "0.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40d3bdbef7068fb9c76b53725daf44457385bbd2656cea7fd7383e66d802ba78"
 dependencies = [
  "postgres-types",
  "serde",
@@ -4637,6 +4641,7 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.18.0"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#607b890db4421ffda92b5832d00fd034504a617a"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -4656,6 +4661,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.18.0"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#607b890db4421ffda92b5832d00fd034504a617a"
 dependencies = [
  "Inflector",
  "arrayref",
