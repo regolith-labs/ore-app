@@ -16,15 +16,13 @@ pub fn UpgradeDone(signature: Signature, amount: u64) -> Element {
                         "{amount_to_ui_amount(amount, ore::TOKEN_DECIMALS_V1)} has been upgraded from v1 to v2"
                     }
                 }
-                div {
-                    "{signature.to_string()}"
-                }
+                div { "{signature.to_string()}" }
             }
         }
         div { class: "flex flex-col gap-3",
             div { class: "h-full" }
             Link {
-                class: "w-full py-3 rounded font-semibold transition-colors text-center text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700 text-white bg-green-500 hover:bg-green-600 active:bg-green-700",
+                class: "w-full py-3 rounded font-semibold transition-colors text-center text-white bg-green-500 hover:bg-green-600 active:bg-green-700",
                 to: Route::Home {},
                 "Done"
             }
