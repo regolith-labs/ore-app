@@ -67,7 +67,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Proof of work.",
                 title2: &"On Solana.",
-                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need any advanced hardware or software degree to get started.",
+                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need advanced hardware or any degree to get started.",
                 section: Section::A,
                 text_color
             }
