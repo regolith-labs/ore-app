@@ -88,6 +88,14 @@ pub fn Landing() -> Element {
                 // TODO Sec3
                 // TODO Neodyme
             }
+            Block {
+                title: &"Borderless asset.",
+                title2: &"Permissionless cash.",
+                detail: &"ORE is digital money at the speed of the internet. It can be sent to anyone, anywhere in the world, in few seconds or less.",
+                section: Section::D,
+                text_color
+                // TODO Current price (in USD, EUR, YUAN, YEN, BTC, SOL, ETH, etc.)
+            }
             // TODO Buy block (CTA link to Jupiter)
             // Footer {}
         }
@@ -191,11 +199,6 @@ fn Block(
         TextColor::Black => "text-black",
         TextColor::White => "text-white",
     };
-    let bg_img = match section {
-        Section::A => asset_path("rock-4.jpg"),
-        Section::B => asset_path("rock-8.png"),
-        Section::C => asset_path("rock-2.png"),
-    };
     rsx! {
         div {
             class: "flex min-h-svh h-full w-full snap-center",
@@ -260,7 +263,16 @@ fn BlockCta(section: Section, text_color: TextColor) -> Element {
             Link {
                 class: "{style} {cta_color}",
                 to: "https://github.com/regolith-labs/ore",
+                new_tab: true,
                 "Checkout the code →"
+            }
+        },
+        Section::D => rsx! {
+            Link {
+                class: "{style} {cta_color}",
+                to: "https://jup.ag/swap/USDC-ORE",
+                new_tab: true,
+                "Buy now →"
             }
         },
     }
@@ -271,6 +283,7 @@ enum Section {
     A,
     B,
     C,
+    D,
 }
 
 fn SectionA() -> Element {
