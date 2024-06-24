@@ -40,7 +40,7 @@ pub fn MinerToolbarInsufficientFunds() -> Element {
                 class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
                 span {
                     class: "font-semibold",
-                    "Insufficient funds →"
+                    "Insufficient SOL →"
                 }
             }
         }
@@ -73,7 +73,7 @@ pub fn MinerToolbarInsufficientBalanceOpen() -> Element {
                 }
                 p {
                     class: "text-sm text-gray-300",
-                    "Your miner keypair is stored on your local device and can be exported at anytime from settings."
+                    "Your miner keypair is stored on your local device and can be exported from settings at anytime."
                 }
             }
             div {
