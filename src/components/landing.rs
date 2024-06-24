@@ -74,36 +74,27 @@ pub fn Landing() -> Element {
         }
         div {
             class: "absolute top-0 flex flex-col w-full h-full overflow-y-scroll z-50 snap-y snap-mandatory",
-            onscroll: move |e: Event<ScrollData>| {
-                log::info!("{:?}", e.data);
-                let target = e.target().unwrap();
-                let scroll_container = target.dyn_into::<HtmlElement>().unwrap();
-                let scroll_top = scroll_container.scroll_top() as f64;
-                let window_height = scroll_container.client_height() as f64;
-                let new_page = get_current_page(scroll_top, window_height, 4);
-                i.set(new_page);
-            },
             Hero {
                 text_color
             }
             Block {
                 title: &"Proof of work.",
                 title2: &"On Solana.",
-                detail: &"ORE is designed to be mined on laptops, phones, and home computers. You don't need advanced hardware to get started and earn tokens.",
+                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need advanced hardware to get started and earn tokens.",
                 section: Section::A,
                 text_color
             }
             Block {
                 title: &"Limited supply.",
                 title2: &"Steady opportunity.",
-                detail: &"ORE has a fixed total supply of 21m tokens. For the next 40 years, one new token will be mined every minute on average by miners around the globe.",
+                detail: &"ORE has a fixed total supply of 21m tokens. At a rate of one per minute, all ORE will be mined by the year 2064.",
                 section: Section::B,
                 text_color
             }
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open-source and frozen to prevent tampering or removal.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart-contract is open-source and audited by world-class teams.",
                 section: Section::C,
                 text_color
             }
