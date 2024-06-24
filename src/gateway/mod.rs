@@ -43,6 +43,7 @@ pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
+pub const CU_LIMIT_UPGRADE: u32 = 17_985 + 300;
 
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 4;
@@ -316,6 +317,32 @@ impl Gateway {
             .await
     }
 
+    pub async fn upgrade_ore(&self, amount: u64) -> GatewayResult<Signature> {
+        let signer = signer();
+        let v2_token_account = self.create_token_account_ore(signer.pubkey()).await?;
+        let v1_token_account = self.get_token_account_ore_v1().await?;
+        let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_UPGRADE);
+        let ix =
+            ore::instruction::upgrade(signer.pubkey(), v2_token_account, v1_token_account, amount);
+        self.send_and_confirm(&[cu_limit_ix, ix], false, false)
+            .await
+    }
+
+    // asserts that the token account is already initialized
+    pub async fn get_token_account_ore_v1(&self) -> GatewayResult<Pubkey> {
+        let signer = signer();
+        let token_account_address = ore_token_account_address_v1(signer.pubkey());
+        self.rpc
+            .get_token_account(&token_account_address)
+            .await
+            .map_err(GatewayError::from)
+            .and_then(|maybe_some_token_account| {
+                // assert that ok(none) was not returned
+                maybe_some_token_account.ok_or(GatewayError::FailedAta)
+            })
+            .map(|_| token_account_address)
+    }
+
     pub async fn create_token_account_ore(&self, owner: Pubkey) -> GatewayResult<Pubkey> {
         // Build instructions.
         let signer = signer();
@@ -414,4 +441,9 @@ pub fn signer() -> Keypair {
 #[cached]
 pub fn ore_token_account_address(pubkey: Pubkey) -> Pubkey {
     get_associated_token_address(&pubkey, &ore::MINT_ADDRESS)
+}
+
+#[cached]
+pub fn ore_token_account_address_v1(pubkey: Pubkey) -> Pubkey {
+    get_associated_token_address(&pubkey, &ore::MINT_V1_ADDRESS)
 }

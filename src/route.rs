@@ -44,6 +44,8 @@ pub enum Route {
             User {
                 id: String,
             },
+            #[route("/upgrade")]
+            Upgrade {}, 
         #[end_layout]
     #[end_layout]
 
