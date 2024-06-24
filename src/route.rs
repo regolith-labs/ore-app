@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::components::{
-    Claim, ExportKey, Home, ImportKey, Landing, MinerToolbarLayout, Navbar, OreTokenomics,
-    PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
+    Claim, Download, ExportKey, Home, ImportKey, Landing, MinerToolbarLayout, Navbar,
+    OreTokenomics, PageNotFound, Send, Settings, SimpleNavbar, Tx, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -16,9 +16,9 @@ pub enum Route {
         WhatIsMining {},
         #[route("/ore-tokenomics")]
         OreTokenomics {},
+        #[route("/download")]
+        Download {},
     #[end_layout]
-    //     #[route("/download")]
-    //     Download {},
 
     #[layout(Navbar)]
         #[layout(MinerToolbarLayout)]
