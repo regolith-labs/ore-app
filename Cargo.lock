@@ -3497,7 +3497,6 @@ dependencies = [
 [[package]]
 name = "ore-program"
 version = "2.0.0"
-source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#0b57e5bba48d9f8a1f52700127e1418d6d55307e"
 dependencies = [
  "array-const-fn-init",
  "bs58 0.5.1",
