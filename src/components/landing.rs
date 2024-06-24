@@ -7,7 +7,7 @@ use web_sys::window;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
-    components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon},
+    components::{ActivityIndicator, Footer, OreIcon, OreLogoIcon, XIcon},
     hooks::{
         use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter, UiTokenAmountBalance,
     },
@@ -67,21 +67,21 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Proof of work.",
                 title2: &"On Solana.",
-                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need any advanced hardware or a degree to get started.",
+                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need any advanced hardware or software degree to get started.",
                 section: Section::A,
                 text_color
             }
             Block {
                 title: &"Limited supply.",
                 title2: &"Predictable future.",
-                detail: &"ORE has a fixed total supply of 21m tokens. At a rate of one per minute, all ORE will be mined by the year 2064.",
+                detail: &"ORE has a fixed total supply of 21m tokens. At a steady rate of one per minute, all tokens in existence will be mined by the year 2064.",
                 section: Section::B,
                 text_color
             }
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart-contract is open-source and audited by multiple world-class teams.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and audited by multiple world-class teams.",
                 section: Section::C,
                 text_color
                 // TODO Ottersec logo
@@ -112,6 +112,10 @@ fn Navbar(text_color: TextColor) -> Element {
         TextColor::Black => "text-black",
         TextColor::White => "text-white",
     };
+    let button_color = match text_color {
+        TextColor::Black => "text-black hover:bg-black hover:text-white",
+        TextColor::White => "text-white hover:bg-white hover:text-black",
+    };
     rsx! {
         div {
             class: "flex flex-row justify-between px-4 sm:px-8 py-8 w-full transition-colors duration-1000 {copy_color}",
@@ -124,12 +128,13 @@ fn Navbar(text_color: TextColor) -> Element {
             }
             div {
                 class: "sm:text-sm md:text-base lg:text-lg",
-                // TODO Language translator
-                // Link {
-                //     class: "font-semibold text-white bg-black hover:bg-gray-900 active:bg-gray-800 transition-colors px-4 py-3 rounded-full",
-                //     to: Route::Home {},
-                //     "Get started →"
-                // }
+                Link {
+                    to: "https://x.com/oresupply",
+                    class: "flex h-10 w-10 transition-colors rounded-full transition-colors duration-1000 {button_color}",
+                    XIcon {
+                        class: "w-5 h-5 m-auto"
+                    }
+                }
             }
         }
     }
@@ -142,8 +147,8 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
         TextColor::White => "text-white",
     };
     let cta_color = match text_color {
-        TextColor::Black => "bg-black text-white",
-        TextColor::White => "bg-white text-black",
+        TextColor::Black => "bg-black text-white hover:scale-105",
+        TextColor::White => "bg-white text-black hover:scale-105",
     };
     rsx! {
         div {
@@ -165,7 +170,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
                     }
                 }
                 Link {
-                    class: "mr-auto sm:mx-auto text-center sm:text-lg md:text-xl lg:text-2xl font-semibold hover:bg-gray-900 active:bg-gray-800 transition-colors duration-1000 {cta_color} px-6 py-3 rounded-full",
+                    class: "mr-auto sm:mx-auto text-center sm:text-lg md:text-xl lg:text-2xl font-semibold transition-colors transition-transform duration-200 hover:shadow {cta_color} px-6 py-3 rounded-full",
                     to: Route::Home {},
                     "Get started →"
                 }
