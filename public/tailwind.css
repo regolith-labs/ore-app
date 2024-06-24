@@ -780,6 +780,10 @@ h2:where(.dark, .dark *) {
   margin-top: auto;
 }
 
+.block {
+  display: block;
+}
+
 .flex {
   display: flex;
 }
@@ -976,6 +980,26 @@ h2:where(.dark, .dark *) {
 
 .max-w-full {
   max-width: 100%;
+}
+
+.max-w-80 {
+  max-width: 20rem;
+}
+
+.max-w-\[684px\] {
+  max-width: 684px;
+}
+
+.max-w-\[800px\] {
+  max-width: 800px;
+}
+
+.max-w-\[1024px\] {
+  max-width: 1024px;
+}
+
+.max-w-\[960px\] {
+  max-width: 960px;
 }
 
 .flex-auto {
