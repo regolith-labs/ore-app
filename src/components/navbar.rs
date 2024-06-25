@@ -71,7 +71,10 @@ pub fn SimpleNavbar() -> Element {
                 class: "py-4 px-4 sm:px-8 grow h-full w-full max-w-[96rem] mx-auto",
                 Outlet::<Route> {}
             }
-            Footer {}
+            Footer {
+                transparent_bg: false,
+                show_site_map: false,
+            }
         }
     }
 }

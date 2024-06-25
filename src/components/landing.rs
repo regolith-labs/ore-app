@@ -5,7 +5,10 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
-    components::{ActivityIndicator, DiscordIcon, Footer, GithubIcon, OreIcon, OreLogoIcon, XIcon},
+    components::{
+        ActivityIndicator, DiscordIcon, Footer, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon,
+        XIcon,
+    },
     hooks::{
         use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter, UiTokenAmountBalance,
     },
@@ -25,11 +28,17 @@ pub fn Landing() -> Element {
     let is_onboarded = use_is_onboarded();
     let mut i = use_signal(|| 0usize);
     let themes = [
-        (asset_path("rock.png"), TextColor::Black),
+        // (asset_path("rock.png"), TextColor::Black),
+        // (asset_path("rock-10.png"), TextColor::Black),
+        // (asset_path("rock-11.png"), TextColor::Black),
         (asset_path("rock-2.jpg"), TextColor::White),
         (asset_path("rock-3.png"), TextColor::White),
         (asset_path("rock-4.png"), TextColor::White),
-        // (asset_path("rock-5.jpg"), TextColor::White),
+        (asset_path("rock-6.png"), TextColor::White),
+        (asset_path("rock-5.png"), TextColor::White),
+        // (asset_path("rock-7.png"), TextColor::White),
+        // (asset_path("rock-8.png"), TextColor::White),
+        (asset_path("rock-9.png"), TextColor::White),
     ];
     let len = themes.len();
     let text_color = themes[*i.read() % len].1;
@@ -37,7 +46,7 @@ pub fn Landing() -> Element {
     // Change the background image every 8 sec
     use_future(move || async move {
         loop {
-            async_std::task::sleep(Duration::from_secs(8)).await;
+            async_std::task::sleep(Duration::from_secs(10)).await;
             i.set(i.cloned().saturating_add(1));
         }
     });
@@ -65,7 +74,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Proof of work.",
                 title2: &"On Solana.",
-                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need any advanced hardware or a degree to get started.",
+                detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need advanced hardware or a software degree to get started.",
                 section: Section::A,
                 text_color
             }
@@ -79,7 +88,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and audited by multiple world-class teams.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and has been reviewed by multiple auditing teams.",
                 section: Section::C,
                 text_color
                 // TODO Ottersec logo
@@ -94,7 +103,10 @@ pub fn Landing() -> Element {
                 text_color
                 // TODO Current price (in USD, EUR, YUAN, YEN, BTC, SOL, ETH, etc.)
             }
-            // Footer {}
+            Footer {
+                transparent_bg: true,
+                show_site_map: true
+            }
         }
     }
 }
@@ -105,7 +117,7 @@ fn BgImg(visible: bool, bg_img: String, index: usize) -> Element {
     rsx! {
         div {
             key: "{index}",
-            class: "fixed top-0 w-full h-full bg-cover bg-center transition-opacity duration-1000 z-0 {visibility}",
+            class: "fixed top-0 w-full h-full bg-cover bg-center transition-opacity z-0 {visibility}",
             style: "background-image: url({bg_img})"
         }
     }
@@ -117,13 +129,9 @@ fn Navbar(text_color: TextColor) -> Element {
         TextColor::Black => "text-black",
         TextColor::White => "text-white",
     };
-    let button_color = match text_color {
-        TextColor::Black => "text-black hover:bg-black hover:text-white",
-        TextColor::White => "text-white hover:bg-white hover:text-black",
-    };
     rsx! {
         div {
-            class: "flex flex-row justify-between px-4 sm:px-8 py-4 md:py-8 w-full transition-colors duration-1000 {copy_color}",
+            class: "flex flex-row justify-between px-4 sm:px-8 py-6 md:py-8 w-full transition-colors {copy_color}",
             Link {
                 to: Route::Landing {},
                 class: "flex flex-row h-10 my-auto",
@@ -131,31 +139,44 @@ fn Navbar(text_color: TextColor) -> Element {
                     class: "h-6 md:h-8 my-auto"
                 }
             }
-            div {
-                class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-8",
-                Link {
-                    to: "https://discord.gg/ore-supply",
-                    class: "flex h-10 w-10 transition-colors rounded-full transition-colors duration-1000 {button_color}",
-                    new_tab: true,
-                    DiscordIcon {
-                        class: "w-6 h-6 m-auto"
-                    }
+            SocialLinks {
+                text_color
+            }
+        }
+    }
+}
+
+#[component]
+fn SocialLinks(text_color: TextColor) -> Element {
+    let button_color = match text_color {
+        TextColor::Black => "text-black hover:bg-black hover:text-white",
+        TextColor::White => "text-white hover:bg-white hover:text-black",
+    };
+    rsx! {
+        div {
+            class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
+            Link {
+                to: "https://discord.gg/ore-supply",
+                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+                new_tab: true,
+                DiscordIcon {
+                    class: "w-6 h-6 m-auto"
                 }
-                Link {
-                    to: "https://github.com/regolith-labs/ore",
-                    class: "flex h-10 w-10 transition-colors rounded-full transition-colors duration-1000 {button_color}",
-                    new_tab: true,
-                    GithubIcon {
-                        class: "w-6 h-6 m-auto"
-                    }
+            }
+            Link {
+                to: "https://github.com/regolith-labs/ore",
+                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+                new_tab: true,
+                GithubIcon {
+                    class: "w-6 h-6 m-auto"
                 }
-                Link {
-                    to: "https://x.com/oresupply",
-                    class: "flex h-10 w-10 transition-colors rounded-full transition-colors duration-1000 {button_color}",
-                    new_tab: true,
-                    XIcon {
-                        class: "w-5 h-5 m-auto"
-                    }
+            }
+            Link {
+                to: "https://x.com/oresupply",
+                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+                new_tab: true,
+                XIcon {
+                    class: "w-5 h-5 m-auto"
                 }
             }
         }
@@ -165,12 +186,12 @@ fn Navbar(text_color: TextColor) -> Element {
 #[component]
 fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
     let copy_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
+        TextColor::Black => "text-black selection:bg-black selection:text-white",
+        TextColor::White => "text-white selection:bg-white selection:text-black",
     };
     let cta_color = match text_color {
-        TextColor::Black => "bg-black text-white hover:scale-105",
-        TextColor::White => "bg-white text-black hover:scale-105",
+        TextColor::Black => "bg-black text-white selection:bg-black selection:text-white",
+        TextColor::White => "bg-white text-black selection:bg-white selection:text-black",
     };
     rsx! {
         div {
@@ -181,7 +202,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
             div {
                 class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 w-full md:mx-auto my-auto pb-24 px-4 md:px-8",
                 div {
-                    class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8 {copy_color} transition-colors duration-1000",
+                    class: "flex flex-col gap-y-4 sm:gap-y-6 md:gap-y-8 {copy_color} transition-colors",
                     p {
                         class: "text-left sm:text-center text-6xl md:text-7xl lg:text-8xl font-bold font-hero",
                         "{title}"
@@ -192,7 +213,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
                     }
                 }
                 Link {
-                    class: "mr-auto sm:mx-auto text-center sm:text-lg md:text-xl lg:text-2xl font-semibold transition-colors transition-transform duration-200 hover:shadow {cta_color} px-6 py-3 rounded-full",
+                    class: "mr-auto sm:mx-auto text-center sm:text-lg md:text-xl lg:text-2xl font-semibold transition-colors transition-transform hover:scale-105 hover:shadow {cta_color} px-6 py-3 rounded-full",
                     to: Route::Home {},
                     "Get started →"
                 }
@@ -210,8 +231,8 @@ fn Block(
     text_color: TextColor,
 ) -> Element {
     let copy_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
+        TextColor::Black => "text-black selection:bg-black selection:text-white",
+        TextColor::White => "text-white selection:bg-white selection:text-black",
     };
     rsx! {
         div {
@@ -219,13 +240,13 @@ fn Block(
             div {
                 class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
-                    class: "flex flex-col gap-4 sm:gap-6 md:gap-8 transition-colors duration-1000 {copy_color}",
+                    class: "flex flex-col gap-4 sm:gap-6 md:gap-8 transition-colors {copy_color}",
                     p {
                         class: "text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
                         "{title}"
                         br {}
                         span {
-                            class: "opacity-50",
+                            class: "opacity-70",
                             "{title2}"
                         }
                     }
@@ -243,6 +264,7 @@ fn Block(
                     match section {
                         // Section::A => rsx! { SectionA {} },
                         Section::B => rsx! { SectionB { text_color } },
+                        Section::C => rsx! { SectionC { text_color } },
                         _ => None
                     }
                 }
@@ -253,10 +275,10 @@ fn Block(
 
 #[component]
 fn BlockCta(section: Section, text_color: TextColor) -> Element {
-    let style = "font-semibold mt-4 rounded py-2 transition-colors duration-1000";
+    let style = "flex shrink font-semibold text-center mr-auto mt-4 px-4 py-3 transition-colors transition-transform rounded-full hover:scale-105 hover:shadow";
     let cta_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
+        TextColor::Black => "bg-black text-white",
+        TextColor::White => "bg-white text-black",
     };
     match section {
         Section::A => rsx! {
@@ -439,9 +461,9 @@ fn OreValue(title: String, amount: u64, text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col gap-3 {copy_color} transition-colors duration-1000",
+            class: "flex flex-col gap-3 {copy_color} transition-colors",
             p {
-                class: "opacity-50 text-sm font-medium",
+                class: "opacity-80 font-medium",
                 "{title}"
             }
             div {
@@ -456,5 +478,33 @@ fn OreValue(title: String, amount: u64, text_color: TextColor) -> Element {
             }
         }
 
+    }
+}
+
+#[component]
+fn SectionC(text_color: TextColor) -> Element {
+    let text_color = match text_color {
+        TextColor::Black => "text-black",
+        TextColor::White => "text-white",
+    };
+    rsx! {
+        div {
+            class: "flex flex-col gap-3 my-auto",
+            p {
+                class: "opacity-80 font-medium {text_color}",
+                "Audited by"
+            }
+            div {
+                class: "flex flex-row gap-12",
+                Link {
+                    to: "https://osec.io/",
+                    class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color}",
+                    new_tab: true,
+                    OttersecIcon {
+                        class: "w-10 h-10 md:w-12 md:h-12 m-auto"
+                    }
+                }
+            }
+        }
     }
 }
