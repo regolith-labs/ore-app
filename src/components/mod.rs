@@ -28,6 +28,7 @@ mod tx;
 mod upgrade;
 mod user;
 mod user_bubble;
+mod wallet_adapter;
 mod what_is_mining;
 
 pub use activity::*;
@@ -60,4 +61,5 @@ pub use tx::*;
 pub use upgrade::*;
 pub use user::*;
 pub use user_bubble::*;
+pub use wallet_adapter::*;
 pub use what_is_mining::*;
