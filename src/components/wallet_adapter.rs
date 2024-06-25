@@ -4,6 +4,7 @@ use dioxus::prelude::*;
 pub fn WalletAdapter() -> Element {
     rsx! {
         Render {}
+        Dispatch {}
     }
 }
 
@@ -21,8 +22,26 @@ fn Render() -> Element {
         let _ = init_wallets.await;
     });
     rsx! {
-        nav {
-            id: "ore-wallet-adapter-id"
+        nav { id: "ore-wallet-adapter-id" }
+    }
+}
+
+#[component]
+fn Dispatch() -> Element {
+    rsx! {
+        button {
+            onclick: move |_| {
+                let _ = use_resource(move || async move {
+                    let init_wallets = eval(
+                        r#"
+                        window.dispatchEvent(new Event("ore-go"));
+                        return
+                    "#,
+                    );
+                    let _ = init_wallets.await;
+                });
+            },
+            "click rsx"
         }
     }
 }
