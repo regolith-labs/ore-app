@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::WarningIcon,
+    components::{WalletAdapter, WarningIcon},
     hooks::{use_ore_balance_v1, UiTokenAmountBalance},
 };
 
@@ -33,6 +33,7 @@ pub fn UpgradeEdit(
             div { class: "flex flex-col gap-3",
                 h2 { "Upgrade" }
                 p { class: "text-lg", "Upgrade ORE v1 to v2" }
+                WalletAdapter {}
             }
             div { class: "flex flex-col gap-12",
                 div { class: "flex flex-col gap-2", "Amount" }
