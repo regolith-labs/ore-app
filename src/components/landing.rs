@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_types::Transfer;
+use serde::Deserialize;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -88,7 +91,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and has been reviewed by multiple auditing teams.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and has been audited by multiple world-class firms.",
                 section: Section::C,
                 text_color
                 // TODO Ottersec logo
@@ -265,6 +268,7 @@ fn Block(
                         // Section::A => rsx! { SectionA {} },
                         Section::B => rsx! { SectionB { text_color } },
                         Section::C => rsx! { SectionC { text_color } },
+                        Section::D => rsx! { SectionD { text_color } },
                         _ => None
                     }
                 }
@@ -461,7 +465,7 @@ fn OreValue(title: String, amount: u64, text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col gap-3 {copy_color} transition-colors",
+            class: "flex flex-col gap-2 {copy_color} transition-colors",
             p {
                 class: "opacity-80 font-medium",
                 "{title}"
@@ -477,7 +481,6 @@ fn OreValue(title: String, amount: u64, text_color: TextColor) -> Element {
                 }
             }
         }
-
     }
 }
 
@@ -489,7 +492,7 @@ fn SectionC(text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col gap-3 my-auto",
+            class: "flex flex-col gap-2 my-auto",
             p {
                 class: "opacity-80 font-medium {text_color}",
                 "Audited by"
@@ -504,6 +507,89 @@ fn SectionC(text_color: TextColor) -> Element {
                         class: "w-10 h-10 md:w-12 md:h-12 m-auto"
                     }
                 }
+            }
+        }
+    }
+}
+
+// {"data":
+// {"ORE":{
+// "id":"oreoN2tQbHXVaZsr3pf66A48miqcBXCDJozganhEJgz","mintSymbol":"ORE","vsToken":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","vsTokenSymbol":"USDC","price":416.725699335}},"timeTaken":0.002227819997642655
+// }
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct JupPriceApiResponse {
+    data: HashMap<String, JupPriceData>,
+    #[serde(rename = "timeTaken")]
+    time_taken: f64,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct JupPriceData {
+    id: String,
+    #[serde(rename = "mintSymbol")]
+    mint_symbol: String,
+    #[serde(rename = "vsToken")]
+    vs_token: String,
+    #[serde(rename = "vsTokenSymbol")]
+    vs_token_symbol: String,
+    price: f64,
+}
+
+#[component]
+fn SectionD(text_color: TextColor) -> Element {
+    let text_color = match text_color {
+        TextColor::Black => "text-black",
+        TextColor::White => "text-white",
+    };
+
+    let quotes = use_resource(move || async move {
+        reqwest::get("https://price.jup.ag/v6/price?ids=USDC,EURC,WBTC&vsToken=ORE")
+            .await?
+            .json::<JupPriceApiResponse>()
+            .await
+    });
+
+    rsx! {
+        div {
+            class: "flex flex-col gap-12 my-auto align-top transition-colors {text_color}",
+            if let Some(Ok(quotes)) = &*quotes.read() {
+                Quote {
+                    title: "ORE/USDC",
+                    price: quotes.data["USDC"].price,
+                    symbol: "$",
+                    decimals: 2
+                }
+                Quote {
+                    title: "ORE/EURC",
+                    price: quotes.data["EURC"].price,
+                    symbol: "€",
+                    decimals: 2
+                }
+                Quote {
+                    title: "ORE/WBTC",
+                    price: quotes.data["WBTC"].price,
+                    symbol: "₿",
+                    decimals: 8
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn Quote(title: String, price: f64, symbol: String, decimals: usize) -> Element {
+    let price = format!("{0:.1$}", 1f64 / price, decimals);
+    rsx! {
+        div {
+            class: "flex flex-col gap-2",
+            p {
+                class: "opacity-80 font-medium",
+                "{title}"
+            }
+            p {
+                class: "text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
+                "{symbol}{price}"
             }
         }
     }
