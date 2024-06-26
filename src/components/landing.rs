@@ -2,19 +2,15 @@ use std::collections::HashMap;
 
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
-use ore_types::Transfer;
 use serde::Deserialize;
+use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
-use web_time::{Duration, SystemTime, UNIX_EPOCH};
+use web_time::{Duration, Instant};
 
 use crate::{
-    components::{
-        ActivityIndicator, DiscordIcon, Footer, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon,
-        XIcon,
-    },
-    hooks::{
-        use_is_onboarded, use_ore_supply, use_transfers, ActivityFilter, UiTokenAmountBalance,
-    },
+    components::{DiscordIcon, Footer, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon, XIcon},
+    hooks::{use_is_onboarded, use_ore_supply, UiTokenAmountBalance},
+    miner::WEB_WORKERS,
     route::Route,
     utils::asset_path,
 };
@@ -39,8 +35,6 @@ pub fn Landing() -> Element {
         (asset_path("rock-4.png"), TextColor::White),
         (asset_path("rock-6.png"), TextColor::White),
         (asset_path("rock-5.png"), TextColor::White),
-        // (asset_path("rock-7.png"), TextColor::White),
-        // (asset_path("rock-8.png"), TextColor::White),
         (asset_path("rock-9.png"), TextColor::White),
     ];
     let len = themes.len();
@@ -72,7 +66,7 @@ pub fn Landing() -> Element {
             Hero {
                 text_color,
                 title: "It's time to mine.",
-                subtitle: &"ORE is a fair-launch, proof-of-work, cross-border digital currency."
+                subtitle: &"ORE is a fair-launch, proof-of-work, digital currency everyone can mine."
             }
             Block {
                 title: &"Proof of work.",
@@ -84,27 +78,25 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fixed supply.",
                 title2: &"Predictable future.",
-                detail: &"ORE has a total supply limit of 21m tokens. At a steady rate of one per minute, all ORE in existence will be mined by the year 2064.",
+                detail: &"ORE has a total maximum supply of 21m tokens. At a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
                 section: Section::B,
                 text_color
             }
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
-                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and has been audited by multiple world-class firms.",
+                detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and has been reviewed by multiple world-class auditing firms.",
                 section: Section::C,
                 text_color
-                // TODO Ottersec logo
                 // TODO Sec3
                 // TODO Neodyme
             }
             Block {
                 title: &"Borderless asset.",
                 title2: &"Permissionless cash.",
-                detail: &"ORE is digital money at the speed of the internet. It can be sent to anyone, anywhere in the world, in few seconds or less.",
+                detail: &"ORE is internet-native money that moves at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligable fees.",
                 section: Section::D,
                 text_color
-                // TODO Current price (in USD, EUR, YUAN, YEN, BTC, SOL, ETH, etc.)
             }
             Footer {
                 transparent_bg: true,
@@ -265,11 +257,10 @@ fn Block(
                 div {
                     class: "flex h-full w-full",
                     match section {
-                        // Section::A => rsx! { SectionA {} },
+                        Section::A => rsx! { SectionA { text_color } },
                         Section::B => rsx! { SectionB { text_color } },
                         Section::C => rsx! { SectionC { text_color } },
                         Section::D => rsx! { SectionD { text_color } },
-                        _ => None
                     }
                 }
             }
@@ -279,7 +270,7 @@ fn Block(
 
 #[component]
 fn BlockCta(section: Section, text_color: TextColor) -> Element {
-    let style = "flex shrink font-semibold text-center mr-auto mt-4 px-4 py-3 transition-colors transition-transform rounded-full hover:scale-105 hover:shadow";
+    let style = "flex shrink font-semibold text-center mr-auto mt-4 px-5 py-3 transition-colors transition-transform rounded-full hover:scale-105 hover:shadow";
     let cta_color = match text_color {
         TextColor::Black => "bg-black text-white",
         TextColor::White => "bg-white text-black",
@@ -326,106 +317,68 @@ enum Section {
     D,
 }
 
-fn SectionA() -> Element {
-    rsx! {
-        div {
-            class: "flex flex-col w-full my-auto gap-4 max-w-[48rem]",
-            div {
-                class: "flex flex-row gap-2",
-                ActivityIndicator {}
-                p {
-                    class: "font-semibold text-xl opacity-50",
-                    "Live transactions"
-                }
-            }
-            div {
-                class: "flex flex-col w-full",
-                TransfersSection {}
-            }
-        }
-    }
-}
-
-fn TransfersSection() -> Element {
-    let filter = use_signal(|| ActivityFilter::Global);
-    let offset = use_signal(|| 0);
-    let transfers = use_transfers(filter, offset);
-    let e = if let Some(transfers) = transfers.read().clone() {
-        match transfers {
-            Ok(transfers) => {
-                rsx! {
-                    if transfers.data.is_empty() {
-                        p {
-                            class: "text-sm opacity-50",
-                            "No transactions yet"
-                        }
-                    }
-                    for (i, transfer) in transfers.data.iter().enumerate() {
-                        if i.le(&5) {
-                            SimpleTransferRow {
-                                transfer: transfer.clone()
-                            }
-                        } else {
-                            div {}
-                        }
-                    }
-                }
-            }
-            _ => None,
-        }
-    } else {
-        None
-    };
-    e
-}
-
+// TODO Hash animation
+// TODO Current hashpower measurement?
 #[component]
-fn SimpleTransferRow(transfer: Transfer) -> Element {
-    let addr = transfer.to_address[..5].to_string();
-    let amount = amount_to_ui_amount(transfer.amount as u64, ore::TOKEN_DECIMALS);
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let ts = Duration::from_secs(transfer.ts as u64);
-    let time = now.saturating_sub(ts);
-    let t = time.as_secs();
-    const ONE_MIN: u64 = 60;
-    const ONE_HOUR: u64 = ONE_MIN * 60;
-    const ONE_DAY: u64 = ONE_HOUR * 24;
-    let time_str = if t.gt(&ONE_DAY) {
-        format!("{}d ago", t.saturating_div(ONE_DAY))
-    } else if t.gt(&ONE_HOUR) {
-        format!("{}h ago", t.saturating_div(ONE_HOUR))
-    } else if t.gt(&ONE_MIN) {
-        format!("{}m ago", t.saturating_div(ONE_MIN))
-    } else {
-        format!("{}s ago", t)
+fn SectionA(text_color: TextColor) -> Element {
+    let copy_color = match text_color {
+        TextColor::Black => "text-black",
+        TextColor::White => "text-white",
     };
+
+    let mut sample_hash = use_signal(|| Blake3Hash::new_unique());
+
+    let hashrate = use_resource(move || async move {
+        let size = 10u64;
+        let t = Instant::now();
+        for i in 0..size {
+            let _ = drillx::hash(&[0; 32], &i.to_le_bytes());
+        }
+        60_000u128
+            .saturating_div(t.elapsed().as_millis())
+            .saturating_mul(size.into())
+            .saturating_mul(*WEB_WORKERS as u128)
+    });
+
+    // Animate the hash to visualize mining.
+    use_future(move || async move {
+        loop {
+            async_std::task::sleep(std::time::Duration::from_millis(125)).await;
+            sample_hash.set(Blake3Hash::new_unique());
+        }
+    });
 
     rsx! {
         div {
-            class: "flex flex-row py-3 gap-3 w-full transition-colors rounded hover:bg-gray-900 px-2 -mx-2",
-            div {
-                class: "flex flex-col pt-1",
-                p {
-                    class: "flex flex-row gap-2",
-                    span {
-                        class: "font-mono font-bold",
-                        "{addr}"
+            class: "flex flex-col w-full my-auto gap-12 max-w-[48rem]",
+            if let Some(hashrate) = hashrate.cloned() {
+                div {
+                    class: "flex flex-col gap-2 {copy_color} transition-colors",
+                    p {
+                        class: "opacity-80 font-medium",
+                        "Your hashpower (est.)"
                     }
-                    "mined "
-                    span {
-                        class: "flex flex-row font-semibold gap-0.5",
-                        OreIcon {
-                            class: "w-3.5 h-3.5 my-auto",
+                    div {
+                        class: "flex flex-row gap-2",
+                        p {
+                            class: "text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
+                            "{hashrate} H/min"
                         }
-                        "{amount:.4}"
                     }
                 }
             }
             div {
-                class: "flex pt-1.5 ml-auto",
+                class: "flex flex-col gap-2 {copy_color} transition-colors",
                 p {
-                    class: "opacity-50 text-right text-nowrap text-sm",
-                    "{time_str}"
+                    class: "opacity-80 font-medium",
+                    "Miner visualized"
+                }
+                div {
+                    class: "flex flex-row gap-2",
+                    p {
+                        class: "text-2xl md:text-3xl lg:text-4xl font-bold font-mono",
+                        "{sample_hash.cloned().to_string()[1..17]}"
+                    }
                 }
             }
         }
@@ -512,27 +465,23 @@ fn SectionC(text_color: TextColor) -> Element {
     }
 }
 
-// {"data":
-// {"ORE":{
-// "id":"oreoN2tQbHXVaZsr3pf66A48miqcBXCDJozganhEJgz","mintSymbol":"ORE","vsToken":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","vsTokenSymbol":"USDC","price":416.725699335}},"timeTaken":0.002227819997642655
-// }
-
 #[derive(Debug, Clone, Deserialize)]
 pub struct JupPriceApiResponse {
     data: HashMap<String, JupPriceData>,
     #[serde(rename = "timeTaken")]
-    time_taken: f64,
+    _time_taken: f64,
 }
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct JupPriceData {
-    id: String,
+    #[serde(rename = "id")]
+    _id: String,
     #[serde(rename = "mintSymbol")]
-    mint_symbol: String,
+    _mint_symbol: String,
     #[serde(rename = "vsToken")]
-    vs_token: String,
+    _vs_token: String,
     #[serde(rename = "vsTokenSymbol")]
-    vs_token_symbol: String,
+    _vs_token_symbol: String,
     price: f64,
 }
 
@@ -587,9 +536,14 @@ fn Quote(title: String, price: f64, symbol: String, decimals: usize) -> Element 
                 class: "opacity-80 font-medium",
                 "{title}"
             }
-            p {
-                class: "text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
-                "{symbol}{price}"
+            div {
+                class: "flex flex-row gap-0.5 text-2xl md:text-3xl lg:text-4xl font-bold font-hero",
+                p {
+                    "{symbol}"
+                }
+                p {
+                    "{price}"
+                }
             }
         }
     }

@@ -49,7 +49,7 @@ pub fn Footer(transparent_bg: bool, show_site_map: bool) -> Element {
 fn SiteMap() -> Element {
     let container_class = "flex flex-col w-full gap-2";
     let title_class = "font-bold";
-    let link_class = "transition-opacity active:opacity-70";
+    let link_class = "transition-opacity active:opacity-70 hover:underline";
     rsx! {
         div {
             class: "flex flex-row gap-2 w-full",
