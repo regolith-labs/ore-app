@@ -1,4 +1,4 @@
-use solana_client_wasm::ClientError;
+use solana_client_wasm::{solana_sdk::program_error::ProgramError, ClientError};
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
 
@@ -12,6 +12,7 @@ pub enum GatewayError {
     AccountNotFound,
     // SimulationFailed,
     RequestFailed,
+    ProgramBuilderFailed,
     Unknown,
 }
 
@@ -33,5 +34,12 @@ impl From<ClientError> for GatewayError {
         } else {
             GatewayError::Unknown
         }
+    }
+}
+
+impl From<ProgramError> for GatewayError {
+    fn from(value: ProgramError) -> Self {
+        log::error!("err: {}", value);
+        GatewayError::ProgramBuilderFailed
     }
 }

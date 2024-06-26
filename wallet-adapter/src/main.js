@@ -5,7 +5,7 @@ import {
   WalletModalProvider,
   WalletMultiButton
 } from '@solana/wallet-adapter-react-ui';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import * as buffer from "buffer";
 window.Buffer = buffer.Buffer;
@@ -33,7 +33,8 @@ export const Wallet = () => {
           <WalletMultiButton />
           { /* Your app's components go here, nested within the context providers. */}
           <RenderOREv2Balance />
-          <LogMessi />
+          <SignTransaction />
+          <GetPublicKey />
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
@@ -85,18 +86,32 @@ function RenderOREv2Balance() {
   )
 }
 
-function LogMessi() {
-  const { connection } = useConnection();
+function SignTransaction() {
   const { publicKey } = useWallet();
-  const callback = useCallback(async (e) => {
-    // 890880 lamports as of 2022-09-01
-    const lamports = await connection.getMinimumBalanceForRentExemption(0);
-    console.log(lamports);
-    console.log(e);
-    console.log(e.detail)
+  const callback = useCallback(async (msg) => {
+    try {
+      const json = msg.json;
+      // console.log(json);
+      const obj = JSON.parse(json);
+      // console.log(obj);
+      const buf = Buffer.from(obj);
+      // console.log(buf);
+      const tx = Transaction.from(buf);
+      // console.log(tx);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [publicKey]);
+  window.OreTxSigner = callback;
+  return
+}
 
-  }, [publicKey, connection]);
-  window.MessiLogger = callback;
+function GetPublicKey() {
+  const { publicKey } = useWallet();
+  const callback = useCallback(() => {
+    return publicKey
+  }, [publicKey]);
+  window.OreGetPublicKey = callback;
   return
 }
 

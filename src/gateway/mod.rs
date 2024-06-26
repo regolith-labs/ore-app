@@ -331,16 +331,38 @@ impl Gateway {
     // asserts that the token account is already initialized
     pub async fn get_token_account_ore_v1(&self) -> GatewayResult<Pubkey> {
         let signer = signer();
-        let token_account_address = ore_token_account_address_v1(signer.pubkey());
+        self.get_token_account_ore_from_pubkey_v1(signer.pubkey())
+            .await
+    }
+
+    // asserts that the token account is already initialized
+    pub async fn get_token_account_ore_from_pubkey_v1(
+        &self,
+        pubkey: Pubkey,
+    ) -> GatewayResult<Pubkey> {
+        let token_account_address = ore_token_account_address_v1(pubkey);
+        self.assert_token_account_ore_exists(token_account_address)
+            .await
+    }
+
+    // asserts that the token account is already initialized
+    pub async fn get_token_account_ore_from_pubkey(&self, pubkey: Pubkey) -> GatewayResult<Pubkey> {
+        let token_account_address = ore_token_account_address(pubkey);
+        self.assert_token_account_ore_exists(token_account_address)
+            .await
+    }
+
+    // asserts that the token account is already initialized
+    async fn assert_token_account_ore_exists(&self, ata: Pubkey) -> GatewayResult<Pubkey> {
         self.rpc
-            .get_token_account(&token_account_address)
+            .get_token_account(&ata)
             .await
             .map_err(GatewayError::from)
             .and_then(|maybe_some_token_account| {
                 // assert that ok(none) was not returned
                 maybe_some_token_account.ok_or(GatewayError::FailedAta)
             })
-            .map(|_| token_account_address)
+            .map(|_| ata)
     }
 
     pub async fn create_token_account_ore(&self, owner: Pubkey) -> GatewayResult<Pubkey> {
