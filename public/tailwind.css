@@ -1424,6 +1424,11 @@ h2:where(.dark, .dark *) {
   padding-bottom: 2rem;
 }
 
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
 .pb-20 {
   padding-bottom: 5rem;
 }
