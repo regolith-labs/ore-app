@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ConnectionProvider, WalletProvider, useConnection, useWallet } from '@solana/wallet-adapter-react';
 import {
@@ -33,6 +33,7 @@ export const Wallet = () => {
           <WalletMultiButton />
           { /* Your app's components go here, nested within the context providers. */}
           <RenderOREv2Balance />
+          <LogMessi />
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
@@ -82,6 +83,21 @@ function RenderOREv2Balance() {
   return (
     <div>{balance}</div>
   )
+}
+
+function LogMessi() {
+  const { connection } = useConnection();
+  const { publicKey } = useWallet();
+  const callback = useCallback(async (e) => {
+    // 890880 lamports as of 2022-09-01
+    const lamports = await connection.getMinimumBalanceForRentExemption(0);
+    console.log(lamports);
+    console.log(e);
+    console.log(e.detail)
+
+  }, [publicKey, connection]);
+  window.MessiLogger = callback;
+  return
 }
 
 //function SendSOLToRandomAddress() {

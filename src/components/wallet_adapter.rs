@@ -34,7 +34,9 @@ fn Dispatch() -> Element {
                 let _ = use_resource(move || async move {
                     let init_wallets = eval(
                         r#"
-                        window.dispatchEvent(new Event("ore-go"));
+                        const anon = window.MessiLogger
+                        console.log(anon);
+                        await anon({detail: {name: "leo"}});
                         return
                     "#,
                     );
