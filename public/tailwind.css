@@ -881,6 +881,10 @@ h2:where(.dark, .dark *) {
   height: 100dvh;
 }
 
+.h-9 {
+  height: 2.25rem;
+}
+
 .max-h-\[80vh\] {
   max-height: 80vh;
 }
@@ -1211,6 +1215,10 @@ h2:where(.dark, .dark *) {
   gap: 0.16rem;
 }
 
+.gap-5 {
+  gap: 1.25rem;
+}
+
 .gap-y-4 {
   row-gap: 1rem;
 }
@@ -1454,6 +1462,10 @@ h2:where(.dark, .dark *) {
 
 .text-right {
   text-align: right;
+}
+
+.align-top {
+  vertical-align: top;
 }
 
 .font-hero {
