@@ -8,7 +8,9 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, Instant};
 
 use crate::{
-    components::{DiscordIcon, Footer, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon, XIcon},
+    components::{
+        DiscordIcon, Footer, FuzzlandIcon, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon, XIcon,
+    },
     hooks::{use_is_onboarded, use_ore_supply, UiTokenAmountBalance},
     miner::WEB_WORKERS,
     route::Route,
@@ -190,7 +192,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col min-h-dvh h-full w-full snap-start snap-always",
+            class: "flex flex-col h-dvh w-full snap-start snap-always",
             Navbar {
                 text_color
             }
@@ -231,7 +233,7 @@ fn Block(
     };
     rsx! {
         div {
-            class: "flex min-h-dvh h-full w-full snap-start",
+            class: "flex h-dvh w-full snap-start",
             div {
                 class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
@@ -457,6 +459,14 @@ fn SectionC(text_color: TextColor) -> Element {
                     class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color}",
                     new_tab: true,
                     OttersecIcon {
+                        class: "w-10 h-10 md:w-12 md:h-12 m-auto"
+                    }
+                }
+                Link {
+                    to: "https://fuzz.land/",
+                    class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color}",
+                    new_tab: true,
+                    FuzzlandIcon {
                         class: "w-10 h-10 md:w-12 md:h-12 m-auto"
                     }
                 }
