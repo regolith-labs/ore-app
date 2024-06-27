@@ -190,7 +190,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col min-h-svh h-full w-full snap-center snap-always",
+            class: "flex flex-col min-h-svh h-full w-full snap-start snap-always",
             Navbar {
                 text_color
             }
@@ -231,7 +231,7 @@ fn Block(
     };
     rsx! {
         div {
-            class: "flex min-h-svh h-full w-full snap-center",
+            class: "flex min-h-svh h-full w-full snap-start",
             div {
                 class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
                 div {
