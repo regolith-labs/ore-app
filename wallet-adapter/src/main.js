@@ -108,10 +108,28 @@ function SignTransaction() {
 
 function GetPublicKey() {
   const { publicKey } = useWallet();
-  const callback = useCallback(() => {
+  useMemo(() => {
+    console.log("dispatching pubkey");
+    console.log(publicKey);
+    if (publicKey) {
+      try {
+        const event = new CustomEvent(
+          "ore-pubkey",
+          {
+            detail: {
+              pubkey: publicKey
+            }
+          }
+        );
+        window.dispatchEvent(
+          event
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    }
     return publicKey
   }, [publicKey]);
-  window.OreGetPublicKey = callback;
   return
 }
 
