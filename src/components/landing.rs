@@ -80,7 +80,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fixed supply.",
                 title2: &"Predictable future.",
-                detail: &"ORE has a total maximum supply of 21m tokens. At a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
+                detail: &"ORE has a total maximum supply of 21m tokens. At a steady rate of one token per minute, all ORE in existence will be mined by the year 2064.",
                 section: Section::B,
                 text_color
             }
@@ -192,7 +192,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col h-dvh w-full snap-start snap-always",
+            class: "flex flex-col min-h-dvh h-full w-full snap-start snap-always",
             Navbar {
                 text_color
             }
@@ -233,9 +233,9 @@ fn Block(
     };
     rsx! {
         div {
-            class: "flex h-dvh w-full snap-start",
+            class: "flex min-h-dvh h-full w-full py-8 md:py-16 px-3 sm:px-8 snap-start",
             div {
-                class: "flex flex-col h-full w-full py-16 gap-24 px-4 sm:px-8",
+                class: "flex flex-col h-full w-full justify-between",
                 div {
                     class: "flex flex-col gap-4 sm:gap-6 md:gap-8 transition-colors {copy_color}",
                     p {
@@ -352,7 +352,7 @@ fn SectionA(text_color: TextColor) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-col w-full my-auto gap-12 max-w-[48rem]",
+            class: "flex flex-col w-full my-auto gap-8 md:gap-12 max-w-[48rem]",
             if let Some(hashrate) = hashrate.cloned() {
                 div {
                     class: "flex flex-col gap-2 {copy_color} transition-colors",
@@ -397,7 +397,7 @@ fn SectionB(text_color: TextColor) -> Element {
         .unwrap_or_else(|| 0f64) as u64;
     rsx! {
         div {
-            class: "flex flex-col gap-12 my-auto",
+            class: "flex flex-col gap-8 md:gap-12 my-auto",
             OreValue {
                 title: "Current supply".to_string(),
                 amount: circulating_supply,
@@ -453,7 +453,7 @@ fn SectionC(text_color: TextColor) -> Element {
                 "Audited by"
             }
             div {
-                class: "flex flex-row gap-12",
+                class: "flex flex-row gap-8 md:gap-12",
                 Link {
                     to: "https://osec.io/",
                     class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color}",
@@ -511,7 +511,7 @@ fn SectionD(text_color: TextColor) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-col gap-12 my-auto align-top transition-colors {text_color}",
+            class: "flex flex-row flex-wrap gap-8 md:gap-12 my-auto align-top transition-colors {text_color}",
             if let Some(Ok(quotes)) = &*quotes.read() {
                 Quote {
                     title: "ORE/USDC",

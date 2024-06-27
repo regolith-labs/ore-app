@@ -2198,6 +2198,10 @@ h2:where(.dark, .dark *) {
     gap: 1.5rem;
   }
 
+  .sm\:gap-8 {
+    gap: 2rem;
+  }
+
   .sm\:gap-y-10 {
     row-gap: 2.5rem;
   }
@@ -2324,6 +2328,10 @@ h2:where(.dark, .dark *) {
     gap: 2rem;
   }
 
+  .md\:gap-12 {
+    gap: 3rem;
+  }
+
   .md\:gap-y-12 {
     row-gap: 3rem;
   }
@@ -2354,6 +2362,11 @@ h2:where(.dark, .dark *) {
   .md\:py-10 {
     padding-top: 2.5rem;
     padding-bottom: 2.5rem;
+  }
+
+  .md\:py-16 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
   }
 
   .md\:text-2xl {
