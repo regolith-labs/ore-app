@@ -31,11 +31,11 @@ pub fn Landing() -> Element {
         // (asset_path("rock-10.png"), TextColor::Black),
         // (asset_path("rock-11.png"), TextColor::Black),
         (asset_path("rock-2.jpg"), TextColor::White),
-        (asset_path("rock-3.png"), TextColor::White),
-        (asset_path("rock-4.png"), TextColor::White),
-        (asset_path("rock-6.png"), TextColor::White),
-        (asset_path("rock-5.png"), TextColor::White),
-        (asset_path("rock-9.png"), TextColor::White),
+        (asset_path("rock-3.jpg"), TextColor::White),
+        (asset_path("rock-4.jpg"), TextColor::White),
+        (asset_path("rock-6.jpg"), TextColor::White),
+        (asset_path("rock-5.jpg"), TextColor::White),
+        (asset_path("rock-9.jpg"), TextColor::White),
     ];
     let len = themes.len();
     let text_color = themes[*i.read() % len].1;
@@ -112,7 +112,7 @@ fn BgImg(visible: bool, bg_img: String, index: usize) -> Element {
     rsx! {
         div {
             key: "{index}",
-            class: "fixed top-0 w-full h-full bg-cover bg-center transition-opacity z-0 {visibility}",
+            class: "fixed top-0 w-full h-full bg-cover bg-center transition-opacity duration-1000 z-0 {visibility}",
             style: "background-image: url({bg_img})"
         }
     }
