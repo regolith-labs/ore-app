@@ -1334,6 +1334,11 @@ h2:where(.dark, .dark *) {
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
 }
 
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
 .bg-cover {
   background-size: cover;
 }
