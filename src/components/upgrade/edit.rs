@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{WalletAdapter, WarningIcon},
-    hooks::{use_ore_balance_v1, UiTokenAmountBalance},
+    hooks::{use_ore_balance_user_v1, use_wallet_adapter, UiTokenAmountBalance},
 };
 
 use super::UpgradeStep;
@@ -14,12 +14,16 @@ pub fn UpgradeEdit(
     parsed_amount: u64,
 ) -> Element {
     let nav = navigator();
-    let balance = use_ore_balance_v1();
-    let (max_amount, max_amount_str) = balance
-        .cloned()
-        .and_then(|b| b.ok())
-        .map(|b| (b.balance(), b.ui_amount_string))
-        .unwrap_or_else(|| (0, "0".to_owned()));
+    let maybe_wallet_adapter = *use_wallet_adapter().read();
+    let maybe_balance = maybe_wallet_adapter.map(|wa| use_ore_balance_user_v1(wa.pubkey));
+    let (max_amount, max_amount_str) = match maybe_balance {
+        Some(balance) => balance
+            .cloned()
+            .and_then(|b| b.ok())
+            .map(|b| (b.balance(), b.ui_amount_string))
+            .unwrap_or_else(|| (0, "0".to_owned())),
+        None => (0, "0".to_owned()),
+    };
     let amount_error_text = if parsed_amount.gt(&max_amount) {
         Some("Amount too large".to_string())
     } else {

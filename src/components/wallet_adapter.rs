@@ -35,16 +35,12 @@ fn RenderPubkey() -> Element {
     let e = match maybe_wallet_adapter {
         Some(wallet_adapter) => {
             rsx! {
-                div {
-                    "{wallet_adapter.pubkey.to_string()}"
-                }
+                div { "{wallet_adapter.pubkey.to_string()}" }
             }
         }
         None => {
             rsx! {
-            div {
-                "no pubkey yet"
-            }
+                div { "no pubkey yet" }
             }
         }
     };
