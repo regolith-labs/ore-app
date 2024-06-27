@@ -83,6 +83,13 @@ pub fn Landing() -> Element {
                 text_color
             }
             Block {
+                title: &"Borderless asset.",
+                title2: &"Permissionless cash.",
+                detail: &"ORE is internet-native money that moves at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligable fees.",
+                section: Section::D,
+                text_color
+            }
+            Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
                 detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and has been reviewed by multiple world-class auditing firms.",
@@ -90,13 +97,6 @@ pub fn Landing() -> Element {
                 text_color
                 // TODO Sec3
                 // TODO Neodyme
-            }
-            Block {
-                title: &"Borderless asset.",
-                title2: &"Permissionless cash.",
-                detail: &"ORE is internet-native money that moves at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligable fees.",
-                section: Section::D,
-                text_color
             }
             Footer {
                 transparent_bg: true,
