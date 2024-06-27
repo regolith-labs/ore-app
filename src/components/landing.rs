@@ -352,7 +352,7 @@ fn SectionA(text_color: TextColor) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-col w-full gap-8 md:gap-12 max-w-[48rem]",
+            class: "flex flex-col w-full my-auto gap-8 md:gap-12 max-w-[48rem]",
             if let Some(hashrate) = hashrate.cloned() {
                 div {
                     class: "flex flex-col gap-2 {copy_color} transition-colors",
@@ -397,7 +397,7 @@ fn SectionB(text_color: TextColor) -> Element {
         .unwrap_or_else(|| 0f64) as u64;
     rsx! {
         div {
-            class: "flex flex-col gap-8 md:gap-12",
+            class: "flex flex-col gap-8 md:gap-12 my-auto",
             OreValue {
                 title: "Current supply".to_string(),
                 amount: circulating_supply,
@@ -447,7 +447,7 @@ fn SectionC(text_color: TextColor) -> Element {
     };
     rsx! {
         div {
-            class: "flex flex-col gap-2",
+            class: "flex flex-col gap-2 my-auto",
             p {
                 class: "opacity-80 font-medium {text_color}",
                 "Audited by"
@@ -511,7 +511,7 @@ fn SectionD(text_color: TextColor) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-row flex-wrap gap-8 md:gap-12 align-top transition-colors {text_color}",
+            class: "flex flex-row flex-wrap gap-8 md:gap-12 my-auto align-top transition-colors {text_color}",
             if let Some(Ok(quotes)) = &*quotes.read() {
                 Quote {
                     title: "ORE/USDC",
