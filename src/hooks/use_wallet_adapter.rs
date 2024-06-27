@@ -4,7 +4,11 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use crate::wallet_adapter::WalletAdapter;
 
 pub fn use_wallet_adapter() -> Signal<Option<WalletAdapter>> {
-    let mut wallet_adapter = use_signal(|| None);
+    use_context::<Signal<Option<WalletAdapter>>>()
+}
+
+pub fn use_wallet_adapter_provider() {
+    let mut wallet_adapter = use_context_provider(|| Signal::new(None));
     let mut eval = eval(
         r#"
         console.log("eval this");
@@ -32,5 +36,4 @@ pub fn use_wallet_adapter() -> Signal<Option<WalletAdapter>> {
         }
         log::info!("exited");
     });
-    wallet_adapter
 }
