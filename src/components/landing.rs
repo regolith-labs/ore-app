@@ -371,7 +371,7 @@ fn SectionA(text_color: TextColor) -> Element {
                 class: "flex flex-col gap-2 {copy_color} transition-colors",
                 p {
                     class: "opacity-80 font-medium",
-                    "Miner visualized"
+                    "Sampling"
                 }
                 div {
                     class: "flex flex-row gap-2",
