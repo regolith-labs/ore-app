@@ -901,6 +901,10 @@ h2:where(.dark, .dark *) {
   min-height: 100svh;
 }
 
+.min-h-dvh {
+  min-height: 100dvh;
+}
+
 .w-10 {
   width: 2.5rem;
 }
