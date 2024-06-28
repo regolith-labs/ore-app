@@ -20,7 +20,7 @@ pub async fn try_start_mining(
 
     toolbar_state.set_status_message(MinerStatusMessage::GeneratingChallenge);
     loop {
-        if gateway.register_ore().await.is_ok() {
+        if gateway.open_ore().await.is_ok() {
             break;
         }
     }
