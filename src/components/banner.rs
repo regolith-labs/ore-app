@@ -1,22 +1,28 @@
 use dioxus::prelude::*;
 
 #[derive(Clone, PartialEq)]
-pub enum BannerType {
+pub enum BannerStyle {
+    Info,
     Error,
 }
 
-pub fn Banner(text: String, banner_type: BannerType) -> Element {
-    let color = match banner_type {
-        BannerType::Error => "bg-red-500 text-white",
+#[component]
+pub fn Banner(style: BannerStyle, link_to: Option<String>, children: Element) -> Element {
+    let color = match style {
+        BannerStyle::Info => "bg-blue-500 text-white",
+        BannerStyle::Error => "bg-red-500 text-white",
     };
     rsx! {
-        div {
-            class: "flex flex-row w-full font-medium text-center gap-1 px-4 sm:px-8 py-2 text-sm {color}",
-            // WarningIcon {
-            //     class: "w-4 h-4 my-auto",
-            // }
-            p {
-                "{text}"
+        if let Some(link_to) = link_to {
+            Link {
+                class: "flex flex-row w-full font-medium text-center gap-1 px-4 sm:px-8 py-2 text-sm {color}",
+                to: link_to,
+                {children}
+            }
+        } else {
+            div {
+                class: "flex flex-row w-full font-medium text-center gap-1 px-4 sm:px-8 py-2 text-sm {color}",
+                {children}
             }
         }
     }
