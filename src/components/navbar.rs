@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{Footer, OreLogoIcon, OreWordmarkIcon, UserBubble},
+    components::{Banner, BannerStyle, Footer, OreLogoIcon, OreWordmarkIcon, UserBubble},
     hooks::use_appearance,
     route::Route,
 };
@@ -17,6 +17,11 @@ pub fn Navbar() -> Element {
     rsx! {
         div {
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
+            Banner {
+                style: BannerStyle::Info,
+                link_to: "https://v1.ore.supply",
+                "This is a devnet preview of ORE v2. To use the v1 app, click here →"
+            }
             div {
                 class: "flex w-full",
                 div {
@@ -71,7 +76,10 @@ pub fn SimpleNavbar() -> Element {
                 class: "py-4 px-4 sm:px-8 grow h-full w-full max-w-[96rem] mx-auto",
                 Outlet::<Route> {}
             }
-            Footer {}
+            Footer {
+                transparent_bg: false,
+                show_site_map: false,
+            }
         }
     }
 }

@@ -137,73 +137,73 @@ pub fn Settings() -> Element {
                     }
                 }
             }
-            div {
-                class: "flex flex-col gap-4",
-                h2 {
-                    class: "{section_title_class}",
-                    "Network"
-                }
-                div {
-                    class: "flex flex-col gap-2",
-                    div {
-                        class: "{container_class}",
-                        p {
-                            class: "{data_title_class}",
-                            "RPC"
-                        }
-                        div {
-                            class: "flex flex-col gap-2",
-                            input {
-                                autofocus: false,
-                                class: "w-full max-w-96 text-right placeholder-gray-300 dark:placeholder-gray-800 bg-transparent",
-                                value: "{rpc_url_input}",
-                                placeholder: "{RPC_URL}",
-                                oninput: move |evt| {
-                                    let s = evt.value();
-                                    rpc_url_input.set(s.clone());
-                                    if !is_url(&s) {
-                                        rpc_url_error.set(Some("Invalid url".to_string()));
-                                    } else {
-                                        rpc_url_error.set(None);
-                                    }
-                                },
-                            }
-                        }
-                    }
-                    div {
-                        class: "flex flex-shrink gap-2 justify-end",
-                        if let Some(err_str) = rpc_url_error.read().clone() {
-                            p {
-                                class: "text-sm text-red-500 text-right",
-                                "{err_str}"
-                            }
-                        }
-                        div {
-                            class: "flex flex-row gap-2",
-                            if rpc_url.read().0.ne(RPC_URL) {
-                                button {
-                                    class: "hover-100 active-200 rounded shrink ml-auto transition-colors px-2 py-1",
-                                    onclick: move |_| {
-                                        rpc_url.set(RpcUrl(RPC_URL.to_string()));
-                                        rpc_url_input.set(RPC_URL.to_string());
-                                        rpc_url_error.set(None);
-                                    },
-                                    "Default"
-                                }
-                            }
-                            if is_rpc_url_edited && rpc_url_error.read().is_none() {
-                                button {
-                                    class: "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded shrink ml-auto transition-colors px-2 py-1",
-                                    onclick: move |_| {
-                                        rpc_url.set(RpcUrl(rpc_url_input.read().clone()));
-                                    },
-                                    "Save"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // div {
+            //     class: "flex flex-col gap-4",
+            //     h2 {
+            //         class: "{section_title_class}",
+            //         "Network"
+            //     }
+            //     div {
+            //         class: "flex flex-col gap-2",
+            //         div {
+            //             class: "{container_class}",
+            //             p {
+            //                 class: "{data_title_class}",
+            //                 "RPC"
+            //             }
+            //             div {
+            //                 class: "flex flex-col gap-2",
+            //                 input {
+            //                     autofocus: false,
+            //                     class: "w-full max-w-96 text-right placeholder-gray-300 dark:placeholder-gray-800 bg-transparent",
+            //                     value: "{rpc_url_input}",
+            //                     placeholder: "{RPC_URL}",
+            //                     oninput: move |evt| {
+            //                         let s = evt.value();
+            //                         rpc_url_input.set(s.clone());
+            //                         if !is_url(&s) {
+            //                             rpc_url_error.set(Some("Invalid url".to_string()));
+            //                         } else {
+            //                             rpc_url_error.set(None);
+            //                         }
+            //                     },
+            //                 }
+            //             }
+            //         }
+            //         div {
+            //             class: "flex flex-shrink gap-2 justify-end",
+            //             if let Some(err_str) = rpc_url_error.read().clone() {
+            //                 p {
+            //                     class: "text-sm text-red-500 text-right",
+            //                     "{err_str}"
+            //                 }
+            //             }
+            //             div {
+            //                 class: "flex flex-row gap-2",
+            //                 if rpc_url.read().0.ne(RPC_URL) {
+            //                     button {
+            //                         class: "hover-100 active-200 rounded shrink ml-auto transition-colors px-2 py-1",
+            //                         onclick: move |_| {
+            //                             rpc_url.set(RpcUrl(RPC_URL.to_string()));
+            //                             rpc_url_input.set(RPC_URL.to_string());
+            //                             rpc_url_error.set(None);
+            //                         },
+            //                         "Default"
+            //                     }
+            //                 }
+            //                 if is_rpc_url_edited && rpc_url_error.read().is_none() {
+            //                     button {
+            //                         class: "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded shrink ml-auto transition-colors px-2 py-1",
+            //                         onclick: move |_| {
+            //                             rpc_url.set(RpcUrl(rpc_url_input.read().clone()));
+            //                         },
+            //                         "Save"
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 }
