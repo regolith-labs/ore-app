@@ -46,3 +46,33 @@ fn RenderPubkey() -> Element {
     };
     e
 }
+
+// #[component]
+// fn RenderBalanceV2() -> Element {
+//     let balance_resource = use_wallet_adapter::use_ore_balance_v2().cloned();
+//     let balance_string = balance_resource
+//         .and_then(|maybe_token_amount| {
+//             maybe_token_amount.map(|token_amount| token_amount.ui_amount_string)
+//         })
+//         .unwrap_or("0.0".to_string());
+//     rsx! {
+//         div {
+//             "ORE v2 balance: {balance_string}"
+//         }
+//     }
+// }
+//
+// #[component]
+// fn RenderBalanceV1() -> Element {
+//     let balance_resource = use_wallet_adapter::use_ore_balance_v1().cloned();
+//     let balance_string = balance_resource
+//         .and_then(|maybe_token_amount| {
+//             maybe_token_amount.map(|token_amount| token_amount.ui_amount_string)
+//         })
+//         .unwrap_or("0.0".to_string());
+//     rsx! {
+//         div {
+//             "ORE v1 balance: {balance_string}"
+//         }
+//     }
+// }
