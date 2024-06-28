@@ -15,7 +15,7 @@ use crate::{
     hooks::{
         use_appearance_provider, use_explorer_provider, use_is_onboarded_provider,
         use_power_level_provider, use_priority_fee_provider, use_rpc_url_provider,
-        use_show_backup_warning_provider, use_wallet_adapter_provider,
+        use_show_backup_warning_provider, use_wallet_adapter::use_wallet_adapter_provider,
     },
     route::Route,
 };

@@ -30,7 +30,7 @@ fn Render() -> Element {
 
 #[component]
 fn RenderPubkey() -> Element {
-    let wallet_adapter_signal = use_wallet_adapter();
+    let wallet_adapter_signal = use_wallet_adapter::use_wallet_adapter();
     let maybe_wallet_adapter = *wallet_adapter_signal.read();
     let e = match maybe_wallet_adapter {
         Some(wallet_adapter) => {
