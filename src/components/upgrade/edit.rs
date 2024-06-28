@@ -5,11 +5,6 @@ use crate::{
     components::{WalletAdapter, WarningIcon},
     hooks::{use_gateway, use_wallet_adapter, UiTokenAmountBalance},
 };
-// use base64::{
-//     alphabet,
-//     engine::{self, general_purpose},
-//     Engine as _,
-// };
 
 use super::UpgradeStep;
 
@@ -22,8 +17,10 @@ fn invoke_signature(tx: Transaction) {
         let tojs = {b64: msg};
         let submitter = window.OreTxSigner;
         console.log(submitter);
-        await submitter(tojs);
-        dioxus.send("hello");
+        let signed = await submitter(tojs);
+        console.log("signed!");
+        console.log(signed);
+        dioxus.send(signed);
         "#,
     );
     if let Ok(vec) = bincode::serialize(&tx) {
@@ -42,10 +39,22 @@ fn invoke_signature(tx: Transaction) {
     spawn(async move {
         let res = eval.recv().await;
         match res {
-            Ok(val) => {
-                log::info!("val rec: {}", val);
+            Ok(serde_json::Value::String(string)) => {
+                log::info!("val rec: {}", string);
+                let buffer = base64::decode(string).unwrap();
+                let tx: Transaction = bincode::deserialize(&buffer).unwrap();
+                let gateway = use_gateway();
+                let rpc_res = gateway.rpc.send_transaction(&tx).await;
+                match rpc_res {
+                    Ok(sig) => {
+                        log::info!("sig: {}", sig);
+                    }
+                    Err(err) => {
+                        log::info!("rpc err: {}", err);
+                    }
+                }
             }
-            Err(_err) => {
+            _ => {
                 log::info!("err recv val");
             }
         }
