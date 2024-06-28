@@ -90,14 +90,24 @@ function SignTransaction() {
   const { publicKey } = useWallet();
   const callback = useCallback(async (msg) => {
     try {
-      const json = msg.json;
-      // console.log(json);
-      const obj = JSON.parse(json);
+      // const map = msg.json;
+      // console.log(map);
+      // const obj = Object.fromEntries(map);
       // console.log(obj);
-      const buf = Buffer.from(obj);
+      // const jsonString = JSON.stringify(obj);
+      // console.log(jsonString);
+      // const objj = JSON.parse(jsonString);
+      // console.log(objj);
+      // const buf = Buffer.from(json, "utf8");
       // console.log(buf);
-      const tx = Transaction.from(buf);
+      // const tx = Transaction.from(buf);
       // console.log(tx);
+      const b64 = msg.b64;
+      console.log(b64);
+      const buf = Buffer.from(b64, "base64");
+      console.log(buf);
+      const tx = Transaction.from(buf);
+      console.log(tx);
     } catch (err) {
       console.log(err);
     }

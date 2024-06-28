@@ -44,9 +44,33 @@ pub fn use_wallet_adapter_provider() {
     });
 }
 
-pub fn use_ore_balance_v1() -> Resource<Option<UiTokenAmount>> {
+pub fn use_ore_balance_v2(
+    wallet_adapter_signal: Signal<Option<WalletAdapter>>,
+) -> Resource<Option<UiTokenAmount>> {
     let gateway = use_gateway();
-    let wallet_adapter_signal = use_wallet_adapter();
+    use_resource(move || {
+        let gateway = gateway.clone();
+        async move {
+            let maybe_wallet_adapter = *wallet_adapter_signal.read();
+            match maybe_wallet_adapter {
+                Some(wa) => {
+                    let token_account_address = ore_token_account_address(wa.pubkey);
+                    gateway
+                        .rpc
+                        .get_token_account_balance(&token_account_address)
+                        .await
+                        .ok()
+                }
+                None => None,
+            }
+        }
+    })
+}
+
+pub fn use_ore_balance_v1(
+    wallet_adapter_signal: Signal<Option<WalletAdapter>>,
+) -> Resource<Option<UiTokenAmount>> {
+    let gateway = use_gateway();
     use_resource(move || {
         let gateway = gateway.clone();
         async move {
