@@ -17,7 +17,8 @@ const ORE_V2 = new PublicKey("HS9XYYijv7g39DJ8G7zWB4Sb5ewRvWyeJ4JyMR2V1YYi");
 
 export const Wallet = () => {
   // You can also provide a custom RPC endpoint.
-  const endpoint = "https://devnet.helius-rpc.com/?api-key=1de92644-323b-4900-9041-13c02730955c"
+  // const endpoint = "https://devnet.helius-rpc.com/?api-key=1de92644-323b-4900-9041-13c02730955c"
+  const endpoint = "http://localhost:8899";
 
   const wallets = useMemo(
     () => [
@@ -87,27 +88,22 @@ function RenderOREv2Balance() {
 }
 
 function SignTransaction() {
-  const { publicKey } = useWallet();
+  const { publicKey, signTransaction } = useWallet();
   const callback = useCallback(async (msg) => {
     try {
-      // const map = msg.json;
-      // console.log(map);
-      // const obj = Object.fromEntries(map);
-      // console.log(obj);
-      // const jsonString = JSON.stringify(obj);
-      // console.log(jsonString);
-      // const objj = JSON.parse(jsonString);
-      // console.log(objj);
-      // const buf = Buffer.from(json, "utf8");
-      // console.log(buf);
-      // const tx = Transaction.from(buf);
-      // console.log(tx);
       const b64 = msg.b64;
       console.log(b64);
       const buf = Buffer.from(b64, "base64");
       console.log(buf);
       const tx = Transaction.from(buf);
       console.log(tx);
+      const signed = await signTransaction(tx);
+      console.log(signed);
+      const ser = signed.serialize();
+      console.log(ser);
+      const str = ser.toString("base64");
+      console.log(str);
+      return str;
     } catch (err) {
       console.log(err);
     }
