@@ -14,16 +14,16 @@ pub fn UpgradeEdit(
     parsed_amount: u64,
 ) -> Element {
     let nav = navigator();
-    let maybe_wallet_adapter = *use_wallet_adapter().read();
-    let maybe_balance = maybe_wallet_adapter.map(|wa| use_ore_balance_user_v1(wa.pubkey));
+    // let maybe_wallet_adapter = *use_wallet_adapter::use_wallet_adapter().read();
+    // let maybe_balance = maybe_wallet_adapter.map(|wa| use_ore_balance_user_v1(wa.pubkey));
+    let maybe_balance = use_wallet_adapter::use_ore_balance_v1().cloned();
     let (max_amount, max_amount_str) = match maybe_balance {
         Some(balance) => balance
-            .cloned()
-            .and_then(|b| b.ok())
             .map(|b| (b.balance(), b.ui_amount_string))
             .unwrap_or_else(|| (0, "0".to_owned())),
         None => (0, "0".to_owned()),
     };
+    log::info!("max amount: {}", max_amount_str);
     let amount_error_text = if parsed_amount.gt(&max_amount) {
         Some("Amount too large".to_string())
     } else {

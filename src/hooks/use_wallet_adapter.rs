@@ -1,7 +1,13 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
-use crate::wallet_adapter::WalletAdapter;
+use crate::{
+    gateway::{ore_token_account_address, ore_token_account_address_v1, GatewayResult},
+    wallet_adapter::WalletAdapter,
+};
+
+use super::use_gateway;
 
 pub fn use_wallet_adapter() -> Signal<Option<WalletAdapter>> {
     use_context::<Signal<Option<WalletAdapter>>>()
@@ -36,4 +42,26 @@ pub fn use_wallet_adapter_provider() {
         }
         log::info!("exited");
     });
+}
+
+pub fn use_ore_balance_v1() -> Resource<Option<UiTokenAmount>> {
+    let gateway = use_gateway();
+    let wallet_adapter_signal = use_wallet_adapter();
+    use_resource(move || {
+        let gateway = gateway.clone();
+        async move {
+            let maybe_wallet_adapter = *wallet_adapter_signal.read();
+            match maybe_wallet_adapter {
+                Some(wa) => {
+                    let token_account_address = ore_token_account_address_v1(wa.pubkey);
+                    gateway
+                        .rpc
+                        .get_token_account_balance(&token_account_address)
+                        .await
+                        .ok()
+                }
+                None => None,
+            }
+        }
+    })
 }
