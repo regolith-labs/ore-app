@@ -3,10 +3,8 @@ use solana_client_wasm::solana_sdk::message::Message;
 use solana_client_wasm::solana_sdk::{
     instruction::Instruction, pubkey::Pubkey, transaction::Transaction,
 };
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
-use solana_extra_wasm::program::{
-    spl_associated_token_account::instruction::create_associated_token_account, spl_token,
-};
+use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
+use solana_extra_wasm::program::spl_token;
 
 use crate::gateway::{ore_token_account_address, GatewayResult, CU_LIMIT_UPGRADE};
 use crate::hooks::use_gateway;
