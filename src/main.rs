@@ -9,7 +9,6 @@ mod hooks;
 mod miner;
 mod route;
 mod utils;
-mod wallet_adapter;
 
 use crate::{
     hooks::{
