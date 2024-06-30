@@ -13,6 +13,7 @@ pub enum GatewayError {
     // SimulationFailed,
     RequestFailed,
     ProgramBuilderFailed,
+    WalletAdapterDisconnected,
     Unknown,
 }
 
