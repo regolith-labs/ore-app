@@ -1,4 +1,5 @@
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
+use solana_client_wasm::solana_sdk::message::Message;
 use solana_client_wasm::solana_sdk::{
     instruction::Instruction, pubkey::Pubkey, transaction::Transaction,
 };
@@ -65,10 +66,10 @@ impl WalletAdapter {
                 vec![cu_limit_ix, create_token_account_ix, upgrade_ix]
             }
         };
-        Ok(Transaction::new_with_payer(
-            ixs.as_slice(),
-            Some(&self.pubkey),
-        ))
+        let blockhash = gateway.rpc.get_latest_blockhash().await?;
+        let message = Message::new_with_blockhash(ixs.as_slice(), Some(&self.pubkey), &blockhash);
+        let tx = Transaction::new_unsigned(message);
+        Ok(tx)
     }
 
     // async fn _build_transfer_tx(
