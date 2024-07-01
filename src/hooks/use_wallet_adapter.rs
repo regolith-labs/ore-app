@@ -1,5 +1,7 @@
+use base64::Engine;
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
+use solana_client_wasm::solana_sdk::signature::Signature;
 use solana_client_wasm::solana_sdk::{
     instruction::Instruction, message::Message, pubkey::Pubkey, transaction::Transaction,
 };
@@ -23,7 +25,6 @@ pub fn use_wallet_adapter_provider() {
     let mut eval = eval(
         r#"
             window.addEventListener("ore-pubkey", (event) => {
-                console.log(event.detail);
                 dioxus.send(event.detail.pubkey);
             });
         "#,
@@ -71,6 +72,69 @@ pub fn use_ore_balances() -> Resource<Option<Balances>> {
     })
 }
 
+pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatus>) {
+    signal.set(InvokeSignatureStatus::Waiting);
+    let mut eval = eval(
+        r#"
+        let msg = await dioxus.recv();
+        let signed = await window.OreTxSigner({b64: msg});
+        dioxus.send(signed);
+        "#,
+    );
+    match bincode::serialize(&tx) {
+        Ok(vec) => {
+            let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
+            let res = eval.send(serde_json::Value::String(b64));
+            match res {
+                Ok(()) => {
+                    spawn(async move {
+                        let res = eval.recv().await;
+                        match res {
+                            Ok(serde_json::Value::String(string)) => {
+                                let buffer = base64::engine::general_purpose::STANDARD
+                                    .decode(string)
+                                    .unwrap();
+                                let tx: Transaction = bincode::deserialize(&buffer).unwrap();
+                                let gateway = use_gateway();
+                                let rpc_res = gateway.rpc.send_transaction(&tx).await;
+                                match rpc_res {
+                                    Ok(sig) => {
+                                        log::info!("sig: {}", sig);
+                                        signal.set(InvokeSignatureStatus::Done(sig));
+                                    }
+                                    Err(err) => {
+                                        log::info!("rpc err: {}", err);
+                                        signal.set(InvokeSignatureStatus::DoneWithError)
+                                    }
+                                }
+                            }
+                            _ => {
+                                log::info!("err recv val");
+                                signal.set(InvokeSignatureStatus::DoneWithError)
+                            }
+                        };
+                    });
+                }
+                Err(_err) => {
+                    log::info!("err sending val");
+                    signal.set(InvokeSignatureStatus::DoneWithError)
+                }
+            }
+        }
+        Err(err) => {
+            log::info!("err serializing tx: {}", err);
+            signal.set(InvokeSignatureStatus::DoneWithError)
+        }
+    };
+}
+
+pub enum InvokeSignatureStatus {
+    Start,
+    Waiting,
+    DoneWithError,
+    Done(Signature),
+}
+
 #[derive(Clone)]
 pub struct Balances {
     pub v1: UiTokenAmount,
@@ -84,9 +148,9 @@ pub enum WalletAdapter {
 
 impl WalletAdapter {
     pub async fn build_upgrade_tx(&self, amount: u64) -> GatewayResult<Transaction> {
-        match self {
-            &WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
-            &WalletAdapter::Connected(pubkey) => {
+        match *self {
+            WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
+            WalletAdapter::Connected(pubkey) => {
                 let gateway = use_gateway();
                 // v2 token account may or may not exist
                 // we'll build an ix to create this token account if needed
@@ -150,9 +214,9 @@ impl WalletAdapter {
         amount: u64,
         memo: String,
     ) -> GatewayResult<Transaction> {
-        match self {
-            &WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
-            &WalletAdapter::Connected(pubkey) => {
+        match *self {
+            WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
+            WalletAdapter::Connected(pubkey) => {
                 // from token account must exist
                 let from_token_account = ore_token_account_address(pubkey);
                 // to token account might exist
@@ -192,8 +256,8 @@ impl WalletAdapter {
             Ok(Some(_)) => None,
             _ => {
                 let ix = create_associated_token_account(
-                    &payer,
-                    &owner,
+                    payer,
+                    owner,
                     &ore::MINT_ADDRESS,
                     &spl_token::id(),
                 );

@@ -1,69 +1,14 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::transaction::Transaction;
 
 use crate::{
-    components::{MountWalletAdapter, WarningIcon},
+    components::{InvokeSignature, MountWalletAdapter, WarningIcon},
     hooks::{
-        use_gateway,
         use_wallet_adapter::{self, WalletAdapter},
         UiTokenAmountBalance,
     },
 };
 
 use super::UpgradeStep;
-
-fn invoke_signature(tx: Transaction) {
-    let mut eval = eval(
-        r#"
-        console.log("submitting tx");
-        let msg = await dioxus.recv();
-        console.log(msg);
-        let tojs = {b64: msg};
-        let submitter = window.OreTxSigner;
-        console.log(submitter);
-        let signed = await submitter(tojs);
-        console.log("signed!");
-        console.log(signed);
-        dioxus.send(signed);
-        "#,
-    );
-    if let Ok(vec) = bincode::serialize(&tx) {
-        let b64 = base64::encode(vec);
-        log::info!("b64: {}", b64);
-        let res = eval.send(serde_json::Value::String(b64));
-        match res {
-            Ok(()) => {
-                log::info!("sent val");
-            }
-            Err(_err) => {
-                log::info!("err sending val");
-            }
-        }
-    }
-    spawn(async move {
-        let res = eval.recv().await;
-        match res {
-            Ok(serde_json::Value::String(string)) => {
-                log::info!("val rec: {}", string);
-                let buffer = base64::decode(string).unwrap();
-                let tx: Transaction = bincode::deserialize(&buffer).unwrap();
-                let gateway = use_gateway();
-                let rpc_res = gateway.rpc.send_transaction(&tx).await;
-                match rpc_res {
-                    Ok(sig) => {
-                        log::info!("sig: {}", sig);
-                    }
-                    Err(err) => {
-                        log::info!("rpc err: {}", err);
-                    }
-                }
-            }
-            _ => {
-                log::info!("err recv val");
-            }
-        }
-    });
-}
 
 #[component]
 pub fn UpgradeEdit(
@@ -106,16 +51,19 @@ pub fn UpgradeEdit(
                 MountWalletAdapter {}
                 div { "ORE v1 balance: {max_amount_str}" }
                 div { "ORE v2 balance: {balance_v2_str}" }
-                button {
-                    onclick: move |_| {
-                        async move {
-                            invoke_signature(wallet_adapter_signal.read().build_upgrade_tx(1_005).await.unwrap())
+                match *wallet_adapter_signal.read() {
+                    WalletAdapter::Connected(_) => {
+                       rsx! {
+                           div {}
+                       }
+                    },
+                    WalletAdapter::Disconnected => {
+                        rsx! {
+                            div {
+                                "not yet"
+                            }
                         }
                     },
-                    match *wallet_adapter_signal.read() {
-                        WalletAdapter::Connected(_) => "click me",
-                        WalletAdapter::Disconnected => "not yet",
-                    }
                 }
             }
             div { class: "flex flex-col gap-12",
