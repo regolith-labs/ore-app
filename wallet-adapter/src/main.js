@@ -44,22 +44,26 @@ window.MountWalletAdapter = MountWalletAdapter;
 function Dispatcher() {
   const { publicKey } = useWallet();
   useMemo(() => {
+    let msg;
     if (publicKey) {
-      try {
-        const event = new CustomEvent(
-          "ore-pubkey",
-          {
-            detail: {
-              pubkey: publicKey.toBuffer().toJSON().data
-            }
+      msg = publicKey.toBuffer().toJSON().data;
+    } else {
+      msg = null
+    }
+    try {
+      const event = new CustomEvent(
+        "ore-pubkey",
+        {
+          detail: {
+            pubkey: msg
           }
-        );
-        window.dispatchEvent(
-          event
-        );
-      } catch (err) {
-        console.log(err);
-      }
+        }
+      );
+      window.dispatchEvent(
+        event
+      );
+    } catch (err) {
+      console.log(err);
     }
     return
   }, [publicKey]);
