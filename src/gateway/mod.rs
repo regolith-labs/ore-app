@@ -39,7 +39,8 @@ use solana_extra_wasm::{
 use web_time::Duration;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
+// pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
+pub const RPC_URL: &str = "http://localhost:8899";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
@@ -264,7 +265,7 @@ impl Gateway {
     }
 
     // Ore
-    pub async fn register_ore(&self) -> GatewayResult<()> {
+    pub async fn open_ore(&self) -> GatewayResult<()> {
         // Return early, if account is already initialized
         let signer = signer();
         let proof_address = proof_pubkey(signer.pubkey());
@@ -273,7 +274,7 @@ impl Gateway {
         }
 
         // Sign and send transaction.
-        let ix = ore::instruction::register(signer.pubkey());
+        let ix = ore::instruction::open(signer.pubkey());
         match self.send_and_confirm(&[ix], true, false).await {
             Ok(_) => Ok(()),
             Err(_) => Err(GatewayError::FailedRegister),
@@ -331,16 +332,38 @@ impl Gateway {
     // asserts that the token account is already initialized
     pub async fn get_token_account_ore_v1(&self) -> GatewayResult<Pubkey> {
         let signer = signer();
-        let token_account_address = ore_token_account_address_v1(signer.pubkey());
+        self.get_token_account_ore_from_pubkey_v1(signer.pubkey())
+            .await
+    }
+
+    // asserts that the token account is already initialized
+    pub async fn get_token_account_ore_from_pubkey_v1(
+        &self,
+        pubkey: Pubkey,
+    ) -> GatewayResult<Pubkey> {
+        let token_account_address = ore_token_account_address_v1(pubkey);
+        self.assert_token_account_ore_exists(token_account_address)
+            .await
+    }
+
+    // asserts that the token account is already initialized
+    pub async fn get_token_account_ore_from_pubkey(&self, pubkey: Pubkey) -> GatewayResult<Pubkey> {
+        let token_account_address = ore_token_account_address(pubkey);
+        self.assert_token_account_ore_exists(token_account_address)
+            .await
+    }
+
+    // asserts that the token account is already initialized
+    async fn assert_token_account_ore_exists(&self, ata: Pubkey) -> GatewayResult<Pubkey> {
         self.rpc
-            .get_token_account(&token_account_address)
+            .get_token_account(&ata)
             .await
             .map_err(GatewayError::from)
             .and_then(|maybe_some_token_account| {
                 // assert that ok(none) was not returned
                 maybe_some_token_account.ok_or(GatewayError::FailedAta)
             })
-            .map(|_| token_account_address)
+            .map(|_| ata)
     }
 
     pub async fn create_token_account_ore(&self, owner: Pubkey) -> GatewayResult<Pubkey> {

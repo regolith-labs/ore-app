@@ -3,3 +3,4 @@ dioxusin
 /dist
 /node_modules
 /target
+wallet-adapter/node_modules/

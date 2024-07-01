@@ -491,6 +491,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
+name = "base64"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
+
+[[package]]
 name = "bincode"
 version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1488,6 +1494,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-logger"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81fe09dc9773dc1f1bb0d38529203d6555d08f67aadca5cf955ac3d1a9e69880"
+dependencies = [
+ "console_error_panic_hook",
+ "tracing",
+ "tracing-subscriber",
+ "tracing-wasm",
+]
+
+[[package]]
 name = "dioxus-router"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1620,7 +1638,6 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 [[package]]
 name = "drillx"
 version = "0.2.0"
-source = "git+https://github.com/regolith-labs/drillx?branch=master#ce0330957a2153c9191bdbcbcf4acce031ccd6bf"
 dependencies = [
  "blake3",
  "equix",
@@ -3461,10 +3478,12 @@ name = "ore-app"
 version = "1.1.0"
 dependencies = [
  "async-std",
+ "base64 0.22.1",
  "bincode",
  "cached",
  "chrono",
  "dioxus",
+ "dioxus-logger",
  "dioxus-std",
  "drillx",
  "futures",
@@ -3486,6 +3505,7 @@ dependencies = [
  "serde_json",
  "solana-client-wasm",
  "solana-extra-wasm",
+ "tracing",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -3497,7 +3517,6 @@ dependencies = [
 [[package]]
 name = "ore-program"
 version = "2.0.0"
-source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#bc68d45cfc528a2fa18c4ade97d0ad5a876fda4d"
 dependencies = [
  "array-const-fn-init",
  "bs58 0.5.1",
@@ -4641,7 +4660,6 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#607b890db4421ffda92b5832d00fd034504a617a"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -4661,7 +4679,6 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#607b890db4421ffda92b5832d00fd034504a617a"
 dependencies = [
  "Inflector",
  "arrayref",
@@ -5460,6 +5477,17 @@ dependencies = [
  "thread_local",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "tracing-wasm"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4575c663a174420fa2d78f4108ff68f65bf2fbb7dd89f33749b6e826b3626e07"
+dependencies = [
+ "tracing",
+ "tracing-subscriber",
+ "wasm-bindgen",
 ]
 
 [[package]]

@@ -16,6 +16,7 @@ mod use_rpc;
 mod use_show_backup_warning;
 mod use_sol_balance;
 mod use_transfers;
+pub mod use_wallet_adapter;
 // mod use_treasury;
 
 pub use use_appearance::*;
