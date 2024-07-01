@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 
+use crate::components::Spinner;
 use crate::hooks::{use_wallet_adapter, use_wallet_adapter::InvokeSignatureStatus};
 
 #[component]
@@ -26,17 +27,17 @@ pub fn InvokeSignature(tx: Transaction) -> Element {
         InvokeSignatureStatus::Start => {
             rsx! {
                 button {
+                    class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
                     onclick: move |_| {
                         use_wallet_adapter::invoke_signature(tx.clone(), signal);
-                    }
+                    },
+                    "Upgrade"
                 }
             }
         }
         InvokeSignatureStatus::Waiting => {
             rsx! {
-                div {
-                    "waiting"
-                }
+                Spinner { class: "mx-auto" }
             }
         }
         InvokeSignatureStatus::DoneWithError => {
@@ -51,9 +52,7 @@ pub fn InvokeSignature(tx: Transaction) -> Element {
         InvokeSignatureStatus::Done(sig) => {
             rsx! {
                 div {
-                    "success"
-                }
-                div {
+                    class: "mx-auto",
                     "{sig.to_string()}"
                 }
             }

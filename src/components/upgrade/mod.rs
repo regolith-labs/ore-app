@@ -7,11 +7,12 @@ use done::*;
 use edit::*;
 
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::signature::Signature;
+use solana_client_wasm::solana_sdk::{signature::Signature, transaction::Transaction};
 
+#[derive(Clone)]
 pub enum UpgradeStep {
     Edit,
-    Confirm,
+    Confirm(Transaction),
     Done(Signature),
 }
 
@@ -24,7 +25,7 @@ pub fn Upgrade() -> Element {
         Err(_) => 0,
     };
 
-    let e = match *upgrade_step.read() {
+    match upgrade_step.cloned() {
         UpgradeStep::Edit => {
             rsx! {
                 UpgradeEdit {
@@ -34,11 +35,12 @@ pub fn Upgrade() -> Element {
                 }
             }
         }
-        UpgradeStep::Confirm => {
+        UpgradeStep::Confirm(tx) => {
             rsx! {
                 UpgradeConfirm {
                     upgrade_step: upgrade_step,
-                    amount: parsed_amount
+                    tx: tx,
+                    amount: parsed_amount,
                 }
             }
         }
@@ -50,6 +52,5 @@ pub fn Upgrade() -> Element {
                 }
             }
         }
-    };
-    e
+    }
 }

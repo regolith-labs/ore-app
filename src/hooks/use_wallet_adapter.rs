@@ -141,6 +141,7 @@ pub struct Balances {
     pub v2: UiTokenAmount,
 }
 
+#[derive(PartialEq, Eq, Clone)]
 pub enum WalletAdapter {
     Connected(Pubkey),
     Disconnected,
