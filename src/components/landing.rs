@@ -399,7 +399,7 @@ fn SectionB(text_color: TextColor) -> Element {
         div {
             class: "flex flex-col gap-8 md:gap-12 my-auto",
             OreValue {
-                title: "Current supply".to_string(),
+                title: "Current supply (devnet)".to_string(),
                 amount: circulating_supply,
                 text_color
             }
