@@ -73,19 +73,18 @@ function SignTransaction() {
   const { publicKey, signTransaction } = useWallet();
   const callback = useCallback(async (msg) => {
     try {
-      const b64 = msg.b64;
-      console.log(b64);
-      const buf = Buffer.from(b64, "base64");
-      console.log(buf);
-      const tx = Transaction.from(buf);
-      console.log(tx);
-      const signed = await signTransaction(tx);
-      console.log(signed);
-      const ser = signed.serialize();
-      console.log(ser);
-      const str = ser.toString("base64");
-      console.log(str);
-      return str;
+      const tx = Transaction.from(
+        Buffer.from(
+          msg.b64,
+          "base64"
+        )
+      );
+      const signed = await signTransaction(
+        tx
+      );
+      return signed
+        .serialize()
+        .toString("base64");
     } catch (err) {
       console.log(err);
     }
