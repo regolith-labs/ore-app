@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{InvokeSignature, MountWalletAdapter, WarningIcon},
+    components::{MountWalletAdapter, WarningIcon},
     hooks::{
         use_wallet_adapter::{self, WalletAdapter},
         UiTokenAmountBalance,
@@ -17,7 +17,7 @@ pub fn UpgradeEdit(
     parsed_amount: u64,
 ) -> Element {
     let nav = navigator();
-    let wallet_adapter_signal = use_wallet_adapter::use_wallet_adapter();
+    let wallet_adapter = use_wallet_adapter::use_wallet_adapter();
     // fetch balances
     let balances_resource = use_wallet_adapter::use_ore_balances();
     let (max_amount, max_amount_str) = match balances_resource.cloned() {
@@ -42,7 +42,8 @@ pub fn UpgradeEdit(
     // build disabled
     let is_disabled = amount_input.read().len().eq(&0)
         || amount_input.read().parse::<f64>().is_err()
-        || amount_error_text.is_some();
+        || amount_error_text.is_some()
+        || wallet_adapter.cloned().eq(&WalletAdapter::Disconnected);
     rsx! {
         div { class: "flex flex-col h-full grow gap-12",
             div { class: "flex flex-col gap-3",
@@ -51,20 +52,6 @@ pub fn UpgradeEdit(
                 MountWalletAdapter {}
                 div { "ORE v1 balance: {max_amount_str}" }
                 div { "ORE v2 balance: {balance_v2_str}" }
-                match *wallet_adapter_signal.read() {
-                    WalletAdapter::Connected(_) => {
-                       rsx! {
-                           div {}
-                       }
-                    },
-                    WalletAdapter::Disconnected => {
-                        rsx! {
-                            div {
-                                "not yet"
-                            }
-                        }
-                    },
-                }
             }
             div { class: "flex flex-col gap-12",
                 div { class: "flex flex-col gap-2", "Amount" }
@@ -108,7 +95,15 @@ pub fn UpgradeEdit(
                 button {
                     class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
                     disabled: is_disabled,
-                    onclick: move |_| { upgrade_step.set(UpgradeStep::Confirm) },
+                    onclick: move |_| {
+                        spawn(async move {
+                            let res = wallet_adapter.read().build_upgrade_tx(parsed_amount).await;
+                            match res {
+                                Ok(tx) => {upgrade_step.set(UpgradeStep::Confirm(tx))},
+                                Err(_) => {upgrade_step.set(UpgradeStep::Edit)}
+                            };
+                        });
+                    },
                     "Review"
                 }
             }
