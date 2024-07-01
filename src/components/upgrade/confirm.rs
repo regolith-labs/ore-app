@@ -1,20 +1,15 @@
 use std::borrow::BorrowMut;
 
 use dioxus::prelude::*;
+use solana_client_wasm::solana_sdk::transaction::Transaction;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
-use crate::{
-    components::{BackButton, OreIcon, Spinner},
-    hooks::use_gateway,
-};
+use crate::components::{BackButton, InvokeSignature, OreIcon};
 
 use super::UpgradeStep;
 
 #[component]
-pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element {
-    let mut is_busy = use_signal(|| false);
-    let gateway = use_gateway();
-
+pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, tx: Transaction, amount: u64) -> Element {
     rsx! {
         div { class: "flex flex-col h-full grow gap-12",
             div { class: "flex flex-col gap-3",
@@ -41,33 +36,7 @@ pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element
                 }
             }
             div { class: "flex flex-col mt-auto sm:flex-row gap-2",
-                button {
-                    class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
-                    disabled: *is_busy.read(),
-                    onclick: move |_| {
-                        let gateway = gateway.clone();
-                        is_busy.set(true);
-                        spawn(async move {
-                            match gateway.upgrade_ore(amount).await {
-                                Ok(sig) => {
-                                    log::info!("Upgrade: {:?}", sig);
-                                    upgrade_step.set(UpgradeStep::Done(sig));
-                                    is_busy.set(false);
-                                }
-                                Err(err) => {
-                                    // TODO: Handle error
-                                    is_busy.set(false);
-                                    log::error!("Failed to send: {:?}", err);
-                                }
-                            }
-                        });
-                    },
-                    if *is_busy.read() {
-                        Spinner { class: "mx-auto" }
-                    } else {
-                        "Upgrade"
-                    }
-                }
+                InvokeSignature { tx: tx }
             }
         }
     }
