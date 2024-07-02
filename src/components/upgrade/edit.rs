@@ -53,12 +53,10 @@ pub fn UpgradeEdit(
             div { class: "flex flex-col gap-3",
                 h2 { "Upgrade" }
                 p { class: "text-lg", "Upgrade ORE v1 to v2" }
-
                 h2 {
                     class: "{section_title_class} mt-8",
                     "Balances"
                 }
-
                 div {
                     class: "{container_class}",
                     p {
@@ -70,8 +68,6 @@ pub fn UpgradeEdit(
                         p { "{max_amount_str}" }
                     }
                 }
-
-
                 div {
                     class: "{container_class}",
                     p {
@@ -83,8 +79,6 @@ pub fn UpgradeEdit(
                         p { "{balance_v2_str}" }
                     }
                 }
-
-
             }
             div { class: "flex flex-col gap-12",
                 div { class: "flex flex-col gap-2", "Upgrade Amount" }
