@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{MountWalletAdapter, WarningIcon},
+    components::WarningIcon,
     hooks::{
         use_wallet_adapter::{self, WalletAdapter},
         UiTokenAmountBalance,
@@ -49,7 +49,6 @@ pub fn UpgradeEdit(
             div { class: "flex flex-col gap-3",
                 h2 { "Upgrade" }
                 p { class: "text-lg", "Upgrade ORE v1 to v2" }
-                MountWalletAdapter {}
                 div { "ORE v1 balance: {max_amount_str}" }
                 div { "ORE v2 balance: {balance_v2_str}" }
             }
