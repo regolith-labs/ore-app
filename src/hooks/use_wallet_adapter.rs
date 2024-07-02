@@ -91,19 +91,25 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                         let res = eval.recv().await;
                         match res {
                             Ok(serde_json::Value::String(string)) => {
-                                let buffer = base64::engine::general_purpose::STANDARD
-                                    .decode(string)
-                                    .unwrap();
-                                let tx: Transaction = bincode::deserialize(&buffer).unwrap();
                                 let gateway = use_gateway();
-                                let rpc_res = gateway.rpc.send_transaction(&tx).await;
+                                let decode_res = base64::engine::general_purpose::STANDARD
+                                    .decode(string)
+                                    .ok()
+                                    .and_then(|buffer| bincode::deserialize(&buffer).ok());
+                                let rpc_res = match decode_res {
+                                    Some(tx) => gateway.rpc.send_transaction(&tx).await.ok(),
+                                    None => {
+                                        log::info!("error decoding tx");
+                                        None
+                                    }
+                                };
                                 match rpc_res {
-                                    Ok(sig) => {
+                                    Some(sig) => {
                                         log::info!("sig: {}", sig);
                                         signal.set(InvokeSignatureStatus::Done(sig));
                                     }
-                                    Err(err) => {
-                                        log::info!("rpc err: {}", err);
+                                    None => {
+                                        log::info!("error sending tx");
                                         signal.set(InvokeSignatureStatus::DoneWithError)
                                     }
                                 }
@@ -224,7 +230,7 @@ impl WalletAdapter {
                 // so pack ix to create account if not
                 let to_token_account = ore_token_account_address(*to);
                 let maybe_create_to_token_account_ix =
-                    WalletAdapter::build_create_token_account_ix(&pubkey, to).await;
+                    WalletAdapter::_build_create_token_account_ix(&pubkey, to).await;
                 // build ixs
                 let memo_ix = spl_memo::build_memo(&memo.into_bytes(), &[&pubkey]);
                 let transfer_ix = spl_token::instruction::transfer(
@@ -250,7 +256,7 @@ impl WalletAdapter {
         }
     }
 
-    async fn build_create_token_account_ix(payer: &Pubkey, owner: &Pubkey) -> Option<Instruction> {
+    async fn _build_create_token_account_ix(payer: &Pubkey, owner: &Pubkey) -> Option<Instruction> {
         let gateway = use_gateway();
         let token_account_address = ore_token_account_address(*owner);
         match gateway.rpc.get_token_account(&token_account_address).await {

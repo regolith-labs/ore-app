@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{Banner, BannerStyle, Footer, OreLogoIcon, OreWordmarkIcon, UserBubble},
+    components::{
+        Banner, BannerStyle, Footer, MountWalletAdapter, OreLogoIcon, OreWordmarkIcon, UserBubble,
+    },
     hooks::use_appearance,
     route::Route,
 };
@@ -35,6 +37,7 @@ pub fn Navbar() -> Element {
                     }
                     div {
                         class: "flex flex-row gap-6 md:gap-8 lg:gap-10",
+                        MountWalletAdapter {}
                         Profile {}
                     }
                 }
@@ -51,6 +54,7 @@ pub fn Profile() -> Element {
     rsx! {
         Link {
             to: Route::Settings {},
+            style: "align-self: center;",
             UserBubble {
                 class: "w-10 h-10"
             }

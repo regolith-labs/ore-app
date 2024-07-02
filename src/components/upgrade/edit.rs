@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{MountWalletAdapter, WarningIcon},
+    components::{OreIcon, WarningIcon},
     hooks::{
         use_wallet_adapter::{self, WalletAdapter},
         UiTokenAmountBalance,
@@ -44,20 +44,48 @@ pub fn UpgradeEdit(
         || amount_input.read().parse::<f64>().is_err()
         || amount_error_text.is_some()
         || wallet_adapter.cloned().eq(&WalletAdapter::Disconnected);
+    // balance styles
+    let container_class = "flex flex-row gap-8 w-full sm:px-1";
+    let section_title_class = "text-lg md:text-2xl font-bold";
+    let data_title_class = "font-medium text-sm my-auto opacity-50";
     rsx! {
         div { class: "flex flex-col h-full grow gap-12",
             div { class: "flex flex-col gap-3",
                 h2 { "Upgrade" }
                 p { class: "text-lg", "Upgrade ORE v1 to v2" }
-                MountWalletAdapter {}
-                div { "ORE v1 balance: {max_amount_str}" }
-                div { "ORE v2 balance: {balance_v2_str}" }
+                h2 {
+                    class: "{section_title_class} mt-8",
+                    "Balances"
+                }
+                div {
+                    class: "{container_class}",
+                    p {
+                        class: "{data_title_class}",
+                        "v1"
+                    }
+                    div { class: "flex flex-row gap-2",
+                        OreIcon { class: "my-auto w-5 h-5" }
+                        p { "{max_amount_str}" }
+                    }
+                }
+                div {
+                    class: "{container_class}",
+                    p {
+                        class: "{data_title_class}",
+                        "v2"
+                    }
+                    div { class: "flex flex-row gap-2",
+                        OreIcon { class: "my-auto w-5 h-5" }
+                        p { "{balance_v2_str}" }
+                    }
+                }
             }
             div { class: "flex flex-col gap-12",
-                div { class: "flex flex-col gap-2", "Amount" }
+                div { class: "flex flex-col gap-2", "Upgrade Amount" }
                 div { class: "flex flex-row gap-3",
                     input {
                         class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl font-medium",
+                        style: "border-bottom: outset;",
                         value: "{amount_input}",
                         placeholder: "0",
                         oninput: move |e| {
