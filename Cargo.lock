@@ -720,15 +720,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "771fe0050b883fcc3ea2359b1a96bcfbc090b7116eae7c3c512c7a083fdf23d3"
 
 [[package]]
-name = "bs58"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf88ba1141d185c399bee5288d850d63b8369520c1eafc32a0430b5b6c287bf4"
-dependencies = [
- "tinyvec",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.15.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1638,6 +1629,7 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 [[package]]
 name = "drillx"
 version = "0.2.0"
+source = "git+https://github.com/regolith-labs/drillx?branch=master#ce0330957a2153c9191bdbcbcf4acce031ccd6bf"
 dependencies = [
  "blake3",
  "equix",
@@ -3474,6 +3466,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "ore-api"
+version = "2.0.0"
+source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#f4d0751775c896cfdcd5177fbce2e5330b773bb3"
+dependencies = [
+ "array-const-fn-init",
+ "bytemuck",
+ "const-crypto",
+ "drillx",
+ "mpl-token-metadata",
+ "num_enum 0.7.2",
+ "shank",
+ "solana-program",
+ "spl-associated-token-account",
+ "spl-token",
+ "static_assertions",
+ "thiserror",
+ "utils",
+]
+
+[[package]]
 name = "ore-app"
 version = "1.1.0"
 dependencies = [
@@ -3517,20 +3529,15 @@ dependencies = [
 [[package]]
 name = "ore-program"
 version = "2.0.0"
+source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#f4d0751775c896cfdcd5177fbce2e5330b773bb3"
 dependencies = [
- "array-const-fn-init",
- "bs58 0.5.1",
- "bytemuck",
- "const-crypto",
  "drillx",
  "mpl-token-metadata",
- "num_enum 0.7.2",
- "shank",
+ "ore-api",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
- "static_assertions",
- "thiserror",
+ "utils",
 ]
 
 [[package]]
@@ -4660,11 +4667,12 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.18.0"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#607b890db4421ffda92b5832d00fd034504a617a"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
  "bincode",
- "bs58 0.4.0",
+ "bs58",
  "clap",
  "futures",
  "reqwest",
@@ -4679,6 +4687,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.18.0"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#607b890db4421ffda92b5832d00fd034504a617a"
 dependencies = [
  "Inflector",
  "arrayref",
@@ -4686,7 +4695,7 @@ dependencies = [
  "base64 0.13.1",
  "bincode",
  "borsh 0.10.3",
- "bs58 0.4.0",
+ "bs58",
  "bytemuck",
  "chrono",
  "clap",
@@ -4716,7 +4725,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d353eac7a178cd8a2ceaf5d304719d4a30c1d3f24f303145d5b029b8cc7c35f0"
 dependencies = [
  "block-buffer 0.10.4",
- "bs58 0.4.0",
+ "bs58",
  "bv",
  "either",
  "generic-array",
@@ -4774,7 +4783,7 @@ dependencies = [
  "borsh 0.10.3",
  "borsh 0.9.3",
  "borsh 1.5.0",
- "bs58 0.4.0",
+ "bs58",
  "bv",
  "bytemuck",
  "cc",
@@ -4823,7 +4832,7 @@ dependencies = [
  "bincode",
  "bitflags 2.5.0",
  "borsh 1.5.0",
- "bs58 0.4.0",
+ "bs58",
  "bytemuck",
  "byteorder",
  "chrono",
@@ -4873,7 +4882,7 @@ version = "1.18.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2975b2c2ed6f06d2ffbb2e6b3e7fdd9ca6b2570a76d49a2173f393e6e84c9c71"
 dependencies = [
- "bs58 0.4.0",
+ "bs58",
  "proc-macro2",
  "quote",
  "rustversion",
@@ -5583,6 +5592,15 @@ name = "utf8-width"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86bd8d4e895da8537e5315b8254664e6b769c4ff3db18321b297a1e7004392e3"
+
+[[package]]
+name = "utils"
+version = "2.0.0"
+source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#f4d0751775c896cfdcd5177fbce2e5330b773bb3"
+dependencies = [
+ "bytemuck",
+ "solana-program",
+]
 
 [[package]]
 name = "uuid"
