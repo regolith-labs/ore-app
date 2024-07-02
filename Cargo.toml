@@ -35,10 +35,10 @@ chrono = "0.4.34"
 dioxus = { version = "0.5", features = ["web", "router"] }
 dioxus-std = { version = "0.5", features = ["clipboard", "utils"] }
 dioxus-logger = { version = "0.5" }
-drillx = { git = "https://github.com/regolith-labs/drillx", branch = "master", features = [
-  "solana",
-] }
-# drillx = { path = "../drillx/drillx", features = ["solana"], optional = false }
+# drillx = { git = "https://github.com/regolith-labs/drillx", branch = "master", features = [
+#   "solana",
+# ] }
+drillx = { path = "../drillx/drillx", features = ["solana"], optional = false }
 futures = "0.3.30"
 futures-util = "0.3.30"
 gloo = { version = "0.11.0", optional = true }
@@ -48,10 +48,10 @@ js-sys = { version = "0.3.67", optional = true }
 lazy_static = "1.4"
 log = "0.4.20"
 num-format = "0.4.4"
-ore = { package = "ore-program", git = "https://github.com/regolith-labs/ore", branch = "hardhat/v2", features = [
-  "no-entrypoint",
-] }
-# ore = { path = "../ore", package = "ore-program", features = ["no-entrypoint"] }
+# ore = { package = "ore-program", git = "https://github.com/regolith-labs/ore", branch = "hardhat/v2", features = [
+#   "no-entrypoint",
+# ] }
+ore = { path = "../ore", package = "ore-program", features = ["no-entrypoint"] }
 ore-types = "0.0.7"
 # ore-types = { path = "../ore-infra/types" }
 qrcode-generator = "4.1.9"
@@ -93,8 +93,8 @@ features = [
 ]
 
 [patch.crates-io]
-solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
-solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
-# solana-client-wasm = { version = "1.18", path = "../solana-playground/wasm/solana-client" }
-# solana-extra-wasm = { version = "1.18", path = "../solana-playground/wasm/utils/solana-extra" }
+# solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
+# solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
+solana-client-wasm = { version = "1.18", path = "../solana-playground/wasm/solana-client" }
+solana-extra-wasm = { version = "1.18", path = "../solana-playground/wasm/utils/solana-extra" }
 # ore = { package = "ore-program", path = "../ore", features = ["no-entrypoint"] }
