@@ -21,8 +21,11 @@ pub fn MountWalletAdapter() -> Element {
 }
 
 #[component]
-pub fn InvokeSignature(tx: Transaction) -> Element {
-    let signal = use_signal(|| InvokeSignatureStatus::Start);
+pub fn InvokeSignature(
+    tx: Transaction,
+    signal: Signal<InvokeSignatureStatus>,
+    start_msg: String,
+) -> Element {
     let e = match *signal.read() {
         InvokeSignatureStatus::Start => {
             rsx! {
@@ -31,7 +34,7 @@ pub fn InvokeSignature(tx: Transaction) -> Element {
                     onclick: move |_| {
                         use_wallet_adapter::invoke_signature(tx.clone(), signal);
                     },
-                    "Upgrade"
+                    "{start_msg}"
                 }
             }
         }
