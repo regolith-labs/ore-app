@@ -45,9 +45,9 @@ pub fn UpgradeEdit(
         || amount_error_text.is_some()
         || wallet_adapter.cloned().eq(&WalletAdapter::Disconnected);
     // balance styles
-    let container_class = "flex flex-row gap-3 w-full sm:px-1 opacity-50";
+    let container_class = "flex flex-row gap-8 w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
-    let data_title_class = "font-medium text-sm my-auto";
+    let data_title_class = "font-medium text-sm my-auto opacity-50";
     rsx! {
         div { class: "flex flex-col h-full grow gap-12",
             div { class: "flex flex-col gap-3",

@@ -230,7 +230,7 @@ impl WalletAdapter {
                 // so pack ix to create account if not
                 let to_token_account = ore_token_account_address(*to);
                 let maybe_create_to_token_account_ix =
-                    WalletAdapter::build_create_token_account_ix(&pubkey, to).await;
+                    WalletAdapter::_build_create_token_account_ix(&pubkey, to).await;
                 // build ixs
                 let memo_ix = spl_memo::build_memo(&memo.into_bytes(), &[&pubkey]);
                 let transfer_ix = spl_token::instruction::transfer(
@@ -256,7 +256,7 @@ impl WalletAdapter {
         }
     }
 
-    async fn build_create_token_account_ix(payer: &Pubkey, owner: &Pubkey) -> Option<Instruction> {
+    async fn _build_create_token_account_ix(payer: &Pubkey, owner: &Pubkey) -> Option<Instruction> {
         let gateway = use_gateway();
         let token_account_address = ore_token_account_address(*owner);
         match gateway.rpc.get_token_account(&token_account_address).await {
