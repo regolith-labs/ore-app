@@ -91,19 +91,25 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                         let res = eval.recv().await;
                         match res {
                             Ok(serde_json::Value::String(string)) => {
-                                let buffer = base64::engine::general_purpose::STANDARD
-                                    .decode(string)
-                                    .unwrap();
-                                let tx: Transaction = bincode::deserialize(&buffer).unwrap();
                                 let gateway = use_gateway();
-                                let rpc_res = gateway.rpc.send_transaction(&tx).await;
+                                let decode_res = base64::engine::general_purpose::STANDARD
+                                    .decode(string)
+                                    .ok()
+                                    .and_then(|buffer| bincode::deserialize(&buffer).ok());
+                                let rpc_res = match decode_res {
+                                    Some(tx) => gateway.rpc.send_transaction(&tx).await.ok(),
+                                    None => {
+                                        log::info!("error decoding tx");
+                                        None
+                                    }
+                                };
                                 match rpc_res {
-                                    Ok(sig) => {
+                                    Some(sig) => {
                                         log::info!("sig: {}", sig);
                                         signal.set(InvokeSignatureStatus::Done(sig));
                                     }
-                                    Err(err) => {
-                                        log::info!("rpc err: {}", err);
+                                    None => {
+                                        log::info!("error sending tx");
                                         signal.set(InvokeSignatureStatus::DoneWithError)
                                     }
                                 }
