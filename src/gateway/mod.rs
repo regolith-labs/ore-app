@@ -318,10 +318,10 @@ impl Gateway {
             .await
     }
 
-    pub async fn upgrade_ore(&self, amount: u64) -> GatewayResult<Signature> {
+    async fn _upgrade_ore(&self, amount: u64) -> GatewayResult<Signature> {
         let signer = signer();
         let v2_token_account = self.create_token_account_ore(signer.pubkey()).await?;
-        let v1_token_account = self.get_token_account_ore_v1().await?;
+        let v1_token_account = self._get_token_account_ore_v1().await?;
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_UPGRADE);
         let ix =
             ore::instruction::upgrade(signer.pubkey(), v2_token_account, v1_token_account, amount);
@@ -330,7 +330,7 @@ impl Gateway {
     }
 
     // asserts that the token account is already initialized
-    pub async fn get_token_account_ore_v1(&self) -> GatewayResult<Pubkey> {
+    async fn _get_token_account_ore_v1(&self) -> GatewayResult<Pubkey> {
         let signer = signer();
         self.get_token_account_ore_from_pubkey_v1(signer.pubkey())
             .await
