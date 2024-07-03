@@ -46,3 +46,18 @@ impl UiTokenAmountBalance for UiTokenAmount {
         self.amount.parse().unwrap_or(0)
     }
 }
+
+pub trait UiTokenAmountDefault {
+    fn default(decimals: u8) -> Self;
+}
+
+impl UiTokenAmountDefault for UiTokenAmount {
+    fn default(decimals: u8) -> Self {
+        UiTokenAmount {
+            ui_amount: None,
+            decimals,
+            amount: "0".to_string(),
+            ui_amount_string: "0".to_string(),
+        }
+    }
+}
