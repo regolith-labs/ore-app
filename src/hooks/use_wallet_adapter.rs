@@ -1,5 +1,6 @@
 use base64::Engine;
 use dioxus::prelude::*;
+use ore::{TOKEN_DECIMALS, TOKEN_DECIMALS_V1};
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_client_wasm::solana_sdk::signature::Signature;
 use solana_client_wasm::solana_sdk::{
@@ -13,6 +14,7 @@ use crate::gateway::{
     ore_token_account_address, ore_token_account_address_v1, GatewayError, GatewayResult,
     CU_LIMIT_UPGRADE,
 };
+use crate::hooks::UiTokenAmountDefault;
 
 use super::use_gateway;
 
@@ -58,13 +60,16 @@ pub fn use_ore_balances() -> Resource<Option<Balances>> {
                         .rpc
                         .get_token_account_balance(&token_account_address_v1)
                         .await
-                        .ok();
+                        .unwrap_or(UiTokenAmount::default(TOKEN_DECIMALS_V1));
                     let balance_v2 = gateway
                         .rpc
                         .get_token_account_balance(&token_account_address_v2)
                         .await
-                        .ok();
-                    balance_v1.and_then(|b1| balance_v2.map(|b2| Balances { v1: b1, v2: b2 }))
+                        .unwrap_or(UiTokenAmount::default(TOKEN_DECIMALS));
+                    Some(Balances {
+                        v1: balance_v1,
+                        v2: balance_v2,
+                    })
                 }
                 WalletAdapter::Disconnected => None,
             }
