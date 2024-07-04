@@ -1,4 +1,7 @@
-use solana_client_wasm::{solana_sdk::program_error::ProgramError, ClientError};
+use solana_client_wasm::{
+    solana_sdk::{program_error::ProgramError, signature::ParseSignatureError},
+    ClientError,
+};
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
 
@@ -14,6 +17,8 @@ pub enum GatewayError {
     RequestFailed,
     ProgramBuilderFailed,
     WalletAdapterDisconnected,
+    SerdeJsonFailed,
+    ParseSignatureFailed,
     Unknown,
 }
 
@@ -42,5 +47,19 @@ impl From<ProgramError> for GatewayError {
     fn from(value: ProgramError) -> Self {
         log::error!("err: {}", value);
         GatewayError::ProgramBuilderFailed
+    }
+}
+
+impl From<serde_json::Error> for GatewayError {
+    fn from(value: serde_json::Error) -> Self {
+        log::error!("err: {}", value);
+        GatewayError::SerdeJsonFailed
+    }
+}
+
+impl From<ParseSignatureError> for GatewayError {
+    fn from(value: ParseSignatureError) -> Self {
+        log::error!("err: {}", value);
+        GatewayError::ParseSignatureFailed
     }
 }

@@ -97,7 +97,7 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                     .ok()
                                     .and_then(|buffer| bincode::deserialize(&buffer).ok());
                                 let rpc_res = match decode_res {
-                                    Some(tx) => gateway.rpc.send_transaction(&tx).await.ok(),
+                                    Some(tx) => gateway.submit_tx(tx).await.ok(),
                                     None => {
                                         log::info!("error decoding tx");
                                         None

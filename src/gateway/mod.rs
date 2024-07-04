@@ -1,6 +1,8 @@
 mod error;
 mod pubkey;
 
+use std::str::FromStr;
+
 use cached::proc_macro::cached;
 pub use error::*;
 use gloo_storage::{LocalStorage, Storage};
@@ -9,7 +11,10 @@ use ore::{
     utils::AccountDeserialize,
     BUS_ADDRESSES, CONFIG_ADDRESS, TREASURY_ADDRESS,
 };
-use ore_types::{response::ListTransfersResponse, Transfer};
+use ore_types::{
+    response::{ListTransfersResponse, SubmitTxResponse},
+    Transfer,
+};
 pub use pubkey::*;
 use solana_client_wasm::{
     solana_sdk::{
@@ -38,9 +43,11 @@ use solana_extra_wasm::{
 };
 use web_time::Duration;
 
-pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
+// pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
+pub const API_URL: &str = "https://ore-infra-mrmizz.onrender.com";
 // pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
-pub const RPC_URL: &str = "http://localhost:8899";
+pub const RPC_URL: &str =
+    "https://devnet.helius-rpc.com/?api-key=1de92644-323b-4900-9041-13c02730955c";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
@@ -448,6 +455,20 @@ impl Gateway {
                 .map_err(GatewayError::from),
             Err(e) => Err(e.into()),
         }
+    }
+
+    pub async fn submit_tx(&self, tx: Transaction) -> GatewayResult<Signature> {
+        let mut map = serde_json::Map::new();
+        let tx_json_val = serde_json::to_value(tx)?;
+        map.insert("tx".to_string(), tx_json_val);
+        let response = reqwest::Client::new()
+            .post(format!("{}/tx", &self.api_url))
+            .json(&map)
+            .send()
+            .await?
+            .json::<SubmitTxResponse>()
+            .await?;
+        Signature::from_str(response.sig.as_str()).map_err(GatewayError::from)
     }
 }
 
