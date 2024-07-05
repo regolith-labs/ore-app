@@ -67,9 +67,9 @@ pub fn ClaimEdit(
                 button {
                     class: "flex transition-colors shrink text-nowrap py-2 px-4 mx-auto text-center text-nowrap rounded-full font-medium hover-100 active-200",
                     onclick: move |_| {
-                        amount_input.set(amount_to_ui_amount(max_rewards, ore::TOKEN_DECIMALS).to_string())
+                        amount_input.set(amount_to_ui_amount(max_rewards, ore_api::consts::TOKEN_DECIMALS).to_string())
                     },
-                    "Max: {amount_to_ui_amount(max_rewards, ore::TOKEN_DECIMALS)}"
+                    "Max: {amount_to_ui_amount(max_rewards, ore_api::consts::TOKEN_DECIMALS)}"
                 }
             }
             div {

@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use ore::state::Treasury;
+use ore_api::state::Treasury;
 
 use crate::gateway::GatewayResult;
 

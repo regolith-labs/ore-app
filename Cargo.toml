@@ -51,6 +51,7 @@ num-format = "0.4.4"
 # ore = { package = "ore-program", git = "https://github.com/regolith-labs/ore", branch = "hardhat/v2", features = [
 #   "no-entrypoint",
 # ] }
+utils = { path = "../ore/utils" }
 ore-api = { path = "../ore/api" }
 ore-types = "0.0.7"
 # ore-types = { path = "../ore-infra/types" }
