@@ -8,7 +8,10 @@ use dioxus::prelude::*;
 use dioxus_std::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
-use ore::{state::Proof, BUS_COUNT, EPOCH_DURATION};
+use ore_api::{
+    consts::{BUS_COUNT, EPOCH_DURATION},
+    state::Proof,
+};
 use rand::Rng;
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{
@@ -112,7 +115,7 @@ impl Miner {
         }
 
         // Kickoff new batch
-        if best_difficulty.lt(&ore::MIN_DIFFICULTY) {
+        if best_difficulty.lt(&ore_api::consts::MIN_DIFFICULTY) {
             self.start_mining(challenge, offset, 0).await;
             return;
         }
@@ -165,12 +168,16 @@ pub async fn submit_solution(
 
     // Reset if needed
     if needs_reset(gateway).await {
-        ixs.push(ore::instruction::reset(signer.pubkey()));
+        ixs.push(ore_api::instruction::reset(signer.pubkey()));
     }
 
     // Build mine tx
     let bus_id = pick_bus();
-    let ix = ore::instruction::mine(signer.pubkey(), ore::BUS_ADDRESSES[bus_id], solution);
+    let ix = ore_api::instruction::mine(
+        signer.pubkey(),
+        ore_api::consts::BUS_ADDRESSES[bus_id],
+        solution,
+    );
     ixs.push(ix);
 
     // Send and configm

@@ -3468,7 +3468,7 @@ dependencies = [
 [[package]]
 name = "ore-api"
 version = "2.0.0"
-source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#f4d0751775c896cfdcd5177fbce2e5330b773bb3"
+source = "git+https://github.com/regolith-labs/ore?branch=master#cbfc7afc2bb5c4551fff9132d31b5892f3faa746"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -3507,7 +3507,7 @@ dependencies = [
  "lazy_static",
  "log",
  "num-format",
- "ore-program",
+ "ore-api",
  "ore-types",
  "qrcode-generator",
  "rand 0.8.5",
@@ -3519,25 +3519,12 @@ dependencies = [
  "solana-extra-wasm",
  "tracing",
  "url",
+ "utils",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",
  "web-sys",
  "web-time",
-]
-
-[[package]]
-name = "ore-program"
-version = "2.0.0"
-source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#f4d0751775c896cfdcd5177fbce2e5330b773bb3"
-dependencies = [
- "drillx",
- "mpl-token-metadata",
- "ore-api",
- "solana-program",
- "spl-associated-token-account",
- "spl-token",
- "utils",
 ]
 
 [[package]]
@@ -5596,7 +5583,7 @@ checksum = "86bd8d4e895da8537e5315b8254664e6b769c4ff3db18321b297a1e7004392e3"
 [[package]]
 name = "utils"
 version = "2.0.0"
-source = "git+https://github.com/regolith-labs/ore?branch=hardhat/v2#f4d0751775c896cfdcd5177fbce2e5330b773bb3"
+source = "git+https://github.com/regolith-labs/ore?branch=master#cbfc7afc2bb5c4551fff9132d31b5892f3faa746"
 dependencies = [
  "bytemuck",
  "solana-program",

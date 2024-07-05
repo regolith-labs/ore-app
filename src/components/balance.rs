@@ -70,7 +70,7 @@ pub fn StakeBalance() -> Element {
                             }
                             p {
                                 class: "font-semibold",
-                                "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
+                                "{amount_to_ui_amount(proof.balance, ore_api::consts::TOKEN_DECIMALS)}"
                             }
                         }
                     }

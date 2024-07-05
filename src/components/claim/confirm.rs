@@ -50,7 +50,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                     }
                     p {
                         class: "text-3xl sm:text-4xl md:text-5xl font-semibold",
-                        "{amount_to_ui_amount(amount, ore::TOKEN_DECIMALS)}"
+                        "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS)}"
                     }
                 }
             }
