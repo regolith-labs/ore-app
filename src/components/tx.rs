@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use ore::{BUS_ADDRESSES, TREASURY_ADDRESS};
+use ore_api::consts::{BUS_ADDRESSES, TREASURY_ADDRESS};
 use ore_types::TransferType;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
@@ -118,7 +118,7 @@ pub fn Tx(sig: String) -> Element {
                                     }
                                     p {
                                         class: "{value_class}",
-                                        "{amount_to_ui_amount(transfer.amount as u64, ore::TOKEN_DECIMALS)}"
+                                        "{amount_to_ui_amount(transfer.amount as u64, ore_api::consts::TOKEN_DECIMALS)}"
                                     }
                                 }
                             }

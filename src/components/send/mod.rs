@@ -26,7 +26,7 @@ pub fn Send(to: Option<String>) -> Element {
     let recipient_input = use_signal(|| to.clone().unwrap_or("".to_string()));
     let recipient = Pubkey::from_str(&recipient_input.read()).ok();
     let parsed_amount: u64 = match amount_input.read().parse::<f64>() {
-        Ok(n) => (n * 10f64.powf(ore::TOKEN_DECIMALS.into())) as u64,
+        Ok(n) => (n * 10f64.powf(ore_api::consts::TOKEN_DECIMALS.into())) as u64,
         Err(_) => 0,
     };
 

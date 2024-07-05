@@ -58,7 +58,7 @@ pub fn SendConfirm(
                         }
                         p {
                             class: "text-2xl",
-                            "{amount_to_ui_amount(amount, ore::TOKEN_DECIMALS)}"
+                            "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS)}"
                        }
                     }
                 }

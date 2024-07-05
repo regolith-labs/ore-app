@@ -254,7 +254,7 @@ pub fn ActivityRow(transfer: Transfer) -> Element {
                             OreIcon {
                                 class: "ml-0.5 w-3.5 h-3.5 my-auto",
                             }
-                            "{amount_to_ui_amount(transfer.amount as u64, ore::TOKEN_DECIMALS)}"
+                            "{amount_to_ui_amount(transfer.amount as u64, ore_api::consts::TOKEN_DECIMALS)}"
                         }
                         if let TransferType::Spl = transfer.transfer_type {
                             "to"

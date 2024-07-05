@@ -13,7 +13,7 @@ pub fn UpgradeDone(signature: Signature, amount: u64) -> Element {
                 div { class: "flex flex-row gap-2",
                     OreIcon { class: "my-auto w-5 h-5" }
                     p { class: "text-2xl",
-                        "{amount_to_ui_amount(amount, ore::TOKEN_DECIMALS_V1)} has been upgraded from v1 to v2"
+                        "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS_V1)} has been upgraded from v1 to v2"
                     }
                 }
                 div { "{signature.to_string()}" }
