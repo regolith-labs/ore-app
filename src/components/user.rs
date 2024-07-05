@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use ore::BUS_ADDRESSES;
+use ore_api::consts::BUS_ADDRESSES;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
@@ -41,13 +41,13 @@ pub fn User(id: String) -> Element {
         .find(|i| (*i.1).eq(&user_id))
     {
         format!("Bus {}", index.0)
-    } else if user_id.eq(&ore::TREASURY_ADDRESS) {
+    } else if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
         "Treasury".to_string()
     } else {
         "User".to_string()
     };
 
-    let description = if user_id.eq(&ore::TREASURY_ADDRESS) {
+    let description = if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
         Some("This is a special program account responsible for minting and distributing the Ore token supply.")
     } else if BUS_ADDRESSES.contains(&user_id) {
         Some("This is a special program account responsible for issuing Ore to miners.")
@@ -73,7 +73,7 @@ pub fn User(id: String) -> Element {
                 }
                 div {
                     class: "flex flex-col gap-8",
-                    if user_id.eq(&ore::TREASURY_ADDRESS) {
+                    if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
                         TreasuryBubble {
                             class: "my-auto w-20 h-20",
                         }
@@ -105,7 +105,7 @@ pub fn User(id: String) -> Element {
                 }
                 div {
                     class: "flex flex-col gap-1",
-                    if !user_id.eq(&ore::TREASURY_ADDRESS) && !BUS_ADDRESSES.contains(&user_id) {
+                    if !user_id.eq(&ore_api::consts::TREASURY_ADDRESS) && !BUS_ADDRESSES.contains(&user_id) {
                         div {
                             class: "{container_class} -mr-2",
                             p {
@@ -159,7 +159,7 @@ pub fn User(id: String) -> Element {
                                         }
                                         p {
                                             class: "{value_class} truncate",
-                                            "{amount_to_ui_amount(proof.balance, ore::TOKEN_DECIMALS)}"
+                                            "{amount_to_ui_amount(proof.balance, ore_api::consts::TOKEN_DECIMALS)}"
                                        }
                                     }
                                 }

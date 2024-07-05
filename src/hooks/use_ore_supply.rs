@@ -12,7 +12,7 @@ pub fn use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
         async move {
             gateway
                 .rpc
-                .get_token_supply(&ore::MINT_ADDRESS)
+                .get_token_supply(&ore_api::consts::MINT_ADDRESS)
                 .await
                 .map_err(GatewayError::from)
         }

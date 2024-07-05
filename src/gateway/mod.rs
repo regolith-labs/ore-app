@@ -4,10 +4,9 @@ mod pubkey;
 use cached::proc_macro::cached;
 pub use error::*;
 use gloo_storage::{LocalStorage, Storage};
-use ore::{
+use ore_api::{
+    consts::{BUS_ADDRESSES, CONFIG_ADDRESS, TREASURY_ADDRESS},
     state::{Bus, Config, Proof, Treasury},
-    utils::AccountDeserialize,
-    BUS_ADDRESSES, CONFIG_ADDRESS, TREASURY_ADDRESS,
 };
 use ore_types::{response::ListTransfersResponse, Transfer};
 pub use pubkey::*;
@@ -36,6 +35,7 @@ use solana_extra_wasm::{
     },
     transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding},
 };
+use utils::AccountDeserialize;
 use web_time::Duration;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
@@ -274,7 +274,7 @@ impl Gateway {
         }
 
         // Sign and send transaction.
-        let ix = ore::instruction::open(signer.pubkey());
+        let ix = ore_api::instruction::open(signer.pubkey(), signer.pubkey());
         match self.send_and_confirm(&[ix], true, false).await {
             Ok(_) => Ok(()),
             Err(_) => Err(GatewayError::FailedRegister),
@@ -286,7 +286,7 @@ impl Gateway {
         let beneficiary = ore_token_account_address(signer.pubkey());
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_CLAIM);
         let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-        let ix = ore::instruction::claim(signer.pubkey(), beneficiary, amount);
+        let ix = ore_api::instruction::claim(signer.pubkey(), beneficiary, amount);
         self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, false)
             .await
     }
@@ -323,8 +323,12 @@ impl Gateway {
         let v2_token_account = self.create_token_account_ore(signer.pubkey()).await?;
         let v1_token_account = self._get_token_account_ore_v1().await?;
         let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_UPGRADE);
-        let ix =
-            ore::instruction::upgrade(signer.pubkey(), v2_token_account, v1_token_account, amount);
+        let ix = ore_api::instruction::upgrade(
+            signer.pubkey(),
+            v2_token_account,
+            v1_token_account,
+            amount,
+        );
         self.send_and_confirm(&[cu_limit_ix, ix], false, false)
             .await
     }
@@ -398,7 +402,7 @@ impl Gateway {
         let ix = create_associated_token_account(
             &signer.pubkey(),
             &owner,
-            &ore::MINT_ADDRESS,
+            &ore_api::consts::MINT_ADDRESS,
             &spl_token::id(),
         );
         match self.send_and_confirm(&[ix], true, false).await {
@@ -463,10 +467,10 @@ pub fn signer() -> Keypair {
 
 #[cached]
 pub fn ore_token_account_address(pubkey: Pubkey) -> Pubkey {
-    get_associated_token_address(&pubkey, &ore::MINT_ADDRESS)
+    get_associated_token_address(&pubkey, &ore_api::consts::MINT_ADDRESS)
 }
 
 #[cached]
 pub fn ore_token_account_address_v1(pubkey: Pubkey) -> Pubkey {
-    get_associated_token_address(&pubkey, &ore::MINT_V1_ADDRESS)
+    get_associated_token_address(&pubkey, &ore_api::consts::MINT_V1_ADDRESS)
 }

@@ -1,6 +1,6 @@
 use base64::Engine;
 use dioxus::prelude::*;
-use ore::{TOKEN_DECIMALS, TOKEN_DECIMALS_V1};
+use ore_api::consts::{TOKEN_DECIMALS, TOKEN_DECIMALS_V1};
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_client_wasm::solana_sdk::signature::Signature;
 use solana_client_wasm::solana_sdk::{
@@ -174,7 +174,7 @@ impl WalletAdapter {
                 let v1_token_account = gateway.get_token_account_ore_from_pubkey_v1(pubkey).await?;
                 // build upgrade ix
                 let build_upgrade_ore_ix = |v2_token_account_address: &Pubkey| -> Instruction {
-                    ore::instruction::upgrade(
+                    ore_api::instruction::upgrade(
                         pubkey,
                         *v2_token_account_address,
                         v1_token_account,
@@ -202,7 +202,7 @@ impl WalletAdapter {
                         let create_token_account_ix = create_associated_token_account(
                             &pubkey,
                             &pubkey,
-                            &ore::MINT_ADDRESS,
+                            &ore_api::consts::MINT_ADDRESS,
                             &spl_token::id(),
                         );
                         // upgrade ix
@@ -270,7 +270,7 @@ impl WalletAdapter {
                 let ix = create_associated_token_account(
                     payer,
                     owner,
-                    &ore::MINT_ADDRESS,
+                    &ore_api::consts::MINT_ADDRESS,
                     &spl_token::id(),
                 );
                 Some(ix)

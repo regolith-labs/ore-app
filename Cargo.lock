@@ -3518,6 +3518,7 @@ dependencies = [
  "solana-extra-wasm",
  "tracing",
  "url",
+ "utils",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",
