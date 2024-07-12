@@ -5,13 +5,14 @@ use num_format::{Locale, ToFormattedString};
 use serde::Deserialize;
 use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
+use web_sys::window;
 use web_time::{Duration, Instant};
 
 use crate::{
     components::{
         DiscordIcon, Footer, FuzzlandIcon, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon, XIcon,
     },
-    hooks::{use_is_onboarded, use_ore_supply, UiTokenAmountBalance},
+    hooks::{use_is_onboarded, use_ore_supply, use_screen_size, ScreenSize, UiTokenAmountBalance},
     miner::WEB_WORKERS,
     route::Route,
     utils::asset_path,
@@ -23,24 +24,31 @@ enum TextColor {
     White,
 }
 
+fn gen_asset_path(filename: &str, screen_size: Signal<ScreenSize>) -> String {
+    match *screen_size.read() {
+        ScreenSize::Desktop => asset_path(format!("{}-desktop.jpeg", filename).as_str()),
+        ScreenSize::Mobile => asset_path(format!("{}-mobile.jpeg", filename).as_str()),
+        ScreenSize::Tablet => asset_path(format!("{}-tablet.jpeg", filename).as_str()),
+    }
+}
+
 pub fn Landing() -> Element {
     // let mut current_page = use_signal(|| 0);
     let nav = navigator();
+    let screen_size = use_screen_size();
     let is_onboarded = use_is_onboarded();
     let mut i = use_signal(|| 0usize);
-    let themes = [
-        // (asset_path("rock.png"), TextColor::Black),
-        // (asset_path("rock-10.png"), TextColor::Black),
-        // (asset_path("rock-11.png"), TextColor::Black),
-        (asset_path("rock-2.jpg"), TextColor::White),
-        (asset_path("rock-3.jpg"), TextColor::White),
-        (asset_path("rock-4.jpg"), TextColor::White),
-        (asset_path("rock-6.jpg"), TextColor::White),
-        (asset_path("rock-5.jpg"), TextColor::White),
-        (asset_path("rock-9.jpg"), TextColor::White),
+    let window = window().unwrap();
+    let bg_imgs = [
+        (gen_asset_path("rock-1", screen_size), TextColor::White),
+        (gen_asset_path("rock-2", screen_size), TextColor::White),
+        (gen_asset_path("rock-3", screen_size), TextColor::White),
+        (gen_asset_path("rock-4", screen_size), TextColor::White),
+        (gen_asset_path("rock-5", screen_size), TextColor::White),
+        (gen_asset_path("rock-6", screen_size), TextColor::White),
     ];
-    let len = themes.len();
-    let text_color = themes[*i.read() % len].1;
+    let len = bg_imgs.len();
+    let text_color = bg_imgs[*i.read() % len].1;
 
     // Change the background image every 8 sec
     use_future(move || async move {
@@ -56,10 +64,10 @@ pub fn Landing() -> Element {
     }
 
     rsx! {
-        for (index, theme) in themes.iter().enumerate() {
+        for (index, bg_img) in bg_imgs.iter().enumerate() {
             BgImg {
                 visible: *i.read() % len == index,
-                bg_img: theme.0.clone(),
+                bg_img: bg_img.0.clone(),
                 index
             }
         }
@@ -114,7 +122,7 @@ fn BgImg(visible: bool, bg_img: String, index: usize) -> Element {
     rsx! {
         div {
             key: "{index}",
-            class: "fixed top-0 w-full h-full bg-cover bg-center transition-opacity duration-1000 z-0 {visibility}",
+            class: "fixed top-0 w-full h-full bg-black bg-cover bg-center transition-opacity duration-1000 z-0 {visibility}",
             style: "background-image: url({bg_img})"
         }
     }

@@ -1,7 +1,7 @@
 [application]
 
 # App (Project) Name
-name = "Ore"
+name = "ORE"
 
 # Dioxus App Default Platform
 # desktop, web, mobile, ssr
