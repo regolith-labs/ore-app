@@ -5,7 +5,6 @@ use num_format::{Locale, ToFormattedString};
 use serde::Deserialize;
 use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
-use web_sys::window;
 use web_time::{Duration, Instant};
 
 use crate::{
@@ -33,12 +32,10 @@ fn gen_asset_path(filename: &str, screen_size: Signal<ScreenSize>) -> String {
 }
 
 pub fn Landing() -> Element {
-    // let mut current_page = use_signal(|| 0);
     let nav = navigator();
     let screen_size = use_screen_size();
     let is_onboarded = use_is_onboarded();
     let mut i = use_signal(|| 0usize);
-    let window = window().unwrap();
     let bg_imgs = [
         (gen_asset_path("rock-1", screen_size), TextColor::White),
         (gen_asset_path("rock-2", screen_size), TextColor::White),

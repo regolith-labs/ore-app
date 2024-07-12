@@ -1,7 +1,5 @@
 use dioxus::prelude::*;
 
-use crate::{components::Appearance, hooks::use_persistent::use_persistent};
-
 pub enum ScreenSize {
     Desktop,
     Tablet,

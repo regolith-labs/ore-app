@@ -1,12 +1,7 @@
 use std::rc::Rc;
 
-use dioxus::prelude::*;
-
-use crate::gateway::{Gateway, API_URL};
-
-use super::use_rpc_url;
+use crate::gateway::{Gateway, API_URL, RPC_URL};
 
 pub fn use_gateway() -> Rc<Gateway> {
-    let rpc_url = use_rpc_url().read().0.clone();
-    Rc::new(Gateway::new(API_URL.to_string(), rpc_url))
+    Rc::new(Gateway::new(API_URL.to_string(), RPC_URL.to_string()))
 }
