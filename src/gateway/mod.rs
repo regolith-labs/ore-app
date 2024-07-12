@@ -9,6 +9,7 @@ use ore_api::{
     state::{Bus, Config, Proof, Treasury},
 };
 use ore_types::{response::ListTransfersResponse, Transfer};
+use ore_utils::AccountDeserialize;
 pub use pubkey::*;
 use solana_client_wasm::{
     solana_sdk::{
@@ -35,7 +36,6 @@ use solana_extra_wasm::{
     },
     transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding},
 };
-use utils::AccountDeserialize;
 use web_time::Duration;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";

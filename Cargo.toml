@@ -35,9 +35,7 @@ chrono = "0.4.34"
 dioxus = { version = "0.5", features = ["web", "router"] }
 dioxus-std = { version = "0.5", features = ["clipboard", "utils"] }
 dioxus-logger = { version = "0.5" }
-drillx = { git = "https://github.com/regolith-labs/drillx", branch = "master", features = [
-  "solana",
-] }
+drillx = "2.0.0-beta"
 futures = "0.3.30"
 futures-util = "0.3.30"
 gloo = { version = "0.11.0", optional = true }
@@ -47,8 +45,8 @@ js-sys = { version = "0.3.67", optional = true }
 lazy_static = "1.4"
 log = "0.4.20"
 num-format = "0.4.4"
-ore-api = { git = "https://github.com/regolith-labs/ore", branch = "master" }
-utils = { git = "https://github.com/regolith-labs/ore", branch = "master" }
+ore-api = "2.0.0-beta"
+ore-utils = "2.0.0-beta"
 ore-types = "0.0.7"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
