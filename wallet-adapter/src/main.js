@@ -10,7 +10,7 @@ import * as buffer from "buffer";
 window.Buffer = buffer.Buffer;
 
 // Default styles that can be overridden by your app
-require('@solana/wallet-adapter-react-ui/styles.css');
+require('../src/styles.css');
 
 export const Wallet = () => {
   const endpoint = "http://localhost:8899";

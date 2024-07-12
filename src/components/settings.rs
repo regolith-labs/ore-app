@@ -1,15 +1,11 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use is_url::is_url;
 use solana_client_wasm::solana_sdk::native_token::lamports_to_sol;
 
 use crate::{
     components::{Appearance, Copyable},
-    gateway::RPC_URL,
-    hooks::{
-        use_appearance, use_explorer, use_pubkey, use_rpc_url, use_sol_balance, Explorer, RpcUrl,
-    },
+    hooks::{use_appearance, use_explorer, use_pubkey, use_sol_balance, Explorer},
     route::Route,
 };
 
@@ -18,11 +14,6 @@ pub fn Settings() -> Element {
     let mut appearance = use_appearance();
     let pubkey = use_pubkey();
     let sol_balance = use_sol_balance();
-
-    let mut rpc_url = use_rpc_url();
-    let mut rpc_url_input = use_signal(|| rpc_url.read().0.clone());
-    let mut rpc_url_error = use_signal::<Option<String>>(|| None);
-    let is_rpc_url_edited = rpc_url.read().0.ne(&*rpc_url_input.read());
 
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
@@ -137,73 +128,6 @@ pub fn Settings() -> Element {
                     }
                 }
             }
-            // div {
-            //     class: "flex flex-col gap-4",
-            //     h2 {
-            //         class: "{section_title_class}",
-            //         "Network"
-            //     }
-            //     div {
-            //         class: "flex flex-col gap-2",
-            //         div {
-            //             class: "{container_class}",
-            //             p {
-            //                 class: "{data_title_class}",
-            //                 "RPC"
-            //             }
-            //             div {
-            //                 class: "flex flex-col gap-2",
-            //                 input {
-            //                     autofocus: false,
-            //                     class: "w-full max-w-96 text-right placeholder-gray-300 dark:placeholder-gray-800 bg-transparent",
-            //                     value: "{rpc_url_input}",
-            //                     placeholder: "{RPC_URL}",
-            //                     oninput: move |evt| {
-            //                         let s = evt.value();
-            //                         rpc_url_input.set(s.clone());
-            //                         if !is_url(&s) {
-            //                             rpc_url_error.set(Some("Invalid url".to_string()));
-            //                         } else {
-            //                             rpc_url_error.set(None);
-            //                         }
-            //                     },
-            //                 }
-            //             }
-            //         }
-            //         div {
-            //             class: "flex flex-shrink gap-2 justify-end",
-            //             if let Some(err_str) = rpc_url_error.read().clone() {
-            //                 p {
-            //                     class: "text-sm text-red-500 text-right",
-            //                     "{err_str}"
-            //                 }
-            //             }
-            //             div {
-            //                 class: "flex flex-row gap-2",
-            //                 if rpc_url.read().0.ne(RPC_URL) {
-            //                     button {
-            //                         class: "hover-100 active-200 rounded shrink ml-auto transition-colors px-2 py-1",
-            //                         onclick: move |_| {
-            //                             rpc_url.set(RpcUrl(RPC_URL.to_string()));
-            //                             rpc_url_input.set(RPC_URL.to_string());
-            //                             rpc_url_error.set(None);
-            //                         },
-            //                         "Default"
-            //                     }
-            //                 }
-            //                 if is_rpc_url_edited && rpc_url_error.read().is_none() {
-            //                     button {
-            //                         class: "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded shrink ml-auto transition-colors px-2 py-1",
-            //                         onclick: move |_| {
-            //                             rpc_url.set(RpcUrl(rpc_url_input.read().clone()));
-            //                         },
-            //                         "Save"
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
         }
     }
 }
