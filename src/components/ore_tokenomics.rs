@@ -40,7 +40,7 @@ pub fn OreTokenomics() -> Element {
                 }
                 li {
                     class: "ml-2",
-                    "You can stake ORE to increase a miner's reward multiplier."
+                    "You can stake ORE to receive a multiplier on your mining rewards."
                 }
             }
         }
