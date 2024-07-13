@@ -25,7 +25,7 @@ pub fn MinerToolbarNotStarted() -> Element {
                 class: "flex flex-row gap-2 sm:gap-4",
                 StartButton {}
             }
-            Tutorial {}
+            // Tutorial {}
         }
     }
 }

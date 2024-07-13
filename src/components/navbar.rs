@@ -2,13 +2,12 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{
-        Banner, BannerStyle, Footer, MountWalletAdapter, OreLogoIcon, OreWordmarkIcon, UserBubble,
+        Appearance, Banner, BannerStyle, CogIcon, Footer, MountWalletAdapter, OreLogoIcon,
+        OreWordmarkIcon,
     },
     hooks::use_appearance,
     route::Route,
 };
-
-use super::Appearance;
 
 pub fn Navbar() -> Element {
     let appearance = use_appearance();
@@ -22,7 +21,7 @@ pub fn Navbar() -> Element {
             Banner {
                 style: BannerStyle::Info,
                 link_to: "https://v1.ore.supply",
-                "This is a devnet preview of ORE v2. To use the v1 app, click here →"
+                "This is a devnet preview of ORE v2. To use the v1 app, please click here →"
             }
             div {
                 class: "flex w-full",
@@ -36,9 +35,9 @@ pub fn Navbar() -> Element {
                         }
                     }
                     div {
-                        class: "flex flex-row gap-6 md:gap-8 lg:gap-10",
+                        class: "flex flex-row gap-4 md:gap-8",
+                        SettingsButton {}
                         MountWalletAdapter {}
-                        Profile {}
                     }
                 }
             }
@@ -50,13 +49,18 @@ pub fn Navbar() -> Element {
     }
 }
 
-pub fn Profile() -> Element {
+pub fn SettingsButton() -> Element {
+    let appearance = use_appearance();
+    let button_color = match *appearance.read() {
+        Appearance::Light => "text-gray-300 hover:bg-gray-100",
+        Appearance::Dark => "text-gray-700 hover:bg-gray-900",
+    };
     rsx! {
         Link {
             to: Route::Settings {},
-            style: "align-self: center;",
-            UserBubble {
-                class: "w-10 h-10"
+            class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+            CogIcon {
+                class: "w-6 h-6 m-auto"
             }
         }
     }

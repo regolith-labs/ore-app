@@ -2,8 +2,8 @@ import React, { useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ConnectionProvider, WalletProvider, useWallet } from '@solana/wallet-adapter-react';
 import {
+  BaseWalletMultiButton,
   WalletModalProvider,
-  WalletMultiButton
 } from '@solana/wallet-adapter-react-ui';
 import { Transaction } from '@solana/web3.js';
 import * as buffer from "buffer";
@@ -11,6 +11,16 @@ window.Buffer = buffer.Buffer;
 
 // Default styles that can be overridden by your app
 require('../src/styles.css');
+
+const LABELS = {
+    'change-wallet': 'Change wallet',
+    connecting: 'Connecting ...',
+    'copy-address': 'Copy address',
+    copied: 'Copied',
+    disconnect: 'Disconnect',
+    'has-wallet': 'Connect',
+    'no-wallet': 'Connect Wallet',
+};
 
 export const Wallet = () => {
   const endpoint = "http://localhost:8899";
@@ -24,7 +34,7 @@ export const Wallet = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <WalletMultiButton />
+          <BaseWalletMultiButton labels={LABELS} />
           { /* Your app's components go here, nested within the context providers. */}
           <Dispatcher />
           <SignTransaction />

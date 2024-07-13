@@ -3,7 +3,7 @@
 .wallet-adapter-button {
     background-color: transparent;
     border: none;
-    color: #fff;
+    color: !inherit;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -25,7 +25,7 @@
 }
 
 .wallet-adapter-button:not([disabled]):hover {
-    background-color: #1a1f2e;
+    background-color: transparent;
 }
 
 .wallet-adapter-button[disabled] {
@@ -104,7 +104,7 @@
     font-size: 14px;
     font-weight: 600;
     height: 37px;
-    color: #fff;
+    color: #fff !important;
 }
 
 .wallet-adapter-dropdown-list-item:not([disabled]):hover {
@@ -130,6 +130,7 @@
     opacity: 0;
     transition: opacity linear 150ms;
     background: rgba(0, 0, 0, 0.5);
+    color: #fff;
     z-index: 1040;
     overflow-y: auto;
 }

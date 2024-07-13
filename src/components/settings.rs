@@ -27,63 +27,63 @@ pub fn Settings() -> Element {
                 h2 {
                     "Settings"
                 }
-                h2 {
-                    class: "{section_title_class} mt-8",
-                    "Account"
-                }
-                div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "Address"
-                    }
-                    Copyable {
-                        value: pubkey.to_string(),
-                        Link {
-                            class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
-                            to: Route::User {
-                                id: pubkey.to_string()
-                            },
-                            "{pubkey}"
-                        }
-                    }
-                }
-                div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "Balance"
-                    }
-                    if let Some(Ok(balance)) = *sol_balance.read() {
-                        p {
-                            "{lamports_to_sol(balance)} SOL"
-                        }
-                    } else {
-                        div {
-                            class: "flex w-32 loading rounded",
-                        }
-                    }
-                }
-                div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "Keypair"
-                    }
-                    div {
-                        class: "flex flex-row gap-2 -mr-2",
-                        Link {
-                            to: Route::ImportKey {},
-                            class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
-                            "Import"
-                        }
-                        Link {
-                            to: Route::ExportKey {},
-                            class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
-                            "Export"
-                        }
-                    }
-                }
+                // h2 {
+                //     class: "{section_title_class} mt-8",
+                //     "Account"
+                // }
+                // div {
+                //     class: "{container_class}",
+                //     p {
+                //         class: "{data_title_class}",
+                //         "Address"
+                //     }
+                //     Copyable {
+                //         value: pubkey.to_string(),
+                //         Link {
+                //             class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
+                //             to: Route::User {
+                //                 id: pubkey.to_string()
+                //             },
+                //             "{pubkey}"
+                //         }
+                //     }
+                // }
+                // div {
+                //     class: "{container_class}",
+                //     p {
+                //         class: "{data_title_class}",
+                //         "Balance"
+                //     }
+                //     if let Some(Ok(balance)) = *sol_balance.read() {
+                //         p {
+                //             "{lamports_to_sol(balance)} SOL"
+                //         }
+                //     } else {
+                //         div {
+                //             class: "flex w-32 loading rounded",
+                //         }
+                //     }
+                // }
+                // div {
+                //     class: "{container_class}",
+                //     p {
+                //         class: "{data_title_class}",
+                //         "Keypair"
+                //     }
+                //     div {
+                //         class: "flex flex-row gap-2 -mr-2",
+                //         Link {
+                //             to: Route::ImportKey {},
+                //             class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
+                //             "Import"
+                //         }
+                //         Link {
+                //             to: Route::ExportKey {},
+                //             class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
+                //             "Export"
+                //         }
+                //     }
+                // }
             }
             div {
                 class: "flex flex-col gap-4",
