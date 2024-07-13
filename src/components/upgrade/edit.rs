@@ -18,32 +18,27 @@ pub fn UpgradeEdit(
 ) -> Element {
     let nav = navigator();
     let wallet_adapter = use_wallet_adapter::use_wallet_adapter();
-    // fetch balances
     let balances_resource = use_wallet_adapter::use_ore_balances();
+
     let (max_amount, max_amount_str) = match balances_resource.cloned() {
         Some(balances) => balances
             .map(|b| (b.v1.balance(), b.v1.ui_amount_string))
             .unwrap_or((0, "0".to_owned())),
         None => (0, "0".to_owned()),
     };
-    let balance_v2_str = match balances_resource.cloned() {
-        Some(balances) => balances
-            .map(|b| b.v2.ui_amount_string)
-            .unwrap_or("0".to_owned()),
-        None => "0".to_owned(),
-    };
-    // build err
-    log::info!("max amount: {}", max_amount_str);
+
     let amount_error_text = if parsed_amount.gt(&max_amount) {
         Some("Amount too large".to_string())
     } else {
         None
     };
+
     // build disabled
     let is_disabled = amount_input.read().len().eq(&0)
         || amount_input.read().parse::<f64>().is_err()
         || amount_error_text.is_some()
         || wallet_adapter.cloned().eq(&WalletAdapter::Disconnected);
+
     // balance styles
     let container_class = "flex flex-row gap-8 w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
@@ -51,41 +46,24 @@ pub fn UpgradeEdit(
     rsx! {
         div { class: "flex flex-col h-full grow gap-12",
             div { class: "flex flex-col gap-3",
-                h2 { "Upgrade" }
-                p { class: "text-lg", "Upgrade ORE v1 to v2" }
                 h2 {
-                    class: "{section_title_class} mt-8",
-                    "Balances"
+                    "Upgrade"
                 }
-                div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "v1"
-                    }
-                    div { class: "flex flex-row gap-2",
-                        OreIcon { class: "my-auto w-5 h-5" }
-                        p { "{max_amount_str}" }
-                    }
+                p {
+                    class: "text-lg",
+                    "Upgrade ORE v1 tokens to ORE v2."
                 }
-                div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "v2"
-                    }
-                    div { class: "flex flex-row gap-2",
-                        OreIcon { class: "my-auto w-5 h-5" }
-                        p { "{balance_v2_str}" }
-                    }
+                p {
+                    class: "text-sm text-gray-300 dark:text-gray-700",
+                    "This will burn your ORE v1 tokens and mint you an equal number of ORE v2 tokens."
                 }
             }
-            div { class: "flex flex-col gap-12",
-                div { class: "flex flex-col gap-2", "Upgrade Amount" }
-                div { class: "flex flex-row gap-3",
+            div {
+                class: "flex flex-col gap-12",
+                div {
+                    class: "flex flex-row gap-3",
                     input {
                         class: "mx-auto w-full focus:ring-0 outline-none placeholder-gray-200 dark:placeholder-gray-700 bg-transparent text-xl font-medium",
-                        style: "border-bottom: outset;",
                         value: "{amount_input}",
                         placeholder: "0",
                         oninput: move |e| {
@@ -106,13 +84,15 @@ pub fn UpgradeEdit(
                     }
                 }
                 if let Some(err) = amount_error_text {
-                    p { class: "flex flex-row flex-nowrap gap-1.5 w-min text-nowrap text-red-500 font-semibold text-sm",
+                    p {
+                        class: "flex flex-row flex-nowrap gap-1.5 w-min text-nowrap text-red-500 font-semibold text-sm",
                         WarningIcon { class: "w-4 h-4 my-auto" }
                         "{err}"
                     }
                 }
             }
-            div { class: "flex flex-col sm:flex-row gap-2 mt-auto",
+            div {
+                class: "flex flex-col sm:flex-row gap-2 mt-auto",
                 button {
                     class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
                     onclick: move |_| {

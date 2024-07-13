@@ -800,6 +800,11 @@ h2:where(.dark, .dark *) {
   display: none;
 }
 
+.size-6 {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 .h-1\/2 {
   height: 50%;
 }
@@ -1281,8 +1286,36 @@ h2:where(.dark, .dark *) {
   border-width: 4px;
 }
 
+.border-2 {
+  border-width: 2px;
+}
+
+.border {
+  border-width: 1px;
+}
+
 .border-white\/30 {
   border-color: rgb(245 245 247 / 0.3);
+}
+
+.border-gray-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(214 214 216 / var(--tw-border-opacity));
+}
+
+.border-gray-100 {
+  --tw-border-opacity: 1;
+  border-color: rgb(232 232 234 / var(--tw-border-opacity));
+}
+
+.border-gray-900 {
+  --tw-border-opacity: 1;
+  border-color: rgb(49 49 51 / var(--tw-border-opacity));
+}
+
+.border-gray-800 {
+  --tw-border-opacity: 1;
+  border-color: rgb(70 70 72 / var(--tw-border-opacity));
 }
 
 .border-t-white {
@@ -1573,6 +1606,11 @@ h2:where(.dark, .dark *) {
 .text-slate-400 {
   --tw-text-opacity: 1;
   color: rgb(148 163 184 / var(--tw-text-opacity));
+}
+
+.text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(112 112 113 / var(--tw-text-opacity));
 }
 
 .text-opacity-80 {
@@ -2070,6 +2108,26 @@ h2:where(.dark, .dark *) {
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-gray-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(232 232 234 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-300:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(176 176 178 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(112 112 113 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-green-500:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(10 207 134 / var(--tw-bg-opacity));
+}
+
 .hover\:text-green-500:hover {
   --tw-text-opacity: 1;
   color: rgb(10 207 134 / var(--tw-text-opacity));
@@ -2128,6 +2186,11 @@ h2:where(.dark, .dark *) {
 .active\:bg-red-600:active {
   --tw-bg-opacity: 1;
   background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+}
+
+.active\:bg-gray-200:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(214 214 216 / var(--tw-bg-opacity));
 }
 
 .active\:opacity-50:active {
@@ -2332,6 +2395,10 @@ h2:where(.dark, .dark *) {
     gap: 3rem;
   }
 
+  .md\:gap-6 {
+    gap: 1.5rem;
+  }
+
   .md\:gap-y-12 {
     row-gap: 3rem;
   }
@@ -2421,6 +2488,10 @@ h2:where(.dark, .dark *) {
 
   .lg\:gap-10 {
     gap: 2.5rem;
+  }
+
+  .lg\:gap-8 {
+    gap: 2rem;
   }
 
   .lg\:text-2xl {

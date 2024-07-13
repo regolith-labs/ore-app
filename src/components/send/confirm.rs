@@ -95,7 +95,6 @@ pub fn SendConfirm(
                         spawn(async move {
                             match gateway.transfer_ore(amount, recipient, memo).await {
                                 Ok(sig) => {
-                                    log::info!("Transfer: {:?}", sig);
                                     ore_balance.restart();
                                     is_busy.set(false);
                                     send_step.set(SendStep::Done);
