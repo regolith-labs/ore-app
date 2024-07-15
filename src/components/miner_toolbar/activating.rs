@@ -1,11 +1,14 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
+use ore_relayer_api::consts::ESCROW;
+use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pubkey};
 
 use crate::{
-    components::{try_start_mining, Spinner},
+    components::{try_start_mining, wallet_adapter, Spinner},
+    gateway,
     hooks::{
-        use_gateway, use_miner_toolbar_state, use_sol_balance, MinerStatus, MinerStatusMessage,
-        ReadMinerToolbarState, UpdateMinerToolbarState,
+        use_gateway, use_miner_toolbar_state, use_sol_balance,
+        use_wallet_adapter::{use_wallet_adapter, WalletAdapter, RELAYER_PUBKEY},
+        MinerStatus, MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     miner::Miner,
 };
@@ -17,37 +20,33 @@ const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(100);
 #[component]
 pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let gateway = use_gateway();
-    let sol_balance = use_sol_balance();
-    let mut sufficient_balance = use_signal(|| true);
     let mut toolbar_state = use_miner_toolbar_state();
 
-    use_effect(move || {
-        if let Some(Ok(sol_balance)) = *sol_balance.read() {
-            sufficient_balance.set(sol_balance.ge(&MIN_BALANCE));
-        } else {
-            sufficient_balance.set(false);
-        }
-    });
+    // TODO Start mining if the escrow account exists
+    // use_future(move || {
+    //     let gateway = gateway.clone();
+    //     async move {
+    //         if *sufficient_balance.read() {
+    //             match try_start_mining(gateway, miner, &mut toolbar_state).await {
+    //                 Ok(()) => {
+    //                     toolbar_state.set_status(MinerStatus::Active);
+    //                 }
+    //                 Err(err) => {
+    //                     log::error!("Failed to start mining: {:?}", err);
+    //                     toolbar_state.set_status(MinerStatus::Error);
+    //                     toolbar_state.set_status_message(MinerStatusMessage::Error);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // });
 
-    use_future(move || {
-        let gateway = gateway.clone();
-        async move {
-            if *sufficient_balance.read() {
-                match try_start_mining(gateway, miner, &mut toolbar_state).await {
-                    Ok(()) => {
-                        toolbar_state.set_status(MinerStatus::Active);
-                    }
-                    Err(err) => {
-                        log::error!("Failed to start mining: {:?}", err);
-                        toolbar_state.set_status(MinerStatus::Error);
-                        toolbar_state.set_status_message(MinerStatusMessage::Error);
-                    }
-                }
-            }
-        }
-    });
-
-    if sol_balance.read().is_some() && !*sufficient_balance.read() {
+    // if sol_balance.read().is_some() && !*sufficient_balance.read() {
+    if toolbar_state
+        .read()
+        .escrow_address
+        .eq(&Pubkey::new_from_array([0; 32]))
+    {
         return rsx! {
             MinerToolbarInsufficientFunds {}
         };
@@ -61,18 +60,18 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
                     class: "text-3xl md:text-4xl lg:text-5xl font-bold",
                     "Starting"
                 }
-                if let MinerStatusMessage::GeneratingChallenge = toolbar_state.status_message() {
-                    div {
-                        class: "flex flex-row gap-2",
-                        p {
-                            class: "text-lg",
-                            "Generating challenge..."
-                        }
-                        Spinner {
-                            class: "my-auto text-white"
-                        }
-                    }
-                }
+                // if let MinerStatusMessage::GeneratingChallenge = toolbar_state.status_message() {
+                //     div {
+                //         class: "flex flex-row gap-2",
+                //         p {
+                //             class: "text-lg",
+                //             "Generating challenge..."
+                //         }
+                //         Spinner {
+                //             class: "my-auto text-white"
+                //         }
+                //     }
+                // }
             }
         } else {
             div {

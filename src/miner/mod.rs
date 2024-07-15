@@ -21,7 +21,7 @@ use solana_client_wasm::solana_sdk::{
 use web_sys::{window, Worker};
 
 use crate::{
-    gateway::{signer, Gateway, GatewayResult, CU_LIMIT_MINE},
+    gateway::{Gateway, GatewayResult, CU_LIMIT_MINE},
     hooks::{
         MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
         ReadMinerToolbarState, UpdateMinerToolbarState,
@@ -160,28 +160,29 @@ pub async fn submit_solution(
     solution: Solution,
     priority_fee: u64,
 ) -> GatewayResult<Signature> {
-    let signer = signer();
+    // let signer = signer();
     // Build ixs
-    let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
-    let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-    let mut ixs = vec![cu_limit_ix, cu_price_ix];
+    // let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
+    // let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+    // let mut ixs = vec![cu_limit_ix, cu_price_ix];
 
     // Reset if needed
-    if needs_reset(gateway).await {
-        ixs.push(ore_api::instruction::reset(signer.pubkey()));
-    }
+    // if needs_reset(gateway).await {
+    //     ixs.push(ore_api::instruction::reset(signer.pubkey()));
+    // }
 
     // Build mine tx
-    let bus_id = pick_bus();
-    let ix = ore_api::instruction::mine(
-        signer.pubkey(),
-        ore_api::consts::BUS_ADDRESSES[bus_id],
-        solution,
-    );
-    ixs.push(ix);
+    // let bus_id = pick_bus();
+    // let ix = ore_api::instruction::mine(
+    //     signer.pubkey(),
+    //     ore_api::consts::BUS_ADDRESSES[bus_id],
+    //     solution,
+    // );
+    // ixs.push(ix);
 
     // Send and configm
-    gateway.send_and_confirm(&ixs, false, false).await
+    // gateway.send_and_confirm(&ixs, false, false).await
+    Ok(Signature::default())
 }
 
 async fn needs_reset(gateway: &Rc<Gateway>) -> bool {

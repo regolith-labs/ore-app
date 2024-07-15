@@ -93,18 +93,19 @@ pub fn SendConfirm(
                         let memo = memo.clone();
                         is_busy.set(true);
                         spawn(async move {
-                            match gateway.transfer_ore(amount, recipient, memo).await {
-                                Ok(sig) => {
-                                    ore_balance.restart();
-                                    is_busy.set(false);
-                                    send_step.set(SendStep::Done);
-                                }
-                                Err(err) => {
-                                    // TODO Handle error
-                                    is_busy.set(false);
-                                    log::error!("Failed to send: {:?}", err);
-                                }
-                            }
+                            // TODO Use wallet adapter
+                            // match gateway.transfer_ore(amount, recipient, memo).await {
+                            //     Ok(sig) => {
+                            //         ore_balance.restart();
+                            //         is_busy.set(false);
+                            //         send_step.set(SendStep::Done);
+                            //     }
+                            //     Err(err) => {
+                            //         // TODO Handle error
+                            //         is_busy.set(false);
+                            //         log::error!("Failed to send: {:?}", err);
+                            //     }
+                            // }
                         });
                     },
                     if *is_busy.read() {

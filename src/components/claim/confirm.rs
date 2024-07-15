@@ -100,33 +100,35 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                         onclick: move |_| {
                             is_busy.set(true);
                             let gateway = gateway.clone();
+
+                            // TODO Use wallet adapter
                             spawn({
                                 async move {
                                     // Create associated token account, if needed
-                                    'ata: loop {
-                                        match gateway
-                                            .create_token_account_ore(pubkey)
-                                            .await
-                                        {
-                                                Ok(_) => break 'ata,
-                                                Err(err) => log::error!("Failed to create token account: {:?}", err),
-                                        }
-                                    }
+                                    // 'ata: loop {
+                                    //     match gateway
+                                    //         .create_token_account_ore(pubkey)
+                                    //         .await
+                                    //     {
+                                    //             Ok(_) => break 'ata,
+                                    //             Err(err) => log::error!("Failed to create token account: {:?}", err),
+                                    //     }
+                                    // }
 
                                     // Claim
-                                    match gateway.claim_ore(amount, priority_fee.read().0).await {
-                                        Ok(_sig) => {
-                                            balance.restart();
-                                            proof.restart();
-                                            is_busy.set(false);
-                                            claim_step.set(ClaimStep::Done);
-                                        }
-                                        Err(_err) => {
-                                            // TODO Handle error
-                                            is_busy.set(false);
-                                            log::error!("Failed to claim!");
-                                        }
-                                    }
+                                    // match gateway.claim_ore(amount, priority_fee.read().0).await {
+                                    //     Ok(_sig) => {
+                                    //         balance.restart();
+                                    //         proof.restart();
+                                    //         is_busy.set(false);
+                                    //         claim_step.set(ClaimStep::Done);
+                                    //     }
+                                    //     Err(_err) => {
+                                    //         // TODO Handle error
+                                    //         is_busy.set(false);
+                                    //         log::error!("Failed to claim!");
+                                    //     }
+                                    // }
                                 }
                             });
                         },

@@ -1,18 +1,21 @@
+use std::rc::Rc;
+
 use base64::Engine;
 use dioxus::prelude::*;
 use ore_api::consts::{TOKEN_DECIMALS, TOKEN_DECIMALS_V1};
+use ore_relayer_api::state::Relayer;
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_client_wasm::solana_sdk::signature::Signature;
 use solana_client_wasm::solana_sdk::{
-    instruction::Instruction, message::Message, pubkey::Pubkey, transaction::Transaction,
+    instruction::Instruction, message::Message, pubkey, pubkey::Pubkey, transaction::Transaction,
 };
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
 use solana_extra_wasm::program::{spl_memo, spl_token};
 
 use crate::gateway::{
-    ore_token_account_address, ore_token_account_address_v1, GatewayError, GatewayResult,
-    CU_LIMIT_UPGRADE,
+    self, ore_token_account_address, ore_token_account_address_v1, Gateway, GatewayError,
+    GatewayResult, CU_LIMIT_UPGRADE,
 };
 use crate::hooks::UiTokenAmountDefault;
 
@@ -102,12 +105,18 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                     .ok()
                                     .and_then(|buffer| bincode::deserialize(&buffer).ok());
                                 let rpc_res = match decode_res {
-                                    Some(tx) => gateway.rpc.send_transaction(&tx).await.ok(),
+                                    Some(tx) => {
+                                        log::info!("Sending: {:?}", tx);
+                                        let x = gateway.rpc.send_transaction(&tx).await;
+                                        log::info!("Sent: {:?}", x);
+                                        x.ok()
+                                    }
                                     None => {
                                         log::info!("error decoding tx");
                                         None
                                     }
                                 };
+                                log::info!("Dec: {:?}", rpc_res);
                                 match rpc_res {
                                     Some(sig) => {
                                         log::info!("sig: {}", sig);
@@ -152,13 +161,31 @@ pub struct Balances {
     pub v2: UiTokenAmount,
 }
 
-#[derive(PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum WalletAdapter {
     Connected(Pubkey),
     Disconnected,
 }
 
+pub const RELAYER_PUBKEY: Pubkey = pubkey!("64PCKXyXMUwuVAttAvK7NCUmiFrzopiAsgjpnnSqk6jd");
+
 impl WalletAdapter {
+    pub async fn build_open_tx(&self, gateway: Rc<Gateway>) -> GatewayResult<Transaction> {
+        match *self {
+            WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
+            WalletAdapter::Connected(signer) => {
+                let relayer = gateway.get_relayer(RELAYER_PUBKEY).await?;
+                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
+                let ix = ore_relayer_api::instruction::open_escrow(signer, relayer, signer);
+                let blockhash = gateway.rpc.get_latest_blockhash().await?;
+                let ixs = vec![cu_limit_ix, ix];
+                let msg = Message::new_with_blockhash(ixs.as_slice(), Some(&signer), &blockhash);
+                let tx = Transaction::new_unsigned(msg);
+                Ok(tx)
+            }
+        }
+    }
+
     pub async fn build_upgrade_tx(&self, amount: u64) -> GatewayResult<Transaction> {
         match *self {
             WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),

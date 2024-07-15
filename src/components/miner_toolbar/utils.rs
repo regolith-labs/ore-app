@@ -4,8 +4,11 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::signer::Signer;
 
 use crate::{
-    gateway::{signer, Gateway, GatewayResult},
-    hooks::{MinerStatusMessage, MinerToolbarState, UpdateMinerToolbarState},
+    gateway::{Gateway, GatewayResult},
+    hooks::{
+        use_wallet_adapter::WalletAdapter, MinerStatusMessage, MinerToolbarState,
+        UpdateMinerToolbarState,
+    },
     miner::Miner,
 };
 
@@ -16,18 +19,8 @@ pub async fn try_start_mining(
     miner: Signal<Miner>,
     toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<()> {
-    // Create proof account, if needed
-
-    toolbar_state.set_status_message(MinerStatusMessage::GeneratingChallenge);
-    loop {
-        if gateway.open_ore().await.is_ok() {
-            break;
-        }
-    }
-
-    // Start mining
-    let signer = signer();
-    if let Ok(proof) = gateway.get_proof(signer.pubkey()).await {
+    let authority = toolbar_state.read().escrow_address;
+    if let Ok(proof) = gateway.get_proof(authority).await {
         if let Ok(clock) = gateway.get_clock().await {
             let cutoff_time = proof
                 .last_hash_at

@@ -1,62 +1,63 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use gloo::net::websocket::Message;
+use ore_relayer_api::state::Relayer;
+use solana_client_wasm::solana_sdk::{
+    compute_budget::ComputeBudgetInstruction, hash::Hash, pubkey::Pubkey, transaction::Transaction,
+};
+use wallet_adapter::InvokeSignature;
 
 use crate::{
-    components::Copyable,
+    components::{wallet_adapter, Copyable},
     hooks::{
-        use_is_onboarded, use_miner_toolbar_state, use_pubkey, use_sol_balance, IsOnboarded,
-        ReadMinerToolbarState,
+        use_gateway, use_is_onboarded, use_miner_toolbar_state, use_pubkey, use_sol_balance,
+        use_wallet_adapter::{
+            use_wallet_adapter, InvokeSignatureStatus, WalletAdapter, RELAYER_PUBKEY,
+        },
+        IsOnboarded, ReadMinerToolbarState,
     },
 };
 
 pub fn MinerToolbarInsufficientFunds() -> Element {
-    let mut sol_balance = use_sol_balance();
-    let mut is_onboarded = use_is_onboarded();
     let toolbar_state = use_miner_toolbar_state();
-
-    // TODO Poll balance every 3 seconds
-    use_future(move || async move {
-        loop {
-            async_std::task::sleep(std::time::Duration::from_secs(2)).await;
-            if toolbar_state.is_open() {
-                sol_balance.restart();
-            }
-        }
-    });
-
-    use_effect(move || {
-        if let Some(Ok(sol_balance)) = *sol_balance.read() {
-            if sol_balance.gt(&0) {
-                is_onboarded.set(IsOnboarded(true));
-            }
-        }
-    });
-
     rsx! {
         if toolbar_state.is_open() {
-            MinerToolbarInsufficientBalanceOpen {}
+            MinerToolbarOpenAccount {}
         } else {
             div {
                 class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
                 span {
                     class: "font-semibold",
-                    "Insufficient SOL →"
+                    "Create account →"
                 }
             }
         }
     }
 }
 
-pub fn MinerToolbarInsufficientBalanceOpen() -> Element {
-    let pubkey = use_pubkey();
-    let solana_pay_req = solana_pay_sol_request(pubkey, 0.1);
-    let qrcode = qrcode_generator::to_svg_to_string(
-        solana_pay_req,
-        qrcode_generator::QrCodeEcc::Low,
-        192,
-        None::<&str>,
-    )
-    .unwrap();
+pub fn MinerToolbarOpenAccount() -> Element {
+    let wallet_adapter = use_wallet_adapter();
+    let gateway = use_gateway();
+    let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
+    let tx = use_resource(move || {
+        let gateway = gateway.clone();
+        async move {
+            if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
+                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
+                let relayer = gateway.get_relayer(RELAYER_PUBKEY).await.unwrap();
+                let ix = ore_relayer_api::instruction::open_escrow(signer, relayer, signer);
+                let ixs = vec![cu_limit_ix, ix];
+                let mut tx = Transaction::new_with_payer(&ixs, Some(&signer));
+                tx.message.recent_blockhash = gateway.rpc.get_latest_blockhash().await.unwrap();
+                Some(tx)
+            } else {
+                None
+            }
+        }
+    });
+
+    // if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+    //     // upgrade_step.set(UpgradeStep::Done(sig));
+    // };
 
     rsx! {
         div {
@@ -65,46 +66,35 @@ pub fn MinerToolbarInsufficientBalanceOpen() -> Element {
                 class: "flex flex-col gap-2",
                 p {
                     class: "text-3xl md:text-4xl lg:text-5xl font-bold",
-                    "Pay transaction fees"
+                    "Create an account"
                 }
                 p {
                     class: "text-lg",
-                    "Scan the QR code from your Solana wallet to top up your miner."
+                    "Open a new account to start mining ORE."
                 }
                 p {
                     class: "text-sm text-gray-300",
-                    "Your miner keypair is stored on your local device and can be exported from settings at anytime."
+                    "This account will secure your progress and miner rewards."
                 }
             }
             div {
-                class: "flex flex-col gap-4 sm:gap-6 md:gap-8",
-                div {
-                    class: "text-center w-48 h-48 bg-gray-100 mx-auto",
-                    dangerous_inner_html: "{qrcode}",
-                }
-                Copyable {
-                    class: "mx-auto max-w-full",
-                    value: pubkey.to_string(),
+                class: "flex flex-col gap-4",
+                if let Some(Some(tx)) = tx.cloned() {
+                    InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Create account" }
+                } else {
                     p {
-                        class: "rounded p-2 font-mono font-medium truncate",
-                        "{pubkey}"
+                        class: "font-medium text-center text-sm text-gray-300 hover:underline",
+                        "Loading..."
                     }
                 }
-            }
-            a {
-                // TODO Get referal code
-                href: "https://www.coinbase.com/price/solana",
-                target: "_blank",
-                class: "font-medium text-center text-sm text-gray-300 hover:underline",
-                "Help! I don't have any SOL."
+                a {
+                    // TODO Get referal code
+                    href: "https://www.coinbase.com/price/solana",
+                    target: "_blank",
+                    class: "font-medium text-center text-sm text-gray-300 hover:underline",
+                    "Help! I don't have any SOL."
+                }
             }
         }
     }
-}
-
-fn solana_pay_sol_request(pubkey: Pubkey, amount: f64) -> String {
-    format!(
-        "solana:{}?amount={}&label=Ore&message=Topping%20up%20Ore%20miner",
-        pubkey, amount
-    )
 }
