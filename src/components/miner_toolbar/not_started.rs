@@ -2,7 +2,11 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{PlayIcon, Tutorial},
-    hooks::{use_miner_toolbar_state, ReadMinerToolbarState, UpdateMinerToolbarState},
+    hooks::{
+        use_miner_toolbar_state,
+        use_wallet_adapter::{self, WalletAdapter},
+        ReadMinerToolbarState, UpdateMinerToolbarState,
+    },
 };
 
 pub fn MinerToolbarNotStarted() -> Element {
@@ -25,7 +29,7 @@ pub fn MinerToolbarNotStarted() -> Element {
                 class: "flex flex-row gap-2 sm:gap-4",
                 StartButton {}
             }
-            // Tutorial {}
+            Tutorial {}
         }
     }
 }

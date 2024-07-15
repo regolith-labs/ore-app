@@ -12,18 +12,49 @@ pub use error::*;
 pub use insufficient_sol::*;
 pub use layout::*;
 pub use not_started::*;
+use ore_relayer_api::consts::ESCROW;
+use solana_sdk::pubkey::Pubkey;
 pub use utils::*;
 
 use dioxus::prelude::*;
 
 use crate::hooks::{
-    use_miner, use_miner_toolbar_state, MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
+    use_gateway, use_miner, use_miner_toolbar_state,
+    use_wallet_adapter::{use_wallet_adapter, WalletAdapter, RELAYER_PUBKEY},
+    MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
 };
 
 #[component]
 pub fn MinerToolbar(hidden: bool) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
+    let wallet_adapter = use_wallet_adapter();
     let miner = use_miner();
+    let gateway = use_gateway();
+
+    use_future(move || {
+        let gateway = gateway.clone();
+        async move {
+            match *wallet_adapter.read() {
+                WalletAdapter::Disconnected => {
+                    log::info!("Disconnected");
+                }
+                WalletAdapter::Connected(pubkey) => {
+                    log::info!("Pub: {:?}", pubkey);
+                    if let Ok(escrow) = gateway.get_escrow(pubkey).await {
+                        log::info!("EScrow: {:?}", escrow);
+                        let escrow_address = Pubkey::find_program_address(
+                            &[ESCROW, pubkey.as_ref(), RELAYER_PUBKEY.as_ref()],
+                            &ore_relayer_api::id(),
+                        )
+                        .0;
+                        toolbar_state.set_escrow_address(escrow_address);
+                    } else {
+                        log::info!("No escrow");
+                    }
+                }
+            }
+        }
+    });
 
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
@@ -47,6 +78,10 @@ pub fn MinerToolbar(hidden: bool) -> Element {
     };
 
     let display = if hidden { "hidden" } else { "" };
+
+    if let WalletAdapter::Disconnected = *wallet_adapter.read() {
+        return None;
+    }
 
     rsx! {
         div {

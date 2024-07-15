@@ -45,8 +45,9 @@ js-sys = { version = "0.3.67", optional = true }
 lazy_static = "1.4"
 log = "0.4.20"
 num-format = "0.4.4"
-ore-api = "2.0.0-beta"
-ore-utils = "2.0.0-beta"
+ore-api = "2.0.0-beta.2"
+ore-relayer-api = "1.0.0-alpha.1"
+ore-utils = "2.0.0-beta.2"
 ore-types = "0.0.7"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
@@ -56,6 +57,7 @@ serde-wasm-bindgen = { version = "0.6.3", optional = true }
 serde_json = "1.0"
 solana-client-wasm = { version = "1.18", optional = true }
 solana-extra-wasm = { version = "1.18", optional = true }
+solana-sdk = "1.18"
 url = "2.5.0"
 wasm-bindgen = { version = "0.2.91", optional = true }
 wasm-bindgen-futures = { version = "0.4.41", optional = true }

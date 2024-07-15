@@ -52,8 +52,8 @@ pub fn Navbar() -> Element {
 pub fn SettingsButton() -> Element {
     let appearance = use_appearance();
     let button_color = match *appearance.read() {
-        Appearance::Light => "text-gray-300 hover:bg-gray-100",
-        Appearance::Dark => "text-gray-700 hover:bg-gray-900",
+        Appearance::Light => "text-gray-300 hover:bg-gray-100 active:bg-gray-200",
+        Appearance::Dark => "text-gray-700 hover:bg-gray-900 active:bg-gray-800",
     };
     rsx! {
         Link {

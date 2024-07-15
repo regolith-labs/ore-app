@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 
-use crate::components::{Appearance, Spinner};
+use crate::components::{icons::CheckCircleIcon, Appearance, Spinner};
 use crate::hooks::{use_appearance, use_wallet_adapter, use_wallet_adapter::InvokeSignatureStatus};
 
 #[component]
@@ -44,11 +44,12 @@ pub fn InvokeSignature(
     signal: Signal<InvokeSignatureStatus>,
     start_msg: String,
 ) -> Element {
+    let button_class = "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700";
     let e = match *signal.read() {
         InvokeSignatureStatus::Start => {
             rsx! {
                 button {
-                    class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
+                    class: "{button_class}",
                     onclick: move |_| {
                         use_wallet_adapter::invoke_signature(tx.clone(), signal);
                     },
@@ -58,7 +59,11 @@ pub fn InvokeSignature(
         }
         InvokeSignatureStatus::Waiting => {
             rsx! {
-                Spinner { class: "mx-auto" }
+                button {
+                    class: "{button_class}",
+                    disabled: true,
+                    Spinner { class: "mx-auto" }
+                }
             }
         }
         InvokeSignatureStatus::DoneWithError => {
@@ -66,15 +71,28 @@ pub fn InvokeSignature(
             // or other signal to user
             rsx! {
                 div {
-                    "failed"
+                    class: "flex flex-col gap-4",
+                    p {
+                        class: "mx-auto text-sm font-medium text-red-500",
+                        "Transaction failed..."
+                    }
+                    button {
+                        class: "{button_class}",
+                        onclick: move |_| {
+                            use_wallet_adapter::invoke_signature(tx.clone(), signal);
+                        },
+                        // "{start_msg}"
+                        "Retry"
+                    }
                 }
             }
         }
         InvokeSignatureStatus::Done(sig) => {
             rsx! {
-                div {
-                    class: "mx-auto",
-                    "{sig.to_string()}"
+                button {
+                    class: "w-full py-3 rounded font-semibold text-white bg-green-500",
+                    disabled: true,
+                    CheckCircleIcon { class: "h-5 w-5 mx-auto" }
                 }
             }
         }

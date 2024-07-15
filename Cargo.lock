@@ -3447,9 +3447,9 @@ dependencies = [
 
 [[package]]
 name = "ore-api"
-version = "2.0.0-beta"
+version = "2.0.0-beta.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4e8157da5714319e2c0859a12ed63109aef45ad48ca72c007944dc7def3286d"
+checksum = "612d67826797dd32cac2769662462875e6015af26e6d8ef553e03c9f3b0c9994"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -3489,6 +3489,7 @@ dependencies = [
  "log",
  "num-format",
  "ore-api",
+ "ore-relayer-api",
  "ore-types",
  "ore-utils",
  "qrcode-generator",
@@ -3499,6 +3500,7 @@ dependencies = [
  "serde_json",
  "solana-client-wasm",
  "solana-extra-wasm",
+ "solana-sdk",
  "tracing",
  "url",
  "wasm-bindgen",
@@ -3506,6 +3508,25 @@ dependencies = [
  "wasm-logger",
  "web-sys",
  "web-time",
+]
+
+[[package]]
+name = "ore-relayer-api"
+version = "1.0.0-alpha.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cbd11f550e2333300b8b55ed3f552d3015cd764f89896913221102b723dac379"
+dependencies = [
+ "bytemuck",
+ "mpl-token-metadata",
+ "num_enum 0.7.2",
+ "ore-api",
+ "ore-utils",
+ "shank",
+ "solana-program",
+ "spl-associated-token-account",
+ "spl-token",
+ "static_assertions",
+ "thiserror",
 ]
 
 [[package]]
@@ -3521,9 +3542,9 @@ dependencies = [
 
 [[package]]
 name = "ore-utils"
-version = "2.0.0-beta"
+version = "2.0.0-beta.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b60da5fc616eaee4c6c010f9fd4b7cf1789b581aceea202b18f0966e571241f"
+checksum = "a57b6b200cb0a57758d440d3d0bbff3adfd1dfae377fb01bb68da66a767e7dd2"
 dependencies = [
  "bytemuck",
  "solana-program",
