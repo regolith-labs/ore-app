@@ -148,7 +148,7 @@ pub fn Tx(sig: String) -> Element {
                     }
                 }
             }
-            _ => None,
+            _ => rsx! {},
         }
     } else {
         rsx! {

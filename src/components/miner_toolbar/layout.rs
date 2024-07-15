@@ -40,7 +40,7 @@ pub fn ToolbarClose(hidden: bool) -> Element {
         "opacity-0 pointer-events-none"
     };
     if hidden {
-        return None;
+        return rsx! {};
     }
     rsx! {
         button {

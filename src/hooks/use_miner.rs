@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::utils::channel::use_channel;
+use dioxus_sdk::utils::channel::use_channel;
 
 use super::{
     use_gateway, use_miner_toolbar_state, use_power_level, use_priority_fee, use_proof, use_pubkey,

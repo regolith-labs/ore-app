@@ -5,7 +5,7 @@ pub use web_worker::*;
 use std::rc::Rc;
 
 use dioxus::prelude::*;
-use dioxus_std::utils::channel::UseChannel;
+use dioxus_sdk::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
 use ore_api::{
