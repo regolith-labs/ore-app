@@ -83,7 +83,7 @@ pub fn StakeBalance() -> Element {
         }
     }
 
-    None
+    rsx! {}
 }
 
 #[component]

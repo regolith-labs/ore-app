@@ -199,7 +199,7 @@ pub fn UserActivity(user_id: Pubkey) -> Element {
                     }
                 }
             }
-            _ => None,
+            _ => rsx! {},
         }
     } else {
         rsx! {

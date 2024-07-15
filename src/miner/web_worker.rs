@@ -1,4 +1,4 @@
-use dioxus_std::utils::channel::UseChannel;
+use dioxus_sdk::utils::channel::UseChannel;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;

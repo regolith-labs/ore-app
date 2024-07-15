@@ -38,7 +38,7 @@ pub fn Activity() -> Element {
                     }
                 }
             }
-            _ => None,
+            _ => rsx! {},
         }
     } else {
         rsx! {

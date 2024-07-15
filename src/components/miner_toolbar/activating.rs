@@ -23,25 +23,28 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
 
     // TODO Start mining if the escrow account exists
-    // use_future(move || {
-    //     let gateway = gateway.clone();
-    //     async move {
-    //         if *sufficient_balance.read() {
-    //             match try_start_mining(gateway, miner, &mut toolbar_state).await {
-    //                 Ok(()) => {
-    //                     toolbar_state.set_status(MinerStatus::Active);
-    //                 }
-    //                 Err(err) => {
-    //                     log::error!("Failed to start mining: {:?}", err);
-    //                     toolbar_state.set_status(MinerStatus::Error);
-    //                     toolbar_state.set_status_message(MinerStatusMessage::Error);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // });
+    use_resource(move || {
+        let gateway = gateway.clone();
+        async move {
+            if toolbar_state
+                .read()
+                .escrow_address
+                .ne(&Pubkey::new_from_array([0; 32]))
+            {
+                match try_start_mining(gateway, miner, &mut toolbar_state).await {
+                    Ok(()) => {
+                        toolbar_state.set_status(MinerStatus::Active);
+                    }
+                    Err(err) => {
+                        log::error!("Failed to start mining: {:?}", err);
+                        toolbar_state.set_status(MinerStatus::Error);
+                        toolbar_state.set_status_message(MinerStatusMessage::Error);
+                    }
+                }
+            }
+        }
+    });
 
-    // if sol_balance.read().is_some() && !*sufficient_balance.read() {
     if toolbar_state
         .read()
         .escrow_address
@@ -61,16 +64,16 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
                     "Starting"
                 }
                 // if let MinerStatusMessage::GeneratingChallenge = toolbar_state.status_message() {
-                //     div {
-                //         class: "flex flex-row gap-2",
-                //         p {
-                //             class: "text-lg",
-                //             "Generating challenge..."
-                //         }
-                //         Spinner {
-                //             class: "my-auto text-white"
-                //         }
-                //     }
+                    div {
+                        class: "flex flex-row gap-2",
+                        p {
+                            class: "text-lg",
+                            "Initializing miner..."
+                        }
+                        Spinner {
+                            class: "my-auto text-white"
+                        }
+                    }
                 // }
             }
         } else {

@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_std::clipboard::use_clipboard;
+use dioxus_sdk::clipboard::use_clipboard;
 
 use crate::components::CopyIcon;
 
@@ -12,12 +12,14 @@ pub fn Copyable(
 ) -> Element {
     let mut clipboard = use_clipboard();
     let mut solid = use_signal(|| false);
+
     use_future(move || async move {
         if *solid.read() {
             async_std::task::sleep(std::time::Duration::from_secs(3)).await;
             solid.set(false);
         }
     });
+
     let class = class.unwrap_or("".to_string());
     if large_button.unwrap_or(false) {
         rsx! {

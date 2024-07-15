@@ -31,28 +31,23 @@ pub fn MinerToolbar(hidden: bool) -> Element {
     let miner = use_miner();
     let gateway = use_gateway();
 
-    use_future(move || {
+    let _ = use_resource(move || {
         let gateway = gateway.clone();
         async move {
             match *wallet_adapter.read() {
-                WalletAdapter::Disconnected => {
-                    log::info!("Disconnected");
-                }
+                WalletAdapter::Disconnected => {}
                 WalletAdapter::Connected(pubkey) => {
-                    log::info!("Pub: {:?}", pubkey);
                     if let Ok(escrow) = gateway.get_escrow(pubkey).await {
-                        log::info!("EScrow: {:?}", escrow);
                         let escrow_address = Pubkey::find_program_address(
                             &[ESCROW, pubkey.as_ref(), RELAYER_PUBKEY.as_ref()],
                             &ore_relayer_api::id(),
                         )
                         .0;
                         toolbar_state.set_escrow_address(escrow_address);
-                    } else {
-                        log::info!("No escrow");
                     }
                 }
             }
+            ()
         }
     });
 
@@ -80,7 +75,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
     let display = if hidden { "hidden" } else { "" };
 
     if let WalletAdapter::Disconnected = *wallet_adapter.read() {
-        return None;
+        return rsx! {};
     }
 
     rsx! {
