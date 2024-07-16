@@ -1,7 +1,11 @@
 use dioxus::prelude::*;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
-use crate::{components::OreIcon, hooks::use_ore_balance, route::Route};
+use crate::{
+    components::OreIcon,
+    hooks::{use_ore_balance, use_proof},
+    route::Route,
+};
 
 pub fn Balance() -> Element {
     let balance = use_ore_balance();
@@ -46,38 +50,38 @@ pub fn Balance() -> Element {
 }
 
 pub fn StakeBalance() -> Element {
-    // let proof = use_proof();
+    let proof = use_proof();
 
-    // if let Some(Ok(proof)) = *proof.read() {
-    //     if proof.balance.gt(&0) {
-    //         return rsx! {
-    //             div {
-    //                 class: "flex flex-row grow justify-between mt-4 -mr-2",
-    //                 div {
-    //                     class: "flex flex-col gap-2",
-    //                     p {
-    //                         class: "font-medium text-xs text-gray-300",
-    //                         "Staking balance"
-    //                     }
-    //                     div {
-    //                         class: "flex flex-row gap-2",
-    //                         OreIcon {
-    //                             class: "my-auto w-4 h-4"
-    //                         }
-    //                         p {
-    //                             class: "font-semibold",
-    //                             "{amount_to_ui_amount(proof.balance, ore_api::consts::TOKEN_DECIMALS)}"
-    //                         }
-    //                     }
-    //                 }
-    //                 span {
-    //                     class: "mt-auto",
-    //                     ClaimButton {}
-    //                 }
-    //             }
-    //         };
-    //     }
-    // }
+    if let Some(Ok(proof)) = *proof.read() {
+        if proof.balance.gt(&0) {
+            return rsx! {
+                div {
+                    class: "flex flex-row grow justify-between mt-4 -mr-2",
+                    div {
+                        class: "flex flex-col gap-2",
+                        p {
+                            class: "font-medium text-xs text-gray-300",
+                            "Staking balance"
+                        }
+                        div {
+                            class: "flex flex-row gap-2",
+                            OreIcon {
+                                class: "my-auto w-4 h-4"
+                            }
+                            p {
+                                class: "font-semibold",
+                                "{amount_to_ui_amount(proof.balance, ore_api::consts::TOKEN_DECIMALS)}"
+                            }
+                        }
+                    }
+                    span {
+                        class: "mt-auto",
+                        ClaimButton {}
+                    }
+                }
+            };
+        }
+    }
 
     rsx! {}
 }

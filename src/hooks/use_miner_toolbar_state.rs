@@ -26,7 +26,15 @@ pub struct MinerToolbarState {
     pub display_hash: Blake3Hash,
     pub is_open: bool,
     // pub escrow_address: Pubkey,
-    pub escrow: Escrow,
+    // pub escrow: Escrow,
+}
+
+pub fn use_escrow() -> Signal<Escrow> {
+    use_context::<Signal<Escrow>>()
+}
+
+pub fn use_escrow_provider() {
+    use_context_provider(|| Signal::new(Escrow::default()));
 }
 
 pub fn use_miner_toolbar_state() -> Signal<MinerToolbarState> {
@@ -39,7 +47,7 @@ pub fn use_miner_toolbar_state_provider() {
             status: MinerStatus::NotStarted,
             status_message: MinerStatusMessage::Searching,
             display_hash: Blake3Hash::new_unique(),
-            escrow: Escrow::default(),
+            // escrow: Escrow::default(),
             is_open: false,
         })
     });
@@ -50,7 +58,7 @@ pub trait ReadMinerToolbarState {
     fn status_message(&self) -> MinerStatusMessage;
     fn display_hash(&self) -> String;
     fn is_open(&self) -> bool;
-    fn escrow(&self) -> Escrow;
+    // fn escrow(&self) -> Escrow;
 }
 
 impl ReadMinerToolbarState for Signal<MinerToolbarState> {
@@ -70,9 +78,9 @@ impl ReadMinerToolbarState for Signal<MinerToolbarState> {
         self.read().is_open
     }
 
-    fn escrow(&self) -> Escrow {
-        self.read().escrow
-    }
+    // fn escrow(&self) -> Escrow {
+    //     self.read().escrow
+    // }
 }
 
 pub trait UpdateMinerToolbarState {
@@ -80,7 +88,7 @@ pub trait UpdateMinerToolbarState {
     fn set_display_hash(&mut self, hash: Blake3Hash);
     fn set_status_message(&mut self, status_message: MinerStatusMessage);
     fn set_status(&mut self, status: MinerStatus);
-    fn set_escrow(&mut self, escrow: Escrow);
+    // fn set_escrow(&mut self, escrow: Escrow);
     fn start(&mut self);
     fn pause(&mut self);
 }
@@ -92,7 +100,7 @@ impl UpdateMinerToolbarState for Signal<MinerToolbarState> {
             status: MinerStatus::Activating,
             status_message: old.status_message,
             display_hash: old.display_hash,
-            escrow: old.escrow,
+            // escrow: old.escrow,
             is_open: true,
         };
         drop(old);
@@ -105,7 +113,7 @@ impl UpdateMinerToolbarState for Signal<MinerToolbarState> {
             status: MinerStatus::NotStarted,
             status_message: old.status_message,
             display_hash: old.display_hash,
-            escrow: old.escrow,
+            // escrow: old.escrow,
             is_open: false,
         };
         drop(old);
@@ -118,7 +126,7 @@ impl UpdateMinerToolbarState for Signal<MinerToolbarState> {
             status: old.status,
             status_message: old.status_message,
             display_hash: old.display_hash,
-            escrow: old.escrow,
+            // escrow: old.escrow,
             is_open,
         };
         drop(old);
@@ -131,7 +139,7 @@ impl UpdateMinerToolbarState for Signal<MinerToolbarState> {
             status: old.status,
             status_message: old.status_message,
             display_hash: hash,
-            escrow: old.escrow,
+            // escrow: old.escrow,
             is_open: old.is_open,
         };
         drop(old);
@@ -144,7 +152,7 @@ impl UpdateMinerToolbarState for Signal<MinerToolbarState> {
             status: old.status,
             status_message,
             display_hash: old.display_hash,
-            escrow: old.escrow,
+            // escrow: old.escrow,
             is_open: old.is_open,
         };
         drop(old);
@@ -157,23 +165,23 @@ impl UpdateMinerToolbarState for Signal<MinerToolbarState> {
             status,
             status_message: old.status_message,
             display_hash: old.display_hash,
-            escrow: old.escrow,
+            // escrow: old.escrow,
             is_open: old.is_open,
         };
         drop(old);
         self.set(new);
     }
 
-    fn set_escrow(&mut self, escrow: Escrow) {
-        let old = self.read();
-        let new = MinerToolbarState {
-            status: old.status,
-            status_message: old.status_message,
-            display_hash: old.display_hash,
-            escrow,
-            is_open: old.is_open,
-        };
-        drop(old);
-        self.set(new);
-    }
+    // fn set_escrow(&mut self, escrow: Escrow) {
+    //     let old = self.read();
+    //     let new = MinerToolbarState {
+    //         status: old.status,
+    //         status_message: old.status_message,
+    //         display_hash: old.display_hash,
+    //         // escrow,
+    //         is_open: old.is_open,
+    //     };
+    //     drop(old);
+    //     self.set(new);
+    // }
 }
