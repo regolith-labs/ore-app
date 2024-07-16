@@ -8,10 +8,7 @@ use ore_api::{
     consts::{BUS_ADDRESSES, CONFIG_ADDRESS, TREASURY_ADDRESS},
     state::{Bus, Config, Proof, Treasury},
 };
-use ore_relayer_api::{
-    consts::ESCROW,
-    state::{Escrow, Relayer},
-};
+use ore_relayer_api::{consts::ESCROW, state::Escrow};
 use ore_types::{response::ListTransfersResponse, Transfer};
 use ore_utils::AccountDeserialize;
 pub use pubkey::*;
@@ -41,8 +38,6 @@ use solana_extra_wasm::{
     transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding},
 };
 use web_time::Duration;
-
-use crate::hooks::use_wallet_adapter::RELAYER_PUBKEY;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
@@ -87,25 +82,6 @@ impl Gateway {
         Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
     }
 
-    // pub async fn _get_bus(&self, id: usize) -> GatewayResult<Bus> {
-    //     let bus_address = BUS_ADDRESSES.get(id).unwrap();
-    //     let data = self
-    //         .rpc
-    //         .get_account_data(bus_address)
-    //         .await
-    //         .map_err(GatewayError::from)?;
-    //     Ok(*Bus::try_from_bytes(&data).expect("Failed to parse bus"))
-    // }
-
-    // pub async fn _get_treasury(&self) -> GatewayResult<Treasury> {
-    //     let data = self
-    //         .rpc
-    //         .get_account_data(&TREASURY_ADDRESS)
-    //         .await
-    //         .map_err(GatewayError::from)?;
-    //     Ok(*Treasury::try_from_bytes(&data).expect("Failed to parse treasury account"))
-    // }
-
     pub async fn get_config(&self) -> GatewayResult<Config> {
         let data = self
             .rpc
@@ -116,11 +92,8 @@ impl Gateway {
     }
 
     pub async fn get_escrow(&self, authority: Pubkey) -> GatewayResult<Escrow> {
-        let escrow_pubkey = Pubkey::find_program_address(
-            &[ESCROW, authority.as_ref(), RELAYER_PUBKEY.as_ref()],
-            &ore_relayer_api::id(),
-        )
-        .0;
+        let escrow_pubkey =
+            Pubkey::find_program_address(&[ESCROW, authority.as_ref()], &ore_relayer_api::id()).0;
         let data = self
             .rpc
             .get_account_data(&escrow_pubkey)
@@ -129,245 +102,101 @@ impl Gateway {
         Ok(*Escrow::try_from_bytes(&data).expect("Failed to parse escrow account"))
     }
 
-    pub async fn get_relayer(&self, pubkey: Pubkey) -> GatewayResult<Relayer> {
-        let data = self
-            .rpc
-            .get_account_data(&pubkey)
+    pub async fn get_token_account(
+        &self,
+        pubkey: &Pubkey,
+    ) -> GatewayResult<Option<UiTokenAccount>> {
+        self.rpc
+            .get_token_account(pubkey)
             .await
-            .map_err(GatewayError::from)?;
-        Ok(*Relayer::try_from_bytes(&data).expect("Failed to parse relayer account"))
+            .map_err(GatewayError::from)
     }
 
-    // pub async fn _get_token_account(
-    //     &self,
-    //     pubkey: &Pubkey,
-    // ) -> GatewayResult<Option<UiTokenAccount>> {
-    //     self.rpc
-    //         .get_token_account(pubkey)
-    //         .await
-    //         .map_err(GatewayError::from)
-    // }
+    pub async fn send_via_relayer(
+        &self,
+        ixs: &[Instruction],
+        skip_confirm: bool,
+    ) -> GatewayResult<Signature> {
+        Ok(Signature::new_unique())
+        // let mut tx = Transaction::new_with_payer(ixs, Some(&ore_relayer_api::consts::MINER_PUBKEY));
+        // let client = reqwest::Client::new();
+        // let mut attempts = 0;
+        // loop {
+        //     log::info!("Attempt: {:?}", attempts);
+        //     match client
+        //         .post("http://api.ore.supply/relay")
+        //         .body(tx)
+        //         .send()
+        //         .await
+        //     {
+        //         Ok(res) => {
+        //             // Parse sig
+        //             let sig: Signature = res.json().await.unwrap();
 
-    // pub async fn send_and_confirm(
-    //     &self,
-    //     ixs: &[Instruction],
-    //     _dynamic_cus: bool,
-    //     skip_confirm: bool,
-    // ) -> GatewayResult<Signature> {
-    //     let signer = signer();
-    //     let (hash, slot) = self
-    //         .rpc
-    //         .get_latest_blockhash_with_commitment(CommitmentConfig::confirmed())
-    //         .await
-    //         .map_err(GatewayError::from)?;
-    //     let send_cfg = RpcSendTransactionConfig {
-    //         skip_preflight: true,
-    //         preflight_commitment: Some(CommitmentLevel::Confirmed),
-    //         encoding: Some(UiTransactionEncoding::Base64),
-    //         max_retries: Some(RPC_RETRIES),
-    //         min_context_slot: Some(slot),
-    //     };
+        //             // Confirm tx
+        //             if skip_confirm {
+        //                 return Ok(sig);
+        //             }
+        //             let confirmed = self.confirm_signature(sig).await;
+        //             if confirmed.is_ok() {
+        //                 return confirmed;
+        //             }
+        //         }
+        //         Err(_) => {
+        //             // TODO
+        //         }
+        //     }
 
-    //     // Build tx
-    //     let mut tx = Transaction::new_with_payer(ixs, Some(&signer.pubkey()));
+        //     // Retry
+        //     async_std::task::sleep(Duration::from_millis(2000)).await;
+        //     attempts += 1;
+        //     if attempts > GATEWAY_RETRIES {
+        //         return Err(GatewayError::TransactionTimeout);
+        //     }
+        // }
+    }
 
-    //     // Simulate tx, if necessary
-    //     // let mut sim_attempts = 0;
-    //     // 'simulate: loop {
-    //     //     let sim_res = self
-    //     //         .rpc
-    //     //         .simulate_transaction_with_config(
-    //     //             &tx,
-    //     //             RpcSimulateTransactionConfig {
-    //     //                 sig_verify: false,
-    //     //                 replace_recent_blockhash: true,
-    //     //                 commitment: Some(CommitmentConfig::confirmed()),
-    //     //                 encoding: Some(UiTransactionEncoding::Base64),
-    //     //                 accounts: None,
-    //     //                 min_context_slot: Some(slot),
-    //     //             },
-    //     //         )
-    //     //         .await;
-    //     //     match sim_res {
-    //     //         Ok(sim_res) => {
-    //     //             if let Some(err) = sim_res.err {
-    //     //                 println!("Simulaton error: {:?}", err);
-    //     //                 sim_attempts += 1;
-    //     //             } else if let Some(units_consumed) = sim_res.units_consumed {
-    //     //                 if dynamic_cus {
-    //     //                     println!("Dynamic CUs: {:?}", units_consumed);
-    //     //                     let cu_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(
-    //     //                         units_consumed as u32 + 1000,
-    //     //                     );
-    //     //                     let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(
-    //     //                         DEFAULT_PRIORITY_FEE,
-    //     //                     );
-    //     //                     let mut final_ixs = vec![];
-    //     //                     final_ixs.extend_from_slice(&[cu_budget_ix, cu_price_ix]);
-    //     //                     final_ixs.extend_from_slice(&ixs);
-    //     //                     tx = Transaction::new_with_payer(&final_ixs, Some(&signer.pubkey()));
-    //     //                 }
-    //     //                 break 'simulate;
-    //     //             }
-    //     //         }
-    //     //         Err(err) => {
-    //     //             println!("Simulaton error: {:?}", err);
-    //     //             sim_attempts += 1;
-    //     //         }
-    //     //     }
+    async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
+        // Confirm tx
+        for _ in 0..CONFIRM_RETRIES {
+            // Delay before confirming
+            async_std::task::sleep(Duration::from_millis(2000)).await;
 
-    //     //     // Return if sim attempts exceeded
-    //     //     if sim_attempts.gt(&SIMULATION_RETRIES) {
-    //     //         return Err(GatewayError::SimulationFailed);
-    //     //     }
-    //     // }
+            // Fetch transaction status
+            match self.rpc.get_signature_statuses(&[sig]).await {
+                Ok(signature_statuses) => {
+                    for signature_status in signature_statuses {
+                        if let Some(signature_status) = signature_status.as_ref() {
+                            if signature_status.confirmation_status.is_some() {
+                                if let Some(current_commitment) =
+                                    signature_status.confirmation_status.as_ref()
+                                {
+                                    log::info!("Commitment: {:?}", current_commitment);
+                                    match current_commitment {
+                                        TransactionConfirmationStatus::Processed => {}
+                                        TransactionConfirmationStatus::Confirmed
+                                        | TransactionConfirmationStatus::Finalized => {
+                                            log::info!("Confirmed: true");
+                                            return Ok(sig);
+                                        }
+                                    }
+                                }
+                            } else {
+                                log::info!("No status");
+                            }
+                        }
+                    }
+                }
 
-    //     // Submit tx
-    //     tx.sign(&[&signer], hash);
-    //     let mut attempts = 0;
-    //     loop {
-    //         log::info!("Attempt: {:?}", attempts);
-    //         match self.rpc.send_transaction_with_config(&tx, send_cfg).await {
-    //             Ok(sig) => {
-    //                 log::info!("{:?}", sig);
+                // Handle confirmation errors
+                Err(err) => {
+                    log::error!("Error confirming: {:?}", err);
+                }
+            }
+        }
 
-    //                 // Confirm tx
-    //                 if skip_confirm {
-    //                     return Ok(sig);
-    //                 }
-
-    //                 // Confirm tx
-    //                 for _ in 0..CONFIRM_RETRIES {
-    //                     // Delay before confirming
-    //                     async_std::task::sleep(Duration::from_millis(2000)).await;
-
-    //                     // Fetch transaction status
-    //                     match self.rpc.get_signature_statuses(&[sig]).await {
-    //                         Ok(signature_statuses) => {
-    //                             for signature_status in signature_statuses {
-    //                                 if let Some(signature_status) = signature_status.as_ref() {
-    //                                     if signature_status.confirmation_status.is_some() {
-    //                                         if let Some(current_commitment) =
-    //                                             signature_status.confirmation_status.as_ref()
-    //                                         {
-    //                                             log::info!("Commitment: {:?}", current_commitment);
-    //                                             match current_commitment {
-    //                                                 TransactionConfirmationStatus::Processed => {}
-    //                                                 TransactionConfirmationStatus::Confirmed
-    //                                                 | TransactionConfirmationStatus::Finalized => {
-    //                                                     log::info!("Confirmed: true");
-    //                                                     return Ok(sig);
-    //                                                 }
-    //                                             }
-    //                                         }
-    //                                     } else {
-    //                                         log::info!("No status");
-    //                                     }
-    //                                 }
-    //                             }
-    //                         }
-
-    //                         // Handle confirmation errors
-    //                         Err(err) => {
-    //                             log::error!("Error confirming: {:?}", err);
-    //                         }
-    //                     }
-    //                 }
-
-    //                 // Failed to confirm tx
-    //                 log::info!("Confirmed: false");
-    //             }
-
-    //             // Handle submit errors
-    //             Err(err) => {
-    //                 log::error!("Error {:?}", err);
-    //             }
-    //         }
-
-    //         // Retry
-    //         async_std::task::sleep(Duration::from_millis(2000)).await;
-    //         attempts += 1;
-    //         if attempts > GATEWAY_RETRIES {
-    //             return Err(GatewayError::TransactionTimeout);
-    //         }
-    //     }
-    // }
-
-    // Ore
-    // pub async fn open_ore(&self) -> GatewayResult<()> {
-    //     // Return early, if account is already initialized
-    //     let signer = signer();
-    //     let proof_address = proof_pubkey(signer.pubkey());
-    //     if self.rpc.get_account(&proof_address).await.is_ok() {
-    //         return Ok(());
-    //     }
-
-    //     // Sign and send transaction.
-    //     let ix = ore_api::instruction::open(signer.pubkey(), signer.pubkey());
-    //     match self.send_and_confirm(&[ix], true, false).await {
-    //         Ok(_) => Ok(()),
-    //         Err(_) => Err(GatewayError::FailedRegister),
-    //     }
-    // }
-
-    // pub async fn claim_ore(&self, amount: u64, priority_fee: u64) -> GatewayResult<Signature> {
-    //     let signer = signer();
-    //     let beneficiary = ore_token_account_address(signer.pubkey());
-    //     let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_CLAIM);
-    //     let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-    //     let ix = ore_api::instruction::claim(signer.pubkey(), beneficiary, amount);
-    //     self.send_and_confirm(&[cu_limit_ix, cu_price_ix, ix], false, false)
-    //         .await
-    // }
-
-    // pub async fn transfer_ore(
-    //     &self,
-    //     amount: u64,
-    //     to: Pubkey,
-    //     memo: String,
-    // ) -> GatewayResult<Signature> {
-    //     // Create recipient token account, if necessary
-    //     self.create_token_account_ore(to).await?;
-
-    //     // Submit transfer ix
-    //     let signer = signer();
-    //     let from_token_account = ore_token_account_address(signer.pubkey());
-    //     let to_token_account = ore_token_account_address(to);
-    //     let memo_ix = spl_memo::build_memo(&memo.into_bytes(), &[&signer.pubkey()]);
-    //     let transfer_ix = spl_token::instruction::transfer(
-    //         &spl_token::ID,
-    //         &from_token_account,
-    //         &to_token_account,
-    //         &signer.pubkey(),
-    //         &[&signer.pubkey()],
-    //         amount,
-    //     )
-    //     .unwrap();
-    //     self.send_and_confirm(&[memo_ix, transfer_ix], true, false)
-    //         .await
-    // }
-
-    // async fn _upgrade_ore(&self, amount: u64) -> GatewayResult<Signature> {
-    //     let signer = signer();
-    //     let v2_token_account = self.create_token_account_ore(signer.pubkey()).await?;
-    //     let v1_token_account = self._get_token_account_ore_v1().await?;
-    //     let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_UPGRADE);
-    //     let ix = ore_api::instruction::upgrade(
-    //         signer.pubkey(),
-    //         v2_token_account,
-    //         v1_token_account,
-    //         amount,
-    //     );
-    //     self.send_and_confirm(&[cu_limit_ix, ix], false, false)
-    //         .await
-    // }
-
-    // asserts that the token account is already initialized
-    // async fn _get_token_account_ore_v1(&self) -> GatewayResult<Pubkey> {
-    //     let signer = signer();
-    //     self.get_token_account_ore_from_pubkey_v1(signer.pubkey())
-    //         .await
-    // }
+        return Err(GatewayError::TransactionTimeout);
+    }
 
     // asserts that the token account is already initialized
     pub async fn get_token_account_ore_from_pubkey_v1(
@@ -397,51 +226,6 @@ impl Gateway {
                 maybe_some_token_account.ok_or(GatewayError::FailedAta)
             })
             .map(|_| ata)
-    }
-
-    pub async fn create_token_account_ore(&self, owner: Pubkey) -> GatewayResult<Pubkey> {
-        // Build instructions.
-        // let signer = signer();
-
-        // Check if account already exists.
-        // let token_account_address = ore_token_account_address(owner);
-        // match self
-        //     .rpc
-        //     .get_token_account(&token_account_address)
-        //     .await
-        //     .map_err(GatewayError::from)
-        // {
-        //     Ok(token_account) => {
-        //         if token_account.is_some() {
-        //             return Ok(token_account_address);
-        //         }
-        //     }
-        //     Err(err) => {
-        //         match err {
-        //             GatewayError::AccountNotFound => {
-        //                 // Noop, continue on to account creation
-        //                 log::info!("Token account not found")
-        //             }
-        //             _ => return Err(err),
-        //         }
-        //     }
-        // }
-
-        // Sign and send transaction.
-        // let ix = create_associated_token_account(
-        //     &signer.pubkey(),
-        //     &owner,
-        //     &ore_api::consts::MINT_ADDRESS,
-        //     &spl_token::id(),
-        // );
-        // match self.send_and_confirm(&[ix], true, false).await {
-        //     Ok(_) => {}
-        //     Err(_) => return Err(GatewayError::FailedAta),
-        // }
-
-        // Return token account address
-        // Ok(token_account_address)
-        Ok(owner)
     }
 
     // API
@@ -484,16 +268,6 @@ impl Gateway {
         }
     }
 }
-
-// pub fn signer() -> Keypair {
-//     let key = "keypair";
-//     let value = LocalStorage::get(key).ok().unwrap_or_else(|| {
-//         let x = Keypair::new().to_base58_string();
-//         LocalStorage::set(key, &x).ok();
-//         x
-//     });
-//     Keypair::from_base58_string(&value)
-// }
 
 #[cached]
 pub fn ore_token_account_address(pubkey: Pubkey) -> Pubkey {

@@ -212,6 +212,7 @@ pub fn CheckCircleIcon(class: Option<String>) -> Element {
     rsx! {
         svg {
             view_box: "0 0 24 24",
+            fill: "none",
             stroke: "currentColor",
             stroke_width: "1.5",
             class: "{class}",

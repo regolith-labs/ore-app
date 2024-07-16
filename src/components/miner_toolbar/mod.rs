@@ -20,7 +20,7 @@ use dioxus::prelude::*;
 
 use crate::hooks::{
     use_gateway, use_miner, use_miner_toolbar_state,
-    use_wallet_adapter::{use_wallet_adapter, WalletAdapter, RELAYER_PUBKEY},
+    use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
     MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
 };
 
@@ -38,12 +38,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
                 WalletAdapter::Disconnected => {}
                 WalletAdapter::Connected(pubkey) => {
                     if let Ok(escrow) = gateway.get_escrow(pubkey).await {
-                        let escrow_address = Pubkey::find_program_address(
-                            &[ESCROW, pubkey.as_ref(), RELAYER_PUBKEY.as_ref()],
-                            &ore_relayer_api::id(),
-                        )
-                        .0;
-                        toolbar_state.set_escrow_address(escrow_address);
+                        toolbar_state.set_escrow(escrow);
                     }
                 }
             }

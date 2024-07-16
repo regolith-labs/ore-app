@@ -1,27 +1,29 @@
 use dioxus::prelude::*;
 use gloo::net::websocket::Message;
-use ore_relayer_api::state::Relayer;
+use miner_toolbar::try_start_mining;
 use solana_client_wasm::solana_sdk::{
     compute_budget::ComputeBudgetInstruction, hash::Hash, pubkey::Pubkey, transaction::Transaction,
 };
 use wallet_adapter::InvokeSignature;
 
 use crate::{
-    components::{wallet_adapter, Copyable},
+    components::{miner_toolbar, wallet_adapter, Copyable},
     hooks::{
         use_gateway, use_is_onboarded, use_miner_toolbar_state, use_pubkey, use_sol_balance,
-        use_wallet_adapter::{
-            use_wallet_adapter, InvokeSignatureStatus, WalletAdapter, RELAYER_PUBKEY,
-        },
-        IsOnboarded, ReadMinerToolbarState,
+        use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
+        IsOnboarded, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
+    miner::Miner,
 };
 
-pub fn MinerToolbarInsufficientFunds() -> Element {
+#[component]
+pub fn MinerToolbarInsufficientFunds(miner: Signal<Miner>) -> Element {
     let toolbar_state = use_miner_toolbar_state();
     rsx! {
         if toolbar_state.is_open() {
-            MinerToolbarOpenAccount {}
+            MinerToolbarOpenAccount {
+                miner
+            }
         } else {
             div {
                 class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
@@ -34,30 +36,31 @@ pub fn MinerToolbarInsufficientFunds() -> Element {
     }
 }
 
-pub fn MinerToolbarOpenAccount() -> Element {
+#[component]
+pub fn MinerToolbarOpenAccount(miner: Signal<Miner>) -> Element {
     let wallet_adapter = use_wallet_adapter();
-    let gateway = use_gateway();
+    let mut toolbar_state = use_miner_toolbar_state();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
-    let tx = use_resource(move || {
-        let gateway = gateway.clone();
-        async move {
-            if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
-                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
-                let relayer = gateway.get_relayer(RELAYER_PUBKEY).await.unwrap();
-                let ix = ore_relayer_api::instruction::open_escrow(signer, relayer, signer);
-                let ixs = vec![cu_limit_ix, ix];
-                let mut tx = Transaction::new_with_payer(&ixs, Some(&signer));
-                tx.message.recent_blockhash = gateway.rpc.get_latest_blockhash().await.unwrap();
-                Some(tx)
-            } else {
-                None
-            }
+
+    let tx = use_resource(move || async move {
+        if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
+            let gateway = use_gateway();
+            let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
+            let ix = ore_relayer_api::instruction::open_escrow(signer, signer);
+            let ixs = vec![cu_limit_ix, ix];
+            let mut tx = Transaction::new_with_payer(&ixs, Some(&signer));
+            tx.message.recent_blockhash = gateway.rpc.get_latest_blockhash().await.unwrap();
+            Some(tx)
+        } else {
+            None
         }
     });
 
-    // if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
-    //     // upgrade_step.set(UpgradeStep::Done(sig));
-    // };
+    use_future(move || async move {
+        if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+            try_start_mining(miner, &mut toolbar_state).await;
+        };
+    });
 
     rsx! {
         div {

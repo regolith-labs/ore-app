@@ -3,7 +3,6 @@ use std::rc::Rc;
 use base64::Engine;
 use dioxus::prelude::*;
 use ore_api::consts::{TOKEN_DECIMALS, TOKEN_DECIMALS_V1};
-use ore_relayer_api::state::Relayer;
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_client_wasm::solana_sdk::signature::Signature;
 use solana_client_wasm::solana_sdk::{
@@ -167,16 +166,13 @@ pub enum WalletAdapter {
     Disconnected,
 }
 
-pub const RELAYER_PUBKEY: Pubkey = pubkey!("64PCKXyXMUwuVAttAvK7NCUmiFrzopiAsgjpnnSqk6jd");
-
 impl WalletAdapter {
     pub async fn build_open_tx(&self, gateway: Rc<Gateway>) -> GatewayResult<Transaction> {
         match *self {
             WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
             WalletAdapter::Connected(signer) => {
-                let relayer = gateway.get_relayer(RELAYER_PUBKEY).await?;
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
-                let ix = ore_relayer_api::instruction::open_escrow(signer, relayer, signer);
+                let ix = ore_relayer_api::instruction::open_escrow(signer, signer);
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
                 let ixs = vec![cu_limit_ix, ix];
                 let msg = Message::new_with_blockhash(ixs.as_slice(), Some(&signer), &blockhash);
