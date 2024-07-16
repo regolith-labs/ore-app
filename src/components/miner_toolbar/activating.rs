@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use ore_relayer_api::consts::ESCROW;
+use ore_relayer_api::{consts::ESCROW, state::Escrow};
 use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pubkey};
 
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
     gateway,
     hooks::{
         use_gateway, use_miner_toolbar_state, use_sol_balance,
-        use_wallet_adapter::{use_wallet_adapter, WalletAdapter, RELAYER_PUBKEY},
+        use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
         MinerStatus, MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     miner::Miner,
@@ -23,35 +23,26 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
 
     // TODO Start mining if the escrow account exists
-    use_resource(move || {
-        let gateway = gateway.clone();
-        async move {
-            if toolbar_state
-                .read()
-                .escrow_address
-                .ne(&Pubkey::new_from_array([0; 32]))
-            {
-                match try_start_mining(gateway, miner, &mut toolbar_state).await {
-                    Ok(()) => {
-                        toolbar_state.set_status(MinerStatus::Active);
-                    }
-                    Err(err) => {
-                        log::error!("Failed to start mining: {:?}", err);
-                        toolbar_state.set_status(MinerStatus::Error);
-                        toolbar_state.set_status_message(MinerStatusMessage::Error);
-                    }
+    use_resource(move || async move {
+        if toolbar_state.escrow().ne(&Escrow::default()) {
+            match try_start_mining(miner, &mut toolbar_state).await {
+                Ok(()) => {
+                    toolbar_state.set_status(MinerStatus::Active);
+                }
+                Err(err) => {
+                    log::error!("Failed to start mining: {:?}", err);
+                    toolbar_state.set_status(MinerStatus::Error);
+                    toolbar_state.set_status_message(MinerStatusMessage::Error);
                 }
             }
         }
     });
 
-    if toolbar_state
-        .read()
-        .escrow_address
-        .eq(&Pubkey::new_from_array([0; 32]))
-    {
+    if toolbar_state.escrow().eq(&Escrow::default()) {
         return rsx! {
-            MinerToolbarInsufficientFunds {}
+            MinerToolbarInsufficientFunds {
+                miner: miner.clone()
+            }
         };
     }
 
@@ -63,18 +54,16 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
                     class: "text-3xl md:text-4xl lg:text-5xl font-bold",
                     "Starting"
                 }
-                // if let MinerStatusMessage::GeneratingChallenge = toolbar_state.status_message() {
-                    div {
-                        class: "flex flex-row gap-2",
-                        p {
-                            class: "text-lg",
-                            "Initializing miner..."
-                        }
-                        Spinner {
-                            class: "my-auto text-white"
-                        }
+                div {
+                    class: "flex flex-row gap-2",
+                    p {
+                        class: "text-lg",
+                        "Preparing to mine..."
                     }
-                // }
+                    Spinner {
+                        class: "my-auto text-white"
+                    }
+                }
             }
         } else {
             div {

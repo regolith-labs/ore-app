@@ -9,7 +9,7 @@ pub fn MinerToolbarError() -> Element {
     let miner_state = use_miner_toolbar_state();
     if miner_state.is_open() {
         rsx! {
-            MinerToolbarInsufficientFunds {}
+            // MinerToolbarInsufficientFunds {}
         }
     } else {
         rsx! {

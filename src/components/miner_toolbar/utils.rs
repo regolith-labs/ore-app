@@ -1,13 +1,14 @@
 use std::rc::Rc;
 
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::signer::Signer;
+use ore_relayer_api::consts::ESCROW;
+use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signer::Signer};
 
 use crate::{
     gateway::{Gateway, GatewayResult},
     hooks::{
-        use_wallet_adapter::WalletAdapter, MinerStatusMessage, MinerToolbarState,
-        UpdateMinerToolbarState,
+        use_gateway, use_wallet_adapter::WalletAdapter, MinerStatusMessage, MinerToolbarState,
+        ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     miner::Miner,
 };
@@ -15,11 +16,15 @@ use crate::{
 // TODO Move this somewhere
 
 pub async fn try_start_mining(
-    gateway: Rc<Gateway>,
     miner: Signal<Miner>,
     toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<()> {
-    let authority = toolbar_state.read().escrow_address;
+    let gateway = use_gateway();
+    let authority = Pubkey::find_program_address(
+        &[ESCROW, toolbar_state.escrow().authority.as_ref()],
+        &ore_relayer_api::id(),
+    )
+    .0;
     if let Ok(proof) = gateway.get_proof(authority).await {
         if let Ok(clock) = gateway.get_clock().await {
             let cutoff_time = proof

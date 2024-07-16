@@ -23,7 +23,7 @@ use web_sys::{window, Worker};
 use crate::{
     gateway::{Gateway, GatewayResult, CU_LIMIT_MINE},
     hooks::{
-        MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
+        use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
         ReadMinerToolbarState, UpdateMinerToolbarState,
     },
 };
@@ -126,7 +126,7 @@ impl Miner {
         let priority_fee = self.priority_fee.read().0;
 
         // Submit solution
-        match submit_solution(&gateway, best_solution, priority_fee).await {
+        match submit_solution(best_solution, priority_fee).await {
             // Start mining again
             Ok(_sig) => {
                 proof.restart();
@@ -155,34 +155,31 @@ impl Miner {
     }
 }
 
-pub async fn submit_solution(
-    gateway: &Rc<Gateway>,
-    solution: Solution,
-    priority_fee: u64,
-) -> GatewayResult<Signature> {
-    // let signer = signer();
+pub async fn submit_solution(solution: Solution, priority_fee: u64) -> GatewayResult<Signature> {
     // Build ixs
-    // let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
-    // let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
-    // let mut ixs = vec![cu_limit_ix, cu_price_ix];
+    let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(CU_LIMIT_MINE);
+    let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+    let mut ixs = vec![cu_limit_ix, cu_price_ix];
 
     // Reset if needed
-    // if needs_reset(gateway).await {
-    //     ixs.push(ore_api::instruction::reset(signer.pubkey()));
-    // }
+    let gateway = use_gateway();
+    if needs_reset(&gateway).await {
+        ixs.push(ore_api::instruction::reset(
+            ore_relayer_api::consts::MINER_PUBKEY,
+        ));
+    }
 
     // Build mine tx
-    // let bus_id = pick_bus();
-    // let ix = ore_api::instruction::mine(
-    //     signer.pubkey(),
-    //     ore_api::consts::BUS_ADDRESSES[bus_id],
-    //     solution,
-    // );
-    // ixs.push(ix);
+    let bus_id = pick_bus();
+    let ix = ore_api::instruction::mine(
+        ore_relayer_api::consts::MINER_PUBKEY,
+        ore_api::consts::BUS_ADDRESSES[bus_id],
+        solution,
+    );
+    ixs.push(ix);
 
     // Send and configm
-    // gateway.send_and_confirm(&ixs, false, false).await
-    Ok(Signature::default())
+    gateway.send_via_relayer(&ixs, false).await
 }
 
 async fn needs_reset(gateway: &Rc<Gateway>) -> bool {
