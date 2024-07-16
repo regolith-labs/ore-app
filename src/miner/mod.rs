@@ -6,6 +6,7 @@ use dioxus::prelude::*;
 use dioxus_sdk::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
+use ore_relayer_api::consts::ESCROW;
 use rand::Rng;
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signature::Signature};
@@ -119,12 +120,14 @@ impl Miner {
         let priority_fee = self.priority_fee.read().0;
 
         // Submit solution
-        let pubkey = toolbar_state.escrow().authority;
-        match submit_solution(pubkey, best_solution, priority_fee).await {
+        let authority = toolbar_state.escrow().authority;
+        let escrow_pubkey =
+            Pubkey::find_program_address(&[ESCROW, authority.as_ref()], &ore_relayer_api::id()).0;
+        match submit_solution(authority, best_solution, priority_fee).await {
             // Start mining again
             Ok(_sig) => {
                 if let MinerStatus::Active = toolbar_state.status() {
-                    if let Ok(proof) = gateway.get_proof(pubkey).await {
+                    if let Ok(proof) = gateway.get_proof(escrow_pubkey).await {
                         if let Ok(clock) = gateway.get_clock().await {
                             toolbar_state.set_status_message(MinerStatusMessage::Searching);
                             let cutoff_time = proof
@@ -134,7 +137,11 @@ impl Miner {
                                 .max(0) as u64;
                             self.start_mining(proof.challenge.into(), 0, cutoff_time)
                                 .await;
+                        } else {
+                            log::error!("Failed to get clock");
                         }
+                    } else {
+                        log::error!("Failed to get proof");
                     }
                 }
             }
