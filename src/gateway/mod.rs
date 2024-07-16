@@ -1,47 +1,31 @@
 mod error;
 mod pubkey;
 
+use std::str::FromStr;
+
 use cached::proc_macro::cached;
 pub use error::*;
-use gloo_storage::{LocalStorage, Storage};
 use ore_api::{
-    consts::{BUS_ADDRESSES, CONFIG_ADDRESS, TREASURY_ADDRESS},
-    state::{Bus, Config, Proof, Treasury},
+    consts::CONFIG_ADDRESS,
+    state::{Config, Proof},
 };
 use ore_relayer_api::{consts::ESCROW, state::Escrow};
 use ore_types::{response::ListTransfersResponse, Transfer};
 use ore_utils::AccountDeserialize;
 pub use pubkey::*;
 use solana_client_wasm::{
-    solana_sdk::{
-        clock::Clock,
-        commitment_config::{CommitmentConfig, CommitmentLevel},
-        compute_budget::ComputeBudgetInstruction,
-        instruction::Instruction,
-        pubkey::Pubkey,
-        signature::{Keypair, Signature},
-        signer::Signer,
-        sysvar,
-        transaction::Transaction,
-    },
-    utils::rpc_config::RpcSendTransactionConfig,
+    solana_sdk::{clock::Clock, pubkey::Pubkey, signature::Signature, sysvar},
     WasmClient,
 };
 use solana_extra_wasm::{
     account_decoder::parse_token::UiTokenAccount,
-    program::{
-        spl_associated_token_account::{
-            get_associated_token_address, instruction::create_associated_token_account,
-        },
-        spl_memo, spl_token,
-    },
-    transaction_status::{TransactionConfirmationStatus, UiTransactionEncoding},
+    program::spl_associated_token_account::get_associated_token_address,
+    transaction_status::TransactionConfirmationStatus,
 };
 use web_time::Duration;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
-// pub const RPC_URL: &str = "http://localhost:8899";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
@@ -114,46 +98,50 @@ impl Gateway {
 
     pub async fn send_via_relayer(
         &self,
-        ixs: &[Instruction],
-        skip_confirm: bool,
+        pubkey: Pubkey,
+        solution: drillx::Solution,
     ) -> GatewayResult<Signature> {
-        Ok(Signature::new_unique())
-        // let mut tx = Transaction::new_with_payer(ixs, Some(&ore_relayer_api::consts::MINER_PUBKEY));
-        // let client = reqwest::Client::new();
-        // let mut attempts = 0;
-        // loop {
-        //     log::info!("Attempt: {:?}", attempts);
-        //     match client
-        //         .post("http://api.ore.supply/relay")
-        //         .body(tx)
-        //         .send()
-        //         .await
-        //     {
-        //         Ok(res) => {
-        //             // Parse sig
-        //             let sig: Signature = res.json().await.unwrap();
+        let req = ore_types::request::RelayPayload {
+            solution,
+            client_pubkey: pubkey.to_bytes(),
+        };
+        let client = reqwest::Client::new();
+        log::info!("Sending via relayer");
+        let mut attempts = 0;
+        loop {
+            log::info!("Attempt: {:?}", attempts);
+            match client
+                .post(format!("{}/relay", self.api_url))
+                .json(&req)
+                .send()
+                .await
+            {
+                Ok(res) => {
+                    // Parse sig
+                    log::info!("Res: {:?}", res);
+                    let res: ore_types::response::RelayResponse = res.json().await.unwrap();
+                    let sig = Signature::from_str(&res.sig).unwrap();
+                    log::info!("Sig: {:?}", sig);
 
-        //             // Confirm tx
-        //             if skip_confirm {
-        //                 return Ok(sig);
-        //             }
-        //             let confirmed = self.confirm_signature(sig).await;
-        //             if confirmed.is_ok() {
-        //                 return confirmed;
-        //             }
-        //         }
-        //         Err(_) => {
-        //             // TODO
-        //         }
-        //     }
+                    // Confirm tx
+                    let confirmed = self.confirm_signature(sig).await;
+                    if confirmed.is_ok() {
+                        return confirmed;
+                    }
+                }
+                Err(err) => {
+                    // TODO
+                    log::error!("Error relaying tx: {:?}", err);
+                }
+            }
 
-        //     // Retry
-        //     async_std::task::sleep(Duration::from_millis(2000)).await;
-        //     attempts += 1;
-        //     if attempts > GATEWAY_RETRIES {
-        //         return Err(GatewayError::TransactionTimeout);
-        //     }
-        // }
+            // Retry
+            async_std::task::sleep(Duration::from_millis(2000)).await;
+            attempts += 1;
+            if attempts > GATEWAY_RETRIES {
+                return Err(GatewayError::TransactionTimeout);
+            }
+        }
     }
 
     async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {

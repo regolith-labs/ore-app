@@ -4,12 +4,12 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::GatewayResult;
 
-use super::{use_gateway, use_pubkey};
+use super::use_gateway;
 
-pub fn use_proof() -> Resource<GatewayResult<Proof>> {
-    let authority = use_pubkey();
-    use_user_proof(authority)
-}
+// pub fn use_proof() -> Resource<GatewayResult<Proof>> {
+//     let authority = use_pubkey();
+//     use_user_proof(authority)
+// }
 
 pub fn use_user_proof(authority: Pubkey) -> Resource<GatewayResult<Proof>> {
     let gateway = use_gateway();

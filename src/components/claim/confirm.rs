@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{BackButton, OreIcon, Spinner},
-    hooks::{use_gateway, use_ore_balance, use_priority_fee, use_proof, use_pubkey, PriorityFee},
+    hooks::{use_gateway, use_ore_balance, use_priority_fee, PriorityFee},
 };
 
 use super::ClaimStep;
@@ -15,8 +15,8 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
     let mut is_busy = use_signal(|| false);
     let mut priority_fee = use_priority_fee();
     let mut balance = use_ore_balance();
-    let mut proof = use_proof();
-    let pubkey = use_pubkey();
+    // let mut proof = use_proof();
+    // let pubkey = use_pubkey();
     let gateway = use_gateway();
 
     rsx! {

@@ -5,10 +5,10 @@ use ore_relayer_api::consts::ESCROW;
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signer::Signer};
 
 use crate::{
-    gateway::{Gateway, GatewayResult},
+    gateway::GatewayResult,
     hooks::{
-        use_gateway, use_wallet_adapter::WalletAdapter, MinerStatusMessage, MinerToolbarState,
-        ReadMinerToolbarState, UpdateMinerToolbarState,
+        use_gateway, MinerStatusMessage, MinerToolbarState, ReadMinerToolbarState,
+        UpdateMinerToolbarState,
     },
     miner::Miner,
 };
@@ -25,20 +25,19 @@ pub async fn try_start_mining(
         &ore_relayer_api::id(),
     )
     .0;
-    if let Ok(proof) = gateway.get_proof(authority).await {
-        if let Ok(clock) = gateway.get_clock().await {
-            let cutoff_time = proof
-                .last_hash_at
-                .saturating_add(60)
-                .saturating_sub(clock.unix_timestamp)
-                .max(0) as u64;
-            toolbar_state.set_status_message(MinerStatusMessage::Searching);
-            miner
-                .read()
-                .start_mining(proof.challenge.into(), 0, cutoff_time)
-                .await;
-        }
-    }
+
+    let proof = gateway.get_proof(authority).await?;
+    let clock = gateway.get_clock().await?;
+    let cutoff_time = proof
+        .last_hash_at
+        .saturating_add(60)
+        .saturating_sub(clock.unix_timestamp)
+        .max(0) as u64;
+    toolbar_state.set_status_message(MinerStatusMessage::Searching);
+    miner
+        .read()
+        .start_mining(proof.challenge.into(), 0, cutoff_time)
+        .await;
 
     Ok(())
 }

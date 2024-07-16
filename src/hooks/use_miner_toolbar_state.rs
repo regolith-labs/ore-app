@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 use ore_relayer_api::state::Escrow;
-use solana_client_wasm::solana_sdk::{blake3::Hash as Blake3Hash, pubkey::Pubkey};
+use solana_sdk::blake3::Hash as Blake3Hash;
 
 #[derive(Copy, Clone, Debug)]
 pub enum MinerStatus {

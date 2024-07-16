@@ -2,9 +2,9 @@ use dioxus::prelude::*;
 
 use crate::gateway::{GatewayError, GatewayResult};
 
-use super::{use_gateway, use_pubkey};
+use super::use_gateway;
 
-pub fn use_sol_balance() -> Resource<GatewayResult<u64>> {
+pub fn _use_sol_balance() -> Resource<GatewayResult<u64>> {
     let address = use_pubkey();
     let gateway = use_gateway();
     use_resource(move || {

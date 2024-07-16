@@ -99,7 +99,6 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                                 }
                             }
                         }
-                        _ => rsx! {}
                     }
                     match toolbar_state.status_message() {
                         MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
@@ -113,7 +112,7 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                         _ => rsx! {}
                     }
                 }
-                PriorityFeeConfig {}
+                // PriorityFeeConfig {}
                 PowerLevelConfig {}
                 DownloadLink {}
             }
@@ -157,7 +156,6 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                                 }
                             }
                         }
-                        _ => rsx! {}
                     }
                 }
                 div {
