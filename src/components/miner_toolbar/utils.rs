@@ -1,15 +1,10 @@
-use std::rc::Rc;
-
 use dioxus::prelude::*;
 use ore_relayer_api::{consts::ESCROW, state::Escrow};
-use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signer::Signer};
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     gateway::GatewayResult,
-    hooks::{
-        use_gateway, MinerStatusMessage, MinerToolbarState, ReadMinerToolbarState,
-        UpdateMinerToolbarState,
-    },
+    hooks::{use_gateway, MinerStatusMessage, MinerToolbarState, UpdateMinerToolbarState},
     miner::Miner,
 };
 

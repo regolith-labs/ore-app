@@ -7,7 +7,7 @@ pub enum ScreenSize {
 }
 
 pub fn use_screen_size() -> Signal<ScreenSize> {
-    let mut screen_size = use_signal(|| ScreenSize::Desktop);
+    let screen_size = use_signal(|| ScreenSize::Desktop);
 
     // TODO This returns 0.0 but should return the actual width
     // use_future(move || async move {

@@ -1,14 +1,10 @@
 mod web_worker;
 
-use std::rc::Rc;
-
 use dioxus::prelude::*;
 use dioxus_sdk::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
-use ore_api::state::Proof;
 use ore_relayer_api::{consts::ESCROW, state::Escrow};
-use rand::Rng;
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signature::Signature};
 use solana_sdk::blake3::Hash as Blake3Hash;
@@ -16,7 +12,7 @@ use web_sys::{window, Worker};
 pub use web_worker::*;
 
 use crate::{
-    gateway::{self, Gateway, GatewayResult},
+    gateway::GatewayResult,
     hooks::{
         use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
         ReadMinerToolbarState, UpdateMinerToolbarState,
