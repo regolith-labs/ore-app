@@ -1,9 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_sdk::utils::channel::use_channel;
 
-use super::{
-    use_escrow, use_gateway, use_miner_toolbar_state, use_power_level, use_priority_fee, use_proof,
-};
+use super::{use_escrow, use_miner_toolbar_state, use_power_level, use_priority_fee};
 use crate::miner::{Miner, WebWorkerResponse, WEB_WORKERS};
 
 pub fn use_miner() -> Signal<Miner> {

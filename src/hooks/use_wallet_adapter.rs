@@ -145,6 +145,7 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
     };
 }
 
+#[derive(PartialEq)]
 pub enum InvokeSignatureStatus {
     Start,
     Waiting,

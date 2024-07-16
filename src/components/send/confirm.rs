@@ -10,7 +10,7 @@ use solana_extra_wasm::program::{
 use solana_sdk::{compute_budget::ComputeBudgetInstruction, transaction::Transaction};
 
 use crate::{
-    components::{BackButton, InvokeSignature, OreIcon, Spinner},
+    components::{BackButton, InvokeSignature, OreIcon},
     gateway::{self, ore_token_account_address},
     hooks::{
         use_gateway, use_ore_balance,
@@ -148,44 +148,13 @@ pub fn SendConfirm(
             div {
                 class: "flex flex-col mt-auto sm:flex-row gap-2",
                 if let Some(Some(tx)) = tx.cloned() {
-                    InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Create account" }
+                    InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Confirm" }
                 } else {
                     p {
                         class: "font-medium text-center text-sm text-gray-300 hover:underline",
                         "Loading..."
                     }
                 }
-                // button {
-                //     class: "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700",
-                //     disabled: *is_busy.read(),
-                //     onclick: move |_| {
-                //         let gateway = gateway.clone();
-                //         let memo = memo.clone();
-                //         is_busy.set(true);
-                //         spawn(async move {
-                //             // TODO Use wallet adapter
-                //             // match gateway.transfer_ore(amount, recipient, memo).await {
-                //             //     Ok(sig) => {
-                //             //         ore_balance.restart();
-                //             //         is_busy.set(false);
-                //             //         send_step.set(SendStep::Done);
-                //             //     }
-                //             //     Err(err) => {
-                //             //         // TODO Handle error
-                //             //         is_busy.set(false);
-                //             //         log::error!("Failed to send: {:?}", err);
-                //             //     }
-                //             // }
-                //         });
-                //     },
-                //     if *is_busy.read() {
-                //         Spinner {
-                //             class: "mx-auto"
-                //         }
-                //     } else {
-                //         "Confirm"
-                //     }
-                // }
             }
         }
     }
