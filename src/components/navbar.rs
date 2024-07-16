@@ -35,7 +35,7 @@ pub fn Navbar() -> Element {
                         }
                     }
                     div {
-                        class: "flex flex-row gap-4 md:gap-8",
+                        class: "flex flex-row gap-4",
                         SettingsButton {}
                         MountWalletAdapter {}
                     }
