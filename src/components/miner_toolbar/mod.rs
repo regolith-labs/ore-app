@@ -17,7 +17,7 @@ pub use utils::*;
 use dioxus::prelude::*;
 
 use crate::hooks::{
-    use_gateway, use_miner, use_miner_toolbar_state,
+    use_escrow, use_gateway, use_miner, use_miner_toolbar_state,
     use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
     MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
 };
@@ -28,6 +28,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
     let wallet_adapter = use_wallet_adapter();
     let miner = use_miner();
     let gateway = use_gateway();
+    let mut escrow = use_escrow();
 
     let _ = use_resource(move || {
         let gateway = gateway.clone();
@@ -35,8 +36,8 @@ pub fn MinerToolbar(hidden: bool) -> Element {
             match *wallet_adapter.read() {
                 WalletAdapter::Disconnected => {}
                 WalletAdapter::Connected(pubkey) => {
-                    if let Ok(escrow) = gateway.get_escrow(pubkey).await {
-                        toolbar_state.set_escrow(escrow);
+                    if let Ok(e) = gateway.get_escrow(pubkey).await {
+                        escrow.set(e);
                     }
                 }
             }

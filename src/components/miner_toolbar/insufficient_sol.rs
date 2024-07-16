@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::{miner_toolbar::try_start_mining, wallet_adapter::InvokeSignature},
     hooks::{
-        use_miner_toolbar_state,
+        use_escrow, use_miner_toolbar_state,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus},
         ReadMinerToolbarState,
     },
@@ -36,10 +36,11 @@ pub fn MinerToolbarOpenAccount(miner: Signal<Miner>) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
     let tx = use_resource(move || async move { wallet_adapter.read().build_open_tx().await });
+    let escrow = use_escrow();
 
     use_future(move || async move {
         if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
-            let _ = try_start_mining(miner, &mut toolbar_state).await;
+            let _ = try_start_mining(miner, escrow, &mut toolbar_state).await;
         };
     });
 

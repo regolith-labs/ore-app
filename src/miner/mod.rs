@@ -6,7 +6,8 @@ use dioxus::prelude::*;
 use dioxus_sdk::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
-use ore_relayer_api::consts::ESCROW;
+use ore_api::state::Proof;
+use ore_relayer_api::{consts::ESCROW, state::Escrow};
 use rand::Rng;
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signature::Signature};
@@ -15,7 +16,7 @@ use web_sys::{window, Worker};
 pub use web_worker::*;
 
 use crate::{
-    gateway::{Gateway, GatewayResult},
+    gateway::{self, Gateway, GatewayResult},
     hooks::{
         use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
         ReadMinerToolbarState, UpdateMinerToolbarState,
@@ -88,11 +89,12 @@ impl Miner {
         &self,
         messages: &Vec<WebWorkerResponse>,
         toolbar_state: &mut Signal<MinerToolbarState>,
-        gateway: Rc<Gateway>,
+        escrow: &mut Signal<Escrow>,
     ) {
         log::info!("Batch: {:?}", messages);
 
         // Get best solution
+        let gateway = use_gateway();
         let mut challenge = [0; 32];
         let mut offset = 0;
         let mut best_difficulty = 0;
@@ -120,28 +122,32 @@ impl Miner {
         let priority_fee = self.priority_fee.read().0;
 
         // Submit solution
-        let authority = toolbar_state.escrow().authority;
+        let authority = escrow.read().authority;
         let escrow_pubkey =
             Pubkey::find_program_address(&[ESCROW, authority.as_ref()], &ore_relayer_api::id()).0;
         match submit_solution(authority, best_solution, priority_fee).await {
             // Start mining again
             Ok(_sig) => {
                 if let MinerStatus::Active = toolbar_state.status() {
-                    if let Ok(proof) = gateway.get_proof(escrow_pubkey).await {
-                        if let Ok(clock) = gateway.get_clock().await {
-                            toolbar_state.set_status_message(MinerStatusMessage::Searching);
-                            let cutoff_time = proof
-                                .last_hash_at
-                                .saturating_add(60)
-                                .saturating_sub(clock.unix_timestamp)
-                                .max(0) as u64;
-                            self.start_mining(proof.challenge.into(), 0, cutoff_time)
-                                .await;
+                    if let Ok(new_escrow) = gateway.get_escrow(authority).await {
+                        escrow.set(new_escrow);
+                        if let Ok(proof) = gateway.get_proof(escrow_pubkey).await {
+                            if let Ok(clock) = gateway.get_clock().await {
+                                toolbar_state.set_status_message(MinerStatusMessage::Searching);
+                                let cutoff_time = proof
+                                    .last_hash_at
+                                    .saturating_add(60)
+                                    .saturating_sub(clock.unix_timestamp)
+                                    .max(0)
+                                    as u64;
+                                self.start_mining(proof.challenge.into(), 0, cutoff_time)
+                                    .await;
+                            } else {
+                                log::error!("Failed to get clock");
+                            }
                         } else {
-                            log::error!("Failed to get clock");
+                            log::error!("Failed to get proof");
                         }
-                    } else {
-                        log::error!("Failed to get proof");
                     }
                 }
             }

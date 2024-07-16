@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use dioxus::prelude::*;
-use ore_relayer_api::consts::ESCROW;
+use ore_relayer_api::{consts::ESCROW, state::Escrow};
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signer::Signer};
 
 use crate::{
@@ -17,11 +17,12 @@ use crate::{
 
 pub async fn try_start_mining(
     miner: Signal<Miner>,
+    escrow: Signal<Escrow>,
     toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<()> {
     let gateway = use_gateway();
     let authority = Pubkey::find_program_address(
-        &[ESCROW, toolbar_state.escrow().authority.as_ref()],
+        &[ESCROW, escrow.read().authority.as_ref()],
         &ore_relayer_api::id(),
     )
     .0;
