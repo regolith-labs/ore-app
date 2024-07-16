@@ -1,12 +1,12 @@
+use dioxus::prelude::*;
+use ore_types::{response::ListTransfersResponse, Transfer, TransferType};
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
-use dioxus::prelude::*;
-use ore_types::{response::ListTransfersResponse, Transfer, TransferType};
-
 use crate::{
     components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
-    hooks::{use_pubkey, use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
+    hooks::{use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
     route::Route,
 };
 
@@ -156,7 +156,8 @@ pub fn ActivityTablePagination(offset: Signal<u64>, has_more: bool) -> Element {
 
 #[component]
 pub fn ActivityRow(transfer: Transfer) -> Element {
-    let pubkey = use_pubkey();
+    // TODO let pubkey = use_pubkey();
+    let pubkey = Pubkey::new_from_array([0; 32]);
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let ts = Duration::from_secs(transfer.ts as u64);
     let time = now.saturating_sub(ts);

@@ -1,14 +1,12 @@
 use dioxus::prelude::*;
-use ore_relayer_api::{consts::ESCROW, state::Escrow};
-use solana_client_wasm::solana_sdk::{native_token::LAMPORTS_PER_SOL, pubkey::Pubkey};
+use ore_relayer_api::state::Escrow;
+use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
-    components::{try_start_mining, wallet_adapter, Spinner},
-    gateway,
+    components::{try_start_mining, Spinner},
     hooks::{
-        use_gateway, use_miner_toolbar_state, use_sol_balance,
-        use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
-        MinerStatus, MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
+        use_miner_toolbar_state, MinerStatus, MinerStatusMessage, ReadMinerToolbarState,
+        UpdateMinerToolbarState,
     },
     miner::Miner,
 };
@@ -19,11 +17,10 @@ const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(100);
 
 #[component]
 pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
-    let gateway = use_gateway();
     let mut toolbar_state = use_miner_toolbar_state();
 
-    // TODO Start mining if the escrow account exists
-    use_resource(move || async move {
+    // Start mining if the escrow account exists
+    let _ = use_resource(move || async move {
         if toolbar_state.escrow().ne(&Escrow::default()) {
             match try_start_mining(miner, &mut toolbar_state).await {
                 Ok(()) => {

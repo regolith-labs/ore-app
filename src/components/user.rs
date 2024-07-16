@@ -10,17 +10,13 @@ use crate::{
         ActivityTable, BackButton, BusBubble, Copyable, OreIcon, SendButton, TreasuryBubble,
         UserBubble,
     },
-    hooks::{
-        use_explorer_account_url, use_ore_balance_user, use_pubkey, use_user_proof,
-        use_user_transfers,
-    },
+    hooks::{use_explorer_account_url, use_ore_balance_user, use_user_proof, use_user_transfers},
 };
 
 // TODO Not found
 
 #[component]
 pub fn User(id: String) -> Element {
-    let pubkey = use_pubkey();
     let user_id = Pubkey::from_str(&id);
     let nav = navigator();
     if user_id.is_err() {
@@ -55,7 +51,7 @@ pub fn User(id: String) -> Element {
         None
     };
 
-    let show_send_button = title.eq("User") && user_id.ne(&pubkey);
+    let show_send_button = false; // title.eq("User") && user_id.ne(&pubkey);
     let container_class = "flex flex-row gap-8 justify-between py-1 sm:px-1";
     let title_class = "opacity-50 text-sm my-auto";
     let value_class = "font-medium py-1 rounded";

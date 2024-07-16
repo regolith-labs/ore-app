@@ -1704,12 +1704,13 @@ checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
 
 [[package]]
 name = "drillx"
-version = "2.0.0-beta"
+version = "2.0.0-beta.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3e8d2de66aeedec77a653a4e2cf0cf4de4ddf556947214becfc16de4604c5db"
+checksum = "3bc503e6662deb892b18b41e6d23d2604d7a7804c00d4b84e1d58ecf22daa61c"
 dependencies = [
  "blake3",
  "equix",
+ "serde",
  "solana-program",
  "strum",
 ]
@@ -3806,10 +3807,11 @@ dependencies = [
 
 [[package]]
 name = "ore-types"
-version = "0.0.7"
+version = "0.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40d3bdbef7068fb9c76b53725daf44457385bbd2656cea7fd7383e66d802ba78"
+checksum = "14ba466520ba71e0f251030f5891680422defd4f53bb155c69401ae36b9cf635"
 dependencies = [
+ "drillx",
  "postgres-types",
  "serde",
  "serde_json",

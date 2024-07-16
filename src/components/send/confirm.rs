@@ -3,7 +3,7 @@ use std::borrow::BorrowMut;
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::{
-    spl_associated_token_account::create_associated_token_account,
+    spl_associated_token_account::instruction::create_associated_token_account,
     spl_memo,
     spl_token::{self, amount_to_ui_amount},
 };
@@ -27,12 +27,10 @@ pub fn SendConfirm(
     recipient: Pubkey,
     memo: String,
 ) -> Element {
-    let mut is_busy = use_signal(|| false);
     let mut ore_balance = use_ore_balance();
     let gateway = use_gateway();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
     let wallet_adapter = use_wallet_adapter();
-    // let memo_bytes = memo.into_bytes().clone();
 
     let tx = use_resource(move || {
         async move {
@@ -51,6 +49,7 @@ pub fn SendConfirm(
                         &signer,
                         &recipient,
                         &ore_api::consts::MINT_ADDRESS,
+                        &spl_token::id(),
                     ));
                 }
 
@@ -80,11 +79,10 @@ pub fn SendConfirm(
         }
     });
 
-    use_future(move || async move {
-        if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
-            // TODO
-        };
-    });
+    if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+        ore_balance.restart();
+        send_step.set(SendStep::Done);
+    };
 
     rsx! {
         div {

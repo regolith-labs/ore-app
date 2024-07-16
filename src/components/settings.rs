@@ -1,19 +1,15 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::native_token::lamports_to_sol;
 
 use crate::{
-    components::{Appearance, Copyable},
-    hooks::{use_appearance, use_explorer, use_pubkey, use_sol_balance, Explorer},
-    route::Route,
+    components::Appearance,
+    hooks::{use_appearance, use_explorer, Explorer},
 };
 
 pub fn Settings() -> Element {
     let mut explorer = use_explorer();
     let mut appearance = use_appearance();
-    let pubkey = use_pubkey();
-    let sol_balance = use_sol_balance();
 
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
