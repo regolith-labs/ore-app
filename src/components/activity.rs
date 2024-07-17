@@ -6,14 +6,28 @@ use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
     components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
-    hooks::{use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
+    hooks::{
+        use_transfers, use_wallet_adapter::use_wallet_adapter, ActivityFilter,
+        ACTIVITY_TABLE_PAGE_LIMIT,
+    },
     route::Route,
 };
+
+use super::wallet_adapter;
 
 pub fn Activity() -> Element {
     let filter = use_signal(|| ActivityFilter::Global);
     let offset = use_signal(|| 0u64);
-    let transfers = use_transfers(filter, offset);
+    let mut transfers = use_transfers(filter, offset);
+    let wallet_adapter = use_wallet_adapter();
+
+    use_future(move || async move {
+        loop {
+            async_std::task::sleep(Duration::from_secs(10)).await;
+            transfers.restart();
+        }
+    });
+
     let e = if let Some(transfers) = transfers.read().clone() {
         match transfers {
             Ok(transfers) => {
@@ -26,10 +40,10 @@ pub fn Activity() -> Element {
                                 class: "text-lg md:text-2xl font-bold my-auto",
                                 "Activity"
                             }
-                            FilterButtons {
-                                filter,
-                                offset
-                            }
+                            // FilterButtons {
+                            //     filter,
+                            //     offset
+                            // }
                         }
                         ActivityTable {
                             offset,
