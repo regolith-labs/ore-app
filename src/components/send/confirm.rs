@@ -28,7 +28,6 @@ pub fn SendConfirm(
     memo: String,
 ) -> Element {
     let mut ore_balance = use_ore_balance();
-    let gateway = use_gateway();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
     let wallet_adapter = use_wallet_adapter();
 

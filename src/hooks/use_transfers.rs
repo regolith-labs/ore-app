@@ -43,21 +43,14 @@ pub fn use_transfers(
     filter: Signal<ActivityFilter>,
     offset: Signal<u64>,
 ) -> Resource<GatewayResult<ListTransfersResponse>> {
-    let gateway = use_gateway();
-    let escrow = use_escrow();
-
-    // let pubkey = use_pubkey();
-    use_resource(move || {
-        let gateway = gateway.clone();
-        async move {
-            let offset = *offset.read();
-            let user = match *filter.read() {
-                ActivityFilter::Global => None,
-                _ => None, // TODO filter ActivityFilter::Personal => Some(pubkey),
-            };
-            gateway
-                .list_transfers(user, offset, ACTIVITY_TABLE_PAGE_LIMIT)
-                .await
-        }
+    use_resource(move || async move {
+        let offset = *offset.read();
+        let user = match *filter.read() {
+            ActivityFilter::Global => None,
+            _ => None, // TODO filter ActivityFilter::Personal => Some(pubkey),
+        };
+        use_gateway()
+            .list_transfers(user, offset, ACTIVITY_TABLE_PAGE_LIMIT)
+            .await
     })
 }

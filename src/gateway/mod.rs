@@ -9,10 +9,9 @@ use ore_api::{
     consts::CONFIG_ADDRESS,
     state::{Config, Proof},
 };
-use ore_relayer_api::{consts::ESCROW, state::Escrow};
+use ore_relayer_api::state::Escrow;
 use ore_types::{response::ListTransfersResponse, Transfer};
 use ore_utils::AccountDeserialize;
-pub use pubkey::*;
 use solana_client_wasm::{
     solana_sdk::{clock::Clock, pubkey::Pubkey, signature::Signature, sysvar},
     WasmClient,
@@ -23,6 +22,8 @@ use solana_extra_wasm::{
     transaction_status::TransactionConfirmationStatus,
 };
 use web_time::Duration;
+
+pub use pubkey::*;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
@@ -57,15 +58,6 @@ impl Gateway {
         bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
     }
 
-    pub async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
-        let data = self
-            .rpc
-            .get_account_data(&proof_pubkey(authority))
-            .await
-            .map_err(GatewayError::from)?;
-        Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
-    }
-
     pub async fn get_config(&self) -> GatewayResult<Config> {
         let data = self
             .rpc
@@ -75,12 +67,19 @@ impl Gateway {
         Ok(*Config::try_from_bytes(&data).expect("Failed to parse config account"))
     }
 
-    pub async fn get_escrow(&self, authority: Pubkey) -> GatewayResult<Escrow> {
-        let escrow_pubkey =
-            Pubkey::find_program_address(&[ESCROW, authority.as_ref()], &ore_relayer_api::id()).0;
+    pub async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
         let data = self
             .rpc
-            .get_account_data(&escrow_pubkey)
+            .get_account_data(&proof_pubkey(authority))
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(*Proof::try_from_bytes(&data).expect("Failed to parse proof"))
+    }
+
+    pub async fn get_escrow(&self, authority: Pubkey) -> GatewayResult<Escrow> {
+        let data = self
+            .rpc
+            .get_account_data(&escrow_pubkey(authority))
             .await
             .map_err(GatewayError::from)?;
         Ok(*Escrow::try_from_bytes(&data).expect("Failed to parse escrow account"))
@@ -106,10 +105,8 @@ impl Gateway {
             client_pubkey: pubkey.to_bytes(),
         };
         let client = reqwest::Client::new();
-        log::info!("Sending via relayer");
         let mut attempts = 0;
         loop {
-            log::info!("Attempt: {:?}", attempts);
             match client
                 .post(format!("{}/relay", self.api_url))
                 .json(&req)
@@ -118,7 +115,6 @@ impl Gateway {
             {
                 Ok(res) => {
                     // Parse sig
-                    log::info!("Res: {:?}", res);
                     let res: ore_types::response::RelayResponse = res.json().await.unwrap();
                     let sig = Signature::from_str(&res.sig).unwrap();
                     log::info!("Sig: {:?}", sig);
@@ -159,7 +155,6 @@ impl Gateway {
                                 if let Some(current_commitment) =
                                     signature_status.confirmation_status.as_ref()
                                 {
-                                    log::info!("Commitment: {:?}", current_commitment);
                                     match current_commitment {
                                         TransactionConfirmationStatus::Processed => {}
                                         TransactionConfirmationStatus::Confirmed
