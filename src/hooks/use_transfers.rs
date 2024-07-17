@@ -4,7 +4,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::GatewayResult;
 
-use super::use_gateway;
+use super::{use_escrow, use_gateway};
 
 pub const ACTIVITY_TABLE_PAGE_LIMIT: usize = 8;
 
@@ -44,6 +44,8 @@ pub fn use_transfers(
     offset: Signal<u64>,
 ) -> Resource<GatewayResult<ListTransfersResponse>> {
     let gateway = use_gateway();
+    let escrow = use_escrow();
+
     // let pubkey = use_pubkey();
     use_resource(move || {
         let gateway = gateway.clone();
