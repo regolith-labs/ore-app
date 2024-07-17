@@ -73,7 +73,7 @@ pub fn Landing() -> Element {
             Hero {
                 text_color,
                 title: "It's time to mine.",
-                subtitle: &"ORE is a fair-launch, proof-of-work, digital currency everyone can mine."
+                subtitle: &"ORE is a fair launch, proof of work, digital currency everyone can mine."
             }
             Block {
                 title: &"Proof of work.",
