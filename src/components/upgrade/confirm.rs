@@ -65,8 +65,6 @@ pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element
         }
     });
 
-    log::info!("TX: {:?}", tx);
-
     if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
         upgrade_step.set(UpgradeStep::Done(sig));
     };
