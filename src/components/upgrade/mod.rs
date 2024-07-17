@@ -12,7 +12,7 @@ use solana_client_wasm::solana_sdk::{signature::Signature, transaction::Transact
 #[derive(Clone)]
 pub enum UpgradeStep {
     Edit,
-    Confirm(Transaction),
+    Confirm,
     Done(Signature),
 }
 
@@ -35,11 +35,10 @@ pub fn Upgrade() -> Element {
                 }
             }
         }
-        UpgradeStep::Confirm(tx) => {
+        UpgradeStep::Confirm => {
             rsx! {
                 UpgradeConfirm {
                     upgrade_step: upgrade_step,
-                    tx: tx,
                     amount: parsed_amount,
                 }
             }

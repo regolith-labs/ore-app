@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 
+use crate::components::WarningIcon;
 use crate::components::{icons::CheckCircleIcon, Appearance, Spinner};
 use crate::hooks::{use_appearance, use_wallet_adapter, use_wallet_adapter::InvokeSignatureStatus};
 
@@ -73,15 +74,17 @@ pub fn InvokeSignature(
                 div {
                     class: "flex flex-col gap-4",
                     p {
-                        class: "mx-auto text-sm font-medium text-red-500",
-                        "Transaction failed..."
+                        class: "flex flex-row flex-nowrap gap-2 text-white w-min mx-auto text-nowrap bg-red-500 text-center font-semibold text-sm rounded py-1 px-2",
+                        WarningIcon {
+                            class: "w-3.5 h-3.5 my-auto"
+                        }
+                        "Transaction failed"
                     }
                     button {
                         class: "{button_class}",
                         onclick: move |_| {
                             use_wallet_adapter::invoke_signature(tx.clone(), signal);
                         },
-                        // "{start_msg}"
                         "Retry"
                     }
                 }
