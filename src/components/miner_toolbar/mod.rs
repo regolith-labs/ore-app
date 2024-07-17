@@ -12,6 +12,7 @@ pub use error::*;
 pub use insufficient_sol::*;
 pub use layout::*;
 pub use not_started::*;
+use ore_relayer_api::state::Escrow;
 pub use utils::*;
 
 use dioxus::prelude::*;
@@ -34,10 +35,14 @@ pub fn MinerToolbar(hidden: bool) -> Element {
         let gateway = gateway.clone();
         async move {
             match *wallet_adapter.read() {
-                WalletAdapter::Disconnected => {}
+                WalletAdapter::Disconnected => {
+                    escrow.set(Escrow::default());
+                }
                 WalletAdapter::Connected(pubkey) => {
                     if let Ok(e) = gateway.get_escrow(pubkey).await {
                         escrow.set(e);
+                    } else {
+                        escrow.set(Escrow::default());
                     }
                 }
             }

@@ -58,10 +58,10 @@ pub fn StakeBalance() -> Element {
                 div {
                     class: "flex flex-row grow justify-between mt-4 -mr-2",
                     div {
-                        class: "flex flex-col gap-2",
+                        class: "flex flex-col pb-2 gap-2",
                         p {
                             class: "font-medium text-xs text-gray-300",
-                            "Stake account"
+                            "Stake"
                         }
                         div {
                             class: "flex flex-row gap-2",
@@ -75,7 +75,7 @@ pub fn StakeBalance() -> Element {
                         }
                     }
                     div {
-                        class: "mt-auto flex flex-row gap-2",
+                        class: "mt-auto flex flex-row gap-1 sm:gap-2",
                         ClaimButton {}
                         StakeButton {}
                     }

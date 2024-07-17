@@ -4,8 +4,9 @@ use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 use crate::{
     components::{ActivityIndicator, Spinner, StopButton},
     hooks::{
-        use_miner_toolbar_state, use_power_level, use_priority_fee, MinerStatusMessage, PowerLevel,
-        PriorityFee, ReadMinerToolbarState, UpdateMinerToolbarState,
+        use_gateway, use_miner_toolbar_state, use_power_level, use_priority_fee, use_proof,
+        MinerStatusMessage, PowerLevel, PriorityFee, ReadMinerToolbarState,
+        UpdateMinerToolbarState,
     },
     miner::{Miner, WEB_WORKERS},
 };
@@ -113,6 +114,7 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                     }
                 }
                 // PriorityFeeConfig {}
+                MultiplierDisplay {}
                 PowerLevelConfig {}
                 DownloadLink {}
             }
@@ -203,6 +205,44 @@ pub fn PriorityFeeConfig() -> Element {
                 p {
                     class: "my-auto",
                     "microlamports"
+                }
+            }
+        }
+    }
+}
+
+pub fn MultiplierDisplay() -> Element {
+    let proof = use_proof();
+
+    let multiplier = use_resource(move || async move {
+        let gateway = use_gateway();
+        if let Some(Ok(proof)) = *proof.read() {
+            if let Ok(config) = gateway.get_config().await {
+                return 1.0 + (proof.balance as f64 / config.max_stake as f64).min(1.0f64);
+            }
+        }
+        1.0
+    });
+
+    rsx! {
+        div {
+            class: "flex flex-row gap-8 justify-between mt-8",
+            div {
+                class: "flex flex-col gap-1",
+                p {
+                    class: "text-white font-semibold",
+                    "Multiplier"
+                }
+                p {
+                    class: "text-white text-xs opacity-80 max-w-96",
+                    "You are earning a multiplier on your mining rewards based on your current stake balance."
+                }
+           }
+           div {
+                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+                p {
+                    class: "text-white text-right px-1 mb-auto font-semibold",
+                    "{multiplier.read().unwrap_or(1.0):.12}x"
                 }
             }
         }

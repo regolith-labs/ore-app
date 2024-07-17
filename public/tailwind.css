@@ -1499,6 +1499,10 @@ h2:where(.dark, .dark *) {
   padding-top: 1.25rem;
 }
 
+.pb-2 {
+  padding-bottom: 0.5rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -2263,6 +2267,10 @@ h2:where(.dark, .dark *) {
 
   .sm\:gap-8 {
     gap: 2rem;
+  }
+
+  .sm\:gap-2 {
+    gap: 0.5rem;
   }
 
   .sm\:gap-y-10 {
