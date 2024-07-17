@@ -61,7 +61,7 @@ pub fn StakeBalance() -> Element {
                         class: "flex flex-col gap-2",
                         p {
                             class: "font-medium text-xs text-gray-300",
-                            "Staking balance"
+                            "Stake account"
                         }
                         div {
                             class: "flex flex-row gap-2",
@@ -74,9 +74,10 @@ pub fn StakeBalance() -> Element {
                             }
                         }
                     }
-                    span {
-                        class: "mt-auto",
+                    div {
+                        class: "mt-auto flex flex-row gap-2",
                         ClaimButton {}
+                        StakeButton {}
                     }
                 }
             };
@@ -108,6 +109,19 @@ pub fn ClaimButton() -> Element {
             span {
                 class: "my-auto",
                 "Claim"
+            }
+        }
+    }
+}
+
+pub fn StakeButton() -> Element {
+    rsx! {
+        Link {
+            class: "flex transition transition-colors font-semibold px-3 h-10 rounded-full hover-100 active-200",
+            to: Route::Stake {},
+            span {
+                class: "my-auto",
+                "Stake"
             }
         }
     }
