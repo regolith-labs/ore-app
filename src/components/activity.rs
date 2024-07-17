@@ -23,7 +23,7 @@ pub fn Activity() -> Element {
 
     use_future(move || async move {
         loop {
-            async_std::task::sleep(Duration::from_secs(10)).await;
+            async_std::task::sleep(Duration::from_secs(30)).await;
             transfers.restart();
         }
     });
