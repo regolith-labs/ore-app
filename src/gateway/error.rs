@@ -27,11 +27,13 @@ impl From<ClientError> for GatewayError {
         let msg = value.to_string();
         if msg.starts_with("Client error: Invalid param: could not find account")
             || msg.starts_with("Client error: AccountNotFound: ")
+            || msg.ends_with("not found.")
         {
             GatewayError::AccountNotFound
         } else if msg.starts_with("Client error: error sending request") {
             GatewayError::NetworkUnavailable
         } else {
+            log::info!("Err: {:?}", msg);
             GatewayError::Unknown
         }
     }

@@ -19,7 +19,6 @@ pub fn Activity() -> Element {
     let filter = use_signal(|| ActivityFilter::Global);
     let offset = use_signal(|| 0u64);
     let mut transfers = use_transfers(filter, offset);
-    let wallet_adapter = use_wallet_adapter();
 
     use_future(move || async move {
         loop {
