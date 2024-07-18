@@ -48,7 +48,7 @@ pub fn Tx(sig: String) -> Element {
                 };
                 rsx! {
                     div {
-                        class: "flex flex-col gap-3 w-full -mt-3.5",
+                        class: "flex flex-col gap-4 w-full -mt-3.5",
                         BackButton {
                             onclick: move |_| {
                                 nav.go_back()

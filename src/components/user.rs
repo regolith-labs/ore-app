@@ -61,7 +61,7 @@ pub fn User(id: String) -> Element {
         div {
             class: "flex flex-col gap-16",
             div {
-                class: "flex flex-col gap-3 -mt-3.5",
+                class: "flex flex-col gap-4 -mt-3.5",
                 BackButton {
                     onclick: move |_| {
                         nav.go_back()

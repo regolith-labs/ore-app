@@ -1,5 +1,5 @@
-import init from "/./assets/dioxus/Ore.js";
+import init from "/./assets/dioxus/ORE.js";
 
-init("/./assets/dioxus/Ore_bg.wasm").then(wasm => {
+init("/./assets/dioxus/ORE_bg.wasm").then(wasm => {
   wasm.start_worker();
 });
