@@ -11,7 +11,7 @@ use solana_sdk::{compute_budget::ComputeBudgetInstruction, transaction::Transact
 
 use crate::{
     components::{BackButton, InvokeSignature, OreIcon},
-    gateway::{self, ore_token_account_address},
+    gateway::ore_token_account_address,
     hooks::{
         use_gateway, use_ore_balance,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},

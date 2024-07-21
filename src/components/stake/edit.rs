@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::WarningIcon,
