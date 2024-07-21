@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::{
     compute_budget::ComputeBudgetInstruction, message::Message, transaction::Transaction,
 };
+use solana_sdk::native_token::sol_to_lamports;
 use web_time::Duration;
 
 use crate::{
@@ -9,7 +10,7 @@ use crate::{
         miner_toolbar::try_start_mining,
         wallet_adapter::{self, InvokeSignature},
     },
-    gateway::{proof_pubkey, GatewayError},
+    gateway::{escrow_pubkey, proof_pubkey, GatewayError},
     hooks::{
         use_escrow, use_gateway, use_miner_toolbar_state,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
@@ -49,9 +50,15 @@ pub fn MinerToolbarOpenAccount(miner: Signal<Miner>) -> Element {
             WalletAdapter::Connected(signer) => {
                 let gateway = use_gateway();
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
-                let ix = ore_relayer_api::instruction::open_escrow(signer, signer);
+                let top_up_amount = sol_to_lamports(0.05);
+                let ix_1 = ore_relayer_api::instruction::open_escrow(signer, signer);
+                let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
+                    &signer,
+                    &escrow_pubkey(authority),
+                    top_up_amount,
+                );
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
-                let ixs = vec![cu_limit_ix, ix];
+                let ixs = vec![cu_limit_ix, ix_1, ix_2];
                 let msg = Message::new_with_blockhash(ixs.as_slice(), Some(&signer), &blockhash);
                 let tx = Transaction::new_unsigned(msg);
                 Ok(tx)

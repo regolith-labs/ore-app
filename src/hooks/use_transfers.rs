@@ -43,11 +43,12 @@ pub fn use_transfers(
     filter: Signal<ActivityFilter>,
     offset: Signal<u64>,
 ) -> Resource<GatewayResult<ListTransfersResponse>> {
+    let escrow = use_escrow();
     use_resource(move || async move {
         let offset = *offset.read();
         let user = match *filter.read() {
             ActivityFilter::Global => None,
-            _ => None, // TODO filter ActivityFilter::Personal => Some(pubkey),
+            ActivityFilter::Personal => Some(escrow.read().authority),
         };
         use_gateway()
             .list_transfers(user, offset, ACTIVITY_TABLE_PAGE_LIMIT)

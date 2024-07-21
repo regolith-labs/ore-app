@@ -680,6 +680,18 @@ h2:where(.dark, .dark *) {
   top: 0px;
 }
 
+.right-0 {
+  right: 0px;
+}
+
+.bottom-8 {
+  bottom: 2rem;
+}
+
+.right-8 {
+  right: 2rem;
+}
+
 .z-0 {
   z-index: 0;
 }

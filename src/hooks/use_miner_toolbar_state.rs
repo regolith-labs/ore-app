@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use ore_relayer_api::state::Escrow;
 use solana_sdk::blake3::Hash as Blake3Hash;
 
 #[derive(Copy, Clone, Debug)]
@@ -14,7 +13,6 @@ pub enum MinerStatus {
 
 #[derive(Copy, Clone, Debug)]
 pub enum MinerStatusMessage {
-    // GeneratingChallenge,
     Searching,
     Submitting,
     Error,
@@ -25,16 +23,6 @@ pub struct MinerToolbarState {
     pub status_message: MinerStatusMessage,
     pub display_hash: Blake3Hash,
     pub is_open: bool,
-    // pub escrow_address: Pubkey,
-    // pub escrow: Escrow,
-}
-
-pub fn use_escrow() -> Signal<Escrow> {
-    use_context::<Signal<Escrow>>()
-}
-
-pub fn use_escrow_provider() {
-    use_context_provider(|| Signal::new(Escrow::default()));
 }
 
 pub fn use_miner_toolbar_state() -> Signal<MinerToolbarState> {
