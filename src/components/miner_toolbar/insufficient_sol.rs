@@ -54,7 +54,7 @@ pub fn MinerToolbarOpenAccount(miner: Signal<Miner>) -> Element {
                 let ix_1 = ore_relayer_api::instruction::open_escrow(signer, signer);
                 let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
-                    &escrow_pubkey(authority),
+                    &escrow_pubkey(signer),
                     top_up_amount,
                 );
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
