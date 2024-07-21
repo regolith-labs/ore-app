@@ -1,5 +1,6 @@
 mod use_appearance;
 mod use_date;
+mod use_escrow;
 mod use_explorer;
 mod use_gateway;
 mod use_is_onboarded;
@@ -18,6 +19,7 @@ pub mod use_wallet_adapter;
 
 pub use use_appearance::*;
 pub use use_date::*;
+pub use use_escrow::*;
 pub use use_explorer::*;
 pub use use_gateway::*;
 pub use use_is_onboarded::*;

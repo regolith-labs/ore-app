@@ -3788,16 +3788,15 @@ dependencies = [
 
 [[package]]
 name = "ore-relayer-api"
-version = "1.0.0-alpha.6"
+version = "1.0.0-alpha.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10d13907c1dc9468671c11f1d0816be35aec482cf19bfd219fd7baa5335f3117"
+checksum = "d864b06da4ba5199cdc2f8982414e821b3d7c897086013607131b63a60fefd1b"
 dependencies = [
  "bytemuck",
  "mpl-token-metadata",
  "num_enum 0.7.2",
  "ore-api",
  "ore-utils",
- "shank",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
