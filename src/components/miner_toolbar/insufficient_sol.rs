@@ -1,3 +1,5 @@
+use std::ops::Div;
+
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::{
     compute_budget::ComputeBudgetInstruction, message::Message, transaction::Transaction,
@@ -50,15 +52,20 @@ pub fn MinerToolbarOpenAccount(miner: Signal<Miner>) -> Element {
             WalletAdapter::Connected(signer) => {
                 let gateway = use_gateway();
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
-                let top_up_amount = sol_to_lamports(0.05);
+                let amount = sol_to_lamports(0.05);
                 let ix_1 = ore_relayer_api::instruction::open_escrow(signer, signer);
                 let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
                     &escrow_pubkey(signer),
                     top_up_amount,
                 );
+                let ix_3 = solana_client_wasm::solana_sdk::system_instruction::transfer(
+                    &signer,
+                    &ore_relayer_api::consts::COLLECTOR_ADDRESS,
+                    amount.div(50), // 2% fee
+                );
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
-                let ixs = vec![cu_limit_ix, ix_1, ix_2];
+                let ixs = vec![cu_limit_ix, ix_1, ix_2, ix_3];
                 let msg = Message::new_with_blockhash(ixs.as_slice(), Some(&signer), &blockhash);
                 let tx = Transaction::new_unsigned(msg);
                 Ok(tx)
