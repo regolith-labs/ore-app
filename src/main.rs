@@ -1,7 +1,5 @@
 #![allow(non_snake_case)]
 
-use std::mem::size_of;
-
 use dioxus::prelude::*;
 use tracing::Level;
 

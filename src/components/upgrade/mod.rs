@@ -7,7 +7,7 @@ use done::*;
 use edit::*;
 
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::{signature::Signature, transaction::Transaction};
+use solana_client_wasm::solana_sdk::signature::Signature;
 
 #[derive(Clone)]
 pub enum UpgradeStep {

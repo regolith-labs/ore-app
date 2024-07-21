@@ -6,10 +6,7 @@ use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
     components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
-    hooks::{
-        use_transfers, use_wallet_adapter::use_wallet_adapter, ActivityFilter,
-        ACTIVITY_TABLE_PAGE_LIMIT,
-    },
+    hooks::{use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
     route::Route,
 };
 

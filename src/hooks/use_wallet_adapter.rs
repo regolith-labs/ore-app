@@ -1,18 +1,13 @@
 use base64::Engine;
 use dioxus::prelude::*;
 use ore_api::consts::{TOKEN_DECIMALS, TOKEN_DECIMALS_V1};
-use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
-use solana_client_wasm::solana_sdk::signature::Signature;
 use solana_client_wasm::solana_sdk::{
-    instruction::Instruction, message::Message, pubkey::Pubkey, transaction::Transaction,
+    pubkey::Pubkey, signature::Signature, transaction::Transaction,
 };
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
-use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
-use solana_extra_wasm::program::{spl_memo, spl_token};
 
 use crate::gateway::{
     ore_token_account_address, ore_token_account_address_v1, GatewayError, GatewayResult,
-    CU_LIMIT_UPGRADE,
 };
 use crate::hooks::UiTokenAmountDefault;
 

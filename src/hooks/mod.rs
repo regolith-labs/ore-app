@@ -13,7 +13,7 @@ mod use_power_level;
 mod use_priority_fee;
 mod use_proof;
 mod use_screen_size;
-// mod use_sol_balance;
+mod use_sol_balance;
 mod use_transfers;
 pub mod use_wallet_adapter;
 
@@ -31,5 +31,5 @@ pub use use_power_level::*;
 pub use use_priority_fee::*;
 pub use use_proof::*;
 pub use use_screen_size::*;
-// pub use use_sol_balance::*;
+pub use use_sol_balance::*;
 pub use use_transfers::*;

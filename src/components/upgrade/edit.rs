@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{OreIcon, WarningIcon},
+    components::WarningIcon,
     hooks::{
         use_wallet_adapter::{self, WalletAdapter},
         UiTokenAmountBalance,
