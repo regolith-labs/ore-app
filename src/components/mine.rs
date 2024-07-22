@@ -4,8 +4,8 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
     components::{
-        Activity, Balance, MinerToolbarCreateAccountOpen, MinerToolbarTopUpOpen, OreIcon, Spinner,
-        MIN_BALANCE,
+        Activity, BackButton, Balance, MinerToolbarCreateAccountOpen, MinerToolbarTopUpOpen,
+        OreIcon, Spinner, MIN_BALANCE,
     },
     hooks::{
         use_escrow, use_escrow_sol_balance, use_gateway, use_miner_toolbar_state, use_power_level,
@@ -22,10 +22,13 @@ pub fn Mine() -> Element {
     let mut escrow_balance = use_escrow_sol_balance();
     let toolbar_state = use_miner_toolbar_state();
     let escrow = use_escrow();
+    let nav = use_navigator();
 
     if escrow.read().eq(&Escrow::default()) {
         return rsx! {
-            MinerToolbarCreateAccountOpen {}
+            MinerToolbarCreateAccountOpen {
+                escrow_balance: escrow_balance.clone()
+            }
         };
     }
 
@@ -43,85 +46,93 @@ pub fn Mine() -> Element {
         div {
             class: "flex flex-col gap-8 overflow-visible",
             div {
-                class: "flex flex-col gap-2",
-                h2 {
-                    "Miner"
+                class: "flex flex-col gap-4 -mt-3.5 mb-4",
+                BackButton {
+                    onclick: move |_| {
+                        nav.go_back()
+                    }
                 }
-                match toolbar_state.status() {
-                    MinerStatus::NotStarted => {
-                        rsx! {
-                            p {
-                                class: "text-lg text-white",
-                                "Stopped"
-                            }
-                        }
-                    },
-                    MinerStatus::Activating => {
-                        rsx! {
-                            p {
-                                class: "text-lg text-white",
-                                "Starting..."
-                            }
-                        }
-                    },
-                    MinerStatus::Error => {
-                        rsx! {
-                            p {
-                                class: "text-lg text-white",
-                                "Error"
-                            }
-                        }
-                    },
-                    MinerStatus::Active => {
-                        rsx! {
-                            match toolbar_state.status_message() {
-                                MinerStatusMessage::Searching => {
-                                    rsx! {
-                                        p {
-                                            class: "text-lg text-white",
-                                            "Searching for a valid hash... "
-                                            // if time_remaining.read().gt(&0) {
-                                            //     "({time_remaining} sec)"
-                                            // }
-                                        }
-                                    }
+                div {
+                    class: "flex flex-col gap-2",
+                    h2 {
+                        "Miner"
+                    }
+                    match toolbar_state.status() {
+                        MinerStatus::NotStarted => {
+                            rsx! {
+                                p {
+                                    class: "text-lg text-white",
+                                    "Stopped"
                                 }
-                                MinerStatusMessage::Submitting => {
-                                    rsx! {
-                                        div {
-                                            class: "flex flex-row gap-2",
+                            }
+                        },
+                        MinerStatus::Activating => {
+                            rsx! {
+                                p {
+                                    class: "text-lg text-white",
+                                    "Starting..."
+                                }
+                            }
+                        },
+                        MinerStatus::Error => {
+                            rsx! {
+                                p {
+                                    class: "text-lg text-white",
+                                    "Error"
+                                }
+                            }
+                        },
+                        MinerStatus::Active => {
+                            rsx! {
+                                match toolbar_state.status_message() {
+                                    MinerStatusMessage::Searching => {
+                                        rsx! {
                                             p {
                                                 class: "text-lg text-white",
-                                                "Submitting hash for validation..."
+                                                "Searching for a valid hash... "
+                                                // if time_remaining.read().gt(&0) {
+                                                //     "({time_remaining} sec)"
+                                                // }
                                             }
-                                            Spinner {
-                                                class: "my-auto"
+                                        }
+                                    }
+                                    MinerStatusMessage::Submitting => {
+                                        rsx! {
+                                            div {
+                                                class: "flex flex-row gap-2",
+                                                p {
+                                                    class: "text-lg text-white",
+                                                    "Submitting hash for validation..."
+                                                }
+                                                Spinner {
+                                                    class: "my-auto"
+                                                }
+                                            }
+                                        }
+                                    }
+                                    MinerStatusMessage::Error => {
+                                        rsx! {
+                                            p {
+                                                class: "text-lg text-white",
+                                                "Error submitting transaction"
                                             }
                                         }
                                     }
                                 }
-                                MinerStatusMessage::Error => {
-                                    rsx! {
-                                        p {
-                                            class: "text-lg text-white",
-                                            "Error submitting transaction"
+                                match toolbar_state.status_message() {
+                                    MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
+                                        rsx! {
+                                            p {
+                                                class: "font-mono text-sm truncate shrink text-gray-300",
+                                                "{toolbar_state.display_hash()}"
+                                            }
                                         }
                                     }
+                                    _ => rsx! {}
                                 }
                             }
-                            match toolbar_state.status_message() {
-                                MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
-                                    rsx! {
-                                        p {
-                                            class: "font-mono text-sm truncate shrink text-gray-300",
-                                            "{toolbar_state.display_hash()}"
-                                        }
-                                    }
-                                }
-                                _ => rsx! {}
-                            }
-                        }
-                    },
+                        },
+                    }
                 }
             }
             StakeBalanceDisplay {}

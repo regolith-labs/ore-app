@@ -56,7 +56,7 @@ pub fn StakeBalance() -> Element {
         if let Ok(proof) = proof {
             return rsx! {
                 div {
-                    class: "flex flex-row grow justify-between mt-4 -mr-2",
+                    class: "flex flex-row grow justify-between mt-4",
                     div {
                         class: "flex flex-col gap-2",
                         p {

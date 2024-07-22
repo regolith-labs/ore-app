@@ -34,7 +34,6 @@ pub fn Navbar() -> Element {
                             class: "h-3 md:h-4 my-auto"
                         }
                     }
-                    // MinerButton {}
                     div {
                         class: "flex flex-row gap-2 sm:gap-4",
                         SettingsButton {}

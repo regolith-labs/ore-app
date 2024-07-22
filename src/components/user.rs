@@ -146,7 +146,7 @@ pub fn User(id: String) -> Element {
                                     class: "{container_class}",
                                     p {
                                         class: "{title_class}",
-                                        "Staked"
+                                        "Stake"
                                     }
                                     span {
                                         class: "flex flex-row gap-1.5",
