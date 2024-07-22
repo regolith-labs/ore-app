@@ -36,10 +36,10 @@ pub fn Activity() -> Element {
                                 class: "text-lg md:text-2xl font-bold my-auto",
                                 "Activity"
                             }
-                            FilterButtons {
-                                filter,
-                                offset
-                            }
+                            // FilterButtons {
+                            //     filter,
+                            //     offset
+                            // }
                         }
                         ActivityTable {
                             offset,
@@ -279,7 +279,7 @@ pub fn ActivityRow(transfer: Transfer) -> Element {
                         }
                     }
                     p {
-                        class: "opacity-50 text-nowrap text-sm",
+                        class: "text-gray-300 text-nowrap text-sm",
                         "{time_str}"
                     }
                 }

@@ -17,10 +17,13 @@ pub use utils::*;
 
 use dioxus::prelude::*;
 
-use crate::hooks::{
-    use_escrow, use_gateway, use_miner, use_miner_toolbar_state,
-    use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
-    MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
+use crate::{
+    hooks::{
+        use_escrow, use_gateway, use_miner, use_miner_toolbar_state,
+        use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
+        MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
+    },
+    route::Route,
 };
 
 #[component]
@@ -30,6 +33,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
     let miner = use_miner();
     let gateway = use_gateway();
     let mut escrow = use_escrow();
+    let nav = use_navigator();
 
     let _ = use_resource(move || {
         let gateway = gateway.clone();
@@ -52,22 +56,12 @@ pub fn MinerToolbar(hidden: bool) -> Element {
 
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
-    let height = if toolbar_state.is_open() {
-        "max-h-[80vh] shrink overflow-y-scroll"
-    } else {
-        "h-16 cursor-pointer"
-    };
+    let height = "h-16 cursor-pointer";
 
     let bg = match toolbar_state.status() {
         MinerStatus::Active => "bg-green-500 text-white",
         MinerStatus::Error => "bg-red-500 text-white",
-        MinerStatus::NotStarted => {
-            if toolbar_state.is_open() {
-                "bg-white dark:bg-gray-900"
-            } else {
-                "bg-gray-100 dark:bg-gray-900"
-            }
-        }
+        MinerStatus::NotStarted => "bg-gray-100 dark:bg-gray-900",
         _ => "bg-gray-100 dark:bg-gray-900",
     };
 
@@ -81,7 +75,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
         div {
             class: "{class} {height} {bg} {display}",
             onclick: move |e| {
-                toolbar_state.set_is_open(true);
+                nav.push(Route::Mine {});
                 e.stop_propagation();
             },
             div {

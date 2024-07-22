@@ -20,15 +20,10 @@ pub fn Tx(sig: String) -> Element {
         match transfer {
             Ok(transfer) => {
                 let transfer_memo = transfer.memo.unwrap_or("–".to_string());
-                let title = match transfer.transfer_type {
-                    TransferType::Claim => "Claim",
-                    TransferType::Mine => "Mine",
-                    TransferType::Spl => "Transfer",
-                };
                 let explorer_url = use_explorer_transaction_url(transfer.sig.clone());
                 let date = use_datetime(transfer.ts);
                 let container_class = "flex gap-8 flex-row justify-between py-2 sm:px-1";
-                let title_class = "opacity-50 text-sm my-auto";
+                let title_class = "text-gray-300 text-sm my-auto";
                 let value_class = "font-medium sm:px-2 py-1 rounded";
                 let link_class = "font-medium transition-colors -ml-2 sm:ml-0 px-2 py-1 hover-100 active-200 rounded truncate";
                 let from_name = if let Ok(from_address) = Pubkey::from_str(&transfer.from_address) {
@@ -56,7 +51,7 @@ pub fn Tx(sig: String) -> Element {
                         }
                         p {
                             class: "text-3xl sm:text-4xl font-bold",
-                            "{title}"
+                            "Transaction"
                         }
                         div {
                             class: "flex flex-col gap-1",

@@ -22,32 +22,8 @@ pub fn MinerToolbarLayout() -> Element {
             class: "flex flex-col h-full grow",
             Outlet::<Route> {}
         }
-        ToolbarClose {
-            hidden
-        }
         MinerToolbar {
             hidden
-        }
-    }
-}
-
-#[component]
-pub fn ToolbarClose(hidden: bool) -> Element {
-    let mut toolbar_state = use_miner_toolbar_state();
-    let opacity = if toolbar_state.is_open() {
-        "opacity-80"
-    } else {
-        "opacity-0 pointer-events-none"
-    };
-    if hidden {
-        return rsx! {};
-    }
-    rsx! {
-        button {
-            class: "fixed transition-opacity flex flex-row left-0 top-0 h-screen w-screen bg-black {opacity}",
-            onclick: move |_e| {
-                toolbar_state.set_is_open(false);
-            }
         }
     }
 }

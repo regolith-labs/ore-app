@@ -34,8 +34,9 @@ pub fn Navbar() -> Element {
                             class: "h-3 md:h-4 my-auto"
                         }
                     }
+                    // MinerButton {}
                     div {
-                        class: "flex flex-row gap-4",
+                        class: "flex flex-row gap-2 sm:gap-4",
                         SettingsButton {}
                         MountWalletAdapter {}
                     }
@@ -53,14 +54,14 @@ pub fn SettingsButton() -> Element {
     let appearance = use_appearance();
     let button_color = match *appearance.read() {
         Appearance::Light => "text-gray-300 hover:bg-gray-100 active:bg-gray-200",
-        Appearance::Dark => "text-gray-700 hover:bg-gray-900 active:bg-gray-800",
+        Appearance::Dark => "text-gray-300 hover:bg-gray-900 active:bg-gray-800",
     };
     rsx! {
         Link {
             to: Route::Settings {},
-            class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+            class: "flex my-auto h-8 w-8 sm:h-10 sm:w-10 transition-colors rounded-full transition-colors {button_color}",
             CogIcon {
-                class: "w-6 h-6 m-auto"
+                class: "h-5 w-5 sm:h-6 sm:w-6 m-auto"
             }
         }
     }

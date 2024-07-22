@@ -53,7 +53,7 @@ pub fn User(id: String) -> Element {
 
     let show_send_button = false; // title.eq("User") && user_id.ne(&pubkey);
     let container_class = "flex flex-row gap-8 justify-between py-1 sm:px-1";
-    let title_class = "opacity-50 text-sm my-auto";
+    let title_class = "text-gray-300 text-sm my-auto";
     let value_class = "font-medium py-1 rounded";
     let link_class = "font-medium transition-colors -ml-2 sm:ml-0 px-2 py-1 hover-100 active-200 rounded truncate";
 
