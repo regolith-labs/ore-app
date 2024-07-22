@@ -704,6 +704,10 @@ h2:where(.dark, .dark *) {
   margin: auto;
 }
 
+.m-2 {
+  margin: 0.5rem;
+}
+
 .-mx-1 {
   margin-left: -0.25rem;
   margin-right: -0.25rem;
@@ -722,6 +726,11 @@ h2:where(.dark, .dark *) {
 .my-auto {
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .-ml-2 {
@@ -885,6 +894,10 @@ h2:where(.dark, .dark *) {
   height: 100vh;
 }
 
+.h-2\.5 {
+  height: 0.625rem;
+}
+
 .max-h-\[80vh\] {
   max-height: 80vh;
 }
@@ -899,6 +912,22 @@ h2:where(.dark, .dark *) {
 
 .min-h-screen {
   min-height: 100vh;
+}
+
+.min-h-8 {
+  min-height: 2rem;
+}
+
+.min-h-12 {
+  min-height: 3rem;
+}
+
+.min-h-20 {
+  min-height: 5rem;
+}
+
+.min-h-24 {
+  min-height: 6rem;
 }
 
 .w-10 {
@@ -964,6 +993,14 @@ h2:where(.dark, .dark *) {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-2\.5 {
+  width: 0.625rem;
+}
+
+.w-8 {
+  width: 2rem;
 }
 
 .max-w-3xl {
@@ -1167,6 +1204,10 @@ h2:where(.dark, .dark *) {
   gap: 0.16rem;
 }
 
+.gap-6 {
+  gap: 1.5rem;
+}
+
 .gap-y-4 {
   row-gap: 1rem;
 }
@@ -1297,6 +1338,10 @@ h2:where(.dark, .dark *) {
 
 .p-2\.5 {
   padding: 0.625rem;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 .px-1 {
@@ -1503,6 +1548,16 @@ h2:where(.dark, .dark *) {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(245 245 247 / var(--tw-text-opacity));
+}
+
+.text-gray-200 {
+  --tw-text-opacity: 1;
+  color: rgb(214 214 216 / var(--tw-text-opacity));
+}
+
+.text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(70 70 72 / var(--tw-text-opacity));
 }
 
 .underline {
@@ -2072,12 +2127,32 @@ h2:where(.dark, .dark *) {
     margin-left: 0px;
   }
 
+  .sm\:block {
+    display: block;
+  }
+
   .sm\:h-8 {
     height: 2rem;
   }
 
+  .sm\:h-10 {
+    height: 2.5rem;
+  }
+
+  .sm\:h-6 {
+    height: 1.5rem;
+  }
+
   .sm\:w-8 {
     width: 2rem;
+  }
+
+  .sm\:w-10 {
+    width: 2.5rem;
+  }
+
+  .sm\:w-6 {
+    width: 1.5rem;
   }
 
   .sm\:flex-row {
@@ -2098,6 +2173,10 @@ h2:where(.dark, .dark *) {
 
   .sm\:gap-6 {
     gap: 1.5rem;
+  }
+
+  .sm\:gap-3 {
+    gap: 0.75rem;
   }
 
   .sm\:gap-y-10 {

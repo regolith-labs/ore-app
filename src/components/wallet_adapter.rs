@@ -31,7 +31,7 @@ pub fn MountWalletAdapter() -> Element {
 
     rsx! {
         div {
-            class: "rounded-full transition-colors {button_color}",
+            class: "rounded-full transition-colors my-auto h-8 sm:h-10 {button_color}",
             nav {
                 id: "ore-wallet-adapter"
             }

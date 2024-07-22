@@ -62,30 +62,16 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     }
 
     rsx! {
-        if toolbar_state.is_open() {
-            div {
-                class: "flex flex-col grow gap-2 px-4 py-6 sm:px-8 sm:py-8",
-                h2 {
-                    class: "text-3xl md:text-4xl lg:text-5xl font-bold",
-                    "Starting"
-                }
-                div {
-                    class: "flex flex-row gap-2",
-                    p {
-                        class: "text-lg",
-                        "Preparing to mine..."
-                    }
-                    Spinner {
-                        class: "my-auto text-white"
-                    }
-                }
+        div {
+            class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
+            p {
+                class: "font-semibold my-auto",
+                "Starting..."
             }
-        } else {
             div {
-                class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
-                p {
-                    class: "font-semibold my-auto",
-                    "Starting"
+                class: "flex w-10 h-10",
+                Spinner {
+                    class: "m-auto text-white"
                 }
             }
         }

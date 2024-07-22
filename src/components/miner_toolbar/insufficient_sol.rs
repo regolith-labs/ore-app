@@ -22,11 +22,11 @@ use crate::{
 pub fn MinerToolbarTopUp(sol_balance: Resource<GatewayResult<u64>>) -> Element {
     let toolbar_state = use_miner_toolbar_state();
     rsx! {
-        if toolbar_state.is_open() {
-            MinerToolbarTopUpOpen {
-                sol_balance: sol_balance.clone()
-            }
-        } else {
+        // if toolbar_state.is_open() {
+        //     MinerToolbarTopUpOpen {
+        //         sol_balance: sol_balance.clone()
+        //     }
+        // } else {
             div {
                 class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
                 span {
@@ -34,7 +34,7 @@ pub fn MinerToolbarTopUp(sol_balance: Resource<GatewayResult<u64>>) -> Element {
                     "Create account →"
                 }
             }
-        }
+        // }
     }
 }
 
@@ -72,7 +72,7 @@ pub fn MinerToolbarTopUpOpen(sol_balance: Resource<GatewayResult<u64>>) -> Eleme
         if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 let gateway = use_gateway();
-                async_std::task::sleep(Duration::from_millis(500)).await;
+                async_std::task::sleep(Duration::from_millis(1000)).await;
                 sol_balance.restart();
             }
         };
@@ -123,11 +123,11 @@ pub fn MinerToolbarTopUpOpen(sol_balance: Resource<GatewayResult<u64>>) -> Eleme
 pub fn MinerToolbarCreateAccount(miner: Signal<Miner>) -> Element {
     let toolbar_state = use_miner_toolbar_state();
     rsx! {
-        if toolbar_state.is_open() {
-            MinerToolbarCreateAccountOpen {
-                miner
-            }
-        } else {
+        // if toolbar_state.is_open() {
+        //     MinerToolbarCreateAccountOpen {
+        //         miner
+        //     }
+        // } else {
             div {
                 class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
                 span {
@@ -135,7 +135,7 @@ pub fn MinerToolbarCreateAccount(miner: Signal<Miner>) -> Element {
                     "Create account →"
                 }
             }
-        }
+        // }
     }
 }
 
@@ -175,7 +175,7 @@ pub fn MinerToolbarCreateAccountOpen(miner: Signal<Miner>) -> Element {
         if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 let gateway = use_gateway();
-                async_std::task::sleep(Duration::from_millis(500)).await;
+                async_std::task::sleep(Duration::from_millis(1000)).await;
                 if let Ok(new_escrow) = gateway.get_escrow(signer).await {
                     escrow.set(new_escrow);
                 }

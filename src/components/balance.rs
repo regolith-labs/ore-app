@@ -2,18 +2,19 @@ use dioxus::prelude::*;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
-    components::OreIcon,
-    hooks::{use_ore_balance, use_proof},
+    components::{Appearance, OreIcon},
+    hooks::{use_appearance, use_ore_balance, use_proof},
     route::Route,
 };
 
 pub fn Balance() -> Element {
     let balance = use_ore_balance();
+
     if let Some(balance) = balance.cloned() {
         let amount = balance
             .map(|b| b.real_number_string_trimmed())
             .unwrap_or_else(|_| "0.00".to_owned());
-        rsx! {
+        return rsx! {
             div {
                 class: "flex flex-row w-full min-h-16 rounded justify-between",
                 div {
@@ -39,28 +40,27 @@ pub fn Balance() -> Element {
                     StakeBalance {}
                 }
             }
-        }
-    } else {
-        rsx! {
-            div {
-                class: "flex flex-row w-full min-h-16 grow loading rounded",
-            }
+        };
+    }
+
+    rsx! {
+        div {
+            class: "flex flex-row w-full min-h-24 grow loading rounded",
         }
     }
 }
 
 pub fn StakeBalance() -> Element {
     let proof = use_proof();
-
-    if let Some(Ok(proof)) = *proof.read() {
-        if proof.balance.gt(&0) {
+    if let Some(proof) = *proof.read() {
+        if let Ok(proof) = proof {
             return rsx! {
                 div {
                     class: "flex flex-row grow justify-between mt-4 -mr-2",
                     div {
                         class: "flex flex-col gap-2",
                         p {
-                            class: "font-medium text-xs text-gray-300",
+                            class: "font-medium text-sm text-gray-300",
                             "Stake"
                         }
                         div {
@@ -81,10 +81,16 @@ pub fn StakeBalance() -> Element {
                     }
                 }
             };
+        } else {
+            return rsx! {};
         }
     }
 
-    rsx! {}
+    rsx! {
+        div {
+            class: "flex flex-row w-full min-h-20 grow loading rounded",
+        }
+    }
 }
 
 #[component]
@@ -102,9 +108,14 @@ pub fn SendButton(to: Option<String>) -> Element {
 }
 
 pub fn ClaimButton() -> Element {
+    let appearance = use_appearance();
+    let button_color = match *appearance.read() {
+        Appearance::Light => "text-gray-300 hover:text-black ",
+        Appearance::Dark => "text-gray-300 hover:text-white ",
+    };
     rsx! {
         Link {
-            class: "flex transition transition-colors font-semibold px-3 h-10 rounded-full hover-100 active-200",
+            class: "flex transition transition-colors font-semibold text-sm px-3 h-10 rounded-full hover-100 active-200 {button_color}",
             to: Route::Claim {},
             span {
                 class: "my-auto",
@@ -115,9 +126,14 @@ pub fn ClaimButton() -> Element {
 }
 
 pub fn StakeButton() -> Element {
+    let appearance = use_appearance();
+    let button_color = match *appearance.read() {
+        Appearance::Light => "text-gray-300 hover:text-black ",
+        Appearance::Dark => "text-gray-300 hover:text-white ",
+    };
     rsx! {
         Link {
-            class: "flex transition transition-colors font-semibold px-3 h-10 rounded-full hover-100 active-200",
+            class: "flex transition transition-colors font-semibold text-sm px-3 h-10 rounded-full hover-100 active-200 {button_color}",
             to: Route::Stake {},
             span {
                 class: "my-auto",

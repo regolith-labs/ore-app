@@ -13,31 +13,7 @@ use crate::{
 
 #[component]
 pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
-    // let mut time_remaining = use_signal(|| 0);
     let mut toolbar_state = use_miner_toolbar_state();
-
-    // Animate countdown timer.
-    // use_future(move || {
-    //     let signer = signer();
-    //     let gateway = gateway.clone();
-    //     async move {
-    //         if let Ok(proof) = gateway.get_proof(signer.pubkey()).await {
-    //             if let Ok(clock) = gateway.get_clock().await {
-    //                 let mut cutoff_time = proof
-    //                     .last_hash_at
-    //                     .saturating_add(60)
-    //                     .saturating_sub(clock.unix_timestamp)
-    //                     .max(0) as u64;
-    //                 time_remaining.set(cutoff_time);
-    //                 loop {
-    //                     async_std::task::sleep(std::time::Duration::from_secs(1)).await;
-    //                     cutoff_time -= 1;
-    //                     time_remaining.set(cutoff_time.min(0));
-    //                 }
-    //             }
-    //         }
-    //     }
-    // });
 
     // Animate the hash in the miner toolbar to visualize mining.
     use_future(move || async move {
@@ -49,124 +25,53 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
         }
     });
 
-    if toolbar_state.is_open() {
-        rsx! {
+    rsx! {
+        div {
+            class: "flex flex-row gap-2 max-w-screen w-screen justify-start my-auto px-4 sm:px-8 object-contain",
             div {
-                class: "flex flex-col grow w-full gap-4 px-4 py-6 sm:px-8",
-                div {
-                    class: "flex flex-col w-full gap-2",
-                    div {
-                        class: "flex flex-row w-full justify-between",
-                        h2 {
-                            class: "text-3xl md:text-4xl lg:text-5xl text-white font-bold",
-                            "Mining"
-                        }
-                        div {
-                            class: "my-auto",
-                            StopButton {}
-                        }
-                    }
-                    match toolbar_state.status_message() {
-                        MinerStatusMessage::Searching => {
-                            rsx! {
-                                p {
-                                    class: "text-lg text-white",
-                                    "Searching for a valid hash... "
-                                    // if time_remaining.read().gt(&0) {
-                                    //     "({time_remaining} sec)"
-                                    // }
-                                }
-                            }
-                        }
-                        MinerStatusMessage::Submitting => {
-                            rsx! {
-                                div {
-                                    class: "flex flex-row gap-2",
-                                    p {
-                                        class: "text-lg text-white",
-                                        "Submitting hash for validation..."
-                                    }
-                                    Spinner {
-                                        class: "my-auto"
-                                    }
-                                }
-                            }
-                        }
-                        MinerStatusMessage::Error => {
-                            rsx! {
-                                p {
-                                    class: "text-lg text-white",
-                                    "Error submitting transaction"
-                                }
-                            }
-                        }
-                    }
-                    match toolbar_state.status_message() {
-                        MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
-                            rsx! {
-                                p {
-                                    class: "font-mono text-sm truncate shrink opacity-80",
-                                    "{toolbar_state.display_hash()}"
-                                }
-                            }
-                        }
-                        _ => rsx! {}
-                    }
-                }
-                // PriorityFeeConfig {}
-                MultiplierDisplay {}
-                PowerLevelConfig {}
-                DownloadLink {}
+                class: "flex-shrink-0 flex-none my-auto",
+                ActivityIndicator {}
             }
-        }
-    } else {
-        rsx! {
+            p {
+                class: "font-semibold text-white flex-shrink-0 flex-none my-auto",
+                "Mining"
+            }
             div {
-                class: "flex flex-row gap-2 max-w-screen w-screen justify-start my-auto px-4 sm:px-8 object-contain",
-                div {
-                    class: "flex-shrink-0 flex-none my-auto",
-                    ActivityIndicator {}
-                }
-                p {
-                    class: "font-semibold text-white flex-shrink-0 flex-none my-auto",
-                    "Mining"
-                }
-                div {
-                    class: "flex-shrink flex-auto truncate my-auto",
-                    match toolbar_state.status_message() {
-                        MinerStatusMessage::Searching => {
-                            rsx! {
-                                p {
-                                    class: "font-mono text-sm truncate flex-shrink flex-auto opacity-80 my-auto ml-2",
-                                    "{toolbar_state.display_hash()}"
-                                }
+                class: "flex-shrink flex-auto truncate my-auto",
+                match toolbar_state.status_message() {
+                    MinerStatusMessage::Searching => {
+                        rsx! {
+                            p {
+                                class: "font-mono text-sm truncate flex-shrink flex-auto opacity-80 my-auto ml-2",
+                                "{toolbar_state.display_hash()}"
                             }
                         }
-                        MinerStatusMessage::Submitting => {
-                            rsx! {
-                                p {
-                                    class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
-                                    "Submitting hash for validation..."
-                                }
+                    }
+                    MinerStatusMessage::Submitting => {
+                        rsx! {
+                            p {
+                                class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
+                                "Submitting hash for validation..."
                             }
                         }
-                        MinerStatusMessage::Error => {
-                            rsx! {
-                                p {
-                                    class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
-                                    "Error submitting transaction"
-                                }
+                    }
+                    MinerStatusMessage::Error => {
+                        rsx! {
+                            p {
+                                class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
+                                "Error submitting transaction"
                             }
                         }
                     }
                 }
-                div {
-                    class: "flex-shrink-0 flex-none ml-auto my-auto",
-                    StopButton {}
-                }
+            }
+            div {
+                class: "flex-shrink-0 flex-none ml-auto my-auto",
+                StopButton {}
             }
         }
     }
+    // }
 }
 
 pub fn PriorityFeeConfig() -> Element {
@@ -205,87 +110,6 @@ pub fn PriorityFeeConfig() -> Element {
                 p {
                     class: "my-auto",
                     "microlamports"
-                }
-            }
-        }
-    }
-}
-
-pub fn MultiplierDisplay() -> Element {
-    let proof = use_proof();
-
-    let multiplier = use_resource(move || async move {
-        let gateway = use_gateway();
-        if let Some(Ok(proof)) = *proof.read() {
-            if let Ok(config) = gateway.get_config().await {
-                return 1.0 + (proof.balance as f64 / config.max_stake as f64).min(1.0f64);
-            }
-        }
-        1.0
-    });
-
-    rsx! {
-        div {
-            class: "flex flex-row gap-8 justify-between mt-8",
-            div {
-                class: "flex flex-col gap-1",
-                p {
-                    class: "text-white font-semibold",
-                    "Multiplier"
-                }
-                p {
-                    class: "text-white text-xs opacity-80 max-w-96",
-                    "You are earning a multiplier on your mining rewards based on your current stake balance."
-                }
-           }
-           div {
-                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                p {
-                    class: "text-white text-right px-1 mb-auto font-semibold",
-                    "{multiplier.read().unwrap_or(1.0):.12}x"
-                }
-            }
-        }
-    }
-}
-
-pub fn PowerLevelConfig() -> Element {
-    let mut power_level = use_power_level();
-    let max = *WEB_WORKERS as i64;
-
-    rsx! {
-        div {
-            class: "flex flex-row gap-8 justify-between mt-8",
-            div {
-                class: "flex flex-col gap-1",
-                p {
-                    class: "text-white font-semibold",
-                    "Power level"
-                }
-                p {
-                    class: "text-white text-xs opacity-80 max-w-96",
-                    "Select how many computer cores to dedicate to mining."
-                }
-            }
-            div {
-                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                input {
-                    class: "bg-transparent text-white text-right px-1 mb-auto rounded font-semibold hover:bg-green-600 transition-colors",
-                    dir: "rtl",
-                    step: 1,
-                    min: 1,
-                    max: max,
-                    r#type: "number",
-                    value: "{power_level.read().0}",
-                    oninput: move |e| {
-                        if let Ok(v) = e.value().parse::<u64>() {
-                            power_level.set(PowerLevel(v));
-                        }
-                    }
-                }
-                p {
-                    class: "my-auto",
-                    "of {max} cores"
                 }
             }
         }
