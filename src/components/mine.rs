@@ -202,7 +202,7 @@ pub fn MultiplierDisplay() -> Element {
         let gateway = use_gateway();
         if let Some(Ok(proof)) = *proof.read() {
             if let Ok(config) = gateway.get_config().await {
-                return 1.0 + (proof.balance as f64 / config.max_stake as f64).min(1.0f64);
+                return 1.0 + (proof.balance as f64 / config.top_balance as f64).min(1.0f64);
             }
         }
         1.0

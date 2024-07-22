@@ -107,9 +107,11 @@ impl Miner {
         }
 
         // Kickoff new batch
-        if best_difficulty.lt(&ore_api::consts::MIN_DIFFICULTY) {
-            self.start_mining(challenge, offset, 0).await;
-            return;
+        if let Ok(config) = gateway.get_config().await {
+            if best_difficulty.lt(&(config.min_difficulty as u32)) {
+                self.start_mining(challenge, offset, 0).await;
+                return;
+            }
         }
 
         // Update toolbar state

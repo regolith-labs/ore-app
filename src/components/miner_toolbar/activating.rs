@@ -48,7 +48,6 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     }
 
     if let Some(Ok(balance)) = *escrow_balance.read() {
-        log::info!("Less than min balance? {:?} {:?}", balance, MIN_BALANCE);
         if balance.lt(&MIN_BALANCE) {
             nav.push(Route::Mine {});
         }
