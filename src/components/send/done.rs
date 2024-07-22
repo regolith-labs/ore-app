@@ -13,7 +13,7 @@ pub fn SendDone() -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "You have sent Ore."
+                    "You have succesfully transferred ORE."
                 }
                 // p {
                 //     class: "text-sm text-gray-300 dark:text-gray-700",
