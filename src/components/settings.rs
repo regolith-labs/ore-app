@@ -15,7 +15,7 @@ pub fn Settings() -> Element {
 
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
-    let data_title_class = "font-medium text-sm opacity-50 my-auto";
+    let data_title_class = "font-medium text-sm text-gray-300 my-auto";
 
     rsx! {
         div {

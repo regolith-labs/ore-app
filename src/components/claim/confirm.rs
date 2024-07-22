@@ -77,7 +77,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
         div {
             class: "flex flex-col h-full grow justify-between",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-2",
                 BackButton {
                     onclick: move |_| {
                         claim_step.borrow_mut().set(ClaimStep::Edit);
@@ -91,7 +91,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                     "Please review your claim information for correctness."
                 }
                 p {
-                    class: "text-sm text-gray-300 dark:text-gray-700",
+                    class: "text-sm text-gray-300",
                     "Once confirmed, this transaction cannot be undone."
                 }
             }

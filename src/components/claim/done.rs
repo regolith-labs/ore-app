@@ -7,7 +7,7 @@ pub fn ClaimDone() -> Element {
         div {
             class: "flex flex-col grow justify-between",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-2",
                 h2 {
                     "Success!"
                 }
@@ -16,7 +16,7 @@ pub fn ClaimDone() -> Element {
                     "You have claimed your mining rewards."
                 }
                 p {
-                    class: "text-sm text-gray-300 dark:text-gray-700",
+                    class: "text-sm text-gray-300",
                     "You can now spend and transfer your Ore from the dashboard."
                 }
             }
