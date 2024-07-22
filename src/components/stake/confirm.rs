@@ -13,9 +13,8 @@ use crate::{
     components::{BackButton, InvokeSignature, OreIcon},
     gateway::ore_token_account_address,
     hooks::{
-        use_gateway, use_ore_balance, use_priority_fee,
+        use_gateway, use_ore_balance,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
-        PriorityFee,
     },
 };
 
@@ -23,7 +22,6 @@ use super::StakeStep;
 
 #[component]
 pub fn StakeConfirm(amount: u64, step: Signal<StakeStep>) -> Element {
-    let mut priority_fee = use_priority_fee();
     let mut ore_balance = use_ore_balance();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
     let wallet_adapter = use_wallet_adapter();
@@ -94,51 +92,12 @@ pub fn StakeConfirm(amount: u64, step: Signal<StakeStep>) -> Element {
                     }
                 }
             }
-            div {
-                class: "flex flex-col gap-8",
-                div {
-                    class: "flex flex-row gap-8 justify-between mt-8",
-                    div {
-                        class: "flex flex-col gap-1",
-                        p {
-                            class: "font-semibold",
-                            "Priority fee"
-                        }
-                        p {
-                            class: "text-xs opacity-80 max-w-96",
-                            "Add a priority fee to increase your chances of landing a transaction."
-                        }
-                    }
-                    div {
-                        class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                        input {
-                            disabled: invoke_signature_signal.read().eq(&InvokeSignatureStatus::Waiting),
-                            class: "bg-transparent text-right px-1 mb-auto font-semibold",
-                            dir: "rtl",
-                            step: 100_000,
-                            min: 0,
-                            max: 50_000_000,
-                            r#type: "number",
-                            value: "{priority_fee.read().0}",
-                            oninput: move |e| {
-                                if let Ok(v) = e.value().parse::<u64>() {
-                                    priority_fee.set(PriorityFee(v));
-                                }
-                            }
-                        }
-                        p {
-                            class: "my-auto",
-                            "microlamports"
-                        }
-                    }
-                }
-                if let Some(Some(tx)) = tx.cloned() {
-                    InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Confirm" }
-                } else {
-                    p {
-                        class: "font-medium text-center text-sm text-gray-300 hover:underline",
-                        "Loading..."
-                    }
+            if let Some(Some(tx)) = tx.cloned() {
+                InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Confirm" }
+            } else {
+                p {
+                    class: "font-medium text-center text-sm text-gray-300 hover:underline",
+                    "Loading..."
                 }
             }
         }

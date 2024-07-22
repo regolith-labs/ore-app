@@ -113,7 +113,8 @@ pub fn ActivityTable(offset: Signal<u64>, transfers: ListTransfersResponse) -> E
     } else {
         rsx! {
             div {
-                class: "flex flex-col gap-4 -mx-2 sm:mx-0",
+                // class: "flex flex-col gap-4 -mx-2 sm:mx-0",
+                class: "flex flex-col gap-4",
                 div {
                     class: "h-full w-full max-w-full",
                     for transfer in transfers.data {
@@ -254,6 +255,9 @@ pub fn ActivityRow(transfer: Transfer) -> Element {
                         class: "flex flex-row gap-1.5 text-wrap flex-wrap",
                         Link {
                             to: Route::User { id: addr_a_link },
+                            onclick: move |e: Event<MouseData>| {
+                                e.stop_propagation();
+                            },
                             span {
                                 class: "{addr_a_class} hover:underline",
                                 "{addr_a}"
@@ -261,9 +265,9 @@ pub fn ActivityRow(transfer: Transfer) -> Element {
                         }
                         "{action} "
                         span {
-                            class: "flex flex-row font-semibold gap-[0.16rem]",
+                            class: "flex flex-row font-semibold gap-1",
                             OreIcon {
-                                class: "ml-0.5 w-3.5 h-3.5 my-auto",
+                                class: "ml-0.5 w-4 h-4 my-auto",
                             }
                             "{amount_to_ui_amount(transfer.amount as u64, ore_api::consts::TOKEN_DECIMALS)}"
                         }

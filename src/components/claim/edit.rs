@@ -36,7 +36,7 @@ pub fn ClaimEdit(
                 }
                 p {
                     class: "text-sm text-gray-300",
-                    "Upon claiming, this amount will be added to your balance in the dashboard."
+                    "This will unsake your ORE and send it to your wallet."
                 }
             }
             div {
