@@ -26,7 +26,7 @@ pub fn ClaimEdit(
         div {
             class: "flex flex-col h-full grow justify-between",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-2",
                 h2 {
                     "Claim"
                 }
@@ -35,7 +35,7 @@ pub fn ClaimEdit(
                     "Select an amount of rewards to claim."
                 }
                 p {
-                    class: "text-sm text-gray-300 dark:text-gray-700",
+                    class: "text-sm text-gray-300",
                     "Upon claiming, this amount will be added to your balance in the dashboard."
                 }
             }

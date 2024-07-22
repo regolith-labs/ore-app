@@ -44,16 +44,16 @@ pub fn User(id: String) -> Element {
     };
 
     let description = if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
-        Some("This is a special program account responsible for minting and distributing the Ore token supply.")
+        Some("This is a special program account responsible for minting ORE tokens.")
     } else if BUS_ADDRESSES.contains(&user_id) {
-        Some("This is a special program account responsible for issuing Ore to miners.")
+        Some("This is a special program account responsible for issuing ORE rewards to miners.")
     } else {
         None
     };
 
     let show_send_button = false; // title.eq("User") && user_id.ne(&pubkey);
     let container_class = "flex flex-row gap-8 justify-between py-1 sm:px-1";
-    let title_class = "text-gray-300 text-sm my-auto";
+    let title_class = "text-gray-300 font-medium text-sm my-auto";
     let value_class = "font-medium py-1 rounded";
     let link_class = "font-medium transition-colors -ml-2 sm:ml-0 px-2 py-1 hover-100 active-200 rounded truncate";
 
@@ -67,21 +67,21 @@ pub fn User(id: String) -> Element {
                         nav.go_back()
                     }
                 }
-                div {
-                    class: "flex flex-col gap-8",
-                    if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
-                        TreasuryBubble {
-                            class: "my-auto w-20 h-20",
-                        }
-                    } else if BUS_ADDRESSES.contains(&user_id) {
-                        BusBubble {
-                            class: "my-auto w-20 h-20",
-                        }
-                    } else {
-                        UserBubble {
-                            class: "my-auto w-20 h-20",
-                        }
-                    }
+                // div {
+                //     class: "flex flex-col gap-8",
+                    // if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
+                    //     TreasuryBubble {
+                    //         class: "my-auto w-20 h-20",
+                    //     }
+                    // } else if BUS_ADDRESSES.contains(&user_id) {
+                    //     BusBubble {
+                    //         class: "my-auto w-20 h-20",
+                    //     }
+                    // } else {
+                    //     UserBubble {
+                    //         class: "my-auto w-20 h-20",
+                    //     }
+                    // }
                     div {
                         class: "flex flex-row justify-between",
                         h2 {
@@ -92,10 +92,10 @@ pub fn User(id: String) -> Element {
                             SendButton { to: id.clone() }
                         }
                     }
-                }
+                // }
                 if let Some(description) = description {
                     p {
-                        class: "text-sm opacity-50 px-1",
+                        class: "text-sm text-gray-300 px-1",
                         "{description}"
                     }
                 }
@@ -125,9 +125,9 @@ pub fn User(id: String) -> Element {
                             }
                             if let Some(balance) = balance.cloned() {
                                 span {
-                                    class: "flex flex-row gap-1.5",
+                                    class: "flex flex-row gap-1",
                                     OreIcon {
-                                        class: "w-3.5 h-3.5 my-auto",
+                                        class: "w-4 h-4 my-auto",
                                     }
                                     p {
                                         class: "{value_class} truncate",
@@ -151,7 +151,7 @@ pub fn User(id: String) -> Element {
                                     span {
                                         class: "flex flex-row gap-1.5",
                                         OreIcon {
-                                            class: "w-3.5 h-3.5 my-auto",
+                                            class: "w-4 h-4 my-auto",
                                         }
                                         p {
                                             class: "{value_class} truncate",

@@ -1,11 +1,15 @@
 use dioxus::prelude::*;
+use ore_relayer_api::state::Escrow;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
-    components::{Activity, Balance, OreIcon, Spinner},
+    components::{
+        Activity, Balance, MinerToolbarCreateAccountOpen, MinerToolbarTopUpOpen, OreIcon, Spinner,
+        MIN_BALANCE,
+    },
     hooks::{
-        use_gateway, use_miner_toolbar_state, use_power_level, use_proof, MinerStatus,
-        MinerStatusMessage, PowerLevel, ReadMinerToolbarState,
+        use_escrow, use_escrow_sol_balance, use_gateway, use_miner_toolbar_state, use_power_level,
+        use_proof, MinerStatus, MinerStatusMessage, PowerLevel, ReadMinerToolbarState,
     },
     miner::WEB_WORKERS,
 };
@@ -15,12 +19,31 @@ use crate::{
 // TODO Stop start button
 
 pub fn Mine() -> Element {
+    let mut escrow_balance = use_escrow_sol_balance();
     let toolbar_state = use_miner_toolbar_state();
+    let escrow = use_escrow();
+
+    if escrow.read().eq(&Escrow::default()) {
+        return rsx! {
+            MinerToolbarCreateAccountOpen {}
+        };
+    }
+
+    if let Some(Ok(balance)) = *escrow_balance.read() {
+        if balance.lt(&MIN_BALANCE) {
+            return rsx! {
+                MinerToolbarTopUpOpen {
+                    escrow_balance: escrow_balance.clone()
+                }
+            };
+        }
+    }
+
     rsx! {
         div {
             class: "flex flex-col gap-8 overflow-visible",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-2",
                 h2 {
                     "Miner"
                 }
@@ -90,7 +113,7 @@ pub fn Mine() -> Element {
                                 MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
                                     rsx! {
                                         p {
-                                            class: "font-mono text-sm truncate shrink opacity-80",
+                                            class: "font-mono text-sm truncate shrink text-gray-300",
                                             "{toolbar_state.display_hash()}"
                                         }
                                     }
@@ -148,7 +171,7 @@ pub fn StakeBalanceDisplay() -> Element {
                         }
                     } else {
                         div {
-                            class: "flex flex-row w-32 h-10 grow loading rounded",
+                            class: "flex flex-row w-32 h-8 grow loading rounded",
                         }
                     }
                 }

@@ -23,8 +23,8 @@ pub fn Tx(sig: String) -> Element {
                 let explorer_url = use_explorer_transaction_url(transfer.sig.clone());
                 let date = use_datetime(transfer.ts);
                 let container_class = "flex gap-8 flex-row justify-between py-2 sm:px-1";
-                let title_class = "text-gray-300 text-sm my-auto";
-                let value_class = "font-medium sm:px-2 py-1 rounded";
+                let title_class = "text-gray-300 font-medium text-sm my-auto";
+                let value_class = "font-medium py-1 rounded";
                 let link_class = "font-medium transition-colors -ml-2 sm:ml-0 px-2 py-1 hover-100 active-200 rounded truncate";
                 let from_name = if let Ok(from_address) = Pubkey::from_str(&transfer.from_address) {
                     if from_address.eq(&TREASURY_ADDRESS) {
@@ -107,9 +107,9 @@ pub fn Tx(sig: String) -> Element {
                                     "Amount"
                                 }
                                 span {
-                                    class: "flex flex-row gap-1",
+                                    class: "flex flex-row gap-1.5",
                                     OreIcon {
-                                        class: "w-3.5 h-3.5 my-auto",
+                                        class: "w-4 h-4 my-auto",
                                     }
                                     p {
                                         class: "{value_class}",

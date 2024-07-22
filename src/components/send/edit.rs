@@ -55,13 +55,13 @@ pub fn SendEdit(
         div {
             class: "flex flex-col h-full grow gap-12",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-2",
                 h2 {
                     "Transfer"
                 }
                 p {
                     class: "text-lg",
-                    "Transfer ORE to another user."
+                    "Send some ORE to another user."
                 }
             }
             div {

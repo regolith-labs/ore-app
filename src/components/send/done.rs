@@ -7,7 +7,7 @@ pub fn SendDone() -> Element {
         div {
             class: "flex flex-col grow justify-between",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-2",
                 h2 {
                     "Success!"
                 }

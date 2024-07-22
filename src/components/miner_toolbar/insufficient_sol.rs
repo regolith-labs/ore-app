@@ -19,27 +19,7 @@ use crate::{
 };
 
 #[component]
-pub fn MinerToolbarTopUp(sol_balance: Resource<GatewayResult<u64>>) -> Element {
-    let toolbar_state = use_miner_toolbar_state();
-    rsx! {
-        // if toolbar_state.is_open() {
-        //     MinerToolbarTopUpOpen {
-        //         sol_balance: sol_balance.clone()
-        //     }
-        // } else {
-            div {
-                class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
-                span {
-                    class: "font-semibold",
-                    "Create account →"
-                }
-            }
-        // }
-    }
-}
-
-#[component]
-pub fn MinerToolbarTopUpOpen(sol_balance: Resource<GatewayResult<u64>>) -> Element {
+pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> Element {
     let wallet_adapter = use_wallet_adapter();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
     let tx = use_resource(move || async move {
@@ -73,7 +53,7 @@ pub fn MinerToolbarTopUpOpen(sol_balance: Resource<GatewayResult<u64>>) -> Eleme
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 let gateway = use_gateway();
                 async_std::task::sleep(Duration::from_millis(1000)).await;
-                sol_balance.restart();
+                escrow_balance.restart();
             }
         };
         ()
@@ -81,24 +61,31 @@ pub fn MinerToolbarTopUpOpen(sol_balance: Resource<GatewayResult<u64>>) -> Eleme
 
     rsx! {
         div {
-            class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between px-4 sm:px-8 py-8",
+            class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between",
             div {
                 class: "flex flex-col gap-2",
                 p {
                     class: "text-3xl md:text-4xl lg:text-5xl font-bold",
-                    "Pay transaction fees"
+                    "Top up"
                 }
                 p {
                     class: "text-lg",
-                    "Top up your account to pay for blockchain transaction fees."
+                    "Fund your account to pay for blockchain transaction fees."
                 }
-                p {
-                    class: "text-sm text-gray-300",
-                    "This will fund your account to automate mining."
-                }
+                // p {
+                //     class: "text-sm text-gray-300",
+                //     "This will fund your account to automate mining."
+                // }
             }
             div {
                 class: "flex flex-col gap-4",
+                a {
+                    // TODO Get referal code
+                    href: "https://www.coinbase.com/price/solana",
+                    target: "_blank",
+                    class: "font-medium text-center py-2 text-sm text-gray-300 hover:underline",
+                    "Help! I don't have any SOL."
+                }
                 if let Some(Ok(tx)) = tx.cloned() {
                     InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Top up" }
                 } else {
@@ -107,40 +94,12 @@ pub fn MinerToolbarTopUpOpen(sol_balance: Resource<GatewayResult<u64>>) -> Eleme
                         "Loading..."
                     }
                 }
-                a {
-                    // TODO Get referal code
-                    href: "https://www.coinbase.com/price/solana",
-                    target: "_blank",
-                    class: "font-medium text-center text-sm text-gray-300 hover:underline",
-                    "Help! I don't have any SOL."
-                }
             }
         }
     }
 }
 
-#[component]
-pub fn MinerToolbarCreateAccount(miner: Signal<Miner>) -> Element {
-    let toolbar_state = use_miner_toolbar_state();
-    rsx! {
-        // if toolbar_state.is_open() {
-        //     MinerToolbarCreateAccountOpen {
-        //         miner
-        //     }
-        // } else {
-            div {
-                class: "flex flex-row font-semibold justify-end w-full h-full px-4 sm:px-8 pt-5 pointer-events-none",
-                span {
-                    class: "font-semibold",
-                    "Create account →"
-                }
-            }
-        // }
-    }
-}
-
-#[component]
-pub fn MinerToolbarCreateAccountOpen(miner: Signal<Miner>) -> Element {
+pub fn MinerToolbarCreateAccountOpen() -> Element {
     let wallet_adapter = use_wallet_adapter();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
     let mut escrow = use_escrow();
