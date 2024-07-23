@@ -12,6 +12,7 @@ pub struct WebWorkerRequest {
     pub nonce: [u8; 8],
     pub offset: u64,
     pub cutoff_time: u64,
+    pub power_level: usize,
 }
 
 /// Mining response for web workers
@@ -23,6 +24,7 @@ pub struct WebWorkerResponse {
     pub difficulty: u32,
     pub offset: u64,
     pub challenge: [u8; 32],
+    pub power_level: usize,
 }
 
 #[wasm_bindgen]
@@ -35,7 +37,13 @@ pub fn start_worker() {
     scope.set_onmessage(Some(&js_sys::Function::unchecked_from_js(
         Closure::<dyn Fn(MessageEvent)>::new(move |e: MessageEvent| {
             let req: WebWorkerRequest = from_value(e.data()).unwrap();
-            let res = find_next_hash(req.challenge, req.nonce, req.offset, req.cutoff_time);
+            let res = find_next_hash(
+                req.challenge,
+                req.nonce,
+                req.offset,
+                req.cutoff_time,
+                req.power_level,
+            );
             scope_.post_message(&to_value(&res).unwrap()).unwrap();
         })
         .into_js_value(),
@@ -81,6 +89,7 @@ pub fn find_next_hash(
     nonce: [u8; 8],
     offset: u64,
     cutoff_time: u64,
+    power_level: usize,
 ) -> WebWorkerResponse {
     let timer = Instant::now();
     let mut i = 0;
@@ -122,5 +131,6 @@ pub fn find_next_hash(
         difficulty: best_difficulty,
         offset: offset + i,
         challenge,
+        power_level,
     }
 }
