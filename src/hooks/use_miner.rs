@@ -18,6 +18,7 @@ pub fn use_miner() -> Signal<Miner> {
         async move {
             let mut messages = vec![];
             while let Ok(msg) = rx.recv().await {
+                log::info!("Got message: {:?}", msg);
                 messages.push(msg);
                 if messages.len().ge(&WEB_WORKERS) {
                     miner
