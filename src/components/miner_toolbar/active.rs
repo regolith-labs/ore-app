@@ -51,7 +51,7 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                         rsx! {
                             p {
                                 class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
-                                "Submitting hash for validation..."
+                                "Submitting hash..."
                             }
                         }
                     }
