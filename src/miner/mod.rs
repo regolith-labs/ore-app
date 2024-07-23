@@ -107,8 +107,11 @@ impl Miner {
         }
 
         // Kickoff new batch
+        log::info!("A");
         if let Ok(config) = gateway.get_config().await {
+            log::info!("B {:?}", config);
             if best_difficulty.lt(&(config.min_difficulty as u32)) {
+                log::info!("C {:?} {:?}", best_difficulty, config.min_difficulty);
                 self.start_mining(challenge, offset, 0).await;
                 return;
             }
