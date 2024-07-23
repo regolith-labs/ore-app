@@ -16,11 +16,14 @@ pub fn use_miner() -> Signal<Miner> {
     use_future(move || {
         let mut rx = cx.receiver();
         async move {
+            let mut power_level = usize::MAX;
             let mut messages = vec![];
             while let Ok(msg) = rx.recv().await {
-                log::info!("Got message: {:?}", msg);
+                if msg.power_level.lt(&power_level) {
+                    power_level = msg.power_level;
+                }
                 messages.push(msg);
-                if messages.len().ge(&WEB_WORKERS) {
+                if messages.len().ge(&power_level) {
                     miner
                         .read()
                         .process_web_worker_results(&messages, &mut toolbar_state, &mut escrow)
