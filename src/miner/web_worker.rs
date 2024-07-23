@@ -103,6 +103,7 @@ pub fn find_next_hash(
 
         // Break if time has elapsed and batch size is processed
         if nonce % 20 == 0 {
+            log::info!("Hash: {:?} {:?}", i, nonce);
             if timer.elapsed().as_secs().gt(&cutoff_time) {
                 if i.ge(&100) {
                     break;
