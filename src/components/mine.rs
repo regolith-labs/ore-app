@@ -227,7 +227,7 @@ pub fn MultiplierDisplay() -> Element {
             }
             p {
                 class: "text-white text-xs opacity-80 max-w-96",
-                "The multiplier you are earning from your mining rewards from staking."
+                "The multiplier you are earning on your mining rewards from staking."
             }
         }
     }
