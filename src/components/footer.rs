@@ -74,7 +74,7 @@ fn SiteMap() -> Element {
                 class: "{container_class}",
                 p {
                     class: "{title_class}",
-                    "Product"
+                    "Apps"
                 }
                 Link {
                     class: "{link_class}",

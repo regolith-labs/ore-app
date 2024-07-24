@@ -55,11 +55,7 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
-            p {
-                class: "font-semibold my-auto",
-                "Starting..."
-            }
+            class: "flex flex-row w-full justify-end my-auto px-4 sm:px-8",
             div {
                 class: "flex w-10 h-10",
                 Spinner {

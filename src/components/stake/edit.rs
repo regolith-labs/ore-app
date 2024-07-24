@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::WarningIcon,
+    components::{BackButton, WarningIcon},
     hooks::{use_ore_balance, UiTokenAmountBalance},
 };
 
@@ -36,17 +36,25 @@ pub fn StakeEdit(
         div {
             class: "flex flex-col h-full grow justify-between",
             div {
-                class: "flex flex-col gap-3",
-                h2 {
-                    "Stake"
+                class: "flex flex-col gap-4 -mt-3.5 mb-4",
+                BackButton {
+                    onclick: move |_| {
+                        nav.go_back()
+                    }
                 }
-                p {
-                    class: "text-lg",
-                    "Select an amount to stake."
-                }
-                p {
-                    class: "text-sm text-gray-300 dark:text-gray-700",
-                    "This amount will be moved from your wallet into your stake account to earn a mining multiplier."
+                div {
+                    class: "flex flex-col gap-3",
+                    h2 {
+                        "Stake"
+                    }
+                    p {
+                        class: "text-lg",
+                        "Stake ORE with your miner."
+                    }
+                    p {
+                        class: "text-sm text-gray-300",
+                        "This will transfer ORE to your miner and increase your mining multiplier."
+                    }
                 }
             }
             div {
@@ -82,13 +90,6 @@ pub fn StakeEdit(
             }
             div {
                 class: "flex flex-col sm:flex-row gap-2",
-                button {
-                    class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
-                    onclick: move |_| {
-                        nav.go_back();
-                    },
-                    "Cancel"
-                }
                 button {
                     class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
                     disabled: is_disabled,

@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::WarningIcon,
+    components::{BackButton, WarningIcon},
     hooks::{use_ore_balance, UiTokenAmountBalance},
 };
 
@@ -55,13 +55,21 @@ pub fn SendEdit(
         div {
             class: "flex flex-col h-full grow gap-12",
             div {
-                class: "flex flex-col gap-2",
-                h2 {
-                    "Transfer"
+                class: "flex flex-col gap-4 -mt-3.5 mb-4",
+                BackButton {
+                    onclick: move |_| {
+                        nav.go_back()
+                    }
                 }
-                p {
-                    class: "text-lg",
-                    "Send ORE to someone."
+                div {
+                    class: "flex flex-col gap-2",
+                    h2 {
+                        "Transfer"
+                    }
+                    p {
+                        class: "text-lg",
+                        "Send ORE to someone."
+                    }
                 }
             }
             div {
@@ -148,13 +156,6 @@ pub fn SendEdit(
             }
             div {
                 class: "flex flex-col sm:flex-row gap-2 mt-auto",
-                button {
-                    class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
-                    onclick: move |_| {
-                        nav.go_back();
-                    },
-                    "Cancel"
-                }
                 button {
                     class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
                     disabled: is_disabled,

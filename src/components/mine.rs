@@ -58,30 +58,6 @@ pub fn Mine() -> Element {
                         "Miner"
                     }
                     match toolbar_state.status() {
-                        MinerStatus::NotStarted => {
-                            rsx! {
-                                p {
-                                    class: "text-lg text-white",
-                                    "Stopped"
-                                }
-                            }
-                        },
-                        MinerStatus::Activating => {
-                            rsx! {
-                                p {
-                                    class: "text-lg text-white",
-                                    "Starting..."
-                                }
-                            }
-                        },
-                        MinerStatus::Error => {
-                            rsx! {
-                                p {
-                                    class: "text-lg text-white",
-                                    "Error"
-                                }
-                            }
-                        },
                         MinerStatus::Active => {
                             rsx! {
                                 match toolbar_state.status_message() {
@@ -89,7 +65,7 @@ pub fn Mine() -> Element {
                                         rsx! {
                                             p {
                                                 class: "text-lg text-white",
-                                                "Searching for a valid hash... "
+                                                "Searching for valid solutions... "
                                                 // if time_remaining.read().gt(&0) {
                                                 //     "({time_remaining} sec)"
                                                 // }
@@ -102,7 +78,7 @@ pub fn Mine() -> Element {
                                                 class: "flex flex-row gap-2",
                                                 p {
                                                     class: "text-lg text-white",
-                                                    "Submitting hash for validation..."
+                                                    "Submitting best solution..."
                                                 }
                                                 Spinner {
                                                     class: "my-auto"
@@ -131,7 +107,8 @@ pub fn Mine() -> Element {
                                     _ => rsx! {}
                                 }
                             }
-                        },
+                        }
+                        _ => { rsx! {} },
                     }
                 }
             }
@@ -149,7 +126,6 @@ pub fn StakeBalanceDisplay() -> Element {
             div {
                 class: "flex flex-row gap-8 justify-between",
                     p {
-                        // class: "text-white font-semibold",
                         class: "text-gray-300 font-medium text-sm my-auto",
                         "Stake"
                     }

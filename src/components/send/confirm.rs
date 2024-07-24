@@ -94,7 +94,7 @@ pub fn SendConfirm(
                     }
                 }
                 h2 {
-                    "Confirm transfer"
+                    "Confirm"
                 }
                 p {
                     class: "text-lg",

@@ -8,14 +8,7 @@ use crate::{
 pub fn MinerToolbarNotStarted() -> Element {
     rsx! {
         div {
-            class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",
-            div {
-                class: "flex flex-row gap-4 sm:gap-6",
-                p {
-                    class: "font-semibold my-auto",
-                    "Stopped"
-                }
-            }
+            class: "flex flex-row w-full justify-end my-auto px-4 sm:px-8",
             div {
                 class: "flex flex-row gap-2 sm:gap-4",
                 StartButton {}
@@ -29,7 +22,6 @@ pub fn StartButton() -> Element {
     rsx! {
         button {
             class: "transition transition-colors flex flex-row gap-2 w-full h-10 px-4 justify-center rounded-full bg-green-500 text-white hover:bg-green-600 active:bg-green-700 text-nowrap",
-            title: "Start mining",
             onclick: move |e| {
                 toolbar_state.start();
                 e.stop_propagation();
@@ -39,7 +31,7 @@ pub fn StartButton() -> Element {
             }
             p {
                 class: "my-auto font-semibold",
-                "Start mining"
+                "Mine"
             }
         }
     }
