@@ -121,22 +121,22 @@ pub fn Tx(sig: String) -> Element {
                                 class: "{container_class}",
                                 p {
                                     class: "{title_class}",
-                                    "Timestamp"
+                                    "Memo"
                                 }
                                 p {
                                     class: "{value_class}",
-                                    "{date}"
+                                    "{transfer_memo}"
                                 }
                             }
                             div {
                                 class: "{container_class}",
                                 p {
                                     class: "{title_class}",
-                                    "Memo"
+                                    "Timestamp"
                                 }
                                 p {
                                     class: "{value_class}",
-                                    "{transfer_memo}"
+                                    "{date}"
                                 }
                             }
                         }
