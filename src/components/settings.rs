@@ -5,13 +5,18 @@ use solana_client_wasm::solana_sdk::native_token::lamports_to_sol;
 
 use crate::{
     components::Appearance,
-    hooks::{use_appearance, use_explorer, use_sol_balance, Explorer},
+    hooks::{
+        use_appearance, use_explorer, use_sol_balance,
+        use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
+        Explorer,
+    },
 };
 
 pub fn Settings() -> Element {
     let mut explorer = use_explorer();
     let mut appearance = use_appearance();
     let sol_balance = use_sol_balance();
+    let wallet_adapter = use_wallet_adapter();
 
     let container_class = "flex flex-row gap-8 justify-between w-full sm:px-1";
     let section_title_class = "text-lg md:text-2xl font-bold";
@@ -20,74 +25,56 @@ pub fn Settings() -> Element {
     rsx! {
         div {
             class: "flex flex-col gap-16 w-full pb-24",
-            div {
-                class: "flex flex-col gap-4 w-full",
-                h2 {
-                    "Settings"
-                }
-                h2 {
-                    class: "{section_title_class} mt-8",
-                    "Account"
-                }
-                // div {
-                //     class: "{container_class}",
-                //     p {
-                //         class: "{data_title_class}",
-                //         "Address"
-                //     }
-                //     Copyable {
-                //         value: pubkey.to_string(),
-                //         Link {
-                //             class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
-                //             to: Route::User {
-                //                 id: pubkey.to_string()
-                //             },
-                //             "{pubkey}"
-                //         }
-                //     }
-                // }
+            if let WalletAdapter::Connected(_) = *wallet_adapter.read() {
                 div {
-                    class: "{container_class}",
-                    p {
-                        class: "{data_title_class}",
-                        "Balance"
+                    class: "flex flex-col gap-4 w-full",
+                    h2 {
+                        "Settings"
                     }
-                    if let Some(balance) = *sol_balance.read() {
-                        if let Ok(balance) = balance {
-                            p {
-                                "{lamports_to_sol(balance)} SOL"
+                    h2 {
+                        class: "{section_title_class} mt-8",
+                        "Account"
+                    }
+                    // div {
+                    //     class: "{container_class}",
+                    //     p {
+                    //         class: "{data_title_class}",
+                    //         "Address"
+                    //     }
+                    //     Copyable {
+                    //         value: pubkey.to_string(),
+                    //         Link {
+                    //             class: "font-mono sm:px-2 py-1 rounded hover-100 active-200 transition-colors truncate font-medium",
+                    //             to: Route::User {
+                    //                 id: pubkey.to_string()
+                    //             },
+                    //             "{pubkey}"
+                    //         }
+                    //     }
+                    // }
+                    div {
+                        class: "{container_class}",
+                        p {
+                            class: "{data_title_class}",
+                            "Balance"
+                        }
+                        if let Some(balance) = *sol_balance.read() {
+                            if let Ok(balance) = balance {
+                                p {
+                                    "{lamports_to_sol(balance)} SOL"
+                                }
+                            } else {
+                                p {
+                                    "N/A"
+                                }
                             }
                         } else {
-                            p {
-                                "N/A"
+                            div {
+                                class: "flex w-32 loading rounded",
                             }
-                        }
-                    } else {
-                        div {
-                            class: "flex w-32 loading rounded",
                         }
                     }
                 }
-                // div {
-                //     class: "{container_class}",
-                //     p {
-                //         class: "{data_title_class}",
-                //         "Keypair"
-                //     }
-                //     div {
-                //         class: "flex flex-row gap-2 -mr-2",
-                //         Link {
-                //             to: Route::ImportKey {},
-                //             class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
-                //             "Import"
-                //         }
-                //         Link {
-                //             to: Route::ExportKey {},
-                //             class: "font-semibold hover-100 active-200 transition-colors px-4 py-1 rounded",
-                //             "Export"
-                //         }
-                //     }
-                // }
             }
             div {
                 class: "flex flex-col gap-4",

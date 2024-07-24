@@ -68,7 +68,11 @@ pub fn SendEdit(
                     }
                     p {
                         class: "text-lg",
-                        "Send ORE to someone."
+                        "Send ORE to anyone, anywhere in the world."
+                    }
+                    p {
+                        class: "text-sm text-gray-300",
+                        "This transaction will be executed and settled directly on the Solana blockchain."
                     }
                 }
             }
