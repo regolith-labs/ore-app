@@ -211,9 +211,8 @@ pub fn PowerLevelConfig() -> Element {
             div {
                 class: "flex flex-row gap-8 justify-between",
                     p {
-                        // class: "text-white font-semibold",
                         class: "text-gray-300 font-medium text-sm my-auto",
-                        "Power level"
+                        "Power"
                     }
                 div {
                     class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
