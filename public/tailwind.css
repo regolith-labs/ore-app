@@ -451,7 +451,7 @@ body {
 
 body:where(.dark, .dark *) {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 h1 {
@@ -459,7 +459,7 @@ h1 {
   line-height: 2.5rem;
   font-weight: 700;
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 h1:where(.dark, .dark *) {
@@ -472,7 +472,7 @@ h2 {
   line-height: 2.25rem;
   font-weight: 700;
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 @media (min-width: 768px) {
@@ -832,10 +832,6 @@ h2:where(.dark, .dark *) {
   height: 66.666667%;
 }
 
-.h-20 {
-  height: 5rem;
-}
-
 .h-3 {
   height: 0.75rem;
 }
@@ -911,10 +907,6 @@ h2:where(.dark, .dark *) {
 
 .w-2 {
   width: 0.5rem;
-}
-
-.w-20 {
-  width: 5rem;
 }
 
 .w-24 {
@@ -1236,7 +1228,7 @@ h2:where(.dark, .dark *) {
 
 .bg-black {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 .bg-blue-500 {
@@ -1469,7 +1461,7 @@ h2:where(.dark, .dark *) {
 
 .text-black {
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 .text-gray-300 {
@@ -1829,12 +1821,12 @@ h2:where(.dark, .dark *) {
 
 .selection\:bg-black *::-moz-selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 .selection\:bg-black *::selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 .selection\:bg-white *::-moz-selection {
@@ -1849,12 +1841,12 @@ h2:where(.dark, .dark *) {
 
 .selection\:text-black *::-moz-selection {
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 .selection\:text-black *::selection {
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 .selection\:text-white *::-moz-selection {
@@ -1869,12 +1861,12 @@ h2:where(.dark, .dark *) {
 
 .selection\:bg-black::-moz-selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 .selection\:bg-black::selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 .selection\:bg-white::-moz-selection {
@@ -1889,12 +1881,12 @@ h2:where(.dark, .dark *) {
 
 .selection\:text-black::-moz-selection {
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 .selection\:text-black::selection {
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 .selection\:text-white::-moz-selection {
@@ -1925,7 +1917,7 @@ h2:where(.dark, .dark *) {
 
 .hover\:bg-black:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-gray-100:hover {
@@ -1955,7 +1947,7 @@ h2:where(.dark, .dark *) {
 
 .hover\:text-black:hover {
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 .hover\:text-green-500:hover {
@@ -2333,7 +2325,7 @@ h2:where(.dark, .dark *) {
 
 .dark\:bg-black:where(.dark, .dark *) {
   --tw-bg-opacity: 1;
-  background-color: rgb(26 26 26 / var(--tw-bg-opacity));
+  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
 }
 
 .dark\:bg-gray-700:where(.dark, .dark *) {
@@ -2353,7 +2345,7 @@ h2:where(.dark, .dark *) {
 
 .dark\:text-black:where(.dark, .dark *) {
   --tw-text-opacity: 1;
-  color: rgb(26 26 26 / var(--tw-text-opacity));
+  color: rgb(19 20 22 / var(--tw-text-opacity));
 }
 
 .dark\:text-gray-700:where(.dark, .dark *) {
