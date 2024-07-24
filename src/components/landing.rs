@@ -90,7 +90,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Borderless asset.",
                 title2: &"Permissionless cash.",
-                detail: &"ORE is internet-native money that can move at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligable fees.",
+                detail: &"ORE is internet-native money that moves at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligable fees.",
                 section: Section::D,
                 text_color
             }
@@ -506,16 +506,19 @@ fn SectionD(text_color: TextColor) -> Element {
     };
 
     let quotes = use_resource(move || async move {
-        reqwest::get("https://price.jup.ag/v6/price?ids=USDC,EURC,WBTC&vsToken=ORE")
-            .await?
-            .json::<JupPriceApiResponse>()
-            .await
+        match reqwest::get("https://price.jup.ag/v6/price?ids=USDC,EURC,WBTC&vsToken=ORE").await {
+            Ok(res) => res.json::<JupPriceApiResponse>().await.ok(),
+            Err(_) => None,
+        }
     });
+
+    // log::info!("Quotes: {:?}", &*quotes.read());
+    // let x = &*quotes.read();
 
     rsx! {
         div {
             class: "flex flex-row flex-wrap gap-8 md:gap-12 my-auto align-top transition-colors {text_color}",
-            if let Some(Ok(quotes)) = &*quotes.read() {
+            if let Some(Some(quotes)) = quotes.cloned() {
                 Quote {
                     title: "ORE/USDC",
                     price: quotes.data["USDC"].price,
