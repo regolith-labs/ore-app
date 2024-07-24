@@ -71,7 +71,6 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
             }
         }
     }
-    // }
 }
 
 pub fn PriorityFeeConfig() -> Element {
