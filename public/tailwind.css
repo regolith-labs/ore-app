@@ -2044,6 +2044,10 @@ h2:where(.dark, .dark *) {
     margin-left: 0px;
   }
 
+  .sm\:block {
+    display: block;
+  }
+
   .sm\:h-10 {
     height: 2.5rem;
   }
@@ -2068,6 +2072,15 @@ h2:where(.dark, .dark *) {
     width: 2rem;
   }
 
+  .sm\:w-full {
+    width: 100%;
+  }
+
+  .sm\:w-min {
+    width: -moz-min-content;
+    width: min-content;
+  }
+
   .sm\:flex-row {
     flex-direction: row;
   }
@@ -2086,6 +2099,10 @@ h2:where(.dark, .dark *) {
 
   .sm\:gap-6 {
     gap: 1.5rem;
+  }
+
+  .sm\:gap-8 {
+    gap: 2rem;
   }
 
   .sm\:gap-y-10 {
@@ -2109,6 +2126,11 @@ h2:where(.dark, .dark *) {
   .sm\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
+  }
+
+  .sm\:px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 
   .sm\:text-center {
