@@ -61,7 +61,7 @@ pub fn SendEdit(
                 }
                 p {
                     class: "text-lg",
-                    "Send some ORE to another user."
+                    "Send ORE to someone."
                 }
             }
             div {

@@ -19,7 +19,7 @@ const LABELS = {
     copied: 'Copied',
     disconnect: 'Disconnect',
     'has-wallet': 'Connect',
-    'no-wallet': 'Connect Wallet',
+    'no-wallet': 'Connect',
 };
 
 export const Wallet = () => {

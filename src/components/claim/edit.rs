@@ -32,11 +32,11 @@ pub fn ClaimEdit(
                 }
                 p {
                     class: "text-lg",
-                    "Select an amount of rewards to claim."
+                    "Claim ORE from your miner."
                 }
                 p {
                     class: "text-sm text-gray-300",
-                    "This will unsake your ORE and send it to your wallet."
+                    "This will unsake ORE from your miner and send it to your wallet."
                 }
             }
             div {

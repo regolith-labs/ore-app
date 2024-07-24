@@ -146,12 +146,11 @@ pub fn StakeBalanceDisplay() -> Element {
     let proof = use_proof();
 
     rsx! {
-        div {
-            class: "flex flex-col gap-2",
             div {
                 class: "flex flex-row gap-8 justify-between",
                     p {
-                        class: "text-white font-semibold",
+                        // class: "text-white font-semibold",
+                        class: "text-gray-300 font-medium text-sm my-auto",
                         "Stake"
                     }
                div {
@@ -187,11 +186,6 @@ pub fn StakeBalanceDisplay() -> Element {
                     }
                 }
             }
-            p {
-                class: "text-white text-xs opacity-80 max-w-96",
-                "The amount of ORE you have staked with your miner."
-            }
-        }
     }
 }
 
@@ -209,12 +203,10 @@ pub fn MultiplierDisplay() -> Element {
     });
 
     rsx! {
-        div {
-            class: "flex flex-col gap-2",
             div {
                 class: "flex flex-row gap-8 justify-between",
                     p {
-                        class: "text-white font-semibold",
+                        class: "text-gray-300 font-medium text-sm my-auto",
                         "Multiplier"
                     }
                div {
@@ -225,11 +217,11 @@ pub fn MultiplierDisplay() -> Element {
                     }
                 }
             }
-            p {
-                class: "text-white text-xs opacity-80 max-w-96",
-                "The multiplier you are earning on your mining rewards from staking."
-            }
-        }
+            // p {
+            //     class: "text-white text-xs opacity-80 max-w-96",
+            //     "The multiplier you are earning on your mining rewards from staking."
+            // }
+        // }
     }
 }
 
@@ -238,12 +230,13 @@ pub fn PowerLevelConfig() -> Element {
     let max = *WEB_WORKERS as i64;
 
     rsx! {
-        div {
-            class: "flex flex-col gap-2",
+        // div {
+        //     class: "flex flex-col gap-2",
             div {
                 class: "flex flex-row gap-8 justify-between",
                     p {
-                        class: "text-white font-semibold",
+                        // class: "text-white font-semibold",
+                        class: "text-gray-300 font-medium text-sm my-auto",
                         "Power level"
                     }
                 div {
@@ -268,10 +261,10 @@ pub fn PowerLevelConfig() -> Element {
                     }
                 }
             }
-            p {
-                class: "text-white text-xs opacity-80 max-w-96",
-                "The number of computer cores you have dedicated to mining."
-            }
-        }
+            // p {
+            //     class: "text-white text-xs opacity-80 max-w-96",
+            //     "The number of computer cores you have dedicated to mining."
+            // }
+        // }
     }
 }

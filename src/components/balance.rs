@@ -60,7 +60,7 @@ pub fn StakeBalance() -> Element {
                     div {
                         class: "flex flex-col gap-2",
                         p {
-                            class: "font-medium text-sm text-gray-300",
+                            class: "font-medium text-sm",
                             "Stake"
                         }
                         div {
