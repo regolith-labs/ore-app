@@ -5,8 +5,8 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use web_time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{
-    components::{GlobeIcon, OreIcon, UserBubble, UserIcon},
-    hooks::{use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
+    components::{Appearance, GlobeIcon, OreIcon, UserBubble, UserIcon},
+    hooks::{use_appearance, use_transfers, ActivityFilter, ACTIVITY_TABLE_PAGE_LIMIT},
     route::Route,
 };
 
@@ -36,10 +36,10 @@ pub fn Activity() -> Element {
                                 class: "text-lg md:text-2xl font-bold my-auto",
                                 "Activity"
                             }
-                            // FilterButtons {
-                            //     filter,
-                            //     offset
-                            // }
+                            FilterButtons {
+                                filter,
+                                offset
+                            }
                         }
                         ActivityTable {
                             offset,
@@ -63,20 +63,25 @@ pub fn Activity() -> Element {
 #[component]
 pub fn FilterButtons(filter: Signal<ActivityFilter>, offset: Signal<u64>) -> Element {
     let selected_class = "";
-    let unselected_class = "text-gray-300 dark:text-gray-700";
+    let unselected_class = "text-gray-300";
     let (global_class, personal_class) = match *filter.read() {
         ActivityFilter::Global => (selected_class, unselected_class),
         ActivityFilter::Personal => (unselected_class, selected_class),
     };
+    let appearance = use_appearance();
+    let hover_class = match *appearance.read() {
+        Appearance::Light => "hover:text-black ",
+        Appearance::Dark => "hover:text-white ",
+    };
     let button_class =
-        "flex flex-row gap-2 px-2 md:px-3 py-2 rounded-full text-xs md:text-sm hover-100 active-200 transition-colors";
-    let icon_class = "w-4 h-4 md:w-5 md:h-5 my-auto";
+        "flex flex-row gap-2 h-10 rounded-full text-xs w-10 sm:w-min sm:px-3 md:text-sm hover-100 active-200 transition-colors transition-transform";
+    let icon_class = "w-4 h-4 md:w-5 md:h-5 m-auto";
 
     rsx! {
         div {
-            class: "flex flex-row gap-1 md:gap-2 font-semibold -mx-1 md:-mx-2",
+            class: "flex flex-row gap-4 font-semibold -mx-1 md:-mx-2",
             button {
-                class: "{button_class} {personal_class}",
+                class: "{button_class} {personal_class} {hover_class}",
                 onclick: move |_e| {
                     filter.set(ActivityFilter::Personal);
                     offset.set(0);
@@ -84,10 +89,13 @@ pub fn FilterButtons(filter: Signal<ActivityFilter>, offset: Signal<u64>) -> Ele
                 UserIcon {
                     class: "{icon_class}"
                 }
-                "Personal"
+                span {
+                    class: "my-auto hidden sm:block",
+                    "Personal"
+                }
             }
             button {
-                class: "{button_class} {global_class}",
+                class: "{button_class} {global_class} {hover_class}",
                 onclick: move |_| {
                     filter.set(ActivityFilter::Global);
                     offset.set(0);
@@ -95,7 +103,10 @@ pub fn FilterButtons(filter: Signal<ActivityFilter>, offset: Signal<u64>) -> Ele
                 GlobeIcon {
                     class: "{icon_class}"
                 }
-                "Global"
+                span {
+                    class: "my-auto hidden sm:block",
+                    "Global"
+                }
             }
         }
     }
