@@ -79,7 +79,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                     }
                 }
                 h2 {
-                    "Confirm claim"
+                    "Confirm"
                 }
                 p {
                     class: "text-lg",

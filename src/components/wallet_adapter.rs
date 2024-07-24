@@ -114,16 +114,9 @@ pub fn PriorityFeeConfig(signal: Signal<InvokeSignatureStatus>) -> Element {
     rsx! {
         div {
             class: "flex flex-row gap-8 justify-between",
-            div {
-                class: "flex flex-col gap-1",
-                p {
-                    class: "font-semibold",
-                    "Priority fee"
-                }
-                p {
-                    class: "text-xs opacity-80 max-w-96",
-                    "Add a priority fee to increase your chances of landing a transaction."
-                }
+            p {
+                class: "text-sm font-semibold text-gray-300 font-medium my-auto",
+                "Priority fee"
             }
             div {
                 class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",

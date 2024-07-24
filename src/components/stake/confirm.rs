@@ -68,7 +68,7 @@ pub fn StakeConfirm(amount: u64, step: Signal<StakeStep>) -> Element {
                     }
                 }
                 h2 {
-                    "Confirm stake"
+                    "Confirm"
                 }
                 p {
                     class: "text-lg",

@@ -25,9 +25,9 @@ enum TextColor {
 
 fn gen_asset_path(filename: &str, screen_size: Signal<ScreenSize>) -> String {
     match *screen_size.read() {
-        ScreenSize::Desktop => asset_path(format!("{}-desktop.jpeg", filename).as_str()),
-        ScreenSize::Mobile => asset_path(format!("{}-mobile.jpeg", filename).as_str()),
-        ScreenSize::Tablet => asset_path(format!("{}-tablet.jpeg", filename).as_str()),
+        ScreenSize::Desktop => asset_path(format!("{}-desktop.jpg", filename).as_str()),
+        ScreenSize::Mobile => asset_path(format!("{}-mobile.jpg", filename).as_str()),
+        ScreenSize::Tablet => asset_path(format!("{}-tablet.jpg", filename).as_str()),
     }
 }
 
@@ -41,8 +41,6 @@ pub fn Landing() -> Element {
         (gen_asset_path("rock-2", screen_size), TextColor::White),
         (gen_asset_path("rock-3", screen_size), TextColor::White),
         (gen_asset_path("rock-4", screen_size), TextColor::White),
-        (gen_asset_path("rock-5", screen_size), TextColor::White),
-        (gen_asset_path("rock-6", screen_size), TextColor::White),
     ];
     let len = bg_imgs.len();
     let text_color = bg_imgs[*i.read() % len].1;
@@ -73,7 +71,7 @@ pub fn Landing() -> Element {
             Hero {
                 text_color,
                 title: "It's time to mine.",
-                subtitle: &"ORE is a fair launch, proof of work, digital currency everyone can mine."
+                subtitle: &"ORE is a cross-border digital currency anyone can mine."
             }
             Block {
                 title: &"Proof of work.",

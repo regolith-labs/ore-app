@@ -44,9 +44,9 @@ pub fn User(id: String) -> Element {
     };
 
     let description = if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
-        Some("This is a special program account responsible for minting ORE tokens.")
+        Some("This is a special program account responsible for minting new ORE tokens.")
     } else if BUS_ADDRESSES.contains(&user_id) {
-        Some("This is a special program account responsible for issuing ORE rewards to miners.")
+        Some("This is a special program account responsible for issuing ORE to miners.")
     } else {
         None
     };
@@ -67,32 +67,16 @@ pub fn User(id: String) -> Element {
                         nav.go_back()
                     }
                 }
-                // div {
-                //     class: "flex flex-col gap-8",
-                    // if user_id.eq(&ore_api::consts::TREASURY_ADDRESS) {
-                    //     TreasuryBubble {
-                    //         class: "my-auto w-20 h-20",
-                    //     }
-                    // } else if BUS_ADDRESSES.contains(&user_id) {
-                    //     BusBubble {
-                    //         class: "my-auto w-20 h-20",
-                    //     }
-                    // } else {
-                    //     UserBubble {
-                    //         class: "my-auto w-20 h-20",
-                    //     }
-                    // }
-                    div {
-                        class: "flex flex-row justify-between",
-                        h2 {
-                            class: "my-auto",
-                            "{title}"
-                        }
-                        if show_send_button {
-                            SendButton { to: id.clone() }
-                        }
+                div {
+                    class: "flex flex-row justify-between",
+                    h2 {
+                        class: "my-auto",
+                        "{title}"
                     }
-                // }
+                    if show_send_button {
+                        SendButton { to: id.clone() }
+                    }
+                }
                 if let Some(description) = description {
                     p {
                         class: "text-sm text-gray-300 px-1",

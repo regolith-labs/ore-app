@@ -27,17 +27,9 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-row gap-2 max-w-screen w-screen justify-start my-auto px-4 sm:px-8 object-contain",
+            class: "flex flex-row gap-2 max-w-screen w-screen justify-between my-auto px-4 sm:px-8",
             div {
-                class: "flex-shrink-0 flex-none my-auto",
-                ActivityIndicator {}
-            }
-            p {
-                class: "font-semibold text-white flex-shrink-0 flex-none my-auto",
-                "Mining"
-            }
-            div {
-                class: "flex-shrink flex-auto truncate my-auto",
+                class: "flex flex-row gap-2 flex-shrink flex-auto truncate my-auto",
                 match toolbar_state.status_message() {
                     MinerStatusMessage::Searching => {
                         rsx! {
@@ -50,8 +42,8 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                     MinerStatusMessage::Submitting => {
                         rsx! {
                             p {
-                                class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
-                                "Submitting hash..."
+                                class: "truncate flex-shrink flex-auto text-sm text-white font-medium opacity-80 my-auto ml-2",
+                                "Submitting transaction..."
                             }
                         }
                     }
@@ -66,7 +58,11 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                 }
             }
             div {
-                class: "flex-shrink-0 flex-none ml-auto my-auto",
+                class: "flex-shrink-0 flex-none flex flex-row gap-2 ml-auto my-auto",
+                // p {
+                //     class: "font-semibold text-white flex-shrink-0 flex-none my-auto",
+                //     "Mining"
+                // }
                 StopButton {}
             }
         }
