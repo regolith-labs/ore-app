@@ -74,14 +74,16 @@ pub fn Tx(sig: String) -> Element {
                                 class: "{container_class}",
                                 p {
                                     class: "{title_class}",
-                                    "To"
+                                    "Amount"
                                 }
-                                Copyable {
-                                    value: transfer.to_address.clone(),
-                                    Link {
-                                        class: "{link_class} font-mono",
-                                        to: Route::User { id: transfer.to_address.clone() },
-                                        "{&transfer.to_address}"
+                                span {
+                                    class: "flex flex-row gap-1.5",
+                                    OreIcon {
+                                        class: "w-4 h-4 my-auto",
+                                    }
+                                    p {
+                                        class: "{value_class}",
+                                        "{amount_to_ui_amount(transfer.amount as u64, ore_api::consts::TOKEN_DECIMALS)}"
                                     }
                                 }
                             }
@@ -104,16 +106,14 @@ pub fn Tx(sig: String) -> Element {
                                 class: "{container_class}",
                                 p {
                                     class: "{title_class}",
-                                    "Amount"
+                                    "To"
                                 }
-                                span {
-                                    class: "flex flex-row gap-1.5",
-                                    OreIcon {
-                                        class: "w-4 h-4 my-auto",
-                                    }
-                                    p {
-                                        class: "{value_class}",
-                                        "{amount_to_ui_amount(transfer.amount as u64, ore_api::consts::TOKEN_DECIMALS)}"
+                                Copyable {
+                                    value: transfer.to_address.clone(),
+                                    Link {
+                                        class: "{link_class} font-mono",
+                                        to: Route::User { id: transfer.to_address.clone() },
+                                        "{&transfer.to_address}"
                                     }
                                 }
                             }
