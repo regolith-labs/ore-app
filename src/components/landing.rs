@@ -82,7 +82,7 @@ pub fn Landing() -> Element {
             }
             Block {
                 title: &"Fixed supply.",
-                title2: &"Sable future.",
+                title2: &"Stable future.",
                 detail: &"ORE has a total maximum supply of 21m tokens. With a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
                 section: Section::B,
                 text_color
@@ -511,9 +511,6 @@ fn SectionD(text_color: TextColor) -> Element {
             Err(_) => None,
         }
     });
-
-    // log::info!("Quotes: {:?}", &*quotes.read());
-    // let x = &*quotes.read();
 
     rsx! {
         div {
