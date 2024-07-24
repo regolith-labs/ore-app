@@ -285,7 +285,7 @@ fn BlockCta(section: Section, text_color: TextColor) -> Element {
             Link {
                 class: "{style} {cta_color}",
                 to: Route::Download {},
-                "Download the app →"
+                "Download now →"
             }
         },
         Section::B => rsx! {
@@ -300,7 +300,7 @@ fn BlockCta(section: Section, text_color: TextColor) -> Element {
                 class: "{style} {cta_color}",
                 to: "https://github.com/regolith-labs/ore",
                 new_tab: true,
-                "Checkout the code →"
+                "Checkout code →"
             }
         },
         Section::D => rsx! {
