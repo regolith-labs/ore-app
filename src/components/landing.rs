@@ -25,9 +25,9 @@ enum TextColor {
 
 fn gen_asset_path(filename: &str, screen_size: Signal<ScreenSize>) -> String {
     match *screen_size.read() {
-        ScreenSize::Desktop => asset_path(format!("{}-desktop.jpg", filename).as_str()),
-        ScreenSize::Mobile => asset_path(format!("{}-mobile.jpg", filename).as_str()),
-        ScreenSize::Tablet => asset_path(format!("{}-tablet.jpg", filename).as_str()),
+        ScreenSize::Desktop => asset_path(format!("{}-desktop.jpeg", filename).as_str()),
+        ScreenSize::Mobile => asset_path(format!("{}-mobile.jpeg", filename).as_str()),
+        ScreenSize::Tablet => asset_path(format!("{}-tablet.jpeg", filename).as_str()),
     }
 }
 
