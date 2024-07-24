@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::components::{
     Claim, Download, Home, Landing, Mine, MinerToolbarLayout, Navbar, OreTokenomics, PageNotFound,
-    Send, Settings, SimpleNavbar, Stake, Tx, Upgrade, User, WhatIsMining,
+    Qr, Send, Settings, SimpleNavbar, Stake, Tx, Upgrade, User, WhatIsMining,
 };
 
 #[rustfmt::skip]
@@ -36,6 +36,8 @@ pub enum Route {
             Send {
                 to: String
             },
+            #[route("/qr")]
+            Qr {},
             #[route("/tx/:sig")]
             Tx {
                 sig: String,

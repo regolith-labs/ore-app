@@ -52,13 +52,13 @@ pub fn Navbar() -> Element {
 pub fn SettingsButton() -> Element {
     let appearance = use_appearance();
     let button_color = match *appearance.read() {
-        Appearance::Light => "text-gray-300 hover:bg-gray-100 active:bg-gray-200",
-        Appearance::Dark => "text-gray-300 hover:bg-gray-900 active:bg-gray-800",
+        Appearance::Light => "text-gray-300 hover:text-black",
+        Appearance::Dark => "text-gray-300 hover:text-white",
     };
     rsx! {
         Link {
             to: Route::Settings {},
-            class: "flex my-auto h-8 w-8 sm:h-10 sm:w-10 transition-colors rounded-full transition-colors {button_color}",
+            class: "flex my-auto h-8 w-8 sm:h-10 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover-100 active-200",
             CogIcon {
                 class: "h-5 w-5 sm:h-6 sm:w-6 m-auto"
             }

@@ -2,18 +2,23 @@ use dioxus::prelude::*;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
-    components::{Appearance, OreIcon},
-    hooks::{use_appearance, use_ore_balance, use_proof},
+    components::{Appearance, OreIcon, QrCodeIcon},
+    hooks::{
+        use_appearance, use_ore_balance, use_proof,
+        use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
+    },
     route::Route,
 };
 
 pub fn Balance() -> Element {
     let balance = use_ore_balance();
+    let wallet_adapter = use_wallet_adapter();
 
     if let Some(balance) = balance.cloned() {
         let amount = balance
             .map(|b| b.real_number_string_trimmed())
             .unwrap_or_else(|_| "0.00".to_owned());
+
         return rsx! {
             div {
                 class: "flex flex-row w-full min-h-16 rounded justify-between",
@@ -35,7 +40,13 @@ pub fn Balance() -> Element {
                                 "{amount}"
                             }
                         }
-                        SendButton {}
+                        if let WalletAdapter::Connected(_) = *wallet_adapter.read() {
+                            div {
+                                class: "flex flex-row gap-4",
+                                QrButton {}
+                                SendButton {}
+                            }
+                        }
                     }
                     StakeBalance {}
                 }
@@ -98,10 +109,28 @@ pub fn SendButton(to: Option<String>) -> Element {
     rsx! {
         Link {
             to: Route::Send { to: to.clone().unwrap_or("".to_string()) },
-            class: "flex h-10 w-10 my-auto rounded-full justify-center text-2xl font-bold transition-all bg-black text-white hover:shadow hover:scale-110 dark:bg-white dark:text-black",
+            class: "flex h-12 w-12 my-auto rounded-full justify-center text-2xl font-bold transition-all bg-black text-white hover:shadow hover:scale-110 dark:bg-white dark:text-black",
             span {
                 class: "my-auto bg-transparent",
                 "↑"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn QrButton(to: Option<String>) -> Element {
+    let appearance = use_appearance();
+    let button_color = match *appearance.read() {
+        Appearance::Light => "text-gray-300 hover:text-black ",
+        Appearance::Dark => "text-gray-300 hover:text-white ",
+    };
+    rsx! {
+        Link {
+            to: Route::Qr {},
+            class: "flex h-12 w-12 my-auto rounded-full justify-center text-2xl font-bold transition-all {button_color} hover-100 active-200",
+            QrCodeIcon {
+                class: "w-6 h-6 my-auto",
             }
         }
     }
