@@ -171,15 +171,15 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
                     class: "flex flex-col gap-2",
                     p {
                         class: "text-3xl md:text-4xl lg:text-5xl font-bold",
-                        "Open account"
+                        "New account"
                     }
                     p {
                         class: "text-lg",
-                        "Create a new account to start mining."
+                        "Open a new account to start mining."
                     }
                     p {
                         class: "text-sm text-gray-300",
-                        "This account will track your progress and secure your miner rewards."
+                        "This will open a new account on the Solana blockchain to secure your miner rewards."
                     }
                 }
             }
