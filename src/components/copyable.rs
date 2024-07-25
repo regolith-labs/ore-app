@@ -10,12 +10,13 @@ pub fn Copyable(
     value: String,
     children: Element,
 ) -> Element {
-    let mut clipboard = use_clipboard();
     let mut solid = use_signal(|| false);
+    let window = web_sys::window().expect("window");
+    let clipboard = window.navigator().clipboard();
 
-    use_future(move || async move {
+    let _ = use_resource(move || async move {
         if *solid.read() {
-            async_std::task::sleep(std::time::Duration::from_secs(3)).await;
+            async_std::task::sleep(std::time::Duration::from_secs(2)).await;
             solid.set(false);
         }
     });
@@ -28,8 +29,10 @@ pub fn Copyable(
                 button {
                     class: "flex flex-row gap-2 shrink-0 p-2 mx-auto rounded transition-colors hover-100 active-200 font-semibold",
                     onclick: move |_e| {
-                        clipboard.set(value.clone()).ok();
-                        solid.set(true);
+                        if let Some(clipboard) = clipboard.clone() {
+                            let _ = clipboard.write_text(value.as_str());
+                            solid.set(true);
+                        }
                     },
                     CopyIcon {
                         class: "w-4 h-4 my-auto",
@@ -47,8 +50,10 @@ pub fn Copyable(
                 button {
                     class: "flex shrink-0 p-2 rounded transition-colors hover-100 active-200",
                     onclick: move |_e| {
-                        clipboard.set(value.clone()).ok();
-                        solid.set(true);
+                        if let Some(clipboard) = clipboard.clone() {
+                            let _ = clipboard.write_text(value.as_str());
+                            solid.set(true);
+                        }
                     },
                     CopyIcon {
                         class: "w-4 h-4 my-auto",
