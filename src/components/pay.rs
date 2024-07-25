@@ -13,7 +13,7 @@ use crate::{
 use super::wallet_adapter;
 
 #[component]
-pub fn Qr() -> Element {
+pub fn Pay() -> Element {
     let nav = use_navigator();
     let wallet_adapter = use_wallet_adapter();
     let mut amount: Signal<Option<String>> = use_signal(|| None);

@@ -127,7 +127,7 @@ pub fn QrButton(to: Option<String>) -> Element {
     };
     rsx! {
         Link {
-            to: Route::Qr {},
+            to: Route::Pay {},
             class: "flex h-12 w-12 my-auto rounded-full justify-center text-2xl font-bold transition-all {button_color} hover-100 active-200",
             QrCodeIcon {
                 class: "w-6 h-6 my-auto",
