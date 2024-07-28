@@ -517,19 +517,13 @@ fn SectionD(text_color: TextColor) -> Element {
             class: "flex flex-row flex-wrap gap-8 md:gap-12 my-auto align-top transition-colors {text_color}",
             if let Some(Some(quotes)) = quotes.cloned() {
                 Quote {
-                    title: "ORE/USDC",
+                    title: "ORE/USD",
                     price: quotes.data["USDC"].price,
                     symbol: "$",
                     decimals: 2
                 }
                 Quote {
-                    title: "ORE/EURC",
-                    price: quotes.data["EURC"].price,
-                    symbol: "€",
-                    decimals: 2
-                }
-                Quote {
-                    title: "ORE/WBTC",
+                    title: "ORE/BTC",
                     price: quotes.data["WBTC"].price,
                     symbol: "₿",
                     decimals: 8
