@@ -506,7 +506,7 @@ fn SectionD(text_color: TextColor) -> Element {
     };
 
     let quotes = use_resource(move || async move {
-        match reqwest::get("https://price.jup.ag/v6/price?ids=USDC,EURC,WBTC&vsToken=ORE").await {
+        match reqwest::get("https://price.jup.ag/v6/price?ids=USDC,WBTC&vsToken=ORE").await {
             Ok(res) => res.json::<JupPriceApiResponse>().await.ok(),
             Err(_) => None,
         }
