@@ -71,7 +71,7 @@ pub fn Landing() -> Element {
             Hero {
                 text_color,
                 title: "It's time to mine.",
-                subtitle: &"ORE is a cross-border digital currency anyone can mine."
+                subtitle: &"ORE is a cross-border digital currency everyone can mine."
             }
             Block {
                 title: &"Proof of work.",
