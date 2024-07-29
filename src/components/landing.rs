@@ -83,7 +83,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fixed supply.",
                 title2: &"Stable future.",
-                detail: &"ORE has a total maximum supply of 21m tokens. With a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
+                detail: &"ORE has a total maximum supply of 21 million tokens. With a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
                 section: Section::B,
                 text_color
             }
@@ -149,15 +149,15 @@ fn Navbar(text_color: TextColor) -> Element {
 #[component]
 fn SocialLinks(text_color: TextColor) -> Element {
     let button_color = match text_color {
-        TextColor::Black => "text-black hover:bg-black hover:text-white",
-        TextColor::White => "text-white hover:bg-white hover:text-black",
+        TextColor::Black => "text-black",
+        TextColor::White => "text-white",
     };
     rsx! {
         div {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
             Link {
                 to: "https://discord.gg/ore-supply",
-                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
                 new_tab: true,
                 DiscordIcon {
                     class: "w-6 h-6 m-auto"
@@ -165,7 +165,7 @@ fn SocialLinks(text_color: TextColor) -> Element {
             }
             Link {
                 to: "https://github.com/regolith-labs/ore",
-                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
                 new_tab: true,
                 GithubIcon {
                     class: "w-6 h-6 m-auto"
@@ -173,7 +173,7 @@ fn SocialLinks(text_color: TextColor) -> Element {
             }
             Link {
                 to: "https://x.com/oresupply",
-                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color}",
+                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
                 new_tab: true,
                 XIcon {
                     class: "w-5 h-5 m-auto"
@@ -459,16 +459,16 @@ fn SectionC(text_color: TextColor) -> Element {
                 class: "flex flex-row gap-8 md:gap-12",
                 Link {
                     to: "https://osec.io/",
-                    class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color}",
                     new_tab: true,
+                    class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
                     OttersecIcon {
                         class: "w-10 h-10 md:w-12 md:h-12 m-auto"
                     }
                 }
                 Link {
                     to: "https://fuzz.land/",
-                    class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color}",
                     new_tab: true,
+                    class: "flex p-2 md:p-4 transition-colors rounded-full transition-colors {text_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
                     FuzzlandIcon {
                         class: "w-10 h-10 md:w-12 md:h-12 m-auto"
                     }
@@ -520,13 +520,15 @@ fn SectionD(text_color: TextColor) -> Element {
                     title: "ORE/USD",
                     price: quotes.data["USDC"].price,
                     symbol: "$",
-                    decimals: 2
+                    decimals: 2,
+                    link: "https://jup.ag/swap/USDC-ORE"
                 }
                 Quote {
                     title: "ORE/BTC",
                     price: quotes.data["WBTC"].price,
                     symbol: "₿",
-                    decimals: 8
+                    decimals: 8,
+                    link: "https://jup.ag/swap/WBTC-ORE"
                 }
             }
         }
@@ -534,11 +536,13 @@ fn SectionD(text_color: TextColor) -> Element {
 }
 
 #[component]
-fn Quote(title: String, price: f64, symbol: String, decimals: usize) -> Element {
+fn Quote(title: String, price: f64, symbol: String, decimals: usize, link: String) -> Element {
     let price = format!("{0:.1$}", 1f64 / price, decimals);
     rsx! {
-        div {
-            class: "flex flex-col gap-2",
+        Link {
+            to: link,
+            new_tab: true,
+            class: "flex flex-col gap-2 p-3 rounded hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
             p {
                 class: "opacity-80 font-medium",
                 "{title}"

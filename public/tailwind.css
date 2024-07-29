@@ -1278,6 +1278,10 @@ h2:where(.dark, .dark *) {
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
 }
 
+.bg-opacity-20 {
+  --tw-bg-opacity: 0.2;
+}
+
 .bg-cover {
   background-size: cover;
 }
@@ -1292,6 +1296,10 @@ h2:where(.dark, .dark *) {
 
 .p-2\.5 {
   padding: 0.625rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
 }
 
 .px-1 {
@@ -1953,6 +1961,10 @@ h2:where(.dark, .dark *) {
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-opacity-20:hover {
+  --tw-bg-opacity: 0.2;
+}
+
 .hover\:text-black:hover {
   --tw-text-opacity: 1;
   color: rgb(19 20 22 / var(--tw-text-opacity));
@@ -2006,6 +2018,10 @@ h2:where(.dark, .dark *) {
 .active\:bg-red-600:active {
   --tw-bg-opacity: 1;
   background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+}
+
+.active\:bg-opacity-30:active {
+  --tw-bg-opacity: 0.3;
 }
 
 .active\:opacity-70:active {

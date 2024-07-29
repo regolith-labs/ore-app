@@ -97,7 +97,7 @@ fn SocialLinks() -> Element {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
             Link {
                 to: "https://discord.gg/ore-supply",
-                class: "flex h-10 w-10 hover:bg-gray-900 active:bg-gray-800 transition-colors rounded-full text-white",
+                class: "flex h-10 w-10 hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30 transition-colors rounded-full text-white",
                 new_tab: true,
                 DiscordIcon {
                     class: "w-6 h-6 m-auto"
@@ -105,7 +105,7 @@ fn SocialLinks() -> Element {
             }
             Link {
                 to: "https://github.com/regolith-labs/ore",
-                class: "flex h-10 w-10 hover:bg-gray-900 active:bg-gray-800 transition-colors rounded-full text-white",
+                class: "flex h-10 w-10 hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30 transition-colors rounded-full text-white",
                 new_tab: true,
                 GithubIcon {
                     class: "w-6 h-6 m-auto"
@@ -113,7 +113,7 @@ fn SocialLinks() -> Element {
             }
             Link {
                 to: "https://x.com/oresupply",
-                class: "flex h-10 w-10 hover:bg-gray-900 active:bg-gray-800 transition-colors rounded-full text-white",
+                class: "flex h-10 w-10 hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30 transition-colors rounded-full text-white",
                 new_tab: true,
                 XIcon {
                     class: "w-6 h-6 m-auto"
