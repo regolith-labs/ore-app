@@ -2,9 +2,9 @@ use std::ops::Div;
 
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::{
-    compute_budget::ComputeBudgetInstruction, message::Message, transaction::Transaction,
+    compute_budget::ComputeBudgetInstruction, message::Message, native_token::sol_to_lamports,
+    pubkey, pubkey::Pubkey, transaction::Transaction,
 };
-use solana_sdk::native_token::sol_to_lamports;
 use web_time::Duration;
 
 use crate::{
@@ -17,6 +17,8 @@ use crate::{
     },
     miner::Miner,
 };
+
+const COLLECTION_ADDRESS: Pubkey = pubkey!("F9gWPbWiMVcT5ftGy4X2fLE4gSDw6kiATgZU8tnCmso6");
 
 #[component]
 pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> Element {
@@ -38,7 +40,7 @@ pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> El
                 );
                 let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
-                    &ore_relayer_api::consts::COLLECTOR_ADDRESS,
+                    &COLLECTION_ADDRESS,
                     amount.div(50), // 2% fee
                 );
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
@@ -131,7 +133,7 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
                 );
                 let ix_3 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
-                    &ore_relayer_api::consts::COLLECTOR_ADDRESS,
+                    &COLLECTION_ADDRESS,
                     amount.div(50), // 2% fee
                 );
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
