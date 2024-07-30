@@ -120,6 +120,19 @@ pub fn Tx(sig: String) -> Element {
                                     }
                                 }
                             }
+                            if let Some(difficulty) = transfer.difficulty {
+                                div {
+                                    class: "{container_class}",
+                                    p {
+                                        class: "{title_class}",
+                                        "Difficulty"
+                                    }
+                                    p {
+                                        class: "{value_class}",
+                                        "{difficulty}"
+                                    }
+                                }
+                            }
                             div {
                                 class: "{container_class}",
                                 p {
