@@ -128,6 +128,7 @@ impl Miner {
             // Start mining again
             Ok(_sig) => {
                 if let MinerStatus::Active = toolbar_state.status() {
+                    async_std::task::sleep(Duration::from_millis(1000)).await;
                     if let Ok(new_escrow) = gateway.get_escrow(authority).await {
                         escrow.set(new_escrow);
                         if let Ok(proof) = gateway.get_proof(escrow_pubkey).await {
