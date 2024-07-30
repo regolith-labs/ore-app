@@ -53,11 +53,11 @@ pub fn UpgradeEdit(
                 }
                 p {
                     class: "text-lg",
-                    "Upgrade your OREv1 tokens to ORE v2."
+                    "Upgrade your ORE v1 tokens to ORE v2."
                 }
                 p {
                     class: "text-sm text-gray-300 dark:text-gray-700",
-                    "This will burn your OREv1 tokens and mint an equal number of ORE tokens directly to your wallet."
+                    "This will burn your ORE v1 tokens and mint an equal number of ORE tokens directly to your wallet."
                 }
             }
             div {

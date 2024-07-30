@@ -237,6 +237,7 @@ impl Gateway {
         if let Some(user_str) = user_ref {
             query.push(("user", user_str));
         };
+        log::info!("Query: {:?}", query);
         match reqwest::Client::new()
             .get(format!("{}/transfers", &self.api_url))
             .query(&query)
