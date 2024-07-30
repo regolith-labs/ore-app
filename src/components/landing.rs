@@ -11,7 +11,7 @@ use crate::{
     components::{
         DiscordIcon, Footer, FuzzlandIcon, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon, XIcon,
     },
-    hooks::{use_is_onboarded, use_ore_supply, use_screen_size, ScreenSize, UiTokenAmountBalance},
+    hooks::{use_ore_supply, use_screen_size, ScreenSize, UiTokenAmountBalance},
     miner::WEB_WORKERS,
     route::Route,
     utils::asset_path,
@@ -34,7 +34,6 @@ fn gen_asset_path(filename: &str, screen_size: Signal<ScreenSize>) -> String {
 pub fn Landing() -> Element {
     let nav = navigator();
     let screen_size = use_screen_size();
-    let is_onboarded = use_is_onboarded();
     let mut i = use_signal(|| 0usize);
     let bg_imgs = [
         (gen_asset_path("rock-1", screen_size), TextColor::White),
@@ -52,11 +51,6 @@ pub fn Landing() -> Element {
             i.set(i.cloned().saturating_add(1));
         }
     });
-
-    // If the user is already onboarded, redirect to home.
-    if is_onboarded.read().0 {
-        nav.replace(Route::Home {});
-    }
 
     rsx! {
         for (index, bg_img) in bg_imgs.iter().enumerate() {
