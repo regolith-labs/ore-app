@@ -4,7 +4,10 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::GatewayResult;
 
-use super::{use_escrow, use_gateway};
+use super::{
+    use_escrow, use_gateway,
+    use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
+};
 
 pub const ACTIVITY_TABLE_PAGE_LIMIT: usize = 8;
 
@@ -43,12 +46,15 @@ pub fn use_transfers(
     filter: Signal<ActivityFilter>,
     offset: Signal<u64>,
 ) -> Resource<GatewayResult<ListTransfersResponse>> {
-    let escrow = use_escrow();
+    let wallet_adapter = use_wallet_adapter();
     use_resource(move || async move {
         let offset = *offset.read();
         let user = match *filter.read() {
             ActivityFilter::Global => None,
-            ActivityFilter::Personal => Some(escrow.read().authority),
+            ActivityFilter::Personal => match *wallet_adapter.read() {
+                WalletAdapter::Connected(pubkey) => Some(pubkey),
+                WalletAdapter::Disconnected => None,
+            },
         };
         use_gateway()
             .list_transfers(user, offset, ACTIVITY_TABLE_PAGE_LIMIT)
