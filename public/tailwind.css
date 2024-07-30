@@ -1209,6 +1209,10 @@ h2:where(.dark, .dark *) {
   text-wrap: nowrap;
 }
 
+.break-words {
+  overflow-wrap: break-word;
+}
+
 .break-all {
   word-break: break-all;
 }

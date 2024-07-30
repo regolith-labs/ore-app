@@ -6,7 +6,7 @@ use crate::components::CopyIcon;
 #[component]
 pub fn Copyable(
     class: Option<String>,
-    large_button: Option<bool>,
+    implicit: Option<bool>,
     value: String,
     children: Element,
 ) -> Element {
@@ -22,31 +22,22 @@ pub fn Copyable(
     });
 
     let class = class.unwrap_or("".to_string());
-    if large_button.unwrap_or(false) {
-        rsx! {
-            div {
-                class: "flex flex-col gap-2 truncate max-w-full {class}",
-                button {
-                    class: "flex flex-row gap-2 shrink-0 p-2 mx-auto rounded transition-colors hover-100 active-200 font-semibold",
-                    onclick: move |_e| {
-                        if let Some(clipboard) = clipboard.clone() {
-                            let _ = clipboard.write_text(value.as_str());
-                            solid.set(true);
-                        }
-                    },
-                    CopyIcon {
-                        class: "w-4 h-4 my-auto",
-                        solid: *solid.read(),
+
+    rsx! {
+        if implicit.unwrap_or(false) {
+            button {
+                class: "flex max-w-full shrink-0 p-2 rounded transition-colors hover-100 active-200 {class}",
+                onclick: move |_e| {
+                    if let Some(clipboard) = clipboard.clone() {
+                        let _ = clipboard.write_text(value.as_str());
+                        solid.set(true);
                     }
-                    "Copy to clipboard"
-                }
+                },
                 {children}
             }
-        }
-    } else {
-        rsx! {
+        } else {
             div {
-                class: "flex flex-row justify-end truncate max-w-full {class}",
+                class: "flex flex-row gap-1 justify-end max-w-full {class}",
                 button {
                     class: "flex shrink-0 p-2 rounded transition-colors hover-100 active-200",
                     onclick: move |_e| {

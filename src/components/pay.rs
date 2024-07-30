@@ -10,7 +10,7 @@ use crate::{
     hooks::use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
 };
 
-use super::wallet_adapter;
+use super::{wallet_adapter, Copyable};
 
 #[component]
 pub fn Pay() -> Element {
@@ -65,8 +65,22 @@ pub fn Pay() -> Element {
                 if let Some(qrcode) = qrcode.cloned() {
                     if let Some(qrcode) = qrcode {
                         div {
-                            class: "text-center w-48 h-48 bg-gray-100 mx-auto",
-                            dangerous_inner_html: "{qrcode}",
+                            class: "flex flex-col gap-8",
+                            div {
+                                class: "text-center w-48 h-48 bg-gray-100 mx-auto",
+                                dangerous_inner_html: "{qrcode}",
+                            }
+                            if let WalletAdapter::Connected(pubkey) = *wallet_adapter.read() {
+                                Copyable {
+                                    class: "break-all mx-auto text-center",
+                                    implicit: true,
+                                    value: pubkey.to_string(),
+                                    p {
+                                        class: "font-mono my-auto px-1",
+                                        "{pubkey}"
+                                    }
+                                }
+                            }
                         }
                     } else {
                         p {
