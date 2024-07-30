@@ -201,10 +201,11 @@ pub fn ActivityRow(transfer: Transfer) -> Element {
         TransferType::Claim => "claimed",
         TransferType::Mine => "mined",
         TransferType::Spl => "sent",
+        TransferType::Upgrade => "upgraded",
     };
 
     let addr_a = match transfer.transfer_type {
-        TransferType::Claim | TransferType::Mine => {
+        TransferType::Claim | TransferType::Mine | TransferType::Upgrade => {
             if transfer.to_address.eq(&pubkey.to_string()) {
                 "You".to_string()
             } else {
@@ -220,7 +221,9 @@ pub fn ActivityRow(transfer: Transfer) -> Element {
         }
     };
     let addr_a_link = match transfer.transfer_type {
-        TransferType::Claim | TransferType::Mine => transfer.to_address.clone(),
+        TransferType::Claim | TransferType::Mine | TransferType::Upgrade => {
+            transfer.to_address.clone()
+        }
         TransferType::Spl => transfer.from_address,
     };
     let addr_a_class = if addr_a.eq(&"You".to_string()) {
@@ -233,12 +236,12 @@ pub fn ActivityRow(transfer: Transfer) -> Element {
         "You".to_string()
     } else {
         match transfer.transfer_type {
-            TransferType::Claim | TransferType::Mine => "".to_string(),
+            TransferType::Claim | TransferType::Mine | TransferType::Upgrade => "".to_string(),
             TransferType::Spl => transfer.to_address[..5].to_string(),
         }
     };
     let addr_b_link = match transfer.transfer_type {
-        TransferType::Claim | TransferType::Mine => "".to_string(),
+        TransferType::Claim | TransferType::Mine | TransferType::Upgrade => "".to_string(),
         TransferType::Spl => transfer.to_address,
     };
     let addr_b_class = if addr_b.eq(&"You".to_string()) {
