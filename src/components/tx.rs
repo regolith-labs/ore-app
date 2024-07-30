@@ -62,6 +62,7 @@ pub fn Tx(sig: String) -> Element {
                                     "Signature"
                                 }
                                 Copyable {
+                                    class: "truncate",
                                     value: transfer.sig.clone(),
                                     Link {
                                         class: "{link_class} font-mono",
@@ -94,6 +95,7 @@ pub fn Tx(sig: String) -> Element {
                                     "From"
                                 }
                                 Copyable {
+                                    class: "truncate",
                                     value: transfer.from_address.clone(),
                                     Link {
                                         class: "{link_class}",
@@ -109,6 +111,7 @@ pub fn Tx(sig: String) -> Element {
                                     "To"
                                 }
                                 Copyable {
+                                    class: "truncate",
                                     value: transfer.to_address.clone(),
                                     Link {
                                         class: "{link_class} font-mono",

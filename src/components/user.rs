@@ -93,6 +93,7 @@ pub fn User(id: String) -> Element {
                                 "ID"
                             }
                             Copyable {
+                                class: "truncate",
                                 value: id.clone(),
                                 Link {
                                     class: "{link_class} font-mono",
