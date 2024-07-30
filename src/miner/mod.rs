@@ -9,6 +9,7 @@ use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signature::Signature};
 use solana_sdk::blake3::Hash as Blake3Hash;
 use web_sys::{window, Worker};
+use web_time::Duration;
 pub use web_worker::*;
 
 use crate::{
