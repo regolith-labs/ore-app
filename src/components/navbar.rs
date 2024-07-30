@@ -20,8 +20,7 @@ pub fn Navbar() -> Element {
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
             Banner {
                 style: BannerStyle::Info,
-                link_to: "https://v1.ore.supply",
-                "This is a devnet preview of ORE v2. To use the v1 app, please click here →"
+                "This is a devnet preview of ORE v2."
             }
             div {
                 class: "flex w-full",
