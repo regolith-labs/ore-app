@@ -65,7 +65,7 @@ pub fn Mine() -> Element {
                                         rsx! {
                                             p {
                                                 class: "text-lg text-white",
-                                                "Searching for valid solutions... "
+                                                "Searching for valid hashes... "
                                                 // if time_remaining.read().gt(&0) {
                                                 //     "({time_remaining} sec)"
                                                 // }
@@ -78,7 +78,7 @@ pub fn Mine() -> Element {
                                                 class: "flex flex-row gap-2",
                                                 p {
                                                     class: "text-lg text-white",
-                                                    "Submitting best solution..."
+                                                    "Submitting best hash..."
                                                 }
                                                 Spinner {
                                                     class: "my-auto"
