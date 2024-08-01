@@ -18,10 +18,10 @@ pub fn Navbar() -> Element {
     rsx! {
         div {
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
-            Banner {
-                style: BannerStyle::Info,
-                "This is a devnet preview of ORE v2."
-            }
+            // Banner {
+            //     style: BannerStyle::Info,
+            //     "This is a devnet preview of ORE v2."
+            // }
             div {
                 class: "flex w-full",
                 div {
