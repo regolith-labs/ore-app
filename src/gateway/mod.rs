@@ -26,7 +26,8 @@ use web_time::Duration;
 pub use pubkey::*;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
-pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com";
+// pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com"; // Devnet
+pub const RPC_URL: &str = "https://amaleta-5y8tse-fast-mainnet.helius-rpc.com"; // Mainnet
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
