@@ -22,8 +22,8 @@ pub fn MinerToolbarLayout() -> Element {
             class: "flex flex-col h-full grow",
             Outlet::<Route> {}
         }
-        // MinerToolbar {
-        //     hidden
-        // }
+        MinerToolbar {
+            hidden
+        }
     }
 }
