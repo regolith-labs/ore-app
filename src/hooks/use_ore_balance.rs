@@ -2,7 +2,9 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
-use crate::gateway::{ore_token_account_address, GatewayError, GatewayResult};
+use crate::gateway::{
+    ore_token_account_address, ore_token_account_address_v1, GatewayError, GatewayResult,
+};
 
 use super::{
     use_gateway,
@@ -26,6 +28,29 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
                 }
                 WalletAdapter::Disconnected => {
                     Ok(UiTokenAmount::default(ore_api::consts::TOKEN_DECIMALS))
+                }
+            }
+        }
+    })
+}
+
+pub fn use_ore_v1_balance() -> Resource<GatewayResult<UiTokenAmount>> {
+    let gateway = use_gateway();
+    let wallet_adapter = use_wallet_adapter();
+    use_resource(move || {
+        let gateway = gateway.clone();
+        async move {
+            match *wallet_adapter.read() {
+                WalletAdapter::Connected(pubkey) => {
+                    let token_account_address = ore_token_account_address_v1(pubkey);
+                    gateway
+                        .rpc
+                        .get_token_account_balance(&token_account_address)
+                        .await
+                        .map_err(GatewayError::from)
+                }
+                WalletAdapter::Disconnected => {
+                    Ok(UiTokenAmount::default(ore_api::consts::TOKEN_DECIMALS_V1))
                 }
             }
         }

@@ -4,7 +4,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use crate::{
     components::{Appearance, OreIcon, QrCodeIcon},
     hooks::{
-        use_appearance, use_ore_balance, use_proof,
+        use_appearance, use_ore_balance, use_ore_v1_balance, use_proof,
         use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
     },
     route::Route,
@@ -49,6 +49,7 @@ pub fn Balance() -> Element {
                         }
                     }
                     StakeBalance {}
+                    OreV1Balance {}
                 }
             }
         };
@@ -71,7 +72,7 @@ pub fn StakeBalance() -> Element {
                     div {
                         class: "flex flex-col gap-2",
                         p {
-                            class: "font-medium text-sm",
+                            class: "font-medium text-sm text-gray-300",
                             "Stake"
                         }
                         div {
@@ -102,6 +103,45 @@ pub fn StakeBalance() -> Element {
             class: "flex flex-row w-full min-h-20 grow loading rounded",
         }
     }
+}
+
+pub fn OreV1Balance() -> Element {
+    let balance = use_ore_v1_balance();
+
+    if let Some(balance) = balance.cloned() {
+        if let Ok(balance) = balance {
+            if let Some(_) = balance.ui_amount {
+                return rsx! {
+                    div {
+                        class: "flex flex-row grow justify-between mt-4",
+                        div {
+                            class: "flex flex-col gap-2",
+                            p {
+                                class: "font-medium text-sm text-gray-300",
+                                "OREv1"
+                            }
+                            div {
+                                class: "flex flex-row gap-2",
+                                OreIcon {
+                                    class: "my-auto w-4 h-4"
+                                }
+                                p {
+                                    class: "font-semibold",
+                                    "{balance.ui_amount_string}"
+                                }
+                            }
+                        }
+                        div {
+                            class: "mt-auto flex flex-row gap-1 sm:gap-2 -mb-2",
+                            UpgradeButton {}
+                        }
+                    }
+                };
+            }
+        }
+    }
+
+    return rsx! {};
 }
 
 #[component]
@@ -167,6 +207,24 @@ pub fn StakeButton() -> Element {
             span {
                 class: "my-auto",
                 "Stake"
+            }
+        }
+    }
+}
+
+pub fn UpgradeButton() -> Element {
+    let appearance = use_appearance();
+    let button_color = match *appearance.read() {
+        Appearance::Light => "text-gray-300 hover:text-black ",
+        Appearance::Dark => "text-gray-300 hover:text-white ",
+    };
+    rsx! {
+        Link {
+            class: "flex transition transition-colors font-semibold text-sm px-3 h-10 rounded-full hover-100 active-200 {button_color}",
+            to: Route::Upgrade {},
+            span {
+                class: "my-auto",
+                "Upgrade"
             }
         }
     }
