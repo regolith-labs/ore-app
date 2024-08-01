@@ -110,33 +110,35 @@ pub fn OreV1Balance() -> Element {
 
     if let Some(balance) = balance.cloned() {
         if let Ok(balance) = balance {
-            if let Some(_) = balance.ui_amount {
-                return rsx! {
-                    div {
-                        class: "flex flex-row grow justify-between mt-4",
+            if let Some(amountf64) = balance.ui_amount {
+                if amountf64.gt(&0) {
+                    return rsx! {
                         div {
-                            class: "flex flex-col gap-2",
-                            p {
-                                class: "font-medium text-sm text-gray-300",
-                                "OREv1"
+                            class: "flex flex-row grow justify-between mt-4",
+                            div {
+                                class: "flex flex-col gap-2",
+                                p {
+                                    class: "font-medium text-sm text-gray-300",
+                                    "OREv1"
+                                }
+                                div {
+                                    class: "flex flex-row gap-2",
+                                    OreIcon {
+                                        class: "my-auto w-4 h-4"
+                                    }
+                                    p {
+                                        class: "font-semibold",
+                                        "{balance.ui_amount_string}"
+                                    }
+                                }
                             }
                             div {
-                                class: "flex flex-row gap-2",
-                                OreIcon {
-                                    class: "my-auto w-4 h-4"
-                                }
-                                p {
-                                    class: "font-semibold",
-                                    "{balance.ui_amount_string}"
-                                }
+                                class: "mt-auto flex flex-row gap-1 sm:gap-2 -mb-2",
+                                UpgradeButton {}
                             }
                         }
-                        div {
-                            class: "mt-auto flex flex-row gap-1 sm:gap-2 -mb-2",
-                            UpgradeButton {}
-                        }
-                    }
-                };
+                    };
+                }
             }
         }
     }
