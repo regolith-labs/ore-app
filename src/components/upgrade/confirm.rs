@@ -71,50 +71,43 @@ pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element
 
     rsx! {
         div {
-            class: "flex flex-col h-full grow gap-12 justify-between",
+            class: "flex flex-col h-full grow justify-between",
             div {
-                class: "flex flex-col gap-3",
+                class: "flex flex-col gap-4 -mt-3.5 mb-4",
                 BackButton {
                     onclick: move |_| {
                         upgrade_step.borrow_mut().set(UpgradeStep::Edit);
                     }
                 }
-                h2 { "Confirm upgrade" }
-                p {
-                    class: "text-lg",
-                    "Please review your upgrade information for correctness."
-                }
-                p {
-                    class: "text-sm text-gray-300 dark:text-gray-700",
-                    "Once confirmed, this transaction cannot be undone."
+                div {
+                    class: "flex flex-col gap-2",
+                    h2 {
+                        "Confirm"
+                    }
+                    p {
+                        class: "text-lg",
+                        "Please review your upgrade information for correctness."
+                    }
+                    p {
+                        class: "text-sm text-gray-300",
+                        "Once confirmed, this transaction cannot be undone."
+                    }
                 }
             }
             div {
-                class: "flex flex-col gap-8",
-                div {
-                    class: "flex flex-col gap-2",
-                    p { "Upgrade" }
-                    div {
-                        class: "flex flex-row gap-4",
-                        div {
-                            p {
-                                class: "text-2xl",
-                                "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS_V1)} OREv1"
-                            }
-                        }
-                        p {
-                            class: "text-2xl",
-                            "→"
-                        }
-                        div {
-                            class: "flex flex-row gap-2",
-                            OreIcon { class: "my-auto w-5 h-5" }
-                            p {
-                                class: "text-2xl",
-                                "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS_V1)}"
-                            }
-                        }
-                    }
+                class: "flex flex-row gap-4",
+                p {
+                    class: "font-medium text-2xl",
+                    "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS_V1)} OREv1"
+                }
+                p {
+                    class: "text-2xl",
+                    "→"
+                }
+                p {
+                    class: "font-medium text-2xl",
+                    "ORE"
+                    // "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS_V1)} ORE"
                 }
             }
             if let Some(Some(tx)) = tx.cloned() {

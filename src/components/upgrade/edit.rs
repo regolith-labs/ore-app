@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::WarningIcon,
+    components::{BackButton, WarningIcon},
     hooks::{
         use_wallet_adapter::{self, WalletAdapter},
         UiTokenAmountBalance,
@@ -47,17 +47,25 @@ pub fn UpgradeEdit(
         div {
             class: "flex flex-col h-full grow justify-between",
             div {
-                class: "flex flex-col gap-3",
-                h2 {
-                    "Upgrade"
+                class: "flex flex-col gap-4 -mt-3.5 mb-4",
+                BackButton {
+                    onclick: move |_| {
+                        nav.go_back()
+                    }
                 }
-                p {
-                    class: "text-lg",
-                    "Upgrade your ORE v1 tokens to ORE v2."
-                }
-                p {
-                    class: "text-sm text-gray-300 dark:text-gray-700",
-                    "This will burn your ORE v1 tokens and mint an equal number of ORE tokens directly to your wallet."
+                div {
+                    class: "flex flex-col gap-2",
+                    h2 {
+                        "Upgrade"
+                    }
+                    p {
+                        class: "text-lg",
+                        "Upgrade your OREv1 tokens to ORE."
+                    }
+                    p {
+                        class: "text-sm text-gray-300",
+                        "This will burn your OREv1 tokens and mint an equal number of ORE tokens directly to your wallet."
+                    }
                 }
             }
             div {
@@ -90,24 +98,14 @@ pub fn UpgradeEdit(
                     onclick: move |_| {
                         amount_input.set(max_amount_str.clone())
                     },
-                    "Max: {max_amount_str}"
+                    "Max"
                 }
             }
-            div {
-                class: "flex flex-col sm:flex-row gap-2",
-                button {
-                    class: "w-full py-3 rounded font-semibold transition-colors hover-100 active-200",
-                    onclick: move |_| {
-                        nav.go_back();
-                    },
-                    "Cancel"
-                }
-                button {
-                    class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
-                    disabled: is_disabled,
-                    onclick: move |_| { upgrade_step.set(UpgradeStep::Confirm) },
-                    "Review"
-                }
+            button {
+                class: "w-full py-3 rounded font-semibold transition-colors transition-opacity text-white bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-20",
+                disabled: is_disabled,
+                onclick: move |_| { upgrade_step.set(UpgradeStep::Confirm) },
+                "Review"
             }
         }
     }
