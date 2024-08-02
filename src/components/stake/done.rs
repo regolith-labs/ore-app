@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::route::Route;
+use crate::{components::CheckCircleIcon, route::Route};
 
 pub fn StakeDone() -> Element {
     rsx! {
@@ -19,6 +19,17 @@ pub fn StakeDone() -> Element {
                     class: "text-sm text-gray-300 dark:text-gray-700",
                     "This will give an extra multiplier on your mining rewards."
                 }
+            }
+            div {
+                class: "flex flex-col gap-8 w-full",
+                CheckCircleIcon { class: "h-12 w-12 mx-auto" }
+                // Link {
+                //     class: "font-mono text-nowrap truncate mx-auto w-full p-2 rounded hover-100 active-200",
+                //     to: Route::Tx {
+                //         sig: signature.to_string(),
+                //     },
+                //     "{signature.to_string()}"
+                // }
             }
             div {
                 class: "flex flex-col gap-3",
