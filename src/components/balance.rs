@@ -111,7 +111,7 @@ pub fn OreV1Balance() -> Element {
     if let Some(balance) = balance.cloned() {
         if let Ok(balance) = balance {
             if let Some(amountf64) = balance.ui_amount {
-                if amountf64.gt(&0) {
+                if amountf64.gt(&0f64) {
                     return rsx! {
                         div {
                             class: "flex flex-row grow justify-between mt-4",
