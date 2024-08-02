@@ -75,7 +75,7 @@ pub fn FilterButtons(filter: Signal<ActivityFilter>, offset: Signal<u64>) -> Ele
     };
     let button_class =
         "flex flex-row gap-2 h-10 rounded-full text-xs w-10 sm:w-min sm:px-3 md:text-sm hover-100 active-200 transition-colors transition-transform";
-    let icon_class = "w-4 h-4 md:w-5 md:h-5 m-auto";
+    let icon_class = "w-5 h-5 m-auto";
 
     rsx! {
         div {
