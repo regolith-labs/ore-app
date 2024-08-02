@@ -26,7 +26,7 @@ pub fn UpgradeDone(signature: Signature, amount: u64) -> Element {
                 class: "flex flex-col gap-8 w-full",
                 CheckCircleIcon { class: "h-12 w-12 mx-auto" }
                 Link {
-                    class: "font-mono text-nowrap truncate mx-auto w-full p-2 rounded hover-100 active-200",
+                    class: "font-mono text-nowrap truncate mx-auto p-2 rounded hover-100 active-200",
                     to: Route::Tx {
                         sig: signature.to_string(),
                     },
