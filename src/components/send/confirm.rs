@@ -144,15 +144,12 @@ pub fn SendConfirm(
                     }
                 }
             }
-            div {
-                class: "flex flex-col mt-auto sm:flex-row gap-2",
-                if let Some(Some(tx)) = tx.cloned() {
-                    InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Confirm" }
-                } else {
-                    p {
-                        class: "font-medium text-center text-sm text-gray-300 hover:underline",
-                        "Loading..."
-                    }
+            if let Some(Some(tx)) = tx.cloned() {
+                InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Confirm" }
+            } else {
+                p {
+                    class: "font-medium text-center text-sm text-gray-300 hover:underline",
+                    "Loading..."
                 }
             }
         }
