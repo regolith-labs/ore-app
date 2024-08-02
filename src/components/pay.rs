@@ -56,7 +56,7 @@ pub fn Pay() -> Element {
                     }
                     p {
                         class: "text-sm text-gray-300",
-                        "This transaction will be executed and settled directly on the Solana blockchain."
+                        "This transaction will be executed and settled on the Solana blockchain."
                     }
                 }
             }
