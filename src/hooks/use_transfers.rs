@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
 use ore_types::{response::ListTransfersResponse, Transfer};
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
@@ -53,7 +55,7 @@ pub fn use_transfers(
             ActivityFilter::Global => None,
             ActivityFilter::Personal => match *wallet_adapter.read() {
                 WalletAdapter::Connected(pubkey) => Some(pubkey),
-                WalletAdapter::Disconnected => None,
+                WalletAdapter::Disconnected => Some(Pubkey::new_from_array([0; 32])),
             },
         };
         use_gateway()
