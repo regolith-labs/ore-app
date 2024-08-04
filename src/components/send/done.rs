@@ -32,7 +32,7 @@ pub fn SendDone() -> Element {
                 // }
             }
             div {
-                class: "flex flex-col gap-3 w-full",
+                class: "flex flex-col gap-3",
                 div {
                     class: "h-full"
                 }

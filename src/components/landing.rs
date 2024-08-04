@@ -515,14 +515,16 @@ fn SectionD(text_color: TextColor) -> Element {
                     price: quotes.data["USDC"].price,
                     symbol: "$",
                     decimals: 2,
-                    link: "https://jup.ag/swap/USDC-ORE"
+                    // link: "https://jup.ag/swap/USDC-ORE"
+                    link: "https://jup.ag/swap/SOL-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
                 }
                 Quote {
                     title: "ORE/BTC",
                     price: quotes.data["WBTC"].price,
                     symbol: "₿",
                     decimals: 8,
-                    link: "https://jup.ag/swap/WBTC-ORE"
+                    link: "https://jup.ag/swap/WBTC-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
+                    // link: "https://jup.ag/swap/WBTC-ORE"
                 }
             }
         }
