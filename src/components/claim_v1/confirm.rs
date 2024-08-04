@@ -102,7 +102,7 @@ pub fn ClaimV1Confirm(amount: u64, claim_step: Signal<ClaimV1Step>) -> Element {
                     }
                     p {
                         class: "text-3xl sm:text-4xl md:text-5xl font-semibold",
-                        "{amount_to_ui_amount(amount, ore_api::consts::TOKEN_DECIMALS)}"
+                        "{amount_to_ui_amount(amount, ore_api_v1::TOKEN_DECIMALS)}"
                     }
                 }
             }
