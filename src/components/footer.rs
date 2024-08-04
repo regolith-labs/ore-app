@@ -96,7 +96,7 @@ fn SocialLinks() -> Element {
         div {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
             Link {
-                to: "https://discord.gg/ore-supply",
+                to: "https://discord.com/invite/ore-supply"
                 class: "flex h-10 w-10 hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30 transition-colors rounded-full text-white",
                 new_tab: true,
                 DiscordIcon {
