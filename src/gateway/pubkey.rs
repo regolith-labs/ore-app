@@ -10,6 +10,11 @@ pub fn proof_pubkey(authority: Pubkey) -> Pubkey {
 }
 
 #[cached]
+pub fn proof_v1_pubkey(authority: Pubkey) -> Pubkey {
+    Pubkey::find_program_address(&[ore_api_v1::PROOF, authority.as_ref()], &ore_api_v1::ID).0
+}
+
+#[cached]
 pub fn escrow_pubkey(authority: Pubkey) -> Pubkey {
     Pubkey::find_program_address(&[ESCROW, authority.as_ref()], &ore_relayer_api::ID).0
 }

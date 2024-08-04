@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{components::CheckCircleIcon, route::Route};
 
-pub fn ClaimDone() -> Element {
+pub fn ClaimV1Done() -> Element {
     rsx! {
         div {
             class: "flex flex-col grow justify-between",
@@ -13,11 +13,11 @@ pub fn ClaimDone() -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "You have claimed your mining rewards."
+                    "You have claimed your OREv1 mining rewards."
                 }
                 p {
                     class: "text-sm text-gray-300",
-                    "You can now spend and transfer your ORE from the dashboard."
+                    "You can now upgrade your ORE to v2 from the dashboard."
                 }
             }
             div {

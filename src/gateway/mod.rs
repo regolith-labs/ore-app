@@ -96,6 +96,20 @@ impl Gateway {
             .map_err(GatewayError::from)
     }
 
+    pub async fn get_proof_v1(&self, authority: Pubkey) -> GatewayResult<ore_api_v1::state::Proof> {
+        let data = self
+            .rpc
+            .get_account_data(&proof_v1_pubkey(authority))
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(
+            *<ore_api_v1::state::Proof as ore_api_v1::utils::AccountDeserialize>::try_from_bytes(
+                &data,
+            )
+            .expect("Failed to parse proof"),
+        )
+    }
+
     pub async fn send_via_relayer(
         &self,
         pubkey: Pubkey,
