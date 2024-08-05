@@ -3818,9 +3818,9 @@ dependencies = [
 
 [[package]]
 name = "ore-relayer-api"
-version = "1.0.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a139ac773bed448aa2568cc2b72bdf85393641a0a94f73b1230e49478e25f8b9"
+checksum = "771e14200d9c262e5270d3d9b40601658aa3e67f5457166e99c29b491601ee3f"
 dependencies = [
  "bytemuck",
  "mpl-token-metadata",

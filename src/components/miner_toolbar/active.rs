@@ -59,79 +59,8 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
             }
             div {
                 class: "flex-shrink-0 flex-none flex flex-row gap-2 ml-auto my-auto",
-                // p {
-                //     class: "font-semibold text-white flex-shrink-0 flex-none my-auto",
-                //     "Mining"
-                // }
                 StopButton {}
             }
         }
     }
-}
-
-pub fn PriorityFeeConfig() -> Element {
-    let mut priority_fee = use_priority_fee();
-
-    rsx! {
-        div {
-            class: "flex flex-row gap-8 justify-between mt-8",
-            div {
-                class: "flex flex-col gap-1",
-                p {
-                    class: "text-white font-semibold",
-                    "Priority fee"
-                }
-                p {
-                    class: "text-white text-xs opacity-80 max-w-96",
-                    "Add a priority fee to increase your chances of landing a transaction."
-                }
-           }
-           div {
-                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                input {
-                    class: "bg-transparent text-white text-right px-1 mb-auto rounded font-semibold hover:bg-green-600 transition-colors",
-                    dir: "rtl",
-                    step: 100_000,
-                    min: 0,
-                    max: 10_000_000,
-                    r#type: "number",
-                    value: "{priority_fee.read().0}",
-                    oninput: move |e| {
-                        if let Ok(v) = e.value().parse::<u64>() {
-                            priority_fee.set(PriorityFee(v));
-                        }
-                    }
-                }
-                p {
-                    class: "my-auto",
-                    "microlamports"
-                }
-            }
-        }
-    }
-}
-
-fn DownloadLink() -> Element {
-    // if cfg!(feature = "web") {
-    //     rsx! {
-    //         div {
-    //             class: "flex flex-row gap-2 mt-8 p-2.5 rounded bg-green-600",
-    //             WarningIcon {
-    //                 class: "w-4 h-4 mt-0.5 shrink-0"
-    //             }
-    //             p {
-    //                 class: "text-sm my-auto",
-    //                 "You are mining from a web browser. For better performance, "
-    //                 Link {
-    //                     to: Route::Download {},
-    //                     class: "font-medium underline",
-    //                     "download the app."
-    //                 }
-    //             }
-    //         }
-    //     }
-    // } else {
-    //     None
-    // }
-    rsx! {}
 }
