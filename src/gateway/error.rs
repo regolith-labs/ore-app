@@ -1,3 +1,4 @@
+use async_std::future::TimeoutError;
 use solana_client_wasm::{solana_sdk::program_error::ProgramError, ClientError};
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
@@ -9,6 +10,9 @@ pub enum GatewayError {
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
+    ParseFailed,
+    RetryFailed,
+    TimeoutError,
     // SimulationFailed,
     RequestFailed,
     ProgramBuilderFailed,
@@ -19,6 +23,12 @@ pub enum GatewayError {
 impl From<reqwest::Error> for GatewayError {
     fn from(_value: reqwest::Error) -> Self {
         GatewayError::RequestFailed
+    }
+}
+
+impl From<TimeoutError> for GatewayError {
+    fn from(_value: TimeoutError) -> Self {
+        GatewayError::TimeoutError
     }
 }
 

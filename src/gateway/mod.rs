@@ -3,6 +3,7 @@ mod pubkey;
 
 use std::str::FromStr;
 
+use async_std::future::{timeout, Future};
 use cached::proc_macro::cached;
 pub use error::*;
 use ore_api::{
@@ -51,6 +52,10 @@ impl Gateway {
     }
 
     pub async fn get_clock(&self) -> GatewayResult<Clock> {
+        retry(|| self.try_get_clock()).await
+    }
+
+    pub async fn try_get_clock(&self) -> GatewayResult<Clock> {
         let data = self
             .rpc
             .get_account_data(&sysvar::clock::ID)
@@ -60,6 +65,10 @@ impl Gateway {
     }
 
     pub async fn get_config(&self) -> GatewayResult<Config> {
+        retry(|| self.try_get_config()).await
+    }
+
+    pub async fn try_get_config(&self) -> GatewayResult<Config> {
         let data = self
             .rpc
             .get_account_data(&CONFIG_ADDRESS)
@@ -69,6 +78,10 @@ impl Gateway {
     }
 
     pub async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
+        retry(|| self.try_get_proof(authority)).await
+    }
+
+    pub async fn try_get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
         let data = self
             .rpc
             .get_account_data(&proof_pubkey(authority))
@@ -78,15 +91,27 @@ impl Gateway {
     }
 
     pub async fn get_escrow(&self, authority: Pubkey) -> GatewayResult<Escrow> {
+        retry(|| self.try_get_escrow(authority)).await
+    }
+
+    pub async fn try_get_escrow(&self, authority: Pubkey) -> GatewayResult<Escrow> {
+        log::info!("Try get escrow...");
         let data = self
             .rpc
             .get_account_data(&escrow_pubkey(authority))
             .await
             .map_err(GatewayError::from)?;
-        Ok(*Escrow::try_from_bytes(&data).expect("Failed to parse escrow account"))
+        Ok(*Escrow::try_from_bytes(&data).expect("Failed to parse escrow"))
     }
 
     pub async fn get_token_account(
+        &self,
+        pubkey: &Pubkey,
+    ) -> GatewayResult<Option<UiTokenAccount>> {
+        retry(|| self.try_get_token_account(pubkey)).await
+    }
+
+    pub async fn try_get_token_account(
         &self,
         pubkey: &Pubkey,
     ) -> GatewayResult<Option<UiTokenAccount>> {
@@ -97,6 +122,13 @@ impl Gateway {
     }
 
     pub async fn get_proof_v1(&self, authority: Pubkey) -> GatewayResult<ore_api_v1::state::Proof> {
+        retry(|| self.try_get_proof_v1(authority)).await
+    }
+
+    pub async fn try_get_proof_v1(
+        &self,
+        authority: Pubkey,
+    ) -> GatewayResult<ore_api_v1::state::Proof> {
         let data = self
             .rpc
             .get_account_data(&proof_v1_pubkey(authority))
@@ -266,6 +298,34 @@ impl Gateway {
             Err(e) => Err(e.into()),
         }
     }
+}
+
+pub async fn retry<F, Fut, T>(f: F) -> GatewayResult<T>
+where
+    F: Fn() -> Fut,
+    Fut: Future<Output = GatewayResult<T>>,
+{
+    const MAX_RETRIES: u32 = 8;
+    const INITIAL_BACKOFF: Duration = Duration::from_millis(200);
+    const TIMEOUT: Duration = Duration::from_secs(8);
+    let mut backoff = INITIAL_BACKOFF;
+    for attempt in 0..MAX_RETRIES {
+        match timeout(TIMEOUT, f()).await {
+            Ok(Ok(result)) => return Ok(result),
+            Ok(Err(e)) if attempt < MAX_RETRIES - 1 => {
+                async_std::task::sleep(backoff).await;
+                backoff *= 2; // Exponential backoff
+            }
+            Ok(Err(e)) => return Err(e),
+            Err(_) if attempt < MAX_RETRIES - 1 => {
+                async_std::task::sleep(backoff).await;
+                backoff *= 2; // Exponential backoff
+            }
+            Err(_) => return Err(GatewayError::RetryFailed),
+        }
+    }
+
+    Err(GatewayError::RetryFailed)
 }
 
 #[cached]
