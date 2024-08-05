@@ -16,7 +16,7 @@ pub fn CodeBlock(text: String) -> Element {
     let strs = text.split('\n');
     rsx! {
         div {
-            class: "flex flex-row justify-between py-2 pl-4 pr-2 bg-gray-100 text-black dark:bg-gray-900 dark:text-white font-mono rounded",
+            class: "flex flex-row justify-between overflow-x-auto py-2 pl-4 pr-2 bg-gray-100 text-black dark:bg-gray-900 dark:text-white font-mono rounded",
             div {
                 class: "flex flex-col",
                 for s in strs {
