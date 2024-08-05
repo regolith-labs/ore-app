@@ -21,9 +21,7 @@ pub fn StartButton() -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
     rsx! {
         button {
-            // class: "transition transition-colors flex flex-row gap-2 w-full h-10 px-4 justify-center rounded-full bg-green-500 text-white hover:bg-green-600 active:bg-green-700 text-nowrap disabled:opacity-50",
-            class: "transition transition-colors flex flex-row gap-2 w-full h-10 px-4 justify-center rounded-full bg-green-500 text-white text-nowrap disabled:opacity-50",
-            disabled: true,
+            class: "transition transition-colors flex flex-row gap-2 w-full h-10 px-4 justify-center rounded-full bg-green-500 text-white hover:bg-green-600 active:bg-green-700 text-nowrap disabled:opacity-50",
             onclick: move |e| {
                 toolbar_state.start();
                 e.stop_propagation();
@@ -33,8 +31,7 @@ pub fn StartButton() -> Element {
             }
             p {
                 class: "my-auto font-semibold",
-                // "Mine"
-                "Coming soon"
+                "Mine"
             }
         }
     }
