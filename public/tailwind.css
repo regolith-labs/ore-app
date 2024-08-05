@@ -1191,6 +1191,10 @@ h2:where(.dark, .dark *) {
   overflow: visible;
 }
 
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
 .overflow-y-scroll {
   overflow-y: scroll;
 }
