@@ -1,10 +1,19 @@
-use actix_files::Files;
-use actix_web::{App, HttpServer};
+use warp::Filter;
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(Files::new("/", "../dist").index_file("index.html")))
-        .bind("0.0.0.0:8080")?
-        .run()
-        .await
+#[tokio::main]
+async fn main() {
+    // Define the directory to serve files from
+    let dir = warp::fs::dir("../dist");
+
+    // Route to handle unknown paths
+    let index = warp::path::end().and(warp::fs::file("../dist/index.html"));
+
+    // Route to handle any other paths (fallback to index.html)
+    let fallback = warp::any().map(|| warp::reply::html(include_str!("../../dist/index.html")));
+
+    // Combine routes
+    let routes = dir.or(index).or(fallback).with(warp::log("ore-app"));
+
+    // Start the warp server
+    warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
 }
