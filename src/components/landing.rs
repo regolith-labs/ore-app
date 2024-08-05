@@ -39,7 +39,7 @@ pub fn Landing() -> Element {
         (gen_asset_path("rock-1", screen_size), TextColor::White),
         (gen_asset_path("rock-2", screen_size), TextColor::White),
         (gen_asset_path("rock-3", screen_size), TextColor::White),
-        (gen_asset_path("rock-4", screen_size), TextColor::White),
+        // (gen_asset_path("rock-4", screen_size), TextColor::White),
     ];
     let len = bg_imgs.len();
     let text_color = bg_imgs[*i.read() % len].1;
