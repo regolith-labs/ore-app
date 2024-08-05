@@ -18,7 +18,8 @@ use crate::{
     miner::Miner,
 };
 
-const COLLECTION_ADDRESS: Pubkey = pubkey!("F9gWPbWiMVcT5ftGy4X2fLE4gSDw6kiATgZU8tnCmso6");
+const TOP_UP_AMOUNT: f64 = 0.02; // In SOL (~$2)
+const COLLECTION_ADDRESS: Pubkey = pubkey!("tHCCE3KWKx8i8cDjX2DQ3Z7EMJkScAVwkfxdWz8SqgP");
 
 #[component]
 pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> Element {
@@ -32,7 +33,7 @@ pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> El
             WalletAdapter::Connected(signer) => {
                 let gateway = use_gateway();
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(50_000);
-                let amount = sol_to_lamports(0.05);
+                let amount = sol_to_lamports(TOP_UP_AMOUNT);
                 let ix_1 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
                     &escrow_pubkey(signer),
@@ -41,7 +42,7 @@ pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> El
                 let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
                     &COLLECTION_ADDRESS,
-                    amount.div(50), // 2% fee
+                    amount.div(100), // 1% fee
                 );
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
                 let ixs = vec![cu_limit_ix, ix_1, ix_2];
@@ -56,7 +57,7 @@ pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> El
         if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 let gateway = use_gateway();
-                async_std::task::sleep(Duration::from_millis(1000)).await;
+                async_std::task::sleep(Duration::from_millis(2000)).await;
                 escrow_balance.restart();
             }
         };
@@ -124,7 +125,7 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
             WalletAdapter::Connected(signer) => {
                 let gateway = use_gateway();
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
-                let amount = sol_to_lamports(0.05);
+                let amount = sol_to_lamports(TOP_UP_AMOUNT);
                 let ix_1 = ore_relayer_api::instruction::open_escrow(signer, signer);
                 let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
@@ -134,7 +135,7 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
                 let ix_3 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
                     &COLLECTION_ADDRESS,
-                    amount.div(50), // 2% fee
+                    amount.div(100), // 1% fee
                 );
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
                 let ixs = vec![cu_limit_ix, ix_1, ix_2, ix_3];
@@ -146,11 +147,16 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
     });
 
     let _ = use_resource(move || async move {
+        log::info!("A");
         if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+            log::info!("B");
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
+                log::info!("C");
                 let gateway = use_gateway();
-                async_std::task::sleep(Duration::from_millis(1000)).await;
+                async_std::task::sleep(Duration::from_millis(2000)).await;
+                log::info!("D");
                 if let Ok(new_escrow) = gateway.get_escrow(signer).await {
+                    log::info!("E");
                     escrow.set(new_escrow);
                     escrow_balance.restart();
                 }
@@ -181,7 +187,7 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
                     }
                     p {
                         class: "text-sm text-gray-300",
-                        "This will open a new account on the Solana blockchain to secure your miner rewards."
+                        "This will open a new account on the Solana blockchain to secure your mining rewards."
                     }
                 }
             }

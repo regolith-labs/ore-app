@@ -390,6 +390,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-retry"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33c7d291ca98798cc3c49b4064314288ad14ba95013d546b47d29af791b72d9c"
+dependencies = [
+ "async-sleep",
+ "futures-util",
+ "pin-project-lite",
+ "retry-policy",
+]
+
+[[package]]
+name = "async-sleep"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "268257885b8f4e7f9c28c29f265f4058130b474dd5b6d59b342e2db84499478a"
+dependencies = [
+ "futures-util",
+]
+
+[[package]]
 name = "async-std"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3757,6 +3778,7 @@ dependencies = [
 name = "ore-app"
 version = "1.1.0"
 dependencies = [
+ "async-retry",
  "async-std",
  "base64 0.22.1",
  "bincode",
@@ -4434,6 +4456,28 @@ dependencies = [
  "web-sys",
  "winreg",
 ]
+
+[[package]]
+name = "retry-backoff"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0d5058b9f1c22f124c926b1f60bb7893c9cfb793d4e2506316cfda4ff17ae56"
+
+[[package]]
+name = "retry-policy"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e4636eceb6380719d9ab5acf2a55528a255f0c32ad8ed4d5148c968f625bf79a"
+dependencies = [
+ "retry-backoff",
+ "retry-predicate",
+]
+
+[[package]]
+name = "retry-predicate"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de4e01b6a9151ea5e162dd4521f35047ab8ca927c226c92e2550e675a08e809d"
 
 [[package]]
 name = "rustc-demangle"

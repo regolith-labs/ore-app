@@ -48,8 +48,8 @@ pub fn Balance() -> Element {
                             }
                         }
                     }
-                    StakeBalance {}
                     OreV1Balance {}
+                    StakeBalance {}
                 }
             }
         };
