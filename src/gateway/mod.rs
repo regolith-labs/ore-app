@@ -38,7 +38,7 @@ pub const CU_LIMIT_UPGRADE: u32 = 17_985 + 300;
 
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 128;
-const CONFIRM_RETRIES: usize = 12;
+const CONFIRM_RETRIES: usize = 20;
 const CONFIRM_DELAY: u64 = 500;
 
 pub struct Gateway {

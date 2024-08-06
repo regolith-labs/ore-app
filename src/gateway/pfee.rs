@@ -31,8 +31,7 @@ pub async fn get_recent_priority_fee_estimate(treasury: bool) -> u64 {
             return res["result"]["priorityFeeEstimate"]
                 .as_f64()
                 .map(|fee| fee as u64)
-                .unwrap_or(0)
-                + 1_000;
+                .unwrap_or(0);
         }
     }
 

@@ -11,7 +11,7 @@ use solana_sdk::{compute_budget::ComputeBudgetInstruction, transaction::Transact
 
 use crate::{
     components::{BackButton, InvokeSignature, OreIcon},
-    gateway::ore_token_account_address,
+    gateway::{self, ore_token_account_address},
     hooks::{
         use_gateway, use_ore_balance,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
@@ -35,8 +35,10 @@ pub fn SendConfirm(
         async move {
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 // Cu limit
-                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
-                let mut ixs = vec![cu_limit_ix];
+                let price = gateway::get_recent_priority_fee_estimate(false).await;
+                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(30_000);
+                let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
+                let mut ixs = vec![cu_limit_ix, cu_price_ix];
                 let from_token_account = ore_token_account_address(signer);
                 let to_token_account = ore_token_account_address(recipient);
 
@@ -44,6 +46,8 @@ pub fn SendConfirm(
                 let gateway = use_gateway();
                 if let Ok(Some(_)) = gateway.get_token_account(&to_token_account).await {
                 } else {
+                    ixs.remove(0);
+                    ixs.insert(0, ComputeBudgetInstruction::set_compute_unit_limit(125_000));
                     ixs.push(create_associated_token_account(
                         &signer,
                         &recipient,
