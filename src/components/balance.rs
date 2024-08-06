@@ -23,15 +23,15 @@ pub fn Balance() -> Element {
             div {
                 class: "flex flex-row w-full min-h-16 rounded justify-between",
                 div {
-                    class: "flex flex-col grow gap-2 sm:gap-4",
+                    class: "flex flex-col grow gap-2 sm:gap-4 max-w-full",
                     h2 {
                         class: "text-lg sm:text-xl md:text-2xl font-bold",
                         "Balance"
                     }
                     div {
-                        class: "flex flex-row grow justify-between",
+                        class: "flex flex-row grow justify-between max-w-full",
                         div {
-                            class: "flex flex-row my-auto gap-2.5 md:gap-4",
+                            class: "flex flex-row my-auto gap-2.5 md:gap-4 truncate",
                             OreIcon {
                                 class: "my-auto w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10"
                             }
