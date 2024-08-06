@@ -163,15 +163,18 @@ impl Gateway {
                 .await
             {
                 Ok(res) => {
-                    // Parse sig
-                    let res: ore_types::response::RelayResponse = res.json().await.unwrap();
-                    let sig = Signature::from_str(&res.sig).unwrap();
-                    log::info!("Sig: {:?}", sig);
+                    if let Ok(res) = res.json::<ore_types::response::RelayResponse>().await {
+                        // Parse sig
+                        let sig = Signature::from_str(&res.sig).unwrap();
+                        log::info!("Sig: {:?}", sig);
 
-                    // Confirm tx
-                    let confirmed = self.confirm_signature(sig).await;
-                    if confirmed.is_ok() {
-                        return confirmed;
+                        // Confirm tx
+                        let confirmed = self.confirm_signature(sig).await;
+                        if confirmed.is_ok() {
+                            return confirmed;
+                        }
+                    } else {
+                        log::error!("Failed to parse response");
                     }
                 }
                 Err(err) => {
