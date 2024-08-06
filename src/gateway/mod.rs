@@ -95,7 +95,6 @@ impl Gateway {
     }
 
     pub async fn try_get_escrow(&self, authority: Pubkey) -> GatewayResult<Escrow> {
-        log::info!("Try get escrow...");
         let data = self
             .rpc
             .get_account_data(&escrow_pubkey(authority))

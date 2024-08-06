@@ -24,7 +24,6 @@ pub fn Mine() -> Element {
     let escrow = use_escrow();
     let nav = use_navigator();
 
-    log::info!("X1");
     if escrow.read().eq(&Escrow::default()) {
         return rsx! {
             MinerToolbarCreateAccountOpen {
@@ -32,7 +31,6 @@ pub fn Mine() -> Element {
             }
         };
     }
-    log::info!("X2");
 
     if let Some(Ok(balance)) = *escrow_balance.read() {
         if balance.lt(&MIN_BALANCE) {
@@ -43,7 +41,6 @@ pub fn Mine() -> Element {
             };
         }
     }
-    log::info!("X3");
 
     rsx! {
         div {

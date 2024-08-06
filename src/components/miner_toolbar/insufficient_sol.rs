@@ -147,16 +147,11 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
     });
 
     let _ = use_resource(move || async move {
-        log::info!("A");
         if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
-            log::info!("B");
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
-                log::info!("C");
                 let gateway = use_gateway();
                 async_std::task::sleep(Duration::from_millis(2000)).await;
-                log::info!("D");
                 if let Ok(new_escrow) = gateway.get_escrow(signer).await {
-                    log::info!("E");
                     escrow.set(new_escrow);
                     escrow_balance.restart();
                 }
