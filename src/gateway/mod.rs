@@ -1,4 +1,5 @@
 mod error;
+mod pfee;
 mod pubkey;
 
 use std::str::FromStr;
@@ -24,6 +25,7 @@ use solana_extra_wasm::{
 };
 use web_time::Duration;
 
+pub use pfee::*;
 pub use pubkey::*;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
@@ -36,7 +38,7 @@ pub const CU_LIMIT_UPGRADE: u32 = 17_985 + 300;
 
 const RPC_RETRIES: usize = 0;
 const GATEWAY_RETRIES: usize = 128;
-const CONFIRM_RETRIES: usize = 8;
+const CONFIRM_RETRIES: usize = 12;
 const CONFIRM_DELAY: u64 = 500;
 
 pub struct Gateway {
@@ -186,7 +188,7 @@ impl Gateway {
         }
     }
 
-    async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
+    pub async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
         // Confirm tx
         for _ in 0..CONFIRM_RETRIES {
             // Delay before confirming
