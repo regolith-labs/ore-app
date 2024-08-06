@@ -21,12 +21,6 @@ pub async fn get_recent_priority_fee_estimate(treasury: bool) -> u64 {
         }]
     });
 
-    // let response: Value = http_client
-    //     .post(RPC_URL.to_string())
-    //     .json(&req)
-    //     .send()
-    //     .await?
-    //     .json()?;
     if let Ok(res) = http_client
         .post(RPC_URL.to_string())
         .json(&req)
