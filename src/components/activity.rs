@@ -17,12 +17,12 @@ pub fn Activity() -> Element {
     let offset = use_signal(|| 0u64);
     let mut transfers = use_transfers(filter, offset);
 
-    use_future(move || async move {
-        loop {
-            async_std::task::sleep(Duration::from_secs(30)).await;
-            transfers.restart();
-        }
-    });
+    // use_future(move || async move {
+    //     loop {
+    //         async_std::task::sleep(Duration::from_secs(30)).await;
+    //         transfers.restart();
+    //     }
+    // });
 
     let e = if let Some(transfers) = transfers.read().clone() {
         match transfers {
