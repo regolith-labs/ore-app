@@ -24,15 +24,10 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let nav = use_navigator();
 
     // Start mining if the escrow account exists
-    log::info!("Toolbar A");
     let _ = use_resource(move || async move {
-        log::info!("Toolbar B");
         if escrow.read().ne(&Escrow::default()) {
-            log::info!("Toolbar C");
             if let Some(Ok(balance)) = *escrow_balance.read() {
-                log::info!("Toolbar D");
                 if balance.ge(&MIN_BALANCE) {
-                    log::info!("Toolbar E");
                     match try_start_mining(miner, escrow, &mut toolbar_state).await {
                         Ok(()) => {
                             toolbar_state.set_status(MinerStatus::Active);
