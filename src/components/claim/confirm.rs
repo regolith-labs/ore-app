@@ -30,8 +30,8 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
         async move {
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 // Cu limit
-                let price = gateway::get_recent_priority_fee_estimate(true).await;
-                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
+                let price = gateway::get_recent_priority_fee_estimate(true).await + 20_000;
+                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(40_000);
                 let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
                 let mut ixs = vec![cu_limit_ix, cu_price_ix];
                 let token_account_address = ore_token_account_address(signer);
@@ -40,6 +40,8 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                 let gateway = use_gateway();
                 if let Ok(Some(_)) = gateway.get_token_account(&token_account_address).await {
                 } else {
+                    ixs.remove(0);
+                    ixs.insert(0, ComputeBudgetInstruction::set_compute_unit_limit(125_000));
                     ixs.push(create_associated_token_account(
                         &signer,
                         &signer,
