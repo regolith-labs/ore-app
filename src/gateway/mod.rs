@@ -35,8 +35,9 @@ pub const CU_LIMIT_MINE: u32 = 500_000;
 pub const CU_LIMIT_UPGRADE: u32 = 17_985 + 300;
 
 const RPC_RETRIES: usize = 0;
-const GATEWAY_RETRIES: usize = 4;
+const GATEWAY_RETRIES: usize = 128;
 const CONFIRM_RETRIES: usize = 8;
+const CONFIRM_DELAY: u64 = 500;
 
 pub struct Gateway {
     pub rpc: WasmClient,
@@ -178,7 +179,6 @@ impl Gateway {
             }
 
             // Retry
-            async_std::task::sleep(Duration::from_millis(2000)).await;
             attempts += 1;
             if attempts > GATEWAY_RETRIES {
                 return Err(GatewayError::TransactionTimeout);
@@ -190,7 +190,7 @@ impl Gateway {
         // Confirm tx
         for _ in 0..CONFIRM_RETRIES {
             // Delay before confirming
-            async_std::task::sleep(Duration::from_millis(2000)).await;
+            async_std::task::sleep(Duration::from_millis(CONFIRM_DELAY)).await;
 
             // Fetch transaction status
             match self.rpc.get_signature_statuses(&[sig]).await {
