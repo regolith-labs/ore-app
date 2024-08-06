@@ -21,7 +21,7 @@ pub fn Banner(style: BannerStyle, link_to: Option<String>, children: Element) ->
             }
         } else {
             div {
-                class: "flex flex-row w-full font-medium text-center gap-1 px-4 sm:px-8 py-2 text-sm {color}",
+                class: "flex flex-row w-full font-medium text-center gap-1 px-4 sm:px-8 py-2 text-xs {color}",
                 {children}
             }
         }
