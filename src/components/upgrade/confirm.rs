@@ -10,7 +10,7 @@ use solana_sdk::compute_budget::ComputeBudgetInstruction;
 
 use crate::{
     components::{BackButton, InvokeSignature, OreIcon},
-    gateway::{ore_token_account_address, ore_token_account_address_v1},
+    gateway::{self, ore_token_account_address, ore_token_account_address_v1},
     hooks::{
         use_gateway,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
@@ -28,8 +28,10 @@ pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element
             WalletAdapter::Disconnected => None,
             WalletAdapter::Connected(signer) => {
                 // Build ixs
+                let price = gateway::get_recent_priority_fee_estimate(true).await;
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(600_000);
-                let mut ixs = vec![cu_limit_ix];
+                let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
+                let mut ixs = vec![cu_limit_ix, cu_price_ix];
 
                 // Create token account if necessary
                 let gateway = use_gateway();
