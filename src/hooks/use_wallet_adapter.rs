@@ -112,7 +112,12 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                 match rpc_res {
                                     Some(sig) => {
                                         log::info!("sig: {}", sig);
-                                        signal.set(InvokeSignatureStatus::Done(sig));
+                                        let confirmed = gateway.confirm_signature(sig).await;
+                                        if confirmed.is_ok() {
+                                            signal.set(InvokeSignatureStatus::Done(sig));
+                                        } else {
+                                            signal.set(InvokeSignatureStatus::Timeout)
+                                        }
                                     }
                                     None => {
                                         log::info!("error sending tx");
@@ -145,6 +150,7 @@ pub enum InvokeSignatureStatus {
     Start,
     Waiting,
     DoneWithError,
+    Timeout,
     Done(Signature),
 }
 

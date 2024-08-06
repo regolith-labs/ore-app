@@ -47,19 +47,31 @@ pub fn InvokeSignature(
     start_msg: String,
 ) -> Element {
     let button_class = "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700";
+    let error_class = "flex flex-row flex-nowrap gap-2 text-white w-min ml-auto text-nowrap bg-red-500 text-center font-semibold text-sm rounded py-1 px-2";
     rsx! {
         div {
             class: "flex flex-col gap-6",
             if let InvokeSignatureStatus::DoneWithError = *signal.read() {
                 p {
-                    class: "flex flex-row flex-nowrap gap-2 text-white w-min ml-auto text-nowrap bg-red-500 text-center font-semibold text-sm rounded py-1 px-2",
+                    class: "{error_class}",
                     WarningIcon {
                         class: "w-3.5 h-3.5 my-auto"
                     }
                     "Transaction failed"
                 }
             }
-            PriorityFeeConfig { signal }
+            if let InvokeSignatureStatus::Timeout = *signal.read() {
+                p {
+                    class: "{error_class}",
+                    WarningIcon {
+                        class: "w-3.5 h-3.5 my-auto"
+                    }
+                    "Timed out"
+                }
+            }
+
+            // PriorityFeeConfig { signal }
+
             match *signal.read() {
                 InvokeSignatureStatus::Start => {
                     rsx! {
@@ -81,7 +93,7 @@ pub fn InvokeSignature(
                         }
                     }
                 }
-                InvokeSignatureStatus::DoneWithError => {
+                InvokeSignatureStatus::DoneWithError | InvokeSignatureStatus::Timeout => {
                     // TODO: could add reset button here
                     // or other signal to user
                     rsx! {

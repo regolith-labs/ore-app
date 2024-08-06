@@ -11,7 +11,7 @@ use solana_extra_wasm::program::{
 
 use crate::{
     components::{BackButton, InvokeSignature, OreIcon},
-    gateway::{ore_token_account_address, ore_token_account_address_v1},
+    gateway::{self, ore_token_account_address, ore_token_account_address_v1},
     hooks::{
         use_gateway, use_ore_balance,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
@@ -30,8 +30,10 @@ pub fn ClaimV1Confirm(amount: u64, claim_step: Signal<ClaimV1Step>) -> Element {
         async move {
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 // Cu limit
+                let price = gateway::get_recent_priority_fee_estimate(false).await;
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
-                let mut ixs = vec![cu_limit_ix];
+                let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
+                let mut ixs = vec![cu_limit_ix, cu_price_ix];
                 let token_account_address = ore_token_account_address_v1(signer);
 
                 // Add create ata ix

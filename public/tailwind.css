@@ -1969,6 +1969,11 @@ h2:where(.dark, .dark *) {
   background-color: rgb(245 245 247 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-gray-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(214 214 216 / var(--tw-bg-opacity));
+}
+
 .hover\:bg-opacity-20:hover {
   --tw-bg-opacity: 0.2;
 }
@@ -2028,6 +2033,11 @@ h2:where(.dark, .dark *) {
   background-color: rgb(220 38 38 / var(--tw-bg-opacity));
 }
 
+.active\:bg-gray-300:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(176 176 178 / var(--tw-bg-opacity));
+}
+
 .active\:bg-opacity-30:active {
   --tw-bg-opacity: 0.3;
 }
@@ -2047,6 +2057,11 @@ h2:where(.dark, .dark *) {
 
 .disabled\:opacity-50:disabled {
   opacity: 0.5;
+}
+
+.group:hover .group-hover\:bg-green-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(10 207 134 / var(--tw-bg-opacity));
 }
 
 @media (min-width: 640px) {
@@ -2435,5 +2450,15 @@ h2:where(.dark, .dark *) {
 .dark\:placeholder-gray-800:where(.dark, .dark *)::placeholder {
   --tw-placeholder-opacity: 1;
   color: rgb(70 70 72 / var(--tw-placeholder-opacity));
+}
+
+.dark\:hover\:bg-gray-800:hover:where(.dark, .dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(70 70 72 / var(--tw-bg-opacity));
+}
+
+.dark\:active\:bg-gray-700:active:where(.dark, .dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(112 112 113 / var(--tw-bg-opacity));
 }
 
