@@ -300,7 +300,8 @@ fn BlockCta(section: Section, text_color: TextColor) -> Element {
         Section::D => rsx! {
             Link {
                 class: "{style} {cta_color}",
-                to: "https://jup.ag/swap/USDC-ORE",
+                // to: "https://jup.ag/swap/USDC-ORE",
+                to: "https://jup.ag/swap/SOL-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
                 new_tab: true,
                 "Buy now →"
             }
@@ -500,7 +501,7 @@ fn SectionD(text_color: TextColor) -> Element {
     };
 
     let quotes = use_resource(move || async move {
-        match reqwest::get("https://price.jup.ag/v6/price?ids=USDC,WBTC&vsToken=ORE").await {
+        match reqwest::get("https://price.jup.ag/v6/price?ids=USDC,WBTC&vsToken=oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp").await {
             Ok(res) => res.json::<JupPriceApiResponse>().await.ok(),
             Err(_) => None,
         }
@@ -517,7 +518,7 @@ fn SectionD(text_color: TextColor) -> Element {
                         symbol: "$",
                         decimals: 2,
                         // link: "https://jup.ag/swap/USDC-ORE"
-                        link: "https://jup.ag/swap/SOL-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
+                        link: "https://jup.ag/swap/USDC-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
                     }
                 }
                 if quotes.data.contains_key("WBTC") {
