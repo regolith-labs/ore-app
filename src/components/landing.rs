@@ -510,21 +510,25 @@ fn SectionD(text_color: TextColor) -> Element {
         div {
             class: "flex flex-row flex-wrap gap-8 md:gap-12 my-auto align-top transition-colors {text_color}",
             if let Some(Some(quotes)) = quotes.cloned() {
-                Quote {
-                    title: "ORE/USD",
-                    price: quotes.data["USDC"].price,
-                    symbol: "$",
-                    decimals: 2,
-                    // link: "https://jup.ag/swap/USDC-ORE"
-                    link: "https://jup.ag/swap/SOL-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
+                if quotes.data.contains_key("USDC") {
+                    Quote {
+                        title: "ORE/USD",
+                        price: quotes.data["USDC"].price,
+                        symbol: "$",
+                        decimals: 2,
+                        // link: "https://jup.ag/swap/USDC-ORE"
+                        link: "https://jup.ag/swap/SOL-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
+                    }
                 }
-                Quote {
-                    title: "ORE/BTC",
-                    price: quotes.data["WBTC"].price,
-                    symbol: "₿",
-                    decimals: 8,
-                    link: "https://jup.ag/swap/WBTC-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
-                    // link: "https://jup.ag/swap/WBTC-ORE"
+                if quotes.data.contains_key("WBTC") {
+                    Quote {
+                        title: "ORE/BTC",
+                        price: quotes.data["WBTC"].price,
+                        symbol: "₿",
+                        decimals: 8,
+                        link: "https://jup.ag/swap/WBTC-oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp"
+                        // link: "https://jup.ag/swap/WBTC-ORE"
+                    }
                 }
             }
         }
