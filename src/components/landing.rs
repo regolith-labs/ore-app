@@ -9,7 +9,8 @@ use web_time::{Duration, Instant};
 
 use crate::{
     components::{
-        DiscordIcon, Footer, FuzzlandIcon, GithubIcon, OreIcon, OreLogoIcon, OttersecIcon, XIcon,
+        DexscreenIcon, DiscordIcon, Footer, FuzzlandIcon, GithubIcon, OreIcon, OreLogoIcon,
+        OttersecIcon, XIcon,
     },
     hooks::{use_ore_supply, use_screen_size, ScreenSize, UiTokenAmountBalance},
     miner::WEB_WORKERS,
@@ -149,6 +150,14 @@ fn SocialLinks(text_color: TextColor) -> Element {
     rsx! {
         div {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
+            Link {
+                to: "https://dexscreener.com/solana/ggadtfbqdgjozz3fp7zrtofgwnrs4e6mczmmd5ni1mxj",
+                class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
+                new_tab: true,
+                DexscreenIcon {
+                    class: "w-6 h-6 m-auto"
+                }
+            }
             Link {
                 to: "https://discord.com/invite/ore-supply",
                 class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
