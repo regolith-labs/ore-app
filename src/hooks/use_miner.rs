@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_sdk::utils::channel::use_channel;
 
-use super::{use_escrow, use_miner_toolbar_state, use_power_level, use_priority_fee};
+use super::{use_escrow, use_miner_toolbar_state, use_power_level, use_priority_fee, use_proof};
 use crate::miner::{Miner, WebWorkerResponse, WEB_WORKERS};
 
 pub fn use_miner() -> Signal<Miner> {
@@ -11,6 +11,7 @@ pub fn use_miner() -> Signal<Miner> {
     let priority_fee = use_priority_fee();
     let miner = use_signal(|| Miner::new(cx.clone(), power_level, priority_fee));
     let mut escrow = use_escrow();
+    let proof = use_proof();
 
     // Process web worker results
     use_future(move || {
@@ -26,7 +27,12 @@ pub fn use_miner() -> Signal<Miner> {
                 if messages.len().ge(&power_level) {
                     miner
                         .read()
-                        .process_web_worker_results(&messages, &mut toolbar_state, &mut escrow)
+                        .process_web_worker_results(
+                            &messages,
+                            &mut toolbar_state,
+                            &mut escrow,
+                            proof,
+                        )
                         .await;
                     messages.clear();
                 }

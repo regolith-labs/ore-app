@@ -1,19 +1,24 @@
 mod web_worker;
 
+use base64::Engine;
 use dioxus::prelude::*;
 use dioxus_sdk::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
+use ore_api::state::Proof;
 use ore_relayer_api::{consts::ESCROW, state::Escrow};
+use rand::Rng;
 use serde_wasm_bindgen::to_value;
-use solana_client_wasm::solana_sdk::{pubkey::Pubkey, signature::Signature};
-use solana_sdk::blake3::Hash as Blake3Hash;
+use solana_client_wasm::solana_sdk::{
+    blake3::Hash as Blake3Hash, compute_budget::ComputeBudgetInstruction, pubkey::Pubkey,
+    signature::Signature, transaction::Transaction,
+};
 use web_sys::{window, Worker};
-use web_time::Duration;
+use web_time::{Duration, Instant};
 pub use web_worker::*;
 
 use crate::{
-    gateway::GatewayResult,
+    gateway::{self, escrow_pubkey, proof_pubkey, GatewayError, GatewayResult},
     hooks::{
         use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
         ReadMinerToolbarState, UpdateMinerToolbarState,
@@ -88,6 +93,7 @@ impl Miner {
         messages: &Vec<WebWorkerResponse>,
         toolbar_state: &mut Signal<MinerToolbarState>,
         escrow: &mut Signal<Escrow>,
+        proof: Resource<GatewayResult<Proof>>,
     ) {
         log::info!("Batch: {:?}", messages);
 
@@ -118,21 +124,31 @@ impl Miner {
 
         // Update toolbar state
         toolbar_state.set_display_hash(Blake3Hash::new_from_array(best_hash));
-        toolbar_state.set_status_message(MinerStatusMessage::Submitting);
-        let priority_fee = self.priority_fee.read().0;
 
         // Submit solution
         let authority = escrow.read().authority;
-        let escrow_pubkey =
-            Pubkey::find_program_address(&[ESCROW, authority.as_ref()], &ore_relayer_api::id()).0;
-        match submit_solution(authority, best_solution, priority_fee).await {
+        let escrow_pubkey = escrow_pubkey(authority);
+        let migrate_miner_authority = if let Some(Ok(proof)) = *proof.read() {
+            proof.miner.ne(&authority)
+        } else {
+            false
+        };
+        match submit_solution(
+            authority,
+            best_solution,
+            migrate_miner_authority,
+            toolbar_state,
+        )
+        .await
+        {
             // Start mining again
             Ok(_sig) => {
                 if let MinerStatus::Active = toolbar_state.status() {
                     async_std::task::sleep(Duration::from_millis(2000)).await;
                     if let Ok(new_escrow) = gateway.get_escrow(authority).await {
                         escrow.set(new_escrow);
-                        if let Ok(proof) = gateway.get_proof(escrow_pubkey).await {
+                        if let Ok(proof) = gateway.get_proof_update(escrow_pubkey, challenge).await
+                        {
                             if let Ok(clock) = gateway.get_clock().await {
                                 toolbar_state.set_status_message(MinerStatusMessage::Searching);
                                 let cutoff_time = proof
@@ -155,18 +171,111 @@ impl Miner {
 
             // Display error
             Err(err) => {
-                toolbar_state.set_status_message(MinerStatusMessage::Error);
-                log::error!("Failed to submit hash: {:?}", err);
+                toolbar_state.set_status(MinerStatus::Error);
+                match err {
+                    GatewayError::SignatureDenied => {
+                        toolbar_state.set_status_message(MinerStatusMessage::SignatureDenied);
+                    }
+                    _ => {}
+                }
             }
         }
     }
 }
 
 pub async fn submit_solution(
-    pubkey: Pubkey,
+    authority: Pubkey,
     solution: Solution,
-    priority_fee: u64,
+    migrate_miner_authority: bool,
+    toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<Signature> {
+    // Build tx
+    toolbar_state.set_status_message(MinerStatusMessage::Submitting(0));
     let gateway = use_gateway();
-    gateway.send_via_relayer(pubkey, solution).await
+    let price = gateway::get_recent_priority_fee_estimate(false).await;
+    let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
+    let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
+    let escrow = escrow_pubkey(authority);
+    let mut ixs = vec![cu_limit_ix, cu_price_ix];
+    if migrate_miner_authority {
+        ixs.push(ore_relayer_api::instruction::update_miner(
+            authority, authority,
+        ));
+    }
+    ixs.push(ore_api::instruction::auth(proof_pubkey(escrow)));
+    ixs.push(ore_api::instruction::mine(
+        authority,
+        escrow,
+        find_bus(),
+        solution,
+    ));
+    let mut tx = Transaction::new_with_payer(&ixs, Some(&authority));
+    log::info!("TX: {:?}", tx);
+
+    // Sign and submit the tx
+    'sign_and_submit: loop {
+        // Get signature from user
+        tx.message.recent_blockhash = gateway.rpc.get_latest_blockhash().await.unwrap();
+        let mut eval = eval(
+            r#"
+        let msg = await dioxus.recv();
+        let signed = await window.OreTxSigner({b64: msg});
+        dioxus.send(signed);
+        "#,
+        );
+        let bytes = bincode::serialize(&tx).unwrap();
+        let b64 = base64::engine::general_purpose::STANDARD.encode(bytes);
+        if let Ok(res) = eval.send(serde_json::Value::String(b64)) {
+            /// Parse response
+            let res = eval.recv().await;
+            if let Ok(serde_json::Value::String(string)) = res {
+                if let Some(tx) = base64::engine::general_purpose::STANDARD
+                    .decode(string)
+                    .ok()
+                    .and_then(|buffer| bincode::deserialize(&buffer).ok())
+                {
+                    /// Submit the tx
+                    let mut i = 1;
+                    let timer = Instant::now();
+                    'submit: loop {
+                        toolbar_state.set_status_message(MinerStatusMessage::Submitting(i));
+                        match gateway.rpc.send_transaction(&tx).await {
+                            Ok(sig) => {
+                                // Confirm the signature
+                                log::info!("Sig: {:?}", sig);
+                                let confirmed = gateway.confirm_signature(sig).await;
+                                if confirmed.is_ok() {
+                                    return Ok(tx.signatures[0]);
+                                }
+
+                                // Break if 1 min has passed
+                                if timer.elapsed().as_secs().gt(&60) {
+                                    break 'submit;
+                                }
+                            }
+                            Err(err) => {
+                                // TODO
+                                log::error!("Err: {:?}", err);
+                                break 'submit;
+                            }
+                        }
+                        i += 1;
+                    }
+                }
+            } else {
+                log::error!("Signature denied A");
+                return Err(GatewayError::SignatureDenied);
+            }
+        } else {
+            log::error!("Signature denied B");
+            return Err(GatewayError::SignatureDenied);
+        }
+    }
+
+    Ok(tx.signatures[0])
+}
+
+fn find_bus() -> Pubkey {
+    let i = rand::thread_rng().gen_range(0..ore_api::consts::BUS_COUNT);
+    ore_api::consts::BUS_ADDRESSES[i]
 }

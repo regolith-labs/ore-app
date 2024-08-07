@@ -32,15 +32,15 @@ pub fn Mine() -> Element {
         };
     }
 
-    if let Some(Ok(balance)) = *escrow_balance.read() {
-        if balance.lt(&MIN_BALANCE) {
-            return rsx! {
-                MinerToolbarTopUpOpen {
-                    escrow_balance: escrow_balance.clone()
-                }
-            };
-        }
-    }
+    // if let Some(Ok(balance)) = *escrow_balance.read() {
+    //     if balance.lt(&MIN_BALANCE) {
+    //         return rsx! {
+    //             MinerToolbarTopUpOpen {
+    //                 escrow_balance: escrow_balance.clone()
+    //             }
+    //         };
+    //     }
+    // }
 
     rsx! {
         div {
@@ -72,13 +72,18 @@ pub fn Mine() -> Element {
                                             }
                                         }
                                     }
-                                    MinerStatusMessage::Submitting => {
+                                    MinerStatusMessage::Submitting(attempt) => {
                                         rsx! {
                                             div {
                                                 class: "flex flex-row gap-2",
                                                 p {
                                                     class: "text-lg text-white",
-                                                    "Submitting best hash..."
+                                                    if attempt.eq(&0) {
+                                                        "Signature needed"
+                                                    } else {
+                                                        "Submitting transaction... (attempt {attempt})"
+                                                    }
+                                                    // "Submitting best hash..."
                                                 }
                                                 Spinner {
                                                     class: "my-auto"
@@ -94,9 +99,17 @@ pub fn Mine() -> Element {
                                             }
                                         }
                                     }
+                                    MinerStatusMessage::SignatureDenied => {
+                                        rsx! {
+                                            p {
+                                                class: "text-lg text-white",
+                                                "Signature denied"
+                                            }
+                                        }
+                                    }
                                 }
                                 match toolbar_state.status_message() {
-                                    MinerStatusMessage::Searching | MinerStatusMessage::Submitting => {
+                                    MinerStatusMessage::Searching | MinerStatusMessage::Submitting(_) => {
                                         rsx! {
                                             p {
                                                 class: "font-mono text-sm truncate shrink text-gray-300",
