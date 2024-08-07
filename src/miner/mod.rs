@@ -210,12 +210,16 @@ pub async fn submit_solution(
         solution,
     ));
     let mut tx = Transaction::new_with_payer(&ixs, Some(&authority));
-    log::info!("TX: {:?}", tx);
 
     // Sign and submit the tx
     'sign_and_submit: loop {
+        // Set recent blockhash
+        if let Ok(blockhash) = gateway.get_latest_blockhash().await {
+            tx.message.recent_blockhash = blockhash;
+        }
+        log::info!("TX: {:?}", tx);
+
         // Get signature from user
-        tx.message.recent_blockhash = gateway.rpc.get_latest_blockhash().await.unwrap();
         let mut eval = eval(
             r#"
         let msg = await dioxus.recv();
