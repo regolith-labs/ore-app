@@ -65,13 +65,6 @@ pub fn MinerToolbar(hidden: bool) -> Element {
         _ => "bg-gray-100 dark:bg-gray-900",
     };
 
-    // let bg = match toolbar_state.status() {
-    //     MinerStatus::Active => "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white",
-    //     MinerStatus::Error => "bg-red-500 text-white",
-    //     MinerStatus::NotStarted => "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 dark:bg-gray-900 dark:hover:bg-gray-800 dark:active:bg-gray-700",
-    //     _ => "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 dark:bg-gray-900 dark:hover:bg-gray-800 dark:active:bg-gray-700",
-    // };
-
     let display = if hidden { "hidden" } else { "" };
 
     if let WalletAdapter::Disconnected = *wallet_adapter.read() {

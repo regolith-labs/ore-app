@@ -39,11 +39,15 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                             }
                         }
                     }
-                    MinerStatusMessage::Submitting => {
+                    MinerStatusMessage::Submitting(attempt) => {
                         rsx! {
                             p {
                                 class: "truncate flex-shrink flex-auto text-sm text-white font-medium opacity-80 my-auto ml-2",
-                                "Submitting transaction..."
+                                if attempt.eq(&0) {
+                                    "Signature needed"
+                                } else {
+                                    "Submitting transaction... (attempt {attempt})"
+                                }
                             }
                         }
                     }
@@ -52,6 +56,14 @@ pub fn MinerToolbarActive(miner: Signal<Miner>) -> Element {
                             p {
                                 class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
                                 "Error submitting transaction"
+                            }
+                        }
+                    }
+                    MinerStatusMessage::SignatureDenied => {
+                        rsx! {
+                            p {
+                                class: "truncate flex-shrink flex-auto text-sm text-white opacity-80 my-auto ml-2",
+                                "Signature denied"
                             }
                         }
                     }
