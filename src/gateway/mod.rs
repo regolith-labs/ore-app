@@ -30,7 +30,8 @@ pub use pubkey::*;
 
 pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 // pub const RPC_URL: &str = "https://emelia-3g4m0w-fast-devnet.helius-rpc.com"; // Devnet
-pub const RPC_URL: &str = "https://amaleta-5y8tse-fast-mainnet.helius-rpc.com"; // Mainnet
+// pub const RPC_URL: &str = "https://amaleta-5y8tse-fast-mainnet.helius-rpc.com"; // Mainnet
+pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 
 pub const CU_LIMIT_CLAIM: u32 = 11_000;
 pub const CU_LIMIT_MINE: u32 = 500_000;
@@ -82,6 +83,25 @@ impl Gateway {
 
     pub async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
         retry(|| self.try_get_proof(authority)).await
+    }
+
+    pub async fn get_proof_update(
+        &self,
+        authority: Pubkey,
+        challenge: [u8; 32],
+    ) -> GatewayResult<Proof> {
+        loop {
+            match retry(|| self.try_get_proof(authority)).await {
+                Err(err) => return Err(err),
+                Ok(proof) => {
+                    if proof.challenge.ne(&challenge) {
+                        return Ok(proof);
+                    }
+                    log::info!("Got stale proof... {:?}", proof);
+                }
+            }
+            async_std::task::sleep(Duration::from_millis(1000)).await;
+        }
     }
 
     pub async fn try_get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {

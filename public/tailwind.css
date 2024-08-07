@@ -1974,6 +1974,11 @@ h2:where(.dark, .dark *) {
   background-color: rgb(214 214 216 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-red-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+}
+
 .hover\:bg-opacity-20:hover {
   --tw-bg-opacity: 0.2;
 }
@@ -2036,6 +2041,11 @@ h2:where(.dark, .dark *) {
 .active\:bg-gray-300:active {
   --tw-bg-opacity: 1;
   background-color: rgb(176 176 178 / var(--tw-bg-opacity));
+}
+
+.active\:bg-red-800:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(153 27 27 / var(--tw-bg-opacity));
 }
 
 .active\:bg-opacity-30:active {

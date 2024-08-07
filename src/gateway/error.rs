@@ -13,6 +13,7 @@ pub enum GatewayError {
     ParseFailed,
     RetryFailed,
     TimeoutError,
+    SignatureDenied,
     // SimulationFailed,
     RequestFailed,
     ProgramBuilderFailed,
