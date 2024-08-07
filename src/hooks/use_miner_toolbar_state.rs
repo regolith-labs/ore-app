@@ -14,8 +14,9 @@ pub enum MinerStatus {
 #[derive(Copy, Clone, Debug)]
 pub enum MinerStatusMessage {
     Searching,
-    Submitting,
+    Submitting(u64),
     Error,
+    SignatureDenied,
 }
 
 pub struct MinerToolbarState {

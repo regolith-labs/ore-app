@@ -3782,6 +3782,7 @@ dependencies = [
  "async-std",
  "base64 0.22.1",
  "bincode",
+ "bs58 0.4.0",
  "cached",
  "chrono",
  "dioxus",
@@ -3840,9 +3841,9 @@ dependencies = [
 
 [[package]]
 name = "ore-relayer-api"
-version = "2.0.0"
+version = "2.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "771e14200d9c262e5270d3d9b40601658aa3e67f5457166e99c29b491601ee3f"
+checksum = "5a57ad347b32515669ebcbc0c5362c9414be0f9a32011f8e233ec4c9128899a1"
 dependencies = [
  "bytemuck",
  "mpl-token-metadata",
