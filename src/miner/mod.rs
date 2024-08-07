@@ -96,6 +96,11 @@ impl Miner {
         proof: Resource<GatewayResult<Proof>>,
     ) {
         log::info!("Batch: {:?}", messages);
+        // Exit early if not active
+        match toolbar_state.status() {
+            MinerStatus::Active => {}
+            _ => return,
+        }
 
         // Get best solution
         let gateway = use_gateway();

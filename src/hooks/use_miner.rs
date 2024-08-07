@@ -24,7 +24,7 @@ pub fn use_miner() -> Signal<Miner> {
                     power_level = msg.power_level;
                 }
                 messages.push(msg);
-                if messages.len().ge(&power_level) {
+                if messages.len().gt(&power_level) {
                     miner
                         .read()
                         .process_web_worker_results(
