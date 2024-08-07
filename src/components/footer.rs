@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{DiscordIcon, GithubIcon, OreLogoIcon, XIcon},
+    components::{DexscreenIcon, DiscordIcon, GithubIcon, OreLogoIcon, XIcon},
     route::Route,
 };
 
@@ -95,6 +95,14 @@ fn SocialLinks() -> Element {
     rsx! {
         div {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
+            Link {
+                to: "https://dexscreener.com/solana/ggadtfbqdgjozz3fp7zrtofgwnrs4e6mczmmd5ni1mxj",
+                class: "flex h-10 w-10 hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30 transition-colors rounded-full text-white",
+                new_tab: true,
+                DexscreenIcon {
+                    class: "w-6 h-6 m-auto"
+                }
+            }
             Link {
                 to: "https://discord.com/invite/ore-supply",
                 class: "flex h-10 w-10 hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30 transition-colors rounded-full text-white",
