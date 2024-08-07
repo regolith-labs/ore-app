@@ -15,8 +15,8 @@ use ore_relayer_api::state::Escrow;
 use ore_types::{response::ListTransfersResponse, Transfer};
 use ore_utils::AccountDeserialize;
 use solana_client_wasm::{
-    solana_sdk::{clock::Clock, pubkey::Pubkey, signature::Signature, sysvar},
-    WasmClient,
+    solana_sdk::{clock::Clock, hash::Hash, pubkey::Pubkey, signature::Signature, sysvar},
+    ClientResult, WasmClient,
 };
 use solana_extra_wasm::{
     account_decoder::parse_token::UiTokenAccount,
@@ -162,6 +162,17 @@ impl Gateway {
             )
             .expect("Failed to parse proof"),
         )
+    }
+
+    pub async fn get_latest_blockhash(&self) -> GatewayResult<Hash> {
+        retry(|| self.try_get_latest_blockhash()).await
+    }
+
+    pub async fn try_get_latest_blockhash(&self) -> GatewayResult<Hash> {
+        self.rpc
+            .get_latest_blockhash()
+            .await
+            .map_err(GatewayError::from)
     }
 
     pub async fn send_via_relayer(
