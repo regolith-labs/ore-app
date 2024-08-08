@@ -85,7 +85,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Borderless asset.",
                 title2: &"Permissionless cash.",
-                detail: &"ORE is internet-native money that moves at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligable fees.",
+                detail: &"ORE is internet-native money that moves at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligible fees.",
                 section: Section::D,
                 text_color
             }
