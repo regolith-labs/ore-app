@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-use crate::components::CodeBlock;
+use crate::{components::CodeBlock, route::Route};
 
 pub fn Download() -> Element {
     rsx! {
@@ -11,7 +11,22 @@ pub fn Download() -> Element {
                 class: "flex flex-col gap-4",
                 p {
                     class: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-hero",
-                    "Download"
+                    "Clients"
+                }
+                p {
+                    class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
+                    "App"
+                }
+                p {
+                    "The ORE web app is the easiest way to get started and begin mining. Simply connect your Solana wallet in the app and click \"Mine\"."
+                }
+                Link {
+                    class: "flex shrink font-semibold text-center mr-auto mt-4 px-5 py-3 bg-green-500 hover:bg-green-600 text-white transition-colors rounded-full",
+                    to: Route::Home {},
+                    p {
+                        class: "text-lg text-center font-semibold",
+                        "Launch app →"
+                    }
                 }
                 p {
                     class: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mt-8 font-hero",
