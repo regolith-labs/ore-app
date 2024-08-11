@@ -20,7 +20,7 @@ pub fn Navbar() -> Element {
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
             Banner {
                 style: BannerStyle::Info,
-                "Mining may be throttled if this page is left in the background."
+                "Mining on this page may be throttled if left in the background."
             }
             div {
                 class: "flex w-full",
