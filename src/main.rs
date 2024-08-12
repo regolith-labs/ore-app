@@ -6,6 +6,7 @@ use tracing::Level;
 mod components;
 mod gateway;
 mod hooks;
+mod metrics;
 mod miner;
 mod route;
 mod utils;
