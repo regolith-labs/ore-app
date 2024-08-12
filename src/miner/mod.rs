@@ -23,6 +23,7 @@ use crate::{
         use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
         ReadMinerToolbarState, UpdateMinerToolbarState,
     },
+    metrics::{self, AppEvent},
 };
 
 // Number of physical cores on machine
@@ -148,6 +149,7 @@ impl Miner {
         {
             // Start mining again
             Ok(_sig) => {
+                metrics::track(AppEvent::Mine);
                 if let MinerStatus::Active = toolbar_state.status() {
                     async_std::task::sleep(Duration::from_millis(2000)).await;
                     if let Ok(new_escrow) = gateway.get_escrow(authority).await {

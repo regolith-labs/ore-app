@@ -11,28 +11,21 @@ use wasm_bindgen::prelude::*;
 // TODO DownloadApp
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum AppEvent {
-    CreateTokenAccount,
-    Register,
-    StartMiner,
-    StopMiner,
-    Claim,
-    Transfer,
-    SetPriorityFee,
+    Mine,
 }
 
 impl Display for AppEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
-            AppEvent::CreateTokenAccount => "Create token accont",
-            AppEvent::Register => "Register",
-            AppEvent::StartMiner => "Start miner",
-            AppEvent::StopMiner => "Stop miner",
-            AppEvent::Claim => "Claim",
-            AppEvent::Transfer => "Transfer",
-            AppEvent::SetPriorityFee => "Set priority fee",
+            AppEvent::Mine => "Mine",
         };
         write!(f, "{:}", str)
     }
+}
+
+// Track an app event.
+pub fn track(event: AppEvent) {
+    trackEvent(event.to_string().as_str(), None).ok();
 }
 
 // Define a function that calls `fathom.trackEvent`
@@ -40,8 +33,4 @@ impl Display for AppEvent {
 extern "C" {
     #[wasm_bindgen(js_namespace = fathom, catch)]
     fn trackEvent(name: &str, value: Option<u32>) -> Result<(), JsValue>;
-}
-
-pub fn track(event: AppEvent, value: Option<u32>) {
-    trackEvent(event.to_string().as_str(), value).ok();
 }
