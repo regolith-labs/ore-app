@@ -32,7 +32,7 @@ pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> El
             WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
             WalletAdapter::Connected(signer) => {
                 let gateway = use_gateway();
-                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(50_000);
+                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(100_000);
                 let amount = sol_to_lamports(TOP_UP_AMOUNT);
                 let ix_1 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
@@ -129,11 +129,11 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
                 let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
                 let amount = sol_to_lamports(TOP_UP_AMOUNT);
                 let ix_1 = ore_relayer_api::instruction::open_escrow(signer, signer);
-                // let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
-                //     &signer,
-                //     &escrow_pubkey(signer),
-                //     amount,
-                // );
+                let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
+                    &signer,
+                    &escrow_pubkey(signer),
+                    amount,
+                );
                 let ix_3 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                     &signer,
                     &COLLECTION_ADDRESS,
