@@ -32,16 +32,15 @@ pub fn Mine() -> Element {
         };
     }
 
-    if let Some(Ok(balance)) = *escrow_balance.read() {
-        // if balance.lt(&MIN_BALANCE) {
-        if true {
-            return rsx! {
-                MinerToolbarTopUpOpen {
-                    escrow_balance: escrow_balance.clone()
-                }
-            };
-        }
-    }
+    // if let Some(Ok(balance)) = *escrow_balance.read() {
+    //     if balance.lt(&MIN_BALANCE) {
+    //         return rsx! {
+    //             MinerToolbarTopUpOpen {
+    //                 escrow_balance: escrow_balance.clone()
+    //             }
+    //         };
+    //     }
+    // }
 
     rsx! {
         div {

@@ -26,20 +26,21 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     // Start mining if the escrow account exists
     let _ = use_resource(move || async move {
         if escrow.read().ne(&Escrow::default()) {
-            if let Some(Ok(balance)) = *escrow_balance.read() {
-                if balance.ge(&MIN_BALANCE) {
-                    match try_start_mining(miner, escrow, &mut toolbar_state).await {
-                        Ok(()) => {
-                            toolbar_state.set_status(MinerStatus::Active);
-                        }
-                        Err(err) => {
-                            log::error!("Failed to start mining: {:?}", err);
-                            toolbar_state.set_status(MinerStatus::Error);
-                            toolbar_state.set_status_message(MinerStatusMessage::Error);
-                        }
-                    }
+            // TODO This is currently comment out because users are manually paying to submit hashes
+            // if let Some(Ok(balance)) = *escrow_balance.read() {
+            //     if balance.ge(&MIN_BALANCE) {
+            match try_start_mining(miner, escrow, &mut toolbar_state).await {
+                Ok(()) => {
+                    toolbar_state.set_status(MinerStatus::Active);
+                }
+                Err(err) => {
+                    log::error!("Failed to start mining: {:?}", err);
+                    toolbar_state.set_status(MinerStatus::Error);
+                    toolbar_state.set_status_message(MinerStatusMessage::Error);
                 }
             }
+            // }
+            // }
         }
     });
 
