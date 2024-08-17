@@ -98,6 +98,7 @@ pub fn User(id: String) -> Element {
                                 Link {
                                     class: "{link_class} font-mono",
                                     to: "{explorer_url}",
+                                    new_tab: true,
                                     "{id}"
                                 }
                             }
