@@ -104,7 +104,7 @@ fn SocialLinks() -> Element {
                 }
             }
             Link {
-                to: "https://discord.com/invite/ore-supply",
+                to: "https://discord.gg/4TQfshAAsT",
                 class: "flex h-10 w-10 hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30 transition-colors rounded-full text-white",
                 new_tab: true,
                 DiscordIcon {
