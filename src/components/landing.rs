@@ -159,7 +159,7 @@ fn SocialLinks(text_color: TextColor) -> Element {
                 }
             }
             Link {
-                to: "https://discord.com/invite/ore-supply",
+                to: "https://discord.gg/4TQfshAAsT",
                 class: "flex h-10 w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-gray-100 hover:bg-opacity-20 active:bg-opacity-30",
                 new_tab: true,
                 DiscordIcon {
