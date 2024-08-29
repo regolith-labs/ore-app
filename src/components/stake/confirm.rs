@@ -51,7 +51,7 @@ pub fn StakeConfirm(amount: u64, step: Signal<StakeStep>) -> Element {
         }
     });
 
-    if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+    if let InvokeSignatureStatus::Done(_sig) = *invoke_signature_signal.read() {
         ore_balance.restart();
         step.set(StakeStep::Done);
     };

@@ -10,7 +10,6 @@ pub enum GatewayError {
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
-    ParseFailed,
     RetryFailed,
     TimeoutError,
     SignatureDenied,

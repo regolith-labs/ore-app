@@ -81,7 +81,7 @@ pub fn SendConfirm(
         }
     });
 
-    if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+    if let InvokeSignatureStatus::Done(_sig) = *invoke_signature_signal.read() {
         ore_balance.restart();
         send_step.set(SendStep::Done);
     };

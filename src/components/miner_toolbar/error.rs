@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub fn MinerToolbarError() -> Element {
-    let mut toolbar_state = use_miner_toolbar_state();
+    let toolbar_state = use_miner_toolbar_state();
     rsx! {
         div {
             class: "flex flex-row w-full justify-between my-auto px-4 sm:px-8",

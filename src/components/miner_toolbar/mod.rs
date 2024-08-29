@@ -28,7 +28,7 @@ use crate::{
 
 #[component]
 pub fn MinerToolbar(hidden: bool) -> Element {
-    let mut toolbar_state = use_miner_toolbar_state();
+    let toolbar_state = use_miner_toolbar_state();
     let wallet_adapter = use_wallet_adapter();
     let miner = use_miner();
     let gateway = use_gateway();

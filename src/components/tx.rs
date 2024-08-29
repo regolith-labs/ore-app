@@ -65,7 +65,7 @@ pub fn Tx(sig: String) -> Element {
                                     value: transfer.sig.clone(),
                                     Link {
                                         class: "{link_class} font-mono",
-                                        to: "{explorer_url}",
+                                        to: explorer_url,
                                         new_tab: true,
                                         "{&transfer.sig.as_str()}"
                                     }

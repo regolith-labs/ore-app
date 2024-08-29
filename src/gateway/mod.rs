@@ -2,8 +2,6 @@ mod error;
 mod pfee;
 mod pubkey;
 
-use std::str::FromStr;
-
 use async_std::future::{timeout, Future};
 use cached::proc_macro::cached;
 pub use error::*;
@@ -36,12 +34,7 @@ pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 
-pub const CU_LIMIT_CLAIM: u32 = 11_000;
-pub const CU_LIMIT_MINE: u32 = 500_000;
-pub const CU_LIMIT_UPGRADE: u32 = 17_985 + 300;
-
-const RPC_RETRIES: usize = 0;
-const GATEWAY_RETRIES: usize = 128;
+// const GATEWAY_RETRIES: usize = 128;
 const CONFIRM_RETRIES: usize = 20;
 const CONFIRM_DELAY: u64 = 500;
 
@@ -177,53 +170,6 @@ impl Gateway {
             .map_err(GatewayError::from)
     }
 
-    pub async fn send_via_relayer(
-        &self,
-        pubkey: Pubkey,
-        solution: drillx::Solution,
-    ) -> GatewayResult<Signature> {
-        let req = ore_types::request::RelayPayload {
-            solution,
-            client_pubkey: pubkey.to_bytes(),
-        };
-        let client = reqwest::Client::new();
-        let mut attempts = 0;
-        loop {
-            match client
-                .post(format!("{}/relay", self.api_url))
-                .json(&req)
-                .send()
-                .await
-            {
-                Ok(res) => {
-                    if let Ok(res) = res.json::<ore_types::response::RelayResponse>().await {
-                        // Parse sig
-                        let sig = Signature::from_str(&res.sig).unwrap();
-                        log::info!("Sig: {:?}", sig);
-
-                        // Confirm tx
-                        let confirmed = self.confirm_signature(sig).await;
-                        if confirmed.is_ok() {
-                            return confirmed;
-                        }
-                    } else {
-                        log::error!("Failed to parse response");
-                    }
-                }
-                Err(err) => {
-                    // TODO
-                    log::error!("Error relaying tx: {:?}", err);
-                }
-            }
-
-            // Retry
-            attempts += 1;
-            if attempts > GATEWAY_RETRIES {
-                return Err(GatewayError::TransactionTimeout);
-            }
-        }
-    }
-
     pub async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
         // Confirm tx
         for _ in 0..CONFIRM_RETRIES {
@@ -263,16 +209,6 @@ impl Gateway {
         }
 
         return Err(GatewayError::TransactionTimeout);
-    }
-
-    // asserts that the token account is already initialized
-    pub async fn get_token_account_ore_from_pubkey_v1(
-        &self,
-        pubkey: Pubkey,
-    ) -> GatewayResult<Pubkey> {
-        let token_account_address = ore_token_account_address_v1(pubkey);
-        self.assert_token_account_ore_exists(token_account_address)
-            .await
     }
 
     // asserts that the token account is already initialized

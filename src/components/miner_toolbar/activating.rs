@@ -18,7 +18,7 @@ pub const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(1000) + RENT_MIN_BA
 #[component]
 pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
-    let mut escrow_balance = use_escrow_sol_balance();
+    let escrow_balance = use_escrow_sol_balance();
     let escrow = use_escrow();
     let nav = use_navigator();
 
