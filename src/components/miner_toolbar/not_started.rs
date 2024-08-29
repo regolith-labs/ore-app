@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{PlayIcon, StakeBalance, Tutorial},
+    components::PlayIcon,
     hooks::{use_miner_toolbar_state, ReadMinerToolbarState, UpdateMinerToolbarState},
 };
 

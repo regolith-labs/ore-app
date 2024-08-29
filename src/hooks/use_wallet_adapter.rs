@@ -6,9 +6,7 @@ use solana_client_wasm::solana_sdk::{
 };
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
-use crate::gateway::{
-    ore_token_account_address, ore_token_account_address_v1, GatewayError, GatewayResult,
-};
+use crate::gateway::{ore_token_account_address, ore_token_account_address_v1};
 use crate::hooks::UiTokenAmountDefault;
 
 use super::use_gateway;

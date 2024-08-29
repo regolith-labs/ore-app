@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use dioxus::prelude::*;
 use ore_api::consts::{BUS_ADDRESSES, TREASURY_ADDRESS};
-use ore_types::TransferType;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 

@@ -21,7 +21,7 @@ use crate::{
     hooks::{
         use_escrow, use_gateway, use_miner, use_miner_toolbar_state,
         use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
-        MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
+        MinerStatus, ReadMinerToolbarState,
     },
     route::Route,
 };

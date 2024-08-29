@@ -34,7 +34,6 @@ mod wallet_adapter;
 mod what_is_mining;
 
 pub use activity::*;
-pub use activity_indicator::*;
 pub use appearance::*;
 pub use back_button::*;
 pub use balance::*;
@@ -60,7 +59,6 @@ pub use send::*;
 pub use settings::*;
 pub use spinner::*;
 pub use stop_button::*;
-pub use tutorial::*;
 pub use tx::*;
 pub use upgrade::*;
 pub use user::*;

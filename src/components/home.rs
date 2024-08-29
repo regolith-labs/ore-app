@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::{Activity, Balance, StopButton};
+use crate::components::{Activity, Balance};
 
 pub fn Home() -> Element {
     rsx! {

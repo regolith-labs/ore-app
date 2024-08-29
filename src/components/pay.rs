@@ -1,16 +1,13 @@
-use std::str::FromStr;
-
 use dioxus::prelude::*;
-use ore_api::consts::{MINT_ADDRESS, MINT_V1_ADDRESS};
+use ore_api::consts::MINT_ADDRESS;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 
 use crate::{
     components::BackButton,
     hooks::use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
 };
 
-use super::{wallet_adapter, Copyable};
+use super::Copyable;
 
 #[component]
 pub fn Pay() -> Element {

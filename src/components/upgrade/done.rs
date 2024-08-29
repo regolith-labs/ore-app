@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::signature::Signature;
 
-use crate::{components::CheckCircleIcon, hooks::use_explorer_transaction_url, route::Route};
+use crate::{components::CheckCircleIcon, route::Route};
 
 #[component]
 pub fn UpgradeDone(signature: Signature, amount: u64) -> Element {

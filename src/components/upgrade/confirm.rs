@@ -9,7 +9,7 @@ use solana_extra_wasm::program::{
 use solana_sdk::compute_budget::ComputeBudgetInstruction;
 
 use crate::{
-    components::{BackButton, InvokeSignature, OreIcon},
+    components::{BackButton, InvokeSignature},
     gateway::{self, ore_token_account_address, ore_token_account_address_v1},
     hooks::{
         use_gateway,

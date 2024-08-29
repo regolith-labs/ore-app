@@ -1,13 +1,12 @@
 use dioxus::prelude::*;
 use ore_relayer_api::state::Escrow;
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
-use solana_sdk::native_token::sol_to_lamports;
 
 use crate::{
     components::{try_start_mining, Spinner},
     hooks::{
         use_escrow, use_escrow_sol_balance, use_miner_toolbar_state, MinerStatus,
-        MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
+        MinerStatusMessage, UpdateMinerToolbarState,
     },
     miner::Miner,
     route::Route,

@@ -8,7 +8,7 @@ use edit::*;
 
 use dioxus::prelude::*;
 
-use crate::hooks::{use_proof, use_proof_v1};
+use crate::hooks::use_proof_v1;
 
 pub enum ClaimV1Step {
     Edit,
