@@ -26,9 +26,9 @@ enum TextColor {
 
 fn gen_asset_path(filename: &str, screen_size: Signal<ScreenSize>) -> String {
     match *screen_size.read() {
-        ScreenSize::Desktop => asset_path(format!("{}-desktop.jpeg", filename).as_str()),
-        ScreenSize::Mobile => asset_path(format!("{}-mobile.jpeg", filename).as_str()),
-        ScreenSize::Tablet => asset_path(format!("{}-tablet.jpeg", filename).as_str()),
+        ScreenSize::Desktop => asset_path(format!("{}-desktop.webp", filename).as_str()),
+        ScreenSize::Mobile => asset_path(format!("{}-mobile.webp", filename).as_str()),
+        ScreenSize::Tablet => asset_path(format!("{}-tablet.webp", filename).as_str()),
     }
 }
 
@@ -36,7 +36,7 @@ pub fn Landing() -> Element {
     let nav = navigator();
     let screen_size = use_screen_size();
     let mut i = use_signal(|| 0usize);
-    let bg_imgs = [
+    let bg_imgs: [(String, TextColor); 3] = [
         (gen_asset_path("rock-1", screen_size), TextColor::White),
         (gen_asset_path("rock-2", screen_size), TextColor::White),
         (gen_asset_path("rock-3", screen_size), TextColor::White),
