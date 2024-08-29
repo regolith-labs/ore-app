@@ -10,8 +10,6 @@ use crate::{
     route::Route,
 };
 
-use super::wallet_adapter;
-
 pub fn Activity() -> Element {
     let filter = use_signal(|| ActivityFilter::Global);
     let offset = use_signal(|| 0u64);

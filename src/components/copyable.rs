@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use dioxus_sdk::clipboard::use_clipboard;
 
 use crate::components::CopyIcon;
 

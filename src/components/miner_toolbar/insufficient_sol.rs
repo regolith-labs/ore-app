@@ -11,11 +11,9 @@ use crate::{
     components::{BackButton, InvokeSignature},
     gateway::{self, escrow_pubkey, GatewayError, GatewayResult},
     hooks::{
-        use_escrow, use_gateway, use_miner_toolbar_state,
+        use_escrow, use_gateway,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
-        ReadMinerToolbarState,
     },
-    miner::Miner,
 };
 
 const TOP_UP_AMOUNT: f64 = 0.02; // In SOL (~$2)

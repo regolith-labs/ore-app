@@ -4,7 +4,6 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::{
     spl_associated_token_account::instruction::create_associated_token_account,
-    spl_memo,
     spl_token::{self, amount_to_ui_amount},
 };
 use solana_sdk::{compute_budget::ComputeBudgetInstruction, transaction::Transaction};

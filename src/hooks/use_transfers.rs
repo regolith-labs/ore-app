@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use dioxus::prelude::*;
 use ore_types::{response::ListTransfersResponse, Transfer};
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
@@ -7,7 +5,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use crate::gateway::GatewayResult;
 
 use super::{
-    use_escrow, use_gateway,
+    use_gateway,
     use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
 };
 

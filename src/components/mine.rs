@@ -3,10 +3,7 @@ use ore_relayer_api::state::Escrow;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
-    components::{
-        Activity, BackButton, Balance, MinerToolbarCreateAccountOpen, MinerToolbarTopUpOpen,
-        OreIcon, Spinner, MIN_BALANCE,
-    },
+    components::{BackButton, MinerToolbarCreateAccountOpen, OreIcon, Spinner},
     hooks::{
         use_escrow, use_escrow_sol_balance, use_gateway, use_miner_toolbar_state, use_power_level,
         use_proof, MinerStatus, MinerStatusMessage, PowerLevel, ReadMinerToolbarState,

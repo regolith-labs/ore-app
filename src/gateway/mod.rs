@@ -16,7 +16,7 @@ use ore_types::{response::ListTransfersResponse, Transfer};
 use ore_utils::AccountDeserialize;
 use solana_client_wasm::{
     solana_sdk::{clock::Clock, hash::Hash, pubkey::Pubkey, signature::Signature, sysvar},
-    ClientResult, WasmClient,
+    WasmClient,
 };
 use solana_extra_wasm::{
     account_decoder::parse_token::UiTokenAccount,
@@ -349,7 +349,7 @@ where
     for attempt in 0..MAX_RETRIES {
         match timeout(TIMEOUT, f()).await {
             Ok(Ok(result)) => return Ok(result),
-            Ok(Err(e)) if attempt < MAX_RETRIES - 1 => {
+            Ok(Err(_e)) if attempt < MAX_RETRIES - 1 => {
                 async_std::task::sleep(backoff).await;
                 backoff *= 2; // Exponential backoff
             }

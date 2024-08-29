@@ -2,13 +2,11 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::blake3::Hash as Blake3Hash;
 
 use crate::{
-    components::{ActivityIndicator, Spinner, StopButton},
+    components::StopButton,
     hooks::{
-        use_gateway, use_miner_toolbar_state, use_power_level, use_priority_fee, use_proof,
-        MinerStatusMessage, PowerLevel, PriorityFee, ReadMinerToolbarState,
-        UpdateMinerToolbarState,
+        use_miner_toolbar_state, MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
-    miner::{Miner, WEB_WORKERS},
+    miner::Miner,
 };
 
 #[component]
