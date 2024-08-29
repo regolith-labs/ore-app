@@ -67,7 +67,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
         }
     });
 
-    if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+    if let InvokeSignatureStatus::Done(_sig) = *invoke_signature_signal.read() {
         ore_balance.restart();
         claim_step.set(ClaimStep::Done);
     };

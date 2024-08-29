@@ -16,7 +16,7 @@ use crate::{
 // TODO Stop start button
 
 pub fn Mine() -> Element {
-    let mut escrow_balance = use_escrow_sol_balance();
+    let escrow_balance = use_escrow_sol_balance();
     let toolbar_state = use_miner_toolbar_state();
     let escrow = use_escrow();
     let nav = use_navigator();

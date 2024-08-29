@@ -20,7 +20,7 @@ pub use web_worker::*;
 use crate::{
     gateway::{self, escrow_pubkey, proof_pubkey, GatewayError, GatewayResult},
     hooks::{
-        use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
+        use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel,
         ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     metrics::{self, AppEvent},
@@ -40,19 +40,13 @@ fn fetch_logical_processors() -> usize {
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
 pub struct Miner {
     power_level: Signal<PowerLevel>,
-    priority_fee: Signal<PriorityFee>,
     web_workers: Vec<Worker>,
 }
 
 impl Miner {
-    pub fn new(
-        cx: UseChannel<WebWorkerResponse>,
-        power_level: Signal<PowerLevel>,
-        priority_fee: Signal<PriorityFee>,
-    ) -> Self {
+    pub fn new(cx: UseChannel<WebWorkerResponse>, power_level: Signal<PowerLevel>) -> Self {
         Self {
             power_level: power_level.clone(),
-            priority_fee: priority_fee.clone(),
             web_workers: (0..*WEB_WORKERS)
                 .map(|_| create_web_worker(cx.clone()))
                 .collect(),

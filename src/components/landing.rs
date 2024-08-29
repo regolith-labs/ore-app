@@ -12,10 +12,9 @@ use crate::{
         DexscreenIcon, DiscordIcon, Footer, FuzzlandIcon, GithubIcon, OreIcon, OreLogoIcon,
         OttersecIcon, XIcon,
     },
-    hooks::{use_ore_supply, use_screen_size, ScreenSize, UiTokenAmountBalance},
+    hooks::{use_ore_supply, UiTokenAmountBalance},
     miner::WEB_WORKERS,
     route::Route,
-    utils::asset_path,
 };
 
 #[derive(Copy, Clone, PartialEq, Eq)]
@@ -24,23 +23,12 @@ enum TextColor {
     White,
 }
 
-fn gen_asset_path(filename: &str, screen_size: Signal<ScreenSize>) -> String {
-    match *screen_size.read() {
-        ScreenSize::Desktop => asset_path(format!("{}-desktop.webp", filename).as_str()),
-        ScreenSize::Mobile => asset_path(format!("{}-mobile.webp", filename).as_str()),
-        ScreenSize::Tablet => asset_path(format!("{}-tablet.webp", filename).as_str()),
-    }
-}
-
 pub fn Landing() -> Element {
-    let nav = navigator();
-    let screen_size = use_screen_size();
     let mut i = use_signal(|| 0usize);
     let bg_imgs: [(String, TextColor); 3] = [
-        (gen_asset_path("rock-1", screen_size), TextColor::White),
-        (gen_asset_path("rock-2", screen_size), TextColor::White),
-        (gen_asset_path("rock-3", screen_size), TextColor::White),
-        // (gen_asset_path("rock-4", screen_size), TextColor::White),
+        ("rock-1-desktop.webp".to_owned(), TextColor::White),
+        ("rock-2-desktop.webp".to_owned(), TextColor::White),
+        ("rock-3-desktop.webp".to_owned(), TextColor::White),
     ];
     let len = bg_imgs.len();
     let text_color = bg_imgs[*i.read() % len].1;
@@ -386,7 +374,7 @@ fn SectionA(text_color: TextColor) -> Element {
                     class: "flex flex-row gap-2",
                     p {
                         class: "text-2xl md:text-3xl lg:text-4xl font-bold font-mono",
-                        "{sample_hash.cloned().to_string()[1..17]}"
+                        "{&sample_hash.clone().to_string()[1..17]}"
                     }
                 }
             }

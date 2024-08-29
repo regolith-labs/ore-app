@@ -94,7 +94,7 @@ pub fn User(id: String) -> Element {
                                 value: id.clone(),
                                 Link {
                                     class: "{link_class} font-mono",
-                                    to: "{explorer_url}",
+                                    to: explorer_url,
                                     new_tab: true,
                                     "{id}"
                                 }

@@ -61,7 +61,7 @@ pub fn use_ore_balances() -> Resource<Option<Balances>> {
                         .unwrap_or(UiTokenAmount::default(TOKEN_DECIMALS));
                     Some(Balances {
                         v1: balance_v1,
-                        v2: balance_v2,
+                        _v2: balance_v2,
                     })
                 }
                 WalletAdapter::Disconnected => None,
@@ -155,7 +155,7 @@ pub enum InvokeSignatureStatus {
 #[derive(Clone)]
 pub struct Balances {
     pub v1: UiTokenAmount,
-    pub v2: UiTokenAmount,
+    pub _v2: UiTokenAmount,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]

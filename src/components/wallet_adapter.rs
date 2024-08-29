@@ -4,7 +4,6 @@ use solana_client_wasm::solana_sdk::transaction::Transaction;
 use crate::components::WarningIcon;
 use crate::components::{icons::CheckCircleIcon, Appearance, Spinner};
 use crate::hooks::{use_appearance, use_wallet_adapter, use_wallet_adapter::InvokeSignatureStatus};
-use crate::hooks::{use_priority_fee, PriorityFee};
 
 #[component]
 pub fn MountWalletAdapter() -> Element {
@@ -106,7 +105,7 @@ pub fn InvokeSignature(
                         }
                     }
                 }
-                InvokeSignatureStatus::Done(sig) => {
+                InvokeSignatureStatus::Done(_sig) => {
                     rsx! {
                         button {
                             class: "w-full py-3 rounded font-semibold text-white bg-green-500",
@@ -114,42 +113,6 @@ pub fn InvokeSignature(
                             CheckCircleIcon { class: "h-5 w-5 mx-auto" }
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn PriorityFeeConfig(signal: Signal<InvokeSignatureStatus>) -> Element {
-    let mut priority_fee = use_priority_fee();
-    rsx! {
-        div {
-            class: "flex flex-row gap-8 justify-between",
-            p {
-                class: "text-sm font-semibold text-gray-300 font-medium my-auto",
-                "Priority fee"
-            }
-            div {
-                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                input {
-                    disabled: signal.read().eq(&InvokeSignatureStatus::Waiting),
-                    class: "bg-transparent text-right px-1 mb-auto font-semibold",
-                    dir: "rtl",
-                    step: 100_000,
-                    min: 0,
-                    max: 50_000_000,
-                    r#type: "number",
-                    value: "{priority_fee.read().0}",
-                    oninput: move |e| {
-                        if let Ok(v) = e.value().parse::<u64>() {
-                            priority_fee.set(PriorityFee(v));
-                        }
-                    }
-                }
-                p {
-                    class: "my-auto",
-                    "microlamports"
                 }
             }
         }

@@ -13,7 +13,7 @@ use crate::{
 pub fn Activity() -> Element {
     let filter = use_signal(|| ActivityFilter::Global);
     let offset = use_signal(|| 0u64);
-    let mut transfers = use_transfers(filter, offset);
+    let transfers = use_transfers(filter, offset);
 
     // use_future(move || async move {
     //     loop {
