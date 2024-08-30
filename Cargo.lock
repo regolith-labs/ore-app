@@ -3756,9 +3756,9 @@ dependencies = [
 
 [[package]]
 name = "ore-api"
-version = "2.1.0"
+version = "2.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0697cf6480f6c81117db19ceeaa66206b76f1d5b0e2896767f6d797f50181475"
+checksum = "26f004e50a7fba301eb53caa4f8ce772c1a512f314de64cff580f90fb1dff8d1"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -3766,7 +3766,7 @@ dependencies = [
  "drillx",
  "mpl-token-metadata",
  "num_enum 0.7.2",
- "ore-utils",
+ "ore-utils 2.1.9",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
@@ -3799,10 +3799,11 @@ dependencies = [
  "log",
  "num-format",
  "ore-api",
+ "ore-boost-api",
  "ore-program",
  "ore-relayer-api",
  "ore-types",
- "ore-utils",
+ "ore-utils 2.1.9",
  "qrcode-generator",
  "rand 0.8.5",
  "reqwest",
@@ -3819,6 +3820,22 @@ dependencies = [
  "wasm-logger",
  "web-sys",
  "web-time",
+]
+
+[[package]]
+name = "ore-boost-api"
+version = "0.1.0"
+dependencies = [
+ "array-const-fn-init",
+ "bytemuck",
+ "const-crypto",
+ "num_enum 0.7.2",
+ "ore-utils 2.1.8",
+ "solana-program",
+ "spl-associated-token-account",
+ "spl-token",
+ "static_assertions",
+ "thiserror",
 ]
 
 [[package]]
@@ -3849,7 +3866,7 @@ dependencies = [
  "mpl-token-metadata",
  "num_enum 0.7.2",
  "ore-api",
- "ore-utils",
+ "ore-utils 2.1.9",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
@@ -3871,9 +3888,19 @@ dependencies = [
 
 [[package]]
 name = "ore-utils"
-version = "2.1.0"
+version = "2.1.8"
+dependencies = [
+ "bytemuck",
+ "solana-program",
+ "spl-associated-token-account",
+ "spl-token",
+]
+
+[[package]]
+name = "ore-utils"
+version = "2.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90a09a7a1e296ce157c75cf41145edb3608b838f9503125897552f4fe49acf64"
+checksum = "7a2d6933b14c84fb91ad7ab2e8fccff589884a81507c1a198dea4f03f3180ef4"
 dependencies = [
  "bytemuck",
  "solana-program",

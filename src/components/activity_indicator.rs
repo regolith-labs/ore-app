@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 
+#[allow(dead_code)]
 pub fn ActivityIndicator() -> Element {
     rsx! {
         span {

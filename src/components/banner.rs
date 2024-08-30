@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 
+#[allow(dead_code)]
 #[derive(Clone, PartialEq)]
 pub enum BannerStyle {
     Info,

@@ -1,12 +1,15 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
 use ore_relayer_api::state::Escrow;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
+use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{BackButton, MinerToolbarCreateAccountOpen, OreIcon, Spinner},
     hooks::{
-        use_escrow, use_escrow_sol_balance, use_gateway, use_miner_toolbar_state, use_power_level,
-        use_proof, MinerStatus, MinerStatusMessage, PowerLevel, ReadMinerToolbarState,
+        use_escrow, use_escrow_sol_balance, use_miner_toolbar_state, use_power_level, use_proof,
+        MinerStatus, MinerStatusMessage, PowerLevel, ReadMinerToolbarState,
     },
     miner::WEB_WORKERS,
 };
@@ -17,7 +20,6 @@ use crate::{
 
 pub fn Mine() -> Element {
     let escrow_balance = use_escrow_sol_balance();
-    let toolbar_state = use_miner_toolbar_state();
     let escrow = use_escrow();
     let nav = use_navigator();
 
@@ -28,16 +30,6 @@ pub fn Mine() -> Element {
             }
         };
     }
-
-    // if let Some(Ok(balance)) = *escrow_balance.read() {
-    //     if balance.lt(&MIN_BALANCE) {
-    //         return rsx! {
-    //             MinerToolbarTopUpOpen {
-    //                 escrow_balance: escrow_balance.clone()
-    //             }
-    //         };
-    //     }
-    // }
 
     rsx! {
         div {
@@ -54,77 +46,88 @@ pub fn Mine() -> Element {
                     h2 {
                         "Miner"
                     }
-                    match toolbar_state.status() {
-                        MinerStatus::Active => {
+                    MinerStatus {}
+                }
+            }
+            div {
+                class: "flex flex-col gap-6",
+                StakeBalanceDisplay {}
+                // MultiplierDisplay {}
+                PowerLevelConfig {}
+            }
+            BoostConfig {}
+        }
+    }
+}
+
+pub fn MinerStatus() -> Element {
+    let toolbar_state = use_miner_toolbar_state();
+    rsx! {
+        match toolbar_state.status() {
+            MinerStatus::Active => {
+                rsx! {
+                    match toolbar_state.status_message() {
+                        MinerStatusMessage::Searching => {
                             rsx! {
-                                match toolbar_state.status_message() {
-                                    MinerStatusMessage::Searching => {
-                                        rsx! {
-                                            p {
-                                                class: "text-lg text-white",
-                                                "Searching for valid hashes... "
-                                                // if time_remaining.read().gt(&0) {
-                                                //     "({time_remaining} sec)"
-                                                // }
-                                            }
-                                        }
-                                    }
-                                    MinerStatusMessage::Submitting(attempt) => {
-                                        rsx! {
-                                            div {
-                                                class: "flex flex-row gap-2",
-                                                p {
-                                                    class: "text-lg text-white",
-                                                    if attempt.eq(&0) {
-                                                        "Signature needed"
-                                                    } else {
-                                                        "Submitting transaction... (attempt {attempt})"
-                                                    }
-                                                    // "Submitting best hash..."
-                                                }
-                                                Spinner {
-                                                    class: "my-auto"
-                                                }
-                                            }
-                                        }
-                                    }
-                                    MinerStatusMessage::Error => {
-                                        rsx! {
-                                            p {
-                                                class: "text-lg text-white",
-                                                "Error submitting transaction"
-                                            }
-                                        }
-                                    }
-                                    MinerStatusMessage::SignatureDenied => {
-                                        rsx! {
-                                            p {
-                                                class: "text-lg text-white",
-                                                "Signature denied"
-                                            }
-                                        }
-                                    }
-                                }
-                                match toolbar_state.status_message() {
-                                    MinerStatusMessage::Searching | MinerStatusMessage::Submitting(_) => {
-                                        rsx! {
-                                            p {
-                                                class: "font-mono text-sm truncate shrink text-gray-300",
-                                                "{toolbar_state.display_hash()}"
-                                            }
-                                        }
-                                    }
-                                    _ => rsx! {}
+                                p {
+                                    class: "text-lg text-white",
+                                    "Searching for valid hashes... "
+                                    // if time_remaining.read().gt(&0) {
+                                    //     "({time_remaining} sec)"
+                                    // }
                                 }
                             }
                         }
-                        _ => { rsx! {} },
+                        MinerStatusMessage::Submitting(attempt) => {
+                            rsx! {
+                                div {
+                                    class: "flex flex-row gap-2",
+                                    p {
+                                        class: "text-lg text-white",
+                                        if attempt.eq(&0) {
+                                            "Signature needed"
+                                        } else {
+                                            "Submitting transaction... (attempt {attempt})"
+                                        }
+                                        // "Submitting best hash..."
+                                    }
+                                    Spinner {
+                                        class: "my-auto"
+                                    }
+                                }
+                            }
+                        }
+                        MinerStatusMessage::Error => {
+                            rsx! {
+                                p {
+                                    class: "text-lg text-white",
+                                    "Error submitting transaction"
+                                }
+                            }
+                        }
+                        MinerStatusMessage::SignatureDenied => {
+                            rsx! {
+                                p {
+                                    class: "text-lg text-white",
+                                    "Signature denied"
+                                }
+                            }
+                        }
+                    }
+                    match toolbar_state.status_message() {
+                        MinerStatusMessage::Searching | MinerStatusMessage::Submitting(_) => {
+                            rsx! {
+                                p {
+                                    class: "font-mono text-sm truncate shrink text-gray-300",
+                                    "{toolbar_state.display_hash()}"
+                                }
+                            }
+                        }
+                        _ => rsx! {}
                     }
                 }
             }
-            StakeBalanceDisplay {}
-            MultiplierDisplay {}
-            PowerLevelConfig {}
+            _ => { rsx! {} },
         }
     }
 }
@@ -137,7 +140,7 @@ pub fn StakeBalanceDisplay() -> Element {
                 class: "flex flex-row gap-8 justify-between",
                     p {
                         class: "text-gray-300 font-medium text-sm my-auto",
-                        "Stake"
+                        "Unclaimed"
                     }
                div {
                     class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
@@ -175,39 +178,84 @@ pub fn StakeBalanceDisplay() -> Element {
     }
 }
 
-pub fn MultiplierDisplay() -> Element {
-    let proof = use_proof();
+// pub fn MultiplierDisplay() -> Element {
+//     let proof = use_proof();
 
-    let multiplier = use_resource(move || async move {
-        let gateway = use_gateway();
-        if let Some(Ok(proof)) = *proof.read() {
-            if let Ok(config) = gateway.get_config().await {
-                return 1.0 + (proof.balance as f64 / config.top_balance as f64).min(1.0f64);
-            }
-        }
-        1.0
-    });
+//     let multiplier = use_resource(move || async move {
+//         let gateway = use_gateway();
+//         if let Some(Ok(proof)) = *proof.read() {
+//             if let Ok(config) = gateway.get_config().await {
+//                 return 1.0 + (proof.balance as f64 / config.top_balance as f64).min(1.0f64);
+//             }
+//         }
+//         1.0
+//     });
+
+//     rsx! {
+//             div {
+//                 class: "flex flex-row gap-8 justify-between",
+//                     p {
+//                         class: "text-gray-300 font-medium text-sm my-auto",
+//                         "Multiplier"
+//                     }
+//                div {
+//                     class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+//                     p {
+//                         class: "text-white text-right px-1 mb-auto font-semibold",
+//                         "{multiplier.read().unwrap_or(1.0):.12}x"
+//                     }
+//                 }
+//             }
+//             // p {
+//             //     class: "text-white text-xs opacity-80 max-w-96",
+//             //     "The multiplier you are earning on your mining rewards from staking."
+//             // }
+//         // }
+//     }
+// }
+
+pub fn BoostConfig() -> Element {
+    let _boosts = vec![Pubkey::from_str("oreFHcE6FvJTrsfaYca4mVeZn7J7T6oZS9FAvW9eg4q").unwrap()];
+
+    // TODO Fetch all boosts
+    // TODO Fetch user boosts
+    // TODO Display user activated boosts at top
+    // TODO In each boost, display user stake, total stake, live multiplier, stake, unstake
 
     rsx! {
+        div {
+            class: "flex flex-col gap-8 my-2",
+            h2 {
+                "Boosts"
+            }
             div {
-                class: "flex flex-row gap-8 justify-between",
-                    p {
-                        class: "text-gray-300 font-medium text-sm my-auto",
-                        "Multiplier"
-                    }
-               div {
-                    class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                    p {
-                        class: "text-white text-right px-1 mb-auto font-semibold",
-                        "{multiplier.read().unwrap_or(1.0):.12}x"
-                    }
+                class: "flex flex-col gap-4",
+                Boost {}
+            }
+        }
+    }
+}
+
+pub fn Boost() -> Element {
+    rsx! {
+        div {
+            class: "flex flex-row justify-between",
+            div {
+                class: "flex flex-col gap-2",
+                p {
+                    "ORE-SOL"
+                }
+                p {
+                    "20 of 100"
                 }
             }
-            // p {
-            //     class: "text-white text-xs opacity-80 max-w-96",
-            //     "The multiplier you are earning on your mining rewards from staking."
-            // }
-        // }
+            div {
+                class: "flex flex-row gap-2",
+                p {
+                    "1.5x"
+                }
+            }
+        }
     }
 }
 
