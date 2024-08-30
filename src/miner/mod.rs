@@ -6,7 +6,7 @@ use dioxus_sdk::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
 use ore_api::state::Proof;
-use ore_relayer_api::{consts::ESCROW, state::Escrow};
+use ore_relayer_api::state::Escrow;
 use rand::Rng;
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{
@@ -20,7 +20,7 @@ pub use web_worker::*;
 use crate::{
     gateway::{self, escrow_pubkey, proof_pubkey, GatewayError, GatewayResult},
     hooks::{
-        use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel, PriorityFee,
+        use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel,
         ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     metrics::{self, AppEvent},
@@ -40,19 +40,13 @@ fn fetch_logical_processors() -> usize {
 /// Miner encapsulates the logic needed to efficiently mine for valid hashes according to the application runtime and hardware.
 pub struct Miner {
     power_level: Signal<PowerLevel>,
-    priority_fee: Signal<PriorityFee>,
     web_workers: Vec<Worker>,
 }
 
 impl Miner {
-    pub fn new(
-        cx: UseChannel<WebWorkerResponse>,
-        power_level: Signal<PowerLevel>,
-        priority_fee: Signal<PriorityFee>,
-    ) -> Self {
+    pub fn new(cx: UseChannel<WebWorkerResponse>, power_level: Signal<PowerLevel>) -> Self {
         Self {
             power_level: power_level.clone(),
-            priority_fee: priority_fee.clone(),
             web_workers: (0..*WEB_WORKERS)
                 .map(|_| create_web_worker(cx.clone()))
                 .collect(),
@@ -219,7 +213,7 @@ pub async fn submit_solution(
     let mut tx = Transaction::new_with_payer(&ixs, Some(&authority));
 
     // Sign and submit the tx
-    'sign_and_submit: loop {
+    loop {
         // Set recent blockhash
         if let Ok(blockhash) = gateway.get_latest_blockhash().await {
             tx.message.recent_blockhash = blockhash;
@@ -236,8 +230,8 @@ pub async fn submit_solution(
         );
         let bytes = bincode::serialize(&tx).unwrap();
         let b64 = base64::engine::general_purpose::STANDARD.encode(bytes);
-        if let Ok(res) = eval.send(serde_json::Value::String(b64)) {
-            /// Parse response
+        if let Ok(_res) = eval.send(serde_json::Value::String(b64)) {
+            // Parse response
             let res = eval.recv().await;
             if let Ok(serde_json::Value::String(string)) = res {
                 if let Some(tx) = base64::engine::general_purpose::STANDARD
@@ -245,7 +239,7 @@ pub async fn submit_solution(
                     .ok()
                     .and_then(|buffer| bincode::deserialize(&buffer).ok())
                 {
-                    /// Submit the tx
+                    // Submit the tx
                     let mut i = 1;
                     let timer = Instant::now();
                     'submit: loop {
@@ -283,7 +277,7 @@ pub async fn submit_solution(
         }
     }
 
-    Ok(tx.signatures[0])
+    // Ok(tx.signatures[0])
 }
 
 fn find_bus() -> Pubkey {

@@ -21,14 +21,14 @@ use crate::{
     hooks::{
         use_escrow, use_gateway, use_miner, use_miner_toolbar_state,
         use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
-        MinerStatus, ReadMinerToolbarState, UpdateMinerToolbarState,
+        MinerStatus, ReadMinerToolbarState,
     },
     route::Route,
 };
 
 #[component]
 pub fn MinerToolbar(hidden: bool) -> Element {
-    let mut toolbar_state = use_miner_toolbar_state();
+    let toolbar_state = use_miner_toolbar_state();
     let wallet_adapter = use_wallet_adapter();
     let miner = use_miner();
     let gateway = use_gateway();

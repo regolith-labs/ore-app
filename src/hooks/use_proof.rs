@@ -3,7 +3,7 @@ use ore_api::state::Proof;
 use ore_relayer_api::consts::ESCROW;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::gateway::{self, GatewayError, GatewayResult};
+use crate::gateway::{GatewayError, GatewayResult};
 
 use super::{
     use_escrow, use_gateway,

@@ -1,6 +1,6 @@
 use serde_json::{json, Value};
 
-use super::{GatewayError, GatewayResult, RPC_URL};
+use super::RPC_URL;
 
 pub async fn get_recent_priority_fee_estimate(treasury: bool) -> u64 {
     let http_client = reqwest::Client::new();

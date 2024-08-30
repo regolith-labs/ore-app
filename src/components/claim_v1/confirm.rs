@@ -11,9 +11,9 @@ use solana_extra_wasm::program::{
 
 use crate::{
     components::{BackButton, InvokeSignature, OreIcon},
-    gateway::{self, ore_token_account_address, ore_token_account_address_v1},
+    gateway::{self, ore_token_account_address_v1},
     hooks::{
-        use_gateway, use_ore_balance,
+        use_gateway,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
     },
 };
@@ -65,7 +65,7 @@ pub fn ClaimV1Confirm(amount: u64, claim_step: Signal<ClaimV1Step>) -> Element {
         }
     });
 
-    if let InvokeSignatureStatus::Done(sig) = *invoke_signature_signal.read() {
+    if let InvokeSignatureStatus::Done(_sig) = *invoke_signature_signal.read() {
         // ore_balance.restart();
         claim_step.set(ClaimV1Step::Done);
     };

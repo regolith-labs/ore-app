@@ -1,13 +1,12 @@
 use dioxus::prelude::*;
 use ore_relayer_api::state::Escrow;
 use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
-use solana_sdk::native_token::sol_to_lamports;
 
 use crate::{
     components::{try_start_mining, Spinner},
     hooks::{
         use_escrow, use_escrow_sol_balance, use_miner_toolbar_state, MinerStatus,
-        MinerStatusMessage, ReadMinerToolbarState, UpdateMinerToolbarState,
+        MinerStatusMessage, UpdateMinerToolbarState,
     },
     miner::Miner,
     route::Route,
@@ -19,7 +18,7 @@ pub const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(1000) + RENT_MIN_BA
 #[component]
 pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
-    let mut escrow_balance = use_escrow_sol_balance();
+    let escrow_balance = use_escrow_sol_balance();
     let escrow = use_escrow();
     let nav = use_navigator();
 

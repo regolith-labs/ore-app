@@ -1,13 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{
-    components::MinerToolbar,
-    hooks::{
-        use_miner_toolbar_state, use_miner_toolbar_state_provider, ReadMinerToolbarState,
-        UpdateMinerToolbarState,
-    },
-    Route,
-};
+use crate::{components::MinerToolbar, hooks::use_miner_toolbar_state_provider, Route};
 
 pub fn MinerToolbarLayout() -> Element {
     use_miner_toolbar_state_provider();

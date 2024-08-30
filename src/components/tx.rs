@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use dioxus::prelude::*;
 use ore_api::consts::{BUS_ADDRESSES, TREASURY_ADDRESS};
-use ore_types::TransferType;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
@@ -66,7 +65,7 @@ pub fn Tx(sig: String) -> Element {
                                     value: transfer.sig.clone(),
                                     Link {
                                         class: "{link_class} font-mono",
-                                        to: "{explorer_url}",
+                                        to: explorer_url,
                                         new_tab: true,
                                         "{&transfer.sig.as_str()}"
                                     }

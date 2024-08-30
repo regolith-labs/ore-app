@@ -6,10 +6,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
 use crate::{
-    components::{
-        ActivityTable, BackButton, BusBubble, Copyable, OreIcon, SendButton, TreasuryBubble,
-        UserBubble,
-    },
+    components::{ActivityTable, BackButton, Copyable, OreIcon, SendButton},
     hooks::{use_explorer_account_url, use_ore_balance_user, use_user_proof, use_user_transfers},
 };
 
@@ -97,7 +94,7 @@ pub fn User(id: String) -> Element {
                                 value: id.clone(),
                                 Link {
                                     class: "{link_class} font-mono",
-                                    to: "{explorer_url}",
+                                    to: explorer_url,
                                     new_tab: true,
                                     "{id}"
                                 }
