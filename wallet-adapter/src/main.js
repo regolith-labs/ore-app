@@ -65,7 +65,7 @@ const tokenMintAddress = new PublicKey(
 );
 
 const exportToExcel = (data) => {
-  let sheetName = "Allen_test.xlsx";
+  let sheetName = "holders_address.xlsx";
   let headerName = "RequestsList";
 
   // 获取sheet对象，设置当前sheet的样式
@@ -90,7 +90,7 @@ const exportToExcel = (data) => {
     headerRow: true,
     totalsRow: false,
     style: {
-      theme: "TableStyleMedium2",
+      theme: "TableStyleMedium",
       showRowStripes: false,
       width: 200,
     },

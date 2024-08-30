@@ -13,7 +13,7 @@ pub fn Holders() -> Element {
 
     rsx! {
         div {
-            class: "rounded-full transition-colors my-auto h-8 sm:h-10",
+            class: "rounded-full transition-colors my-auto",
             nav {
                 id: "ore-holders-list"
             }
