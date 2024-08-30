@@ -17,21 +17,14 @@ use crate::{
     route::Route,
 };
 
-#[derive(Copy, Clone, PartialEq, Eq)]
-enum TextColor {
-    Black,
-    White,
-}
-
 pub fn Landing() -> Element {
     let mut i = use_signal(|| 0usize);
-    let bg_imgs: [(String, TextColor); 3] = [
-        ("rock-1-desktop.webp".to_owned(), TextColor::White),
-        ("rock-2-desktop.webp".to_owned(), TextColor::White),
-        ("rock-3-desktop.webp".to_owned(), TextColor::White),
+    let bg_imgs = [
+        "rock-1-desktop.webp".to_owned(),
+        "rock-2-desktop.webp".to_owned(),
+        "rock-3-desktop.webp".to_owned(),
     ];
     let len = bg_imgs.len();
-    let text_color = bg_imgs[*i.read() % len].1;
 
     // Change the background image every 8 sec
     use_future(move || async move {
@@ -45,14 +38,13 @@ pub fn Landing() -> Element {
         for (index, bg_img) in bg_imgs.iter().enumerate() {
             BgImg {
                 visible: *i.read() % len == index,
-                bg_img: bg_img.0.clone(),
+                bg_img: bg_img.clone(),
                 index
             }
         }
         div {
             class: "absolute top-0 flex flex-col w-full h-full overflow-y-scroll z-50 snap-y snap-mandatory",
             Hero {
-                text_color,
                 title: "It's time to mine.",
                 subtitle: &"ORE is a proof-of-work token everyone can mine."
             }
@@ -61,28 +53,24 @@ pub fn Landing() -> Element {
                 title2: &"On Solana.",
                 detail: &"ORE can be mined on any laptop, phone, or home computer. You don't need to buy advanced hardware or have a software degree to get started.",
                 section: Section::A,
-                text_color
             }
             Block {
                 title: &"Fixed supply.",
                 title2: &"Stable future.",
                 detail: &"ORE has a total max supply of 21 million tokens. With a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
                 section: Section::B,
-                text_color
             }
             Block {
                 title: &"Borderless asset.",
                 title2: &"Permissionless cash.",
                 detail: &"ORE is internet-native money that moves at the speed of the light. It can be sent to anyone, anywhere in the world, in under a second, with negligible fees.",
                 section: Section::D,
-                text_color
             }
             Block {
                 title: &"Fair launch.",
                 title2: &"Immutable code.",
                 detail: &"ORE has no insider token allocation nor pre-mined supply. The smart contract is open source and has been reviewed by multiple world-class auditing firms.",
                 section: Section::C,
-                text_color
                 // TODO Sec3
                 // TODO Neodyme
             }
@@ -106,12 +94,8 @@ fn BgImg(visible: bool, bg_img: String, index: usize) -> Element {
     }
 }
 
-#[component]
-fn Navbar(text_color: TextColor) -> Element {
-    let copy_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
-    };
+fn Navbar() -> Element {
+    let copy_color = "text-white";
     rsx! {
         div {
             class: "flex flex-row justify-between px-4 sm:px-8 py-6 md:py-8 w-full transition-colors {copy_color}",
@@ -122,19 +106,13 @@ fn Navbar(text_color: TextColor) -> Element {
                     class: "h-6 md:h-8 my-auto"
                 }
             }
-            SocialLinks {
-                text_color
-            }
+            SocialLinks {}
         }
     }
 }
 
-#[component]
-fn SocialLinks(text_color: TextColor) -> Element {
-    let button_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
-    };
+fn SocialLinks() -> Element {
+    let button_color = "text-white";
     rsx! {
         div {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
@@ -175,21 +153,13 @@ fn SocialLinks(text_color: TextColor) -> Element {
 }
 
 #[component]
-fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
-    let copy_color = match text_color {
-        TextColor::Black => "text-black selection:bg-black selection:text-white",
-        TextColor::White => "text-white selection:bg-white selection:text-black",
-    };
-    let cta_color = match text_color {
-        TextColor::Black => "bg-black text-white selection:bg-black selection:text-white",
-        TextColor::White => "bg-white text-black selection:bg-white selection:text-black",
-    };
+fn Hero(title: String, subtitle: String) -> Element {
+    let copy_color = "text-white selection:bg-white selection:text-black";
+    let cta_color = "bg-white text-black selection:bg-white selection:text-black";
     rsx! {
         div {
             class: "flex flex-col min-h-dvh h-full w-full snap-start snap-always",
-            Navbar {
-                text_color
-            }
+            Navbar {}
             div {
                 class: "flex flex-col gap-y-8 sm:gap-y-10 md:gap-y-12 w-full md:mx-auto my-auto pb-24 px-4 md:px-8",
                 div {
@@ -199,7 +169,7 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
                         "{title}"
                     }
                     p {
-                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl mx-auto font-hero font-medium",
+                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-hero font-medium",
                         "{subtitle}"
                     }
                 }
@@ -214,17 +184,8 @@ fn Hero(title: String, subtitle: String, text_color: TextColor) -> Element {
 }
 
 #[component]
-fn Block(
-    title: String,
-    title2: String,
-    detail: String,
-    section: Section,
-    text_color: TextColor,
-) -> Element {
-    let copy_color = match text_color {
-        TextColor::Black => "text-black selection:bg-black selection:text-white",
-        TextColor::White => "text-white selection:bg-white selection:text-black",
-    };
+fn Block(title: String, title2: String, detail: String, section: Section) -> Element {
+    let copy_color = "text-white selection:bg-white selection:text-black";
     rsx! {
         div {
             class: "flex min-h-dvh h-full w-full py-8 md:py-16 px-3 sm:px-8 snap-start",
@@ -247,16 +208,15 @@ fn Block(
                     }
                     BlockCta {
                         section: section.clone(),
-                        text_color
                     }
                 }
                 div {
                     class: "flex h-full w-full",
                     match section {
-                        Section::A => rsx! { SectionA { text_color } },
-                        Section::B => rsx! { SectionB { text_color } },
-                        Section::C => rsx! { SectionC { text_color } },
-                        Section::D => rsx! { SectionD { text_color } },
+                        Section::A => rsx! { SectionA { } },
+                        Section::B => rsx! { SectionB { } },
+                        Section::C => rsx! { SectionC { } },
+                        Section::D => rsx! { SectionD { } },
                     }
                 }
             }
@@ -265,12 +225,9 @@ fn Block(
 }
 
 #[component]
-fn BlockCta(section: Section, text_color: TextColor) -> Element {
+fn BlockCta(section: Section) -> Element {
     let style = "flex shrink font-semibold text-center mr-auto mt-4 px-5 py-3 transition-colors transition-transform rounded-full hover:scale-105 hover:shadow";
-    let cta_color = match text_color {
-        TextColor::Black => "bg-black text-white",
-        TextColor::White => "bg-white text-black",
-    };
+    let cta_color = "bg-white text-black";
     match section {
         Section::A => rsx! {
             Link {
@@ -316,13 +273,8 @@ enum Section {
 
 // TODO Hash animation
 // TODO Current hashpower measurement?
-#[component]
-fn SectionA(text_color: TextColor) -> Element {
-    let copy_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
-    };
-
+fn SectionA() -> Element {
+    let copy_color = "text-white";
     let mut sample_hash = use_signal(|| Blake3Hash::new_unique());
 
     let hashrate = use_resource(move || async move {
@@ -382,8 +334,7 @@ fn SectionA(text_color: TextColor) -> Element {
     }
 }
 
-#[component]
-fn SectionB(text_color: TextColor) -> Element {
+fn SectionB() -> Element {
     let supply = use_ore_supply();
     let circulating_supply = supply
         .cloned()
@@ -396,23 +347,18 @@ fn SectionB(text_color: TextColor) -> Element {
             OreValue {
                 title: "Current supply".to_string(),
                 amount: circulating_supply,
-                text_color
             }
             OreValue {
                 title: "Total supply".to_string(),
                 amount: 21_000_000,
-                text_color
             }
         }
     }
 }
 
 #[component]
-fn OreValue(title: String, amount: u64, text_color: TextColor) -> Element {
-    let copy_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
-    };
+fn OreValue(title: String, amount: u64) -> Element {
+    let copy_color = "text-white";
     rsx! {
         div {
             class: "flex flex-col gap-2 {copy_color} transition-colors",
@@ -434,12 +380,8 @@ fn OreValue(title: String, amount: u64, text_color: TextColor) -> Element {
     }
 }
 
-#[component]
-fn SectionC(text_color: TextColor) -> Element {
-    let text_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
-    };
+fn SectionC() -> Element {
+    let text_color = "text-white";
     rsx! {
         div {
             class: "flex flex-col gap-2 my-auto",
@@ -490,12 +432,8 @@ pub struct JupPriceData {
     price: f64,
 }
 
-#[component]
-fn SectionD(text_color: TextColor) -> Element {
-    let text_color = match text_color {
-        TextColor::Black => "text-black",
-        TextColor::White => "text-white",
-    };
+fn SectionD() -> Element {
+    let text_color = "text-white";
 
     let quotes = use_resource(move || async move {
         match reqwest::get("https://price.jup.ag/v6/price?ids=USDC,WBTC&vsToken=oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp").await {
