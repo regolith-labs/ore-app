@@ -49,7 +49,7 @@ pub fn Balance() -> Element {
                         }
                     }
                     OreV1Balance {}
-                    StakeBalance {}
+                    UnclaimedBalance {}
                 }
             }
         };
@@ -62,7 +62,7 @@ pub fn Balance() -> Element {
     }
 }
 
-pub fn StakeBalance() -> Element {
+pub fn UnclaimedBalance() -> Element {
     let proof = use_proof();
     let escrow_proof = use_escrow_proof();
 
@@ -71,20 +71,27 @@ pub fn StakeBalance() -> Element {
             div {
                 class: "flex flex-row grow justify-between mt-4",
                 div {
-                    class: "flex flex-col gap-2",
-                    p {
-                        class: "font-medium text-sm text-gray-300",
-                        "Stake"
+                    class: "flex flex-row grow justify-between mt-4",
+                    div {
+                        class: "flex flex-col gap-2",
+                        p {
+                            class: "font-medium text-sm text-gray-300",
+                            "Unclaimed"
+                        }
+                        div {
+                            class: "flex flex-row gap-2",
+                            OreIcon {
+                                class: "my-auto w-4 h-4"
+                            }
+                            p {
+                                class: "font-semibold",
+                                "{amount_to_ui_amount(proof.balance, ore_api::consts::TOKEN_DECIMALS)}"
+                            }
+                        }
                     }
                     div {
-                        class: "flex flex-row gap-2",
-                        OreIcon {
-                            class: "my-auto w-4 h-4"
-                        }
-                        p {
-                            class: "font-semibold",
-                            "{amount_to_ui_amount(proof.balance, ore_api::consts::TOKEN_DECIMALS)}"
-                        }
+                        class: "mt-auto flex flex-row gap-1 sm:gap-2 -mb-2",
+                        ClaimButton {}
                     }
                 }
                 div {
