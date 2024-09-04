@@ -6,7 +6,6 @@ use dioxus_sdk::utils::channel::UseChannel;
 use drillx::Solution;
 use lazy_static::lazy_static;
 use ore_api::state::Proof;
-use ore_relayer_api::state::Escrow;
 use rand::Rng;
 use serde_wasm_bindgen::to_value;
 use solana_client_wasm::solana_sdk::{
@@ -20,8 +19,8 @@ pub use web_worker::*;
 use crate::{
     gateway::{self, escrow_pubkey, proof_pubkey, GatewayError, GatewayResult},
     hooks::{
-        use_gateway, MinerStatus, MinerStatusMessage, MinerToolbarState, PowerLevel,
-        ReadMinerToolbarState, UpdateMinerToolbarState,
+        use_gateway, use_wallet_adapter::WalletAdapter, MinerStatus, MinerStatusMessage,
+        MinerToolbarState, PowerLevel, ReadMinerToolbarState, UpdateMinerToolbarState,
     },
     metrics::{self, AppEvent},
 };
@@ -87,8 +86,8 @@ impl Miner {
         &self,
         messages: &Vec<WebWorkerResponse>,
         toolbar_state: &mut Signal<MinerToolbarState>,
-        escrow: &mut Signal<Escrow>,
         proof: Resource<GatewayResult<Proof>>,
+        wallet_adapter: Signal<WalletAdapter>,
     ) {
         log::info!("Batch: {:?}", messages);
         // Exit early if not active
@@ -96,6 +95,11 @@ impl Miner {
             MinerStatus::Active => {}
             _ => return,
         }
+
+        // Get the pubkey
+        let WalletAdapter::Connected(authority) = *wallet_adapter.read() else {
+            return;
+        };
 
         // Get best solution
         let gateway = use_gateway();
@@ -125,14 +129,16 @@ impl Miner {
         // Update toolbar state
         toolbar_state.set_display_hash(Blake3Hash::new_from_array(best_hash));
 
-        // Submit solution
-        let authority = escrow.read().authority;
-        let escrow_pubkey = escrow_pubkey(authority);
+        // Check if miner authority should be migrated
         let migrate_miner_authority = if let Some(Ok(proof)) = *proof.read() {
             proof.miner.ne(&authority)
         } else {
             false
         };
+
+        // TODO Migrate escrow authority??
+
+        // Submit solution
         match submit_solution(
             authority,
             best_solution,
@@ -146,26 +152,21 @@ impl Miner {
                 metrics::track(AppEvent::Mine);
                 if let MinerStatus::Active = toolbar_state.status() {
                     async_std::task::sleep(Duration::from_millis(2000)).await;
-                    if let Ok(new_escrow) = gateway.get_escrow(authority).await {
-                        escrow.set(new_escrow);
-                        if let Ok(proof) = gateway.get_proof_update(escrow_pubkey, challenge).await
-                        {
-                            if let Ok(clock) = gateway.get_clock().await {
-                                toolbar_state.set_status_message(MinerStatusMessage::Searching);
-                                let cutoff_time = proof
-                                    .last_hash_at
-                                    .saturating_add(60)
-                                    .saturating_sub(clock.unix_timestamp)
-                                    .max(0)
-                                    as u64;
-                                self.start_mining(proof.challenge.into(), 0, cutoff_time)
-                                    .await;
-                            } else {
-                                log::error!("Failed to get clock");
-                            }
+                    if let Ok(proof) = gateway.get_proof_update(authority, challenge).await {
+                        if let Ok(clock) = gateway.get_clock().await {
+                            toolbar_state.set_status_message(MinerStatusMessage::Searching);
+                            let cutoff_time = proof
+                                .last_hash_at
+                                .saturating_add(60)
+                                .saturating_sub(clock.unix_timestamp)
+                                .max(0) as u64;
+                            self.start_mining(proof.challenge.into(), 0, cutoff_time)
+                                .await;
                         } else {
-                            log::error!("Failed to get proof");
+                            log::error!("Failed to get clock");
                         }
+                    } else {
+                        log::error!("Failed to get proof");
                     }
                 }
             }

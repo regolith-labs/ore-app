@@ -11,6 +11,19 @@ use super::{
 };
 
 pub fn use_proof() -> Resource<GatewayResult<Proof>> {
+    let wallet_adapter = use_wallet_adapter();
+    use_resource(move || async move {
+        match *wallet_adapter.read() {
+            WalletAdapter::Disconnected => Err(GatewayError::AccountNotFound.into()),
+            WalletAdapter::Connected(pubkey) => {
+                let gateway = use_gateway();
+                gateway.get_proof(pubkey).await
+            }
+        }
+    })
+}
+
+pub fn use_escrow_proof() -> Resource<GatewayResult<Proof>> {
     let escrow = use_escrow();
     use_resource(move || async move {
         let authority = escrow.read().authority;

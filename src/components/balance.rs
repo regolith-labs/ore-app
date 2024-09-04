@@ -33,7 +33,7 @@ pub fn Balance() -> Element {
                         div {
                             class: "flex flex-row my-auto gap-2.5 md:gap-4 truncate",
                             OreIcon {
-                                class: "my-auto w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10"
+                                class: "my-auto w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 shrink-0"
                             }
                             h2 {
                                 class: "text-3xl sm:text-4xl md:text-5xl",

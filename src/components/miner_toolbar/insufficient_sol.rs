@@ -11,7 +11,7 @@ use crate::{
     components::{BackButton, InvokeSignature},
     gateway::{self, escrow_pubkey, GatewayError, GatewayResult},
     hooks::{
-        use_escrow, use_gateway,
+        use_gateway, use_proof,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
     },
 };
@@ -109,11 +109,10 @@ pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> El
     }
 }
 
-#[component]
-pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>>) -> Element {
+pub fn MinerToolbarCreateAccountOpen() -> Element {
     let wallet_adapter = use_wallet_adapter();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
-    let mut escrow = use_escrow();
+    let mut proof = use_proof();
     let nav = use_navigator();
 
     let tx = use_resource(move || async move {
@@ -148,13 +147,9 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
 
     let _ = use_resource(move || async move {
         if let InvokeSignatureStatus::Done(_sig) = *invoke_signature_signal.read() {
-            if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
-                let gateway = use_gateway();
+            if let WalletAdapter::Connected(_signer) = *wallet_adapter.read() {
                 async_std::task::sleep(Duration::from_millis(2000)).await;
-                if let Ok(new_escrow) = gateway.get_escrow(signer).await {
-                    escrow.set(new_escrow);
-                    escrow_balance.restart();
-                }
+                proof.restart();
             }
         };
         ()
