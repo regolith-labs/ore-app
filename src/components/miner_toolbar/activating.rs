@@ -1,34 +1,25 @@
 use dioxus::prelude::*;
-use ore_relayer_api::state::Escrow;
-use solana_client_wasm::solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     components::{try_start_mining, Spinner},
     hooks::{
-        use_escrow, use_escrow_sol_balance, use_miner_toolbar_state, MinerStatus,
-        MinerStatusMessage, UpdateMinerToolbarState,
+        use_miner_toolbar_state, use_proof, MinerStatus, MinerStatusMessage,
+        UpdateMinerToolbarState,
     },
     miner::Miner,
     route::Route,
 };
 
-pub const RENT_MIN_BALANCE: u64 = 1392000;
-pub const MIN_BALANCE: u64 = LAMPORTS_PER_SOL.saturating_div(1000) + RENT_MIN_BALANCE;
-
 #[component]
 pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
     let mut toolbar_state = use_miner_toolbar_state();
-    let escrow_balance = use_escrow_sol_balance();
-    let escrow = use_escrow();
+    let proof = use_proof();
     let nav = use_navigator();
 
     // Start mining if the escrow account exists
     let _ = use_resource(move || async move {
-        if escrow.read().ne(&Escrow::default()) {
-            // TODO This is currently comment out because users are manually paying to submit hashes
-            // if let Some(Ok(balance)) = *escrow_balance.read() {
-            //     if balance.ge(&MIN_BALANCE) {
-            match try_start_mining(miner, escrow, &mut toolbar_state).await {
+        if let Some(Ok(proof)) = *proof.read() {
+            match try_start_mining(miner, proof, &mut toolbar_state).await {
                 Ok(()) => {
                     toolbar_state.set_status(MinerStatus::Active);
                 }
@@ -38,19 +29,11 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
                     toolbar_state.set_status_message(MinerStatusMessage::Error);
                 }
             }
-            // }
-            // }
         }
     });
 
-    if escrow.read().eq(&Escrow::default()) {
+    if proof.read().is_none() {
         nav.push(Route::Mine {});
-    }
-
-    if let Some(Ok(balance)) = *escrow_balance.read() {
-        if balance.lt(&MIN_BALANCE) {
-            nav.push(Route::Mine {});
-        }
     }
 
     rsx! {

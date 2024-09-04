@@ -1,15 +1,14 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use ore_relayer_api::state::Escrow;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{BackButton, MinerToolbarCreateAccountOpen, OreIcon, Spinner},
     hooks::{
-        use_escrow, use_escrow_sol_balance, use_miner_toolbar_state, use_power_level, use_proof,
-        MinerStatus, MinerStatusMessage, PowerLevel, ReadMinerToolbarState,
+        use_miner_toolbar_state, use_power_level, use_proof, MinerStatus, MinerStatusMessage,
+        PowerLevel, ReadMinerToolbarState,
     },
     miner::WEB_WORKERS,
 };
@@ -19,16 +18,15 @@ use crate::{
 // TODO Stop start button
 
 pub fn Mine() -> Element {
-    let escrow_balance = use_escrow_sol_balance();
-    let escrow = use_escrow();
     let nav = use_navigator();
+    let proof = use_proof();
 
-    if escrow.read().eq(&Escrow::default()) {
-        return rsx! {
-            MinerToolbarCreateAccountOpen {
-                escrow_balance: escrow_balance.clone()
-            }
-        };
+    if let Some(proof_result) = *proof.read() {
+        if proof_result.is_err() {
+            return rsx! {
+                MinerToolbarCreateAccountOpen {}
+            };
+        }
     }
 
     rsx! {
