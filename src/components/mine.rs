@@ -22,8 +22,7 @@ pub fn Mine() -> Element {
     let escrow = use_escrow();
     let proof = use_proof();
 
-    // if let Some(Ok(_escrow)) = *escrow.read() {
-    if true {
+    if let Some(Ok(_escrow)) = *escrow.read() {
         return rsx! {
             MigrateAccountPage {}
         };
