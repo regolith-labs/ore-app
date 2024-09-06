@@ -50,7 +50,7 @@ num-format = "0.4.4"
 ore-api = "2.1.8"
 ore-api-v1 = { package = "ore-program", version = "1.2" }
 ore-boost-api = { path = "../ore-boost/api", versio = "0.1.0" }
-ore-relayer-api = "2.1.2"
+ore-relayer-api = "2.2.0"
 ore-utils = "2.1.8"
 ore-types = "0.0.9"
 qrcode-generator = "4.1.9"

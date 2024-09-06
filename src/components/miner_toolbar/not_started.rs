@@ -2,10 +2,24 @@ use dioxus::prelude::*;
 
 use crate::{
     components::PlayIcon,
-    hooks::{use_miner_toolbar_state, ReadMinerToolbarState, UpdateMinerToolbarState},
+    hooks::{use_escrow, use_miner_toolbar_state, ReadMinerToolbarState, UpdateMinerToolbarState},
 };
 
 pub fn MinerToolbarNotStarted() -> Element {
+    let escrow = use_escrow();
+
+    if let Some(Ok(_escrow)) = *escrow.read() {
+        return rsx! {
+            div {
+                class: "flex flex-row w-full justify-end my-auto px-4 sm:px-8",
+                div {
+                    class: "flex flex-row gap-2 sm:gap-4",
+                    "Migrate..."
+                }
+            }
+        };
+    }
+
     rsx! {
         div {
             class: "flex flex-row w-full justify-end my-auto px-4 sm:px-8",
