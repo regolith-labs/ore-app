@@ -261,7 +261,7 @@ pub fn MigrateAccountPage() -> Element {
                     }
                     p {
                         class: "text-lg",
-                        "To continue mining, please migrate your account to our new systems."
+                        "To continue mining, please migrate your account to our new web-based mining system."
                     }
                     p {
                         class: "text-sm text-gray-300",
@@ -270,27 +270,27 @@ pub fn MigrateAccountPage() -> Element {
                 }
             }
             div {
-                class: "flex flex-col gap-4",
+                class: "flex flex-col gap-4 mb-auto",
                 div {
-                    class: "flex flex-row gap-4",
+                    class: "flex flex-row gap-2",
                     InfoIcon {
-                        class: "w-5 h-5 shrink-0"
+                        class: "w-5 h-5 shrink-0 mt-1"
                     }
                     p {
-                        class: "font-bold text-lg",
-                        "Info"
+                        class: "font-bold text-xl",
+                        "What's happening?"
                     }
                 }
                 ul {
-                    class: "flex flex-col gap-2",
+                    class: "flex flex-col gap-2 list-disc px-4",
                     li {
-                        "To prepare for new features such as mining pools, we have deprecated a backend transaction relayer system this app used to rely on."
+                        "In preparation of new features such as mining pools, we have deprecated the transaction relayer system this app used to rely on."
                     }
                     li {
-                        "To continue mining, users must migrate to a fully self-custodied account. The migration will require only 1 transaction and can be completed in 5 seconds or less."
+                        "To continue mining on this app, users must migrate to the new system. This migration requires only 1 transaction and can be completed in 5 seconds or less."
                     }
                     li {
-                        "Your stake balance will automatically be migrated to the new account."
+                        "Your entire stake balance will securely be migrated to the new account automatically."
                     }
                 }
             }
