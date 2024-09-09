@@ -28,11 +28,17 @@ pub fn Claim() -> Element {
 
     // TODO Calc if escrow proof is present
 
-    let max_rewards = proof
+    let max_rewards = escrow_proof
         .read()
         .and_then(|p| p.ok())
         .map(|p| p.balance)
-        .unwrap_or_else(|| 0);
+        .unwrap_or_else(|| {
+            proof
+                .read()
+                .and_then(|p| p.ok())
+                .map(|p| p.balance)
+                .unwrap_or_else(|| 0)
+        });
 
     let e = match *claim_step.read() {
         ClaimStep::Edit => {

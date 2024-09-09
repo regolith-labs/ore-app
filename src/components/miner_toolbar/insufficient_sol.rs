@@ -16,7 +16,7 @@ use crate::{
     components::{BackButton, InfoIcon, InvokeSignature},
     gateway::{self, escrow_pubkey, ore_token_account_address, GatewayError, GatewayResult},
     hooks::{
-        use_escrow, use_gateway, use_proof,
+        use_gateway, use_proof,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
     },
 };

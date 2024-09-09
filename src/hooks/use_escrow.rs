@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use ore_relayer_api::state::Escrow;
 
-use crate::gateway::{escrow_pubkey, GatewayError, GatewayResult};
+use crate::gateway::{GatewayError, GatewayResult};
 
 use super::{
     use_gateway,
