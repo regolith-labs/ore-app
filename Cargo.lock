@@ -5069,7 +5069,6 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#5cb0c7d4804192a1ecb1686c18ceb4d8060a325a"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -5089,7 +5088,6 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#5cb0c7d4804192a1ecb1686c18ceb4d8060a325a"
 dependencies = [
  "Inflector",
  "arrayref",

@@ -7,7 +7,7 @@ use solana_sdk::pubkey::Pubkey;
 use crate::{
     components::{BackButton, CreateAccountPage, MigrateAccountPage, OreIcon, Spinner},
     hooks::{
-        use_escrow, use_miner_toolbar_state, use_power_level, use_proof, MinerStatus,
+        use_escrow, use_gateway, use_miner_toolbar_state, use_power_level, use_proof, MinerStatus,
         MinerStatusMessage, PowerLevel, ReadMinerToolbarState,
     },
     miner::WEB_WORKERS,
@@ -24,7 +24,10 @@ pub fn Mine() -> Element {
 
     if let Some(Ok(_escrow)) = *escrow.read() {
         return rsx! {
-            MigrateAccountPage {}
+            MigrateAccountPage {
+                escrow: escrow,
+                proof: proof
+            }
         };
     }
 
@@ -57,10 +60,10 @@ pub fn Mine() -> Element {
             div {
                 class: "flex flex-col gap-6",
                 StakeBalanceDisplay {}
-                // MultiplierDisplay {}
+                MultiplierDisplay {}
                 PowerLevelConfig {}
             }
-            BoostConfig {}
+            // BoostConfig {}
         }
     }
 }
@@ -183,6 +186,38 @@ pub fn StakeBalanceDisplay() -> Element {
     }
 }
 
+pub fn MultiplierDisplay() -> Element {
+    let proof = use_proof();
+
+    let multiplier = use_resource(move || async move {
+        let gateway = use_gateway();
+        if let Some(Ok(proof)) = *proof.read() {
+            if let Ok(config) = gateway.get_config().await {
+                return 1.0 + (proof.balance as f64 / config.top_balance as f64).min(1.0f64);
+            }
+        }
+        1.0
+    });
+
+    rsx! {
+        div {
+            class: "flex flex-row gap-8 justify-between",
+                p {
+                    class: "text-gray-300 font-medium text-sm my-auto",
+                    "Multiplier"
+                }
+           div {
+                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+                p {
+                    class: "text-white text-right px-1 mb-auto font-semibold",
+                    "{multiplier.read().unwrap_or(1.0):.12}x"
+                }
+            }
+        }
+    }
+}
+
+#[allow(dead_code)]
 pub fn BoostConfig() -> Element {
     let _boosts = vec![Pubkey::from_str("oreFHcE6FvJTrsfaYca4mVeZn7J7T6oZS9FAvW9eg4q").unwrap()];
 
@@ -205,6 +240,7 @@ pub fn BoostConfig() -> Element {
     }
 }
 
+#[allow(dead_code)]
 pub fn Boost() -> Element {
     rsx! {
         div {
@@ -233,40 +269,33 @@ pub fn PowerLevelConfig() -> Element {
     let max = *WEB_WORKERS as i64;
 
     rsx! {
-        // div {
-        //     class: "flex flex-col gap-2",
+        div {
+            class: "flex flex-row gap-8 justify-between",
+                p {
+                    class: "text-gray-300 font-medium text-sm my-auto",
+                    "Power"
+                }
             div {
-                class: "flex flex-row gap-8 justify-between",
-                    p {
-                        class: "text-gray-300 font-medium text-sm my-auto",
-                        "Power"
-                    }
-                div {
-                    class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                    input {
-                        class: "bg-transparent text-white text-right px-1 mb-auto rounded font-semibold transition-colors",
-                        dir: "rtl",
-                        step: 1,
-                        min: 1,
-                        max: max,
-                        r#type: "number",
-                        value: "{power_level.read().0}",
-                        oninput: move |e| {
-                            if let Ok(v) = e.value().parse::<u64>() {
-                                power_level.set(PowerLevel(v));
-                            }
+                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
+                input {
+                    class: "bg-transparent text-white text-right px-1 mb-auto rounded font-semibold transition-colors",
+                    dir: "rtl",
+                    step: 1,
+                    min: 1,
+                    max: max,
+                    r#type: "number",
+                    value: "{power_level.read().0}",
+                    oninput: move |e| {
+                        if let Ok(v) = e.value().parse::<u64>() {
+                            power_level.set(PowerLevel(v));
                         }
                     }
-                    p {
-                        class: "my-auto",
-                        "of {max} cores"
-                    }
+                }
+                p {
+                    class: "my-auto",
+                    "of {max} cores"
                 }
             }
-            // p {
-            //     class: "text-white text-xs opacity-80 max-w-96",
-            //     "The number of computer cores you have dedicated to mining."
-            // }
-        // }
+        }
     }
 }

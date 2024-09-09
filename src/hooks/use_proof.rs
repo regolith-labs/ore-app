@@ -2,10 +2,10 @@ use dioxus::prelude::*;
 use ore_api::state::Proof;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::gateway::{GatewayError, GatewayResult};
+use crate::gateway::{escrow_pubkey, GatewayError, GatewayResult};
 
 use super::{
-    use_gateway,
+    use_escrow, use_gateway,
     use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
 };
 
@@ -22,21 +22,22 @@ pub fn use_proof() -> Resource<GatewayResult<Proof>> {
     })
 }
 
-// pub fn use_escrow_proof() -> Resource<GatewayResult<Proof>> {
-//     let escrow = use_escrow();
-//     use_resource(move || async move {
-//         let authority = escrow.read().authority;
-//         if authority.ne(&Pubkey::new_from_array([0; 32])) {
-//             let escrow_pubkey =
-//                 Pubkey::find_program_address(&[ESCROW, authority.as_ref()], &ore_relayer_api::id())
-//                     .0;
-//             let gateway = use_gateway();
-//             gateway.get_proof(escrow_pubkey).await
-//         } else {
-//             Err(GatewayError::AccountNotFound.into())
-//         }
-//     })
-// }
+pub fn use_escrow_proof() -> Resource<GatewayResult<Proof>> {
+    let escrow = use_escrow();
+    use_resource(move || async move {
+        if let Some(Ok(escrow)) = *escrow.read() {
+            let authority = escrow.authority;
+            if authority.ne(&Pubkey::new_from_array([0; 32])) {
+                let gateway = use_gateway();
+                gateway.get_proof(escrow_pubkey(authority)).await
+            } else {
+                Err(GatewayError::AccountNotFound.into())
+            }
+        } else {
+            Err(GatewayError::AccountNotFound.into())
+        }
+    })
+}
 
 pub fn use_user_proof(authority: Pubkey) -> Resource<GatewayResult<Proof>> {
     let gateway = use_gateway();

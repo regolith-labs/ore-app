@@ -17,7 +17,7 @@ use web_time::{Duration, Instant};
 pub use web_worker::*;
 
 use crate::{
-    gateway::{self, escrow_pubkey, proof_pubkey, GatewayError, GatewayResult},
+    gateway::{self, proof_pubkey, GatewayError, GatewayResult},
     hooks::{
         use_gateway, use_wallet_adapter::WalletAdapter, MinerStatus, MinerStatusMessage,
         MinerToolbarState, PowerLevel, ReadMinerToolbarState, UpdateMinerToolbarState,
@@ -129,24 +129,8 @@ impl Miner {
         // Update toolbar state
         toolbar_state.set_display_hash(Blake3Hash::new_from_array(best_hash));
 
-        // Check if miner authority should be migrated
-        let migrate_miner_authority = if let Some(Ok(proof)) = *proof.read() {
-            proof.miner.ne(&authority)
-        } else {
-            false
-        };
-
-        // TODO Migrate escrow authority??
-
         // Submit solution
-        match submit_solution(
-            authority,
-            best_solution,
-            migrate_miner_authority,
-            toolbar_state,
-        )
-        .await
-        {
+        match submit_solution(authority, best_solution, toolbar_state).await {
             // Start mining again
             Ok(_sig) => {
                 metrics::track(AppEvent::Mine);
@@ -188,7 +172,6 @@ impl Miner {
 pub async fn submit_solution(
     authority: Pubkey,
     solution: Solution,
-    migrate_miner_authority: bool,
     toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<Signature> {
     // Build tx
@@ -197,17 +180,11 @@ pub async fn submit_solution(
     let price = gateway::get_recent_priority_fee_estimate(false).await;
     let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
     let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
-    let escrow = escrow_pubkey(authority);
     let mut ixs = vec![cu_limit_ix, cu_price_ix];
-    if migrate_miner_authority {
-        ixs.push(ore_relayer_api::instruction::update_miner(
-            authority, authority,
-        ));
-    }
-    ixs.push(ore_api::instruction::auth(proof_pubkey(escrow)));
+    ixs.push(ore_api::instruction::auth(proof_pubkey(authority)));
     ixs.push(ore_api::instruction::mine(
         authority,
-        escrow,
+        authority,
         find_bus(),
         solution,
     ));
