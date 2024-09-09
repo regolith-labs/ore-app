@@ -25,11 +25,6 @@ fn main() {
     launch(App);
 }
 
-// TODO Escrow migration plan
-//      Rewrite all components to ignore escrow account.
-//      In balance section, check if user has an escrow account.
-//      If so, display a "Migrate" button
-
 pub fn App() -> Element {
     // Global variables
     use_appearance_provider();
