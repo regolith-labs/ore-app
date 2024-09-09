@@ -1,15 +1,20 @@
 use std::ops::Div;
 
 use dioxus::prelude::*;
+use ore_api::state::Proof;
+use ore_relayer_api::state::Escrow;
 use solana_client_wasm::solana_sdk::{
     compute_budget::ComputeBudgetInstruction, message::Message, native_token::sol_to_lamports,
     pubkey, pubkey::Pubkey, transaction::Transaction,
+};
+use solana_extra_wasm::program::{
+    spl_associated_token_account::instruction::create_associated_token_account, spl_token,
 };
 use web_time::Duration;
 
 use crate::{
     components::{BackButton, InfoIcon, InvokeSignature},
-    gateway::{self, escrow_pubkey, GatewayError, GatewayResult},
+    gateway::{self, escrow_pubkey, ore_token_account_address, GatewayError, GatewayResult},
     hooks::{
         use_escrow, use_gateway, use_proof,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
@@ -124,7 +129,7 @@ pub fn CreateAccountPage() -> Element {
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
                 let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
                 let amount = sol_to_lamports(TOP_UP_AMOUNT);
-                let ix_1 = ore_relayer_api::instruction::open_escrow(signer, signer);
+                let ix_1 = ore_api::instruction::open(signer, signer, signer);
                 // TODO This is commented out because users are currently manually signing (not escrow)
                 // let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                 //     &signer,
@@ -203,11 +208,13 @@ pub fn CreateAccountPage() -> Element {
     }
 }
 
-pub fn MigrateAccountPage() -> Element {
+#[component]
+pub fn MigrateAccountPage(
+    proof: Resource<GatewayResult<Proof>>,
+    escrow: Resource<GatewayResult<Escrow>>,
+) -> Element {
     let wallet_adapter = use_wallet_adapter();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
-    let mut escrow = use_escrow();
-    let mut proof = use_proof();
     let nav = use_navigator();
 
     let tx = use_resource(move || async move {
@@ -216,11 +223,23 @@ pub fn MigrateAccountPage() -> Element {
             WalletAdapter::Connected(signer) => {
                 let gateway = use_gateway();
                 let price = gateway::get_recent_priority_fee_estimate(false).await;
-                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(1_000_000);
-                let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
-                let ix = ore_relayer_api::instruction::migrate(signer, signer, signer);
+                let mut ixs = vec![];
+                ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(1_400_000));
+                ixs.push(ComputeBudgetInstruction::set_compute_unit_price(price));
+                let token_account_address = ore_token_account_address(signer);
+                if let Ok(Some(_)) = gateway.get_token_account(&token_account_address).await {
+                } else {
+                    ixs.push(create_associated_token_account(
+                        &signer,
+                        &signer,
+                        &ore_api::consts::MINT_ADDRESS,
+                        &spl_token::id(),
+                    ));
+                }
+                ixs.push(ore_relayer_api::instruction::migrate(
+                    signer, signer, signer,
+                ));
                 let blockhash = gateway.rpc.get_latest_blockhash().await?;
-                let ixs = vec![cu_limit_ix, cu_price_ix, ix];
                 let msg = Message::new_with_blockhash(ixs.as_slice(), Some(&signer), &blockhash);
                 let tx = Transaction::new_unsigned(msg);
                 Ok(tx)
@@ -234,14 +253,11 @@ pub fn MigrateAccountPage() -> Element {
                 async_std::task::sleep(Duration::from_millis(2000)).await;
                 escrow.restart();
                 proof.restart();
+                // TODO Refresh
             }
         };
         ()
     });
-
-    // Reduced fees
-    // Preparation for future features
-    //
 
     rsx! {
         div {
@@ -261,7 +277,7 @@ pub fn MigrateAccountPage() -> Element {
                     }
                     p {
                         class: "text-lg",
-                        "To continue mining, please migrate your account to our new web-based mining system."
+                        "Please migrate your account to our new system."
                     }
                     p {
                         class: "text-sm text-gray-300",
@@ -284,13 +300,16 @@ pub fn MigrateAccountPage() -> Element {
                 ul {
                     class: "flex flex-col gap-2 list-disc px-4",
                     li {
-                        "In preparation of new features such as mining pools, we have deprecated the transaction relayer system this app used to rely on."
+                        "To prepare for new features such as mining pools, we have deprecated the transaction relayer system this website used to rely on."
                     }
                     li {
-                        "To continue mining on this app, users must migrate to the new system. This migration requires only 1 transaction and can be completed in 5 seconds or less."
+                        "To continue mining, existing users must migrate to our new web-based mining system."
                     }
                     li {
-                        "Your entire stake balance will securely be migrated to the new account automatically."
+                        "This migration requires 1 transaction and can be completed in 5 seconds or less."
+                    }
+                    li {
+                        "All of your stake will be securely migrated to the new account automatically."
                     }
                 }
             }
