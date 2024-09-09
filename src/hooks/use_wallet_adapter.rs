@@ -98,19 +98,6 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                     Some(tx) => {
                                         log::info!("Sending: {:?}", tx);
                                         let x = gateway.rpc.send_transaction(&tx).await;
-                                        // let x = gateway
-                                        //     .rpc
-                                        //     .send_transaction_with_config(
-                                        //         &tx,
-                                        //         RpcSendTransactionConfig {
-                                        //             skip_preflight: true,
-                                        //             preflight_commitment: Some(solana_sdk::commitment_config::CommitmentLevel::Confirmed),
-                                        //             encoding: Some(UiTransactionEncoding::Base64),
-                                        //             max_retries: None,
-                                        //             min_context_slot: None,
-                                        //         },
-                                        //     )
-                                        //     .await;
                                         log::info!("Sent: {:?}", x);
                                         x.ok()
                                     }
