@@ -86,7 +86,7 @@ impl Miner {
         &self,
         messages: &Vec<WebWorkerResponse>,
         toolbar_state: &mut Signal<MinerToolbarState>,
-        proof: Resource<GatewayResult<Proof>>,
+        proof: &mut Resource<GatewayResult<Proof>>,
         wallet_adapter: Signal<WalletAdapter>,
     ) {
         log::info!("Batch: {:?}", messages);
@@ -136,6 +136,7 @@ impl Miner {
                 metrics::track(AppEvent::Mine);
                 if let MinerStatus::Active = toolbar_state.status() {
                     async_std::task::sleep(Duration::from_millis(2000)).await;
+                    proof.restart();
                     if let Ok(proof) = gateway.get_proof_update(authority, challenge).await {
                         if let Ok(clock) = gateway.get_clock().await {
                             toolbar_state.set_status_message(MinerStatusMessage::Searching);

@@ -12,7 +12,7 @@ pub fn use_miner() -> Signal<Miner> {
     let wallet_adapter = use_wallet_adapter();
     let power_level = use_power_level();
     let miner = use_signal(|| Miner::new(cx.clone(), power_level));
-    let proof = use_proof();
+    let mut proof = use_proof();
 
     // Process web worker results
     use_future(move || {
@@ -31,7 +31,7 @@ pub fn use_miner() -> Signal<Miner> {
                         .process_web_worker_results(
                             &messages,
                             &mut toolbar_state,
-                            proof,
+                            &mut proof,
                             wallet_adapter,
                         )
                         .await;
