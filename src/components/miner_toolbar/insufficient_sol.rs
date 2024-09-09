@@ -1,17 +1,22 @@
 use std::ops::Div;
 
 use dioxus::prelude::*;
+use ore_api::state::Proof;
+use ore_relayer_api::state::Escrow;
 use solana_client_wasm::solana_sdk::{
     compute_budget::ComputeBudgetInstruction, message::Message, native_token::sol_to_lamports,
     pubkey, pubkey::Pubkey, transaction::Transaction,
 };
+use solana_extra_wasm::program::{
+    spl_associated_token_account::instruction::create_associated_token_account, spl_token,
+};
 use web_time::Duration;
 
 use crate::{
-    components::{BackButton, InvokeSignature},
-    gateway::{self, escrow_pubkey, GatewayError, GatewayResult},
+    components::{BackButton, InfoIcon, InvokeSignature},
+    gateway::{self, escrow_pubkey, ore_token_account_address, GatewayError, GatewayResult},
     hooks::{
-        use_escrow, use_gateway,
+        use_gateway, use_proof,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
     },
 };
@@ -109,11 +114,10 @@ pub fn MinerToolbarTopUpOpen(escrow_balance: Resource<GatewayResult<u64>>) -> El
     }
 }
 
-#[component]
-pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>>) -> Element {
+pub fn CreateAccountPage() -> Element {
     let wallet_adapter = use_wallet_adapter();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
-    let mut escrow = use_escrow();
+    let mut proof = use_proof();
     let nav = use_navigator();
 
     let tx = use_resource(move || async move {
@@ -125,7 +129,7 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
                 let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
                 let amount = sol_to_lamports(TOP_UP_AMOUNT);
-                let ix_1 = ore_relayer_api::instruction::open_escrow(signer, signer);
+                let ix_1 = ore_api::instruction::open(signer, signer, signer);
                 // TODO This is commented out because users are currently manually signing (not escrow)
                 // let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                 //     &signer,
@@ -148,13 +152,9 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
 
     let _ = use_resource(move || async move {
         if let InvokeSignatureStatus::Done(_sig) = *invoke_signature_signal.read() {
-            if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
-                let gateway = use_gateway();
+            if let WalletAdapter::Connected(_signer) = *wallet_adapter.read() {
                 async_std::task::sleep(Duration::from_millis(2000)).await;
-                if let Ok(new_escrow) = gateway.get_escrow(signer).await {
-                    escrow.set(new_escrow);
-                    escrow_balance.restart();
-                }
+                proof.restart();
             }
         };
         ()
@@ -202,6 +202,126 @@ pub fn MinerToolbarCreateAccountOpen(escrow_balance: Resource<GatewayResult<u64>
                     target: "_blank",
                     class: "font-medium text-center py-2 text-sm text-gray-300 hover:underline",
                     "Help! I don't have any SOL."
+                }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn MigrateAccountPage(
+    proof: Resource<GatewayResult<Proof>>,
+    escrow: Resource<GatewayResult<Escrow>>,
+) -> Element {
+    let wallet_adapter = use_wallet_adapter();
+    let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
+    let nav = use_navigator();
+
+    let tx = use_resource(move || async move {
+        match *wallet_adapter.read() {
+            WalletAdapter::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
+            WalletAdapter::Connected(signer) => {
+                let gateway = use_gateway();
+                let price = gateway::get_recent_priority_fee_estimate(false).await;
+                let mut ixs = vec![];
+                ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(1_400_000));
+                ixs.push(ComputeBudgetInstruction::set_compute_unit_price(price));
+                let token_account_address = ore_token_account_address(signer);
+                if let Ok(Some(_)) = gateway.get_token_account(&token_account_address).await {
+                } else {
+                    ixs.push(create_associated_token_account(
+                        &signer,
+                        &signer,
+                        &ore_api::consts::MINT_ADDRESS,
+                        &spl_token::id(),
+                    ));
+                }
+                ixs.push(ore_relayer_api::instruction::migrate(
+                    signer, signer, signer,
+                ));
+                let blockhash = gateway.rpc.get_latest_blockhash().await?;
+                let msg = Message::new_with_blockhash(ixs.as_slice(), Some(&signer), &blockhash);
+                let tx = Transaction::new_unsigned(msg);
+                Ok(tx)
+            }
+        }
+    });
+
+    let _ = use_resource(move || async move {
+        if let InvokeSignatureStatus::Done(_sig) = *invoke_signature_signal.read() {
+            if let WalletAdapter::Connected(_signer) = *wallet_adapter.read() {
+                async_std::task::sleep(Duration::from_millis(2000)).await;
+                escrow.restart();
+                proof.restart();
+                // TODO Refresh
+            }
+        };
+        ()
+    });
+
+    rsx! {
+        div {
+            class: "flex flex-col h-full w-full grow gap-12 sm:gap-16 justify-between",
+            div {
+                class: "flex flex-col gap-4 -mt-3.5 mb-4",
+                BackButton {
+                    onclick: move |_| {
+                        nav.go_back()
+                    }
+                }
+                div {
+                    class: "flex flex-col gap-2",
+                    p {
+                        class: "text-3xl md:text-4xl lg:text-5xl font-bold",
+                        "Migrate account"
+                    }
+                    p {
+                        class: "text-lg",
+                        "Please migrate your account to our new system."
+                    }
+                    p {
+                        class: "text-sm text-gray-300",
+                        "An older version this website relied on infrastructure that has now been deprecated."
+                    }
+                }
+            }
+            div {
+                class: "flex flex-col gap-4 mb-auto",
+                div {
+                    class: "flex flex-row gap-2",
+                    InfoIcon {
+                        class: "w-5 h-5 shrink-0 mt-1"
+                    }
+                    p {
+                        class: "font-bold text-xl",
+                        "What's happening?"
+                    }
+                }
+                ul {
+                    class: "flex flex-col gap-2 list-disc px-4",
+                    li {
+                        "To prepare for new features such as mining pools, we have deprecated the transaction relayer system this website used to rely on."
+                    }
+                    li {
+                        "To continue mining, existing users must migrate to our new web-based mining system."
+                    }
+                    li {
+                        "This migration requires 1 transaction and can be completed in 5 seconds or less."
+                    }
+                    li {
+                        "All of your stake will be securely migrated to the new account automatically."
+                    }
+                }
+            }
+            div {
+                class: "flex flex-col gap-4",
+                if let Some(Ok(tx)) = tx.cloned() {
+                    InvokeSignature { tx: tx, signal: invoke_signature_signal, start_msg: "Migrate" }
+                } else {
+                    p {
+                        class: "font-medium text-center text-sm text-gray-300 hover:underline",
+                        "Loading..."
+                    }
                 }
             }
         }

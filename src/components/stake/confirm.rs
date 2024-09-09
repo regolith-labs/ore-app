@@ -35,7 +35,7 @@ pub fn StakeConfirm(amount: u64, step: Signal<StakeStep>) -> Element {
                 let token_account_address = ore_token_account_address(signer);
 
                 // Add transfer
-                ixs.push(ore_relayer_api::instruction::stake(
+                ixs.push(ore_api::instruction::stake(
                     signer,
                     token_account_address,
                     amount,

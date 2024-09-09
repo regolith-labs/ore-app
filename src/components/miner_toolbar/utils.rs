@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
-use ore_relayer_api::{consts::ESCROW, state::Escrow};
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use ore_api::state::Proof;
 
 use crate::{
     gateway::GatewayResult,
@@ -12,17 +11,11 @@ use crate::{
 
 pub async fn try_start_mining(
     miner: Signal<Miner>,
-    escrow: Signal<Escrow>,
+    proof: Proof,
     toolbar_state: &mut Signal<MinerToolbarState>,
 ) -> GatewayResult<()> {
     let gateway = use_gateway();
-    let authority = Pubkey::find_program_address(
-        &[ESCROW, escrow.read().authority.as_ref()],
-        &ore_relayer_api::id(),
-    )
-    .0;
 
-    let proof = gateway.get_proof(authority).await?;
     let clock = gateway.get_clock().await?;
     let cutoff_time = proof
         .last_hash_at

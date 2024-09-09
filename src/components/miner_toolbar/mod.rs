@@ -12,14 +12,13 @@ pub use error::*;
 pub use insufficient_sol::*;
 pub use layout::*;
 pub use not_started::*;
-use ore_relayer_api::state::Escrow;
 pub use utils::*;
 
 use dioxus::prelude::*;
 
 use crate::{
     hooks::{
-        use_escrow, use_gateway, use_miner, use_miner_toolbar_state,
+        use_miner, use_miner_toolbar_state,
         use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
         MinerStatus, ReadMinerToolbarState,
     },
@@ -31,28 +30,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
     let toolbar_state = use_miner_toolbar_state();
     let wallet_adapter = use_wallet_adapter();
     let miner = use_miner();
-    let gateway = use_gateway();
-    let mut escrow = use_escrow();
     let nav = use_navigator();
-
-    let _ = use_resource(move || {
-        let gateway = gateway.clone();
-        async move {
-            match *wallet_adapter.read() {
-                WalletAdapter::Disconnected => {
-                    escrow.set(Escrow::default());
-                }
-                WalletAdapter::Connected(pubkey) => {
-                    if let Ok(e) = gateway.get_escrow(pubkey).await {
-                        escrow.set(e);
-                    } else {
-                        escrow.set(Escrow::default());
-                    }
-                }
-            }
-            ()
-        }
-    });
 
     let class =
         "fixed transition-height transition-colors flex flex-row justify-between inset-x-0 bottom-0 drop-shadow-md";
