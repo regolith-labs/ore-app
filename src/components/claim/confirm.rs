@@ -13,7 +13,7 @@ use crate::{
     components::{BackButton, InvokeSignature, OreIcon},
     gateway::{self, ore_token_account_address},
     hooks::{
-        use_gateway, use_ore_balance,
+        use_escrow_proof, use_gateway, use_ore_balance,
         use_wallet_adapter::{use_wallet_adapter, InvokeSignatureStatus, WalletAdapter},
     },
 };
@@ -22,6 +22,7 @@ use super::ClaimStep;
 
 #[component]
 pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
+    let escrow_proof = use_escrow_proof();
     let mut ore_balance = use_ore_balance();
     let invoke_signature_signal = use_signal(|| InvokeSignatureStatus::Start);
     let wallet_adapter = use_wallet_adapter();
@@ -41,7 +42,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                 if let Ok(Some(_)) = gateway.get_token_account(&token_account_address).await {
                 } else {
                     ixs.remove(0);
-                    ixs.insert(0, ComputeBudgetInstruction::set_compute_unit_limit(125_000));
+                    ixs.insert(0, ComputeBudgetInstruction::set_compute_unit_limit(500_000));
                     ixs.push(create_associated_token_account(
                         &signer,
                         &signer,
@@ -50,12 +51,20 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                     ));
                 }
 
-                // Add transfer
-                ixs.push(ore_relayer_api::instruction::claim(
-                    signer,
-                    token_account_address,
-                    amount,
-                ));
+                // Add claim ix
+                if let Some(Ok(_)) = *escrow_proof.read() {
+                    ixs.push(ore_relayer_api::instruction::claim(
+                        signer,
+                        token_account_address,
+                        amount,
+                    ));
+                } else {
+                    ixs.push(ore_api::instruction::claim(
+                        signer,
+                        token_account_address,
+                        amount,
+                    ));
+                }
 
                 // Return tx
                 let mut tx = Transaction::new_with_payer(&ixs, Some(&signer));

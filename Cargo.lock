@@ -3766,7 +3766,7 @@ dependencies = [
  "drillx",
  "mpl-token-metadata",
  "num_enum 0.7.2",
- "ore-utils 2.1.9",
+ "ore-utils 2.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
@@ -3803,7 +3803,7 @@ dependencies = [
  "ore-program",
  "ore-relayer-api",
  "ore-types",
- "ore-utils 2.1.9",
+ "ore-utils 2.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "qrcode-generator",
  "rand 0.8.5",
  "reqwest",
@@ -3830,7 +3830,7 @@ dependencies = [
  "bytemuck",
  "const-crypto",
  "num_enum 0.7.2",
- "ore-utils 2.1.8",
+ "ore-utils 2.1.9",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
@@ -3858,15 +3858,15 @@ dependencies = [
 
 [[package]]
 name = "ore-relayer-api"
-version = "2.1.2"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a57ad347b32515669ebcbc0c5362c9414be0f9a32011f8e233ec4c9128899a1"
+checksum = "4dfa49defe74ce7208daf179e10763b670d742640716489ab1665dd79dd22265"
 dependencies = [
  "bytemuck",
  "mpl-token-metadata",
  "num_enum 0.7.2",
  "ore-api",
- "ore-utils 2.1.9",
+ "ore-utils 2.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
@@ -3888,7 +3888,7 @@ dependencies = [
 
 [[package]]
 name = "ore-utils"
-version = "2.1.8"
+version = "2.1.9"
 dependencies = [
  "bytemuck",
  "solana-program",
@@ -5069,7 +5069,7 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#5cb0c7d4804192a1ecb1686c18ceb4d8060a325a"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#2c6ca13b1303079743fdf72d52d3425f71a51c84"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -5089,7 +5089,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#5cb0c7d4804192a1ecb1686c18ceb4d8060a325a"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#2c6ca13b1303079743fdf72d52d3425f71a51c84"
 dependencies = [
  "Inflector",
  "arrayref",

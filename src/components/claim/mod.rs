@@ -8,7 +8,7 @@ use edit::*;
 
 use dioxus::prelude::*;
 
-use crate::hooks::use_proof;
+use crate::hooks::{use_escrow_proof, use_proof};
 
 pub enum ClaimStep {
     Edit,
@@ -18,17 +18,27 @@ pub enum ClaimStep {
 
 pub fn Claim() -> Element {
     let proof = use_proof();
+    let escrow_proof = use_escrow_proof();
     let claim_step = use_signal(|| ClaimStep::Edit);
     let amount_input = use_signal(|| "".to_string());
     let parsed_amount: u64 = match amount_input.read().parse::<f64>() {
         Ok(n) => (n * 10f64.powf(ore_api::consts::TOKEN_DECIMALS.into())) as u64,
         Err(_) => 0,
     };
-    let max_rewards = proof
+
+    // TODO Calc if escrow proof is present
+
+    let max_rewards = escrow_proof
         .read()
         .and_then(|p| p.ok())
         .map(|p| p.balance)
-        .unwrap_or_else(|| 0);
+        .unwrap_or_else(|| {
+            proof
+                .read()
+                .and_then(|p| p.ok())
+                .map(|p| p.balance)
+                .unwrap_or_else(|| 0)
+        });
 
     let e = match *claim_step.read() {
         ClaimStep::Edit => {

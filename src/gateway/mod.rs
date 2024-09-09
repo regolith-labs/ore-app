@@ -285,9 +285,14 @@ where
     for attempt in 0..MAX_RETRIES {
         match timeout(TIMEOUT, f()).await {
             Ok(Ok(result)) => return Ok(result),
-            Ok(Err(_e)) if attempt < MAX_RETRIES - 1 => {
-                async_std::task::sleep(backoff).await;
-                backoff *= 2; // Exponential backoff
+            Ok(Err(e)) if attempt < MAX_RETRIES - 1 => {
+                match e {
+                    GatewayError::AccountNotFound => return Err(e),
+                    _ => {
+                        async_std::task::sleep(backoff).await;
+                        backoff *= 2; // Exponential backoff
+                    }
+                }
             }
             Ok(Err(e)) => return Err(e),
             Err(_) if attempt < MAX_RETRIES - 1 => {
@@ -298,7 +303,7 @@ where
         }
     }
 
-    Err(GatewayError::RetryFailed)
+    Err(GatewayError::AccountNotFound)
 }
 
 #[cached]
