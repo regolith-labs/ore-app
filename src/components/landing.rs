@@ -169,7 +169,7 @@ fn Hero(title: String, subtitle: String) -> Element {
                         "{title}"
                     }
                     p {
-                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-hero font-medium",
+                        class: "text-left sm:text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-hero font-medium opacity-80",
                         "{subtitle}"
                     }
                 }
