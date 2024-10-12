@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BackButton, WarningIcon},
+    components::WarningIcon,
     hooks::{use_balance, UiTokenAmountBalance},
 };
 
@@ -14,8 +14,6 @@ pub fn StakeEdit(
     parsed_amount: u64,
     stake: Stake,
 ) -> Element {
-    let nav = navigator();
-
     let balance = use_balance(stake.mint, stake.decimals);
     let (max_amount, max_amount_str) = balance
         .cloned()
@@ -42,18 +40,11 @@ pub fn StakeEdit(
     rsx! {
         div {
             class: "flex flex-col h-full grow justify-between",
+            style: "margin-bottom: 50px;",
             div {
                 class: "flex flex-col gap-4 -mt-3.5 mb-4",
-                BackButton {
-                    onclick: move |_| {
-                        nav.go_back()
-                    }
-                }
                 div {
                     class: "flex flex-col gap-3",
-                    h2 {
-                        "Stake"
-                    }
                     p {
                         class: "text-lg",
                         "{title}"
