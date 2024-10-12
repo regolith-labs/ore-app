@@ -32,7 +32,8 @@ pub const API_URL: &str = "https://ore-api-lthm.onrender.com";
 
 // pub const RPC_URL: &str = "https://amaleta-5y8tse-fast-mainnet.helius-rpc.com"; // Mainnet
 
-pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
+// pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
+pub const RPC_URL: &str = "https://vocational-jayne-fast-devnet.helius-rpc.com";
 
 // const GATEWAY_RETRIES: usize = 128;
 const CONFIRM_RETRIES: usize = 20;

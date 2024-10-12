@@ -1,8 +1,29 @@
 use dioxus::prelude::*;
 
-use crate::{components::CheckCircleIcon, route::Route};
+use crate::{
+    components::CheckCircleIcon,
+    hooks::use_wallet_adapter::{use_wallet_adapter, WalletAdapter},
+    route::Route,
+};
 
-pub fn StakeDone() -> Element {
+use super::Stake;
+
+#[component]
+pub fn StakeDone(stake: Stake) -> Element {
+    // idempotent register in pool
+    let wallet_adapter = use_wallet_adapter();
+    let pool = crate::pool::Pool::new(reqwest::Client::new());
+    spawn(async move {
+        if let WalletAdapter::Connected(pubkey) = *wallet_adapter.read() {
+            if let Err(err) = pool.post_register(pubkey).await {
+                log::error!("{:?}", err);
+            }
+            if let Err(err) = pool.post_register_staker(pubkey, stake.mint).await {
+                log::error!("{:?}", err);
+            }
+        }
+    });
+    let action = format!("You have successfully stake your {}.", stake.name);
     rsx! {
         div {
             class: "flex flex-col grow justify-between",
@@ -13,9 +34,10 @@ pub fn StakeDone() -> Element {
                 }
                 p {
                     class: "text-lg",
-                    "You have successfully stake your ORE."
+                    "{action}"
                 }
                 p {
+                    // TODO: "it can take a few minutes for your stake to register (with the pool)."
                     class: "text-sm text-gray-300 dark:text-gray-700",
                     "This will give an extra multiplier on your mining rewards."
                 }

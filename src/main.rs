@@ -8,7 +8,9 @@ mod gateway;
 mod hooks;
 mod metrics;
 mod miner;
+mod pool;
 mod route;
+mod staker;
 mod utils;
 
 use crate::{

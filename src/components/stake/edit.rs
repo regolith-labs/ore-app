@@ -2,20 +2,21 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{BackButton, WarningIcon},
-    hooks::{use_ore_balance, UiTokenAmountBalance},
+    hooks::{use_balance, UiTokenAmountBalance},
 };
 
-use super::StakeStep;
+use super::{Stake, StakeStep};
 
 #[component]
 pub fn StakeEdit(
     step: Signal<StakeStep>,
     amount_input: Signal<String>,
     parsed_amount: u64,
+    stake: Stake,
 ) -> Element {
     let nav = navigator();
 
-    let balance = use_ore_balance();
+    let balance = use_balance(stake.mint, stake.decimals);
     let (max_amount, max_amount_str) = balance
         .cloned()
         .and_then(|b| b.ok())
@@ -31,6 +32,12 @@ pub fn StakeEdit(
     let is_disabled = amount_input.read().len().eq(&0)
         || amount_input.read().parse::<f64>().is_err()
         || error_text.is_some();
+
+    let title = format!("Stake {} with your miner.", stake.name);
+    let action = format!(
+        "This will transfer {} to your miner and increase your mining multiplier.",
+        stake.name
+    );
 
     rsx! {
         div {
@@ -49,11 +56,11 @@ pub fn StakeEdit(
                     }
                     p {
                         class: "text-lg",
-                        "Stake ORE with your miner."
+                        "{title}"
                     }
                     p {
                         class: "text-sm text-gray-300",
-                        "This will transfer ORE to your miner and increase your mining multiplier."
+                        "{action}"
                     }
                 }
             }
