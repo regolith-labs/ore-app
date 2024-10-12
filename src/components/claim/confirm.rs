@@ -59,11 +59,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
                         amount,
                     ));
                 } else {
-                    ixs.push(ore_api::instruction::claim(
-                        signer,
-                        token_account_address,
-                        amount,
-                    ));
+                    ixs.push(ore_api::sdk::claim(signer, token_account_address, amount));
                 }
 
                 // Return tx

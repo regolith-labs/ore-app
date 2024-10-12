@@ -182,12 +182,13 @@ pub async fn submit_solution(
     let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
     let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
     let mut ixs = vec![cu_limit_ix, cu_price_ix];
-    ixs.push(ore_api::instruction::auth(proof_pubkey(authority)));
-    ixs.push(ore_api::instruction::mine(
+    ixs.push(ore_api::sdk::auth(proof_pubkey(authority)));
+    ixs.push(ore_api::sdk::mine(
         authority,
         authority,
         find_bus(),
         solution,
+        vec![],
     ));
     let mut tx = Transaction::new_with_payer(&ixs, Some(&authority));
 

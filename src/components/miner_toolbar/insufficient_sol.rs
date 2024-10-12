@@ -129,7 +129,7 @@ pub fn CreateAccountPage() -> Element {
                 let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(500_000);
                 let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
                 let amount = sol_to_lamports(TOP_UP_AMOUNT);
-                let ix_1 = ore_api::instruction::open(signer, signer, signer);
+                let ix_1 = ore_api::sdk::open(signer, signer, signer);
                 // TODO This is commented out because users are currently manually signing (not escrow)
                 // let ix_2 = solana_client_wasm::solana_sdk::system_instruction::transfer(
                 //     &signer,

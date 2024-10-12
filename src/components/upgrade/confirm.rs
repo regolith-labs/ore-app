@@ -51,7 +51,7 @@ pub fn UpgradeConfirm(upgrade_step: Signal<UpgradeStep>, amount: u64) -> Element
                 // Build upgrade ix
                 let v1_token_account_address = ore_token_account_address_v1(signer);
                 let v2_token_account_address = ore_token_account_address(signer);
-                ixs.push(ore_api::instruction::upgrade(
+                ixs.push(ore_api::sdk::upgrade(
                     signer,
                     v2_token_account_address,
                     v1_token_account_address,

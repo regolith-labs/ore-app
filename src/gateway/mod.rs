@@ -11,7 +11,6 @@ use ore_api::{
 };
 use ore_relayer_api::state::Escrow;
 use ore_types::{response::ListTransfersResponse, Transfer};
-use ore_utils::AccountDeserialize;
 use solana_client_wasm::{
     solana_sdk::{clock::Clock, hash::Hash, pubkey::Pubkey, signature::Signature, sysvar},
     WasmClient,
@@ -21,6 +20,7 @@ use solana_extra_wasm::{
     program::spl_associated_token_account::get_associated_token_address,
     transaction_status::TransactionConfirmationStatus,
 };
+use steel::AccountDeserialize;
 use web_time::Duration;
 
 pub use pfee::*;
@@ -118,7 +118,11 @@ impl Gateway {
             .get_account_data(&escrow_pubkey(authority))
             .await
             .map_err(GatewayError::from)?;
-        Ok(*Escrow::try_from_bytes(&data).expect("Failed to parse escrow"))
+        let escrow = {
+            use ore_utils::AccountDeserialize;
+            *Escrow::try_from_bytes(&data).expect("Failed to parse escrow")
+        };
+        Ok(escrow)
     }
 
     pub async fn get_token_account(
