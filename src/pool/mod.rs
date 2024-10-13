@@ -4,8 +4,8 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::GatewayError;
 
-pub const POOL_ADDRESS: Pubkey = pubkey!("EhmsiF3QtepUfFGLiypTSXLRKURDQKZZmk2Y7Vhw9PSr");
-const POOL_URL: &str = "http://localhost:3000";
+pub const POOL_ADDRESS: Pubkey = pubkey!("9RrEyMNFhFcrqVikWby5rVn1eXeKHr2SwGRbPhZ7wDCK");
+const POOL_URL: &str = "https://official.ec1ipse.me";
 
 pub struct Pool {
     http_client: reqwest::Client,

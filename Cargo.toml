@@ -47,11 +47,11 @@ js-sys = { version = "0.3.67", optional = true }
 lazy_static = "1.4"
 log = "0.4.20"
 num-format = "0.4.4"
-ore-api = { path = "../ore/api" }
+ore-api = "2.2.0"
 ore-api-v1 = { package = "ore-program", version = "1.2" }
-ore-boost-api = { path = "../ore-boost/api" }
-ore-pool-api = { path = "../ore-pool/api" }
-ore-pool-types = { path = "../ore-pool/types" }
+ore-boost-api = "0.2.0"
+ore-pool-api = "0.1.0"
+ore-pool-types = "0.1.0"
 ore-relayer-api = "2.2.0"
 ore-utils = "2.1.8"
 ore-types = "0.0.9"

@@ -3757,24 +3757,6 @@ dependencies = [
 [[package]]
 name = "ore-api"
 version = "2.2.0"
-dependencies = [
- "array-const-fn-init",
- "bytemuck",
- "const-crypto",
- "drillx",
- "mpl-token-metadata",
- "num_enum 0.7.2",
- "solana-program",
- "spl-associated-token-account",
- "spl-token",
- "static_assertions",
- "steel",
- "thiserror",
-]
-
-[[package]]
-name = "ore-api"
-version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95419f2a52567607388137876912dc97f7eef964b3c556131987bf01ef925d9c"
 dependencies = [
@@ -3816,8 +3798,8 @@ dependencies = [
  "lazy_static",
  "log",
  "num-format",
- "ore-api 2.2.0",
- "ore-boost-api 0.2.0",
+ "ore-api",
+ "ore-boost-api",
  "ore-pool-api",
  "ore-pool-types",
  "ore-program",
@@ -3846,22 +3828,6 @@ dependencies = [
 [[package]]
 name = "ore-boost-api"
 version = "0.2.0"
-dependencies = [
- "array-const-fn-init",
- "bytemuck",
- "const-crypto",
- "num_enum 0.7.2",
- "solana-program",
- "spl-associated-token-account",
- "spl-token",
- "static_assertions",
- "steel",
- "thiserror",
-]
-
-[[package]]
-name = "ore-boost-api"
-version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c97f55b9d1a40a6b3044444c457acd70b983d31b7edd5c8459b8c616b080fecd"
 dependencies = [
@@ -3880,6 +3846,8 @@ dependencies = [
 [[package]]
 name = "ore-pool-api"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ea50286b875552bb90a9167718c2739e9d134780b582e48150ebbd4efbbe5162"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -3887,8 +3855,8 @@ dependencies = [
  "drillx",
  "mpl-token-metadata",
  "num_enum 0.7.2",
- "ore-api 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "ore-boost-api 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ore-api",
+ "ore-boost-api",
  "solana-program",
  "spl-associated-token-account",
  "spl-token",
@@ -3900,6 +3868,8 @@ dependencies = [
 [[package]]
 name = "ore-pool-types"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1df6b6ec69e85f02b55d366c078883b35ceecacda262a8d8be74ad43d364162"
 dependencies = [
  "drillx",
  "serde",
@@ -3933,7 +3903,7 @@ dependencies = [
  "bytemuck",
  "mpl-token-metadata",
  "num_enum 0.7.2",
- "ore-api 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ore-api",
  "ore-utils",
  "solana-program",
  "spl-associated-token-account",

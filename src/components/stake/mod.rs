@@ -107,15 +107,15 @@ pub fn Stake() -> Element {
             rsx! {
                 StakeConfirm {
                     step,
-                    amount: parsed_amount_isc,
-                    stake: stake_isc,
+                    amount: parsed_amount_ore,
+                    stake: stake_ore,
                 }
             }
         }
         StakeStep::Done => {
             rsx! {
                 StakeDone {
-                    stake: stake_isc
+                    stake: stake_ore
                 }
             }
         }
