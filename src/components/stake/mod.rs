@@ -29,26 +29,13 @@ pub struct Stake {
 
 pub fn Stake() -> Element {
     let nav = navigator();
+    // step signal
     let step = use_signal(|| StakeStep::Edit);
-    let amount_input_ore = use_signal(|| "".to_string());
-    let amount_input_isc = use_signal(|| "".to_string());
-    let amount_input_usdc = use_signal(|| "".to_string());
-    let parsed_amount_ore: u64 = match amount_input_ore.read().parse::<f64>() {
-        Ok(n) => (n * 10f64.powf(ore_api::consts::TOKEN_DECIMALS.into())) as u64,
-        Err(_) => 0,
-    };
-    let parsed_amount_isc: u64 = match amount_input_isc.read().parse::<f64>() {
-        Ok(n) => (n * 10f64.powf(ore_api::consts::TOKEN_DECIMALS.into())) as u64,
-        Err(_) => 0,
-    };
-    let parsed_amount_usdc: u64 = match amount_input_usdc.read().parse::<f64>() {
-        Ok(n) => (n * 10f64.powf(ore_api::consts::TOKEN_DECIMALS.into())) as u64,
-        Err(_) => 0,
-    };
+    // stake
     let stake_ore = Stake {
         mint: ore_api::consts::MINT_ADDRESS,
         decimals: ore_api::consts::TOKEN_DECIMALS,
-        name: "ISC LP".to_string(),
+        name: "ORE".to_string(),
     };
     let stake_isc = Stake {
         mint: ISC_LP_MINT,
@@ -59,6 +46,23 @@ pub fn Stake() -> Element {
         mint: ISC_LP_MINT,
         decimals: ISC_LP_MINT_DECIMALS,
         name: "USDC LP".to_string(),
+    };
+    // amount input
+    let amount_input_ore = use_signal(|| "".to_string());
+    let amount_input_isc = use_signal(|| "".to_string());
+    let amount_input_usdc = use_signal(|| "".to_string());
+    // parsed amounts
+    let parsed_amount_ore: u64 = match amount_input_ore.read().parse::<f64>() {
+        Ok(n) => (n * 10f64.powf(stake_ore.decimals.into())) as u64,
+        Err(_) => 0,
+    };
+    let parsed_amount_isc: u64 = match amount_input_isc.read().parse::<f64>() {
+        Ok(n) => (n * 10f64.powf(stake_isc.decimals.into())) as u64,
+        Err(_) => 0,
+    };
+    let parsed_amount_usdc: u64 = match amount_input_usdc.read().parse::<f64>() {
+        Ok(n) => (n * 10f64.powf(stake_usdc.decimals.into())) as u64,
+        Err(_) => 0,
     };
 
     let e = match *step.read() {
