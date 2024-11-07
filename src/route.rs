@@ -4,7 +4,7 @@ use crate::components::NavbarLayout;
 use crate::pages::*;
 
 #[rustfmt::skip]
-#[derive(Routable, Clone,PartialEq, Eq)]
+#[derive(Routable, Clone, PartialEq, Eq)]
 pub enum Route {
     #[route("/")]
     Landing {},
