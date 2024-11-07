@@ -1,13 +1,9 @@
 use base64::Engine;
 use dioxus::prelude::*;
-use ore_api::consts::{TOKEN_DECIMALS, TOKEN_DECIMALS_V1};
 use solana_client_wasm::solana_sdk::{
     pubkey::Pubkey, signature::Signature, transaction::Transaction,
 };
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
-
-use crate::gateway::{ore_token_account_address, ore_token_account_address_v1};
-use crate::hooks::UiTokenAmountDefault;
 
 use super::use_gateway;
 
@@ -33,41 +29,6 @@ pub fn use_wallet_adapter_provider() {
             }
         }
     });
-}
-
-// we only have one resource per hook
-// until we update to latest dioxus from git
-// so will have to pack many future here
-// in a big result if we want more reactive async data
-pub fn use_ore_balances() -> Resource<Option<Balances>> {
-    let gateway = use_gateway();
-    let signal = use_wallet_adapter();
-    use_resource(move || {
-        let gateway = gateway.clone();
-        async move {
-            match *signal.read() {
-                WalletAdapter::Connected(pubkey) => {
-                    let token_account_address_v1 = ore_token_account_address_v1(pubkey);
-                    let token_account_address_v2 = ore_token_account_address(pubkey);
-                    let balance_v1 = gateway
-                        .rpc
-                        .get_token_account_balance(&token_account_address_v1)
-                        .await
-                        .unwrap_or(UiTokenAmount::default(TOKEN_DECIMALS_V1));
-                    let balance_v2 = gateway
-                        .rpc
-                        .get_token_account_balance(&token_account_address_v2)
-                        .await
-                        .unwrap_or(UiTokenAmount::default(TOKEN_DECIMALS));
-                    Some(Balances {
-                        v1: balance_v1,
-                        _v2: balance_v2,
-                    })
-                }
-                WalletAdapter::Disconnected => None,
-            }
-        }
-    })
 }
 
 pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatus>) {
@@ -150,12 +111,6 @@ pub enum InvokeSignatureStatus {
     DoneWithError,
     Timeout,
     Done(Signature),
-}
-
-#[derive(Clone)]
-pub struct Balances {
-    pub v1: UiTokenAmount,
-    pub _v2: UiTokenAmount,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]

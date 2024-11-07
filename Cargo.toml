@@ -13,6 +13,9 @@ keywords = ["solana", "crypto", "mining"]
 [features]
 default = ["web"]
 bundle = []
+desktop = [
+  "solana-sdk"
+]
 web = [
   "gloo",
   "gloo-storage",
@@ -61,7 +64,7 @@ serde-wasm-bindgen = { version = "0.6.3", optional = true }
 serde_json = "1.0"
 solana-client-wasm = { version = "1.18", optional = true }
 solana-extra-wasm = { version = "1.18", optional = true }
-solana-sdk = "1.18"
+solana-sdk = { version = "1.18", optional = true }
 url = "2.5.0"
 wasm-bindgen = { version = "0.2.91", optional = true }
 wasm-bindgen-futures = { version = "0.4.41", optional = true }

@@ -1,19 +1,19 @@
 use async_std::future::TimeoutError;
-use solana_client_wasm::{solana_sdk::program_error::ProgramError, ClientError};
+use solana_client_wasm::ClientError;
+
+use crate::steel_app::solana::sdk::program_error::ProgramError;
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GatewayError {
     FailedDeserialization,
-    FailedAta,
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
     RetryFailed,
     TimeoutError,
     SignatureDenied,
-    // SimulationFailed,
     RequestFailed,
     ProgramBuilderFailed,
     WalletAdapterDisconnected,

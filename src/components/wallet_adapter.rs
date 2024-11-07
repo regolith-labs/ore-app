@@ -1,19 +1,17 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 
+use crate::components::icons::CheckCircleIcon;
 use crate::components::WarningIcon;
-use crate::components::{icons::CheckCircleIcon, Appearance, Spinner};
-use crate::hooks::{use_appearance, use_wallet_adapter, use_wallet_adapter::InvokeSignatureStatus};
+use crate::hooks::{use_wallet_adapter, use_wallet_adapter::InvokeSignatureStatus};
 
 #[component]
 pub fn MountWalletAdapter() -> Element {
-    let appearance = use_appearance();
     let wallet_adapter = use_wallet_adapter::use_wallet_adapter();
     let button_color = match *wallet_adapter.read() {
-        use_wallet_adapter::WalletAdapter::Connected(_) => match *appearance.read() {
-            Appearance::Light => "text-black hover:bg-gray-100 active:bg-gray-200",
-            Appearance::Dark => "text-white hover:bg-gray-900 active:bg-gray-800",
-        },
+        use_wallet_adapter::WalletAdapter::Connected(_) => {
+            "text-white hover:bg-gray-900 active:bg-gray-800"
+        }
         use_wallet_adapter::WalletAdapter::Disconnected => {
             "text-white bg-green-500 hover:bg-green-600 active:bg-green-700"
         }
@@ -88,7 +86,7 @@ pub fn InvokeSignature(
                         button {
                             class: "{button_class}",
                             disabled: true,
-                            Spinner { class: "mx-auto" }
+                            // Spinner { class: "mx-auto" }
                         }
                     }
                 }

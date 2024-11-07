@@ -3,12 +3,6 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-// TODO StopMiner
-// TODO SetPowerLevel
-// TODO SetAppearance
-// TODO SetExplorer
-// TODO ExportKey
-// TODO DownloadApp
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum AppEvent {
     Mine,
