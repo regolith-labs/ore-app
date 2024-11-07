@@ -1,18 +1,15 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 
-use crate::components::icons::CheckCircleIcon;
-use crate::components::WarningIcon;
-use crate::hooks::{use_wallet_adapter, use_wallet_adapter::InvokeSignatureStatus};
+use crate::components::{CheckCircleIcon, WarningIcon};
+use crate::hooks::{invoke_signature, use_wallet_status, InvokeSignatureStatus, WalletStatus};
 
 #[component]
-pub fn MountWalletAdapter() -> Element {
-    let wallet_adapter = use_wallet_adapter::use_wallet_adapter();
+pub fn WalletAdapter() -> Element {
+    let wallet_adapter = use_wallet_status();
     let button_color = match *wallet_adapter.read() {
-        use_wallet_adapter::WalletAdapter::Connected(_) => {
-            "text-white hover:bg-gray-900 active:bg-gray-800"
-        }
-        use_wallet_adapter::WalletAdapter::Disconnected => {
+        WalletStatus::Connected(_) => "text-white hover:bg-gray-900 active:bg-gray-800",
+        WalletStatus::Disconnected => {
             "text-white bg-green-500 hover:bg-green-600 active:bg-green-700"
         }
     };
@@ -75,7 +72,7 @@ pub fn InvokeSignature(
                         button {
                             class: "{button_class}",
                             onclick: move |_| {
-                                use_wallet_adapter::invoke_signature(tx.clone(), signal);
+                                invoke_signature(tx.clone(), signal);
                             },
                             "{start_msg}"
                         }
@@ -97,7 +94,7 @@ pub fn InvokeSignature(
                         button {
                             class: "{button_class}",
                             onclick: move |_| {
-                                use_wallet_adapter::invoke_signature(tx.clone(), signal);
+                                invoke_signature(tx.clone(), signal);
                             },
                             "Retry"
                         }

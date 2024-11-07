@@ -2,6 +2,7 @@
 mod components;
 mod gateway;
 mod hooks;
+mod pages;
 mod route;
 mod steel_app;
 mod utils;
@@ -10,7 +11,7 @@ use dioxus::prelude::*;
 use tracing::Level;
 
 use crate::{
-    hooks::{use_explorer_provider, use_wallet_adapter::use_wallet_adapter_provider},
+    hooks::{use_explorer_provider, use_wallet_status_provider},
     route::Route,
 };
 
@@ -30,7 +31,7 @@ fn main() {
 pub fn App() -> Element {
     // Global variables
     use_explorer_provider();
-    use_wallet_adapter_provider();
+    use_wallet_status_provider();
 
     // Render
     rsx! {

@@ -1,13 +1,20 @@
 use dioxus::prelude::*;
 
-use crate::components::{Home, PageNotFound};
+use crate::pages::*;
 
 #[rustfmt::skip]
 #[derive(Routable, Clone)]
 pub enum Route {
-    #[route("/home")]
-    Home {},
+    #[route("/")]
+    Landing {},
+
+    #[route("/mine")]
+    Mine {},
+    #[route("/stake")]
+    Stake {},
+    #[route("/trade")]
+    Trade {},
 
     #[route("/:.._route")]
-    PageNotFound { _route: Vec<String> }
+    NotFound { _route: Vec<String> }
 }

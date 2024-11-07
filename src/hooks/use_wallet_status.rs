@@ -3,16 +3,15 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::{
     pubkey::Pubkey, signature::Signature, transaction::Transaction,
 };
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use super::use_gateway;
 
-pub fn use_wallet_adapter() -> Signal<WalletAdapter> {
-    use_context::<Signal<WalletAdapter>>()
+pub fn use_wallet_status() -> Signal<WalletStatus> {
+    use_context::<Signal<WalletStatus>>()
 }
 
-pub fn use_wallet_adapter_provider() {
-    let mut signal = use_context_provider(|| Signal::new(WalletAdapter::Disconnected));
+pub fn use_wallet_status_provider() {
+    let mut signal = use_context_provider(|| Signal::new(WalletStatus::Disconnected));
     let mut eval = eval(
         r#"
             window.addEventListener("ore-pubkey", (event) => {
@@ -24,8 +23,8 @@ pub fn use_wallet_adapter_provider() {
         while let Ok(json_val) = eval.recv().await {
             let pubkey_result: Result<Pubkey, serde_json::Error> = serde_json::from_value(json_val);
             match pubkey_result {
-                Ok(pubkey) => signal.set(WalletAdapter::Connected(pubkey)),
-                Err(_) => signal.set(WalletAdapter::Disconnected),
+                Ok(pubkey) => signal.set(WalletStatus::Connected(pubkey)),
+                Err(_) => signal.set(WalletStatus::Disconnected),
             }
         }
     });
@@ -114,7 +113,7 @@ pub enum InvokeSignatureStatus {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum WalletAdapter {
+pub enum WalletStatus {
     Connected(Pubkey),
     Disconnected,
 }
