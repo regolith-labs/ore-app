@@ -1,24 +1,31 @@
 use dioxus::prelude::*;
 
-use crate::{components::WalletAdapter, route::Route};
+use crate::{
+    components::{OreWordmarkIcon, WalletAdapter},
+    route::Route,
+};
 
-pub fn NavbarLayout() -> Element {
+pub fn NavBarLayout() -> Element {
     rsx! {
         div {
             class: "flex flex-col w-screen h-full",
-            Navbar {}
+            NavBar {}
+            MobileTabBar {}
             Outlet::<Route> {}
         }
     }
 }
 
-fn Navbar() -> Element {
+fn NavBar() -> Element {
     rsx! {
         div {
-            class: "flex flex-row gap-16 w-full",
-            Logo {}
-            Tabs {}
-            WalletAdapter {}
+            class: "flex w-screen h-20 px-5 sm:px-8",
+            div {
+                class: "flex flex-row justify-end sm:justify-between w-full my-auto",
+                Logo {}
+                TabBar {}
+                WalletAdapter {}
+            }
         }
     }
 }
@@ -26,16 +33,19 @@ fn Navbar() -> Element {
 fn Logo() -> Element {
     rsx! {
         Link {
+            class: "hidden sm:flex my-auto",
             to: Route::Landing {},
-            "ORE"
+            OreWordmarkIcon {
+                class: "h-5"
+            }
         }
     }
 }
 
-fn Tabs() -> Element {
+fn TabBar() -> Element {
     rsx! {
         div {
-            class: "flex flex-row w-full gap-8",
+            class: "hidden sm:flex flex-row h-full",
             Tab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -62,9 +72,58 @@ fn Tab(title: String, route: Route) -> Element {
     };
     rsx! {
         Link {
-            class: "{opacity}",
+            class: "flex px-8 h-10",
             to: route,
-            "{title}"
+            span {
+                class: "text-sm font-medium my-auto {opacity}",
+                "{title}"
+            }
+        }
+    }
+}
+
+fn MobileTabBar() -> Element {
+    rsx! {
+        div {
+            class: "flex flex-row fixed bottom-0 w-full block sm:hidden",
+            MobileTab {
+                title: "Mine",
+                route: Route::Mine {}
+            }
+            MobileTab {
+                title: "Stake",
+                route: Route::Stake {}
+            }
+            MobileTab {
+                title: "Trade",
+                route: Route::Trade {}
+            }
+        }
+    }
+}
+
+#[component]
+fn MobileTab(title: String, route: Route) -> Element {
+    let current_route: Route = use_route();
+    let opacity = if route != current_route {
+        "opacity-50"
+    } else {
+        ""
+    };
+    rsx! {
+        Link {
+            class: "flex h-20 w-full",
+            to: route,
+            span {
+                class: "flex flex-col gap-1 mx-auto my-auto {opacity}",
+                span {
+                    class: "h-8 w-8 mx-auto bg-black"
+                }
+                span {
+                    class: "mx-auto text-xs",
+                    "{title}"
+                }
+            }
         }
     }
 }

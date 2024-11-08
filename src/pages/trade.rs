@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::steel_app::solana::sdk::pubkey::Pubkey;
 
 pub fn Trade() -> Element {
-    let listed_assets = [Asset {
+    let _listed_assets = [Asset {
         mint: Pubkey::new_from_array([0; 32]),
         name: "Solana".to_owned(),
         ticker: "SOL".to_owned(),
@@ -15,11 +15,11 @@ pub fn Trade() -> Element {
         div {
             class: "flex flex-col",
             "Trade"
-            for asset in listed_assets {
-                AssetRow {
-                    asset: asset
-                }
-            }
+            // for asset in listed_assets {
+            //     AssetRow {
+            //         asset: asset
+            //     }
+            // }
         }
     }
 }

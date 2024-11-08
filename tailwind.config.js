@@ -33,13 +33,10 @@ module.exports = {
     }),
     extend: {
       fontFamily: {
-        mono: ['GeistMono', 'ui-monospace', 'monospace'],
-        sans: ['Geist', 'ui-sans-serif', 'system-ui'],
+        mono: ['ui-monospace', 'monospace'],
+        sans: ['ui-sans-serif', 'system-ui'],
         serif: ['ui-serif'],
-        hero: ['RoobertTRIAL', 'ui-sans-serif', 'system-ui']
-      },
-      transitionProperty: {
-        'height': 'height'
+        hero: ['ui-sans-serif', 'system-ui']
       },
     },
   },
