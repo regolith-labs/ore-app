@@ -9,6 +9,11 @@ pub mod solana {
         pub use solana_client_wasm::solana_sdk::*;
     }
 
+    #[cfg(feature = "web")]
+    pub mod program {
+        pub use solana_extra_wasm::program::*;
+    }
+
     pub mod account_decoder {
         #[cfg(feature = "web")]
         pub use solana_extra_wasm::account_decoder::*;

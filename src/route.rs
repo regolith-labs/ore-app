@@ -1,15 +1,17 @@
 use dioxus::prelude::*;
 
-use crate::components::Navigation;
+use crate::components::{AppNavigation, LandingNavigation};
 use crate::pages::*;
 
 #[rustfmt::skip]
 #[derive(Routable, Clone, PartialEq, Eq)]
 pub enum Route {
-    #[route("/")]
-    Landing {},
+    #[layout(LandingNavigation)]
+        #[route("/")]
+        Landing {},
+    #[end_layout]
 
-    #[layout(Navigation)]
+    #[layout(AppNavigation)]
         #[route("/mine")]
         Mine {},
         #[route("/stake")]

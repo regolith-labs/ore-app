@@ -3,11 +3,9 @@ mod error;
 mod ore_program;
 mod priority_fee;
 mod retry;
+mod token;
 
-use crate::steel_app::solana::{
-    account_decoder::parse_token::UiTokenAccount,
-    sdk::{clock::Clock, hash::Hash, pubkey::Pubkey, sysvar},
-};
+use crate::steel_app::solana::sdk::{clock::Clock, hash::Hash, sysvar};
 pub use error::*;
 
 use retry::retry;
@@ -42,19 +40,6 @@ impl Gateway {
         retry(|| async {
             self.rpc
                 .get_latest_blockhash()
-                .await
-                .map_err(GatewayError::from)
-        })
-        .await
-    }
-
-    pub async fn get_token_account(
-        &self,
-        pubkey: &Pubkey,
-    ) -> GatewayResult<Option<UiTokenAccount>> {
-        retry(|| async {
-            self.rpc
-                .get_token_account(pubkey)
                 .await
                 .map_err(GatewayError::from)
         })

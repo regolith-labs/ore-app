@@ -5,26 +5,52 @@ use crate::{
     route::Route,
 };
 
-pub fn Navigation() -> Element {
+pub fn AppNavigation() -> Element {
     rsx! {
         div {
-            class: "flex flex-col w-screen h-full",
-            NavBar {}
+            class: "flex flex-col w-screen h-full gap-5 sm:gap-8",
+            AppNavBar {}
             MobileTabBar {}
             Outlet::<Route> {}
         }
     }
 }
 
-fn NavBar() -> Element {
+pub fn LandingNavigation() -> Element {
+    rsx! {
+        div {
+            class: "flex flex-col w-screen h-full",
+            LandingNavBar {}
+            Outlet::<Route> {}
+        }
+    }
+}
+
+fn AppNavBar() -> Element {
     rsx! {
         div {
             class: "flex w-screen h-20 px-5 sm:px-8",
             div {
                 class: "flex flex-row justify-end sm:justify-between w-full my-auto",
-                Logo {}
+                span {
+                    class: "hidden sm:flex my-auto",
+                    Logo {}
+                }
                 TabBar {}
                 WalletAdapter {}
+            }
+        }
+    }
+}
+
+fn LandingNavBar() -> Element {
+    rsx! {
+        div {
+            class: "flex w-screen h-20 px-5 sm:px-8",
+            div {
+                class: "flex flex-row justify-between w-full my-auto",
+                Logo {}
+                div {}
             }
         }
     }
@@ -33,7 +59,7 @@ fn NavBar() -> Element {
 fn Logo() -> Element {
     rsx! {
         Link {
-            class: "hidden sm:flex my-auto",
+            class: "my-auto",
             to: Route::Landing {},
             OreWordmarkIcon {
                 class: "h-5"

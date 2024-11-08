@@ -1,18 +1,11 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::transaction::Transaction;
 
-use crate::components::{CheckCircleIcon, WarningIcon};
+use crate::components::{CarrotDownIcon, CheckCircleIcon, WarningIcon};
 use crate::hooks::{invoke_signature, use_wallet_status, InvokeSignatureStatus, WalletStatus};
+use crate::steel_app::solana::sdk::{pubkey::Pubkey, transaction::Transaction};
 
-#[component]
 pub fn WalletAdapter() -> Element {
-    let wallet_adapter = use_wallet_status();
-    let button_color = match *wallet_adapter.read() {
-        WalletStatus::Connected(_) => "text-white hover:bg-gray-900 active:bg-gray-800",
-        WalletStatus::Disconnected => {
-            "text-white bg-green-500 hover:bg-green-600 active:bg-green-700"
-        }
-    };
+    let wallet_status = use_wallet_status();
 
     let _ = use_future(move || async move {
         let eval = eval(
@@ -24,11 +17,44 @@ pub fn WalletAdapter() -> Element {
         let _ = eval.await;
     });
 
+    match wallet_status.cloned() {
+        WalletStatus::Connected(address) => {
+            rsx! {
+                ConnectedWalletAdapter {
+                    address: address
+                }
+            }
+        }
+        WalletStatus::Disconnected => {
+            rsx! {
+                div {
+                    class: "rounded-full transition-colors my-auto h-8 sm:h-10 text-black bg-white",
+                    nav {
+                        id: "ore-wallet-adapter"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// TODO Disconnect options
+
+#[component]
+fn ConnectedWalletAdapter(address: Pubkey) -> Element {
+    let len = address.to_string().len();
+    let first_four = &address.to_string()[0..4];
+    let last_four = &address.to_string()[len - 4..len];
+
     rsx! {
         div {
-            class: "rounded-full transition-colors my-auto h-8 sm:h-10 {button_color}",
-            nav {
-                id: "ore-wallet-adapter"
+            class: "flex flex-row gap-2 elevated rounded-full text-sm font-semibold h-8 sm:h-10 px-4 transition hover:cursor-pointer hover:bg-gray-800",
+            span {
+                class: "mx-auto my-auto",
+                "{first_four}...{last_four}"
+            }
+            CarrotDownIcon {
+                class: "w-3 text-gray-700"
             }
         }
     }
