@@ -24,7 +24,7 @@ pub fn QrCodeIcon(class: Option<String>) -> Element {
         svg {
             fill: "none",
             view_box: "0 0 24 24",
-            stroke_width: "2",
+            stroke_width: "1.5",
             stroke: "currentColor",
             class: "{class}",
             path {
