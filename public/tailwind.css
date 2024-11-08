@@ -44,7 +44,7 @@ html {
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: ui-sans-serif, system-ui;
+  font-family: Pilat, ui-sans-serif, system-ui;
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -422,6 +422,13 @@ video {
   display: none;
 }
 
+body {
+  --tw-bg-opacity: 1;
+  background-color: rgb(15 14 17 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(250 250 250 / var(--tw-text-opacity));
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -522,6 +529,14 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
+.elevated {
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(39 37 43 / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgb(21 20 25 / var(--tw-bg-opacity));
+}
+
 .static {
   position: static;
 }
@@ -548,10 +563,6 @@ video {
   margin-left: auto;
 }
 
-.block {
-  display: block;
-}
-
 .flex {
   display: flex;
 }
@@ -562,6 +573,10 @@ video {
 
 .hidden {
   display: none;
+}
+
+.h-10 {
+  height: 2.5rem;
 }
 
 .h-16 {
@@ -590,22 +605,6 @@ video {
 
 .h-full {
   height: 100%;
-}
-
-.h-32 {
-  height: 8rem;
-}
-
-.h-6 {
-  height: 1.5rem;
-}
-
-.h-10 {
-  height: 2.5rem;
-}
-
-.h-4 {
-  height: 1rem;
 }
 
 .w-16 {
@@ -661,10 +660,6 @@ video {
   justify-content: flex-end;
 }
 
-.justify-between {
-  justify-content: space-between;
-}
-
 .gap-1 {
   gap: 0.25rem;
 }
@@ -681,6 +676,10 @@ video {
   gap: 2rem;
 }
 
+.overflow-clip {
+  overflow: clip;
+}
+
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -695,20 +694,6 @@ video {
   border-radius: 9999px;
 }
 
-.border-b {
-  border-bottom-width: 1px;
-}
-
-.border-b-black {
-  --tw-border-opacity: 1;
-  border-bottom-color: rgb(19 20 22 / var(--tw-border-opacity));
-}
-
-.bg-black {
-  --tw-bg-opacity: 1;
-  background-color: rgb(19 20 22 / var(--tw-bg-opacity));
-}
-
 .bg-green-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(10 207 134 / var(--tw-bg-opacity));
@@ -719,14 +704,14 @@ video {
   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
 }
 
-.bg-blue-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
-}
-
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 .px-8 {
@@ -744,16 +729,6 @@ video {
   padding-bottom: 0.75rem;
 }
 
-.px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
 .text-center {
   text-align: center;
 }
@@ -768,21 +743,22 @@ video {
   line-height: 1rem;
 }
 
-.font-semibold {
-  font-weight: 600;
-}
-
 .font-medium {
   font-weight: 500;
 }
 
-.text-white {
-  --tw-text-opacity: 1;
-  color: rgb(245 245 247 / var(--tw-text-opacity));
+.font-semibold {
+  font-weight: 600;
 }
 
-.opacity-50 {
-  opacity: 0.5;
+.text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(112 112 112 / var(--tw-text-opacity));
+}
+
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(250 250 250 / var(--tw-text-opacity));
 }
 
 .transition-colors {
@@ -791,297 +767,122 @@ video {
   transition-duration: 150ms;
 }
 
-/* @font-face { */
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
 
-/* font-family: 'RoobertTRIAL'; */
+@font-face {
+  font-family: 'Pilat';
 
-/* src: url('/fonts/RoobertTRIAL-Light.otf') format('opentype'); */
+  src: url('/fonts/Pilat/Pilat-Light.otf') format('opentype');
 
-/* font-weight: 300; */
+  font-weight: 300;
 
-/* font-style: normal; */
+  font-style: normal;
+}
 
-/* } */
+@font-face {
+  font-family: 'Pilat';
 
-/* @font-face { */
+  src: url('/fonts/Pilat/Pilat-Regular.otf') format('opentype');
 
-/* font-family: 'RoobertTRIAL'; */
+  font-weight: 400;
 
-/* src: url('/fonts/RoobertTRIAL-Regular.otf') format('opentype'); */
+  font-style: normal;
+}
 
-/* font-weight: 400; */
+@font-face {
+  font-family: 'Pilat';
 
-/* font-style: normal; */
+  src: url('/fonts/Pilat/Pilat-Book.otf') format('opentype');
 
-/* } */
+  font-weight: 500;
 
-/* @font-face { */
+  font-style: normal;
+}
 
-/* font-family: 'RoobertTRIAL'; */
+@font-face {
+  font-family: 'Pilat';
 
-/* src: url('/fonts/RoobertTRIAL-Medium.otf') format('opentype'); */
+  src: url('/fonts/Pilat/Pilat-Demi.otf') format('opentype');
 
-/* font-weight: 500; */
+  font-weight: 600;
 
-/* font-style: normal; */
+  font-style: normal;
+}
 
-/* } */
+@font-face {
+  font-family: 'Pilat';
 
-/* @font-face { */
+  src: url('/fonts/Pilat/Pilat-Bold.otf') format('opentype');
 
-/* font-family: 'RoobertTRIAL'; */
+  font-weight: 700;
 
-/* src: url('/fonts/RoobertTRIAL-SemiBold.otf') format('opentype'); */
+  font-style: normal;
+}
 
-/* font-weight: 600; */
+@font-face {
+  font-family: 'PilatWide';
 
-/* font-style: normal; */
+  src: url('/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
 
-/* } */
+  font-weight: 300;
 
-/* @font-face { */
+  font-style: normal;
+}
 
-/* font-family: 'RoobertTRIAL'; */
+@font-face {
+  font-family: 'PilatWide';
 
-/* src: url('/fonts/RoobertTRIAL-Bold.otf') format('opentype'); */
+  src: url('/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
 
-/* font-weight: 700; */
+  font-weight: 400;
 
-/* font-style: normal; */
+  font-style: normal;
+}
 
-/* } */
+@font-face {
+  font-family: 'PilatWide';
 
-/* @font-face { */
+  src: url('/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
 
-/* font-family: 'RoobertTRIAL'; */
+  font-weight: 500;
 
-/* src: url('/fonts/RoobertTRIAL-Heavy.otf') format('opentype'); */
+  font-style: normal;
+}
 
-/* font-weight: 800; */
+@font-face {
+  font-family: 'PilatWide';
 
-/* font-style: normal; */
+  src: url('/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
 
-/* } */
+  font-weight: 600;
 
-/* @font-face { */
+  font-style: normal;
+}
 
-/* font-family: 'Geist'; */
+@font-face {
+  font-family: 'PilatWide';
 
-/* src: url('/fonts/Geist-Thin.otf') format('opentype'); */
+  src: url('/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
 
-/* font-weight: 100; */
+  font-weight: 700;
 
-/* font-style: normal; */
+  font-style: normal;
+}
 
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-UltraLight.otf') format('opentype'); */
-
-/* font-weight: 200; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-Light.otf') format('opentype'); */
-
-/* font-weight: 300; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-Regular.otf') format('opentype'); */
-
-/* font-weight: 400; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-Medium.otf') format('opentype'); */
-
-/* font-weight: 500; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-SemiBold.otf') format('opentype'); */
-
-/* font-weight: 600; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-Bold.otf') format('opentype'); */
-
-/* font-weight: 700; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-Black.otf') format('opentype'); */
-
-/* font-weight: 800; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'Geist'; */
-
-/* src: url('/fonts/Geist-UltraBlack.otf') format('opentype'); */
-
-/* font-weight: 900; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-Thin.otf') format('opentype'); */
-
-/* font-weight: 100; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-UltraLight.otf') format('opentype'); */
-
-/* font-weight: 200; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-Light.otf') format('opentype'); */
-
-/* font-weight: 300; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-Regular.otf') format('opentype'); */
-
-/* font-weight: 400; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-Medium.otf') format('opentype'); */
-
-/* font-weight: 500; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-SemiBold.otf') format('opentype'); */
-
-/* font-weight: 600; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-Bold.otf') format('opentype'); */
-
-/* font-weight: 700; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-Black.otf') format('opentype'); */
-
-/* font-weight: 800; */
-
-/* font-style: normal; */
-
-/* } */
-
-/* @font-face { */
-
-/* font-family: 'GeistMono'; */
-
-/* src: url('/fonts/GeistMono-UltraBlack.otf') format('opentype'); */
-
-/* font-weight: 900; */
-
-/* font-style: normal; */
-
-/* } */
+.hover\:bg-gray-800:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 37 43 / var(--tw-bg-opacity));
+}
 
 .hover\:bg-gray-900:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(49 49 51 / var(--tw-bg-opacity));
+  background-color: rgb(21 20 25 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-green-600:hover {
@@ -1091,7 +892,7 @@ video {
 
 .active\:bg-gray-800:active {
   --tw-bg-opacity: 1;
-  background-color: rgb(70 70 72 / var(--tw-bg-opacity));
+  background-color: rgb(39 37 43 / var(--tw-bg-opacity));
 }
 
 .active\:bg-green-700:active {
@@ -1105,14 +906,6 @@ video {
 }
 
 @media (min-width: 640px) {
-  .sm\:block {
-    display: block;
-  }
-
-  .sm\:inline {
-    display: inline;
-  }
-
   .sm\:flex {
     display: flex;
   }
@@ -1125,10 +918,6 @@ video {
     height: 2.5rem;
   }
 
-  .sm\:h-5 {
-    height: 1.25rem;
-  }
-
   .sm\:justify-between {
     justify-content: space-between;
   }
@@ -1138,4 +927,3 @@ video {
     padding-right: 2rem;
   }
 }
-

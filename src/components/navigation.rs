@@ -1,11 +1,11 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{OreWordmarkIcon, WalletAdapter},
+    components::{GlobeIcon, OreWordmarkIcon, WalletAdapter},
     route::Route,
 };
 
-pub fn NavBarLayout() -> Element {
+pub fn Navigation() -> Element {
     rsx! {
         div {
             class: "flex flex-col w-screen h-full",
@@ -45,7 +45,7 @@ fn Logo() -> Element {
 fn TabBar() -> Element {
     rsx! {
         div {
-            class: "hidden sm:flex flex-row h-full",
+            class: "hidden sm:flex flex-row h-full rounded-full elevated overflow-clip",
             Tab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -64,18 +64,18 @@ fn TabBar() -> Element {
 
 #[component]
 fn Tab(title: String, route: Route) -> Element {
-    let current_route: Route = use_route();
-    let opacity = if route != current_route {
-        "opacity-50"
+    let current_route = use_route();
+    let color = if route != current_route {
+        "text-gray-700"
     } else {
         ""
     };
     rsx! {
         Link {
-            class: "flex px-8 h-10",
+            class: "flex px-8 h-10 transition hover:bg-gray-800",
             to: route,
             span {
-                class: "text-sm font-medium my-auto {opacity}",
+                class: "text-sm font-medium my-auto font-semibold {color}",
                 "{title}"
             }
         }
@@ -85,7 +85,7 @@ fn Tab(title: String, route: Route) -> Element {
 fn MobileTabBar() -> Element {
     rsx! {
         div {
-            class: "flex flex-row fixed bottom-0 w-full block sm:hidden",
+            class: "sm:hidden flex flex-row fixed bottom-0 w-full elevated",
             MobileTab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -104,9 +104,9 @@ fn MobileTabBar() -> Element {
 
 #[component]
 fn MobileTab(title: String, route: Route) -> Element {
-    let current_route: Route = use_route();
-    let opacity = if route != current_route {
-        "opacity-50"
+    let current_route = use_route();
+    let color = if route != current_route {
+        "text-gray-700"
     } else {
         ""
     };
@@ -115,12 +115,12 @@ fn MobileTab(title: String, route: Route) -> Element {
             class: "flex h-20 w-full",
             to: route,
             span {
-                class: "flex flex-col gap-1 mx-auto my-auto {opacity}",
-                span {
-                    class: "h-8 w-8 mx-auto bg-black"
+                class: "flex flex-col gap-1 mx-auto my-auto {color}",
+                GlobeIcon {
+                    class: "h-8 w-8 mx-auto"
                 }
                 span {
-                    class: "mx-auto text-xs",
+                    class: "mx-auto font-medium text-xs",
                     "{title}"
                 }
             }

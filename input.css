@@ -2,163 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {}
-
-@layer components {
-  .loading {
-    @apply bg-gray-100 dark:bg-gray-900 animate-pulse;
-  }
-  .top-safe {
-    top: 0;
-    padding-top: env(safe-area-inset-top);
-  }
+@layer base {
+    body {
+        @apply bg-black text-white;  
+    }
 }
 
-/* @font-face { */
-    /* font-family: 'RoobertTRIAL'; */
-    /* src: url('/fonts/RoobertTRIAL-Light.otf') format('opentype'); */
-    /* font-weight: 300; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'RoobertTRIAL'; */
-    /* src: url('/fonts/RoobertTRIAL-Regular.otf') format('opentype'); */
-    /* font-weight: 400; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'RoobertTRIAL'; */
-    /* src: url('/fonts/RoobertTRIAL-Medium.otf') format('opentype'); */
-    /* font-weight: 500; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'RoobertTRIAL'; */
-    /* src: url('/fonts/RoobertTRIAL-SemiBold.otf') format('opentype'); */
-    /* font-weight: 600; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'RoobertTRIAL'; */
-    /* src: url('/fonts/RoobertTRIAL-Bold.otf') format('opentype'); */
-    /* font-weight: 700; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'RoobertTRIAL'; */
-    /* src: url('/fonts/RoobertTRIAL-Heavy.otf') format('opentype'); */
-    /* font-weight: 800; */
-    /* font-style: normal; */
-/* } */
+@layer components {
+    .loading {
+        @apply bg-gray-100 dark:bg-gray-900 animate-pulse;
+    }
 
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-Thin.otf') format('opentype'); */
-    /* font-weight: 100; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-UltraLight.otf') format('opentype'); */
-    /* font-weight: 200; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-Light.otf') format('opentype'); */
-    /* font-weight: 300; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-Regular.otf') format('opentype'); */
-    /* font-weight: 400; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-Medium.otf') format('opentype'); */
-    /* font-weight: 500; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-SemiBold.otf') format('opentype'); */
-    /* font-weight: 600; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-Bold.otf') format('opentype'); */
-    /* font-weight: 700; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-Black.otf') format('opentype'); */
-    /* font-weight: 800; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'Geist'; */
-    /* src: url('/fonts/Geist-UltraBlack.otf') format('opentype'); */
-    /* font-weight: 900; */
-    /* font-style: normal; */
-/* } */
+    .elevated {
+        @apply bg-gray-900 border border-gray-800;
+    }
+  
+    .top-safe {
+        top: 0;
+        padding-top: env(safe-area-inset-top);
+    }
+}
 
+@font-face {
+    font-family: 'Pilat';
+    src: url('/fonts/Pilat/Pilat-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Pilat';
+    src: url('/fonts/Pilat/Pilat-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Pilat';
+    src: url('/fonts/Pilat/Pilat-Book.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Pilat';
+    src: url('/fonts/Pilat/Pilat-Demi.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Pilat';
+    src: url('/fonts/Pilat/Pilat-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
 
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-Thin.otf') format('opentype'); */
-    /* font-weight: 100; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-UltraLight.otf') format('opentype'); */
-    /* font-weight: 200; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-Light.otf') format('opentype'); */
-    /* font-weight: 300; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-Regular.otf') format('opentype'); */
-    /* font-weight: 400; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-Medium.otf') format('opentype'); */
-    /* font-weight: 500; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-SemiBold.otf') format('opentype'); */
-    /* font-weight: 600; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-Bold.otf') format('opentype'); */
-    /* font-weight: 700; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-Black.otf') format('opentype'); */
-    /* font-weight: 800; */
-    /* font-style: normal; */
-/* } */
-/* @font-face { */
-    /* font-family: 'GeistMono'; */
-    /* src: url('/fonts/GeistMono-UltraBlack.otf') format('opentype'); */
-    /* font-weight: 900; */
-    /* font-style: normal; */
-/* } */
-
+@font-face {
+    font-family: 'PilatWide';
+    src: url('/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'PilatWide';
+    src: url('/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'PilatWide';
+    src: url('/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'PilatWide';
+    src: url('/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'PilatWide';
+    src: url('/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}

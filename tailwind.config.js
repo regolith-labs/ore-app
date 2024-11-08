@@ -13,8 +13,8 @@ module.exports = {
     colors: ({ colors }) => ({
       ...colors,
       transparent: colors.transparent,
-      white: '#f5f5f7',
-      black: '#131416',
+      white: '#FAFAFA',
+      black: '#0F0E11',
       green: {
         400: '#5EDCA7',
         500: '#0acf86',
@@ -26,17 +26,17 @@ module.exports = {
         100: '#e8e8ea',
         200: '#d6d6d8',
         300: '#b0b0b2',
-        700: '#707071',
-        800: '#464648',
-        900: '#313133',
+        700: '#707070',
+        800: '#27252B',
+        900: '#151419',
       },
     }),
     extend: {
       fontFamily: {
         mono: ['ui-monospace', 'monospace'],
-        sans: ['ui-sans-serif', 'system-ui'],
+        sans: ['Pilat', 'ui-sans-serif', 'system-ui'],
         serif: ['ui-serif'],
-        hero: ['ui-sans-serif', 'system-ui']
+        wide: ['PilatWide', 'ui-sans-serif', 'system-ui']
       },
     },
   },

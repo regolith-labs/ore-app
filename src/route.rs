@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::NavBarLayout;
+use crate::components::Navigation;
 use crate::pages::*;
 
 #[rustfmt::skip]
@@ -9,7 +9,7 @@ pub enum Route {
     #[route("/")]
     Landing {},
 
-    #[layout(NavBarLayout)]
+    #[layout(Navigation)]
         #[route("/mine")]
         Mine {},
         #[route("/stake")]

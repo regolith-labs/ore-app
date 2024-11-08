@@ -1,9 +1,9 @@
 mod icons;
-mod navbar;
+mod navigation;
 #[cfg(feature = "web")]
 mod wallet_adapter;
 
 pub use icons::*;
-pub use navbar::*;
+pub use navigation::*;
 #[cfg(feature = "web")]
 pub use wallet_adapter::*;
