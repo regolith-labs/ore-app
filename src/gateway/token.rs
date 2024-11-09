@@ -22,11 +22,19 @@ impl Gateway {
         .await
     }
 
-    pub async fn get_ore_balance(&self, owner: &Pubkey) -> GatewayResult<UiTokenAmount> {
-        let ata_address = get_associated_token_address(owner, &MINT_ADDRESS);
+    pub async fn get_token_balance(
+        &self,
+        owner: &Pubkey,
+        mint: &Pubkey,
+    ) -> GatewayResult<UiTokenAmount> {
+        let ata_address = get_associated_token_address(owner, &mint);
         let Some(token_account) = self.get_token_account(&ata_address).await? else {
             return Err(GatewayError::AccountNotFound.into());
         };
         Ok(token_account.token_amount)
+    }
+
+    pub async fn get_ore_balance(&self, owner: &Pubkey) -> GatewayResult<UiTokenAmount> {
+        self.get_token_balance(owner, &MINT_ADDRESS).await
     }
 }

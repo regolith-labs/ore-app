@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::{OreIcon, QrCodeIcon},
     gateway::GatewayResult,
-    hooks::use_ore_balance,
+    hooks::{use_ore_balance, use_token_balance},
     route::Route,
     steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey},
 };
@@ -11,7 +11,7 @@ use crate::{
 pub fn Trade() -> Element {
     rsx! {
         div {
-            class: "flex flex-col gap-8 w-screen",
+            class: "flex flex-col gap-8 w-screen pb-28 sm:pb-16",
             Balance {}
             AssetTable {}
         }
@@ -126,30 +126,41 @@ fn AssetTable() -> Element {
             name: "Solana".to_owned(),
             ticker: "SOL".to_owned(),
             description: "".to_owned(),
-            icon: "".to_owned(),
+            image: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png".to_owned(),
+        },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "International Stable Currency".to_owned(),
+            ticker: "USDC".to_owned(),
+            description: "".to_owned(),
+            image: "https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png"
+                .to_owned(),
         },
         Asset {
             mint: Pubkey::new_from_array([0; 32]),
             name: "International Stable Currency".to_owned(),
             ticker: "ISC".to_owned(),
             description: "".to_owned(),
-            icon: "".to_owned(),
+            image: "https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png"
+                .to_owned(),
         },
         Asset {
             mint: Pubkey::new_from_array([0; 32]),
             name: "Mobile".to_owned(),
             ticker: "MOBILE".to_owned(),
             description: "".to_owned(),
-            icon: "".to_owned(),
+            image: "https://shdw-drive.genesysgo.net/6tcnBSybPG7piEDShBcrVtYJDPSvGrDbVvXmXKpzBvWP/mobile.png".to_owned(),
         },
         Asset {
             mint: Pubkey::new_from_array([0; 32]),
-            name: "Render".to_owned(),
-            ticker: "RNDR".to_owned(),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
             description: "".to_owned(),
-            icon: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
         },
     ];
+
+    // TODO Sort by token balances
 
     rsx! {
         div {
@@ -182,6 +193,7 @@ fn AssetTableHeader() -> Element {
 
 #[component]
 fn AssetRow(asset: Asset) -> Element {
+    let balance = use_token_balance(asset.mint);
     // TODO Fetch balance
     // TODO Fetch price
     // TODO Fetch 24h change
@@ -191,8 +203,9 @@ fn AssetRow(asset: Asset) -> Element {
             class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
             div {
                 class: "flex flex-row gap-4",
-                div {
-                    class: "w-12 h-12 my-auto bg-gray-700 rounded-full",
+                img {
+                    class: "w-9 h-9 my-auto bg-gray-900 rounded-full",
+                    src: "{asset.image}"
                 }
                 div {
                     class: "flex flex-col",
@@ -245,5 +258,5 @@ struct Asset {
     name: String,
     ticker: String,
     description: String,
-    icon: String,
+    image: String,
 }

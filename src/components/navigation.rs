@@ -91,11 +91,16 @@ fn TabBar() -> Element {
 #[component]
 fn Tab(title: String, route: Route) -> Element {
     let current_route = use_route();
-    let color = if route != current_route {
-        "text-gray-700"
-    } else {
-        ""
+    let selected = match route {
+        Route::Mine {} => current_route == route,
+        Route::Stake {} => current_route == route,
+        Route::Trade {} => match current_route {
+            Route::Trade {} | Route::Asset { asset: _ } => true,
+            _ => false,
+        },
+        _ => false,
     };
+    let color = if !selected { "text-gray-700" } else { "" };
     rsx! {
         Link {
             class: "flex px-8 h-10 transition hover:bg-gray-800",
@@ -130,12 +135,17 @@ fn MobileTabBar() -> Element {
 
 #[component]
 fn MobileTab(title: String, route: Route) -> Element {
-    let current_route = use_route();
-    let color = if route != current_route {
-        "text-gray-700"
-    } else {
-        ""
+    let current_route: Route = use_route();
+    let selected = match route {
+        Route::Mine {} => current_route == route,
+        Route::Stake {} => current_route == route,
+        Route::Trade {} => match current_route {
+            Route::Trade {} | Route::Asset { asset: _ } => true,
+            _ => false,
+        },
+        _ => false,
     };
+    let color = if !selected { "text-gray-700" } else { "" };
     rsx! {
         Link {
             class: "flex h-20 w-full",

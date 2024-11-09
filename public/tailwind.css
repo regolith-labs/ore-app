@@ -883,6 +883,14 @@ body {
   padding-right: 0.75rem;
 }
 
+.pb-24 {
+  padding-bottom: 6rem;
+}
+
+.pb-28 {
+  padding-bottom: 7rem;
+}
+
 .text-center {
   text-align: center;
 }
@@ -1177,5 +1185,9 @@ body {
   .sm\:px-3 {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
+  }
+
+  .sm\:pb-16 {
+    padding-bottom: 4rem;
   }
 }
