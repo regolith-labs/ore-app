@@ -1,9 +1,11 @@
+mod asset;
 mod landing;
 mod mine;
 mod not_found;
 mod stake;
 mod trade;
 
+pub use asset::*;
 pub use landing::*;
 pub use mine::*;
 pub use not_found::*;

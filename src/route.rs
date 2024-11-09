@@ -18,7 +18,10 @@ pub enum Route {
         Stake {},
         #[route("/trade")]
         Trade {},
+        #[route("/trade/:asset")]
+        Asset { asset: String },
     #[end_layout]
+
 
     #[route("/:.._route")]
     NotFound { _route: Vec<String> }
