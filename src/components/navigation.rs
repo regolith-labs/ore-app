@@ -8,10 +8,13 @@ use crate::{
 pub fn AppNavigation() -> Element {
     rsx! {
         div {
-            class: "flex flex-col w-screen h-full gap-5 sm:gap-8",
+            class: "flex flex-col w-screen h-full",
             AppNavBar {}
             MobileTabBar {}
-            Outlet::<Route> {}
+            span {
+                class: "py-5 sm:py-8",
+                Outlet::<Route> {}
+            }
         }
     }
 }
@@ -27,17 +30,28 @@ pub fn LandingNavigation() -> Element {
 }
 
 fn AppNavBar() -> Element {
+    let route: Route = use_route();
+    let visible = match route {
+        Route::Mine {} | Route::Stake {} | Route::Trade {} => "flex",
+        _ => "hidden sm:flex",
+    };
     rsx! {
         div {
-            class: "flex w-screen h-20 px-5 sm:px-8",
+            class: "{visible} sticky top-0 w-screen h-16 sm:h-20 px-5 sm:px-8 bg-black",
             div {
-                class: "flex flex-row justify-end sm:justify-between w-full my-auto",
+                class: "flex flex-row justify-between w-full my-auto",
                 span {
                     class: "hidden sm:flex my-auto",
                     Logo {}
                 }
+                div {
+                    class: "flex sm:hidden"
+                }
                 TabBar {}
                 WalletAdapter {}
+                div {
+                    class: "flex sm:hidden"
+                }
             }
         }
     }
@@ -148,12 +162,12 @@ fn MobileTab(title: String, route: Route) -> Element {
     let color = if !selected { "text-gray-700" } else { "" };
     rsx! {
         Link {
-            class: "flex h-20 w-full",
+            class: "flex h-16 w-full",
             to: route,
             span {
                 class: "flex flex-col gap-1 mx-auto my-auto {color}",
                 GlobeIcon {
-                    class: "h-8 w-8 mx-auto"
+                    class: "h-6 w-6 mx-auto"
                 }
                 span {
                     class: "mx-auto font-medium text-xs",

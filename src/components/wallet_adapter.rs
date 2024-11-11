@@ -28,7 +28,7 @@ pub fn WalletAdapter() -> Element {
         WalletStatus::Disconnected => {
             rsx! {
                 div {
-                    class: "rounded-full transition-colors my-auto h-8 sm:h-10 text-black bg-white",
+                    class: "rounded-full transition-colors my-auto h-10 text-black bg-white",
                     nav {
                         id: "ore-wallet-adapter"
                     }
@@ -48,7 +48,7 @@ fn ConnectedWalletAdapter(address: Pubkey) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-row gap-2 elevated rounded-full text-sm font-semibold h-8 sm:h-10 px-4 transition hover:cursor-pointer hover:bg-gray-800",
+            class: "flex flex-row gap-2 elevated rounded-full text-sm font-semibold h-10 px-4 transition hover:cursor-pointer hover:bg-gray-800",
             span {
                 class: "mx-auto my-auto",
                 "{first_four}...{last_four}"

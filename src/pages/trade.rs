@@ -11,7 +11,7 @@ use crate::{
 pub fn Trade() -> Element {
     rsx! {
         div {
-            class: "flex flex-col gap-8 w-screen pb-28 sm:pb-16",
+            class: "flex flex-col gap-8 w-screen pb-20 sm:pb-16",
             Balance {}
             AssetTable {}
         }
@@ -22,9 +22,9 @@ fn Balance() -> Element {
     let balance = use_ore_balance();
     rsx! {
         div {
-            class: "flex flex-col gap-4 mx-5 sm:mx-8",
+            class: "flex flex-col gap-2 sm:gap-4 mx-5 sm:mx-8",
             span {
-                class: "font-wide font-semibold text-lg",
+                class: "font-medium text-xs sm:text-sm text-gray-700",
                 "Balance"
             }
             div {
@@ -85,18 +85,18 @@ fn OreValue(ui_amount_string: String) -> Element {
     let small_units = units[1];
     rsx! {
         div {
-            class: "flex flex-row gap-3 h-10 w-min",
+            class: "flex flex-row gap-2 sm:gap-3 h-10 w-min",
             OreIcon {
-                class: "h-9 w-9 my-auto"
+                class: "h-6 w-6 sm:h-7 sm:w-7 my-auto"
             }
             div {
                 class: "flex flex-row my-auto",
                 span {
-                    class: "mt-auto font-wide font-semibold text-4xl",
+                    class: "mt-auto font-wide font-semibold text-2xl sm:text-3xl",
                     "{big_units}"
                 }
                 span {
-                    class: "mt-auto font-wide font-semibold text-3xl text-gray-700",
+                    class: "mt-auto font-wide font-semibold text-xl sm:text-2xl text-gray-700",
                     ".{small_units}"
                 }
             }
@@ -158,6 +158,55 @@ fn AssetTable() -> Element {
             description: "".to_owned(),
             image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
         },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
+            description: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
+        },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
+            description: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
+        },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
+            description: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
+        },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
+            description: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
+        },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
+            description: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
+        },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
+            description: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
+        },
+        Asset {
+            mint: Pubkey::new_from_array([0; 32]),
+            name: "Honey".to_owned(),
+            ticker: "HONEY".to_owned(),
+            description: "".to_owned(),
+            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
+        },
     ];
 
     // TODO Sort by token balances
@@ -178,7 +227,7 @@ fn AssetTable() -> Element {
 fn AssetTableHeader() -> Element {
     rsx! {
         div {
-            class: "flex flex-row h-10 px-5 sm:px-3 justify-between font-medium text-sm text-gray-700",
+            class: "flex flex-row h-8 sm:h-10 px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
             span {
                 class: "my-auto",
                 "Asset"
@@ -200,21 +249,21 @@ fn AssetRow(asset: Asset) -> Element {
     rsx! {
         Link {
             to: Route::Asset { asset: asset.ticker.clone() },
-            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
+            class: "flex flex-row w-full pr-5 pl-4 sm:pr-3 sm:pl-2 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
             div {
                 class: "flex flex-row gap-4",
                 img {
-                    class: "w-9 h-9 my-auto bg-gray-900 rounded-full",
+                    class: "w-8 h-8 my-auto bg-gray-900 rounded-full",
                     src: "{asset.image}"
                 }
                 div {
                     class: "flex flex-col",
                     span {
-                        class: "font-wide font-semibold text-lg",
+                        class: "font-medium",
                         "{asset.ticker}"
                     }
                     span {
-                        class: "text-gray-700",
+                        class: "font-medium text-gray-700 text-sm",
                         "0.00"
                     }
                 }
@@ -225,7 +274,7 @@ fn AssetRow(asset: Asset) -> Element {
                     ui_amount_string: "1.20245"
                 }
                 span {
-                    class: "text-green-500",
+                    class: "font-medium text-green-500 text-sm",
                     "0.2%"
                 }
             }
@@ -237,14 +286,14 @@ fn AssetRow(asset: Asset) -> Element {
 fn OreValueSmall(ui_amount_string: String) -> Element {
     rsx! {
         div {
-            class: "flex flex-row gap-2 w-min",
+            class: "flex flex-row gap-1.5 w-min",
             OreIcon {
-                class: "h-5 w-5 my-auto"
+                class: "h-3.5 w-3.5 my-auto"
             }
             div {
-                class: "flex flex-row my-auto",
+                class: "flex flex-row font-medium my-auto",
                 span {
-                    class: "mt-auto font-wide font-semibold text-lg",
+                    class: "mt-auto",
                     "{ui_amount_string}"
                 }
             }
