@@ -1,5 +1,11 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use solana_client_wasm::solana_sdk::{
+    lamports,
+    native_token::{lamports_to_sol, LAMPORTS_PER_SOL},
+    pubkey::Pubkey,
+};
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::gateway::{GatewayError, GatewayResult};
@@ -24,10 +30,30 @@ pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>>
     use_resource(move || async move {
         match *wallet_status.read() {
             WalletStatus::Disconnected => Err(GatewayError::AccountNotFound.into()),
-            WalletStatus::Connected(pubkey) => use_gateway()
-                .get_token_balance(&pubkey, &mint)
-                .await
-                .map_err(GatewayError::from),
+            WalletStatus::Connected(pubkey) => {
+                if mint == Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap()
+                {
+                    use_gateway()
+                        .rpc
+                        .get_balance(&pubkey)
+                        .await
+                        .map(|lamports| {
+                            let sol = lamports_to_sol(lamports);
+                            UiTokenAmount {
+                                ui_amount: Some(sol),
+                                decimals: 8,
+                                amount: format!("{}", lamports).to_owned(),
+                                ui_amount_string: format!("{}", sol).to_owned(),
+                            }
+                        })
+                        .map_err(GatewayError::from)
+                } else {
+                    use_gateway()
+                        .get_token_balance(&pubkey, &mint)
+                        .await
+                        .map_err(GatewayError::from)
+                }
+            }
         }
     })
 }

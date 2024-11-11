@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
 
 use crate::{
@@ -85,9 +87,9 @@ fn OreValue(ui_amount_string: String) -> Element {
     let small_units = units[1];
     rsx! {
         div {
-            class: "flex flex-row gap-2 sm:gap-3 h-10 w-min",
+            class: "flex flex-row gap-2.5 sm:gap-3 h-10 w-min",
             OreIcon {
-                class: "h-6 w-6 sm:h-7 sm:w-7 my-auto"
+                class: "h-7 w-7 sm:h-8 sm:w-8 my-auto"
             }
             div {
                 class: "flex flex-row my-auto",
@@ -122,86 +124,37 @@ fn AssetTable() -> Element {
     // TODO Read from config file
     let listed_assets = [
         Asset {
-            mint: Pubkey::new_from_array([0; 32]),
+            mint: Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap(),
             name: "Solana".to_owned(),
             ticker: "SOL".to_owned(),
             description: "".to_owned(),
             image: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png".to_owned(),
         },
         Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "International Stable Currency".to_owned(),
+            mint: Pubkey::from_str("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v").unwrap(),
+            name: "USDC".to_owned(),
             ticker: "USDC".to_owned(),
             description: "".to_owned(),
             image: "https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png"
                 .to_owned(),
         },
         Asset {
-            mint: Pubkey::new_from_array([0; 32]),
+            mint: Pubkey::from_str("J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD").unwrap(),
             name: "International Stable Currency".to_owned(),
             ticker: "ISC".to_owned(),
             description: "".to_owned(),
             image: "https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png"
                 .to_owned(),
         },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
+        Asset {           
+            mint: Pubkey::from_str("mb1eu7TzEc71KxDpsmsKoucSSuuoGLv1drys1oP2jh6").unwrap(),
             name: "Mobile".to_owned(),
             ticker: "MOBILE".to_owned(),
             description: "".to_owned(),
             image: "https://shdw-drive.genesysgo.net/6tcnBSybPG7piEDShBcrVtYJDPSvGrDbVvXmXKpzBvWP/mobile.png".to_owned(),
         },
         Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::new_from_array([0; 32]),
+            mint: Pubkey::from_str("4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy").unwrap(),
             name: "Honey".to_owned(),
             ticker: "HONEY".to_owned(),
             description: "".to_owned(),
@@ -227,10 +180,10 @@ fn AssetTable() -> Element {
 fn AssetTableHeader() -> Element {
     rsx! {
         div {
-            class: "flex flex-row h-8 sm:h-10 px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
+            class: "flex flex-row h-8 h-10 px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
             span {
                 class: "my-auto",
-                "Asset"
+                "Market"
             }
             span {
                 class: "my-auto",
@@ -243,13 +196,14 @@ fn AssetTableHeader() -> Element {
 #[component]
 fn AssetRow(asset: Asset) -> Element {
     let balance = use_token_balance(asset.mint);
+    log::info!("Balance: {:?}", balance);
     // TODO Fetch balance
     // TODO Fetch price
     // TODO Fetch 24h change
     rsx! {
         Link {
             to: Route::Asset { asset: asset.ticker.clone() },
-            class: "flex flex-row w-full pr-5 pl-4 sm:pr-3 sm:pl-2 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
+            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
             div {
                 class: "flex flex-row gap-4",
                 img {
@@ -263,8 +217,18 @@ fn AssetRow(asset: Asset) -> Element {
                         "{asset.ticker}"
                     }
                     span {
-                        class: "font-medium text-gray-700 text-sm",
-                        "0.00"
+                        class: "font-medium text-gray-700 h-5 text-sm",
+                        match balance.cloned() {
+                            None => rsx! {
+                                div { class: "h-5 w-20 loading rounded"}
+                            },
+                            Some(balance) => {
+                                match balance {
+                                    Err(_) => rsx!{ "0.00" },
+                                    Ok(b) => rsx!{ "{b.ui_amount_string}" },
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -28,6 +28,7 @@ impl Gateway {
         mint: &Pubkey,
     ) -> GatewayResult<UiTokenAmount> {
         let ata_address = get_associated_token_address(owner, &mint);
+        log::info!("Owner: {} Mint: {} Ata: {}", owner, mint, ata_address);
         let Some(token_account) = self.get_token_account(&ata_address).await? else {
             return Err(GatewayError::AccountNotFound.into());
         };
