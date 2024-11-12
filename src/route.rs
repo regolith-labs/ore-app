@@ -14,12 +14,20 @@ pub enum Route {
     #[layout(AppNavigation)]
         #[route("/mine")]
         Mine {},
+        #[route("/mine/:pool")]
+        Pool { pool: String },
         #[route("/stake")]
         Stake {},
         #[route("/trade")]
         Trade {},
         #[route("/trade/:asset")]
         Asset { asset: String },
+        #[route("/deposit")]
+        Deposit {},
+        #[route("/swap")]
+        Swap {},
+        #[route("/pay")]
+        Pay {},
     #[end_layout]
 
 

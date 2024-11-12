@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 
 use crate::{
-    components::{OreIcon, OreValue, QrCodeIcon, TradeIcon},
+    components::{OreValue, OreValueSmall, QrCodeIcon, SwapIcon},
     gateway::GatewayResult,
     hooks::{use_ore_balance, use_quote, use_token_balance},
     route::Route,
@@ -15,9 +15,12 @@ pub fn Trade() -> Element {
         div {
             class: "flex flex-col gap-8 w-screen pb-20 sm:pb-16",
             span {
-                class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 font-wide text-2xl font-semibold",
-                "Trade"
-                TradeButton {}
+                class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
+                span {
+                    class: "align-text-bottom my-auto",
+                    "Trade"
+                }
+                SwapButton {}
             }
             Balance {}
             AssetTable {}
@@ -54,10 +57,10 @@ fn Balance() -> Element {
                 }
                 div {
                     class: "flex flex-row gap-4",
-                    QrButton {}
+                    PayButton {}
                     span {
                         class: "hidden sm:flex",
-                        TradeButton {}
+                        SwapButton {}
                     }
                 }
             }
@@ -92,28 +95,23 @@ fn OreBalance(balance: GatewayResult<UiTokenAmount>) -> Element {
     }
 }
 
-
-fn TradeButton() -> Element {
+fn SwapButton() -> Element {
     rsx! {
-        button {
-            class: "flex h-10 w-10 rounded-md transition text-black bg-white",
-            onclick: move |_| {
-                // TODO Send/receive modal
-            },
-            TradeIcon {
+        Link {
+            to: Route::Swap {},
+            class: "controls-square controls-primary",
+            SwapIcon {
                 class: "h-5 w-5 mx-auto my-auto"
             }
         }
     }
 }
 
-fn QrButton() -> Element {
+fn PayButton() -> Element {
     rsx! {
-        button {
-            class: "flex h-10 w-10 rounded-md transition text-gray-200 bg-gray-900 hover:bg-gray-800 hover:text-white",
-            onclick: move |_| {
-                // TODO Send/receive modal
-            },
+        Link {
+            to: Route::Pay {},
+            class: "controls-square controls-secondary",
             QrCodeIcon {
                 class: "h-6 w-6 mx-auto my-auto"
             }
@@ -246,24 +244,6 @@ fn AssetRow(asset: Asset) -> Element {
     }
 }
 
-#[component]
-fn OreValueSmall(ui_amount_string: String) -> Element {
-    rsx! {
-        div {
-            class: "flex flex-row gap-1.5 w-min",
-            OreIcon {
-                class: "h-3.5 w-3.5 my-auto"
-            }
-            div {
-                class: "flex flex-row font-medium my-auto",
-                span {
-                    class: "mt-auto",
-                    "{ui_amount_string}"
-                }
-            }
-        }
-    }
-}
 
 #[derive(Clone, PartialEq, Eq)]
 struct Asset {

@@ -21,7 +21,20 @@
         top: 0;
         padding-top: env(safe-area-inset-top);
     }
+
+    .controls-primary {
+        @apply flex transition text-black bg-white;
+    }
+
+    .controls-secondary {
+        @apply flex transition text-gray-200 bg-gray-900 hover:bg-gray-800 hover:text-white;
+    }
+
+    .controls-square {
+        @apply h-10 w-10 rounded-md;
+    }
 }
+
 
 @font-face {
     font-family: 'Pilat';

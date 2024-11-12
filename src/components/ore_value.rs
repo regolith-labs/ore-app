@@ -27,3 +27,22 @@ pub fn OreValue(ui_amount_string: String) -> Element {
         }
     }
 }
+
+#[component]
+pub fn OreValueSmall(ui_amount_string: String) -> Element {
+    rsx! {
+        div {
+            class: "flex flex-row gap-1 w-min",
+            OreIcon {
+                class: "h-3.5 w-3.5 my-auto"
+            }
+            div {
+                class: "flex flex-row font-medium my-auto",
+                span {
+                    class: "mt-auto",
+                    "{ui_amount_string}"
+                }
+            }
+        }
+    }
+}

@@ -1,13 +1,21 @@
 mod asset;
+mod deposit;
 mod landing;
 mod mine;
 mod not_found;
+mod pay;
+mod pool;
 mod stake;
+mod swap;
 mod trade;
 
 pub use asset::*;
+pub use deposit::*;
 pub use landing::*;
 pub use mine::*;
 pub use not_found::*;
+pub use pay::*;
+pub use pool::*;
 pub use stake::*;
+pub use swap::*;
 pub use trade::*;

@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{GlobeIcon, OreWordmarkIcon, WalletAdapter},
+    components::{
+        BeakerIcon, BoltIcon, GlobeIcon, OreWordmarkIcon, ScaleIcon, SquareStackIcon, WalletAdapter,
+    },
     route::Route,
 };
 
@@ -30,14 +32,9 @@ pub fn LandingNavigation() -> Element {
 }
 
 fn AppNavBar() -> Element {
-    let route: Route = use_route();
-    let visible = match route {
-        Route::Mine {} | Route::Stake {} | Route::Trade {} => "flex",
-        _ => "hidden sm:flex",
-    };
     rsx! {
         div {
-            class: "{visible} w-screen h-20 px-5 sm:px-8",
+            class: "flex w-screen h-16 sm:h-20 px-5 sm:px-8 sm:sticky sm:top-0 bg-black shadow",
             div {
                 class: "flex flex-row justify-center sm:justify-between w-full my-auto",
                 span {
@@ -54,7 +51,7 @@ fn AppNavBar() -> Element {
 fn LandingNavBar() -> Element {
     rsx! {
         div {
-            class: "flex w-screen shrink-0 h-20 px-5 sm:px-8",
+            class: "flex w-screen shrink-0 h-16 sm:h-20 px-5 sm:px-8",
             div {
                 class: "flex flex-row w-full my-auto",
                 Logo {}
@@ -156,11 +153,26 @@ fn MobileTab(title: String, route: Route) -> Element {
     rsx! {
         Link {
             class: "flex h-16 w-full",
-            to: route,
+            to: route.clone(),
             span {
                 class: "flex flex-col gap-1 mx-auto my-auto {color}",
-                GlobeIcon {
-                    class: "h-6 w-6 mx-auto"
+                match route {
+                    Route::Mine {  } => rsx!{
+                        BoltIcon {
+                            class: "h-5 w-5 mx-auto"
+                        }
+                    },
+                    Route::Stake {  } => rsx!{
+                        BeakerIcon {
+                            class: "h-5 w-5 mx-auto"
+                        }
+                    },
+                    Route::Trade {  } => rsx!{
+                        GlobeIcon {
+                            class: "h-5 w-5 mx-auto"
+                        }
+                    },
+                    _ => rsx! {}
                 }
                 span {
                     class: "mx-auto font-medium text-xs",

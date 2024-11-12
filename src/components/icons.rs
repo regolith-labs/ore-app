@@ -156,6 +156,38 @@ pub fn PlusIcon(class: Option<String>) -> Element {
 }
 
 #[component]
+pub fn PlusCircleIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                fill_rule: "evenodd",
+                d:"M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn EyeDropperIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                fill_rule: "evenodd",
+                d: "M16.098 2.598a3.75 3.75 0 1 1 3.622 6.275l-1.72.46V12a.75.75 0 0 1-.22.53l-.75.75a.75.75 0 0 1-1.06 0l-.97-.97-7.94 7.94a2.56 2.56 0 0 1-1.81.75 1.06 1.06 0 0 0-.75.31l-.97.97a.75.75 0 0 1-1.06 0l-.75-.75a.75.75 0 0 1 0-1.06l.97-.97a1.06 1.06 0 0 0 .31-.75c0-.68.27-1.33.75-1.81L11.69 9l-.97-.97a.75.75 0 0 1 0-1.06l.75-.75A.75.75 0 0 1 12 6h2.666l.461-1.72c.165-.617.49-1.2.971-1.682Zm-3.348 7.463L4.81 18a1.06 1.06 0 0 0-.31.75c0 .318-.06.63-.172.922a2.56 2.56 0 0 1 .922-.172c.281 0 .551-.112.75-.31l7.94-7.94-1.19-1.19Z"
+            }
+        }
+    }
+}
+
+#[component]
 pub fn InfoIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {
@@ -279,6 +311,83 @@ pub fn GlobeIcon(class: Option<String>) -> Element {
 }
 
 #[component]
+pub fn SquareStackIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                d: "M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z"
+            }
+            path {
+                d: "m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.739a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.71 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.37-.738Z"
+            }
+            path {
+                d: "m10.933 19.231-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.489.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn CircleStackIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                d:"M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875Z"
+            }
+            path {
+                d:"M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 0 0 1.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 0 0 1.897 1.384C6.809 12.164 9.315 12.75 12 12.75Z"
+            }
+            path {
+                d:"M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 15.914 9.315 16.5 12 16.5Z"
+            }
+            path {
+                d:"M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 19.664 9.315 20.25 12 20.25Z"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn ScaleIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                fill_rule: "evenodd",
+                d:"M12 2.25a.75.75 0 0 1 .75.75v.756a49.106 49.106 0 0 1 9.152 1 .75.75 0 0 1-.152 1.485h-1.918l2.474 10.124a.75.75 0 0 1-.375.84A6.723 6.723 0 0 1 18.75 18a6.723 6.723 0 0 1-3.181-.795.75.75 0 0 1-.375-.84l2.474-10.124H12.75v13.28c1.293.076 2.534.343 3.697.776a.75.75 0 0 1-.262 1.453h-8.37a.75.75 0 0 1-.262-1.453c1.162-.433 2.404-.7 3.697-.775V6.24H6.332l2.474 10.124a.75.75 0 0 1-.375.84A6.723 6.723 0 0 1 5.25 18a6.723 6.723 0 0 1-3.181-.795.75.75 0 0 1-.375-.84L4.168 6.241H2.25a.75.75 0 0 1-.152-1.485 49.105 49.105 0 0 1 9.152-1V3a.75.75 0 0 1 .75-.75Zm4.878 13.543 1.872-7.662 1.872 7.662h-3.744Zm-9.756 0L5.25 8.131l-1.872 7.662h3.744Z"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn BeakerIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                fill_rule: "evenodd",
+                d:"M10.5 3.798v5.02a3 3 0 0 1-.879 2.121l-2.377 2.377a9.845 9.845 0 0 1 5.091 1.013 8.315 8.315 0 0 0 5.713.636l.285-.071-3.954-3.955a3 3 0 0 1-.879-2.121v-5.02a23.614 23.614 0 0 0-3 0Zm4.5.138a.75.75 0 0 0 .093-1.495A24.837 24.837 0 0 0 12 2.25a25.048 25.048 0 0 0-3.093.191A.75.75 0 0 0 9 3.936v4.882a1.5 1.5 0 0 1-.44 1.06l-6.293 6.294c-1.62 1.621-.903 4.475 1.471 4.88 2.686.46 5.447.698 8.262.698 2.816 0 5.576-.239 8.262-.697 2.373-.406 3.092-3.26 1.47-4.881L15.44 9.879A1.5 1.5 0 0 1 15 8.818V3.936Z"
+            }
+        }
+    }
+}
+
+#[component]
 pub fn CarrotDownIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {
@@ -311,27 +420,7 @@ pub fn CarrotRightIcon(class: Option<String>) -> Element {
 }
 
 #[component]
-pub fn TradeIcon(class: Option<String>) -> Element {
-    let class = class.unwrap_or("".to_string());
-    rsx! {
-        svg {
-            view_box: "0 0 17 16",
-            // fill: "currentColor",
-            class: "{class} rotate-45",
-            path {
-                // fill_rule: "evenodd",
-                stroke: "currentColor",
-                d: "M5.16667 2.6665L5.16667 13.3332M5.16667 13.3332L2.5 10.6665M5.16667 13.3332L7.83333 10.6665M11.8333 13.3332L11.8333 2.6665M11.8333 2.6665L9.16667 5.33317M11.8333 2.6665L14.5 5.33317",
-                stroke_width: 2,
-                stroke_linecap:"round",
-                stroke_linejoin:"round"
-            }
-        }
-    }
-}
-
-#[component]
-pub fn CircleStackIcon(class: Option<String>) -> Element {
+pub fn BoltIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {
         svg {
@@ -340,19 +429,45 @@ pub fn CircleStackIcon(class: Option<String>) -> Element {
             class: "{class}",
             path {
                 fill_rule: "evenodd",
-                d: "M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875Z",
+                d: "M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn PieChartIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                fill_rule: "evenodd",
+                d: "M2.25 13.5a8.25 8.25 0 0 1 8.25-8.25.75.75 0 0 1 .75.75v6.75H18a.75.75 0 0 1 .75.75 8.25 8.25 0 0 1-16.5 0Z"
             }
             path {
                 fill_rule: "evenodd",
-                d: "M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 0 0 1.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 0 0 1.897 1.384C6.809 12.164 9.315 12.75 12 12.75Z",
+                d: "M12.75 3a.75.75 0 0 1 .75-.75 8.25 8.25 0 0 1 8.25 8.25.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75V3Z"
             }
+        }
+    }
+}
+
+#[component]
+pub fn SwapIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 17 16",
+            class: "{class} rotate-45",
             path {
-                fill_rule: "evenodd",
-                d: "M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 15.914 9.315 16.5 12 16.5Z"
-            }
-            path {
-                fill_rule: "evenodd",
-                d: "M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 19.664 9.315 20.25 12 20.25Z"
+                stroke: "currentColor",
+                d: "M5.16667 2.6665L5.16667 13.3332M5.16667 13.3332L2.5 10.6665M5.16667 13.3332L7.83333 10.6665M11.8333 13.3332L11.8333 2.6665M11.8333 2.6665L9.16667 5.33317M11.8333 2.6665L14.5 5.33317",
+                stroke_width: 2,
+                stroke_linecap:"round",
+                stroke_linejoin:"round"
             }
         }
     }
