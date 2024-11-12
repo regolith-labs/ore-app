@@ -38,4 +38,27 @@ impl Gateway {
     pub async fn get_ore_balance(&self, owner: &Pubkey) -> GatewayResult<UiTokenAmount> {
         self.get_token_balance(owner, &MINT_ADDRESS).await
     }
+
+    pub async fn get_quote(&self, mint: &Pubkey) -> GatewayResult<u64> {
+        // TODO Fetch from jup
+        match reqwest::get(
+            "https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112\
+&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v\
+&amount=100000000\
+&slippageBps=50",
+        )
+        .await
+        {
+            Ok(res) => {
+                log::info!("res: {:?}", res);
+            }
+            Err(err) => todo!(),
+        }
+        //         https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112\
+        // &outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v\
+        // &amount=100000000\
+        // &slippageBps=50'
+
+        Ok(0)
+    }
 }

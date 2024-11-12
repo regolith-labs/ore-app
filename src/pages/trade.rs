@@ -3,9 +3,9 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 
 use crate::{
-    components::{OreIcon, QrCodeIcon},
+    components::{OreIcon, OreValue, QrCodeIcon, TradeIcon},
     gateway::GatewayResult,
-    hooks::{use_ore_balance, use_token_balance},
+    hooks::{use_ore_balance, use_quote, use_token_balance},
     route::Route,
     steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey},
 };
@@ -14,6 +14,11 @@ pub fn Trade() -> Element {
     rsx! {
         div {
             class: "flex flex-col gap-8 w-screen pb-20 sm:pb-16",
+            span {
+                class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 font-wide text-2xl font-semibold",
+                "Trade"
+                TradeButton {}
+            }
             Balance {}
             AssetTable {}
         }
@@ -47,7 +52,14 @@ fn Balance() -> Element {
                         }
                     }
                 }
-                QrButton {}
+                div {
+                    class: "flex flex-row gap-4",
+                    QrButton {}
+                    span {
+                        class: "hidden sm:flex",
+                        TradeButton {}
+                    }
+                }
             }
         }
     }
@@ -80,27 +92,16 @@ fn OreBalance(balance: GatewayResult<UiTokenAmount>) -> Element {
     }
 }
 
-#[component]
-fn OreValue(ui_amount_string: String) -> Element {
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let small_units = units[1];
+
+fn TradeButton() -> Element {
     rsx! {
-        div {
-            class: "flex flex-row gap-2.5 sm:gap-3 h-10 w-min",
-            OreIcon {
-                class: "h-7 w-7 sm:h-8 sm:w-8 my-auto"
-            }
-            div {
-                class: "flex flex-row my-auto",
-                span {
-                    class: "mt-auto font-wide font-semibold text-2xl sm:text-3xl",
-                    "{big_units}"
-                }
-                span {
-                    class: "mt-auto font-wide font-semibold text-xl sm:text-2xl text-gray-700",
-                    ".{small_units}"
-                }
+        button {
+            class: "flex h-10 w-10 rounded-md transition text-black bg-white",
+            onclick: move |_| {
+                // TODO Send/receive modal
+            },
+            TradeIcon {
+                class: "h-5 w-5 mx-auto my-auto"
             }
         }
     }
@@ -196,8 +197,7 @@ fn AssetTableHeader() -> Element {
 #[component]
 fn AssetRow(asset: Asset) -> Element {
     let balance = use_token_balance(asset.mint);
-    log::info!("Balance: {:?}", balance);
-    // TODO Fetch balance
+    let quote = use_quote(asset.mint);
     // TODO Fetch price
     // TODO Fetch 24h change
     rsx! {
@@ -207,7 +207,7 @@ fn AssetRow(asset: Asset) -> Element {
             div {
                 class: "flex flex-row gap-4",
                 img {
-                    class: "w-8 h-8 my-auto bg-gray-900 rounded-full",
+                    class: "w-10 h-10 my-auto bg-gray-900 rounded-full",
                     src: "{asset.image}"
                 }
                 div {

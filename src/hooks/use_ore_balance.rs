@@ -1,11 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::{
-    lamports,
-    native_token::{lamports_to_sol, LAMPORTS_PER_SOL},
-    pubkey::Pubkey,
-};
+use solana_client_wasm::solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::gateway::{GatewayError, GatewayResult};
@@ -22,6 +18,15 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
                 .await
                 .map_err(GatewayError::from),
         }
+    })
+}
+
+pub fn use_quote(mint: Pubkey) -> Resource<GatewayResult<u64>> {
+    use_resource(move || async move {
+        use_gateway()
+            .get_quote(&mint)
+            .await
+            .map_err(GatewayError::from)
     })
 }
 

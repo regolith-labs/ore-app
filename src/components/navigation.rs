@@ -22,7 +22,7 @@ pub fn AppNavigation() -> Element {
 pub fn LandingNavigation() -> Element {
     rsx! {
         div {
-            class: "flex flex-col w-screen h-full",
+            class: "flex flex-col w-screen h-screen",
             LandingNavBar {}
             Outlet::<Route> {}
         }
@@ -37,21 +37,15 @@ fn AppNavBar() -> Element {
     };
     rsx! {
         div {
-            class: "{visible} sticky top-0 w-screen h-16 sm:h-20 px-5 sm:px-8 bg-black",
+            class: "{visible} w-screen h-20 px-5 sm:px-8",
             div {
-                class: "flex flex-row justify-between w-full my-auto",
+                class: "flex flex-row justify-center sm:justify-between w-full my-auto",
                 span {
                     class: "hidden sm:flex my-auto",
                     Logo {}
                 }
-                div {
-                    class: "flex sm:hidden"
-                }
                 TabBar {}
                 WalletAdapter {}
-                div {
-                    class: "flex sm:hidden"
-                }
             }
         }
     }
@@ -60,11 +54,10 @@ fn AppNavBar() -> Element {
 fn LandingNavBar() -> Element {
     rsx! {
         div {
-            class: "flex w-screen h-20 px-5 sm:px-8",
+            class: "flex w-screen shrink-0 h-20 px-5 sm:px-8",
             div {
-                class: "flex flex-row justify-between w-full my-auto",
+                class: "flex flex-row w-full my-auto",
                 Logo {}
-                div {}
             }
         }
     }
@@ -73,7 +66,7 @@ fn LandingNavBar() -> Element {
 fn Logo() -> Element {
     rsx! {
         Link {
-            class: "my-auto",
+            class: "p-1 my-auto rounded hover:bg-gray-800",
             to: Route::Landing {},
             OreWordmarkIcon {
                 class: "h-5"

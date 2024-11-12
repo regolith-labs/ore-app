@@ -10,7 +10,7 @@
 
 @layer components {
     .loading {
-        @apply bg-gray-800 animate-pulse;
+        @apply transition bg-gray-800 animate-pulse;
     }
 
     .elevated {
