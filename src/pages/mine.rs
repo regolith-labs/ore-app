@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{CircleStackIcon, OreValue, OreValueSmall, PlayIcon},
+    components::{CircleStackIcon, OreValue, PlayIcon},
     hooks::use_ore_balance,
     route::Route,
 };
@@ -10,7 +10,7 @@ use crate::{
 pub fn Mine() -> Element {
     rsx! {
         div {
-            class: "flex flex-col gap-8 w-screen",
+            class: "flex flex-col gap-8 w-screen pb-20 sm:pb-16",
             span {
                 class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
                 span {
@@ -71,7 +71,7 @@ fn StartButton() -> Element {
             to: Route::Pay {},
             class: "controls-square controls-primary",
             PlayIcon {
-                class: "h-6 w-6 mx-auto my-auto"
+                class: "h-5 w-5 mx-auto my-auto"
             }
         }
     }
@@ -162,20 +162,6 @@ fn PoolRow(pool: Pool) -> Element {
                         class: "font-medium",
                         "{pool.name}"
                     }
-                    // span {
-                    //     class: "font-medium text-gray-700 h-5 text-sm",
-                    //     match balance.cloned() {
-                    //         None => rsx! {
-                    //             div { class: "h-5 w-20 loading rounded"}
-                    //         },
-                    //         Some(balance) => {
-                    //             match balance {
-                    //                 Err(_) => rsx!{ "0.00" },
-                    //                 Ok(b) => rsx!{ "{b.ui_amount_string}" },
-                    //             }
-                    //         }
-                    //     }
-                    // }
                 }
             }
             div {

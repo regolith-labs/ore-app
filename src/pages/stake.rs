@@ -1,7 +1,8 @@
 use dioxus::prelude::*;
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{CircleStackIcon, EyeDropperIcon, OreValue},
+    components::{CircleStackIcon, EyeDropperIcon, OreValue, PlusIcon},
     hooks::use_ore_balance,
     route::Route,
 };
@@ -9,7 +10,7 @@ use crate::{
 pub fn Stake() -> Element {
     rsx! {
         div {
-            class: "flex flex-col gap-8 w-screen",
+            class: "flex flex-col gap-8 w-screen pb-20 sm:pb-16",
             span {
                 class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
                 span {
@@ -69,8 +70,8 @@ fn DepositButton() -> Element {
         Link {
             to: Route::Deposit {},
             class: "controls-square controls-primary",
-            EyeDropperIcon {
-                class: "h-5 w-5 mx-auto my-auto"
+            PlusIcon {
+                class: "h-4 w-4 mx-auto my-auto"
             }
         }
     }
@@ -90,16 +91,48 @@ fn ClaimButton() -> Element {
 
 fn LiquidityTable() -> Element {
     // TODO Read from config file
+    let listed_liquidity = vec![
+        Liquidity {
+            name: "SOL-ORE".to_string(),
+            mint: Pubkey::new_unique(),
+            lp: Pubkey::new_unique(),
+            image: "".to_string(),
+        },
+        Liquidity {
+            name: "USDC-ORE".to_string(),
+            mint: Pubkey::new_unique(),
+            lp: Pubkey::new_unique(),
+            image: "".to_string(),
+        },
+        Liquidity {
+            name: "ISC-ORE".to_string(),
+            mint: Pubkey::new_unique(),
+            lp: Pubkey::new_unique(),
+            image: "".to_string(),
+        },
+        Liquidity {
+            name: "MOBILE-ORE".to_string(),
+            mint: Pubkey::new_unique(),
+            lp: Pubkey::new_unique(),
+            image: "".to_string(),
+        },
+        Liquidity {
+            name: "HONEY-ORE".to_string(),
+            mint: Pubkey::new_unique(),
+            lp: Pubkey::new_unique(),
+            image: "".to_string(),
+        },
+    ];
 
     rsx! {
         div {
             class: "flex flex-col sm:mx-5",
             LiquidityTableHeader {}
-            // for asset in listed_assets {
-            //     AssetRow {
-            //         asset: asset
-            //     }
-            // }
+            for liquidity in listed_liquidity {
+                LiquidityRow {
+                    liquidity: liquidity
+                }
+            }
         }
     }
 }
@@ -125,4 +158,47 @@ fn LiquidityTableHeader() -> Element {
             }
         }
     }
+}
+
+#[component]
+fn LiquidityRow(liquidity: Liquidity) -> Element {
+    rsx! {
+        Link {
+            to: Route::Pool { pool: liquidity.name.clone() },
+            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
+            div {
+                class: "flex flex-row gap-4",
+                img {
+                    class: "w-10 h-10 my-auto bg-gray-900 rounded border border-gray-800",
+                    src: "{liquidity.image}"
+                }
+                div {
+                    class: "flex flex-col my-auto",
+                    span {
+                        class: "font-medium",
+                        "{liquidity.name}"
+                    }
+                }
+            }
+            div {
+                class: "flex flex-row text-right my-auto",
+                span {
+                    class: "w-28 sm:w-40",
+                    "2.4x",
+                }
+                span {
+                    class: "flex w-28 sm:w-40 justify-end",
+                    "64480"
+                }
+            }
+        }
+    }
+}
+
+#[derive(Clone, PartialEq, Eq)]
+struct Liquidity {
+    name: String,
+    mint: Pubkey,
+    lp: Pubkey,
+    image: String,
 }
