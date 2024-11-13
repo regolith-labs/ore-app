@@ -1,9 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{
-        BeakerIcon, BoltIcon, GlobeIcon, OreWordmarkIcon, ScaleIcon, SquareStackIcon, WalletAdapter,
-    },
+    components::{BeakerIcon, BoltIcon, GlobeIcon, OreWordmarkIcon, WalletAdapter},
     route::Route,
 };
 
@@ -14,7 +12,7 @@ pub fn AppNavigation() -> Element {
             AppNavBar {}
             MobileTabBar {}
             span {
-                class: "py-5 sm:py-8",
+                class: "py-5 sm:py-8 w-full max-w-[80rem] mx-auto",
                 Outlet::<Route> {}
             }
         }
@@ -95,15 +93,7 @@ fn TabBar() -> Element {
 #[component]
 fn Tab(title: String, route: Route) -> Element {
     let current_route = use_route();
-    let selected = match route {
-        Route::Mine {} => current_route == route,
-        Route::Stake {} => current_route == route,
-        Route::Trade {} => match current_route {
-            Route::Trade {} | Route::Asset { asset: _ } => true,
-            _ => false,
-        },
-        _ => false,
-    };
+    let selected = is_tab_selected(&route, &current_route);
     let color = if !selected { "text-gray-700" } else { "" };
     rsx! {
         Link {
@@ -140,15 +130,7 @@ fn MobileTabBar() -> Element {
 #[component]
 fn MobileTab(title: String, route: Route) -> Element {
     let current_route: Route = use_route();
-    let selected = match route {
-        Route::Mine {} => current_route == route,
-        Route::Stake {} => current_route == route,
-        Route::Trade {} => match current_route {
-            Route::Trade {} | Route::Asset { asset: _ } => true,
-            _ => false,
-        },
-        _ => false,
-    };
+    let selected = is_tab_selected(&route, &current_route);
     let color = if !selected { "text-gray-700" } else { "" };
     rsx! {
         Link {
@@ -180,5 +162,23 @@ fn MobileTab(title: String, route: Route) -> Element {
                 }
             }
         }
+    }
+}
+
+fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
+    match route {
+        Route::Mine {} => match current_route {
+            Route::Mine {} | Route::Pool { pool: _ } => true,
+            _ => false,
+        },
+        Route::Stake {} => match current_route {
+            Route::Stake {} | Route::Pair { pair: _ } => true,
+            _ => false,
+        },
+        Route::Trade {} => match current_route {
+            Route::Trade {} | Route::Asset { asset: _ } => true,
+            _ => false,
+        },
+        _ => false,
     }
 }

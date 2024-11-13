@@ -32,9 +32,9 @@ pub fn OreValue(ui_amount_string: String) -> Element {
 pub fn OreValueSmall(ui_amount_string: String) -> Element {
     rsx! {
         div {
-            class: "flex flex-row gap-1 w-min",
+            class: "flex flex-row gap-1.5 w-min",
             OreIcon {
-                class: "h-3.5 w-3.5 my-auto"
+                class: "h-4 w-4 my-auto"
             }
             div {
                 class: "flex flex-row font-medium my-auto",

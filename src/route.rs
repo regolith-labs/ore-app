@@ -18,6 +18,8 @@ pub enum Route {
         Pool { pool: String },
         #[route("/stake")]
         Stake {},
+        #[route("/stake/:pair")]
+        Pair { pair: String },
         #[route("/trade")]
         Trade {},
         #[route("/trade/:asset")]

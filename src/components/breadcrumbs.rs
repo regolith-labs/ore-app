@@ -6,8 +6,19 @@ pub fn Breadcrumbs() -> Element {
     let route: Route = use_route();
     rsx! {
         div {
-            class: "flex flex-row gap-2 font-medium text-xs sm:text-sm",
+            class: "flex flex-row gap-1 font-medium text-xs sm:text-sm",
             match route {
+                Route::Pair { pair } => {
+                    rsx! {
+                        Path {
+                            title: "Stake",
+                            route: Route::Stake {},
+                        }
+                        Active {
+                            title: "{pair}"
+                        }
+                    }
+                }
                 Route::Pool { pool } => {
                     rsx! {
                         Path {
@@ -40,10 +51,10 @@ pub fn Breadcrumbs() -> Element {
 fn Path(title: String, route: Route) -> Element {
     rsx! {
         span {
-            class: "flex flex-row gap-2",
+            class: "flex flex-row gap-1",
             Link {
                 to: route,
-                class: "text-gray-700 py-2 hover:underline",
+                class: "text-gray-700 hover:underline",
                 "{title}"
             }
             CarrotRightIcon {
@@ -57,7 +68,7 @@ fn Path(title: String, route: Route) -> Element {
 fn Active(title: String) -> Element {
     rsx! {
         span {
-            class: "text-white py-2",
+            class: "text-white",
             "{title}"
         }
     }

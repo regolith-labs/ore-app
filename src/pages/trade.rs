@@ -13,7 +13,7 @@ use crate::{
 pub fn Trade() -> Element {
     rsx! {
         div {
-            class: "flex flex-col gap-8 w-screen pb-20 sm:pb-16",
+            class: "flex flex-col gap-8 w-full pb-20 sm:pb-16",
             span {
                 class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
                 span {
@@ -205,7 +205,7 @@ fn AssetRow(asset: Asset) -> Element {
             div {
                 class: "flex flex-row gap-4",
                 img {
-                    class: "w-10 h-10 my-auto bg-gray-900 rounded-full",
+                    class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",
                     src: "{asset.image}"
                 }
                 div {
@@ -222,7 +222,7 @@ fn AssetRow(asset: Asset) -> Element {
                             },
                             Some(balance) => {
                                 match balance {
-                                    Err(_) => rsx!{ "0.00" },
+                                    Err(_) => rsx!{ "0" },
                                     Ok(b) => rsx!{ "{b.ui_amount_string}" },
                                 }
                             }

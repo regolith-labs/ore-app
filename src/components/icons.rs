@@ -140,21 +140,6 @@ pub fn PlayIcon(class: Option<String>) -> Element {
     }
 }
 
-// #[component]
-// pub fn PlusIcon(class: Option<String>) -> Element {
-//     let class = class.unwrap_or("".to_string());
-//     rsx! {
-//         svg {
-//             view_box: "0 0 20 20",
-//             fill: "currentColor",
-//             class: "{class}",
-//             path {
-//                 d: "M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"
-//             }
-//         }
-//     }
-// }
-
 #[component]
 pub fn PlusIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
@@ -177,11 +162,6 @@ pub fn PlusIcon(class: Option<String>) -> Element {
         }
     }
 }
-
-// <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <path d="M9 1L9 17" stroke="white" stroke-width="2" stroke-linecap="round"/>
-// <path d="M1 9L17 9" stroke="white" stroke-width="2" stroke-linecap="round"/>
-// </svg>
 
 #[component]
 pub fn PlusCircleIcon(class: Option<String>) -> Element {

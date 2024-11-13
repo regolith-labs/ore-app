@@ -10,7 +10,7 @@ use crate::{
 pub fn Mine() -> Element {
     rsx! {
         div {
-            class: "flex flex-col gap-8 w-screen pb-20 sm:pb-16",
+            class: "flex flex-col gap-8 w-full pb-20 sm:pb-16",
             span {
                 class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
                 span {
@@ -133,11 +133,11 @@ fn PoolTableHeader() -> Element {
                 class: "flex flex-row text-right",
                 span {
                     class: "my-auto w-28 sm:w-40",
-                    "Boost"
+                    "Hashpower"
                 }
                 span {
                     class: "my-auto w-28 sm:w-40",
-                    "Hashpower"
+                    "Multiplier"
                 }
             }
         }
@@ -167,12 +167,12 @@ fn PoolRow(pool: Pool) -> Element {
             div {
                 class: "flex flex-row text-right my-auto",
                 span {
-                    class: "w-28 sm:w-40",
-                    "2.4x",
-                }
-                span {
                     class: "flex w-28 sm:w-40 justify-end",
                     "64480"
+                }
+                span {
+                    class: "w-28 sm:w-40",
+                    "2.4x",
                 }
             }
         }
