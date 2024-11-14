@@ -164,6 +164,24 @@ pub fn PlusIcon(class: Option<String>) -> Element {
 }
 
 #[component]
+pub fn SwitchIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 17 16",
+            class: "{class}",
+            path {
+                d: "M5.16667 2.66675L5.16667 13.3334M5.16667 13.3334L2.5 10.6667M5.16667 13.3334L7.83333 10.6667M11.8333 13.3334L11.8333 2.66675M11.8333 2.66675L9.16667 5.33341M11.8333 2.66675L14.5 5.33341",
+                stroke: "currentColor",
+                stroke_width: 1.5,
+                stroke_linecap: "round",
+                stroke_linejoin: "round"
+            }
+        }
+    }
+}
+
+#[component]
 pub fn PlusCircleIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {

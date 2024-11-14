@@ -73,7 +73,7 @@ fn Logo() -> Element {
 fn TabBar() -> Element {
     rsx! {
         div {
-            class: "hidden sm:flex flex-row h-full rounded-full elevated overflow-clip",
+            class: "hidden sm:flex flex-row h-full rounded-full elevated elevated-border overflow-clip",
             Tab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -97,7 +97,7 @@ fn Tab(title: String, route: Route) -> Element {
     let color = if !selected { "text-gray-700" } else { "" };
     rsx! {
         Link {
-            class: "flex px-8 h-10 transition hover:bg-gray-800",
+            class: "flex px-8 h-10 elevated-control",
             to: route,
             span {
                 class: "text-sm font-medium my-auto font-semibold {color}",

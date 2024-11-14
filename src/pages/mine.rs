@@ -149,7 +149,7 @@ fn PoolRow(pool: Pool) -> Element {
     rsx! {
         Link {
             to: Route::Pool { pool: pool.name.clone() },
-            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
+            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
             div {
                 class: "flex flex-row gap-4",
                 img {

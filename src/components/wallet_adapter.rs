@@ -48,7 +48,7 @@ fn ConnectedWalletAdapter(address: Pubkey) -> Element {
 
     rsx! {
         div {
-            class: "flex flex-row gap-2 elevated rounded-full text-sm font-semibold h-10 px-4 transition hover:cursor-pointer hover:bg-gray-800",
+            class: "flex flex-row gap-2 elevated-control elevated-border rounded-full text-sm font-semibold h-10 px-4 hover:cursor-pointer",
             span {
                 class: "mx-auto my-auto",
                 "{first_four}...{last_four}"

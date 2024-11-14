@@ -20,7 +20,7 @@ pub fn OreValue(ui_amount_string: String) -> Element {
                     "{big_units}"
                 }
                 span {
-                    class: "mt-auto font-semibold text-xl sm:text-2xl text-gray-700",
+                    class: "mt-auto font-semibold text-xl sm:text-2xl text-elements-lowEmphasis",
                     ".{small_units}"
                 }
             }

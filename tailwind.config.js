@@ -15,6 +15,37 @@ module.exports = {
       transparent: colors.transparent,
       white: '#FAFAFA',
       black: '#0F0E11',
+      base: {
+        bg: '#0F0E11',
+        canvas: '#0C0C0E'
+      },
+      elements: {
+        highEmphasis: '#FAFAFA',
+        midEmphasis: '#D1D1D1',
+        lowEmphasis: '#707070'
+      },
+      surface: {
+        elevated: '#131216',
+        elevatedHover: '#151419',
+        floating: '#1A191F'
+      },
+      controls: {
+        primary: '#F5F5F5',
+        primaryHover: '#FAFAFA',
+        secondary: '#26242D',
+        secondaryHover: '#2B2932',
+        tertiary: '#1D1C22',
+        tertiaryHover: '#222027',
+        danger: '#CC3B28',
+        dangerHover: '#BC3625',
+        disabled: '#18171C',
+        handle: '#302E38'
+      },
+      on: {
+        onColor: '#0D0D0D',
+        onDisabled: '#585661',
+        onHighContrast: '#0F0E11'
+      },
       green: {
         400: '#5EDCA7',
         500: '#0acf86',

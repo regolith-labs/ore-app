@@ -3,6 +3,7 @@ mod icons;
 mod navigation;
 mod ore_value;
 mod page_title;
+mod swap;
 #[cfg(feature = "web")]
 mod wallet_adapter;
 
@@ -11,5 +12,6 @@ pub use icons::*;
 pub use navigation::*;
 pub use ore_value::*;
 pub use page_title::*;
+pub use swap::*;
 #[cfg(feature = "web")]
 pub use wallet_adapter::*;

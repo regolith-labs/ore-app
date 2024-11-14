@@ -167,7 +167,7 @@ fn LiquidityRow(liquidity: Liquidity) -> Element {
     rsx! {
         Link {
             to: Route::Pair { pair: liquidity.name.clone() },
-            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-gray-900 hover:cursor-pointer",
+            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
             div {
                 class: "flex flex-row gap-4",
                 div {

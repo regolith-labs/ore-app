@@ -4,7 +4,7 @@
 
 @layer base {
     body {
-        @apply bg-black text-white;  
+        @apply bg-base-bg text-elements-highEmphasis;
     }
 }
 
@@ -14,7 +14,15 @@
     }
 
     .elevated {
-        @apply bg-gray-900 border border-gray-800;
+        @apply bg-surface-elevated;
+    }
+
+    .elevated-control {
+        @apply transition elevated hover:bg-surface-elevatedHover active:bg-surface-floating;
+    }
+
+    .elevated-border {
+        @apply border border-gray-800;
     }
   
     .top-safe {
@@ -23,18 +31,17 @@
     }
 
     .controls-primary {
-        @apply flex transition text-black bg-white;
+        @apply flex transition font-medium bg-controls-primary text-on-onColor hover:bg-controls-primaryHover;
     }
 
     .controls-secondary {
-        @apply flex transition text-gray-200 bg-gray-900 hover:bg-gray-800 hover:text-white;
+        @apply flex transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
     }
 
     .controls-square {
         @apply h-10 w-10 rounded-md;
     }
 }
-
 
 @font-face {
     font-family: 'Pilat';
