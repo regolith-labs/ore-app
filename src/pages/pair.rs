@@ -1,12 +1,13 @@
 use dioxus::prelude::*;
 
-use crate::components::Breadcrumbs;
+use crate::components::{Breadcrumbs, Col};
 
 #[component]
 pub fn Pair(pair: String) -> Element {
     rsx! {
-        div {
-            class: "flex flex-col w-full px-5 sm:px-8",
+        Col {
+            class: "w-full px-5 sm:px-8",
+            gap: 4,
             Breadcrumbs {}
             span {
                 class: "font-wide text-2xl font-semibold",

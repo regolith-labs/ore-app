@@ -1,14 +1,14 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BeakerIcon, BoltIcon, GlobeIcon, OreWordmarkIcon, WalletAdapter},
+    components::{BeakerIcon, BoltIcon, Col, GlobeIcon, OreWordmarkIcon, Row, WalletAdapter},
     route::Route,
 };
 
 pub fn AppNavigation() -> Element {
     rsx! {
-        div {
-            class: "flex flex-col w-screen h-full",
+        Col {
+            class: "w-screen h-full",
             AppNavBar {}
             MobileTabBar {}
             span {
@@ -21,8 +21,8 @@ pub fn AppNavigation() -> Element {
 
 pub fn LandingNavigation() -> Element {
     rsx! {
-        div {
-            class: "flex flex-col w-screen h-screen",
+        Col {
+            class: "w-screen h-screen",
             LandingNavBar {}
             Outlet::<Route> {}
         }
@@ -31,10 +31,10 @@ pub fn LandingNavigation() -> Element {
 
 fn AppNavBar() -> Element {
     rsx! {
-        div {
-            class: "flex w-screen h-16 sm:h-20 px-5 sm:px-8 sm:sticky sm:top-0 bg-black shadow",
-            div {
-                class: "flex flex-row justify-center sm:justify-between w-full my-auto",
+        Row {
+            class: "w-screen h-16 sm:h-20 px-5 sm:px-8 sm:sticky sm:top-0 bg-black shadow",
+            Row {
+                class: "justify-center sm:justify-between w-full my-auto",
                 span {
                     class: "hidden sm:flex my-auto",
                     Logo {}
@@ -48,10 +48,10 @@ fn AppNavBar() -> Element {
 
 fn LandingNavBar() -> Element {
     rsx! {
-        div {
-            class: "flex w-screen shrink-0 h-16 sm:h-20 px-5 sm:px-8",
-            div {
-                class: "flex flex-row w-full my-auto",
+        Row {
+            class: "w-screen shrink-0 h-16 sm:h-20 px-5 sm:px-8",
+            Row {
+                class: "w-full my-auto",
                 Logo {}
             }
         }
@@ -78,8 +78,8 @@ fn TabBar() -> Element {
         "hidden sm:flex"
     };
     rsx! {
-        div {
-            class: "{hidden} flex-row h-full rounded-full elevated elevated-border overflow-clip",
+        Row {
+            class: "{hidden} h-full rounded-full elevated elevated-border overflow-clip",
             Tab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -121,8 +121,8 @@ fn MobileTabBar() -> Element {
         ""
     };
     rsx! {
-        div {
-            class: "{hidden} sm:hidden flex flex-row fixed bottom-0 w-full elevated",
+        Row {
+            class: "{hidden} sm:hidden fixed bottom-0 w-full elevated",
             MobileTab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -148,8 +148,9 @@ fn MobileTab(title: String, route: Route) -> Element {
         Link {
             class: "flex h-16 w-full",
             to: route.clone(),
-            span {
-                class: "flex flex-col gap-1 mx-auto my-auto {color}",
+            Col {
+                class: "mx-auto my-auto {color}",
+                gap: 1,
                 match route {
                     Route::Mine {  } => rsx!{
                         BoltIcon {

@@ -2,17 +2,18 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{CircleStackIcon, OreValue, PlayIcon, Table, TableHeader, TableRowLink},
+    components::{CircleStackIcon, Col, OreValue, PlayIcon, Row, Table, TableHeader, TableRowLink},
     hooks::use_ore_balance,
     route::Route,
 };
 
 pub fn Mine() -> Element {
     rsx! {
-        div {
-            class: "flex flex-col gap-8 w-full pb-20 sm:pb-16",
-            span {
-                class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
+        Col {
+            class: "w-full pb-20 sm:pb-16",
+            gap: 8,
+            Row {
+                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
                 span {
                     class: "my-auto",
                     "Mine"
@@ -28,14 +29,15 @@ pub fn Mine() -> Element {
 fn MiningYield() -> Element {
     let balance = use_ore_balance();
     rsx! {
-        div {
-            class: "flex flex-col gap-2 sm:gap-4 px-5 sm:px-8",
+        Col {
+            class: "sm:gap-4 px-5 sm:px-8",
+            gap: 2,
             span {
                 class: "font-medium text-xs sm:text-sm text-gray-700",
                 "Yield"
             }
-            div {
-                class: "flex flex-row justify-between align-top",
+            Row {
+                class: "justify-between align-top",
                 match balance.cloned() {
                     None => {
                         rsx! {
@@ -52,8 +54,8 @@ fn MiningYield() -> Element {
                         }
                     }
                 }
-                div {
-                    class: "flex flex-row gap-4",
+                Row {
+                    gap: 4,
                     ClaimButton {}
                     span {
                         class: "hidden sm:flex",
@@ -127,14 +129,14 @@ fn PoolRow(pool: Pool) -> Element {
         TableRowLink {
             to: Route::Pool { pool: pool.name.clone() },
             left: rsx! {
-                div {
-                    class: "flex flex-row gap-4",
+                Row {
+                    gap: 4,
                     img {
                         class: "w-10 h-10 my-auto bg-gray-900 rounded border border-gray-800",
                         src: "{pool.image}"
                     }
-                    div {
-                        class: "flex flex-col my-auto",
+                    Col {
+                        class: "my-auto",
                         span {
                             class: "font-medium",
                             "{pool.name}"
@@ -144,8 +146,8 @@ fn PoolRow(pool: Pool) -> Element {
             },
             right: vec![
                 rsx! {
-                    div {
-                        class: "flex flex-row text-right my-auto",
+                    Row {
+                        class: "text-right my-auto",
                         span {
                             class: "flex w-28 sm:w-40 justify-end",
                             "64480"

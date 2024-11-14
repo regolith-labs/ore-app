@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::{CarrotDownIcon, CheckCircleIcon, WarningIcon};
+use crate::components::{CarrotDownIcon, CheckCircleIcon, Col, Row, WarningIcon};
 use crate::hooks::{invoke_signature, use_wallet_status, InvokeSignatureStatus, WalletStatus};
 use crate::steel_app::solana::sdk::{pubkey::Pubkey, transaction::Transaction};
 
@@ -47,8 +47,9 @@ fn ConnectedWalletAdapter(address: Pubkey) -> Element {
     let last_four = &address.to_string()[len - 4..len];
 
     rsx! {
-        div {
-            class: "flex flex-row gap-2 elevated-control elevated-border rounded-full text-sm font-semibold h-10 px-4 hover:cursor-pointer",
+        Row {
+            class: "elevated-control elevated-border rounded-full text-sm font-semibold h-10 px-4 hover:cursor-pointer",
+            gap: 2,
             span {
                 class: "mx-auto my-auto",
                 "{first_four}...{last_four}"
@@ -69,8 +70,8 @@ pub fn InvokeSignature(
     let button_class = "w-full py-3 rounded font-semibold transition-colors text-white bg-green-500 hover:bg-green-600 active:enabled:bg-green-700";
     let error_class = "flex flex-row flex-nowrap gap-2 text-white w-min ml-auto text-nowrap bg-red-500 text-center font-semibold text-sm rounded py-1 px-2";
     rsx! {
-        div {
-            class: "flex flex-col gap-6",
+        Col {
+            gap: 6,
             if let InvokeSignatureStatus::DoneWithError = *signal.read() {
                 p {
                     class: "{error_class}",

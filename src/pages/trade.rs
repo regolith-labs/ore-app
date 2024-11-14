@@ -3,19 +3,20 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 
 use crate::{
-    components::{OreValue, OreValueSmall, QrCodeIcon, SwapIcon, Table, TableHeader, TableRowLink},
+    components::{Col, OreValue, OreValueSmall, QrCodeIcon, Row, SwapIcon, Table, TableHeader, TableRowLink},
     gateway::GatewayResult,
-    hooks::{use_ore_balance, use_quote, use_token_balance},
+    hooks::{use_ore_balance,  use_token_balance},
     route::Route,
     steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey},
 };
 
 pub fn Trade() -> Element {
     rsx! {
-        div {
-            class: "flex flex-col gap-8 w-full pb-20 sm:pb-16",
-            span {
-                class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
+        Col {
+            class: "w-full pb-20 sm:pb-16",
+            gap: 8,
+            Row {
+                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
                 span {
                     class: "align-text-bottom my-auto",
                     "Trade"
@@ -31,14 +32,15 @@ pub fn Trade() -> Element {
 fn Balance() -> Element {
     let balance = use_ore_balance();
     rsx! {
-        div {
-            class: "flex flex-col gap-2 sm:gap-4 mx-5 sm:mx-8",
+        Col {
+            class: "sm:gap-4 mx-5 sm:mx-8",
+            gap: 2,
             span {
                 class: "font-medium text-xs sm:text-sm text-gray-700",
                 "Balance"
             }
-            div {
-                class: "flex flex-row justify-between align-top",
+            Row {
+                class: "justify-between align-top",
                 match balance.cloned() {
                     None => {
                         rsx! {
@@ -55,8 +57,8 @@ fn Balance() -> Element {
                         }
                     }
                 }
-                div {
-                    class: "flex flex-row gap-4",
+                Row {
+                    gap: 4,
                     PayButton {}
                     span {
                         class: "hidden sm:flex",
@@ -80,8 +82,8 @@ fn OreBalance(balance: GatewayResult<UiTokenAmount>) -> Element {
         }
         Err(err) => {
             rsx! {
-                div {
-                    class: "flex flex-col gap-2",
+                Col {
+                    gap: 2,
                     OreValue {
                         ui_amount_string: "0.000"
                     }
@@ -187,14 +189,13 @@ fn AssetTable() -> Element {
 fn AssetNameAndBalance(asset: Asset) -> Element {
     let balance = use_token_balance(asset.mint);
     rsx! {
-        div {
-            class: "flex flex-row gap-4",
+        Row {
+            gap: 4,
             img {
                 class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",
                 src: "{asset.image}"
             }
-            div {
-                class: "flex flex-col",
+            Col {
                 span {
                     class: "font-medium",
                     "{asset.ticker}"
@@ -221,8 +222,8 @@ fn AssetNameAndBalance(asset: Asset) -> Element {
 #[component]
 fn AssetQuote(asset: Asset) -> Element {
     rsx! {
-        div {
-            class: "flex flex-col text-right",
+        Col {
+            class: "text-right",
             OreValueSmall {
                 ui_amount_string: "1.20245"
             }

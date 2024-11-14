@@ -1,22 +1,48 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::components::{PageTitle, SwapTool};
+use crate::components::{Col, SwapForm};
 
 pub fn Swap() -> Element {
     rsx! {
         div {
-            class: "flex flex-col gap-8 w-full",
-            PageTitle {
-                title: "Swap"
-            }
-            span {
+            class: "flex w-full",
+            Col {
                 class: "w-96 mx-auto my-auto",
-                SwapTool {
-                    mint_a: Pubkey::new_unique(),
-                    mint_b: Pubkey::new_unique(),
+                gap: 8,
+                Col {
+                    gap: 2,
+                    BackButton {}
+                    span {
+                        class: "font-wide text-2xl font-semibold",
+                        "Swap"
+                    }
+                    span {
+                        class: "text-elements-lowEmphasis",
+                        "Swap from one asset to another."
+                    }
+                }
+                span {
+                    class: "w-96 mx-auto my-auto",
+                    SwapForm {
+                        mint_a: Pubkey::new_unique(),
+                        mint_b: Pubkey::new_unique(),
+                    }
                 }
             }
+        }
+    }
+}
+
+fn BackButton() -> Element {
+    let navigator = use_navigator();
+    rsx! {
+        button {
+            class: "w-10 h-10 -ml-2.5 rounded-full text-elements-midEmphasis hover:bg-controls-handle",
+            onclick: move |_| {
+                navigator.go_back();
+            },
+            "←"
         }
     }
 }

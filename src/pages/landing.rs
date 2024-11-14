@@ -1,14 +1,18 @@
 use dioxus::prelude::*;
 
-use crate::{components::OreIcon, route::Route};
+use crate::{
+    components::{Col, OreIcon},
+    route::Route,
+};
 
 pub fn Landing() -> Element {
     rsx! {
         Link {
             to: Route::Mine {},
             class: "flex h-full w-full mx-auto p-8 ",
-            div {
-                class: "flex flex-col gap-8 mx-auto my-auto",
+            Col {
+                class: "mx-auto my-auto",
+                gap: 8,
                 span {
                     class: "p-10 mx-auto rounded-full hover:loading",
                     OreIcon {

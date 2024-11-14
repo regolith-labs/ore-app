@@ -3,7 +3,8 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{
-        CircleStackIcon, OreValue, OreValueSmall, PlusIcon, Table, TableHeader, TableRowLink,
+        CircleStackIcon, Col, OreValue, OreValueSmall, PlusIcon, Row, Table, TableHeader,
+        TableRowLink,
     },
     hooks::use_ore_balance,
     route::Route,
@@ -11,10 +12,11 @@ use crate::{
 
 pub fn Stake() -> Element {
     rsx! {
-        div {
-            class: "flex flex-col gap-8 w-full pb-20 sm:pb-16",
-            span {
-                class: "flex flex-row justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
+        Col {
+            class: "w-full pb-20 sm:pb-16",
+            gap: 8,
+            Row {
+                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
                 span {
                     class: "my-auto",
                     "Stake"
@@ -30,14 +32,15 @@ pub fn Stake() -> Element {
 fn StakingYield() -> Element {
     let balance = use_ore_balance();
     rsx! {
-        div {
-            class: "flex flex-col gap-2 sm:gap-4 px-5 sm:px-8",
+        Col {
+            class: "sm:gap-4 px-5 sm:px-8",
+            gap: 2,
             span {
                 class: "font-medium text-xs sm:text-sm text-gray-700",
                 "Yield"
             }
-            div {
-                class: "flex flex-row justify-between align-top",
+            Row {
+                class: "justify-between align-top",
                 match balance.cloned() {
                     None => {
                         rsx! {
@@ -54,8 +57,8 @@ fn StakingYield() -> Element {
                         }
                     }
                 }
-                div {
-                    class: "flex flex-row gap-4",
+                Row {
+                    gap: 4,
                     ClaimButton {}
                     span {
                         class: "hidden sm:flex",
@@ -138,10 +141,11 @@ fn LiquidityTable() -> Element {
                 TableRowLink {
                     to: Route::Pair { pair: liquidity.name.clone() },
                     left: rsx! {
-                        div {
-                            class: "flex flex-row grow gap-4 w-48 shrink-0",
-                            div {
-                                class: "flex flex-row gap-0 shrink-0",
+                        Row {
+                            class: "grow w-48 shrink-0",
+                            gap: 4,
+                            Row {
+                                class: "shrink-0",
                                 img {
                                     class: "w-10 h-10 shrink-0 my-auto rounded-full border border-gray-800",
                                     src: "{liquidity.image}"
@@ -151,8 +155,8 @@ fn LiquidityTable() -> Element {
                                     src: "icon.png"
                                 }
                             }
-                            div {
-                                class: "flex flex-col my-auto min-w-32 shrink-0",
+                            Col {
+                                class: "my-auto min-w-32 shrink-0",
                                 span {
                                     class: "font-medium whitespace-nowrap",
                                     "{liquidity.name}"

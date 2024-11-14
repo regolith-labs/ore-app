@@ -1,11 +1,12 @@
 use dioxus::prelude::*;
 
-use crate::components::PageTitle;
+use crate::components::{Col, PageTitle};
 
 pub fn Pay() -> Element {
     rsx! {
-        div {
-            class: "flex flex-col gap-8 w-full",
+        Col {
+            class: "w-full",
+            gap: 8,
             PageTitle {
                 title: "Pay"
             }

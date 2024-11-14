@@ -665,6 +665,11 @@ body {
   margin-bottom: auto;
 }
 
+.mx-3 {
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+}
+
 .-ml-2 {
   margin-left: -0.5rem;
 }
@@ -683,6 +688,14 @@ body {
 
 .mt-auto {
   margin-top: auto;
+}
+
+.-ml-3 {
+  margin-left: -0.75rem;
+}
+
+.-ml-2\.5 {
+  margin-left: -0.625rem;
 }
 
 .flex {
@@ -748,6 +761,10 @@ body {
 
 .h-screen {
   height: 100vh;
+}
+
+.h-80 {
+  height: 20rem;
 }
 
 .min-h-screen {
@@ -1352,6 +1369,11 @@ body {
   background-color: rgb(0 184 124 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-controls-handle:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(48 46 56 / var(--tw-bg-opacity));
+}
+
 .hover\:font-semibold:hover {
   font-weight: 600;
 }
@@ -1417,6 +1439,19 @@ body {
     width: 2rem;
   }
 
+  .sm\:w-min {
+    width: -moz-min-content;
+    width: min-content;
+  }
+
+  .sm\:w-16 {
+    width: 4rem;
+  }
+
+  .sm\:w-32 {
+    width: 8rem;
+  }
+
   .sm\:justify-between {
     justify-content: space-between;
   }
@@ -1448,6 +1483,11 @@ body {
     padding-bottom: 2rem;
   }
 
+  .sm\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .sm\:pb-16 {
     padding-bottom: 4rem;
   }
@@ -1468,8 +1508,18 @@ body {
   }
 }
 
+@media (min-width: 768px) {
+  .md\:flex {
+    display: flex;
+  }
+}
+
 @media (min-width: 1024px) {
   .lg\:flex {
     display: flex;
+  }
+
+  .lg\:hidden {
+    display: none;
   }
 }

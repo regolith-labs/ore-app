@@ -1,31 +1,49 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::components::{Breadcrumbs, SwapTool};
+use crate::components::{Breadcrumbs, Col, Row, SwapForm};
 
 #[component]
 pub fn Asset(asset: String) -> Element {
     rsx! {
-        div {
-            class: "flex flex-col gap-4 w-full px-5 sm:px-8",
+        Col {
+            class: "w-full px-5 sm:px-8",
+            gap: 4,
             Breadcrumbs {}
             span {
                 class: "font-wide text-2xl font-semibold",
                 "{asset}"
             }
-            div {
-                class: "flex flex-row gap-4",
-                div {
-                    class: "flex w-full h-64 bg-gray-800 rounded"
-                }
+            Row {
+                gap: 4,
+                PriceChart {}
                 span {
                     class: "hidden lg:flex",
-                    SwapTool {
+                    SwapForm {
                         mint_a: Pubkey::new_unique(),
                         mint_b: Pubkey::new_unique(),
                     }
                 }
             }
+            Row {
+                class: "justify-end lg:hidden",
+                button {
+                    class: "flex controls-primary h-10 rounded-full w-full sm:w-40",
+                    span {
+                        class: "mx-auto my-auto",
+                        "Swap"
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn PriceChart() -> Element {
+    rsx! {
+        // TODO
+        div {
+            class: "flex w-full h-80 bg-gray-800 rounded"
         }
     }
 }

@@ -1,12 +1,16 @@
 use dioxus::prelude::*;
 
-use crate::{components::CarrotRightIcon, route::Route};
+use crate::{
+    components::{CarrotRightIcon, Row},
+    route::Route,
+};
 
 pub fn Breadcrumbs() -> Element {
     let route: Route = use_route();
     rsx! {
-        div {
-            class: "flex flex-row gap-1 font-medium text-xs sm:text-sm",
+        Row {
+            class: "font-medium text-xs sm:text-sm",
+            gap: 1,
             match route {
                 Route::Pair { pair } => {
                     rsx! {
@@ -50,8 +54,8 @@ pub fn Breadcrumbs() -> Element {
 #[component]
 fn Path(title: String, route: Route) -> Element {
     rsx! {
-        span {
-            class: "flex flex-row gap-1",
+        Row {
+            gap: 1,
             Link {
                 to: route,
                 class: "text-gray-700 hover:underline",

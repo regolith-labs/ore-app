@@ -1,10 +1,10 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::components::SwitchIcon;
+use crate::components::{Col, Row, SwitchIcon};
 
 #[component]
-pub fn SwapTool(mint_a: Pubkey, mint_b: Pubkey) -> Element {
+pub fn SwapForm(mint_a: Pubkey, mint_b: Pubkey) -> Element {
     let sell_input_amount = use_signal::<String>(|| "".to_owned());
     let buy_input_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
@@ -30,10 +30,10 @@ pub fn SwapTool(mint_a: Pubkey, mint_b: Pubkey) -> Element {
     });
 
     rsx! {
-        div {
-            class: "flex flex-col gap-4",
-            div {
-                class: "relative lg:flex flex-col elevated elevated-border shrink-0 h-min w-96 rounded",
+        Col {
+            gap: 4,
+            Col {
+                class: "relative lg:flex elevated elevated-border shrink-0 h-min w-96 rounded",
                 SwapInput {
                     mint: Pubkey::new_unique(),
                     mode: SwapInputMode::Sell,
@@ -56,8 +56,9 @@ pub fn SwapTool(mint_a: Pubkey, mint_b: Pubkey) -> Element {
 
 fn SwapDetails() -> Element {
     rsx! {
-        div {
-            class: "flex flex-col gap-3 px-1",
+        Col {
+            class: "px-1",
+            gap: 3,
             DetailLabel {
                 title: "Transaction fee",
                 value: "0.00005 SOL"
@@ -73,8 +74,8 @@ fn SwapDetails() -> Element {
 #[component]
 fn DetailLabel(title: String, value: String) -> Element {
     rsx! {
-        div {
-            class: "flex flex-row w-full justify-between text-sm",
+        Row {
+            class: "w-full justify-between text-sm",
             span {
                 class: "text-elements-lowEmphasis",
                 "{title}"
@@ -112,7 +113,7 @@ fn SwapButton(enabled: Signal<bool>) -> Element {
 fn SwitchButton() -> Element {
     rsx! {
         button {
-            class: "absolute w-12 h-8 -mt-4 inset-y-1/2 -ml-4 inset-x-1/2 rounded elevated-control elevated-border text-elements-lowEmphasis",
+            class: "absolute w-12 h-8 -mt-4 inset-y-1/2 -ml-4 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
             onclick: move |_| {
                 // TODO
             },
@@ -141,12 +142,13 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>) ->
     };
 
     rsx! {
-        div {
-            class: "flex flex-col gap-2 w-full p-4 {border}",
-            div {
-                class: "flex flex-row justify-between",
+        Col {
+            class: "w-full p-4 {border}",
+            gap: 2,
+            Row {
+                class: "justify-between",
                 span {
-                    class: "text-gray-700 my-auto pl-1",
+                    class: "text-elements-midEmphasis my-auto pl-1",
                     "{title}"
                 }
                 if mode == SwapInputMode::Sell {
@@ -159,10 +161,11 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>) ->
                     }
                 }
             }
-            div {
-                class: "flex flex-row gap-4",
-                div {
-                    class: "flex flex-row gap-3 my-auto",
+            Row {
+                gap: 4,
+                Row {
+                    class: "my-auto",
+                    gap: 3,
                     img {
                         class: "w-8 h-8 rounded-full",
                         src: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
