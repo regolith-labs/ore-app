@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 
 use crate::{
-    components::{OreValue, OreValueSmall, QrCodeIcon, SwapIcon},
+    components::{OreValue, OreValueSmall, QrCodeIcon, SwapIcon, Table, TableHeader, TableRowLink},
     gateway::GatewayResult,
     hooks::{use_ore_balance, use_quote, use_token_balance},
     route::Route,
@@ -162,88 +162,77 @@ fn AssetTable() -> Element {
     ];
 
     // TODO Sort by token balances
-
     rsx! {
-        div {
-            class: "flex flex-col sm:mx-5",
-            AssetTableHeader {}
+        Table {
+            TableHeader {
+                left: "Market",
+                right: vec!["Price".to_string()]
+            }
             for asset in listed_assets {
-                AssetRow {
-                    asset: asset
+                TableRowLink {
+                    to: Route::Asset { asset: asset.ticker.clone() },
+                    left: rsx! {
+                        AssetNameAndBalance { asset: asset.clone() }
+                    },
+                    right: vec![
+                        rsx! { AssetQuote { asset: asset } },
+                    ]
                 }
-            }
-        }
-    }
-}
-
-fn AssetTableHeader() -> Element {
-    rsx! {
-        div {
-            class: "flex flex-row h-8 h-10 px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
-            span {
-                class: "my-auto",
-                "Market"
-            }
-            span {
-                class: "my-auto",
-                "Price"
             }
         }
     }
 }
 
 #[component]
-fn AssetRow(asset: Asset) -> Element {
+fn AssetNameAndBalance(asset: Asset) -> Element {
     let balance = use_token_balance(asset.mint);
-    let quote = use_quote(asset.mint);
-    // TODO Fetch price
-    // TODO Fetch 24h change
     rsx! {
-        Link {
-            to: Route::Asset { asset: asset.ticker.clone() },
-            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
+        div {
+            class: "flex flex-row gap-4",
+            img {
+                class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",
+                src: "{asset.image}"
+            }
             div {
-                class: "flex flex-row gap-4",
-                img {
-                    class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",
-                    src: "{asset.image}"
+                class: "flex flex-col",
+                span {
+                    class: "font-medium",
+                    "{asset.ticker}"
                 }
-                div {
-                    class: "flex flex-col",
-                    span {
-                        class: "font-medium",
-                        "{asset.ticker}"
-                    }
-                    span {
-                        class: "font-medium text-gray-700 h-5 text-sm",
-                        match balance.cloned() {
-                            None => rsx! {
-                                div { class: "h-5 w-20 loading rounded"}
-                            },
-                            Some(balance) => {
-                                match balance {
-                                    Err(_) => rsx!{ "0" },
-                                    Ok(b) => rsx!{ "{b.ui_amount_string}" },
-                                }
+                span {
+                    class: "font-medium text-gray-700 h-5 text-sm",
+                    match balance.cloned() {
+                        None => rsx! {
+                            div { class: "h-5 w-20 loading rounded"}
+                        },
+                        Some(balance) => {
+                            match balance {
+                                Err(_) => rsx!{ "0" },
+                                Ok(b) => rsx!{ "{b.ui_amount_string}" },
                             }
                         }
                     }
-                }
-            }
-            div {
-                class: "flex flex-col text-right",
-                OreValueSmall {
-                    ui_amount_string: "1.20245"
-                }
-                span {
-                    class: "font-medium text-green-500 text-sm",
-                    "0.2%"
                 }
             }
         }
     }
 }
 
+#[component]
+fn AssetQuote(asset: Asset) -> Element {
+    rsx! {
+        div {
+            class: "flex flex-col text-right",
+            OreValueSmall {
+                ui_amount_string: "1.20245"
+            }
+            span {
+                class: "font-medium text-green-500 text-sm",
+                "0.2%"
+            }
+        }
+    }
+}
 
 #[derive(Clone, PartialEq, Eq)]
 struct Asset {

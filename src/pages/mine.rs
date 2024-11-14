@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{CircleStackIcon, OreValue, PlayIcon},
+    components::{CircleStackIcon, OreValue, PlayIcon, Table, TableHeader, TableRowLink},
     hooks::use_ore_balance,
     route::Route,
 };
@@ -109,36 +109,13 @@ fn PoolTable() -> Element {
     ];
 
     rsx! {
-        div {
-            class: "flex flex-col sm:mx-5",
-            PoolTableHeader {}
+        Table {
+            TableHeader {
+                left: "Pool",
+                right: vec!["Hashpower".to_string(), "Multiplier".to_string()]
+            }
             for pool in listed_pools {
-                PoolRow {
-                    pool: pool
-                }
-            }
-        }
-    }
-}
-
-fn PoolTableHeader() -> Element {
-    rsx! {
-        div {
-            class: "flex flex-row h-8 h-10 px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
-            span {
-                class: "my-auto",
-                "Pool"
-            }
-            div {
-                class: "flex flex-row text-right",
-                span {
-                    class: "my-auto w-28 sm:w-40",
-                    "Hashpower"
-                }
-                span {
-                    class: "my-auto w-28 sm:w-40",
-                    "Multiplier"
-                }
+                PoolRow { pool: pool }
             }
         }
     }
@@ -147,34 +124,39 @@ fn PoolTableHeader() -> Element {
 #[component]
 fn PoolRow(pool: Pool) -> Element {
     rsx! {
-        Link {
+        TableRowLink {
             to: Route::Pool { pool: pool.name.clone() },
-            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
-            div {
-                class: "flex flex-row gap-4",
-                img {
-                    class: "w-10 h-10 my-auto bg-gray-900 rounded border border-gray-800",
-                    src: "{pool.image}"
-                }
+            left: rsx! {
                 div {
-                    class: "flex flex-col my-auto",
-                    span {
-                        class: "font-medium",
-                        "{pool.name}"
+                    class: "flex flex-row gap-4",
+                    img {
+                        class: "w-10 h-10 my-auto bg-gray-900 rounded border border-gray-800",
+                        src: "{pool.image}"
+                    }
+                    div {
+                        class: "flex flex-col my-auto",
+                        span {
+                            class: "font-medium",
+                            "{pool.name}"
+                        }
                     }
                 }
-            }
-            div {
-                class: "flex flex-row text-right my-auto",
-                span {
-                    class: "flex w-28 sm:w-40 justify-end",
-                    "64480"
+            },
+            right: vec![
+                rsx! {
+                    div {
+                        class: "flex flex-row text-right my-auto",
+                        span {
+                            class: "flex w-28 sm:w-40 justify-end",
+                            "64480"
+                        }
+                        span {
+                            class: "w-28 sm:w-40",
+                            "2.4x",
+                        }
+                    }
                 }
-                span {
-                    class: "w-28 sm:w-40",
-                    "2.4x",
-                }
-            }
+            ]
         }
     }
 }

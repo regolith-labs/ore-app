@@ -689,6 +689,10 @@ body {
   display: flex;
 }
 
+.table {
+  display: table;
+}
+
 .contents {
   display: contents;
 }
@@ -815,12 +819,28 @@ body {
   width: 100vw;
 }
 
+.w-32 {
+  width: 8rem;
+}
+
+.w-48 {
+  width: 12rem;
+}
+
+.min-w-\[32rem\] {
+  min-width: 32rem;
+}
+
 .max-w-\[80rem\] {
   max-width: 80rem;
 }
 
 .shrink-0 {
   flex-shrink: 0;
+}
+
+.grow {
+  flex-grow: 1;
 }
 
 .rotate-45 {
@@ -892,9 +912,17 @@ body {
   overflow: clip;
 }
 
+.overflow-x-scroll {
+  overflow-x: scroll;
+}
+
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whitespace-nowrap {
   white-space: nowrap;
 }
 
@@ -961,6 +989,21 @@ body {
 .bg-blue-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
+.bg-purple-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(168 85 247 / var(--tw-bg-opacity));
+}
+
+.bg-purple-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(192 132 252 / var(--tw-bg-opacity));
+}
+
+.bg-red-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 226 226 / var(--tw-bg-opacity));
 }
 
 .p-1 {
@@ -1360,6 +1403,10 @@ body {
 
   .sm\:h-8 {
     height: 2rem;
+  }
+
+  .sm\:h-10 {
+    height: 2.5rem;
   }
 
   .sm\:w-40 {

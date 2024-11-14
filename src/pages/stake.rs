@@ -2,7 +2,9 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{CircleStackIcon, OreValue, OreValueSmall, PlusIcon},
+    components::{
+        CircleStackIcon, OreValue, OreValueSmall, PlusIcon, Table, TableHeader, TableRowLink,
+    },
     hooks::use_ore_balance,
     route::Route,
 };
@@ -127,85 +129,53 @@ fn LiquidityTable() -> Element {
     ];
 
     rsx! {
-        div {
-            class: "flex flex-col sm:mx-5",
-            LiquidityTableHeader {}
+        Table {
+            TableHeader {
+                left: "Pair",
+                right: vec!["Liquidity".to_string(), "Volume".to_string()]
+            }
             for liquidity in listed_liquidity {
-                LiquidityRow {
-                    liquidity: liquidity
-                }
-            }
-        }
-    }
-}
-
-fn LiquidityTableHeader() -> Element {
-    rsx! {
-        div {
-            class: "flex flex-row h-8 h-10 px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
-            span {
-                class: "my-auto",
-                "Pair"
-            }
-            div {
-                class: "flex flex-row text-right",
-                span {
-                    class: "my-auto w-28 sm:w-40",
-                    "Liquidity"
-                }
-                span {
-                    class: "my-auto w-28 sm:w-40",
-                    "Volume"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn LiquidityRow(liquidity: Liquidity) -> Element {
-    rsx! {
-        Link {
-            to: Route::Pair { pair: liquidity.name.clone() },
-            class: "flex flex-row w-full px-5 sm:px-3 py-4 justify-between transition sm:rounded-md hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
-            div {
-                class: "flex flex-row gap-4",
-                div {
-                    class: "flex flex-row gap-0",
-                    img {
-                        class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",
-                        src: "{liquidity.image}"
-                    }
-                    img {
-                        class: "w-10 h-10 -ml-2 my-auto bg-gray-900 rounded-full border border-gray-800",
-                        src: "icon.png"
-                    }
-                }
-                div {
-                    class: "flex flex-col my-auto",
-                    span {
-                        class: "font-medium",
-                        "{liquidity.name}"
-                    }
-                    span {
-                        class: "font-medium text-gray-700 h-5 text-sm",
-                        "0"
-                    }
-                }
-            }
-            div {
-                class: "flex flex-row text-right my-auto",
-                span {
-                    class: "flex w-28 sm:w-40 justify-end",
-                    OreValueSmall {
-                        ui_amount_string: "4209.202"
-                    }
-                }
-                span {
-                    class: "flex w-28 sm:w-40 justify-end",
-                    OreValueSmall {
-                        ui_amount_string: "602.204"
-                    }
+                TableRowLink {
+                    to: Route::Pair { pair: liquidity.name.clone() },
+                    left: rsx! {
+                        div {
+                            class: "flex flex-row grow gap-4 w-48 shrink-0",
+                            div {
+                                class: "flex flex-row gap-0 shrink-0",
+                                img {
+                                    class: "w-10 h-10 shrink-0 my-auto rounded-full border border-gray-800",
+                                    src: "{liquidity.image}"
+                                }
+                                img {
+                                    class: "w-10 h-10 shrink-0 -ml-2 my-auto rounded-full border border-gray-800",
+                                    src: "icon.png"
+                                }
+                            }
+                            div {
+                                class: "flex flex-col my-auto min-w-32 shrink-0",
+                                span {
+                                    class: "font-medium whitespace-nowrap",
+                                    "{liquidity.name}"
+                                }
+                                span {
+                                    class: "font-medium text-gray-700 h-5 text-sm",
+                                    "0"
+                                }
+                            }
+                        }
+                    },
+                    right: vec![
+                        rsx! {
+                            OreValueSmall {
+                                ui_amount_string: "4209.202"
+                            }
+                        },
+                        rsx! {
+                            OreValueSmall {
+                                ui_amount_string: "602.204"
+                            }
+                        }
+                    ]
                 }
             }
         }

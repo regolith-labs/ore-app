@@ -7,6 +7,23 @@ pub fn OreValue(ui_amount_string: String) -> Element {
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
     let small_units = units[1];
+
+    // let is_thousands = big_units.len() > 3;
+    // let k = if is_thousands { "k" } else { "" };
+    // let big_units_display = if is_thousands {
+    //     match big_units.char_indices().rev().nth(2) {
+    //         Some((i, _)) => &big_units[..i],
+    //         None => "",
+    //     }
+    // } else {
+    //     big_units
+    // };
+    // let small_units_display: String = if is_thousands {
+    //     big_units.chars().rev().take(3).collect()
+    // } else {
+    //     small_units.chars().take(2).collect()
+    // };
+
     rsx! {
         div {
             class: "flex flex-row gap-2 sm:gap-3 h-10 w-min",
@@ -30,6 +47,26 @@ pub fn OreValue(ui_amount_string: String) -> Element {
 
 #[component]
 pub fn OreValueSmall(ui_amount_string: String) -> Element {
+    let units: Vec<_> = ui_amount_string.split('.').collect();
+    let big_units = units[0];
+    let small_units = units[1];
+
+    let is_thousands = big_units.len() > 3;
+    let k = if is_thousands { "k" } else { "" };
+    let big_units_display = if is_thousands {
+        match big_units.char_indices().rev().nth(2) {
+            Some((i, _)) => &big_units[..i],
+            None => "",
+        }
+    } else {
+        big_units
+    };
+    let small_units_display: String = if is_thousands {
+        big_units.chars().rev().take(3).into_iter().collect()
+    } else {
+        small_units.chars().take(3).collect()
+    };
+
     rsx! {
         div {
             class: "flex flex-row gap-1.5 w-min",
@@ -40,7 +77,7 @@ pub fn OreValueSmall(ui_amount_string: String) -> Element {
                 class: "flex flex-row font-medium my-auto",
                 span {
                     class: "mt-auto",
-                    "{ui_amount_string}"
+                    "{big_units_display}.{small_units_display}{k}"
                 }
             }
         }
