@@ -746,6 +746,10 @@ body {
   height: 100vh;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
 .w-10 {
   width: 2.5rem;
 }
@@ -952,6 +956,11 @@ body {
 .bg-controls-disabled {
   --tw-bg-opacity: 1;
   background-color: rgb(24 23 28 / var(--tw-bg-opacity));
+}
+
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
 }
 
 .p-1 {

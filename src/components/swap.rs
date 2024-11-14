@@ -4,7 +4,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use crate::components::SwitchIcon;
 
 #[component]
-pub fn Swap(mint_a: Pubkey, mint_b: Pubkey) -> Element {
+pub fn SwapTool(mint_a: Pubkey, mint_b: Pubkey) -> Element {
     let sell_input_amount = use_signal::<String>(|| "".to_owned());
     let buy_input_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);

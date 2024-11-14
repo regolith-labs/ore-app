@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::components::{Breadcrumbs, Swap};
+use crate::components::{Breadcrumbs, SwapTool};
 
 #[component]
 pub fn Asset(asset: String) -> Element {
@@ -20,7 +20,7 @@ pub fn Asset(asset: String) -> Element {
                 }
                 span {
                     class: "hidden lg:flex",
-                    Swap {
+                    SwapTool {
                         mint_a: Pubkey::new_unique(),
                         mint_b: Pubkey::new_unique(),
                     }
