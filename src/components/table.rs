@@ -19,7 +19,7 @@ pub fn TableHeader(left: String, right: Vec<String>) -> Element {
             class: "flex flex-row h-8 sm:h-10 min-w-[32rem] w-full px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
             span {
                 class: "my-auto w-48 grow shrink-0",
-                "Pair"
+                "{left}"
             }
             div {
                 class: "flex flex-row text-right shrink-0",

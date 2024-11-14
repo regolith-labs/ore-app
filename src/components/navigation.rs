@@ -71,9 +71,15 @@ fn Logo() -> Element {
 }
 
 fn TabBar() -> Element {
+    let current_route: Route = use_route();
+    let hidden = if is_navbar_hidden(&current_route) {
+        "hidden"
+    } else {
+        "hidden sm:flex"
+    };
     rsx! {
         div {
-            class: "hidden sm:flex flex-row h-full rounded-full elevated elevated-border overflow-clip",
+            class: "{hidden} flex-row h-full rounded-full elevated elevated-border overflow-clip",
             Tab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -108,9 +114,15 @@ fn Tab(title: String, route: Route) -> Element {
 }
 
 fn MobileTabBar() -> Element {
+    let current_route: Route = use_route();
+    let hidden = if is_navbar_hidden(&current_route) {
+        "hidden"
+    } else {
+        ""
+    };
     rsx! {
         div {
-            class: "sm:hidden flex flex-row fixed bottom-0 w-full elevated",
+            class: "{hidden} sm:hidden flex flex-row fixed bottom-0 w-full elevated",
             MobileTab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -162,6 +174,13 @@ fn MobileTab(title: String, route: Route) -> Element {
                 }
             }
         }
+    }
+}
+
+fn is_navbar_hidden(current_route: &Route) -> bool {
+    match current_route {
+        Route::Swap {} | Route::Pay {} => true,
+        _ => false,
     }
 }
 
