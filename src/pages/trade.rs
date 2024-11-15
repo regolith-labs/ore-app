@@ -185,9 +185,7 @@ fn AssetTable() -> Element {
                 for asset in listed_assets {
                     TableRowLink {
                         to: Route::Market { market: asset.ticker.clone() },
-                        left: rsx! {
-                            AssetNameAndBalance { asset: asset.clone() }
-                        },
+                        left: rsx! { AssetNameAndBalance { asset: asset.clone() } },
                         right_1: rsx! { AssetQuote { asset: asset } },
                     }
                 }
