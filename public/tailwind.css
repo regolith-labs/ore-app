@@ -916,6 +916,10 @@ body {
   flex-grow: 1;
 }
 
+.table-auto {
+  table-layout: auto;
+}
+
 .rotate-45 {
   --tw-rotate: 45deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -1173,6 +1177,10 @@ body {
 
 .pl-1 {
   padding-left: 0.25rem;
+}
+
+.text-left {
+  text-align: left;
 }
 
 .text-center {
