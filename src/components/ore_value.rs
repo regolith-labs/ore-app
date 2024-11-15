@@ -53,15 +53,15 @@ pub fn OrePrice(ui_amount_string: String) -> Element {
     let small_units = units[1];
     rsx! {
         Row {
-            class: "sm:gap-3 h-10 w-min",
+            class: "sm:gap-2.5 w-min",
             gap: 2,
             OreIcon {
-                class: "h-6 w-6 sm:h-8 sm:w-8 my-auto"
+                class: "h-6 w-6 sm:h-7 sm:w-7 my-auto"
             }
             Row {
                 class: "my-auto",
                 span {
-                    class: "mt-auto font-semibold text-2xl sm:text-3xl",
+                    class: "mt-auto font-semibold text-xl sm:text-2xl",
                     "{big_units}.{small_units}"
                 }
             }

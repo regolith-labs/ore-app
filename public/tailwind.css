@@ -715,6 +715,22 @@ body {
   margin-left: -0.625rem;
 }
 
+.-ml-1 {
+  margin-left: -0.25rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.mb-1\.5 {
+  margin-bottom: 0.375rem;
+}
+
 .flex {
   display: flex;
 }
@@ -782,6 +798,10 @@ body {
 
 .h-80 {
   height: 20rem;
+}
+
+.h-12 {
+  height: 3rem;
 }
 
 .min-h-screen {
@@ -1013,6 +1033,10 @@ body {
 
 .rounded-full {
   border-radius: 9999px;
+}
+
+.rounded-sm {
+  border-radius: 0.125rem;
 }
 
 .border {
@@ -1489,6 +1513,14 @@ body {
     margin-right: 2rem;
   }
 
+  .sm\:mb-1 {
+    margin-bottom: 0.25rem;
+  }
+
+  .sm\:mb-1\.5 {
+    margin-bottom: 0.375rem;
+  }
+
   .sm\:flex {
     display: flex;
   }
@@ -1507,6 +1539,14 @@ body {
 
   .sm\:h-10 {
     height: 2.5rem;
+  }
+
+  .sm\:h-6 {
+    height: 1.5rem;
+  }
+
+  .sm\:h-7 {
+    height: 1.75rem;
   }
 
   .sm\:w-40 {
@@ -1530,6 +1570,14 @@ body {
     width: 8rem;
   }
 
+  .sm\:w-6 {
+    width: 1.5rem;
+  }
+
+  .sm\:w-7 {
+    width: 1.75rem;
+  }
+
   .sm\:justify-between {
     justify-content: space-between;
   }
@@ -1540,6 +1588,14 @@ body {
 
   .sm\:gap-4 {
     gap: 1rem;
+  }
+
+  .sm\:gap-2 {
+    gap: 0.5rem;
+  }
+
+  .sm\:gap-2\.5 {
+    gap: 0.625rem;
   }
 
   .sm\:rounded-md {
@@ -1583,6 +1639,11 @@ body {
   .sm\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+
+  .sm\:text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
   }
 }
 
