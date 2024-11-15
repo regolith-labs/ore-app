@@ -34,14 +34,14 @@ pub fn Breadcrumbs() -> Element {
                         }
                     }
                 }
-                Route::Asset { asset } => {
+                Route::Market { market } => {
                     rsx! {
                         Path {
                             title: "Trade",
                             route: Route::Trade {},
                         }
                         Active {
-                            title: "{asset}"
+                            title: "{market}"
                         }
                     }
                 }

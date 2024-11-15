@@ -168,11 +168,13 @@ fn AssetTable() -> Element {
         Table {
             TableHeader {
                 left: "Market",
+                    left_width: 40,
                 right: vec!["Price".to_string()]
             }
             for asset in listed_assets {
                 TableRowLink {
-                    to: Route::Asset { asset: asset.ticker.clone() },
+                    to: Route::Market { market: asset.ticker.clone() },
+                    left_width: 40,
                     left: rsx! {
                         AssetNameAndBalance { asset: asset.clone() }
                     },
@@ -190,6 +192,7 @@ fn AssetNameAndBalance(asset: Asset) -> Element {
     let balance = use_token_balance(asset.mint);
     rsx! {
         Row {
+            // class: "w-40",
             gap: 4,
             img {
                 class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",

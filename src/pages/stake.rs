@@ -135,14 +135,17 @@ fn LiquidityTable() -> Element {
         Table {
             TableHeader {
                 left: "Pair",
+                left_width: 48,
                 right: vec!["Liquidity".to_string(), "Volume".to_string()]
             }
             for liquidity in listed_liquidity {
                 TableRowLink {
                     to: Route::Pair { pair: liquidity.name.clone() },
+                    left_width: 48,
                     left: rsx! {
                         Row {
-                            class: "grow w-48 shrink-0",
+                            // class: "grow w-48 shrink-0",
+                            class: "grow shrink-0",
                             gap: 4,
                             Row {
                                 class: "shrink-0",

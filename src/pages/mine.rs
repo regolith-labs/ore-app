@@ -114,6 +114,7 @@ fn PoolTable() -> Element {
         Table {
             TableHeader {
                 left: "Pool",
+                left_width: 40,
                 right: vec!["Hashpower".to_string(), "Multiplier".to_string()]
             }
             for pool in listed_pools {
@@ -128,6 +129,7 @@ fn PoolRow(pool: Pool) -> Element {
     rsx! {
         TableRowLink {
             to: Route::Pool { pool: pool.name.clone() },
+            left_width: 40,
             left: rsx! {
                 Row {
                     gap: 4,
@@ -146,16 +148,13 @@ fn PoolRow(pool: Pool) -> Element {
             },
             right: vec![
                 rsx! {
-                    Row {
-                        class: "text-right my-auto",
-                        span {
-                            class: "flex w-28 sm:w-40 justify-end",
-                            "64480"
-                        }
-                        span {
-                            class: "w-28 sm:w-40",
-                            "2.4x",
-                        }
+                    span {
+                        "64480"
+                    }
+                },
+                rsx! {
+                    span {
+                        "2.4x",
                     }
                 }
             ]

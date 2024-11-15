@@ -1,18 +1,24 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::components::{Breadcrumbs, Col, Row, SwapForm};
+use crate::components::{Breadcrumbs, Col, OrePrice, Row, SwapForm};
 
 #[component]
-pub fn Asset(asset: String) -> Element {
+pub fn Market(market: String) -> Element {
     rsx! {
         Col {
             class: "w-full px-5 sm:px-8",
-            gap: 4,
+            gap: 2,
             Breadcrumbs {}
-            span {
-                class: "font-wide text-2xl font-semibold",
-                "{asset}"
+            Row {
+                class: "justify-between",
+                span {
+                    class: "font-wide text-2xl font-semibold",
+                    "{market}"
+                }
+                OrePrice {
+                    ui_amount_string: "1.042",
+                }
             }
             Row {
                 gap: 4,

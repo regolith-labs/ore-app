@@ -22,8 +22,8 @@ pub enum Route {
         Pair { pair: String },
         #[route("/trade")]
         Trade {},
-        #[route("/trade/:asset")]
-        Asset { asset: String },
+        #[route("/trade/:market")]
+        Market { market: String },
         #[route("/deposit")]
         Deposit {},
         #[route("/swap")]

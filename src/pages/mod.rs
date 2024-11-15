@@ -1,6 +1,6 @@
-mod asset;
 mod deposit;
 mod landing;
+mod market;
 mod mine;
 mod not_found;
 mod pair;
@@ -10,9 +10,9 @@ mod stake;
 mod swap;
 mod trade;
 
-pub use asset::*;
 pub use deposit::*;
 pub use landing::*;
+pub use market::*;
 pub use mine::*;
 pub use not_found::*;
 pub use pair::*;

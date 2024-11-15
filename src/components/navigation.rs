@@ -196,7 +196,7 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
             _ => false,
         },
         Route::Trade {} => match current_route {
-            Route::Trade {} | Route::Asset { asset: _ } => true,
+            Route::Trade {} | Route::Market { market: _ } => true,
             _ => false,
         },
         _ => false,
