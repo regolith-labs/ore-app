@@ -2,7 +2,10 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{CircleStackIcon, Col, OreValue, PlayIcon, Row, Table, TableHeader, TableRowLink},
+    components::{
+        CircleStackIcon, Col, OreValue, OreValueSmall, PlayIcon, Row, Table, TableHeader,
+        TableRowLink,
+    },
     hooks::use_ore_balance,
     route::Route,
 };
@@ -10,12 +13,13 @@ use crate::{
 pub fn Mine() -> Element {
     rsx! {
         Col {
-            class: "w-full pb-20 sm:pb-16",
+            class: "w-full pb-20 sm:pb-16 gap-8",
             gap: 8,
             Row {
-                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl sm:text-3xl font-semibold",
+                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10",
+                gap: 4,
                 span {
-                    class: "my-auto",
+                    class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
                     "Mine"
                 }
                 StartButton {}
@@ -70,10 +74,14 @@ fn MiningYield() -> Element {
 fn StartButton() -> Element {
     rsx! {
         Link {
-            to: Route::Pay {},
-            class: "controls-square controls-primary",
+            to: Route::Swap {},
+            class: "h-10 controls-primary rounded-full px-4 gap-2",
             PlayIcon {
                 class: "h-5 w-5 mx-auto my-auto"
+            }
+            span {
+                class: "my-auto",
+                "Start"
             }
         }
     }
@@ -83,9 +91,13 @@ fn ClaimButton() -> Element {
     rsx! {
         Link {
             to: Route::Pay {},
-            class: "controls-square controls-secondary",
+            class: "h-10 controls-secondary rounded-full px-4 gap-2",
             CircleStackIcon {
                 class: "h-5 w-5 mx-auto my-auto"
+            }
+            span {
+                class: "my-auto",
+                "Claim"
             }
         }
     }
@@ -115,7 +127,7 @@ fn PoolTable() -> Element {
             TableHeader {
                 left: "Pool",
                 left_width: 40,
-                right: vec!["Hashpower".to_string(), "Multiplier".to_string()]
+                right: vec!["Hashpower".to_string(), "Multiplier".to_string(), "Yield".to_string()]
             }
             for pool in listed_pools {
                 PoolRow { pool: pool }
@@ -155,6 +167,14 @@ fn PoolRow(pool: Pool) -> Element {
                 rsx! {
                     span {
                         "2.4x",
+                    }
+                },
+                rsx! {
+                    span {
+                        class: "text-elements-gold",
+                        OreValueSmall {
+                            ui_amount_string: "2.054"
+                        }
                     }
                 }
             ]

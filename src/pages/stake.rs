@@ -16,9 +16,10 @@ pub fn Stake() -> Element {
             class: "w-full pb-20 sm:pb-16",
             gap: 8,
             Row {
-                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl sm:text-3xl font-semibold",
+                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10",
+                gap: 4,
                 span {
-                    class: "my-auto",
+                    class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
                     "Stake"
                 }
                 DepositButton {}
@@ -74,9 +75,13 @@ fn DepositButton() -> Element {
     rsx! {
         Link {
             to: Route::Deposit {},
-            class: "controls-square controls-primary",
+            class: "h-10 controls-primary rounded-full px-4 gap-2",
             PlusIcon {
                 class: "h-4 w-4 mx-auto my-auto"
+            }
+            span {
+                class: "my-auto",
+                "Deposit"
             }
         }
     }
@@ -86,9 +91,13 @@ fn ClaimButton() -> Element {
     rsx! {
         Link {
             to: Route::Pay {},
-            class: "controls-square controls-secondary",
+            class: "h-10 controls-secondary rounded-full px-4 gap-2",
             CircleStackIcon {
                 class: "h-5 w-5 mx-auto my-auto"
+            }
+            span {
+                class: "my-auto",
+                "Claim"
             }
         }
     }
@@ -136,7 +145,7 @@ fn LiquidityTable() -> Element {
             TableHeader {
                 left: "Pair",
                 left_width: 48,
-                right: vec!["Liquidity".to_string(), "Volume".to_string()]
+                right: vec!["Liquidity".to_string(), "Volume".to_string(), "Yield".to_string()]
             }
             for liquidity in listed_liquidity {
                 TableRowLink {
@@ -180,6 +189,14 @@ fn LiquidityTable() -> Element {
                         rsx! {
                             OreValueSmall {
                                 ui_amount_string: "602.204"
+                            }
+                        },
+                        rsx! {
+                            span {
+                                class: "text-elements-gold",
+                                OreValueSmall {
+                                    ui_amount_string: "2.054"
+                                }
                             }
                         }
                     ]

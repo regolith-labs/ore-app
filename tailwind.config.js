@@ -22,7 +22,8 @@ module.exports = {
       elements: {
         highEmphasis: '#FAFAFA',
         midEmphasis: '#D1D1D1',
-        lowEmphasis: '#707070'
+        lowEmphasis: '#707070',
+        gold: '#ECC771'
       },
       surface: {
         elevated: '#131216',

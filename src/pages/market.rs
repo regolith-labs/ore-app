@@ -95,7 +95,7 @@ fn SocialButtons() -> Element {
     rsx! {
         Link {
             to: Route::Swap {},
-            class: "flex controls-tertiary h-10 w-10 rounded-full shrink-0",
+            class: "flex controls-secondary h-10 w-10 rounded-full shrink-0",
             XIcon {
                 class: "w-5 h-5 mx-auto my-auto"
             }
@@ -175,7 +175,7 @@ fn PriceChart() -> Element {
             class: "gap-3",
             // gap: 3,
             Row {
-                class: "text-sm text-elements-midEmphasis ml-auto",
+                class: "text-sm text-elements-midEmphasis",
                 TimeFrameButton {
                     title: "1D"
                 }
