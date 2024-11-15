@@ -16,9 +16,9 @@ pub fn Trade() -> Element {
             class: "w-full pb-20 sm:pb-16",
             gap: 8,
             Row {
-                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl sm:text-3xl font-semibold",
+                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10",
                 span {
-                    class: "align-text-bottom my-auto",
+                    class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
                     "Trade"
                 }
                 SwapButton {}
@@ -101,9 +101,13 @@ fn SwapButton() -> Element {
     rsx! {
         Link {
             to: Route::Swap {},
-            class: "controls-square controls-primary",
+            class: "h-10 controls-primary rounded-full px-4 gap-2",
             SwapIcon {
                 class: "h-5 w-5 mx-auto my-auto"
+            }
+            span {
+                class: "my-auto",
+                "Swap"
             }
         }
     }
@@ -113,9 +117,13 @@ fn PayButton() -> Element {
     rsx! {
         Link {
             to: Route::Pay {},
-            class: "controls-square controls-secondary",
+            class: "h-10 controls-secondary rounded-full px-4 gap-2",
             QrCodeIcon {
                 class: "h-6 w-6 mx-auto my-auto"
+            }
+            span {
+                class: "my-auto",
+                "Pay"
             }
         }
     }

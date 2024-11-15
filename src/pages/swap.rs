@@ -19,7 +19,7 @@ pub fn Swap() -> Element {
                     }
                     span {
                         class: "text-elements-lowEmphasis",
-                        "Swap from one asset to another."
+                        "Sell one token and buy another."
                     }
                 }
                 SwapForm {

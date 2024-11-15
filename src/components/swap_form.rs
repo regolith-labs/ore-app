@@ -178,11 +178,15 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>) ->
                 input {
                     class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right",
                     placeholder: "0",
+                    value: input_amount.cloned(),
                     oninput: move |e| {
                         let s = e.value();
                         if s.len().eq(&0) || s.parse::<f64>().is_ok() {
+                            log::info!("Ok... {s}");
                             input_amount.set(s);
                         } else {
+                            let x = s[..s.len()-1].to_string();
+                            log::info!("Not ok... {s} yep {x}");
                             input_amount.set(s[..s.len()-1].to_string());
                         }
                     }

@@ -600,6 +600,7 @@ body {
   display: flex;
   --tw-bg-opacity: 1;
   background-color: rgb(38 36 45 / var(--tw-bg-opacity));
+  font-weight: 500;
   --tw-text-opacity: 1;
   color: rgb(209 209 209 / var(--tw-text-opacity));
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
@@ -618,6 +619,7 @@ body {
   display: flex;
   --tw-bg-opacity: 1;
   background-color: rgb(29 28 34 / var(--tw-bg-opacity));
+  font-weight: 500;
   --tw-text-opacity: 1;
   color: rgb(112 112 112 / var(--tw-text-opacity));
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
@@ -713,12 +715,12 @@ body {
   margin-left: auto;
 }
 
-.mt-auto {
-  margin-top: auto;
-}
-
 .mt-24 {
   margin-top: 6rem;
+}
+
+.mt-auto {
+  margin-top: auto;
 }
 
 .flex {
@@ -929,16 +931,12 @@ body {
   gap: 0.5rem;
 }
 
-.gap-4 {
-  gap: 1rem;
-}
-
-.gap-8 {
-  gap: 2rem;
-}
-
 .gap-3 {
   gap: 0.75rem;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .overflow-clip {
@@ -1023,11 +1021,6 @@ body {
   background-color: rgb(250 250 250 / var(--tw-bg-opacity));
 }
 
-.bg-controls-tertiary {
-  --tw-bg-opacity: 1;
-  background-color: rgb(29 28 34 / var(--tw-bg-opacity));
-}
-
 .p-1 {
   padding: 0.25rem;
 }
@@ -1104,22 +1097,6 @@ body {
 
 .pr-1 {
   padding-right: 0.25rem;
-}
-
-.pt-32 {
-  padding-top: 8rem;
-}
-
-.pt-28 {
-  padding-top: 7rem;
-}
-
-.pt-24 {
-  padding-top: 6rem;
-}
-
-.pt-20 {
-  padding-top: 5rem;
 }
 
 .text-center {
@@ -1381,6 +1358,11 @@ body {
   background-color: rgb(29 28 34 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-controls-tertiaryHover:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(34 32 39 / var(--tw-bg-opacity));
+}
+
 .hover\:bg-gray-800:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(39 37 43 / var(--tw-bg-opacity));
@@ -1389,11 +1371,6 @@ body {
 .hover\:bg-green-600:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(0 184 124 / var(--tw-bg-opacity));
-}
-
-.hover\:bg-controls-tertiaryHover:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(34 32 39 / var(--tw-bg-opacity));
 }
 
 .hover\:font-semibold:hover {

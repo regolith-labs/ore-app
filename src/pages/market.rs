@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{Col, OrePrice, OreValueSmall, Row, SwapForm},
+    components::{Col, OrePrice, OreValueSmall, Row, SwapForm, XIcon},
     route::Route,
 };
 
@@ -68,8 +68,10 @@ fn Actions() -> Element {
         div {
             class: "flex flex-col-reverse sm:flex-row gap-4",
             Info {}
-            span {
+            Row {
                 class: "lg:hidden",
+                gap: 2,
+                SocialButtons {}
                 SwapButton {}
             }
         }
@@ -80,10 +82,22 @@ fn SwapButton() -> Element {
     rsx! {
         Link {
             to: Route::Swap {},
-            class: "flex controls-primary h-10 rounded-full shrink-0 w-full sm:w-40",
+            class: "flex controls-primary h-10 rounded-full w-full sm:w-40",
             span {
                 class: "mx-auto my-auto",
                 "Swap"
+            }
+        }
+    }
+}
+
+fn SocialButtons() -> Element {
+    rsx! {
+        Link {
+            to: Route::Swap {},
+            class: "flex controls-tertiary h-10 w-10 rounded-full shrink-0",
+            XIcon {
+                class: "w-5 h-5 mx-auto my-auto"
             }
         }
     }
@@ -95,13 +109,9 @@ fn Info() -> Element {
             gap: 1,
             class: "px-1",
             span {
-                class: "text-xs font-medium text-elements-lowEmphasis",
+                class: "text-xs sm:text-sm font-medium text-elements-lowEmphasis",
                 "About"
             }
-            // span {
-            //     class: "font-medium text-xs sm:text-sm text-gray-700",
-            //     "Balance"
-            // }
             span {
                 class: "text-elements-midEmphasis w-full",
                 "Solana is a highly functional open source project that banks on blockchain technology’s permissionless nature to provide decentralized finance (DeFi) solutions."
@@ -117,22 +127,22 @@ fn Stats() -> Element {
             div {
                 class: "flex flex-col sm:flex-row gap-1",
                 StatValue {
-                    title: "MARKET CAP",
+                    title: "SUPPLY",
                     value: 123
                 }
                 StatValue {
-                    title: "VOLUME",
+                    title: "LIQUIDITY",
                     value: 123
                 }
             }
             div {
                 class: "flex flex-col sm:flex-row gap-1",
                 StatValue {
-                    title: "SUPPLY",
+                    title: "VOLUME",
                     value: 123
                 }
                 StatValue {
-                    title: "FDV",
+                    title: "VALUATION",
                     value: 123
                 }
             }

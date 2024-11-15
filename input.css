@@ -31,15 +31,15 @@
     }
 
     .controls-primary {
-        @apply flex transition font-medium bg-controls-primary text-on-onColor hover:bg-controls-primaryHover;
+        @apply flex font-medium transition font-medium bg-controls-primary text-on-onColor hover:bg-controls-primaryHover;
     }
 
     .controls-secondary {
-        @apply flex transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
+        @apply flex font-medium transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
     }
 
     .controls-tertiary {
-        @apply flex transition bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis;
+        @apply flex font-medium transition bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis;
     }
 
     .controls-square {
