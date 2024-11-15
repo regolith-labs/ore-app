@@ -103,7 +103,7 @@ fn Info() -> Element {
             //     "Balance"
             // }
             span {
-                class: "text-sm text-elements-midEmphasis w-full",
+                class: "text-elements-midEmphasis w-full",
                 "Solana is a highly functional open source project that banks on blockchain technology’s permissionless nature to provide decentralized finance (DeFi) solutions."
             }
         }
@@ -146,7 +146,7 @@ fn StatValue(title: String, value: u64) -> Element {
         Row {
             class: "justify-between elevated h-12 w-full px-4 rounded-sm",
             span {
-                class: "font-medium my-auto text-sm text-elements-lowEmphasis",
+                class: "font-medium my-auto text-xs sm:text-sm text-elements-lowEmphasis",
                 "{title}"
             }
             span {
