@@ -1,51 +1,29 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::components::{Breadcrumbs, Col, OrePrice, OreValueSmall, Row, SwapForm};
+use crate::{
+    components::{Col, OrePrice, OreValueSmall, Row, SwapForm},
+    route::Route,
+};
 
 #[component]
 pub fn Market(market: String) -> Element {
     rsx! {
         Row {
-            class: "w-full px-5 sm:px-8",
+            class: "w-full px-5 sm:px-8 pb-20 sm:pb-16",
             gap:4,
             Col {
                 class: "w-full",
                 gap: 4,
-                Col {
-                    gap: 2,
-                    // Breadcrumbs {}
-                    Row {
-                        class: "justify-between",
-                        Row {
-                            gap: 2,
-                            img {
-                                class: "w-10 h-10 rounded-full border border-gray-800 -ml-1 my-auto",
-                                src: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-                            }
-                            span {
-                                class: "font-wide text-2xl sm:text-3xl font-semibold my-auto",
-                                "{market}"
-                            }
-                        }
-                        Row {
-                            gap: 2,
-                            OrePrice {
-                                ui_amount_string: "1.042",
-                            }
-                            span {
-                                class: "font-medium text-green-500 text-sm mt-auto mb-2 sm:mb-1.5",
-                                "0.2%"
-                            }
-                        }
-                    }
+                Header {
+                    market: market
                 }
                 PriceChart {}
                 Actions {}
                 Stats {}
             }
             span {
-                class: "hidden lg:flex",
+                class: "hidden lg:flex mt-24",
                 SwapForm {
                     mint_a: Pubkey::new_unique(),
                     mint_b: Pubkey::new_unique(),
@@ -55,16 +33,78 @@ pub fn Market(market: String) -> Element {
     }
 }
 
-fn Actions() -> Element {
+#[component]
+fn Header(market: String) -> Element {
     rsx! {
         Row {
-            class: "justify-end lg:hidden",
-            button {
-                class: "flex controls-primary h-10 rounded-full w-full sm:w-40",
-                span {
-                    class: "mx-auto my-auto",
-                    "Swap"
+            class: "justify-between h-10",
+            Row {
+                gap: 2,
+                img {
+                    class: "w-10 h-10 rounded-full border border-gray-800 -ml-1 my-auto",
+                    src: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
                 }
+                span {
+                    class: "font-wide text-2xl sm:text-3xl font-semibold my-auto",
+                    "{market}"
+                }
+            }
+            Row {
+                gap: 2,
+                OrePrice {
+                    ui_amount_string: "1.042",
+                }
+                span {
+                    class: "font-medium text-green-500 text-sm mt-auto mb-2 sm:mb-1.5",
+                    "0.2%"
+                }
+            }
+        }
+    }
+}
+
+fn Actions() -> Element {
+    rsx! {
+        div {
+            class: "flex flex-col-reverse sm:flex-row gap-4",
+            Info {}
+            span {
+                class: "lg:hidden",
+                SwapButton {}
+            }
+        }
+    }
+}
+
+fn SwapButton() -> Element {
+    rsx! {
+        Link {
+            to: Route::Swap {},
+            class: "flex controls-primary h-10 rounded-full shrink-0 w-full sm:w-40",
+            span {
+                class: "mx-auto my-auto",
+                "Swap"
+            }
+        }
+    }
+}
+
+fn Info() -> Element {
+    rsx! {
+        Col {
+            gap: 1,
+            class: "px-1",
+            span {
+                class: "text-xs font-medium text-elements-lowEmphasis",
+                "About"
+            }
+            // span {
+            //     class: "font-medium text-xs sm:text-sm text-gray-700",
+            //     "Balance"
+            // }
+            span {
+                class: "text-sm text-elements-midEmphasis w-full",
+                "Solana is a highly functional open source project that banks on blockchain technology’s permissionless nature to provide decentralized finance (DeFi) solutions."
             }
         }
     }
@@ -74,21 +114,21 @@ fn Stats() -> Element {
     rsx! {
         Col {
             gap: 1,
-            Row {
-                gap: 1,
+            div {
+                class: "flex flex-col sm:flex-row gap-1",
                 StatValue {
-                    title: "Market cap",
+                    title: "MARKET CAP",
                     value: 123
                 }
                 StatValue {
-                    title: "Volume",
+                    title: "VOLUME",
                     value: 123
                 }
             }
-            Row {
-                gap: 1,
+            div {
+                class: "flex flex-col sm:flex-row gap-1",
                 StatValue {
-                    title: "Total supply",
+                    title: "SUPPLY",
                     value: 123
                 }
                 StatValue {
@@ -121,12 +161,11 @@ fn StatValue(title: String, value: u64) -> Element {
 
 fn PriceChart() -> Element {
     rsx! {
-        // TODO
         Col {
-            gap: 2,
+            class: "gap-3",
+            // gap: 3,
             Row {
                 class: "text-sm text-elements-midEmphasis ml-auto",
-                gap: 1,
                 TimeFrameButton {
                     title: "1D"
                 }
@@ -144,7 +183,11 @@ fn PriceChart() -> Element {
                 }
             }
             div {
-                class: "flex w-full h-80 bg-gray-800 rounded"
+                class: "flex w-full h-80 elevated rounded",
+                span {
+                    class: "text-xs mx-auto my-auto",
+                    "Chart goes here"
+                }
             }
         }
     }
@@ -154,7 +197,7 @@ fn PriceChart() -> Element {
 fn TimeFrameButton(title: String) -> Element {
     rsx! {
         button {
-            class: "py-1 w-10 rounded text-elements-midEmphasis",
+            class: "py-1 w-10 rounded text-center transition text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis",
             "{title}"
         }
     }

@@ -16,7 +16,7 @@ pub fn Trade() -> Element {
             class: "w-full pb-20 sm:pb-16",
             gap: 8,
             Row {
-                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl font-semibold",
+                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10 font-wide text-2xl sm:text-3xl font-semibold",
                 span {
                     class: "align-text-bottom my-auto",
                     "Trade"

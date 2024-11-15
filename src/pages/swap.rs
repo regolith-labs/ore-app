@@ -9,12 +9,12 @@ pub fn Swap() -> Element {
             class: "flex w-full",
             Col {
                 class: "w-96 mx-auto my-auto",
-                gap: 8,
+                gap: 4,
                 Col {
                     gap: 2,
                     BackButton {}
                     span {
-                        class: "font-wide text-2xl font-semibold",
+                        class: "font-wide text-2xl sm:text-3xl font-semibold",
                         "Swap"
                     }
                     span {
@@ -22,12 +22,9 @@ pub fn Swap() -> Element {
                         "Swap from one asset to another."
                     }
                 }
-                span {
-                    class: "w-96 mx-auto my-auto",
-                    SwapForm {
-                        mint_a: Pubkey::new_unique(),
-                        mint_b: Pubkey::new_unique(),
-                    }
+                SwapForm {
+                    mint_a: Pubkey::new_unique(),
+                    mint_b: Pubkey::new_unique(),
                 }
             }
         }
@@ -38,7 +35,7 @@ fn BackButton() -> Element {
     let navigator = use_navigator();
     rsx! {
         button {
-            class: "w-10 h-10 -ml-2.5 rounded-full text-elements-midEmphasis hover:bg-controls-handle",
+            class: "w-10 h-10 -ml-2.5 rounded-full text-bold text-elements-midEmphasis hover:bg-controls-handle",
             onclick: move |_| {
                 navigator.go_back();
             },

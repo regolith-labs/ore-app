@@ -38,6 +38,10 @@
         @apply flex transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
     }
 
+    .controls-tertiary {
+        @apply flex transition bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis;
+    }
+
     .controls-square {
         @apply h-10 w-10 rounded-md;
     }
