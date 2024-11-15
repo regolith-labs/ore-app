@@ -175,21 +175,21 @@ fn AssetTable() -> Element {
     // TODO Sort by token balances
     rsx! {
         Table {
-            TableHeader {
-                left: "Market",
-                    left_width: 40,
-                right: vec!["Price".to_string()]
-            }
-            for asset in listed_assets {
-                TableRowLink {
-                    to: Route::Market { market: asset.ticker.clone() },
-                    left_width: 40,
-                    left: rsx! {
-                        AssetNameAndBalance { asset: asset.clone() }
-                    },
-                    right: vec![
-                        rsx! { AssetQuote { asset: asset } },
-                    ]
+            header: rsx! {
+                TableHeader {
+                    left: "Market",
+                    right_1: "Price"
+                }
+            },
+            rows: rsx! {
+                for asset in listed_assets {
+                    TableRowLink {
+                        to: Route::Market { market: asset.ticker.clone() },
+                        left: rsx! {
+                            AssetNameAndBalance { asset: asset.clone() }
+                        },
+                        right_1: rsx! { AssetQuote { asset: asset } },
+                    }
                 }
             }
         }

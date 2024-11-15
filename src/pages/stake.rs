@@ -142,66 +142,75 @@ fn LiquidityTable() -> Element {
 
     rsx! {
         Table {
-            TableHeader {
-                left: "Pair",
-                left_width: 48,
-                right: vec!["Liquidity".to_string(), "Volume".to_string(), "Yield".to_string()]
-            }
-            for liquidity in listed_liquidity {
-                TableRowLink {
-                    to: Route::Pair { pair: liquidity.name.clone() },
-                    left_width: 48,
-                    left: rsx! {
-                        Row {
-                            // class: "grow w-48 shrink-0",
-                            class: "grow shrink-0",
-                            gap: 4,
-                            Row {
-                                class: "shrink-0",
-                                img {
-                                    class: "w-10 h-10 shrink-0 my-auto rounded-full border border-gray-800",
-                                    src: "{liquidity.image}"
-                                }
-                                img {
-                                    class: "w-10 h-10 shrink-0 -ml-2 my-auto rounded-full border border-gray-800",
-                                    src: "icon.png"
-                                }
-                            }
-                            Col {
-                                class: "my-auto min-w-32 shrink-0",
-                                span {
-                                    class: "font-medium whitespace-nowrap",
-                                    "{liquidity.name}"
-                                }
-                                span {
-                                    class: "font-medium text-gray-700 h-5 text-sm",
-                                    "0"
-                                }
-                            }
-                        }
-                    },
-                    right: vec![
-                        rsx! {
-                            OreValueSmall {
-                                ui_amount_string: "4209.202"
-                            }
-                        },
-                        rsx! {
-                            OreValueSmall {
-                                ui_amount_string: "602.204"
-                            }
-                        },
-                        rsx! {
-                            span {
-                                class: "text-elements-gold",
-                                OreValueSmall {
-                                    ui_amount_string: "2.054"
-                                }
-                            }
-                        }
-                    ]
+            header: rsx! {
+                TableHeader {
+                    left: "Pair",
+                    right_1: "Liquidity",
+                    right_2: "Volume",
+                    right_3: "Yield"
+                }
+            },
+            rows: rsx! {
+                for liquidity in listed_liquidity {
+                    LiquidityRow { liquidity: liquidity }
                 }
             }
+        }
+    }
+}
+
+#[component]
+fn LiquidityRow(liquidity: Liquidity) -> Element {
+    rsx! {
+        TableRowLink {
+            to: Route::Pair { pair: liquidity.name.clone() },
+            left: rsx! {
+                Row {
+                    // class: "grow w-48 shrink-0",
+                    class: "grow shrink-0",
+                    gap: 4,
+                    Row {
+                        class: "shrink-0",
+                        img {
+                            class: "w-10 h-10 shrink-0 my-auto rounded-full border border-gray-800",
+                            src: "{liquidity.image}"
+                        }
+                        img {
+                            class: "w-10 h-10 shrink-0 -ml-2 my-auto rounded-full border border-gray-800",
+                            src: "icon.png"
+                        }
+                    }
+                    Col {
+                        class: "my-auto min-w-32 shrink-0",
+                        span {
+                            class: "font-medium whitespace-nowrap",
+                            "{liquidity.name}"
+                        }
+                        span {
+                            class: "font-medium text-gray-700 h-5 text-sm",
+                            "0"
+                        }
+                    }
+                }
+            },
+            right_1: rsx! {
+                OreValueSmall {
+                    ui_amount_string: "4209.202"
+                }
+            },
+            right_2: rsx! {
+                OreValueSmall {
+                    ui_amount_string: "602.204"
+                }
+            },
+            right_3: rsx! {
+                span {
+                    class: "text-elements-gold",
+                    OreValueSmall {
+                        ui_amount_string: "2.054"
+                    }
+                }
+            },
         }
     }
 }

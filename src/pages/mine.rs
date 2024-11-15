@@ -124,13 +124,18 @@ fn PoolTable() -> Element {
 
     rsx! {
         Table {
-            TableHeader {
-                left: "Pool",
-                left_width: 40,
-                right: vec!["Hashpower".to_string(), "Multiplier".to_string(), "Yield".to_string()]
-            }
-            for pool in listed_pools {
-                PoolRow { pool: pool }
+            header: rsx! {
+                TableHeader {
+                    left: "Pool",
+                    right_1: "Hashpower",
+                    right_2: "Multiplier",
+                    right_3: "Yield",
+                }
+            },
+            rows: rsx! {
+                for pool in listed_pools {
+                    PoolRow { pool: pool }
+                }
             }
         }
     }
@@ -141,7 +146,6 @@ fn PoolRow(pool: Pool) -> Element {
     rsx! {
         TableRowLink {
             to: Route::Pool { pool: pool.name.clone() },
-            left_width: 40,
             left: rsx! {
                 Row {
                     gap: 4,
@@ -158,26 +162,24 @@ fn PoolRow(pool: Pool) -> Element {
                     }
                 }
             },
-            right: vec![
-                rsx! {
-                    span {
-                        "64480"
-                    }
-                },
-                rsx! {
-                    span {
-                        "2.4x",
-                    }
-                },
-                rsx! {
-                    span {
-                        class: "text-elements-gold",
-                        OreValueSmall {
-                            ui_amount_string: "2.054"
-                        }
+            right_1: rsx! {
+                span {
+                    "64480"
+                }
+            },
+            right_2: rsx! {
+                span {
+                    "2.4x",
+                }
+            },
+            right_3: rsx! {
+                span {
+                    class: "text-elements-gold",
+                    OreValueSmall {
+                        ui_amount_string: "2.054"
                     }
                 }
-            ]
+            },
         }
     }
 }
