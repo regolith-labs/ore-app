@@ -35,22 +35,21 @@ pub fn TableHeader(
                         {left}
                     }
                     span {
-                        class: "flex text-right w-40 my-auto justify-end",
+                        class: "text-right w-40 my-auto",
                         {right_1}
                     }
                 }
             }
             Row {
-                class: "text-right",
                 if let Some(right_2) = right_2 {
                     span {
-                        class: "w-40",
+                        class: "text-right w-40 my-auto",
                         {right_2}
                     }
                 }
                 if let Some(right_3) = right_3 {
                     span {
-                        class: "w-40",
+                        class: "text-right w-40 my-auto",
                         {right_3}
                     }
                 }
