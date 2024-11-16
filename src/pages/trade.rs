@@ -178,16 +178,13 @@ fn AssetTable() -> Element {
             header: rsx! {
                 TableHeader {
                     left: "Market",
-                    right_1: "Price"
+                    right_1: "Price",
+                    right_2: "Value"
                 }
             },
             rows: rsx! {
                 for asset in listed_assets {
-                    TableRowLink {
-                        to: Route::Market { market: asset.ticker.clone() },
-                        left: rsx! { AssetNameAndBalance { asset: asset.clone() } },
-                        right_1: rsx! { AssetQuote { asset: asset } },
-                    }
+                    AssetRow { asset: asset }
                 }
             }
         }
@@ -195,11 +192,23 @@ fn AssetTable() -> Element {
 }
 
 #[component]
-fn AssetNameAndBalance(asset: Asset) -> Element {
+fn AssetRow(asset: Asset) -> Element {
     let balance = use_token_balance(asset.mint);
     rsx! {
+        TableRowLink {
+            to: Route::Market { market: asset.ticker.clone() },
+            left: rsx! { AssetNameAndBalance { asset: asset.clone(), balance: balance } },
+            right_1: rsx! { AssetQuote { asset: asset.clone() } },
+            right_2: rsx! { AssetValue { asset: asset, balance: balance } },
+        }
+    }
+    
+}
+
+#[component]
+fn AssetNameAndBalance(asset: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> Element {
+    rsx! {
         Row {
-            // class: "w-40",
             gap: 4,
             img {
                 class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",
@@ -240,6 +249,36 @@ fn AssetQuote(asset: Asset) -> Element {
             span {
                 class: "font-medium text-green-500 text-sm",
                 "0.2%"
+            }
+        }
+    }
+}
+
+#[component]
+fn AssetValue(asset: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> Element {
+    let mut value = use_signal(|| 0.0);
+    let price = 1.2;
+
+    use_effect(move || {
+        if let Some(balance) = balance.cloned() {
+            match balance {
+               Err(_) => {
+                   value.set(0.0);
+               }
+               Ok(balance) => {
+                   if let Some(ui_amount) = balance.ui_amount {
+                       value.set(ui_amount * price)
+                   }
+               }
+            }
+        }
+    });
+
+    rsx! {
+        Col {
+            class: "text-right",
+            OreValueSmall {
+                ui_amount_string: "{value}"
             }
         }
     }
