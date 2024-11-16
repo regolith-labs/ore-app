@@ -86,16 +86,15 @@ pub fn TableRowLink(
                 }
             }
             Row {
-                class: "text-right",
                 if let Some(right_2) = right_2 {
                     span {
-                        class: "flex w-40 justify-end",
+                        class: "flex text-right w-40 my-auto justify-end",
                         {right_2}
                     }
                 }
                 if let Some(right_3) = right_3 {
                     span {
-                        class: "flex w-40 justify-end",
+                        class: "flex text-right w-40 my-auto justify-end",
                         {right_3}
                     }
                 }
