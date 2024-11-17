@@ -200,6 +200,7 @@ fn AssetRow(asset: Asset) -> Element {
             left: rsx! { AssetNameAndBalance { asset: asset.clone(), balance: balance } },
             right_1: rsx! { AssetQuote { asset: asset.clone() } },
             right_2: rsx! { AssetValue { asset: asset, balance: balance } },
+            // right_2: rsx! { },
         }
     }
     
@@ -256,18 +257,18 @@ fn AssetQuote(asset: Asset) -> Element {
 
 #[component]
 fn AssetValue(asset: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> Element {
-    let mut value = use_signal(|| 0.0);
-    let price = 1.2;
+    let mut value = use_signal(|| "0.000".to_string());
+    let price = 1.2; // TODO
 
     use_effect(move || {
         if let Some(balance) = balance.cloned() {
             match balance {
                Err(_) => {
-                   value.set(0.0);
+                   value.set("0.000".to_string());
                }
                Ok(balance) => {
                    if let Some(ui_amount) = balance.ui_amount {
-                       value.set(ui_amount * price)
+                       value.set(format!("{:.3}", ui_amount * price));
                    }
                }
             }
@@ -275,10 +276,13 @@ fn AssetValue(asset: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> 
     });
 
     rsx! {
-        Col {
-            class: "text-right",
+        if let Some(_balance) = balance.cloned() {
             OreValueSmall {
-                ui_amount_string: "{value}"
+                ui_amount_string: "{*value.read()}"
+            }
+        } else {
+            div {
+                class: "loading w-24 h-8 rounded",
             }
         }
     }

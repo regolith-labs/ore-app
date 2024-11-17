@@ -850,6 +850,10 @@ body {
   width: 100vw;
 }
 
+.w-24 {
+  width: 6rem;
+}
+
 .min-w-max {
   min-width: -moz-max-content;
   min-width: max-content;
