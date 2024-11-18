@@ -8,7 +8,7 @@ use crate::{
 pub fn AppNavigation() -> Element {
     rsx! {
         Col {
-            class: "w-screen h-dvh",
+            class: "w-screen min-h-screen",
             AppNavBar {}
             MobileTabBar {}
             span {
