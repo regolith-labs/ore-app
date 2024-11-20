@@ -69,11 +69,11 @@ pub fn TableRowLink(
     rsx! {
         Link {
             to: to,
-            class: "flex flex-row w-full min-w-max px-5 sm:px-3 py-4 sm:rounded-md transition hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
+            class: "flex flex-row w-full min-w-max px-5 sm:px-3 h-20 sm:rounded-md transition hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
             span {
-                class: "w-screen sm:w-full sm:min-w-96 -ml-5 sm:ml-0 px-5 sm:px-0",
+                class: "w-screen sm:w-full sm:min-w-96 my-auto -ml-5 sm:ml-0 px-5 sm:px-0",
                 Row {
-                    class: "my-auto w-full sm:min-w-96 grow-0 shrink-0 sm:grow justify-between",
+                    class: "w-full sm:min-w-96 my-auto grow-0 shrink-0 sm:grow justify-between",
                     span {
                         class: "w-min sm:w-64",
                         {left}

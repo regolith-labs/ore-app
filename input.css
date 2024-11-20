@@ -35,7 +35,7 @@
     }
 
     .controls-secondary {
-        @apply flex font-medium transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
+        @apply flex font-medium text-center transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
     }
 
     .controls-tertiary {

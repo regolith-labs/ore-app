@@ -59,6 +59,24 @@ pub fn SearchIcon(class: Option<String>) -> Element {
 }
 
 #[component]
+pub fn DownloadIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            stroke: "currentColor",
+            view_box: "0 0 24 24",
+            class: "{class}",
+            path {
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                stroke_width: 2,
+                d: "M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+            }
+        }
+    }
+}
+
+#[component]
 pub fn CubeIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {

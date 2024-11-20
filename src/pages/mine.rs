@@ -3,8 +3,8 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{
-        CircleStackIcon, Col, OreValue, OreValueSmall, PlayIcon, Row, Table, TableHeader,
-        TableRowLink,
+        CircleStackIcon, Col, DownloadIcon, OreValue, OreValueSmall, PlayIcon, Row, Table,
+        TableHeader, TableRowLink,
     },
     hooks::use_ore_balance,
     route::Route,
@@ -15,17 +15,28 @@ pub fn Mine() -> Element {
         Col {
             class: "w-full pb-20 sm:pb-16 gap-8",
             gap: 8,
-            Row {
-                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10",
-                gap: 4,
-                span {
-                    class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
-                    "Mine"
-                }
-                StartButton {}
+            Col {
+                gap: 8,
+                class: "px-5 sm:px-8",
+                Header {}
+                MiningYield {}
+                // DownloadButton {}
             }
-            MiningYield {}
             PoolTable {}
+        }
+    }
+}
+
+fn Header() -> Element {
+    rsx! {
+        Row {
+            class: "justify-between sm:hidden h-10",
+            gap: 4,
+            span {
+                class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
+                "Mine"
+            }
+            StartButton {}
         }
     }
 }
@@ -34,7 +45,7 @@ fn MiningYield() -> Element {
     let balance = use_ore_balance();
     rsx! {
         Col {
-            class: "sm:gap-4 px-5 sm:px-8",
+            class: "sm:gap-4",
             gap: 2,
             span {
                 class: "font-medium text-xs sm:text-sm text-gray-700",
@@ -98,6 +109,32 @@ fn ClaimButton() -> Element {
             span {
                 class: "my-auto",
                 "Claim"
+            }
+        }
+    }
+}
+
+fn DownloadButton() -> Element {
+    rsx! {
+        Link {
+            to: Route::Download {},
+            class: "flex rounded bg-controls-secondary p-2 sm:p-4",
+            Row {
+                gap: 4,
+                DownloadIcon {
+                    class: "w-8 h-8 my-auto text-elements-midEmphasis",
+                }
+                Col {
+                    class: "my-auto w-full",
+                    span {
+                        class: "text-elements-highEmphasis font-semibold",
+                        "Download"
+                    }
+                    span {
+                        class: "text-elements-midEmphasis text-sm",
+                        "Available for Mac, Windows, and Linux."
+                    }
+                }
             }
         }
     }

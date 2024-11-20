@@ -1,4 +1,5 @@
 mod deposit;
+mod download;
 mod landing;
 mod market;
 mod mine;
@@ -11,6 +12,7 @@ mod swap;
 mod trade;
 
 pub use deposit::*;
+pub use download::*;
 pub use landing::*;
 pub use market::*;
 pub use mine::*;

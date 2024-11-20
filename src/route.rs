@@ -9,6 +9,8 @@ pub enum Route {
     #[layout(LandingNavigation)]
         #[route("/")]
         Landing {},
+        #[route("/download")]
+        Download {},
     #[end_layout]
 
     #[layout(AppNavigation)]
