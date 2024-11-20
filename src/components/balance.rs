@@ -110,7 +110,7 @@ pub fn Yield() -> Element {
                     Some(_balance) => {
                         rsx! {
                             OreValue {
-                                class: "text-elements-gold",
+                                // class: "text-elements-gold",
                                 ui_amount_string: "0.000"
                             }
                         }
