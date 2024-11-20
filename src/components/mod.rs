@@ -1,3 +1,4 @@
+mod balance;
 mod breadcrumbs;
 mod common;
 mod icons;
@@ -9,6 +10,7 @@ mod table;
 #[cfg(feature = "web")]
 mod wallet_adapter;
 
+pub use balance::*;
 pub use breadcrumbs::*;
 pub use common::*;
 pub use icons::*;

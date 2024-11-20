@@ -3,11 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 
 use crate::{
-    components::{Col, OreValue, OreValueSmall, QrCodeIcon, Row, SwapIcon, Table, TableHeader, TableRowLink},
-    gateway::GatewayResult,
-    hooks::{use_ore_balance,  use_token_balance},
-    route::Route,
-    steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey},
+    components::{Balance, Col, OreValueSmall,  Row, SwapIcon, Table, TableHeader, TableRowLink}, gateway::GatewayResult, hooks::use_token_balance, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
 };
 
 pub fn Trade() -> Element {
@@ -15,85 +11,27 @@ pub fn Trade() -> Element {
         Col {
             class: "w-full pb-20 sm:pb-16",
             gap: 8,
-            Row {
-                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10",
-                gap: 4,
-                span {
-                    class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
-                    "Trade"
-                }
-                SwapButton {}
+            Header {}
+            Col {
+                class: "md:flex-row md:gap-0 px-5 sm:px-8",
+                gap: 8,
+                Balance {}
             }
-            Balance {}
             AssetTable {}
         }
     }
 }
 
-fn Balance() -> Element {
-    let balance = use_ore_balance();
+fn Header() -> Element {
     rsx! {
-        Col {
-            class: "sm:gap-4 mx-5 sm:mx-8",
-            gap: 2,
+        Row {
+            class: "justify-between h-10 px-5 sm:px-8",
+            gap: 4,
             span {
-                class: "font-medium text-xs sm:text-sm text-gray-700",
-                "Balance"
+                class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
+                "Trade"
             }
-            Row {
-                class: "justify-between align-top",
-                match balance.cloned() {
-                    None => {
-                        rsx! {
-                            span {
-                                class: "h-10 w-64 loading rounded"
-                            }
-                        }
-                    }
-                    Some(balance) => {
-                        rsx! {
-                            OreBalance {
-                                balance: balance
-                            }
-                        }
-                    }
-                }
-                Row {
-                    gap: 4,
-                    PayButton {}
-                    span {
-                        class: "hidden sm:flex",
-                        SwapButton {}
-                    }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn OreBalance(balance: GatewayResult<UiTokenAmount>) -> Element {
-    match balance {
-        Ok(balance) => {
-            rsx! {
-                OreValue {
-                    ui_amount_string: balance.ui_amount_string
-                }
-            }
-        }
-        Err(err) => {
-            rsx! {
-                Col {
-                    gap: 2,
-                    OreValue {
-                        ui_amount_string: "0.000"
-                    }
-                    span {
-                        class: "text-sm font-medium text-red-500",
-                        "Error: {err:?}"
-                    }
-                }
-            }
+            SwapButton {}
         }
     }
 }
@@ -109,22 +47,6 @@ fn SwapButton() -> Element {
             span {
                 class: "my-auto",
                 "Swap"
-            }
-        }
-    }
-}
-
-fn PayButton() -> Element {
-    rsx! {
-        Link {
-            to: Route::Pay {},
-            class: "h-10 controls-secondary rounded-full px-4 gap-2",
-            QrCodeIcon {
-                class: "h-6 w-6 mx-auto my-auto"
-            }
-            span {
-                class: "my-auto",
-                "Pay"
             }
         }
     }

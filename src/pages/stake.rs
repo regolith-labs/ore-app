@@ -3,10 +3,8 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{
-        CircleStackIcon, Col, OreValue, OreValueSmall, PlusIcon, Row, Table, TableHeader,
-        TableRowLink,
+        Balance, Col, OreValueSmall, PlusIcon, Row, Table, TableHeader, TableRowLink, Yield,
     },
-    hooks::use_ore_balance,
     route::Route,
 };
 
@@ -15,58 +13,28 @@ pub fn Stake() -> Element {
         Col {
             class: "w-full pb-20 sm:pb-16",
             gap: 8,
-            Row {
-                class: "justify-between sm:hidden mx-5 sm:mx-8 h-10",
-                gap: 4,
-                span {
-                    class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
-                    "Stake"
-                }
-                DepositButton {}
+            Header {}
+            Col {
+                class: "md:flex-row md:gap-0 px-5 sm:px-8",
+                gap: 8,
+                Balance {}
+                Yield {}
             }
-            StakingYield {}
             LiquidityTable {}
         }
     }
 }
 
-fn StakingYield() -> Element {
-    let balance = use_ore_balance();
+fn Header() -> Element {
     rsx! {
-        Col {
-            class: "sm:gap-4 px-5 sm:px-8",
-            gap: 2,
+        Row {
+            class: "justify-between h-10 px-5 sm:px-8",
+            gap: 4,
             span {
-                class: "font-medium text-xs sm:text-sm text-gray-700",
-                "Yield"
+                class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
+                "Stake"
             }
-            Row {
-                class: "justify-between align-top",
-                match balance.cloned() {
-                    None => {
-                        rsx! {
-                            span {
-                                class: "h-10 w-64 loading rounded"
-                            }
-                        }
-                    }
-                    Some(_balance) => {
-                        rsx! {
-                            OreValue {
-                                ui_amount_string: "0.000"
-                            }
-                        }
-                    }
-                }
-                Row {
-                    gap: 4,
-                    ClaimButton {}
-                    span {
-                        class: "hidden sm:flex",
-                        DepositButton {}
-                    }
-                }
-            }
+            DepositButton {}
         }
     }
 }
@@ -82,22 +50,6 @@ fn DepositButton() -> Element {
             span {
                 class: "my-auto",
                 "Deposit"
-            }
-        }
-    }
-}
-
-fn ClaimButton() -> Element {
-    rsx! {
-        Link {
-            to: Route::Pay {},
-            class: "h-10 controls-secondary rounded-full px-4 gap-2",
-            CircleStackIcon {
-                class: "h-5 w-5 mx-auto my-auto"
-            }
-            span {
-                class: "my-auto",
-                "Claim"
             }
         }
     }

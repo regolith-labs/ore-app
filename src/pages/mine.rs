@@ -3,24 +3,23 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{
-        CircleStackIcon, Col, DownloadIcon, OreValue, OreValueSmall, PlayIcon, Row, Table,
-        TableHeader, TableRowLink,
+        Balance, Col, DownloadIcon, OreValueSmall, PlayIcon, Row, Table, TableHeader, TableRowLink,
+        Yield,
     },
-    hooks::use_ore_balance,
     route::Route,
 };
 
 pub fn Mine() -> Element {
     rsx! {
         Col {
-            class: "w-full pb-20 sm:pb-16 gap-8",
+            class: "pb-20 sm:pb-16 gap-8",
             gap: 8,
+            Header {}
             Col {
+                class: "md:flex-row md:gap-0 px-5 sm:px-8",
                 gap: 8,
-                class: "px-5 sm:px-8",
-                Header {}
-                MiningYield {}
-                // DownloadButton {}
+                Balance {}
+                Yield{}
             }
             PoolTable {}
         }
@@ -30,54 +29,13 @@ pub fn Mine() -> Element {
 fn Header() -> Element {
     rsx! {
         Row {
-            class: "justify-between sm:hidden h-10",
+            class: "justify-between h-10 px-5 sm:px-8",
             gap: 4,
             span {
                 class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
                 "Mine"
             }
             StartButton {}
-        }
-    }
-}
-
-fn MiningYield() -> Element {
-    let balance = use_ore_balance();
-    rsx! {
-        Col {
-            class: "sm:gap-4",
-            gap: 2,
-            span {
-                class: "font-medium text-xs sm:text-sm text-gray-700",
-                "Yield"
-            }
-            Row {
-                class: "justify-between align-top",
-                match balance.cloned() {
-                    None => {
-                        rsx! {
-                            span {
-                                class: "h-10 w-64 loading rounded"
-                            }
-                        }
-                    }
-                    Some(_balance) => {
-                        rsx! {
-                            OreValue {
-                                ui_amount_string: "0.000"
-                            }
-                        }
-                    }
-                }
-                Row {
-                    gap: 4,
-                    ClaimButton {}
-                    span {
-                        class: "hidden sm:flex",
-                        StartButton {}
-                    }
-                }
-            }
         }
     }
 }
@@ -93,22 +51,6 @@ fn StartButton() -> Element {
             span {
                 class: "my-auto",
                 "Start"
-            }
-        }
-    }
-}
-
-fn ClaimButton() -> Element {
-    rsx! {
-        Link {
-            to: Route::Pay {},
-            class: "h-10 controls-secondary rounded-full px-4 gap-2",
-            CircleStackIcon {
-                class: "h-5 w-5 mx-auto my-auto"
-            }
-            span {
-                class: "my-auto",
-                "Claim"
             }
         }
     }
