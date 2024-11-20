@@ -93,11 +93,11 @@ pub fn Yield() -> Element {
             class: "w-full sm:gap-4",
             gap: 2,
             span {
-                class: "font-medium text-xs sm:text-sm text-gray-700",
+                class: "font-medium text-xs sm:text-sm text-gray-700 md:ml-auto",
                 "Yield"
             }
             Row {
-                class: "md:flex-col sm:gap-2 justify-between md:justify-start align-top",
+                class: "md:flex-col sm:gap-2 justify-between md:justify-start align-top md:ml-auto",
                 gap: 0,
                 match balance.cloned() {
                     None => {
@@ -110,6 +110,7 @@ pub fn Yield() -> Element {
                     Some(_balance) => {
                         rsx! {
                             OreValue {
+                                class: "text-elements-gold",
                                 ui_amount_string: "0.000"
                             }
                         }
@@ -125,7 +126,7 @@ fn ClaimButton() -> Element {
     rsx! {
         Link {
             to: Route::Pay {},
-            class: "flex flex-row h-10 w-min text-elements-lowEmphasis transition hover:bg-controls-secondaryHover hover:text-elements-highEmphasis rounded-full px-4 gap-2 -ml-3",
+            class: "flex flex-row h-10 w-min text-elements-lowEmphasis transition hover:bg-controls-secondaryHover hover:text-elements-highEmphasis rounded-full px-4 gap-2 -ml-3 md:ml-auto md:-mr-2",
             CircleStackIcon {
                 class: "h-5 w-5 mx-auto my-auto"
             }

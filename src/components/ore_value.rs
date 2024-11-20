@@ -3,7 +3,8 @@ use dioxus::prelude::*;
 use crate::components::{OreIcon, Row};
 
 #[component]
-pub fn OreValue(ui_amount_string: String) -> Element {
+pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
     let small_units = units[1];
@@ -26,7 +27,7 @@ pub fn OreValue(ui_amount_string: String) -> Element {
 
     rsx! {
         Row {
-            class: "sm:gap-3 h-10 w-min",
+            class: "sm:gap-3 h-10 w-min {class}",
             gap: 2,
             OreIcon {
                 class: "h-6 w-6 sm:h-8 sm:w-8 my-auto"

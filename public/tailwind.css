@@ -709,6 +709,10 @@ body {
   margin-right: -0.75rem;
 }
 
+.-mr-2 {
+  margin-right: -0.5rem;
+}
+
 .flex {
   display: flex;
 }
@@ -1675,6 +1679,14 @@ body {
 
   .md\:-ml-3 {
     margin-left: -0.75rem;
+  }
+
+  .md\:-mr-3 {
+    margin-right: -0.75rem;
+  }
+
+  .md\:-mr-2 {
+    margin-right: -0.5rem;
   }
 
   .md\:flex-row {
