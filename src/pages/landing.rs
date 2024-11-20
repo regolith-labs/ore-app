@@ -13,10 +13,10 @@ pub fn Landing() -> Element {
                     class: "mx-auto font-wide text-3xl sm:text-4xl font-medium",
                     "Welcome to crypto."
                 }
-                span {
-                    class: "mx-auto text-elements-lowEmphasis sm:text-lg font-medium",
-                    "Pick an activity..."
-                }
+                // span {
+                //     class: "mx-auto text-elements-lowEmphasis sm:text-lg font-medium",
+                //     "Pick an activity..."
+                // }
                 div {
                     class: "flex flex-col sm:flex-row sm:gap-4",
                     ActionTab {
@@ -41,10 +41,10 @@ pub fn Landing() -> Element {
 fn ActionTab(title: String, to: Route) -> Element {
     rsx! {
         Link {
-            class: "flex h-24 w-full sm:w-64 rounded-full text-elements-midEmphasis hover:text-elements-highEmphasis hover:bg-controls-secondaryHover",
+            class: "flex h-24 w-full sm:w-64 rounded-full text-elements-lowEmphasis hover:text-elements-highEmphasis hover:bg-controls-secondaryHover",
             to: to,
             span {
-                class: "font-wide font-semibold text-2xl mx-auto my-auto",
+                class: "font-wide font-bold text-2xl mx-auto my-auto",
                 "{title}"
             }
         }

@@ -1227,6 +1227,10 @@ body {
   font-weight: 600;
 }
 
+.font-bold {
+  font-weight: 700;
+}
+
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(15 14 17 / var(--tw-text-opacity));
@@ -1463,6 +1467,11 @@ body {
   background-color: rgb(43 41 50 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-elements-gold:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(236 199 113 / var(--tw-bg-opacity));
+}
+
 .hover\:font-semibold:hover {
   font-weight: 600;
 }
@@ -1475,6 +1484,11 @@ body {
 .hover\:text-elements-highEmphasis:hover {
   --tw-text-opacity: 1;
   color: rgb(250 250 250 / var(--tw-text-opacity));
+}
+
+.hover\:text-black:hover {
+  --tw-text-opacity: 1;
+  color: rgb(15 14 17 / var(--tw-text-opacity));
 }
 
 .hover\:underline:hover {
