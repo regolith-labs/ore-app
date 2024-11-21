@@ -32,6 +32,10 @@ pub enum Route {
         Swap {},
         #[route("/pay")]
         Pay {},
+        #[route("/analyze")]
+        Analyze {},
+        #[route("/claim")]
+        Claim {},
     #[end_layout]
 
 

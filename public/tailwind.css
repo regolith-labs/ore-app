@@ -880,6 +880,14 @@ body {
   max-width: 80rem;
 }
 
+.max-w-screen-2xl {
+  max-width: 1536px;
+}
+
+.max-w-7xl {
+  max-width: 80rem;
+}
+
 .shrink-0 {
   flex-shrink: 0;
 }
@@ -915,6 +923,10 @@ body {
 
 .flex-nowrap {
   flex-wrap: nowrap;
+}
+
+.items-center {
+  align-items: center;
 }
 
 .justify-end {
@@ -1654,6 +1666,11 @@ body {
 
   .md\:gap-2 {
     gap: 0.5rem;
+  }
+
+  .md\:px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 
   .md\:pl-8 {

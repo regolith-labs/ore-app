@@ -125,7 +125,7 @@ pub fn Yield() -> Element {
 fn ClaimButton() -> Element {
     rsx! {
         Link {
-            to: Route::Pay {},
+            to: Route::Claim {},
             class: "flex flex-row h-10 w-min text-elements-gold transition hover:bg-elements-gold hover:text-black rounded-full px-4 gap-2 -ml-3 md:ml-auto md:-mr-2",
             CircleStackIcon {
                 class: "h-5 w-5 mx-auto my-auto"
@@ -177,7 +177,7 @@ pub fn Worth() -> Element {
 fn AnalyzeButton() -> Element {
     rsx! {
         Link {
-            to: Route::Pay {},
+            to: Route::Analyze {},
             class: "flex flex-row h-10 w-min text-elements-lowEmphasis transition hover:bg-controls-handle hover:text-elements-highEmphasis rounded-full px-4 gap-2 -ml-3 md:ml-auto md:-mr-2",
             PieChartIcon {
                 class: "h-5 w-5 mx-auto my-auto"

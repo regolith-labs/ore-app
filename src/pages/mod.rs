@@ -1,3 +1,6 @@
+mod analyze;
+mod claim;
+mod coming_soon;
 mod deposit;
 mod download;
 mod landing;
@@ -11,6 +14,9 @@ mod stake;
 mod swap;
 mod trade;
 
+pub use analyze::*;
+pub use claim::*;
+pub use coming_soon::*;
 pub use deposit::*;
 pub use download::*;
 pub use landing::*;
