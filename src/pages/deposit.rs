@@ -1,15 +1,9 @@
 use dioxus::prelude::*;
 
-use crate::components::{Col, PageTitle};
+use crate::pages::ComingSoon;
 
 pub fn Deposit() -> Element {
     rsx! {
-        Col {
-            class: "w-full",
-            gap: 8,
-            PageTitle {
-                title: "Deposit"
-            }
-        }
+        ComingSoon {}
     }
 }

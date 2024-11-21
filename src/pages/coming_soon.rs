@@ -10,7 +10,7 @@ pub fn ComingSoon() -> Element {
                     class: "flex flex-col gap-2",
                     BackButton {}
                     span {
-                        class: "font-wide text-lg sm:text-xl font-semibold text-center",
+                        class: "font-wide text-lg sm:text-xl text-center",
                         "Coming soon"
                     }
                 }
