@@ -1,10 +1,9 @@
-use std::str::FromStr;
-
 use dioxus::prelude::*;
 
 use crate::{
-    components::*, gateway::GatewayResult, hooks::use_token_balance, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
+    components::*, gateway::GatewayResult, hooks::{use_assets, use_token_balance, Asset}, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
 };
+
 
 pub fn Trade() -> Element {
     rsx! {
@@ -54,48 +53,7 @@ fn SwapButton() -> Element {
 }
 
 fn AssetTable() -> Element {
-    // TODO Read from config file
-    let listed_assets = [
-        Asset {
-            mint: Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap(),
-            name: "Solana".to_owned(),
-            ticker: "SOL".to_owned(),
-            description: "".to_owned(),
-            image: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::from_str("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v").unwrap(),
-            name: "USDC".to_owned(),
-            ticker: "USDC".to_owned(),
-            description: "".to_owned(),
-            image: "https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png"
-                .to_owned(),
-        },
-        Asset {
-            mint: Pubkey::from_str("J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD").unwrap(),
-            name: "International Stable Currency".to_owned(),
-            ticker: "ISC".to_owned(),
-            description: "".to_owned(),
-            image: "https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png"
-                .to_owned(),
-        },
-        Asset {           
-            mint: Pubkey::from_str("hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux").unwrap(),
-            name: "Helium".to_owned(),
-            ticker: "HNT".to_owned(),
-            description: "".to_owned(),
-            image: "https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg".to_owned(),
-        },
-        Asset {
-            mint: Pubkey::from_str("4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy").unwrap(),
-            name: "Honey".to_owned(),
-            ticker: "HONEY".to_owned(),
-            description: "".to_owned(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-    ];
-
-    // TODO Sort by token balances
+    let listed_assets = use_assets();
     rsx! {
         Col {
             gap: 4,
@@ -108,8 +66,22 @@ fn AssetTable() -> Element {
                     }
                 },
                 rows: rsx! {
-                    for asset in listed_assets {
-                        AssetRow { asset: asset }
+                    match listed_assets.cloned() {
+                        None => rsx! {
+                            TableRowLink {
+                                to: Route::Market { market: "SOL".to_string() },
+                                left: rsx! { div { class: "h-10 w-48 loading rounded" } },
+                                right_1: rsx! { div { class: "h-10 w-24 loading rounded" } },
+                                right_2: rsx! { div { class: "h-10 w-24 loading rounded" } }
+                            }
+                        },
+                        Some(assets) => {
+                            rsx! {
+                                for asset in assets {
+                                    AssetRow { asset: asset }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -126,7 +98,6 @@ fn AssetRow(asset: Asset) -> Element {
             left: rsx! { AssetNameAndBalance { asset: asset.clone(), balance: balance } },
             right_1: rsx! { AssetQuote { asset: asset.clone() } },
             right_2: rsx! { AssetValue { asset: asset, balance: balance } },
-            // right_2: rsx! { },
         }
     }
     
@@ -212,13 +183,4 @@ fn AssetValue(asset: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> 
             }
         }
     }
-}
-
-#[derive(Clone, PartialEq, Eq)]
-struct Asset {
-    mint: Pubkey,
-    name: String,
-    ticker: String,
-    description: String,
-    image: String,
 }

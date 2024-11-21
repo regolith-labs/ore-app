@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
+    hooks::{use_pools, Pool},
     components::*,
     route::Route,
 };
@@ -80,24 +80,7 @@ fn DownloadButton() -> Element {
 }
 
 fn PoolTable() -> Element {
-    // TODO Read from config file
-    let listed_pools = vec![
-        Pool {
-            address: Pubkey::new_unique(),
-            name: "Ec1ipse".to_owned(),
-            description: "".to_owned(),
-            image: "https://pbs.twimg.com/profile_images/1736827532312211456/V0bvyS_2_400x400.jpg"
-                .to_owned(),
-        },
-        Pool {
-            address: Pubkey::new_unique(),
-            name: "Rush".to_owned(),
-            description: "".to_owned(),
-            image: "https://pbs.twimg.com/profile_images/1825694276929368064/GJcGr3rR_400x400.jpg"
-                .to_owned(),
-        },
-    ];
-
+    let listed_pools = use_pools();
     rsx! {
         Col {
             gap: 2, 
@@ -111,8 +94,23 @@ fn PoolTable() -> Element {
                     }
                 },
                 rows: rsx! {
-                    for pool in listed_pools {
-                        PoolRow { pool: pool }
+                    match listed_pools.cloned() {
+                        None => rsx! {
+                            TableRowLink {
+                                to: Route::Pool { pool: "Loading".to_string() },
+                                left: rsx! { div { class: "h-10 w-48 loading rounded" } },
+                                right_1: rsx! { div { class: "h-10 w-24 loading rounded" } },
+                                right_2: rsx! { div { class: "h-10 w-24 loading rounded" } },
+                                right_3: rsx! { div { class: "h-10 w-24 loading rounded" } }
+                            }
+                        },
+                        Some(pools) => {
+                            rsx! {
+                                for pool in pools {
+                                    PoolRow { pool: pool }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -161,12 +159,4 @@ fn PoolRow(pool: Pool) -> Element {
             },
         }
     }
-}
-
-#[derive(Clone, PartialEq, Eq)]
-struct Pool {
-    address: Pubkey,
-    name: String,
-    description: String,
-    image: String,
 }

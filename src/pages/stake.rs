@@ -1,9 +1,7 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::*,
-    route::Route,
+    components::*, hooks::{use_assets, Asset}, route::Route
 };
 
 pub fn Stake() -> Element {
@@ -54,42 +52,7 @@ fn DepositButton() -> Element {
 }
 
 fn LiquidityTable() -> Element {
-    // TODO Read from config file
-    let listed_liquidity = vec![
-        Liquidity {
-            name: "SOL-ORE".to_string(),
-            mint: Pubkey::new_unique(),
-            lp: Pubkey::new_unique(),
-            image: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png".to_owned(),
-        },
-        Liquidity {
-            name: "USDC-ORE".to_string(),
-            mint: Pubkey::new_unique(),
-            lp: Pubkey::new_unique(),
-            image: "https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png"
-                .to_owned(),
-        },
-        Liquidity {
-            name: "ISC-ORE".to_string(),
-            mint: Pubkey::new_unique(),
-            lp: Pubkey::new_unique(),
-            image: "https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png"
-                .to_owned(),
-        },
-        Liquidity {
-            name: "HNT-ORE".to_string(),
-            mint: Pubkey::new_unique(),
-            lp: Pubkey::new_unique(),
-            image: "https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg".to_owned(),
-        },
-        Liquidity {
-            name: "HONEY-ORE".to_string(),
-            mint: Pubkey::new_unique(),
-            lp: Pubkey::new_unique(),
-            image: "https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png".to_owned(),
-        },
-    ];
-
+    let listed_assets = use_assets();
     rsx! {
         Col {
             gap: 2, 
@@ -103,8 +66,23 @@ fn LiquidityTable() -> Element {
                     }
                 },
                 rows: rsx! {
-                    for liquidity in listed_liquidity {
-                        LiquidityRow { liquidity: liquidity }
+                    match listed_assets.cloned() {
+                        None => rsx! {
+                            TableRowLink {
+                                to: Route::Pair { pair: "Loading".to_string() },
+                                left: rsx! { div { class: "h-10 w-48 loading rounded" } },
+                                right_1: rsx! { div { class: "h-10 w-24 loading rounded" } },
+                                right_2: rsx! { div { class: "h-10 w-24 loading rounded" } },
+                                right_3: rsx! { div { class: "h-10 w-24 loading rounded" } }
+                            }
+                        },
+                        Some(assets) => {
+                            rsx! {
+                                for asset in assets {
+                                    LiquidityRow { asset: asset }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -113,20 +91,19 @@ fn LiquidityTable() -> Element {
 }
 
 #[component]
-fn LiquidityRow(liquidity: Liquidity) -> Element {
+fn LiquidityRow(asset: Asset) -> Element {
     rsx! {
         TableRowLink {
-            to: Route::Pair { pair: liquidity.name.clone() },
+            to: Route::Pair { pair: asset.ticker.clone() },
             left: rsx! {
                 Row {
-                    // class: "grow w-48 shrink-0",
                     class: "grow shrink-0",
                     gap: 4,
                     Row {
                         class: "shrink-0",
                         img {
                             class: "w-10 h-10 shrink-0 my-auto rounded-full border border-gray-800",
-                            src: "{liquidity.image}"
+                            src: "{asset.image}"
                         }
                         img {
                             class: "w-10 h-10 shrink-0 -ml-2 my-auto rounded-full border border-gray-800",
@@ -137,7 +114,7 @@ fn LiquidityRow(liquidity: Liquidity) -> Element {
                         class: "my-auto min-w-32 shrink-0",
                         span {
                             class: "font-medium whitespace-nowrap",
-                            "{liquidity.name}"
+                            "{asset.ticker}-ORE"
                         }
                         span {
                             class: "font-medium text-gray-700 h-5 text-sm",
@@ -168,10 +145,3 @@ fn LiquidityRow(liquidity: Liquidity) -> Element {
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
-struct Liquidity {
-    name: String,
-    mint: Pubkey,
-    lp: Pubkey,
-    image: String,
-}

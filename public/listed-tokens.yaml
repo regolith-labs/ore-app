@@ -1,0 +1,30 @@
+assets:
+  - mint: So11111111111111111111111111111111111111112
+    name: Solana
+    ticker: SOL
+    description: ""
+    image: https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png
+  
+  - mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    name: USDC
+    ticker: USDC
+    description: ""
+    image: https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png
+  
+  - mint: J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD
+    name: International Stable Currency
+    ticker: ISC
+    description: ""
+    image: https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png
+  
+  - mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux
+    name: Helium
+    ticker: HNT
+    description: ""
+    image: https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg
+  
+  - mint: 4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy
+    name: Honey
+    ticker: HONEY
+    description: ""
+    image: https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png
