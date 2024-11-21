@@ -2,9 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{
-        Balance, Col, OreValueSmall, PlusIcon, Row, Table, TableHeader, TableRowLink, Yield,
-    },
+    components::*,
     route::Route,
 };
 
@@ -93,18 +91,21 @@ fn LiquidityTable() -> Element {
     ];
 
     rsx! {
-        Table {
-            header: rsx! {
-                TableHeader {
-                    left: "Pair",
-                    right_1: "Liquidity",
-                    right_2: "Volume",
-                    right_3: "Yield"
-                }
-            },
-            rows: rsx! {
-                for liquidity in listed_liquidity {
-                    LiquidityRow { liquidity: liquidity }
+        Col {
+            gap: 2, 
+            Table {
+                header: rsx! {
+                    TableHeader {
+                        left: "Pair",
+                        right_1: "Liquidity",
+                        right_2: "Volume",
+                        right_3: "Yield"
+                    }
+                },
+                rows: rsx! {
+                    for liquidity in listed_liquidity {
+                        LiquidityRow { liquidity: liquidity }
+                    }
                 }
             }
         }

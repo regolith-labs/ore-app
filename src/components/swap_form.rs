@@ -33,7 +33,7 @@ pub fn SwapForm(mint_a: Pubkey, mint_b: Pubkey) -> Element {
         Col {
             gap: 4,
             Col {
-                class: "relative lg:flex elevated elevated-border shrink-0 h-min w-96 rounded",
+                class: "relative lg:flex elevated elevated-border shrink-0 h-min w-96 rounded z-0",
                 SwapInput {
                     mint: Pubkey::new_unique(),
                     mode: SwapInputMode::Sell,

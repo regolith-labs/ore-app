@@ -2,10 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{
-        Balance, Col, DownloadIcon, OreValueSmall, PlayIcon, Row, Table, TableHeader, TableRowLink,
-        Yield,
-    },
+    components::*,
     route::Route,
 };
 
@@ -102,18 +99,21 @@ fn PoolTable() -> Element {
     ];
 
     rsx! {
-        Table {
-            header: rsx! {
-                TableHeader {
-                    left: "Pool",
-                    right_1: "Hashpower",
-                    right_2: "Multiplier",
-                    right_3: "Yield",
-                }
-            },
-            rows: rsx! {
-                for pool in listed_pools {
-                    PoolRow { pool: pool }
+        Col {
+            gap: 2, 
+            Table {
+                header: rsx! {
+                    TableHeader {
+                        left: "Pool",
+                        right_1: "Hashpower",
+                        right_2: "Multiplier",
+                        right_3: "Yield",
+                    }
+                },
+                rows: rsx! {
+                    for pool in listed_pools {
+                        PoolRow { pool: pool }
+                    }
                 }
             }
         }

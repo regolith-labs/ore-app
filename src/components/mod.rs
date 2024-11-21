@@ -1,6 +1,7 @@
 mod balance;
 mod breadcrumbs;
 mod common;
+mod heading;
 mod icons;
 mod navigation;
 mod ore_value;
@@ -13,6 +14,7 @@ mod wallet_adapter;
 pub use balance::*;
 pub use breadcrumbs::*;
 pub use common::*;
+pub use heading::*;
 pub use icons::*;
 pub use navigation::*;
 pub use ore_value::*;

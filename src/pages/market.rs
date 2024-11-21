@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{Col, OrePrice, OreValueSmall, Row, SwapForm, XIcon},
+    components::*,
     route::Route,
 };
 
@@ -10,17 +10,22 @@ use crate::{
 pub fn Market(market: String) -> Element {
     rsx! {
         Row {
-            class: "w-full px-5 sm:px-8 pb-20 sm:pb-16",
-            gap:4,
+            class: "w-full pb-20 sm:pb-16 md:pr-8",
+            gap: 4,
             Col {
                 class: "w-full",
-                gap: 4,
-                Header {
-                    market: market
-                }
-                PriceChart {}
-                Actions {}
-                Stats {}
+                gap: 8,
+                Col {
+                    class: "w-full px-5 md:pl-8 md:pr-0",
+                    gap: 4,
+                    Header {
+                        market: market
+                    },
+                    PriceChart {},
+                    Actions {},
+                    Stats {}
+                },
+                TransactionTable {}
             }
             span {
                 class: "hidden lg:flex mt-24",
@@ -209,6 +214,75 @@ fn TimeFrameButton(title: String) -> Element {
         button {
             class: "py-1 w-10 rounded text-center transition text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis",
             "{title}"
+        }
+    }
+}
+fn TransactionTable() -> Element {
+    rsx! {
+        Col {
+            gap: 2,
+            Table {
+                header: rsx! {
+                    TableHeader {
+                        left: "Time",
+                        right_1: "Amount",
+                        right_2: "By"
+                    }
+                },
+                rows: rsx! {
+                    // TODO: Replace with actual transaction data
+                    TransactionRow {
+                        timestamp: "3m ago",
+                        amount: "12.5",
+                        by: "Hf12...3x9k"
+                    }
+                    TransactionRow {
+                        timestamp: "6m ago",
+                        amount: "5.2",
+                        by: "Kp98...2m4j"
+                    }
+                }
+            }
+        }
+    }
+}
+#[component]
+fn TransactionRow(
+    timestamp: String,
+    amount: String,
+    by: String
+) -> Element {
+    rsx! {
+        TableRowLink {
+            to: Route::Pay {},
+            left: rsx! {
+                span {
+                    class: "whitespace-nowrap",
+                    "{timestamp}"
+                }
+            },
+            right_1: rsx! {
+                Row {
+                    class: "gap-2",
+                    TokenValueSmall {
+                        amount: amount,
+                        image: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png".to_string()
+                    }
+                    span {
+                        class: "text-elements-lowEmphasis",
+                        "→"
+                    }
+                    OreValueSmall {
+                        ui_amount_string: "1.202".to_string()
+                    }
+                }
+            },
+            right_2: rsx! {
+                span {
+                    class: "text-elements-highEmphasis",
+                    "{by}"
+                }
+            }
         }
     }
 }

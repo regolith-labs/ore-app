@@ -22,6 +22,7 @@ pub fn TableHeader(
     right_1: String,
     right_2: Option<String>,
     right_3: Option<String>,
+    right_4: Option<String>,
 ) -> Element {
     rsx! {
         Row {
@@ -53,6 +54,12 @@ pub fn TableHeader(
                         {right_3}
                     }
                 }
+                if let Some(right_4) = right_4 {
+                    span {
+                        class: "text-right w-40 my-auto",
+                        {right_4}
+                    }
+                }
             }
         }
     }
@@ -65,6 +72,7 @@ pub fn TableRowLink(
     right_1: Element,
     right_2: Option<Element>,
     right_3: Option<Element>,
+    right_4: Option<Element>,
 ) -> Element {
     rsx! {
         Link {
@@ -95,6 +103,12 @@ pub fn TableRowLink(
                     span {
                         class: "flex text-right w-40 my-auto justify-end",
                         {right_3}
+                    }
+                }
+                if let Some(right_4) = right_4 {
+                    span {
+                        class: "flex text-right w-40 my-auto justify-end",
+                        {right_4}
                     }
                 }
             }

@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 
 use crate::{
-    components::{Balance, Col, OreValueSmall,  Row, SwapIcon, Table, TableHeader, TableRowLink, Worth}, gateway::GatewayResult, hooks::use_token_balance, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
+    components::*, gateway::GatewayResult, hooks::use_token_balance, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
 };
 
 pub fn Trade() -> Element {
@@ -97,17 +97,20 @@ fn AssetTable() -> Element {
 
     // TODO Sort by token balances
     rsx! {
-        Table {
-            header: rsx! {
-                TableHeader {
-                    left: "Market",
-                    right_1: "Price",
-                    right_2: "Valuation"
-                }
-            },
-            rows: rsx! {
-                for asset in listed_assets {
-                    AssetRow { asset: asset }
+        Col {
+            gap: 4,
+            Table {
+                header: rsx! {
+                    TableHeader {
+                        left: "Market",
+                        right_1: "Price", 
+                        right_2: "Valuation"
+                    }
+                },
+                rows: rsx! {
+                    for asset in listed_assets {
+                        AssetRow { asset: asset }
+                    }
                 }
             }
         }
