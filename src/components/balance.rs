@@ -49,7 +49,7 @@ pub fn Balance() -> Element {
                         }
                     }
                     OreV1Balance {}
-                    StakeBalance {}
+                    YieldBalance {}
                 }
             }
         };
@@ -62,7 +62,7 @@ pub fn Balance() -> Element {
     }
 }
 
-pub fn StakeBalance() -> Element {
+pub fn YieldBalance() -> Element {
     let proof = use_proof();
     let escrow_proof = use_escrow_proof();
 
@@ -101,7 +101,7 @@ pub fn StakeBalance() -> Element {
                     class: "flex flex-col gap-2",
                     p {
                         class: "font-medium text-sm text-gray-300",
-                        "Stake"
+                        "Yield"
                     }
                     div {
                         class: "flex flex-row gap-2",
@@ -117,7 +117,7 @@ pub fn StakeBalance() -> Element {
                 div {
                     class: "mt-auto flex flex-row gap-1 sm:gap-2 -mb-2",
                     ClaimButton {}
-                    StakeButton {}
+                    // StakeButton {}
                 }
             }
         };
@@ -221,23 +221,23 @@ pub fn ClaimButton() -> Element {
     }
 }
 
-pub fn StakeButton() -> Element {
-    let appearance = use_appearance();
-    let button_color = match *appearance.read() {
-        Appearance::Light => "text-gray-300 hover:text-black ",
-        Appearance::Dark => "text-gray-300 hover:text-white ",
-    };
-    rsx! {
-        Link {
-            class: "flex transition transition-colors font-semibold text-sm px-3 h-10 rounded-full hover-100 active-200 {button_color}",
-            to: Route::Stake {},
-            span {
-                class: "my-auto",
-                "Stake"
-            }
-        }
-    }
-}
+// pub fn StakeButton() -> Element {
+//     let appearance = use_appearance();
+//     let button_color = match *appearance.read() {
+//         Appearance::Light => "text-gray-300 hover:text-black ",
+//         Appearance::Dark => "text-gray-300 hover:text-white ",
+//     };
+//     rsx! {
+//         Link {
+//             class: "flex transition transition-colors font-semibold text-sm px-3 h-10 rounded-full hover-100 active-200 {button_color}",
+//             to: Route::Stake {},
+//             span {
+//                 class: "my-auto",
+//                 "Stake"
+//             }
+//         }
+//     }
+// }
 
 pub fn UpgradeButton() -> Element {
     let appearance = use_appearance();
