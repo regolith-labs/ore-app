@@ -77,10 +77,10 @@ fn LiquidityTable() -> Element {
                 .to_owned(),
         },
         Liquidity {
-            name: "MOBILE-ORE".to_string(),
+            name: "HNT-ORE".to_string(),
             mint: Pubkey::new_unique(),
             lp: Pubkey::new_unique(),
-            image: "https://shdw-drive.genesysgo.net/6tcnBSybPG7piEDShBcrVtYJDPSvGrDbVvXmXKpzBvWP/mobile.png".to_owned(),
+            image: "https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg".to_owned(),
         },
         Liquidity {
             name: "HONEY-ORE".to_string(),

@@ -80,11 +80,11 @@ fn AssetTable() -> Element {
                 .to_owned(),
         },
         Asset {           
-            mint: Pubkey::from_str("mb1eu7TzEc71KxDpsmsKoucSSuuoGLv1drys1oP2jh6").unwrap(),
-            name: "Mobile".to_owned(),
-            ticker: "MOBILE".to_owned(),
+            mint: Pubkey::from_str("hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux").unwrap(),
+            name: "Helium".to_owned(),
+            ticker: "HNT".to_owned(),
             description: "".to_owned(),
-            image: "https://shdw-drive.genesysgo.net/6tcnBSybPG7piEDShBcrVtYJDPSvGrDbVvXmXKpzBvWP/mobile.png".to_owned(),
+            image: "https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg".to_owned(),
         },
         Asset {
             mint: Pubkey::from_str("4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy").unwrap(),
