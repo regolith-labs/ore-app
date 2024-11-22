@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::*, gateway::GatewayResult, hooks::{use_assets, use_token_balance, Asset}, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
+    components::*, gateway::GatewayResult, hooks::{use_token_balance, Asset, ASSETS}, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
 };
 
 
@@ -53,7 +53,7 @@ fn SwapButton() -> Element {
 }
 
 fn AssetTable() -> Element {
-    let listed_assets = use_assets();
+    let listed_assets = ASSETS.values().collect::<Vec<_>>();
     rsx! {
         Col {
             gap: 4,
@@ -66,22 +66,8 @@ fn AssetTable() -> Element {
                     }
                 },
                 rows: rsx! {
-                    match listed_assets.cloned() {
-                        None => rsx! {
-                            TableRowLink {
-                                to: Route::Market { market: "SOL".to_string() },
-                                left: rsx! { div { class: "h-10 w-48 loading rounded" } },
-                                right_1: rsx! { div { class: "h-10 w-24 loading rounded" } },
-                                right_2: rsx! { div { class: "h-10 w-24 loading rounded" } }
-                            }
-                        },
-                        Some(assets) => {
-                            rsx! {
-                                for asset in assets {
-                                    AssetRow { asset: asset }
-                                }
-                            }
-                        }
+                    for asset in listed_assets {
+                        AssetRow { asset: asset.clone() }
                     }
                 }
             }

@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    hooks::{use_pools, Pool},
+    hooks::{POOLS, Pool},
     components::*,
     route::Route,
 };
@@ -41,7 +41,7 @@ fn StartButton() -> Element {
     rsx! {
         Link {
             to: Route::Swap {},
-            class: "h-10 controls-primary rounded-full px-4 gap-2 -mr-2",
+            class: "h-10 controls-primary rounded-full px-4 gap-2",
             PlayIcon {
                 class: "h-5 w-5 mx-auto my-auto"
             }
@@ -78,9 +78,7 @@ fn DownloadButton() -> Element {
         }
     }
 }
-
 fn PoolTable() -> Element {
-    let listed_pools = use_pools();
     rsx! {
         Col {
             gap: 2, 
@@ -94,23 +92,8 @@ fn PoolTable() -> Element {
                     }
                 },
                 rows: rsx! {
-                    match listed_pools.cloned() {
-                        None => rsx! {
-                            TableRowLink {
-                                to: Route::Pool { pool: "Loading".to_string() },
-                                left: rsx! { div { class: "h-10 w-48 loading rounded" } },
-                                right_1: rsx! { div { class: "h-10 w-24 loading rounded" } },
-                                right_2: rsx! { div { class: "h-10 w-24 loading rounded" } },
-                                right_3: rsx! { div { class: "h-10 w-24 loading rounded" } }
-                            }
-                        },
-                        Some(pools) => {
-                            rsx! {
-                                for pool in pools {
-                                    PoolRow { pool: pool }
-                                }
-                            }
-                        }
+                    for pool in POOLS.iter() {
+                        PoolRow { pool: pool.clone() }
                     }
                 }
             }

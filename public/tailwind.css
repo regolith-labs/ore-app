@@ -1528,6 +1528,10 @@ body {
     width: 100%;
   }
 
+  .sm\:w-56 {
+    width: 14rem;
+  }
+
   .sm\:grow {
     flex-grow: 1;
   }

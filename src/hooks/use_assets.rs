@@ -1,32 +1,24 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
-use dioxus::prelude::*;
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer};
-use wasm_bindgen_futures::JsFuture;
-use wasm_bindgen::JsCast;
 
 use crate::steel_app::solana::sdk::pubkey::Pubkey;
 
-pub fn use_assets() -> Resource<Vec<Asset>> {
-    use_resource(move || async move {
-        let window = web_sys::window().expect("no window exists");
-        let resp = JsFuture::from(window.fetch_with_str("/listed-tokens.yaml"))
-            .await
-            .expect("Failed to fetch config");
-        
-        let resp: web_sys::Response = resp.dyn_into().unwrap();
-        let text = JsFuture::from(resp.text().unwrap())
-            .await
-            .expect("Failed to get response text")
-            .as_string()
-            .unwrap();
-        log::info!("Got text: {}", text);
-
-        let config: Config = serde_yaml::from_str(&text)
-            .expect("Failed to parse config");
-        config.assets
-    })
-}
+// Create a static HashMap indexed by ticker
+pub static ASSETS: Lazy<HashMap<String, Asset>> = Lazy::new(|| {
+    // Read the YAML file at compile time
+    let yaml_str = include_str!("../../public/listed-tokens.yaml");
+    
+    // Parse the config
+    let config: Config = serde_yaml::from_str(yaml_str)
+        .expect("Failed to parse listed-tokens.yaml");
+    
+    // Convert Vec<Asset> into HashMap<String, Asset>
+    config.assets.into_iter()
+        .map(|asset| (asset.ticker.clone(), asset))
+        .collect()
+});
 
 #[derive(Clone, PartialEq, Eq, Deserialize)]
 pub struct Asset {
@@ -36,6 +28,8 @@ pub struct Asset {
     pub ticker: String,
     pub description: String,
     pub image: String,
+    pub twitter: String,
+    pub homepage: String,
 }
 
 #[derive(Deserialize)]

@@ -2,29 +2,39 @@ assets:
   - mint: So11111111111111111111111111111111111111112
     name: Solana
     ticker: SOL
-    description: ""
+    description: "Solana is a high-performance blockchain platform known for its ultra-fast transactions, low fees, and powerful smart contract capabilities. With its innovative Proof of History consensus mechanism and ability to process up to 65,000 transactions per second, Solana has established itself as a leading ecosystem for DeFi, NFTs, and Web3 applications."
     image: https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png
+    twitter: https://twitter.com/solana
+    homepage: https://solana.com
   
   - mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
     name: USDC
     ticker: USDC
-    description: ""
+    description: "USDC (USD Coin) is a fully-reserved digital dollar stablecoin, backed 1:1 by cash and short-duration US Treasury bonds. As one of the world's most trusted and widely-used stablecoins, USDC provides a reliable bridge between traditional finance and digital markets, enabling fast, low-cost transactions while maintaining a stable value pegged to the US dollar."
     image: https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png
+    twitter: https://twitter.com/circle
+    homepage: https://www.circle.com/en/usdc
   
   - mint: J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD
     name: International Stable Currency
     ticker: ISC
-    description: ""
+    description: "ISC (International Stable Currency) is a decentralized stablecoin designed to maintain a stable value against a basket of major world currencies. By using an algorithmic stabilization mechanism and robust collateral system, ISC aims to provide a globally accessible, low-volatility digital currency that serves as a reliable medium of exchange and store of value across international borders."
     image: https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png
+    twitter: https://twitter.com/ISC_money
+    homepage: https://isc.money
   
   - mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux
     name: Helium
     ticker: HNT
-    description: ""
+    description: "Helium is a decentralized wireless network protocol that incentivizes individuals to provide and validate wireless coverage. Originally focused on IoT connectivity through its LongFi network, Helium has expanded to include 5G cellular coverage. Network participants earn HNT tokens by operating hotspots that provide coverage or validating network transactions. This innovative 'proof-of-coverage' model has created one of the fastest-growing decentralized networks, transforming traditional telecom infrastructure into a community-powered system."
     image: https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg
+    twitter: https://twitter.com/helium
+    homepage: https://www.helium.com
   
   - mint: 4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy
     name: Honey
     ticker: HONEY
-    description: ""
+    description: "HONEY is the native token of Hivemapper, a decentralized mapping network that rewards contributors for capturing and validating map data. By using dashcams and the Hivemapper mobile app, community members earn HONEY tokens for collecting fresh street-level imagery that keeps the map current. This innovative approach to mapping combines blockchain incentives with real-world utility, creating a constantly-updated, community-driven alternative to traditional mapping services. The HONEY token serves as both a reward mechanism and governance tool within the Hivemapper ecosystem."
     image: https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png
+    twitter: https://twitter.com/hivemapper
+    homepage: https://hivemapper.com

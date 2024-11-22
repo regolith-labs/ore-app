@@ -32,7 +32,7 @@ pub fn TableHeader(
                 Row {
                     class: "my-auto w-full sm:min-w-96 grow-0 shrink-0 sm:grow justify-between",
                     span {
-                        class: "w-min sm:w-64",
+                        class: "w-min sm:w-56",
                         {left}
                     }
                     span {
@@ -83,7 +83,7 @@ pub fn TableRowLink(
                 Row {
                     class: "w-full sm:min-w-96 my-auto grow-0 shrink-0 sm:grow justify-between",
                     span {
-                        class: "w-min sm:w-64",
+                        class: "w-min sm:w-56",
                         {left}
                     }
                     span {

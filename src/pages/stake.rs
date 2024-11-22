@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::*, hooks::{use_assets, Asset}, route::Route
+    components::*, hooks::{Asset, ASSETS}, route::Route
 };
 
 pub fn Stake() -> Element {
@@ -50,39 +50,23 @@ fn DepositButton() -> Element {
         }
     }
 }
-
 fn LiquidityTable() -> Element {
-    let listed_assets = use_assets();
+    let listed_assets = ASSETS.values().collect::<Vec<_>>();
     rsx! {
         Col {
-            gap: 2, 
+            gap: 2,
             Table {
                 header: rsx! {
                     TableHeader {
                         left: "Pair",
-                        right_1: "Liquidity",
+                        right_1: "Liquidity", 
                         right_2: "Volume",
                         right_3: "Yield"
                     }
                 },
                 rows: rsx! {
-                    match listed_assets.cloned() {
-                        None => rsx! {
-                            TableRowLink {
-                                to: Route::Pair { pair: "Loading".to_string() },
-                                left: rsx! { div { class: "h-10 w-48 loading rounded" } },
-                                right_1: rsx! { div { class: "h-10 w-24 loading rounded" } },
-                                right_2: rsx! { div { class: "h-10 w-24 loading rounded" } },
-                                right_3: rsx! { div { class: "h-10 w-24 loading rounded" } }
-                            }
-                        },
-                        Some(assets) => {
-                            rsx! {
-                                for asset in assets {
-                                    LiquidityRow { asset: asset }
-                                }
-                            }
-                        }
+                    for asset in listed_assets {
+                        LiquidityRow { asset: asset.clone() }
                     }
                 }
             }
@@ -94,7 +78,9 @@ fn LiquidityTable() -> Element {
 fn LiquidityRow(asset: Asset) -> Element {
     rsx! {
         TableRowLink {
-            to: Route::Pair { pair: asset.ticker.clone() },
+            to: Route::Pair { 
+                pair: format!("{}-ORE", asset.ticker.clone())
+            },
             left: rsx! {
                 Row {
                     class: "grow shrink-0",

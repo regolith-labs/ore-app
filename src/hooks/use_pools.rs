@@ -1,31 +1,21 @@
 use std::str::FromStr;
-use dioxus::prelude::*;
+
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer};
-use wasm_bindgen_futures::JsFuture;
-use wasm_bindgen::JsCast;
 
 use crate::steel_app::solana::sdk::pubkey::Pubkey;
 
-pub fn use_pools() -> Resource<Vec<Pool>> {
-    use_resource(move || async move {
-        let window = web_sys::window().expect("no window exists");
-        let resp = JsFuture::from(window.fetch_with_str("/listed-pools.yaml"))
-            .await
-            .expect("Failed to fetch pools config");
-        
-        let resp: web_sys::Response = resp.dyn_into().unwrap();
-        let text = JsFuture::from(resp.text().unwrap())
-            .await
-            .expect("Failed to get response text")
-            .as_string()
-            .unwrap();
-        log::info!("Got pools text: {}", text);
 
-        let config: PoolConfig = serde_yaml::from_str(&text)
-            .expect("Failed to parse pools config");
-        config.pools
-    })
-}
+pub static POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
+    // Read the YAML file at compile time
+    let yaml_str = include_str!("../../public/listed-pools.yaml");
+    
+    // Parse the config
+    let config: PoolConfig = serde_yaml::from_str(yaml_str)
+        .expect("Failed to parse listed-pools.yaml");
+
+    config.pools
+});
 
 #[derive(Clone, PartialEq, Eq, Deserialize)]
 pub struct Pool {

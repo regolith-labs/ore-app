@@ -3798,6 +3798,7 @@ dependencies = [
  "lazy_static",
  "log",
  "num-format",
+ "once_cell",
  "ore-api",
  "ore-program",
  "ore-relayer-api",
