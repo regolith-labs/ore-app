@@ -48,22 +48,27 @@ pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
 }
 
 #[component]
-pub fn OrePrice(ui_amount_string: String) -> Element {
+pub fn OrePrice(ui_amount_string: String, change: Option<f64>) -> Element {
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
     let small_units = units[1];
     rsx! {
         Row {
-            class: "sm:gap-2.5 w-min",
-            gap: 2,
+            class: "gap-2 w-min",
             OreIcon {
-                class: "h-6 w-6 sm:h-7 sm:w-7 my-auto"
+                class: "h-6 w-6 sm:h-8 sm:w-8 my-auto"
             }
             Row {
                 class: "my-auto",
                 span {
-                    class: "mt-auto font-semibold text-xl sm:text-2xl",
+                    class: "mt-auto font-semibold text-2xl sm:text-3xl",
                     "{big_units}.{small_units}"
+                }
+            }
+            if let Some(change) = change {
+                span {
+                    class: "font-medium text-green-500 text-sm mt-auto mb-1.5 sm:mb-[5px]",
+                    "{change:.2}%"
                 }
             }
         }

@@ -74,7 +74,7 @@ fn PayButton() -> Element {
     rsx! {
         Link {
             to: Route::Pay {},
-            class: "flex flex-row h-10 w-min text-elements-lowEmphasis transition hover:bg-controls-secondaryHover hover:text-elements-highEmphasis rounded-full px-4 gap-2 md:-ml-3",
+            class: "flex flex-row h-10 w-min text-elements-lowEmphasis transition hover:bg-controls-secondaryHover hover:text-elements-highEmphasis rounded-full px-4 gap-2 -mr-2 md:-ml-3",
             QrCodeIcon {
                 class: "h-6 w-6 mx-auto my-auto"
             }
@@ -126,7 +126,7 @@ fn ClaimButton() -> Element {
     rsx! {
         Link {
             to: Route::Claim {},
-            class: "flex flex-row h-10 w-min text-elements-gold transition hover:bg-elements-gold hover:text-black rounded-full px-4 gap-2 -ml-3 md:ml-auto md:-mr-2",
+            class: "flex flex-row h-10 w-min text-elements-gold transition hover:bg-elements-gold hover:text-black rounded-full px-4 gap-2 -ml-3 md:ml-auto -mr-2",
             CircleStackIcon {
                 class: "h-5 w-5 mx-auto my-auto"
             }
@@ -178,7 +178,7 @@ fn AnalyzeButton() -> Element {
     rsx! {
         Link {
             to: Route::Analyze {},
-            class: "flex flex-row h-10 w-min text-elements-lowEmphasis transition hover:bg-controls-handle hover:text-elements-highEmphasis rounded-full px-4 gap-2 -ml-3 md:ml-auto md:-mr-2",
+            class: "flex flex-row h-10 w-min text-elements-lowEmphasis transition hover:bg-controls-handle hover:text-elements-highEmphasis rounded-full px-4 gap-2 -ml-3 md:ml-auto -mr-2",
             PieChartIcon {
                 class: "h-5 w-5 mx-auto my-auto"
             }

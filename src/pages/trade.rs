@@ -40,7 +40,7 @@ fn SwapButton() -> Element {
     rsx! {
         Link {
             to: Route::Swap {},
-            class: "h-10 controls-primary rounded-full px-4 gap-2",
+            class: "h-10 controls-primary rounded-full px-4 gap-2 -mr-2",
             SwapIcon {
                 class: "h-5 w-5 mx-auto my-auto"
             }

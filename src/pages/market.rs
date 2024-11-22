@@ -17,12 +17,18 @@ pub fn Market(market: String) -> Element {
                 Col {
                     class: "w-full px-5 md:pl-8 md:pr-0",
                     gap: 4,
-                    Header {
-                        asset: asset.clone()
-                    },
-                    PriceChart {
-                        asset: asset.clone()
-                    },
+                    Col {
+                        gap: 2,
+                        Header {
+                            asset: asset.clone()
+                        },
+                        PriceChartHeader {
+                            asset: asset.clone()
+                        },
+                        PriceChart {
+                            asset: asset.clone()
+                        },
+                    }
                     Actions {
                         asset: asset.clone()
                     },
@@ -52,27 +58,15 @@ pub fn Market(market: String) -> Element {
 fn Header(asset: Asset) -> Element {
     rsx! {
         Row {
-            class: "justify-between h-10",
-            Row {
-                gap: 2,
-                img {
-                    class: "w-10 h-10 rounded-full border border-gray-800 -ml-1 my-auto",
-                    src: "{asset.image}",
-                }
-                span {
-                    class: "font-wide text-2xl sm:text-3xl font-semibold my-auto",
-                    "{asset.ticker}"
-                }
+            class: "mb-1",
+            gap: 2,
+            img {
+                class: "w-6 h-6 rounded-full border border-gray-800 my-auto ml-1",
+                src: "{asset.image}",
             }
-            Row {
-                gap: 2,
-                OrePrice {
-                    ui_amount_string: "1.042",
-                }
-                span {
-                    class: "font-medium text-green-500 text-sm mt-auto mb-2 sm:mb-1.5",
-                    "0.2%"
-                }
+            span {
+                class: "font-wide text-base font-semibold my-auto translate-y-[1px]",
+                "{asset.ticker}"
             }
         }
     }
@@ -210,25 +204,7 @@ fn StatValue(title: String, value: u64) -> Element {
 fn PriceChart(asset: Asset) -> Element {
     rsx! {
         Col {
-            gap: 3,
-            Row {
-                class: "text-sm text-elements-midEmphasis",
-                TimeFrameButton {
-                    title: "1D"
-                }
-                TimeFrameButton {
-                    title: "1W"
-                }
-                TimeFrameButton {
-                    title: "1M"
-                }
-                TimeFrameButton {
-                    title: "1Y"
-                }
-                TimeFrameButton {
-                    title: "All"
-                }
-            }
+            gap: 2,
             div {
                 class: "flex w-full h-80 elevated rounded",
                 span {
@@ -241,10 +217,47 @@ fn PriceChart(asset: Asset) -> Element {
 }
 
 #[component]
-fn TimeFrameButton(title: String) -> Element {
+fn PriceChartHeader(asset: Asset) -> Element {
+    rsx! {
+        Row {
+            class: "justify-between h-10",
+            OrePrice {
+                ui_amount_string: "1.042",
+                change: Some(0.2)
+            }
+            Timescale {}
+        }
+    }
+}
+
+fn Timescale() -> Element {
+    rsx! {
+        Row {
+            class: "my-auto text-sm text-elements-midEmphasis",
+            TimescaleButton {
+                title: "1D"
+            }
+            TimescaleButton {
+                title: "1W"
+            }
+            TimescaleButton {
+                title: "1M"
+            }
+            TimescaleButton {
+                title: "1Y"
+            }
+            TimescaleButton {
+                title: "Max"
+            }
+        }
+    }
+}
+
+#[component]
+fn TimescaleButton(title: String) -> Element {
     rsx! {
         button {
-            class: "py-1 w-10 rounded text-center transition text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis",
+            class: "py-1 w-10 h-8 my-auto rounded text-center transition text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis",
             "{title}"
         }
     }

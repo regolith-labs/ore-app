@@ -39,7 +39,7 @@ fn DepositButton() -> Element {
     rsx! {
         Link {
             to: Route::Deposit {},
-            class: "h-10 controls-primary rounded-full px-4 gap-2",
+            class: "h-10 controls-primary rounded-full px-4 gap-2 -mr-2",
             PlusIcon {
                 class: "h-4 w-4 mx-auto my-auto"
             }
