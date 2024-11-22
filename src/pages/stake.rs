@@ -88,11 +88,11 @@ fn LiquidityRow(asset: Asset) -> Element {
                     Row {
                         class: "shrink-0",
                         img {
-                            class: "w-10 h-10 shrink-0 my-auto rounded-full border border-gray-800",
+                            class: "w-10 h-10 shrink-0 my-auto rounded-full",
                             src: "{asset.image}"
                         }
                         img {
-                            class: "w-10 h-10 shrink-0 -ml-2 my-auto rounded-full border border-gray-800",
+                            class: "w-10 h-10 shrink-0 -ml-2 my-auto rounded-full",
                             src: "icon.png"
                         }
                     }

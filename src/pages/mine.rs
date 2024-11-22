@@ -110,7 +110,7 @@ fn PoolRow(pool: Pool) -> Element {
                 Row {
                     gap: 4,
                     img {
-                        class: "w-10 h-10 my-auto bg-gray-900 rounded border border-gray-800",
+                        class: "w-10 h-10 my-auto bg-gray-900 rounded",
                         src: "{pool.image}"
                     }
                     Col {

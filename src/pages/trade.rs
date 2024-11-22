@@ -95,7 +95,7 @@ fn AssetNameAndBalance(asset: Asset, balance: Resource<GatewayResult<UiTokenAmou
         Row {
             gap: 4,
             img {
-                class: "w-10 h-10 my-auto bg-gray-900 rounded-full border border-gray-800",
+                class: "w-10 h-10 my-auto bg-gray-900 rounded-full",
                 src: "{asset.image}"
             }
             Col {
