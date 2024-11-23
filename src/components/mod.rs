@@ -1,5 +1,6 @@
 mod balance;
 mod breadcrumbs;
+mod buttons;
 mod common;
 mod heading;
 mod icons;
@@ -13,6 +14,7 @@ mod wallet_adapter;
 
 pub use balance::*;
 pub use breadcrumbs::*;
+pub use buttons::*;
 pub use common::*;
 pub use heading::*;
 pub use icons::*;

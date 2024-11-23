@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::components::{Col, SwapForm};
+use crate::components::{BackButton, Col, SwapForm};
 
 pub fn Swap() -> Element {
     rsx! {
@@ -27,19 +27,6 @@ pub fn Swap() -> Element {
                     mint_b: Pubkey::new_unique(),
                 }
             }
-        }
-    }
-}
-
-fn BackButton() -> Element {
-    let navigator = use_navigator();
-    rsx! {
-        button {
-            class: "w-10 h-10 -ml-2.5 rounded-full text-bold text-elements-midEmphasis hover:bg-controls-handle",
-            onclick: move |_| {
-                navigator.go_back();
-            },
-            "←"
         }
     }
 }
