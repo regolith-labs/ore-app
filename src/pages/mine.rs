@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::{
-    hooks::{POOLS, Pool},
     components::*,
+    hooks::{Pool, POOLS},
     route::Route,
 };
 
@@ -18,7 +18,27 @@ pub fn Mine() -> Element {
                 Balance {}
                 Yield{}
             }
+            PoolOrNotPool {}
             PoolTable {}
+        }
+    }
+}
+
+fn PoolOrNotPool() -> Element {
+    rsx! {
+        Row {
+            class: "px-5",
+            Link {
+                to: Route::MineComparison {},
+                class: "self-start h-10 controls-primary rounded-full px-4 gap-2 -mr-2",
+                InfoIcon {
+                    class: "h-5 w-5 mx-auto my-auto"
+                }
+                span {
+                    class: "my-auto",
+                    "Solo VS Pool"
+                }
+            }
         }
     }
 }
@@ -81,7 +101,7 @@ fn DownloadButton() -> Element {
 fn PoolTable() -> Element {
     rsx! {
         Col {
-            gap: 2, 
+            gap: 2,
             Table {
                 header: rsx! {
                     TableHeader {

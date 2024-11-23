@@ -16,6 +16,8 @@ pub enum Route {
     #[layout(AppNavigation)]
         #[route("/mine")]
         Mine {},
+        #[route("/mine/comparison")]
+        MineComparison {},
         #[route("/mine/:pool")]
         Pool { pool: String },
         #[route("/stake")]
