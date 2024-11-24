@@ -57,7 +57,7 @@ pub fn Landing() -> Element {
             Block {
                 title: &"Fixed supply.",
                 title2: &"Stable future.",
-                detail: &"ORE has a total max supply of 21 million tokens. With a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
+                detail: &"ORE has a total max supply of 5 million tokens. With a steady issuance rate of one token per minute, all ORE in existence will be mined by the year 2064.",
                 section: Section::B,
             }
             Block {
@@ -350,7 +350,7 @@ fn SectionB() -> Element {
             }
             OreValue {
                 title: "Total supply".to_string(),
-                amount: 21_000_000,
+                amount: 5_000_000,
             }
         }
     }
