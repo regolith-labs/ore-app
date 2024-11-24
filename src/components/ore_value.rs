@@ -67,7 +67,7 @@ pub fn OrePrice(ui_amount_string: String, change: Option<f64>) -> Element {
             }
             if let Some(change) = change {
                 span {
-                    class: "font-medium text-green-500 text-sm mt-auto mb-1.5 sm:mb-[5px]",
+                    class: "font-medium text-green-500 text-sm mt-auto mb-2 sm:mb-[7px]",
                     "{change:.2}%"
                 }
             }

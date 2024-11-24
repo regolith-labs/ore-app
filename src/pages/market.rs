@@ -17,6 +17,7 @@ pub fn Market(market: String) -> Element {
                 Col {
                     class: "w-full px-5 md:pl-8 md:pr-0",
                     gap: 4,
+                    Breadcrumbs {}
                     Header {
                         asset: asset.clone()
                     },

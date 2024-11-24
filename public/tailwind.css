@@ -1614,6 +1614,14 @@ body {
     margin-bottom: 5px;
   }
 
+  .sm\:mb-2\.5 {
+    margin-bottom: 0.625rem;
+  }
+
+  .sm\:mb-\[7px\] {
+    margin-bottom: 7px;
+  }
+
   .sm\:flex {
     display: flex;
   }
