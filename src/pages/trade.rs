@@ -62,7 +62,7 @@ fn AssetTable() -> Element {
                     TableHeader {
                         left: "Market",
                         right_1: "Price", 
-                        right_2: "Valuation"
+                        right_2: "Value"
                     }
                 },
                 rows: rsx! {

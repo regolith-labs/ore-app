@@ -56,12 +56,12 @@ pub fn OrePrice(ui_amount_string: String, change: Option<f64>) -> Element {
         Row {
             class: "gap-2 w-min",
             OreIcon {
-                class: "h-6 w-6 sm:h-8 sm:w-8 my-auto"
+                class: "h-4 w-4 sm:h-6 sm:w-6 my-auto"
             }
             Row {
                 class: "my-auto",
                 span {
-                    class: "mt-auto font-semibold text-2xl sm:text-3xl",
+                    class: "mt-auto font-semibold text-lg sm:text-xl",
                     "{big_units}.{small_units}"
                 }
             }

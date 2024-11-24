@@ -17,18 +17,12 @@ pub fn Market(market: String) -> Element {
                 Col {
                     class: "w-full px-5 md:pl-8 md:pr-0",
                     gap: 4,
-                    Col {
-                        gap: 2,
-                        Header {
-                            asset: asset.clone()
-                        },
-                        PriceChartHeader {
-                            asset: asset.clone()
-                        },
-                        PriceChart {
-                            asset: asset.clone()
-                        },
-                    }
+                    Header {
+                        asset: asset.clone()
+                    },
+                    PriceChart {
+                        asset: asset.clone()
+                    },
                     Actions {
                         asset: asset.clone()
                     },
@@ -58,15 +52,21 @@ pub fn Market(market: String) -> Element {
 fn Header(asset: Asset) -> Element {
     rsx! {
         Row {
-            class: "mb-1",
-            gap: 2,
-            img {
-                class: "w-6 h-6 rounded-full border border-gray-800 my-auto ml-1",
-                src: "{asset.image}",
+            class: "justify-between",
+            Row {
+                gap: 4,
+                img {
+                    class: "w-10 h-10 rounded-full my-auto ml-1",
+                    src: "{asset.image}",
+                }
+                span {
+                    class: "font-wide text-2xl sm:text-3xl font-semibold my-auto translate-y-[1px]",
+                    "{asset.ticker}"
+                }
             }
-            span {
-                class: "font-wide text-base font-semibold my-auto translate-y-[1px]",
-                "{asset.ticker}"
+            OrePrice {
+                ui_amount_string: "1.042", 
+                change: Some(0.2)
             }
         }
     }
@@ -150,31 +150,25 @@ fn Stats(asset: Asset) -> Element {
         Col {
             gap: 2,
             Subheading {
-                title: "Stats".to_string(),
+                title: "Info".to_string(),
             }
             Col {
                 gap: 1,
-                div {
-                    class: "flex flex-col sm:flex-row gap-1",
-                    StatValue {
-                        title: "SUPPLY",
-                        value: 123
-                    }
-                    StatValue {
-                        title: "LIQUIDITY",
-                        value: 123
-                    }
+                StatValue {
+                    title: "Supply",
+                    value: 123
                 }
-                div {
-                    class: "flex flex-col sm:flex-row gap-1",
-                    StatValue {
-                        title: "VOLUME",
-                        value: 123
-                    }
-                    StatValue {
-                        title: "VALUATION",
-                        value: 123
-                    }
+                StatValue {
+                    title: "Liquidity", 
+                    value: 123
+                }
+                StatValue {
+                    title: "Valuation",
+                    value: 123
+                }
+                StatValue {
+                    title: "Volume",
+                    value: 123
                 }
             }
         }
@@ -185,13 +179,18 @@ fn Stats(asset: Asset) -> Element {
 fn StatValue(title: String, value: u64) -> Element {
     rsx! {
         Row {
-            class: "justify-between elevated h-12 w-full px-4 rounded-sm",
-            span {
-                class: "font-medium my-auto text-xs sm:text-sm text-elements-lowEmphasis",
+            class: "h-12 w-full",
+            justify: Justify::Between,
+            Space {
+                class: "my-auto sm:text-sm",
+                font_weight: FontWeight::Medium,
+                font_size: FontSize::XS,
+                text_color: TextColor::LowEmphasis,
                 "{title}"
             }
-            span {
-                class: "my-auto text-elements-midEmphasis",
+            Space {
+                class: "my-auto",
+                text_color: TextColor::MidEmphasis,
                 OreValueSmall {
                     ui_amount_string: "1.202"
                 }
@@ -204,7 +203,9 @@ fn StatValue(title: String, value: u64) -> Element {
 fn PriceChart(asset: Asset) -> Element {
     rsx! {
         Col {
-            gap: 2,
+            PriceChartHeader {
+                asset: asset.clone()
+            },
             div {
                 class: "flex w-full h-80 elevated rounded",
                 span {
@@ -220,11 +221,7 @@ fn PriceChart(asset: Asset) -> Element {
 fn PriceChartHeader(asset: Asset) -> Element {
     rsx! {
         Row {
-            class: "justify-between h-10",
-            OrePrice {
-                ui_amount_string: "1.042",
-                change: Some(0.2)
-            }
+            class: "justify-end h-10",
             Timescale {}
         }
     }
