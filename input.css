@@ -108,3 +108,53 @@
     font-weight: 700;
     font-style: normal;
 }
+
+/* Custom CSS */
+
+.comparison-table {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.comparison-table h2 {
+  padding-bottom: 5px;
+  border-bottom: 1px solid white;
+}
+
+.comparison-table p {
+  width: 60%;
+}
+
+.comparison-table::before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  background: white;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.comparison-table__header > div {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+}
+
+.comparison-table__row {
+  display: flex;
+}
+
+.comparison-table__row > div {
+  width: 50%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
