@@ -7,7 +7,7 @@ use solana_sdk::pubkey::Pubkey;
 use crate::{
     components::{BackButton, CreateAccountPage, MigrateAccountPage, OreIcon, Spinner},
     hooks::{
-        use_escrow, use_gateway, use_miner_toolbar_state, use_power_level, use_proof, MinerStatus,
+        use_escrow, use_miner_toolbar_state, use_power_level, use_proof, MinerStatus,
         MinerStatusMessage, PowerLevel, ReadMinerToolbarState,
     },
     miner::WEB_WORKERS,
@@ -60,7 +60,7 @@ pub fn Mine() -> Element {
             div {
                 class: "flex flex-col gap-6",
                 StakeBalanceDisplay {}
-                MultiplierDisplay {}
+                // MultiplierDisplay {}
                 PowerLevelConfig {}
             }
             // BoostConfig {}
@@ -183,37 +183,6 @@ pub fn StakeBalanceDisplay() -> Element {
                     }
                 }
             }
-    }
-}
-
-pub fn MultiplierDisplay() -> Element {
-    let proof = use_proof();
-
-    let multiplier = use_resource(move || async move {
-        let gateway = use_gateway();
-        if let Some(Ok(proof)) = *proof.read() {
-            if let Ok(config) = gateway.get_config().await {
-                return 1.0 + (proof.balance as f64 / config.top_balance as f64).min(1.0f64);
-            }
-        }
-        1.0
-    });
-
-    rsx! {
-        div {
-            class: "flex flex-row gap-8 justify-between",
-                p {
-                    class: "text-gray-300 font-medium text-sm my-auto",
-                    "Multiplier"
-                }
-           div {
-                class: "flex flex-row flex-shrink h-min gap-1 shrink mb-auto",
-                p {
-                    class: "text-white text-right px-1 mb-auto font-semibold",
-                    "{multiplier.read().unwrap_or(1.0):.12}x"
-                }
-            }
-        }
     }
 }
 
