@@ -4,12 +4,16 @@ use crate::{
     components::*, gateway::GatewayResult, hooks::{use_token_balance, Asset, ASSETS}, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
 };
 
-
 pub fn Trade() -> Element {
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 8,
+            Subheading {
+                class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
+                title: "Trade".to_string(),
+                subtitle: None
+            }
             span {
                 class: "mx-auto max-w-2xl px-5 sm:px-8",
                 SwapForm {

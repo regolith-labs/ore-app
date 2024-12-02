@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
-use crate::{components::{Col, Row, SwitchIcon}, hooks::ASSETS};
+use crate::{components::{Col, Row, SwitchIcon}, hooks::{use_token_balance, ASSETS}};
 
 #[component]
 pub fn SwapForm(mint_a: Pubkey, mint_b: Pubkey) -> Element {
@@ -10,8 +10,8 @@ pub fn SwapForm(mint_a: Pubkey, mint_b: Pubkey) -> Element {
     let mut enabled = use_signal(|| false);
     let show_token_selector_a = use_signal(|| false);
     let show_token_selector_b = use_signal(|| false);
-    let token_a = use_signal(|| "SOL".to_string());
-    let token_b = use_signal(|| "USDC".to_string());
+    let token_a = use_signal(|| "ORE".to_string());
+    let token_b = use_signal(|| "SOL".to_string());
     let tokens_swapped = use_signal(|| false);
 
     use_effect(move || {
@@ -42,15 +42,15 @@ pub fn SwapForm(mint_a: Pubkey, mint_b: Pubkey) -> Element {
                 class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded z-0",
                 SwapInput {
                     mint: Pubkey::new_unique(),
-                    mode: SwapInputMode::Sell,
-                    input_amount: sell_input_amount,
+                    mode: SwapInputMode::Buy,
+                    input_amount: buy_input_amount,
                     show_selector: show_token_selector_a,
                     selected_token: token_a,
                 }
                 SwapInput {
                     mint: Pubkey::new_unique(),
-                    mode: SwapInputMode::Buy,
-                    input_amount: buy_input_amount,
+                    mode: SwapInputMode::Sell,
+                    input_amount: sell_input_amount,
                     show_selector: show_token_selector_b,
                     selected_token: token_b,
                 }
@@ -252,6 +252,8 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>, sh
         .map(|asset| asset.image.clone())
         .unwrap_or_else(|| "icon.png".to_string());
 
+    let balance = use_token_balance(mint);
+
     rsx! {
         Col {
             class: "w-full p-4 {border}",
@@ -262,14 +264,16 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>, sh
                     class: "text-elements-midEmphasis my-auto pl-1",
                     "{title}"
                 }
-                if mode == SwapInputMode::Sell {
-                    button {
-                        class: "text-xs my-auto py-1 px-3 rounded-full bg-gray-800",
-                        onclick: move |_| {
-                            // TODO
-                        },
-                        "Max"
-                    }
+                button {
+                    class: "text-xs my-auto py-1 px-3 rounded-full bg-gray-800",
+                    onclick: move |_| {
+                        if let SwapInputMode::Sell = mode {
+                            if let Some(Ok(balance)) = balance.read().as_ref() {
+                                input_amount.set(balance.ui_amount.unwrap_or(0.0).to_string());
+                            }
+                        }
+                    },
+                    "Max"
                 }
             }
             Row {
