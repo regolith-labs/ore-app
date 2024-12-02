@@ -14,10 +14,10 @@ pub fn Balance() -> Element {
         Col {
             class: "w-full sm:gap-4",
             gap: 2,
-            span {
-                class: "font-medium text-xs sm:text-sm text-gray-700",
-                "Balance"
-            }
+            // span {
+            //     class: "font-medium text-xs sm:text-sm text-gray-700",
+            //     "Balance"
+            // }
             Row {
                 class: "md:flex-col md:gap-2 w-full justify-between md:justify-start align-top",
                 gap: 0,

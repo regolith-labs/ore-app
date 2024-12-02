@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::*, hooks::{Asset, ASSETS}, route::Route
@@ -9,14 +10,21 @@ pub fn Stake() -> Element {
         Col {
             class: "w-full pb-20 sm:pb-16",
             gap: 8,
-            Header {}
-            Col {
-                class: "md:flex-row md:gap-0 px-5 sm:px-8",
-                gap: 8,
-                Balance {}
-                Yield {}
+            span {
+                class: "mx-auto max-w-2xl px-5 sm:px-8",
+                StakeForm {
+                    mint: Pubkey::new_unique(),
+                }
             }
-            LiquidityTable {}
+            
+            // Header {}
+            // Col {
+            //     class: "md:flex-row md:gap-0 px-5 sm:px-8",
+            //     gap: 8,
+            //     Balance {}
+            //     Yield {}
+            // }
+            // LiquidityTable {}
         }
     }
 }

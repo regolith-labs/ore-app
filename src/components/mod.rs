@@ -6,6 +6,7 @@ mod icons;
 mod navigation;
 mod ore_value;
 mod page_title;
+mod stake_form;
 mod swap_form;
 mod table;
 #[cfg(feature = "web")]
@@ -19,6 +20,7 @@ pub use icons::*;
 pub use navigation::*;
 pub use ore_value::*;
 pub use page_title::*;
+pub use stake_form::*;
 pub use swap_form::*;
 pub use table::*;
 #[cfg(feature = "web")]
