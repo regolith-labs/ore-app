@@ -6,12 +6,12 @@ pub fn Orb(
     is_gold: bool,
     is_large: Option<bool>,
 ) -> Element {
-    let animation = if is_gold { "animate-gold-orb" } else { "animate-black-orb" };
     let class = class.unwrap_or_default();
-    let size = if is_large.unwrap_or(false) { "w-56 h-56" } else { "w-32 h-32" };
+    let animation = if is_gold { "animate-orb-spin-fast" } else { "animate-orb-spin-slow" };
+    let image = if is_gold { "bg-[url('assets/orb_gold_sprite.webp')]" } else { "bg-[url('assets/orb_black_sprite.webp')]" };
     rsx! {
         div {
-            class: "relative {size} bg-cover bg-no-repeat {animation} {class}",
+            class: "relative bg-no-repeat w-32 h-32 {image} {animation} {class}",
         }
     }
 }

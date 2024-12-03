@@ -8,7 +8,7 @@ use crate::steel_app::solana::sdk::pubkey::Pubkey;
 
 pub static POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
     // Read the YAML file at compile time
-    let yaml_str = include_str!("../../public/listed-pools.yaml");
+    let yaml_str = include_str!("../../public/config/listed-pools.yaml");
     
     // Parse the config
     let config: PoolConfig = serde_yaml::from_str(yaml_str)

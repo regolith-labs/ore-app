@@ -82,7 +82,7 @@ pub fn StakeForm(
                             pair_deposit.set(!pair_deposit.cloned())
                         }
                     }
-                    "Pair with ORE"
+                    "Deposit as pair"
                 }
             }
             StakeDetails {}
@@ -188,6 +188,8 @@ fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>,
                     input {
                         class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right",
                         placeholder: "0",
+                        r#type: "number",
+                        inputmode: "numeric",
                         value: amount_a.cloned(),
                         oninput: move |e| {
                             let s = e.value();
@@ -216,7 +218,9 @@ fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>,
                         }
                         input {
                             class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right",
-                            placeholder: "0",
+                            placeholder: "0", 
+                            r#type: "number",
+                            inputmode: "numeric",
                             value: amount_b.cloned(),
                             oninput: move |e| {
                                 let s = e.value();

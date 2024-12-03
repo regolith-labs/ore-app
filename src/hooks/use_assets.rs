@@ -8,7 +8,7 @@ use crate::steel_app::solana::sdk::pubkey::Pubkey;
 // Create a static HashMap indexed by ticker
 pub static ASSETS: Lazy<HashMap<String, Asset>> = Lazy::new(|| {
     // Read the YAML file at compile time
-    let yaml_str = include_str!("../../public/listed-tokens.yaml");
+    let yaml_str = include_str!("../../public/config/listed-tokens.yaml");
     
     // Parse the config
     let config: Config = serde_yaml::from_str(yaml_str)

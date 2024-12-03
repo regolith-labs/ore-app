@@ -302,6 +302,9 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>, sh
                 input {
                     class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right",
                     placeholder: "0",
+                    r#type: "number",
+                    inputmode: "numeric",
+                    step: "any",
                     value: input_amount.cloned(),
                     oninput: move |e| {
                         let s = e.value();

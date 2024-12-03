@@ -773,6 +773,10 @@ body {
   height: 0.875rem;
 }
 
+.h-32 {
+  height: 8rem;
+}
+
 .h-4 {
   height: 1rem;
 }
@@ -793,10 +797,6 @@ body {
   height: 20rem;
 }
 
-.h-96 {
-  height: 24rem;
-}
-
 .h-full {
   height: 100%;
 }
@@ -808,18 +808,6 @@ body {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-32 {
-  height: 8rem;
-}
-
-.h-64 {
-  height: 16rem;
-}
-
-.h-56 {
-  height: 14rem;
 }
 
 .min-h-screen {
@@ -848,6 +836,10 @@ body {
 
 .w-3\.5 {
   width: 0.875rem;
+}
+
+.w-32 {
+  width: 8rem;
 }
 
 .w-4 {
@@ -882,6 +874,11 @@ body {
   width: 4.5rem;
 }
 
+.w-fit {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
 .w-full {
   width: 100%;
 }
@@ -893,19 +890,6 @@ body {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-fit {
-  width: -moz-fit-content;
-  width: fit-content;
-}
-
-.w-32 {
-  width: 8rem;
-}
-
-.w-56 {
-  width: 14rem;
 }
 
 .min-w-max {
@@ -951,1944 +935,1944 @@ body {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-@keyframes blackOrb {
+@keyframes orbSpin {
   0.000% {
-    background-image: url("assets/orb/black/orb2x_0001.png");
+    background-position: 0 0;
   }
 
   0.417% {
-    background-image: url("assets/orb/black/orb2x_0002.png");
+    background-position: -128px 0;
   }
 
   0.833% {
-    background-image: url("assets/orb/black/orb2x_0003.png");
+    background-position: -256px 0;
   }
 
   1.250% {
-    background-image: url("assets/orb/black/orb2x_0004.png");
+    background-position: -384px 0;
   }
 
   1.667% {
-    background-image: url("assets/orb/black/orb2x_0005.png");
+    background-position: -512px 0;
   }
 
   2.083% {
-    background-image: url("assets/orb/black/orb2x_0006.png");
+    background-position: -640px 0;
   }
 
   2.500% {
-    background-image: url("assets/orb/black/orb2x_0007.png");
+    background-position: -768px 0;
   }
 
   2.917% {
-    background-image: url("assets/orb/black/orb2x_0008.png");
+    background-position: -896px 0;
   }
 
   3.333% {
-    background-image: url("assets/orb/black/orb2x_0009.png");
+    background-position: -1024px 0;
   }
 
   3.750% {
-    background-image: url("assets/orb/black/orb2x_0010.png");
+    background-position: -1152px 0;
   }
 
   4.167% {
-    background-image: url("assets/orb/black/orb2x_0011.png");
+    background-position: -1280px 0;
   }
 
   4.583% {
-    background-image: url("assets/orb/black/orb2x_0012.png");
+    background-position: -1408px 0;
   }
 
   5.000% {
-    background-image: url("assets/orb/black/orb2x_0013.png");
+    background-position: -1536px 0;
   }
 
   5.417% {
-    background-image: url("assets/orb/black/orb2x_0014.png");
+    background-position: -1664px 0;
   }
 
   5.833% {
-    background-image: url("assets/orb/black/orb2x_0015.png");
+    background-position: -1792px 0;
   }
 
   6.250% {
-    background-image: url("assets/orb/black/orb2x_0016.png");
+    background-position: -1920px 0;
   }
 
   6.667% {
-    background-image: url("assets/orb/black/orb2x_0017.png");
+    background-position: 0 -128px;
   }
 
   7.083% {
-    background-image: url("assets/orb/black/orb2x_0018.png");
+    background-position: -128px -128px;
   }
 
   7.500% {
-    background-image: url("assets/orb/black/orb2x_0019.png");
+    background-position: -256px -128px;
   }
 
   7.917% {
-    background-image: url("assets/orb/black/orb2x_0020.png");
+    background-position: -384px -128px;
   }
 
   8.333% {
-    background-image: url("assets/orb/black/orb2x_0021.png");
+    background-position: -512px -128px;
   }
 
   8.750% {
-    background-image: url("assets/orb/black/orb2x_0022.png");
+    background-position: -640px -128px;
   }
 
   9.167% {
-    background-image: url("assets/orb/black/orb2x_0023.png");
+    background-position: -768px -128px;
   }
 
   9.583% {
-    background-image: url("assets/orb/black/orb2x_0024.png");
+    background-position: -896px -128px;
   }
 
   10.000% {
-    background-image: url("assets/orb/black/orb2x_0025.png");
+    background-position: -1024px -128px;
   }
 
   10.417% {
-    background-image: url("assets/orb/black/orb2x_0026.png");
+    background-position: -1152px -128px;
   }
 
   10.833% {
-    background-image: url("assets/orb/black/orb2x_0027.png");
+    background-position: -1280px -128px;
   }
 
   11.250% {
-    background-image: url("assets/orb/black/orb2x_0028.png");
+    background-position: -1408px -128px;
   }
 
   11.667% {
-    background-image: url("assets/orb/black/orb2x_0029.png");
+    background-position: -1536px -128px;
   }
 
   12.083% {
-    background-image: url("assets/orb/black/orb2x_0030.png");
+    background-position: -1664px -128px;
   }
 
   12.500% {
-    background-image: url("assets/orb/black/orb2x_0031.png");
+    background-position: -1792px -128px;
   }
 
   12.917% {
-    background-image: url("assets/orb/black/orb2x_0032.png");
+    background-position: -1920px -128px;
   }
 
   13.333% {
-    background-image: url("assets/orb/black/orb2x_0033.png");
+    background-position: 0 -256px;
   }
 
   13.750% {
-    background-image: url("assets/orb/black/orb2x_0034.png");
+    background-position: -128px -256px;
   }
 
   14.167% {
-    background-image: url("assets/orb/black/orb2x_0035.png");
+    background-position: -256px -256px;
   }
 
   14.583% {
-    background-image: url("assets/orb/black/orb2x_0036.png");
+    background-position: -384px -256px;
   }
 
   15.000% {
-    background-image: url("assets/orb/black/orb2x_0037.png");
+    background-position: -512px -256px;
   }
 
   15.417% {
-    background-image: url("assets/orb/black/orb2x_0038.png");
+    background-position: -640px -256px;
   }
 
   15.833% {
-    background-image: url("assets/orb/black/orb2x_0039.png");
+    background-position: -768px -256px;
   }
 
   16.250% {
-    background-image: url("assets/orb/black/orb2x_0040.png");
+    background-position: -896px -256px;
   }
 
   16.667% {
-    background-image: url("assets/orb/black/orb2x_0041.png");
+    background-position: -1024px -256px;
   }
 
   17.083% {
-    background-image: url("assets/orb/black/orb2x_0042.png");
+    background-position: -1152px -256px;
   }
 
   17.500% {
-    background-image: url("assets/orb/black/orb2x_0043.png");
+    background-position: -1280px -256px;
   }
 
   17.917% {
-    background-image: url("assets/orb/black/orb2x_0044.png");
+    background-position: -1408px -256px;
   }
 
   18.333% {
-    background-image: url("assets/orb/black/orb2x_0045.png");
+    background-position: -1536px -256px;
   }
 
   18.750% {
-    background-image: url("assets/orb/black/orb2x_0046.png");
+    background-position: -1664px -256px;
   }
 
   19.167% {
-    background-image: url("assets/orb/black/orb2x_0047.png");
+    background-position: -1792px -256px;
   }
 
   19.583% {
-    background-image: url("assets/orb/black/orb2x_0048.png");
+    background-position: -1920px -256px;
   }
 
   20.000% {
-    background-image: url("assets/orb/black/orb2x_0049.png");
+    background-position: 0 -384px;
   }
 
   20.417% {
-    background-image: url("assets/orb/black/orb2x_0050.png");
+    background-position: -128px -384px;
   }
 
   20.833% {
-    background-image: url("assets/orb/black/orb2x_0051.png");
+    background-position: -256px -384px;
   }
 
   21.250% {
-    background-image: url("assets/orb/black/orb2x_0052.png");
+    background-position: -384px -384px;
   }
 
   21.667% {
-    background-image: url("assets/orb/black/orb2x_0053.png");
+    background-position: -512px -384px;
   }
 
   22.083% {
-    background-image: url("assets/orb/black/orb2x_0054.png");
+    background-position: -640px -384px;
   }
 
   22.500% {
-    background-image: url("assets/orb/black/orb2x_0055.png");
+    background-position: -768px -384px;
   }
 
   22.917% {
-    background-image: url("assets/orb/black/orb2x_0056.png");
+    background-position: -896px -384px;
   }
 
   23.333% {
-    background-image: url("assets/orb/black/orb2x_0057.png");
+    background-position: -1024px -384px;
   }
 
   23.750% {
-    background-image: url("assets/orb/black/orb2x_0058.png");
+    background-position: -1152px -384px;
   }
 
   24.167% {
-    background-image: url("assets/orb/black/orb2x_0059.png");
+    background-position: -1280px -384px;
   }
 
   24.583% {
-    background-image: url("assets/orb/black/orb2x_0060.png");
+    background-position: -1408px -384px;
   }
 
   25.000% {
-    background-image: url("assets/orb/black/orb2x_0061.png");
+    background-position: -1536px -384px;
   }
 
   25.417% {
-    background-image: url("assets/orb/black/orb2x_0062.png");
+    background-position: -1664px -384px;
   }
 
   25.833% {
-    background-image: url("assets/orb/black/orb2x_0063.png");
+    background-position: -1792px -384px;
   }
 
   26.250% {
-    background-image: url("assets/orb/black/orb2x_0064.png");
+    background-position: -1920px -384px;
   }
 
   26.667% {
-    background-image: url("assets/orb/black/orb2x_0065.png");
+    background-position: 0 -512px;
   }
 
   27.083% {
-    background-image: url("assets/orb/black/orb2x_0066.png");
+    background-position: -128px -512px;
   }
 
   27.500% {
-    background-image: url("assets/orb/black/orb2x_0067.png");
+    background-position: -256px -512px;
   }
 
   27.917% {
-    background-image: url("assets/orb/black/orb2x_0068.png");
+    background-position: -384px -512px;
   }
 
   28.333% {
-    background-image: url("assets/orb/black/orb2x_0069.png");
+    background-position: -512px -512px;
   }
 
   28.750% {
-    background-image: url("assets/orb/black/orb2x_0070.png");
+    background-position: -640px -512px;
   }
 
   29.167% {
-    background-image: url("assets/orb/black/orb2x_0071.png");
+    background-position: -768px -512px;
   }
 
   29.583% {
-    background-image: url("assets/orb/black/orb2x_0072.png");
+    background-position: -896px -512px;
   }
 
   30.000% {
-    background-image: url("assets/orb/black/orb2x_0073.png");
+    background-position: -1024px -512px;
   }
 
   30.417% {
-    background-image: url("assets/orb/black/orb2x_0074.png");
+    background-position: -1152px -512px;
   }
 
   30.833% {
-    background-image: url("assets/orb/black/orb2x_0075.png");
+    background-position: -1280px -512px;
   }
 
   31.250% {
-    background-image: url("assets/orb/black/orb2x_0076.png");
+    background-position: -1408px -512px;
   }
 
   31.667% {
-    background-image: url("assets/orb/black/orb2x_0077.png");
+    background-position: -1536px -512px;
   }
 
   32.083% {
-    background-image: url("assets/orb/black/orb2x_0078.png");
+    background-position: -1664px -512px;
   }
 
   32.500% {
-    background-image: url("assets/orb/black/orb2x_0079.png");
+    background-position: -1792px -512px;
   }
 
   32.917% {
-    background-image: url("assets/orb/black/orb2x_0080.png");
+    background-position: -1920px -512px;
   }
 
   33.333% {
-    background-image: url("assets/orb/black/orb2x_0081.png");
+    background-position: 0 -640px;
   }
 
   33.750% {
-    background-image: url("assets/orb/black/orb2x_0082.png");
+    background-position: -128px -640px;
   }
 
   34.167% {
-    background-image: url("assets/orb/black/orb2x_0083.png");
+    background-position: -256px -640px;
   }
 
   34.583% {
-    background-image: url("assets/orb/black/orb2x_0084.png");
+    background-position: -384px -640px;
   }
 
   35.000% {
-    background-image: url("assets/orb/black/orb2x_0085.png");
+    background-position: -512px -640px;
   }
 
   35.417% {
-    background-image: url("assets/orb/black/orb2x_0086.png");
+    background-position: -640px -640px;
   }
 
   35.833% {
-    background-image: url("assets/orb/black/orb2x_0087.png");
+    background-position: -768px -640px;
   }
 
   36.250% {
-    background-image: url("assets/orb/black/orb2x_0088.png");
+    background-position: -896px -640px;
   }
 
   36.667% {
-    background-image: url("assets/orb/black/orb2x_0089.png");
+    background-position: -1024px -640px;
   }
 
   37.083% {
-    background-image: url("assets/orb/black/orb2x_0090.png");
+    background-position: -1152px -640px;
   }
 
   37.500% {
-    background-image: url("assets/orb/black/orb2x_0091.png");
+    background-position: -1280px -640px;
   }
 
   37.917% {
-    background-image: url("assets/orb/black/orb2x_0092.png");
+    background-position: -1408px -640px;
   }
 
   38.333% {
-    background-image: url("assets/orb/black/orb2x_0093.png");
+    background-position: -1536px -640px;
   }
 
   38.750% {
-    background-image: url("assets/orb/black/orb2x_0094.png");
+    background-position: -1664px -640px;
   }
 
   39.167% {
-    background-image: url("assets/orb/black/orb2x_0095.png");
+    background-position: -1792px -640px;
   }
 
   39.583% {
-    background-image: url("assets/orb/black/orb2x_0096.png");
+    background-position: -1920px -640px;
   }
 
   40.000% {
-    background-image: url("assets/orb/black/orb2x_0097.png");
+    background-position: 0 -768px;
   }
 
   40.417% {
-    background-image: url("assets/orb/black/orb2x_0098.png");
+    background-position: -128px -768px;
   }
 
   40.833% {
-    background-image: url("assets/orb/black/orb2x_0099.png");
+    background-position: -256px -768px;
   }
 
   41.250% {
-    background-image: url("assets/orb/black/orb2x_0100.png");
+    background-position: -384px -768px;
   }
 
   41.667% {
-    background-image: url("assets/orb/black/orb2x_0101.png");
+    background-position: -512px -768px;
   }
 
   42.083% {
-    background-image: url("assets/orb/black/orb2x_0102.png");
+    background-position: -640px -768px;
   }
 
   42.500% {
-    background-image: url("assets/orb/black/orb2x_0103.png");
+    background-position: -768px -768px;
   }
 
   42.917% {
-    background-image: url("assets/orb/black/orb2x_0104.png");
+    background-position: -896px -768px;
   }
 
   43.333% {
-    background-image: url("assets/orb/black/orb2x_0105.png");
+    background-position: -1024px -768px;
   }
 
   43.750% {
-    background-image: url("assets/orb/black/orb2x_0106.png");
+    background-position: -1152px -768px;
   }
 
   44.167% {
-    background-image: url("assets/orb/black/orb2x_0107.png");
+    background-position: -1280px -768px;
   }
 
   44.583% {
-    background-image: url("assets/orb/black/orb2x_0108.png");
+    background-position: -1408px -768px;
   }
 
   45.000% {
-    background-image: url("assets/orb/black/orb2x_0109.png");
+    background-position: -1536px -768px;
   }
 
   45.417% {
-    background-image: url("assets/orb/black/orb2x_0110.png");
+    background-position: -1664px -768px;
   }
 
   45.833% {
-    background-image: url("assets/orb/black/orb2x_0111.png");
+    background-position: -1792px -768px;
   }
 
   46.250% {
-    background-image: url("assets/orb/black/orb2x_0112.png");
+    background-position: -1920px -768px;
   }
 
   46.667% {
-    background-image: url("assets/orb/black/orb2x_0113.png");
+    background-position: 0 -896px;
   }
 
   47.083% {
-    background-image: url("assets/orb/black/orb2x_0114.png");
+    background-position: -128px -896px;
   }
 
   47.500% {
-    background-image: url("assets/orb/black/orb2x_0115.png");
+    background-position: -256px -896px;
   }
 
   47.917% {
-    background-image: url("assets/orb/black/orb2x_0116.png");
+    background-position: -384px -896px;
   }
 
   48.333% {
-    background-image: url("assets/orb/black/orb2x_0117.png");
+    background-position: -512px -896px;
   }
 
   48.750% {
-    background-image: url("assets/orb/black/orb2x_0118.png");
+    background-position: -640px -896px;
   }
 
   49.167% {
-    background-image: url("assets/orb/black/orb2x_0119.png");
+    background-position: -768px -896px;
   }
 
   49.583% {
-    background-image: url("assets/orb/black/orb2x_0120.png");
+    background-position: -896px -896px;
   }
 
   50.000% {
-    background-image: url("assets/orb/black/orb2x_0121.png");
+    background-position: -1024px -896px;
   }
 
   50.417% {
-    background-image: url("assets/orb/black/orb2x_0122.png");
+    background-position: -1152px -896px;
   }
 
   50.833% {
-    background-image: url("assets/orb/black/orb2x_0123.png");
+    background-position: -1280px -896px;
   }
 
   51.250% {
-    background-image: url("assets/orb/black/orb2x_0124.png");
+    background-position: -1408px -896px;
   }
 
   51.667% {
-    background-image: url("assets/orb/black/orb2x_0125.png");
+    background-position: -1536px -896px;
   }
 
   52.083% {
-    background-image: url("assets/orb/black/orb2x_0126.png");
+    background-position: -1664px -896px;
   }
 
   52.500% {
-    background-image: url("assets/orb/black/orb2x_0127.png");
+    background-position: -1792px -896px;
   }
 
   52.917% {
-    background-image: url("assets/orb/black/orb2x_0128.png");
+    background-position: -1920px -896px;
   }
 
   53.333% {
-    background-image: url("assets/orb/black/orb2x_0129.png");
+    background-position: 0 -1024px;
   }
 
   53.750% {
-    background-image: url("assets/orb/black/orb2x_0130.png");
+    background-position: -128px -1024px;
   }
 
   54.167% {
-    background-image: url("assets/orb/black/orb2x_0131.png");
+    background-position: -256px -1024px;
   }
 
   54.583% {
-    background-image: url("assets/orb/black/orb2x_0132.png");
+    background-position: -384px -1024px;
   }
 
   55.000% {
-    background-image: url("assets/orb/black/orb2x_0133.png");
+    background-position: -512px -1024px;
   }
 
   55.417% {
-    background-image: url("assets/orb/black/orb2x_0134.png");
+    background-position: -640px -1024px;
   }
 
   55.833% {
-    background-image: url("assets/orb/black/orb2x_0135.png");
+    background-position: -768px -1024px;
   }
 
   56.250% {
-    background-image: url("assets/orb/black/orb2x_0136.png");
+    background-position: -896px -1024px;
   }
 
   56.667% {
-    background-image: url("assets/orb/black/orb2x_0137.png");
+    background-position: -1024px -1024px;
   }
 
   57.083% {
-    background-image: url("assets/orb/black/orb2x_0138.png");
+    background-position: -1152px -1024px;
   }
 
   57.500% {
-    background-image: url("assets/orb/black/orb2x_0139.png");
+    background-position: -1280px -1024px;
   }
 
   57.917% {
-    background-image: url("assets/orb/black/orb2x_0140.png");
+    background-position: -1408px -1024px;
   }
 
   58.333% {
-    background-image: url("assets/orb/black/orb2x_0141.png");
+    background-position: -1536px -1024px;
   }
 
   58.750% {
-    background-image: url("assets/orb/black/orb2x_0142.png");
+    background-position: -1664px -1024px;
   }
 
   59.167% {
-    background-image: url("assets/orb/black/orb2x_0143.png");
+    background-position: -1792px -1024px;
   }
 
   59.583% {
-    background-image: url("assets/orb/black/orb2x_0144.png");
+    background-position: -1920px -1024px;
   }
 
   60.000% {
-    background-image: url("assets/orb/black/orb2x_0145.png");
+    background-position: 0 -1152px;
   }
 
   60.417% {
-    background-image: url("assets/orb/black/orb2x_0146.png");
+    background-position: -128px -1152px;
   }
 
   60.833% {
-    background-image: url("assets/orb/black/orb2x_0147.png");
+    background-position: -256px -1152px;
   }
 
   61.250% {
-    background-image: url("assets/orb/black/orb2x_0148.png");
+    background-position: -384px -1152px;
   }
 
   61.667% {
-    background-image: url("assets/orb/black/orb2x_0149.png");
+    background-position: -512px -1152px;
   }
 
   62.083% {
-    background-image: url("assets/orb/black/orb2x_0150.png");
+    background-position: -640px -1152px;
   }
 
   62.500% {
-    background-image: url("assets/orb/black/orb2x_0151.png");
+    background-position: -768px -1152px;
   }
 
   62.917% {
-    background-image: url("assets/orb/black/orb2x_0152.png");
+    background-position: -896px -1152px;
   }
 
   63.333% {
-    background-image: url("assets/orb/black/orb2x_0153.png");
+    background-position: -1024px -1152px;
   }
 
   63.750% {
-    background-image: url("assets/orb/black/orb2x_0154.png");
+    background-position: -1152px -1152px;
   }
 
   64.167% {
-    background-image: url("assets/orb/black/orb2x_0155.png");
+    background-position: -1280px -1152px;
   }
 
   64.583% {
-    background-image: url("assets/orb/black/orb2x_0156.png");
+    background-position: -1408px -1152px;
   }
 
   65.000% {
-    background-image: url("assets/orb/black/orb2x_0157.png");
+    background-position: -1536px -1152px;
   }
 
   65.417% {
-    background-image: url("assets/orb/black/orb2x_0158.png");
+    background-position: -1664px -1152px;
   }
 
   65.833% {
-    background-image: url("assets/orb/black/orb2x_0159.png");
+    background-position: -1792px -1152px;
   }
 
   66.250% {
-    background-image: url("assets/orb/black/orb2x_0160.png");
+    background-position: -1920px -1152px;
   }
 
   66.667% {
-    background-image: url("assets/orb/black/orb2x_0161.png");
+    background-position: 0 -1280px;
   }
 
   67.083% {
-    background-image: url("assets/orb/black/orb2x_0162.png");
+    background-position: -128px -1280px;
   }
 
   67.500% {
-    background-image: url("assets/orb/black/orb2x_0163.png");
+    background-position: -256px -1280px;
   }
 
   67.917% {
-    background-image: url("assets/orb/black/orb2x_0164.png");
+    background-position: -384px -1280px;
   }
 
   68.333% {
-    background-image: url("assets/orb/black/orb2x_0165.png");
+    background-position: -512px -1280px;
   }
 
   68.750% {
-    background-image: url("assets/orb/black/orb2x_0166.png");
+    background-position: -640px -1280px;
   }
 
   69.167% {
-    background-image: url("assets/orb/black/orb2x_0167.png");
+    background-position: -768px -1280px;
   }
 
   69.583% {
-    background-image: url("assets/orb/black/orb2x_0168.png");
+    background-position: -896px -1280px;
   }
 
   70.000% {
-    background-image: url("assets/orb/black/orb2x_0169.png");
+    background-position: -1024px -1280px;
   }
 
   70.417% {
-    background-image: url("assets/orb/black/orb2x_0170.png");
+    background-position: -1152px -1280px;
   }
 
   70.833% {
-    background-image: url("assets/orb/black/orb2x_0171.png");
+    background-position: -1280px -1280px;
   }
 
   71.250% {
-    background-image: url("assets/orb/black/orb2x_0172.png");
+    background-position: -1408px -1280px;
   }
 
   71.667% {
-    background-image: url("assets/orb/black/orb2x_0173.png");
+    background-position: -1536px -1280px;
   }
 
   72.083% {
-    background-image: url("assets/orb/black/orb2x_0174.png");
+    background-position: -1664px -1280px;
   }
 
   72.500% {
-    background-image: url("assets/orb/black/orb2x_0175.png");
+    background-position: -1792px -1280px;
   }
 
   72.917% {
-    background-image: url("assets/orb/black/orb2x_0176.png");
+    background-position: -1920px -1280px;
   }
 
   73.333% {
-    background-image: url("assets/orb/black/orb2x_0177.png");
+    background-position: 0 -1408px;
   }
 
   73.750% {
-    background-image: url("assets/orb/black/orb2x_0178.png");
+    background-position: -128px -1408px;
   }
 
   74.167% {
-    background-image: url("assets/orb/black/orb2x_0179.png");
+    background-position: -256px -1408px;
   }
 
   74.583% {
-    background-image: url("assets/orb/black/orb2x_0180.png");
+    background-position: -384px -1408px;
   }
 
   75.000% {
-    background-image: url("assets/orb/black/orb2x_0181.png");
+    background-position: -512px -1408px;
   }
 
   75.417% {
-    background-image: url("assets/orb/black/orb2x_0182.png");
+    background-position: -640px -1408px;
   }
 
   75.833% {
-    background-image: url("assets/orb/black/orb2x_0183.png");
+    background-position: -768px -1408px;
   }
 
   76.250% {
-    background-image: url("assets/orb/black/orb2x_0184.png");
+    background-position: -896px -1408px;
   }
 
   76.667% {
-    background-image: url("assets/orb/black/orb2x_0185.png");
+    background-position: -1024px -1408px;
   }
 
   77.083% {
-    background-image: url("assets/orb/black/orb2x_0186.png");
+    background-position: -1152px -1408px;
   }
 
   77.500% {
-    background-image: url("assets/orb/black/orb2x_0187.png");
+    background-position: -1280px -1408px;
   }
 
   77.917% {
-    background-image: url("assets/orb/black/orb2x_0188.png");
+    background-position: -1408px -1408px;
   }
 
   78.333% {
-    background-image: url("assets/orb/black/orb2x_0189.png");
+    background-position: -1536px -1408px;
   }
 
   78.750% {
-    background-image: url("assets/orb/black/orb2x_0190.png");
+    background-position: -1664px -1408px;
   }
 
   79.167% {
-    background-image: url("assets/orb/black/orb2x_0191.png");
+    background-position: -1792px -1408px;
   }
 
   79.583% {
-    background-image: url("assets/orb/black/orb2x_0192.png");
+    background-position: -1920px -1408px;
   }
 
   80.000% {
-    background-image: url("assets/orb/black/orb2x_0193.png");
+    background-position: 0 -1536px;
   }
 
   80.417% {
-    background-image: url("assets/orb/black/orb2x_0194.png");
+    background-position: -128px -1536px;
   }
 
   80.833% {
-    background-image: url("assets/orb/black/orb2x_0195.png");
+    background-position: -256px -1536px;
   }
 
   81.250% {
-    background-image: url("assets/orb/black/orb2x_0196.png");
+    background-position: -384px -1536px;
   }
 
   81.667% {
-    background-image: url("assets/orb/black/orb2x_0197.png");
+    background-position: -512px -1536px;
   }
 
   82.083% {
-    background-image: url("assets/orb/black/orb2x_0198.png");
+    background-position: -640px -1536px;
   }
 
   82.500% {
-    background-image: url("assets/orb/black/orb2x_0199.png");
+    background-position: -768px -1536px;
   }
 
   82.917% {
-    background-image: url("assets/orb/black/orb2x_0200.png");
+    background-position: -896px -1536px;
   }
 
   83.333% {
-    background-image: url("assets/orb/black/orb2x_0201.png");
+    background-position: -1024px -1536px;
   }
 
   83.750% {
-    background-image: url("assets/orb/black/orb2x_0202.png");
+    background-position: -1152px -1536px;
   }
 
   84.167% {
-    background-image: url("assets/orb/black/orb2x_0203.png");
+    background-position: -1280px -1536px;
   }
 
   84.583% {
-    background-image: url("assets/orb/black/orb2x_0204.png");
+    background-position: -1408px -1536px;
   }
 
   85.000% {
-    background-image: url("assets/orb/black/orb2x_0205.png");
+    background-position: -1536px -1536px;
   }
 
   85.417% {
-    background-image: url("assets/orb/black/orb2x_0206.png");
+    background-position: -1664px -1536px;
   }
 
   85.833% {
-    background-image: url("assets/orb/black/orb2x_0207.png");
+    background-position: -1792px -1536px;
   }
 
   86.250% {
-    background-image: url("assets/orb/black/orb2x_0208.png");
+    background-position: -1920px -1536px;
   }
 
   86.667% {
-    background-image: url("assets/orb/black/orb2x_0209.png");
+    background-position: 0 -1664px;
   }
 
   87.083% {
-    background-image: url("assets/orb/black/orb2x_0210.png");
+    background-position: -128px -1664px;
   }
 
   87.500% {
-    background-image: url("assets/orb/black/orb2x_0211.png");
+    background-position: -256px -1664px;
   }
 
   87.917% {
-    background-image: url("assets/orb/black/orb2x_0212.png");
+    background-position: -384px -1664px;
   }
 
   88.333% {
-    background-image: url("assets/orb/black/orb2x_0213.png");
+    background-position: -512px -1664px;
   }
 
   88.750% {
-    background-image: url("assets/orb/black/orb2x_0214.png");
+    background-position: -640px -1664px;
   }
 
   89.167% {
-    background-image: url("assets/orb/black/orb2x_0215.png");
+    background-position: -768px -1664px;
   }
 
   89.583% {
-    background-image: url("assets/orb/black/orb2x_0216.png");
+    background-position: -896px -1664px;
   }
 
   90.000% {
-    background-image: url("assets/orb/black/orb2x_0217.png");
+    background-position: -1024px -1664px;
   }
 
   90.417% {
-    background-image: url("assets/orb/black/orb2x_0218.png");
+    background-position: -1152px -1664px;
   }
 
   90.833% {
-    background-image: url("assets/orb/black/orb2x_0219.png");
+    background-position: -1280px -1664px;
   }
 
   91.250% {
-    background-image: url("assets/orb/black/orb2x_0220.png");
+    background-position: -1408px -1664px;
   }
 
   91.667% {
-    background-image: url("assets/orb/black/orb2x_0221.png");
+    background-position: -1536px -1664px;
   }
 
   92.083% {
-    background-image: url("assets/orb/black/orb2x_0222.png");
+    background-position: -1664px -1664px;
   }
 
   92.500% {
-    background-image: url("assets/orb/black/orb2x_0223.png");
+    background-position: -1792px -1664px;
   }
 
   92.917% {
-    background-image: url("assets/orb/black/orb2x_0224.png");
+    background-position: -1920px -1664px;
   }
 
   93.333% {
-    background-image: url("assets/orb/black/orb2x_0225.png");
+    background-position: 0 -1792px;
   }
 
   93.750% {
-    background-image: url("assets/orb/black/orb2x_0226.png");
+    background-position: -128px -1792px;
   }
 
   94.167% {
-    background-image: url("assets/orb/black/orb2x_0227.png");
+    background-position: -256px -1792px;
   }
 
   94.583% {
-    background-image: url("assets/orb/black/orb2x_0228.png");
+    background-position: -384px -1792px;
   }
 
   95.000% {
-    background-image: url("assets/orb/black/orb2x_0229.png");
+    background-position: -512px -1792px;
   }
 
   95.417% {
-    background-image: url("assets/orb/black/orb2x_0230.png");
+    background-position: -640px -1792px;
   }
 
   95.833% {
-    background-image: url("assets/orb/black/orb2x_0231.png");
+    background-position: -768px -1792px;
   }
 
   96.250% {
-    background-image: url("assets/orb/black/orb2x_0232.png");
+    background-position: -896px -1792px;
   }
 
   96.667% {
-    background-image: url("assets/orb/black/orb2x_0233.png");
+    background-position: -1024px -1792px;
   }
 
   97.083% {
-    background-image: url("assets/orb/black/orb2x_0234.png");
+    background-position: -1152px -1792px;
   }
 
   97.500% {
-    background-image: url("assets/orb/black/orb2x_0235.png");
+    background-position: -1280px -1792px;
   }
 
   97.917% {
-    background-image: url("assets/orb/black/orb2x_0236.png");
+    background-position: -1408px -1792px;
   }
 
   98.333% {
-    background-image: url("assets/orb/black/orb2x_0237.png");
+    background-position: -1536px -1792px;
   }
 
   98.750% {
-    background-image: url("assets/orb/black/orb2x_0238.png");
+    background-position: -1664px -1792px;
   }
 
   99.167% {
-    background-image: url("assets/orb/black/orb2x_0239.png");
+    background-position: -1792px -1792px;
   }
 
   99.583% {
-    background-image: url("assets/orb/black/orb2x_0240.png");
+    background-position: -1920px -1792px;
   }
 
   100.000% {
-    background-image: url("assets/orb/black/orb2x_0001.png");
+    background-position: 0 0;
   }
 }
 
-.animate-black-orb {
-  animation: blackOrb 24000ms steps(1) infinite;
+.animate-orb-spin-fast {
+  animation: orbSpin 6000ms steps(1) infinite;
 }
 
-@keyframes goldOrb {
+@keyframes orbSpin {
   0.000% {
-    background-image: url("assets/orb/gold/orb1x_0001.png");
+    background-position: 0 0;
   }
 
   0.417% {
-    background-image: url("assets/orb/gold/orb1x_0002.png");
+    background-position: -128px 0;
   }
 
   0.833% {
-    background-image: url("assets/orb/gold/orb1x_0003.png");
+    background-position: -256px 0;
   }
 
   1.250% {
-    background-image: url("assets/orb/gold/orb1x_0004.png");
+    background-position: -384px 0;
   }
 
   1.667% {
-    background-image: url("assets/orb/gold/orb1x_0005.png");
+    background-position: -512px 0;
   }
 
   2.083% {
-    background-image: url("assets/orb/gold/orb1x_0006.png");
+    background-position: -640px 0;
   }
 
   2.500% {
-    background-image: url("assets/orb/gold/orb1x_0007.png");
+    background-position: -768px 0;
   }
 
   2.917% {
-    background-image: url("assets/orb/gold/orb1x_0008.png");
+    background-position: -896px 0;
   }
 
   3.333% {
-    background-image: url("assets/orb/gold/orb1x_0009.png");
+    background-position: -1024px 0;
   }
 
   3.750% {
-    background-image: url("assets/orb/gold/orb1x_0010.png");
+    background-position: -1152px 0;
   }
 
   4.167% {
-    background-image: url("assets/orb/gold/orb1x_0011.png");
+    background-position: -1280px 0;
   }
 
   4.583% {
-    background-image: url("assets/orb/gold/orb1x_0012.png");
+    background-position: -1408px 0;
   }
 
   5.000% {
-    background-image: url("assets/orb/gold/orb1x_0013.png");
+    background-position: -1536px 0;
   }
 
   5.417% {
-    background-image: url("assets/orb/gold/orb1x_0014.png");
+    background-position: -1664px 0;
   }
 
   5.833% {
-    background-image: url("assets/orb/gold/orb1x_0015.png");
+    background-position: -1792px 0;
   }
 
   6.250% {
-    background-image: url("assets/orb/gold/orb1x_0016.png");
+    background-position: -1920px 0;
   }
 
   6.667% {
-    background-image: url("assets/orb/gold/orb1x_0017.png");
+    background-position: 0 -128px;
   }
 
   7.083% {
-    background-image: url("assets/orb/gold/orb1x_0018.png");
+    background-position: -128px -128px;
   }
 
   7.500% {
-    background-image: url("assets/orb/gold/orb1x_0019.png");
+    background-position: -256px -128px;
   }
 
   7.917% {
-    background-image: url("assets/orb/gold/orb1x_0020.png");
+    background-position: -384px -128px;
   }
 
   8.333% {
-    background-image: url("assets/orb/gold/orb1x_0021.png");
+    background-position: -512px -128px;
   }
 
   8.750% {
-    background-image: url("assets/orb/gold/orb1x_0022.png");
+    background-position: -640px -128px;
   }
 
   9.167% {
-    background-image: url("assets/orb/gold/orb1x_0023.png");
+    background-position: -768px -128px;
   }
 
   9.583% {
-    background-image: url("assets/orb/gold/orb1x_0024.png");
+    background-position: -896px -128px;
   }
 
   10.000% {
-    background-image: url("assets/orb/gold/orb1x_0025.png");
+    background-position: -1024px -128px;
   }
 
   10.417% {
-    background-image: url("assets/orb/gold/orb1x_0026.png");
+    background-position: -1152px -128px;
   }
 
   10.833% {
-    background-image: url("assets/orb/gold/orb1x_0027.png");
+    background-position: -1280px -128px;
   }
 
   11.250% {
-    background-image: url("assets/orb/gold/orb1x_0028.png");
+    background-position: -1408px -128px;
   }
 
   11.667% {
-    background-image: url("assets/orb/gold/orb1x_0029.png");
+    background-position: -1536px -128px;
   }
 
   12.083% {
-    background-image: url("assets/orb/gold/orb1x_0030.png");
+    background-position: -1664px -128px;
   }
 
   12.500% {
-    background-image: url("assets/orb/gold/orb1x_0031.png");
+    background-position: -1792px -128px;
   }
 
   12.917% {
-    background-image: url("assets/orb/gold/orb1x_0032.png");
+    background-position: -1920px -128px;
   }
 
   13.333% {
-    background-image: url("assets/orb/gold/orb1x_0033.png");
+    background-position: 0 -256px;
   }
 
   13.750% {
-    background-image: url("assets/orb/gold/orb1x_0034.png");
+    background-position: -128px -256px;
   }
 
   14.167% {
-    background-image: url("assets/orb/gold/orb1x_0035.png");
+    background-position: -256px -256px;
   }
 
   14.583% {
-    background-image: url("assets/orb/gold/orb1x_0036.png");
+    background-position: -384px -256px;
   }
 
   15.000% {
-    background-image: url("assets/orb/gold/orb1x_0037.png");
+    background-position: -512px -256px;
   }
 
   15.417% {
-    background-image: url("assets/orb/gold/orb1x_0038.png");
+    background-position: -640px -256px;
   }
 
   15.833% {
-    background-image: url("assets/orb/gold/orb1x_0039.png");
+    background-position: -768px -256px;
   }
 
   16.250% {
-    background-image: url("assets/orb/gold/orb1x_0040.png");
+    background-position: -896px -256px;
   }
 
   16.667% {
-    background-image: url("assets/orb/gold/orb1x_0041.png");
+    background-position: -1024px -256px;
   }
 
   17.083% {
-    background-image: url("assets/orb/gold/orb1x_0042.png");
+    background-position: -1152px -256px;
   }
 
   17.500% {
-    background-image: url("assets/orb/gold/orb1x_0043.png");
+    background-position: -1280px -256px;
   }
 
   17.917% {
-    background-image: url("assets/orb/gold/orb1x_0044.png");
+    background-position: -1408px -256px;
   }
 
   18.333% {
-    background-image: url("assets/orb/gold/orb1x_0045.png");
+    background-position: -1536px -256px;
   }
 
   18.750% {
-    background-image: url("assets/orb/gold/orb1x_0046.png");
+    background-position: -1664px -256px;
   }
 
   19.167% {
-    background-image: url("assets/orb/gold/orb1x_0047.png");
+    background-position: -1792px -256px;
   }
 
   19.583% {
-    background-image: url("assets/orb/gold/orb1x_0048.png");
+    background-position: -1920px -256px;
   }
 
   20.000% {
-    background-image: url("assets/orb/gold/orb1x_0049.png");
+    background-position: 0 -384px;
   }
 
   20.417% {
-    background-image: url("assets/orb/gold/orb1x_0050.png");
+    background-position: -128px -384px;
   }
 
   20.833% {
-    background-image: url("assets/orb/gold/orb1x_0051.png");
+    background-position: -256px -384px;
   }
 
   21.250% {
-    background-image: url("assets/orb/gold/orb1x_0052.png");
+    background-position: -384px -384px;
   }
 
   21.667% {
-    background-image: url("assets/orb/gold/orb1x_0053.png");
+    background-position: -512px -384px;
   }
 
   22.083% {
-    background-image: url("assets/orb/gold/orb1x_0054.png");
+    background-position: -640px -384px;
   }
 
   22.500% {
-    background-image: url("assets/orb/gold/orb1x_0055.png");
+    background-position: -768px -384px;
   }
 
   22.917% {
-    background-image: url("assets/orb/gold/orb1x_0056.png");
+    background-position: -896px -384px;
   }
 
   23.333% {
-    background-image: url("assets/orb/gold/orb1x_0057.png");
+    background-position: -1024px -384px;
   }
 
   23.750% {
-    background-image: url("assets/orb/gold/orb1x_0058.png");
+    background-position: -1152px -384px;
   }
 
   24.167% {
-    background-image: url("assets/orb/gold/orb1x_0059.png");
+    background-position: -1280px -384px;
   }
 
   24.583% {
-    background-image: url("assets/orb/gold/orb1x_0060.png");
+    background-position: -1408px -384px;
   }
 
   25.000% {
-    background-image: url("assets/orb/gold/orb1x_0061.png");
+    background-position: -1536px -384px;
   }
 
   25.417% {
-    background-image: url("assets/orb/gold/orb1x_0062.png");
+    background-position: -1664px -384px;
   }
 
   25.833% {
-    background-image: url("assets/orb/gold/orb1x_0063.png");
+    background-position: -1792px -384px;
   }
 
   26.250% {
-    background-image: url("assets/orb/gold/orb1x_0064.png");
+    background-position: -1920px -384px;
   }
 
   26.667% {
-    background-image: url("assets/orb/gold/orb1x_0065.png");
+    background-position: 0 -512px;
   }
 
   27.083% {
-    background-image: url("assets/orb/gold/orb1x_0066.png");
+    background-position: -128px -512px;
   }
 
   27.500% {
-    background-image: url("assets/orb/gold/orb1x_0067.png");
+    background-position: -256px -512px;
   }
 
   27.917% {
-    background-image: url("assets/orb/gold/orb1x_0068.png");
+    background-position: -384px -512px;
   }
 
   28.333% {
-    background-image: url("assets/orb/gold/orb1x_0069.png");
+    background-position: -512px -512px;
   }
 
   28.750% {
-    background-image: url("assets/orb/gold/orb1x_0070.png");
+    background-position: -640px -512px;
   }
 
   29.167% {
-    background-image: url("assets/orb/gold/orb1x_0071.png");
+    background-position: -768px -512px;
   }
 
   29.583% {
-    background-image: url("assets/orb/gold/orb1x_0072.png");
+    background-position: -896px -512px;
   }
 
   30.000% {
-    background-image: url("assets/orb/gold/orb1x_0073.png");
+    background-position: -1024px -512px;
   }
 
   30.417% {
-    background-image: url("assets/orb/gold/orb1x_0074.png");
+    background-position: -1152px -512px;
   }
 
   30.833% {
-    background-image: url("assets/orb/gold/orb1x_0075.png");
+    background-position: -1280px -512px;
   }
 
   31.250% {
-    background-image: url("assets/orb/gold/orb1x_0076.png");
+    background-position: -1408px -512px;
   }
 
   31.667% {
-    background-image: url("assets/orb/gold/orb1x_0077.png");
+    background-position: -1536px -512px;
   }
 
   32.083% {
-    background-image: url("assets/orb/gold/orb1x_0078.png");
+    background-position: -1664px -512px;
   }
 
   32.500% {
-    background-image: url("assets/orb/gold/orb1x_0079.png");
+    background-position: -1792px -512px;
   }
 
   32.917% {
-    background-image: url("assets/orb/gold/orb1x_0080.png");
+    background-position: -1920px -512px;
   }
 
   33.333% {
-    background-image: url("assets/orb/gold/orb1x_0081.png");
+    background-position: 0 -640px;
   }
 
   33.750% {
-    background-image: url("assets/orb/gold/orb1x_0082.png");
+    background-position: -128px -640px;
   }
 
   34.167% {
-    background-image: url("assets/orb/gold/orb1x_0083.png");
+    background-position: -256px -640px;
   }
 
   34.583% {
-    background-image: url("assets/orb/gold/orb1x_0084.png");
+    background-position: -384px -640px;
   }
 
   35.000% {
-    background-image: url("assets/orb/gold/orb1x_0085.png");
+    background-position: -512px -640px;
   }
 
   35.417% {
-    background-image: url("assets/orb/gold/orb1x_0086.png");
+    background-position: -640px -640px;
   }
 
   35.833% {
-    background-image: url("assets/orb/gold/orb1x_0087.png");
+    background-position: -768px -640px;
   }
 
   36.250% {
-    background-image: url("assets/orb/gold/orb1x_0088.png");
+    background-position: -896px -640px;
   }
 
   36.667% {
-    background-image: url("assets/orb/gold/orb1x_0089.png");
+    background-position: -1024px -640px;
   }
 
   37.083% {
-    background-image: url("assets/orb/gold/orb1x_0090.png");
+    background-position: -1152px -640px;
   }
 
   37.500% {
-    background-image: url("assets/orb/gold/orb1x_0091.png");
+    background-position: -1280px -640px;
   }
 
   37.917% {
-    background-image: url("assets/orb/gold/orb1x_0092.png");
+    background-position: -1408px -640px;
   }
 
   38.333% {
-    background-image: url("assets/orb/gold/orb1x_0093.png");
+    background-position: -1536px -640px;
   }
 
   38.750% {
-    background-image: url("assets/orb/gold/orb1x_0094.png");
+    background-position: -1664px -640px;
   }
 
   39.167% {
-    background-image: url("assets/orb/gold/orb1x_0095.png");
+    background-position: -1792px -640px;
   }
 
   39.583% {
-    background-image: url("assets/orb/gold/orb1x_0096.png");
+    background-position: -1920px -640px;
   }
 
   40.000% {
-    background-image: url("assets/orb/gold/orb1x_0097.png");
+    background-position: 0 -768px;
   }
 
   40.417% {
-    background-image: url("assets/orb/gold/orb1x_0098.png");
+    background-position: -128px -768px;
   }
 
   40.833% {
-    background-image: url("assets/orb/gold/orb1x_0099.png");
+    background-position: -256px -768px;
   }
 
   41.250% {
-    background-image: url("assets/orb/gold/orb1x_0100.png");
+    background-position: -384px -768px;
   }
 
   41.667% {
-    background-image: url("assets/orb/gold/orb1x_0101.png");
+    background-position: -512px -768px;
   }
 
   42.083% {
-    background-image: url("assets/orb/gold/orb1x_0102.png");
+    background-position: -640px -768px;
   }
 
   42.500% {
-    background-image: url("assets/orb/gold/orb1x_0103.png");
+    background-position: -768px -768px;
   }
 
   42.917% {
-    background-image: url("assets/orb/gold/orb1x_0104.png");
+    background-position: -896px -768px;
   }
 
   43.333% {
-    background-image: url("assets/orb/gold/orb1x_0105.png");
+    background-position: -1024px -768px;
   }
 
   43.750% {
-    background-image: url("assets/orb/gold/orb1x_0106.png");
+    background-position: -1152px -768px;
   }
 
   44.167% {
-    background-image: url("assets/orb/gold/orb1x_0107.png");
+    background-position: -1280px -768px;
   }
 
   44.583% {
-    background-image: url("assets/orb/gold/orb1x_0108.png");
+    background-position: -1408px -768px;
   }
 
   45.000% {
-    background-image: url("assets/orb/gold/orb1x_0109.png");
+    background-position: -1536px -768px;
   }
 
   45.417% {
-    background-image: url("assets/orb/gold/orb1x_0110.png");
+    background-position: -1664px -768px;
   }
 
   45.833% {
-    background-image: url("assets/orb/gold/orb1x_0111.png");
+    background-position: -1792px -768px;
   }
 
   46.250% {
-    background-image: url("assets/orb/gold/orb1x_0112.png");
+    background-position: -1920px -768px;
   }
 
   46.667% {
-    background-image: url("assets/orb/gold/orb1x_0113.png");
+    background-position: 0 -896px;
   }
 
   47.083% {
-    background-image: url("assets/orb/gold/orb1x_0114.png");
+    background-position: -128px -896px;
   }
 
   47.500% {
-    background-image: url("assets/orb/gold/orb1x_0115.png");
+    background-position: -256px -896px;
   }
 
   47.917% {
-    background-image: url("assets/orb/gold/orb1x_0116.png");
+    background-position: -384px -896px;
   }
 
   48.333% {
-    background-image: url("assets/orb/gold/orb1x_0117.png");
+    background-position: -512px -896px;
   }
 
   48.750% {
-    background-image: url("assets/orb/gold/orb1x_0118.png");
+    background-position: -640px -896px;
   }
 
   49.167% {
-    background-image: url("assets/orb/gold/orb1x_0119.png");
+    background-position: -768px -896px;
   }
 
   49.583% {
-    background-image: url("assets/orb/gold/orb1x_0120.png");
+    background-position: -896px -896px;
   }
 
   50.000% {
-    background-image: url("assets/orb/gold/orb1x_0121.png");
+    background-position: -1024px -896px;
   }
 
   50.417% {
-    background-image: url("assets/orb/gold/orb1x_0122.png");
+    background-position: -1152px -896px;
   }
 
   50.833% {
-    background-image: url("assets/orb/gold/orb1x_0123.png");
+    background-position: -1280px -896px;
   }
 
   51.250% {
-    background-image: url("assets/orb/gold/orb1x_0124.png");
+    background-position: -1408px -896px;
   }
 
   51.667% {
-    background-image: url("assets/orb/gold/orb1x_0125.png");
+    background-position: -1536px -896px;
   }
 
   52.083% {
-    background-image: url("assets/orb/gold/orb1x_0126.png");
+    background-position: -1664px -896px;
   }
 
   52.500% {
-    background-image: url("assets/orb/gold/orb1x_0127.png");
+    background-position: -1792px -896px;
   }
 
   52.917% {
-    background-image: url("assets/orb/gold/orb1x_0128.png");
+    background-position: -1920px -896px;
   }
 
   53.333% {
-    background-image: url("assets/orb/gold/orb1x_0129.png");
+    background-position: 0 -1024px;
   }
 
   53.750% {
-    background-image: url("assets/orb/gold/orb1x_0130.png");
+    background-position: -128px -1024px;
   }
 
   54.167% {
-    background-image: url("assets/orb/gold/orb1x_0131.png");
+    background-position: -256px -1024px;
   }
 
   54.583% {
-    background-image: url("assets/orb/gold/orb1x_0132.png");
+    background-position: -384px -1024px;
   }
 
   55.000% {
-    background-image: url("assets/orb/gold/orb1x_0133.png");
+    background-position: -512px -1024px;
   }
 
   55.417% {
-    background-image: url("assets/orb/gold/orb1x_0134.png");
+    background-position: -640px -1024px;
   }
 
   55.833% {
-    background-image: url("assets/orb/gold/orb1x_0135.png");
+    background-position: -768px -1024px;
   }
 
   56.250% {
-    background-image: url("assets/orb/gold/orb1x_0136.png");
+    background-position: -896px -1024px;
   }
 
   56.667% {
-    background-image: url("assets/orb/gold/orb1x_0137.png");
+    background-position: -1024px -1024px;
   }
 
   57.083% {
-    background-image: url("assets/orb/gold/orb1x_0138.png");
+    background-position: -1152px -1024px;
   }
 
   57.500% {
-    background-image: url("assets/orb/gold/orb1x_0139.png");
+    background-position: -1280px -1024px;
   }
 
   57.917% {
-    background-image: url("assets/orb/gold/orb1x_0140.png");
+    background-position: -1408px -1024px;
   }
 
   58.333% {
-    background-image: url("assets/orb/gold/orb1x_0141.png");
+    background-position: -1536px -1024px;
   }
 
   58.750% {
-    background-image: url("assets/orb/gold/orb1x_0142.png");
+    background-position: -1664px -1024px;
   }
 
   59.167% {
-    background-image: url("assets/orb/gold/orb1x_0143.png");
+    background-position: -1792px -1024px;
   }
 
   59.583% {
-    background-image: url("assets/orb/gold/orb1x_0144.png");
+    background-position: -1920px -1024px;
   }
 
   60.000% {
-    background-image: url("assets/orb/gold/orb1x_0145.png");
+    background-position: 0 -1152px;
   }
 
   60.417% {
-    background-image: url("assets/orb/gold/orb1x_0146.png");
+    background-position: -128px -1152px;
   }
 
   60.833% {
-    background-image: url("assets/orb/gold/orb1x_0147.png");
+    background-position: -256px -1152px;
   }
 
   61.250% {
-    background-image: url("assets/orb/gold/orb1x_0148.png");
+    background-position: -384px -1152px;
   }
 
   61.667% {
-    background-image: url("assets/orb/gold/orb1x_0149.png");
+    background-position: -512px -1152px;
   }
 
   62.083% {
-    background-image: url("assets/orb/gold/orb1x_0150.png");
+    background-position: -640px -1152px;
   }
 
   62.500% {
-    background-image: url("assets/orb/gold/orb1x_0151.png");
+    background-position: -768px -1152px;
   }
 
   62.917% {
-    background-image: url("assets/orb/gold/orb1x_0152.png");
+    background-position: -896px -1152px;
   }
 
   63.333% {
-    background-image: url("assets/orb/gold/orb1x_0153.png");
+    background-position: -1024px -1152px;
   }
 
   63.750% {
-    background-image: url("assets/orb/gold/orb1x_0154.png");
+    background-position: -1152px -1152px;
   }
 
   64.167% {
-    background-image: url("assets/orb/gold/orb1x_0155.png");
+    background-position: -1280px -1152px;
   }
 
   64.583% {
-    background-image: url("assets/orb/gold/orb1x_0156.png");
+    background-position: -1408px -1152px;
   }
 
   65.000% {
-    background-image: url("assets/orb/gold/orb1x_0157.png");
+    background-position: -1536px -1152px;
   }
 
   65.417% {
-    background-image: url("assets/orb/gold/orb1x_0158.png");
+    background-position: -1664px -1152px;
   }
 
   65.833% {
-    background-image: url("assets/orb/gold/orb1x_0159.png");
+    background-position: -1792px -1152px;
   }
 
   66.250% {
-    background-image: url("assets/orb/gold/orb1x_0160.png");
+    background-position: -1920px -1152px;
   }
 
   66.667% {
-    background-image: url("assets/orb/gold/orb1x_0161.png");
+    background-position: 0 -1280px;
   }
 
   67.083% {
-    background-image: url("assets/orb/gold/orb1x_0162.png");
+    background-position: -128px -1280px;
   }
 
   67.500% {
-    background-image: url("assets/orb/gold/orb1x_0163.png");
+    background-position: -256px -1280px;
   }
 
   67.917% {
-    background-image: url("assets/orb/gold/orb1x_0164.png");
+    background-position: -384px -1280px;
   }
 
   68.333% {
-    background-image: url("assets/orb/gold/orb1x_0165.png");
+    background-position: -512px -1280px;
   }
 
   68.750% {
-    background-image: url("assets/orb/gold/orb1x_0166.png");
+    background-position: -640px -1280px;
   }
 
   69.167% {
-    background-image: url("assets/orb/gold/orb1x_0167.png");
+    background-position: -768px -1280px;
   }
 
   69.583% {
-    background-image: url("assets/orb/gold/orb1x_0168.png");
+    background-position: -896px -1280px;
   }
 
   70.000% {
-    background-image: url("assets/orb/gold/orb1x_0169.png");
+    background-position: -1024px -1280px;
   }
 
   70.417% {
-    background-image: url("assets/orb/gold/orb1x_0170.png");
+    background-position: -1152px -1280px;
   }
 
   70.833% {
-    background-image: url("assets/orb/gold/orb1x_0171.png");
+    background-position: -1280px -1280px;
   }
 
   71.250% {
-    background-image: url("assets/orb/gold/orb1x_0172.png");
+    background-position: -1408px -1280px;
   }
 
   71.667% {
-    background-image: url("assets/orb/gold/orb1x_0173.png");
+    background-position: -1536px -1280px;
   }
 
   72.083% {
-    background-image: url("assets/orb/gold/orb1x_0174.png");
+    background-position: -1664px -1280px;
   }
 
   72.500% {
-    background-image: url("assets/orb/gold/orb1x_0175.png");
+    background-position: -1792px -1280px;
   }
 
   72.917% {
-    background-image: url("assets/orb/gold/orb1x_0176.png");
+    background-position: -1920px -1280px;
   }
 
   73.333% {
-    background-image: url("assets/orb/gold/orb1x_0177.png");
+    background-position: 0 -1408px;
   }
 
   73.750% {
-    background-image: url("assets/orb/gold/orb1x_0178.png");
+    background-position: -128px -1408px;
   }
 
   74.167% {
-    background-image: url("assets/orb/gold/orb1x_0179.png");
+    background-position: -256px -1408px;
   }
 
   74.583% {
-    background-image: url("assets/orb/gold/orb1x_0180.png");
+    background-position: -384px -1408px;
   }
 
   75.000% {
-    background-image: url("assets/orb/gold/orb1x_0181.png");
+    background-position: -512px -1408px;
   }
 
   75.417% {
-    background-image: url("assets/orb/gold/orb1x_0182.png");
+    background-position: -640px -1408px;
   }
 
   75.833% {
-    background-image: url("assets/orb/gold/orb1x_0183.png");
+    background-position: -768px -1408px;
   }
 
   76.250% {
-    background-image: url("assets/orb/gold/orb1x_0184.png");
+    background-position: -896px -1408px;
   }
 
   76.667% {
-    background-image: url("assets/orb/gold/orb1x_0185.png");
+    background-position: -1024px -1408px;
   }
 
   77.083% {
-    background-image: url("assets/orb/gold/orb1x_0186.png");
+    background-position: -1152px -1408px;
   }
 
   77.500% {
-    background-image: url("assets/orb/gold/orb1x_0187.png");
+    background-position: -1280px -1408px;
   }
 
   77.917% {
-    background-image: url("assets/orb/gold/orb1x_0188.png");
+    background-position: -1408px -1408px;
   }
 
   78.333% {
-    background-image: url("assets/orb/gold/orb1x_0189.png");
+    background-position: -1536px -1408px;
   }
 
   78.750% {
-    background-image: url("assets/orb/gold/orb1x_0190.png");
+    background-position: -1664px -1408px;
   }
 
   79.167% {
-    background-image: url("assets/orb/gold/orb1x_0191.png");
+    background-position: -1792px -1408px;
   }
 
   79.583% {
-    background-image: url("assets/orb/gold/orb1x_0192.png");
+    background-position: -1920px -1408px;
   }
 
   80.000% {
-    background-image: url("assets/orb/gold/orb1x_0193.png");
+    background-position: 0 -1536px;
   }
 
   80.417% {
-    background-image: url("assets/orb/gold/orb1x_0194.png");
+    background-position: -128px -1536px;
   }
 
   80.833% {
-    background-image: url("assets/orb/gold/orb1x_0195.png");
+    background-position: -256px -1536px;
   }
 
   81.250% {
-    background-image: url("assets/orb/gold/orb1x_0196.png");
+    background-position: -384px -1536px;
   }
 
   81.667% {
-    background-image: url("assets/orb/gold/orb1x_0197.png");
+    background-position: -512px -1536px;
   }
 
   82.083% {
-    background-image: url("assets/orb/gold/orb1x_0198.png");
+    background-position: -640px -1536px;
   }
 
   82.500% {
-    background-image: url("assets/orb/gold/orb1x_0199.png");
+    background-position: -768px -1536px;
   }
 
   82.917% {
-    background-image: url("assets/orb/gold/orb1x_0200.png");
+    background-position: -896px -1536px;
   }
 
   83.333% {
-    background-image: url("assets/orb/gold/orb1x_0201.png");
+    background-position: -1024px -1536px;
   }
 
   83.750% {
-    background-image: url("assets/orb/gold/orb1x_0202.png");
+    background-position: -1152px -1536px;
   }
 
   84.167% {
-    background-image: url("assets/orb/gold/orb1x_0203.png");
+    background-position: -1280px -1536px;
   }
 
   84.583% {
-    background-image: url("assets/orb/gold/orb1x_0204.png");
+    background-position: -1408px -1536px;
   }
 
   85.000% {
-    background-image: url("assets/orb/gold/orb1x_0205.png");
+    background-position: -1536px -1536px;
   }
 
   85.417% {
-    background-image: url("assets/orb/gold/orb1x_0206.png");
+    background-position: -1664px -1536px;
   }
 
   85.833% {
-    background-image: url("assets/orb/gold/orb1x_0207.png");
+    background-position: -1792px -1536px;
   }
 
   86.250% {
-    background-image: url("assets/orb/gold/orb1x_0208.png");
+    background-position: -1920px -1536px;
   }
 
   86.667% {
-    background-image: url("assets/orb/gold/orb1x_0209.png");
+    background-position: 0 -1664px;
   }
 
   87.083% {
-    background-image: url("assets/orb/gold/orb1x_0210.png");
+    background-position: -128px -1664px;
   }
 
   87.500% {
-    background-image: url("assets/orb/gold/orb1x_0211.png");
+    background-position: -256px -1664px;
   }
 
   87.917% {
-    background-image: url("assets/orb/gold/orb1x_0212.png");
+    background-position: -384px -1664px;
   }
 
   88.333% {
-    background-image: url("assets/orb/gold/orb1x_0213.png");
+    background-position: -512px -1664px;
   }
 
   88.750% {
-    background-image: url("assets/orb/gold/orb1x_0214.png");
+    background-position: -640px -1664px;
   }
 
   89.167% {
-    background-image: url("assets/orb/gold/orb1x_0215.png");
+    background-position: -768px -1664px;
   }
 
   89.583% {
-    background-image: url("assets/orb/gold/orb1x_0216.png");
+    background-position: -896px -1664px;
   }
 
   90.000% {
-    background-image: url("assets/orb/gold/orb1x_0217.png");
+    background-position: -1024px -1664px;
   }
 
   90.417% {
-    background-image: url("assets/orb/gold/orb1x_0218.png");
+    background-position: -1152px -1664px;
   }
 
   90.833% {
-    background-image: url("assets/orb/gold/orb1x_0219.png");
+    background-position: -1280px -1664px;
   }
 
   91.250% {
-    background-image: url("assets/orb/gold/orb1x_0220.png");
+    background-position: -1408px -1664px;
   }
 
   91.667% {
-    background-image: url("assets/orb/gold/orb1x_0221.png");
+    background-position: -1536px -1664px;
   }
 
   92.083% {
-    background-image: url("assets/orb/gold/orb1x_0222.png");
+    background-position: -1664px -1664px;
   }
 
   92.500% {
-    background-image: url("assets/orb/gold/orb1x_0223.png");
+    background-position: -1792px -1664px;
   }
 
   92.917% {
-    background-image: url("assets/orb/gold/orb1x_0224.png");
+    background-position: -1920px -1664px;
   }
 
   93.333% {
-    background-image: url("assets/orb/gold/orb1x_0225.png");
+    background-position: 0 -1792px;
   }
 
   93.750% {
-    background-image: url("assets/orb/gold/orb1x_0226.png");
+    background-position: -128px -1792px;
   }
 
   94.167% {
-    background-image: url("assets/orb/gold/orb1x_0227.png");
+    background-position: -256px -1792px;
   }
 
   94.583% {
-    background-image: url("assets/orb/gold/orb1x_0228.png");
+    background-position: -384px -1792px;
   }
 
   95.000% {
-    background-image: url("assets/orb/gold/orb1x_0229.png");
+    background-position: -512px -1792px;
   }
 
   95.417% {
-    background-image: url("assets/orb/gold/orb1x_0230.png");
+    background-position: -640px -1792px;
   }
 
   95.833% {
-    background-image: url("assets/orb/gold/orb1x_0231.png");
+    background-position: -768px -1792px;
   }
 
   96.250% {
-    background-image: url("assets/orb/gold/orb1x_0232.png");
+    background-position: -896px -1792px;
   }
 
   96.667% {
-    background-image: url("assets/orb/gold/orb1x_0233.png");
+    background-position: -1024px -1792px;
   }
 
   97.083% {
-    background-image: url("assets/orb/gold/orb1x_0234.png");
+    background-position: -1152px -1792px;
   }
 
   97.500% {
-    background-image: url("assets/orb/gold/orb1x_0235.png");
+    background-position: -1280px -1792px;
   }
 
   97.917% {
-    background-image: url("assets/orb/gold/orb1x_0236.png");
+    background-position: -1408px -1792px;
   }
 
   98.333% {
-    background-image: url("assets/orb/gold/orb1x_0237.png");
+    background-position: -1536px -1792px;
   }
 
   98.750% {
-    background-image: url("assets/orb/gold/orb1x_0238.png");
+    background-position: -1664px -1792px;
   }
 
   99.167% {
-    background-image: url("assets/orb/gold/orb1x_0239.png");
+    background-position: -1792px -1792px;
   }
 
   99.583% {
-    background-image: url("assets/orb/gold/orb1x_0240.png");
+    background-position: -1920px -1792px;
   }
 
   100.000% {
-    background-image: url("assets/orb/gold/orb1x_0240.png");
+    background-position: 0 0;
   }
 }
 
-.animate-gold-orb {
-  animation: goldOrb 6000ms steps(1) infinite;
+.animate-orb-spin-slow {
+  animation: orbSpin 16000ms steps(1) infinite;
 }
 
 .cursor-pointer {
@@ -2959,20 +2943,16 @@ body {
   gap: 3rem;
 }
 
+.gap-16 {
+  gap: 4rem;
+}
+
 .gap-2 {
   gap: 0.5rem;
 }
 
 .gap-4 {
   gap: 1rem;
-}
-
-.gap-8 {
-  gap: 2rem;
-}
-
-.gap-16 {
-  gap: 4rem;
 }
 
 .overflow-clip {
@@ -3066,16 +3046,12 @@ body {
   --tw-bg-opacity: 0.5;
 }
 
-.bg-\[url\(\'\/assets\/landing\.png\'\)\] {
-  background-image: url('/assets/landing.png');
+.bg-\[url\(\'assets\/orb_black_sprite\.webp\'\)\] {
+  background-image: url('assets/orb_black_sprite.webp');
 }
 
-.bg-cover {
-  background-size: cover;
-}
-
-.bg-center {
-  background-position: center;
+.bg-\[url\(\'assets\/orb_gold_sprite\.webp\'\)\] {
+  background-image: url('assets/orb_gold_sprite.webp');
 }
 
 .bg-no-repeat {
@@ -3346,10 +3322,6 @@ body {
   opacity: 0.5;
 }
 
-.opacity-80 {
-  opacity: 0.8;
-}
-
 .outline-none {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -3485,32 +3457,6 @@ body {
 .placeholder\:text-gray-700::placeholder {
   --tw-text-opacity: 1;
   color: rgb(112 112 112 / var(--tw-text-opacity));
-}
-
-.before\:absolute::before {
-  content: var(--tw-content);
-  position: absolute;
-}
-
-.before\:inset-0::before {
-  content: var(--tw-content);
-  inset: 0px;
-}
-
-.before\:bg-black::before {
-  content: var(--tw-content);
-  --tw-bg-opacity: 1;
-  background-color: rgb(15 14 17 / var(--tw-bg-opacity));
-}
-
-.before\:opacity-20::before {
-  content: var(--tw-content);
-  opacity: 0.2;
-}
-
-.before\:content-\[\'\'\]::before {
-  --tw-content: '';
-  content: var(--tw-content);
 }
 
 .hover\:cursor-pointer:hover {
@@ -3732,9 +3678,9 @@ body {
     line-height: 1;
   }
 
-  .sm\:text-lg {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
+  .sm\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
   }
 
   .sm\:text-sm {
@@ -3745,11 +3691,6 @@ body {
   .sm\:text-xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
-  }
-
-  .sm\:text-base {
-    font-size: 1rem;
-    line-height: 1.5rem;
   }
 }
 

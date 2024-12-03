@@ -5,15 +5,18 @@ use crate::{
     components::*,
     route::Route,
 };
-
 pub fn Mine() -> Element {
     let mut is_gold = use_signal(|| false);
 
     rsx! {
         Col {
-            class: "pb-20 sm:pb-16 gap-8",
+            class: "w-full h-full pb-20 sm:pb-16 max-w-2xl mx-auto px-5 sm:px-8",
             gap: 4,
-            // Header {}
+            Heading {
+                class: "w-full",
+                title: "Mine",
+                subtitle: "Earn yield by mining with your phone or computer."
+            }
             button {
                 class: "w-fit",
                 onclick: move |_| is_gold.set(!is_gold.cloned()),

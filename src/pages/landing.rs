@@ -10,12 +10,11 @@ pub fn Landing() -> Element {
                 class: "mx-auto my-auto gap-16",
                 gap: 16,
                 Col {
-                    class: "mx-auto",
-                    gap: 8,
+                    class: "mx-auto gap-12",
+                    gap: 12,
                     Orb {
                         class: "mx-auto", 
                         is_gold: true,
-                        is_large: true
                     }
                     Col {
                         class: "mx-auto",
