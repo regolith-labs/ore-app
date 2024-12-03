@@ -71,7 +71,7 @@ module.exports = {
         wide: ['PilatWide', 'ui-sans-serif', 'system-ui']
       },
       animation: {
-        'orb-spin-slow': 'orbSpin 16000ms steps(1) infinite',
+        'orb-spin-slow': 'orbSpin 12000ms steps(1) infinite',
         'orb-spin-fast': 'orbSpin 6000ms steps(1) infinite',
       },
       keyframes: {

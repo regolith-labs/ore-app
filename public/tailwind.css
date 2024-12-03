@@ -729,6 +729,10 @@ body {
   margin-top: auto;
 }
 
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
 .flex {
   display: flex;
 }
@@ -907,6 +911,10 @@ body {
 
 .max-w-\[80rem\] {
   max-width: 80rem;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
 }
 
 .shrink-0 {
@@ -2872,11 +2880,15 @@ body {
 }
 
 .animate-orb-spin-slow {
-  animation: orbSpin 16000ms steps(1) infinite;
+  animation: orbSpin 12000ms steps(1) infinite;
 }
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
 }
 
 .flex-row {
@@ -2985,12 +2997,24 @@ body {
   border-radius: 0.5rem;
 }
 
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
 .border {
   border-width: 1px;
 }
 
 .border-b {
   border-bottom-width: 1px;
+}
+
+.border-t {
+  border-top-width: 1px;
 }
 
 .border-gray-800 {
@@ -3042,6 +3066,16 @@ body {
   background-color: rgb(250 250 250 / var(--tw-bg-opacity));
 }
 
+.bg-surface-elevated {
+  --tw-bg-opacity: 1;
+  background-color: rgb(19 18 22 / var(--tw-bg-opacity));
+}
+
+.bg-surface-floating {
+  --tw-bg-opacity: 1;
+  background-color: rgb(26 25 31 / var(--tw-bg-opacity));
+}
+
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -3072,6 +3106,10 @@ body {
 
 .p-8 {
   padding: 2rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
 }
 
 .px-1 {
@@ -3119,6 +3157,16 @@ body {
   padding-bottom: 1.25rem;
 }
 
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
 .pb-20 {
   padding-bottom: 5rem;
 }
@@ -3129,6 +3177,10 @@ body {
 
 .pr-1 {
   padding-right: 0.25rem;
+}
+
+.pt-4 {
+  padding-top: 1rem;
 }
 
 .text-left {
@@ -3349,6 +3401,12 @@ body {
   transition-duration: 200ms;
 }
 
+.\[appearance\:textfield\] {
+  -webkit-appearance: textfield;
+     -moz-appearance: textfield;
+          appearance: textfield;
+}
+
 @font-face {
   font-family: 'Pilat';
 
@@ -3496,6 +3554,16 @@ body {
 .hover\:bg-green-600:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(0 184 124 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-surface-elevated:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(19 18 22 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-surface-floating:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(26 25 31 / var(--tw-bg-opacity));
 }
 
 .hover\:text-black:hover {
@@ -3749,4 +3817,14 @@ body {
   .lg\:hidden {
     display: none;
   }
+}
+
+.\[\&\:\:-webkit-inner-spin-button\]\:appearance-none::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+          appearance: none;
+}
+
+.\[\&\:\:-webkit-outer-spin-button\]\:appearance-none::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+          appearance: none;
 }
