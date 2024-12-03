@@ -44,7 +44,7 @@ pub fn SwapForm(
             class: "w-full {class}",
             gap: 4,
             Col {
-                class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded z-0",
+                class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0",
                 SwapInput {
                     mint: Pubkey::new_unique(),
                     mode: SwapInputMode::Buy,
@@ -300,11 +300,10 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>, sh
                     }
                 }
                 input {
-                    class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right",
+                    class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                     placeholder: "0",
                     r#type: "number",
-                    inputmode: "numeric",
-                    step: "any",
+                    inputmode: "decimal",
                     value: input_amount.cloned(),
                     oninput: move |e| {
                         let s = e.value();
