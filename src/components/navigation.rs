@@ -8,7 +8,7 @@ use crate::{
 pub fn AppNavigation() -> Element {
     rsx! {
         Col {
-            class: "w-screen min-h-screen",
+            class: "w-screen min-h-dvh",
             AppNavBar {}
             MobileTabBar {}
             span {
@@ -22,7 +22,7 @@ pub fn AppNavigation() -> Element {
 pub fn LandingNavigation() -> Element {
     rsx! {
         Col {
-            class: "w-screen h-screen",
+            class: "w-screen h-dvh",
             LandingNavBar {}
             Outlet::<Route> {}
         }
