@@ -4,7 +4,12 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use crate::{components::{Col, Row, SwitchIcon}, hooks::{use_token_balance, ASSETS}};
 
 #[component]
-pub fn SwapForm(mint_a: Pubkey, mint_b: Pubkey) -> Element {
+pub fn SwapForm(
+    class: Option<String>,
+    mint_a: Pubkey,
+    mint_b: Pubkey
+) -> Element {
+    let class = class.unwrap_or_default();
     let sell_input_amount = use_signal::<String>(|| "".to_owned());
     let buy_input_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
@@ -36,7 +41,7 @@ pub fn SwapForm(mint_a: Pubkey, mint_b: Pubkey) -> Element {
 
     rsx! {
         Col {
-            class: "w-full max-w-2xl",
+            class: "w-full {class}",
             gap: 4,
             Col {
                 class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded z-0",

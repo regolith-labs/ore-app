@@ -7,18 +7,26 @@ use crate::{
 };
 
 pub fn Mine() -> Element {
+    let mut is_gold = use_signal(|| false);
+
     rsx! {
         Col {
             class: "pb-20 sm:pb-16 gap-8",
-            gap: 8,
-            Header {}
-            Col {
-                class: "md:flex-row md:gap-0 px-5 sm:px-8",
-                gap: 8,
-                Balance {}
-                Yield{}
+            gap: 4,
+            // Header {}
+            button {
+                onclick: move |_| is_gold.set(!is_gold.cloned()),
+                Orb {
+                    is_gold: *is_gold.read()
+                }
             }
-            PoolTable {}
+            // Col {
+            //     class: "md:flex-row md:gap-0 px-5 sm:px-8",
+            //     gap: 8,
+            //     Balance {}
+            //     Yield{}
+            // }
+            // PoolTable {}
         }
     }
 }

@@ -1,4 +1,4 @@
-use dioxus::{dioxus_core::SpawnIfAsync, prelude::*};
+use dioxus::prelude::*;
 
 use crate::{
     components::*, gateway::GatewayResult, hooks::{use_token_balance, Asset, ASSETS}, route::Route, steel_app::solana::{account_decoder::parse_token::UiTokenAmount, sdk::pubkey::Pubkey}
@@ -8,34 +8,17 @@ pub fn Trade() -> Element {
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
-            gap: 8,
+            gap: 4,
             Subheading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: "Trade".to_string(),
-                subtitle: None
+                title: "Trade",
+                subtitle: "Swap tokens at the best available market price."
             }
-            span {
-                class: "mx-auto max-w-2xl px-5 sm:px-8",
-                SwapForm {
-                    mint_a: Pubkey::new_unique(),
-                    mint_b: Pubkey::new_unique(),
-                }
+            SwapForm {
+                class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
+                mint_a: Pubkey::new_unique(),
+                mint_b: Pubkey::new_unique(),
             }
-            // Col {
-            //     class: "md:flex-row md:gap-0 px-5 sm:px-8",
-            //     gap: 8,
-            //     Balance {}
-            //     Worth {}
-            // }
-            // Col {
-            //     gap: 4,
-            //     Header {}
-            //     span {
-            //         class: "px-5 sm:px-8",
-            //         Balance {}
-            //     }
-            //     AssetTable {}
-            // }
         }
     }
 }
@@ -49,7 +32,6 @@ fn Header() -> Element {
                 class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
                 "Balance"
             }
-            // SwapButton {}
         }
     }
 }

@@ -8,6 +8,7 @@
     }
 }
 
+
 @layer components {
     .loading {
         @apply transition bg-gray-800 animate-pulse;

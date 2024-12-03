@@ -8,23 +8,17 @@ use crate::{
 pub fn Stake() -> Element {
     rsx! {
         Col {
-            class: "w-full pb-20 sm:pb-16",
-            gap: 8,
-            span {
-                class: "mx-auto max-w-2xl px-5 sm:px-8",
-                StakeForm {
-                    mint: Pubkey::new_unique(),
-                }
+            class: "w-full h-full pb-20 sm:pb-16",
+            gap: 4,
+            Subheading {
+                class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
+                title: "Stake",
+                subtitle: "Provide liquidity for trading pairs to earn yield."
             }
-            
-            // Header {}
-            // Col {
-            //     class: "md:flex-row md:gap-0 px-5 sm:px-8",
-            //     gap: 8,
-            //     Balance {}
-            //     Yield {}
-            // }
-            // LiquidityTable {}
+            StakeForm {
+                class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
+                mint: Pubkey::new_unique(),
+            }
         }
     }
 }

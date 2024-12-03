@@ -4,7 +4,11 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use crate::components::{Col, Row};
 
 #[component]
-pub fn StakeForm(mint: Pubkey) -> Element {
+pub fn StakeForm(
+    class: Option<String>,
+    mint: Pubkey
+) -> Element {
+    let class = class.unwrap_or_default();
     let stake_amount_a = use_signal::<String>(|| "".to_owned());
     let stake_amount_b = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
@@ -56,7 +60,7 @@ pub fn StakeForm(mint: Pubkey) -> Element {
 
     rsx! {
         Col {
-            class: "w-full max-w-2xl",
+            class: "w-full {class}",
             gap: 4,
             Col {
                 class: "lg:flex elevated elevated-border shrink-0 h-min rounded z-0",
