@@ -6,8 +6,8 @@ pub fn SplineModel() -> Element {
             class: "bg-transparent mx-auto",
             dangerous_inner_html: r#"
                 <spline-viewer 
-                    style="height: 32rem; width: 32rem;" 
-                    url="https://prod.spline.design/KCMBCfI59-me0kTJ/scene.splinecode"
+                    style="height: 12rem; width: 12rem;" 
+                    url="https://prod.spline.design/FEOrs1ySmEDKhU71/scene.splinecode"
                 />
             "#
         }

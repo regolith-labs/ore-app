@@ -22,7 +22,7 @@ pub fn AppNavigation() -> Element {
 pub fn LandingNavigation() -> Element {
     rsx! {
         Col {
-            class: "w-screen h-dvh",
+            class: "w-screen h-screen",
             LandingNavBar {}
             Outlet::<Route> {}
         }

@@ -13,10 +13,10 @@ pub fn Landing() -> Element {
                     class: "mx-auto gap-12",
                     gap: 12,
                     SplineModel {}
-                    Orb {
-                        class: "mx-auto", 
-                        is_gold: true,
-                    }
+                    // Orb {
+                    //     class: "mx-auto", 
+                    //     is_gold: true,
+                    // }
                     Col {
                         class: "mx-auto",
                         gap: 2,
