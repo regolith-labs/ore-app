@@ -46,7 +46,7 @@ pub fn Landing() -> Element {
             class: "absolute top-0 flex flex-col w-full h-full overflow-y-scroll z-50 snap-y snap-mandatory",
             Hero {
                 title: "It's time to mine.",
-                subtitle: &"ORE is a cryptocurrency everyone can mine."
+                subtitle: &"ORE is digital gold on Solana."
             }
             Block {
                 title: &"Proof of work.",
