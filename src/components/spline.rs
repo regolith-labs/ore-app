@@ -7,7 +7,7 @@ pub fn SplineModel() -> Element {
             dangerous_inner_html: r#"
                 <spline-viewer 
                     style="height: 12rem; width: 12rem;" 
-                    url="https://prod.spline.design/FEOrs1ySmEDKhU71/scene.splinecode"
+                    url="https://prod.spline.design/zyaww3tr0AUmyWMP/scene.splinecode"
                 />
             "#
         }
