@@ -12,13 +12,13 @@ pub fn StakeForm(
     let stake_amount_a = use_signal::<String>(|| "".to_owned());
     let stake_amount_b = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
-    let mut single_asset = use_signal(|| true);
+    let mut pair_deposit = use_signal(|| false);
 
     use_effect(move || {
         let amount_str_a = stake_amount_a.cloned();
         let amount_str_b = stake_amount_b.cloned();
 
-        if *single_asset.read() {
+        if !*pair_deposit.read() {
             if amount_str_a.is_empty() {
                 enabled.set(false);
                 return;
@@ -68,7 +68,7 @@ pub fn StakeForm(
                     mint: mint,
                     amount_a: stake_amount_a,
                     amount_b: stake_amount_b,
-                    single_asset: single_asset
+                    pair_deposit: pair_deposit
                 }
             }
             Row {
@@ -77,12 +77,12 @@ pub fn StakeForm(
                     class: "flex items-center gap-2 text-sm text-elements-lowEmphasis cursor-pointer",
                     input {
                         r#type: "checkbox",
-                        checked: *single_asset.read(),
+                        checked: *pair_deposit.read(),
                         oninput: move |_| {
-                            single_asset.set(!single_asset.cloned())
+                            pair_deposit.set(!pair_deposit.cloned())
                         }
                     }
-                    "Single asset deposit"
+                    "Pair with ORE"
                 }
             }
             StakeDetails {}
@@ -99,12 +99,12 @@ fn StakeDetails() -> Element {
             class: "px-1",
             gap: 3,
             DetailLabel {
-                title: "Transaction fee",
-                value: "0.00005 SOL"
+                title: "Estimated yield",
+                value: "1 ORE / day"
             }
             DetailLabel {
-                title: "Yield",
-                value: "1 ORE / day"
+                title: "Transaction fee",
+                value: "0.00005 SOL"
             }
         }
     }
@@ -150,7 +150,7 @@ fn StakeButton(enabled: Signal<bool>) -> Element {
 }
 
 #[component]
-fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>, single_asset: Signal<bool>) -> Element {
+fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>, pair_deposit: Signal<bool>) -> Element {
     rsx! {
         Col {
             class: "w-full p-4",
@@ -170,7 +170,7 @@ fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>,
                 }
             }
             Col {
-                gap: if *single_asset.read() { 0 } else { 4 },
+                gap: if *pair_deposit.read() { 4 } else { 0 },
                 Row {
                     gap: 4,
                     Row {
@@ -199,7 +199,7 @@ fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>,
                         }
                     }
                 }
-                if !*single_asset.read() {
+                if *pair_deposit.read() {
                     Row {
                         gap: 4,
                         Row {

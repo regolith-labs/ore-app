@@ -15,6 +15,7 @@ pub fn Mine() -> Element {
             gap: 4,
             // Header {}
             button {
+                class: "w-fit",
                 onclick: move |_| is_gold.set(!is_gold.cloned()),
                 Orb {
                     is_gold: *is_gold.read()

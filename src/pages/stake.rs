@@ -10,10 +10,10 @@ pub fn Stake() -> Element {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 4,
-            Subheading {
+            Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake",
-                subtitle: "Provide liquidity for trading pairs to earn yield."
+                subtitle: "Provide liquidity for traders and earn yield."
             }
             StakeForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",

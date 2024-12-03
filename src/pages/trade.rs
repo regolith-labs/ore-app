@@ -9,10 +9,10 @@ pub fn Trade() -> Element {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 4,
-            Subheading {
+            Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Trade",
-                subtitle: "Swap tokens at the best available market price."
+                subtitle: "Swap tokens at the best available price."
             }
             SwapForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",

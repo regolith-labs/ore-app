@@ -559,7 +559,7 @@ module.exports = {
         },
       },
       animation: {
-        'black-orb': 'blackOrb 8000ms steps(1) infinite',
+        'black-orb': 'blackOrb 24000ms steps(1) infinite',
         'gold-orb': 'goldOrb 6000ms steps(1) infinite',
       }
     },

@@ -134,7 +134,7 @@ fn About(asset: Asset) -> Element {
     rsx! {
         Col {
             gap: 2,
-            Subheading {
+            Heading {
                 title: "About".to_string(),
             }
             span {
@@ -150,7 +150,7 @@ fn Stats(asset: Asset) -> Element {
     rsx! {
         Col {
             gap: 2,
-            Subheading {
+            Heading {
                 title: "Info".to_string(),
             }
             Col {
@@ -266,7 +266,7 @@ fn TransactionTable(asset: Asset) -> Element {
     rsx! {
         Col {
             gap: 2,
-            Subheading {
+            Heading {
                 class: "px-5 md:pl-8 md:pr-0",
                 title: "Transactions",
             }
