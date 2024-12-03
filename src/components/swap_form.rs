@@ -244,8 +244,8 @@ enum SwapInputMode {
 #[component]
 fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>, show_selector: Signal<bool>, selected_token: Signal<String>) -> Element {
     let border = match mode {
-        SwapInputMode::Buy => "",
-        SwapInputMode::Sell => "border-b border-gray-800",
+        SwapInputMode::Buy => "border-b border-gray-800",
+        SwapInputMode::Sell => "",
     };
     let title = match mode {
         SwapInputMode::Buy => "Buy",
