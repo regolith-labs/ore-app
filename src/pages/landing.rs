@@ -30,7 +30,7 @@ pub fn Landing() -> Element {
                     class: "flex mx-auto h-16 w-full sm:w-64 rounded-full controls-primary",
                     to: Route::Mine {},
                     span {
-                        class: "font-wide font-bold text-2xl mx-auto my-auto",
+                        class: "font-wide font-bold text-xl sm:text-2xl mx-auto my-auto",
                         "Start mining →"
                     }
                 }
