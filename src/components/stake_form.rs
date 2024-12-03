@@ -255,7 +255,7 @@ pub fn DepositForm(
                             pair_deposit.set(!pair_deposit.cloned())
                         }
                     }
-                    "Deposit pair"
+                    "Deposit as pair"
                 }
             }
             StakeDetails {}
