@@ -207,13 +207,13 @@ fn SwapButton(enabled: Signal<bool>) -> Element {
     };
     rsx! {
         button {
-            class: "h-10 w-full rounded-full {colors}",
+            class: "h-12 w-full rounded-full {colors}",
             disabled: !*enabled.read(),
             onclick: move |_| {
                 // TODO
             },
             span {
-                class: "mx-auto my-auto",
+                class: "mx-auto my-auto font-semibold",
                 "Swap"
             }
         }

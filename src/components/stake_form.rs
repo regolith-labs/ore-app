@@ -44,15 +44,15 @@ pub enum StakeTab {
 #[component]
 fn StakeTabs(tab: Signal<StakeTab>) -> Element {
     let deposit_class = if *tab.read() == StakeTab::Deposit { 
-        "flex-1 py-3 transition-colors bg-surface-floating text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors bg-surface-floating text-elements-highEmphasis"
     } else {
-        "flex-1 py-3 transition-colors bg-surface-elevated text-elements-lowEmphasis hover:bg-surface-floating hover:text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors bg-surface-elevated text-elements-lowEmphasis hover:bg-surface-floating hover:text-elements-highEmphasis"
     };
 
     let withdraw_class = if *tab.read() == StakeTab::Withdraw {
-        "flex-1 py-3 transition-colors bg-surface-floating text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors bg-surface-floating text-elements-highEmphasis"
     } else {
-        "flex-1 py-3 transition-colors bg-surface-elevated text-elements-lowEmphasis hover:bg-surface-floating hover:text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors bg-surface-elevated text-elements-lowEmphasis hover:bg-surface-floating hover:text-elements-highEmphasis"
     };
 
     rsx! {
@@ -322,13 +322,13 @@ fn StakeButton(enabled: Signal<bool>) -> Element {
     };
     rsx! {
         button {
-            class: "h-10 w-full rounded-full {colors}",
+            class: "h-12 w-full rounded-full {colors}",
             disabled: !*enabled.read(),
             onclick: move |_| {
                 // TODO: Implement staking logic
             },
             span {
-                class: "mx-auto my-auto",
+                class: "mx-auto my-auto font-semibold",
                 "Stake"
             }
         }
@@ -344,13 +344,13 @@ fn WithdrawButton(enabled: Signal<bool>) -> Element {
     };
     rsx! {
         button {
-            class: "h-10 w-full rounded-full {colors}",
+            class: "h-12 w-full rounded-full {colors}",
             disabled: !*enabled.read(),
             onclick: move |_| {
                 // TODO: Implement withdraw logic
             },
             span {
-                class: "mx-auto my-auto",
+                class: "mx-auto my-auto font-semibold",
                 "Withdraw"
             }
         }

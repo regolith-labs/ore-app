@@ -27,10 +27,10 @@ pub fn Landing() -> Element {
                     }
                 }
                 Link {
-                    class: "flex mx-auto h-16 w-full sm:w-64 rounded-full controls-primary",
+                    class: "flex mx-auto h-16 w-full px-4 rounded-full controls-primary transition-transform hover:scale-105",
                     to: Route::Mine {},
                     span {
-                        class: "font-wide font-bold text-xl sm:text-2xl mx-auto my-auto",
+                        class: "font-wide font-bold text-lg sm:text-xl mx-auto my-auto",
                         "Start mining →"
                     }
                 }
