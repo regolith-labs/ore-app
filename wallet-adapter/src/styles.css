@@ -246,6 +246,8 @@
     font-weight: 400;
     border-radius: 0;
     font-size: 18px;
+    line-height: 24px;
+    height: 48px;
 }
 
 .wallet-adapter-modal-list .wallet-adapter-button-end-icon,
