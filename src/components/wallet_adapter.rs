@@ -81,7 +81,8 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
                 div {
                     class: "fixed top-0 right-0 h-full transition-transform duration-200 ease-in-out {drawer_transform}",
                     WalletDrawer {
-                        on_close: move |_| drawer_open.set(false)
+                        on_close: move |_| drawer_open.set(false),
+                        wallet_remount: wallet_remount
                     }
                 }
             }

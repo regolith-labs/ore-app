@@ -7,12 +7,36 @@ use crate::hooks::{use_token_balance, Asset, ASSETS};
 use crate::route::Route;
 
 #[component]
-pub fn WalletDrawer(on_close: EventHandler) -> Element {
+pub fn WalletDrawer(on_close: EventHandler, wallet_remount: Signal<bool>) -> Element {
     rsx! {
         div {
-            class: "h-full w-96 elevated elevated-border text-white p-4 z-50",
+            class: "flex flex-col gap-8 h-full w-96 elevated elevated-border text-white p-4 z-50",
             onclick: move |e| e.stop_propagation(),
+            // "TODO: Wallet address + copy button"
+            DisconnectButton { wallet_remount: wallet_remount },
             AssetTable {}
+            // "TODO: LP balances"
+        }
+    }
+}
+
+#[component]
+fn DisconnectButton(wallet_remount: Signal<bool>) -> Element {
+    rsx! {
+        button {
+            onclick: move |_| {
+                wallet_remount.set(true);
+                let disconnect = eval(
+                    r#"
+                    window.OreWalletDisconnecter();
+                    return
+                "#,
+                );
+                spawn(async move {
+                    let _ = disconnect.await;
+                });
+            },
+            "Disconnect"
         }
     }
 }
