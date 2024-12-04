@@ -13,13 +13,13 @@ window.Buffer = buffer.Buffer;
 require('../src/styles.css');
 
 const LABELS = {
-    'change-wallet': 'Change wallet',
-    connecting: 'Connecting ...',
-    'copy-address': 'Copy address',
-    copied: 'Copied',
-    disconnect: 'Disconnect',
-    'has-wallet': 'Connect',
-    'no-wallet': 'Connect',
+  'change-wallet': 'Change wallet',
+  connecting: 'Connecting ...',
+  'copy-address': 'Copy address',
+  copied: 'Copied',
+  disconnect: 'Disconnect',
+  'has-wallet': 'Connect',
+  'no-wallet': 'Connect',
 };
 
 export const Wallet = () => {
@@ -32,11 +32,12 @@ export const Wallet = () => {
   );
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect={false}>
         <WalletModalProvider>
           <BaseWalletMultiButton labels={LABELS} />
           { /* Your app's components go here, nested within the context providers. */}
           <Dispatcher />
+          <Disconnect />
           <SignTransaction />
         </WalletModalProvider>
       </WalletProvider>
@@ -77,6 +78,20 @@ function Dispatcher() {
     }
     return
   }, [publicKey]);
+}
+
+function Disconnect() {
+  const { publicKey, disconnect } = useWallet();
+  const callback = useCallback(async (_) => {
+    try {
+      console.log("disconnecting");
+      await disconnect();
+    } catch (err) {
+      console.log(err);
+    }
+  }, [publicKey]);
+  window.OreWalletDisconnecter = callback;
+  return
 }
 
 function SignTransaction() {

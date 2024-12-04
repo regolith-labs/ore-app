@@ -7,9 +7,10 @@ use crate::steel_app::solana::sdk::{pubkey::Pubkey, transaction::Transaction};
 pub fn WalletAdapter() -> Element {
     let wallet_status = use_wallet_status();
 
-    let _ = use_future(move || async move {
+    let mut mount_wallet = use_future(move || async move {
         let eval = eval(
             r#"
+                console.log("mount");
                 window.MountWalletAdapter();
                 return
             "#,
@@ -17,15 +18,23 @@ pub fn WalletAdapter() -> Element {
         let _ = eval.await;
     });
 
+    let mut wallet_remount = use_signal(|| false);
+
     match wallet_status.cloned() {
         WalletStatus::Connected(address) => {
             rsx! {
                 ConnectedWalletAdapter {
-                    address: address
+                    address: address,
+                    wallet_status,
+                    wallet_remount
                 }
             }
         }
         WalletStatus::Disconnected => {
+            if *wallet_remount.read() {
+                mount_wallet.restart();
+                wallet_remount.set(false);
+            }
             rsx! {
                 div {
                     class: "rounded-full transition-colors my-auto h-10 text-black bg-white",
@@ -41,21 +50,41 @@ pub fn WalletAdapter() -> Element {
 // TODO Disconnect options
 
 #[component]
-fn ConnectedWalletAdapter(address: Pubkey) -> Element {
+fn ConnectedWalletAdapter(
+    address: Pubkey,
+    wallet_status: Signal<WalletStatus>,
+    wallet_remount: Signal<bool>,
+) -> Element {
     let len = address.to_string().len();
     let first_four = &address.to_string()[0..4];
     let last_four = &address.to_string()[len - 4..len];
 
     rsx! {
-        Row {
-            class: "elevated-control elevated-border rounded-full text-sm font-semibold h-10 px-4 hover:cursor-pointer",
-            gap: 2,
-            span {
-                class: "mx-auto my-auto",
-                "{first_four}...{last_four}"
-            }
-            CarrotDownIcon {
-                class: "w-3 text-gray-700"
+        button {
+            onclick: move |_| {
+                let disconnect = eval(
+                    r#"
+                    console.log("disconnect pls");
+                    window.OreWalletDisconnecter();
+                    return
+                "#,
+                );
+                spawn(async move {
+                    disconnect.await;
+                wallet_status.set(WalletStatus::Disconnected);
+                wallet_remount.set(true);
+                });
+            },
+            Row {
+                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-10 px-4 hover:cursor-pointer",
+                gap: 2,
+                span {
+                    class: "mx-auto my-auto",
+                    "{first_four}...{last_four}"
+                }
+                CarrotDownIcon {
+                    class: "w-3 text-gray-700"
+                }
             }
         }
     }
