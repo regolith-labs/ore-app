@@ -113,7 +113,7 @@ pub fn WithdrawForm(
         Col {
             gap: 4,
             Col {
-                class: "p-1 bg-surface-elevated rounded-xl border border-gray-800 {class}",
+                class: "p-1 bg-surface-elevated rounded-lg border border-gray-800 {class}",
                 gap: 4,
                 Row {
                     class: "w-full p-3",

@@ -3236,6 +3236,11 @@ body {
   padding-bottom: 1rem;
 }
 
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 .pb-20 {
   padding-bottom: 5rem;
 }
@@ -3804,6 +3809,10 @@ body {
   .sm\:w-fit {
     width: -moz-fit-content;
     width: fit-content;
+  }
+
+  .sm\:w-96 {
+    width: 24rem;
   }
 
   .sm\:grow {

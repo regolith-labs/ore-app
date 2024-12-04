@@ -44,7 +44,7 @@ pub fn SwapForm(
             class: "w-full {class}",
             gap: 4,
             Col {
-                class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0",
+                class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
                 SwapInput {
                     mint: Pubkey::new_unique(),
                     mode: SwapInputMode::Buy,

@@ -15,7 +15,7 @@ pub fn Mine() -> Element {
             Heading {
                 class: "w-full",
                 title: "Mine",
-                subtitle: "Earn yield by mining with your phone or computer."
+                subtitle: "Forge new ORE by mining with your phone or computer."
             }
             button {
                 class: "w-fit",

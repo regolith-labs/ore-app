@@ -32,7 +32,7 @@ pub fn LandingNavigation() -> Element {
 fn AppNavBar() -> Element {
     rsx! {
         Row {
-            class: "w-screen h-16 sm:h-20 px-3 sm:px-6 sm:sticky sm:top-0 bg-black z-50",
+            class: "w-screen h-20 px-3 sm:px-6 sm:sticky sm:top-0 bg-black z-50",
             Row {
                 class: "relative justify-center sm:justify-between w-full my-auto",
                 span {

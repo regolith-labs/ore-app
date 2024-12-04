@@ -30,7 +30,7 @@ pub fn Landing() -> Element {
                     class: "flex mx-auto h-16 w-full px-4 rounded-full controls-primary transition-transform hover:scale-105",
                     to: Route::Mine {},
                     span {
-                        class: "font-bold text-lg sm:text-xl mx-auto my-auto",
+                        class: "font-semibold text-lg sm:text-xl mx-auto my-auto",
                         "Start mining →"
                     }
                 }
