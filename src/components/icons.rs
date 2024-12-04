@@ -317,6 +317,24 @@ pub fn UserIcon(class: Option<String>) -> Element {
 }
 
 #[component]
+pub fn DrawerIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 29 38",
+            fill: "currentColor", 
+            class: "{class}",
+            path {
+                fill_rule: "evenodd",
+                clip_rule: "evenodd",
+                d: "M5 33V5H16V33H5ZM0 3C0 1.34315 1.34315 0 3 0H26C27.6569 0 29 1.34315 29 3V35C29 36.6569 27.6569 38 26 38H3C1.34315 38 0 36.6569 0 35V3Z"
+            }
+        }
+    }
+}
+
+
+#[component]
 pub fn UserGroupIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {

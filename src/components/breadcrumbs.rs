@@ -12,17 +12,17 @@ pub fn Breadcrumbs() -> Element {
             class: "font-medium text-xs sm:text-sm",
             gap: 1,
             match route {
-                Route::Pair { pair } => {
-                    rsx! {
-                        Path {
-                            title: "Stake",
-                            route: Route::Stake {},
-                        }
-                        Active {
-                            title: "{pair}"
-                        }
-                    }
-                }
+                // Route::Pair { pair } => {
+                //     rsx! {
+                //         Path {
+                //             title: "Stake",
+                //             route: Route::Stake {},
+                //         }
+                //         Active {
+                //             title: "{pair}"
+                //         }
+                //     }
+                // }
                 Route::Pool { pool } => {
                     rsx! {
                         Path {
@@ -34,17 +34,17 @@ pub fn Breadcrumbs() -> Element {
                         }
                     }
                 }
-                Route::Market { market } => {
-                    rsx! {
-                        Path {
-                            title: "Trade",
-                            route: Route::Trade {},
-                        }
-                        Active {
-                            title: "{market}"
-                        }
-                    }
-                }
+                // Route::Market { market } => {
+                //     rsx! {
+                //         Path {
+                //             title: "Trade",
+                //             route: Route::Trade {},
+                //         }
+                //         Active {
+                //             title: "{market}"
+                //         }
+                //     }
+                // }
                 _ => rsx! {},
             }
         }

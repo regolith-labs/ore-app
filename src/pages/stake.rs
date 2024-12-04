@@ -80,9 +80,10 @@ fn LiquidityTable() -> Element {
 fn LiquidityRow(asset: Asset) -> Element {
     rsx! {
         TableRowLink {
-            to: Route::Pair { 
-                pair: format!("{}-ORE", asset.ticker.clone())
-            },
+            // to: Route::Pair { 
+            //     pair: format!("{}-ORE", asset.ticker.clone())
+            // },
+            to: Route::Landing {},
             left: rsx! {
                 Row {
                     class: "grow shrink-0",

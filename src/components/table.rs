@@ -9,7 +9,7 @@ use crate::{
 pub fn Table(header: Element, rows: Element) -> Element {
     rsx! {
         Col {
-            class: "sm:mx-5 overflow-x-scroll",
+            class: "overflow-x-scroll",
             {header}
             {rows}
         }

@@ -12,6 +12,7 @@ mod swap_form;
 mod table;
 #[cfg(feature = "web")]
 mod wallet_adapter;
+mod wallet_drawer;
 
 pub use balance::*;
 pub use breadcrumbs::*;
@@ -27,3 +28,4 @@ pub use swap_form::*;
 pub use table::*;
 #[cfg(feature = "web")]
 pub use wallet_adapter::*;
+pub use wallet_drawer::*;

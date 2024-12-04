@@ -34,12 +34,15 @@ fn AppNavBar() -> Element {
         Row {
             class: "w-screen h-16 sm:h-20 px-3 sm:px-6 sm:sticky sm:top-0 bg-black z-50",
             Row {
-                class: "justify-center sm:justify-between w-full my-auto",
+                class: "relative justify-center sm:justify-between w-full my-auto",
                 span {
                     class: "hidden sm:flex my-auto",
                     Logo {}
                 }
-                TabBar {}
+                div {
+                    class: "absolute left-1/2 -translate-x-1/2",
+                    TabBar {}
+                }
                 WalletAdapter {}
             }
         }
@@ -103,7 +106,7 @@ fn Tab(title: String, route: Route) -> Element {
     let color = if !selected { "text-gray-700" } else { "" };
     rsx! {
         Link {
-            class: "flex px-8 h-10 elevated-control",
+            class: "flex px-8 h-12 elevated-control",
             to: route,
             span {
                 class: "text-sm font-medium my-auto font-semibold {color}",
@@ -192,11 +195,11 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
             _ => false,
         },
         Route::Stake {} => match current_route {
-            Route::Stake {} | Route::Pair { pair: _ } => true,
+            Route::Stake {} => true,
             _ => false,
         },
         Route::Trade {} => match current_route {
-            Route::Trade {} | Route::Market { market: _ } => true,
+            Route::Trade {} => true,
             _ => false,
         },
         _ => false,

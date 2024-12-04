@@ -44,34 +44,35 @@ pub enum StakeTab {
 #[component]
 fn StakeTabs(tab: Signal<StakeTab>) -> Element {
     let deposit_class = if *tab.read() == StakeTab::Deposit { 
-        "flex-1 h-12 transition-colors bg-surface-floating text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors text-elements-highEmphasis border-b-2 border-white"
     } else {
-        "flex-1 h-12 transition-colors bg-surface-elevated text-elements-lowEmphasis hover:bg-surface-floating hover:text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors text-elements-lowEmphasis hover:bg-surface-elevated"
     };
 
     let withdraw_class = if *tab.read() == StakeTab::Withdraw {
-        "flex-1 h-12 transition-colors bg-surface-floating text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors text-elements-highEmphasis border-b-2 border-white"
     } else {
-        "flex-1 h-12 transition-colors bg-surface-elevated text-elements-lowEmphasis hover:bg-surface-floating hover:text-elements-highEmphasis"
+        "flex-1 h-12 transition-colors text-elements-lowEmphasis hover:bg-surface-elevated"
     };
 
     rsx! {
         Row {
-            class: "w-full rounded-full bg-surface-elevated mb-4 p-1",
+            class: "w-full mb-4",
             gap: 1,
             button {
-                class: "{deposit_class} rounded-full",
+                class: "{deposit_class}",
                 onclick: move |_| tab.set(StakeTab::Deposit),
                 "Deposit"
             }
             button {
-                class: "{withdraw_class} rounded-full",
+                class: "{withdraw_class}",
                 onclick: move |_| tab.set(StakeTab::Withdraw),
                 "Withdraw" 
             }
         }
     }
 }
+
 #[component]
 pub fn WithdrawForm(
     class: Option<String>,
@@ -329,7 +330,7 @@ fn StakeButton(enabled: Signal<bool>) -> Element {
             },
             span {
                 class: "mx-auto my-auto font-semibold",
-                "Stake"
+                "Submit"
             }
         }
     }
@@ -351,7 +352,7 @@ fn WithdrawButton(enabled: Signal<bool>) -> Element {
             },
             span {
                 class: "mx-auto my-auto font-semibold",
-                "Withdraw"
+                "Submit"
             }
         }
     }

@@ -1,8 +1,9 @@
 use dioxus::prelude::*;
 
-use crate::components::{CarrotDownIcon, CheckCircleIcon, Col, Row, WarningIcon};
+use crate::components::*;
 use crate::hooks::{invoke_signature, use_wallet_status, InvokeSignatureStatus, WalletStatus};
 use crate::steel_app::solana::sdk::{pubkey::Pubkey, transaction::Transaction};
+use crate::components::wallet_drawer::WalletDrawer;
 
 pub fn WalletAdapter() -> Element {
     let wallet_status = use_wallet_status();
@@ -51,29 +52,37 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
     let first_four = &address.to_string()[0..4];
     let last_four = &address.to_string()[len - 4..len];
 
+    let mut drawer_open = use_signal(|| false);
+    let drawer_container = if *drawer_open.read() { "bg-black/50" } else { "bg-transparent pointer-events-none" };
+    let drawer_transform = if *drawer_open.read() { "translate-x-0" } else { "translate-x-full" };
+
     rsx! {
-        button {
-            onclick: move |_| {
-                wallet_remount.set(true);
-                let disconnect = eval(
-                    r#"
-                    window.OreWalletDisconnecter();
-                    return
-                "#,
-                );
-                spawn(async move {
-                    disconnect.await;
-                });
-            },
-            Row {
-                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-10 px-4 hover:cursor-pointer",
-                gap: 2,
-                span {
-                    class: "mx-auto my-auto",
-                    "{first_four}...{last_four}"
+        div {
+            class: "relative",
+            button {
+                onclick: move |_| {
+                    drawer_open.set(!drawer_open.cloned());
+                },
+                Row {
+                    class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer gap-3",
+                    gap: 3,
+                    span {
+                        class: "mx-auto my-auto",
+                        "{first_four}...{last_four}"
+                    }
+                    DrawerIcon {
+                        class: "w-3 text-gray-700"
+                    }
                 }
-                CarrotDownIcon {
-                    class: "w-3 text-gray-700"
+            }
+            div {
+                class: "fixed inset-0 transition-colors duration-200 ease-in-out {drawer_container}",
+                onclick: move |_| drawer_open.set(false),
+                div {
+                    class: "fixed top-0 right-0 h-full transition-transform duration-200 ease-in-out {drawer_transform}",
+                    WalletDrawer {
+                        on_close: move |_| drawer_open.set(false)
+                    }
                 }
             }
         }
