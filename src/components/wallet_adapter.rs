@@ -10,7 +10,6 @@ pub fn WalletAdapter() -> Element {
     let mut mount_wallet = use_future(move || async move {
         let eval = eval(
             r#"
-                console.log("mount");
                 window.MountWalletAdapter();
                 return
             "#,
@@ -25,7 +24,6 @@ pub fn WalletAdapter() -> Element {
             rsx! {
                 ConnectedWalletAdapter {
                     address: address,
-                    wallet_status,
                     wallet_remount
                 }
             }
@@ -47,14 +45,8 @@ pub fn WalletAdapter() -> Element {
     }
 }
 
-// TODO Disconnect options
-
 #[component]
-fn ConnectedWalletAdapter(
-    address: Pubkey,
-    wallet_status: Signal<WalletStatus>,
-    wallet_remount: Signal<bool>,
-) -> Element {
+fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Element {
     let len = address.to_string().len();
     let first_four = &address.to_string()[0..4];
     let last_four = &address.to_string()[len - 4..len];
@@ -65,7 +57,6 @@ fn ConnectedWalletAdapter(
                 wallet_remount.set(true);
                 let disconnect = eval(
                     r#"
-                    console.log("disconnect pls");
                     window.OreWalletDisconnecter();
                     return
                 "#,

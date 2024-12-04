@@ -84,7 +84,6 @@ function Disconnect() {
   const { publicKey, disconnect } = useWallet();
   const callback = useCallback(async (_) => {
     try {
-      console.log("disconnecting");
       await disconnect();
     } catch (err) {
       console.log(err);
