@@ -53,10 +53,17 @@ async fn main() {
 }
 
 fn should_cache(path: &str) -> bool {
-    let extension = Path::new(path)
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .unwrap_or("");
-
-    matches!(extension, "png" | "jpg" | "jpeg" | "gif" | "webp" | "css" | "js")
+    // Don't cache .wasm files
+    if path.ends_with(".wasm") {
+        return false;
+    }
+    // Cache other static assets
+    path.contains("assets/") || 
+    path.ends_with(".js") ||
+    path.ends_with(".css") ||
+    path.ends_with(".png") ||
+    path.ends_with(".jpg") ||
+    path.ends_with(".jpeg") ||
+    path.ends_with(".gif") ||
+    path.ends_with(".webp")
 }

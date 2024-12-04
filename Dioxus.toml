@@ -36,7 +36,10 @@ index_on_404 = true
 style = ["/tailwind.css"]
 
 # Javascript code file
-script = ["/worker.js", "/wallet.js"]
+script = [
+    "/worker.js?hash={git_hash}",
+    "/wallet.js?hash={git_hash}"
+]
 
 [web.resource.dev]
 
