@@ -8,19 +8,13 @@
     display: flex;
     align-items: center;
     font-family: 'Pilat', 'ui-sans-serif', 'system-ui';
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
-    height: 32px;
-    line-height: 32px;
-    padding: 0 16px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 20px;
     border-radius: 9999px;
-    margin: auto 0px;
-    @media (min-width: 640px) {
-        font-size: 16px;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 20px;
-    }
+    margin: auto auto;
 }
 
 .wallet-adapter-button-trigger {
