@@ -54,7 +54,7 @@ async fn main() {
 
 fn should_cache(path: &str) -> bool {
     // Don't cache .wasm files
-    if path.ends_with(".wasm") {
+    if path.ends_with(".wasm") || path.contains("ORE.js") {
         return false;
     }
     // Cache other static assets
