@@ -62,6 +62,7 @@ fn ConnectedWalletAdapter(
     rsx! {
         button {
             onclick: move |_| {
+                wallet_remount.set(true);
                 let disconnect = eval(
                     r#"
                     console.log("disconnect pls");
@@ -71,8 +72,6 @@ fn ConnectedWalletAdapter(
                 );
                 spawn(async move {
                     disconnect.await;
-                wallet_status.set(WalletStatus::Disconnected);
-                wallet_remount.set(true);
                 });
             },
             Row {

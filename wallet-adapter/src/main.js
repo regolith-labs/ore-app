@@ -32,7 +32,7 @@ export const Wallet = () => {
   );
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
+      <WalletProvider wallets={wallets} autoConnect={true}>
         <WalletModalProvider>
           <BaseWalletMultiButton labels={LABELS} />
           { /* Your app's components go here, nested within the context providers. */}
