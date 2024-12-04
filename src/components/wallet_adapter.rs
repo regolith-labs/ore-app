@@ -7,7 +7,7 @@ use crate::steel_app::solana::sdk::{pubkey::Pubkey, transaction::Transaction};
 pub fn WalletAdapter() -> Element {
     let wallet_status = use_wallet_status();
 
-    let mut mount_wallet = use_future(move || async move {
+    let mut wallet_mount = use_future(move || async move {
         let eval = eval(
             r#"
                 window.MountWalletAdapter();
@@ -30,7 +30,7 @@ pub fn WalletAdapter() -> Element {
         }
         WalletStatus::Disconnected => {
             if *wallet_remount.read() {
-                mount_wallet.restart();
+                wallet_mount.restart();
                 wallet_remount.set(false);
             }
             rsx! {
