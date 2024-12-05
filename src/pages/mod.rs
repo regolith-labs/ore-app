@@ -1,7 +1,3 @@
-mod analyze;
-mod claim;
-mod coming_soon;
-mod deposit;
 mod download;
 mod landing;
 mod mine;
@@ -9,13 +5,8 @@ mod not_found;
 mod pay;
 mod pool;
 mod stake;
-mod swap;
 mod trade;
 
-pub use analyze::*;
-pub use claim::*;
-pub use coming_soon::*;
-pub use deposit::*;
 pub use download::*;
 pub use landing::*;
 pub use mine::*;
@@ -23,5 +14,4 @@ pub use not_found::*;
 pub use pay::*;
 pub use pool::*;
 pub use stake::*;
-pub use swap::*;
 pub use trade::*;
