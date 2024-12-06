@@ -15,12 +15,14 @@ pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDY
 
 pub struct Gateway {
     pub rpc: WasmClient,
+    pub http: reqwest::Client,
 }
 
 impl Gateway {
     pub fn new(rpc_url: String) -> Self {
         Gateway {
             rpc: WasmClient::new(&rpc_url),
+            http: reqwest::Client::new(),
         }
     }
 

@@ -4,7 +4,6 @@ use solana_client_wasm::solana_sdk::{signature::Signature, transaction::Transact
 
 use crate::{components::*, hooks::use_gateway};
 
-
 #[component]
 pub fn SubmitTransaction(
     tx: Transaction,
@@ -85,7 +84,7 @@ pub fn SubmitTransaction(
     }
 }
 
-fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatus>) {
+pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatus>) {
     signal.set(InvokeSignatureStatus::Waiting);
     let mut eval = eval(
         r#"

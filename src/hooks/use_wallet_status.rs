@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
+use crate::gateway::{GatewayError, GatewayResult};
+
 pub fn use_wallet_status() -> Signal<WalletStatus> {
     use_context::<Signal<WalletStatus>>()
 }
@@ -29,4 +31,17 @@ pub fn use_wallet_status_provider() {
 pub enum WalletStatus {
     Connected(Pubkey),
     Disconnected,
+}
+
+pub trait GetPubkey {
+    fn get_pubkey(&self) -> GatewayResult<Pubkey>;
+}
+
+impl GetPubkey for Signal<WalletStatus> {
+    fn get_pubkey(&self) -> GatewayResult<Pubkey> {
+        match *self.read() {
+            WalletStatus::Connected(pubkey) => Ok(pubkey),
+            WalletStatus::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
+        }
+    }
 }
