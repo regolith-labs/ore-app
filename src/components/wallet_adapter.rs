@@ -1,14 +1,16 @@
 use dioxus::prelude::*;
 
+use crate::components::wallet_drawer::WalletDrawer;
 use crate::components::*;
 use crate::hooks::{use_wallet_status, WalletStatus};
 use crate::steel_app::solana::sdk::pubkey::Pubkey;
-use crate::components::wallet_drawer::WalletDrawer;
+use crate::steel_app::time::Duration;
 
 pub fn WalletAdapter() -> Element {
     let wallet_status = use_wallet_status();
 
     let mut wallet_mount = use_future(move || async move {
+        async_std::task::sleep(Duration::from_millis(100)).await;
         let eval = eval(
             r#"
                 window.MountWalletAdapter();
@@ -53,8 +55,16 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
     let last_four = &address.to_string()[len - 4..len];
 
     let mut drawer_open = use_signal(|| false);
-    let drawer_container = if *drawer_open.read() { "bg-black/50" } else { "bg-transparent pointer-events-none" };
-    let drawer_transform = if *drawer_open.read() { "translate-x-0" } else { "translate-x-full" };
+    let drawer_container = if *drawer_open.read() {
+        "bg-black/50"
+    } else {
+        "bg-transparent pointer-events-none"
+    };
+    let drawer_transform = if *drawer_open.read() {
+        "translate-x-0"
+    } else {
+        "translate-x-full"
+    };
 
     rsx! {
         div {
@@ -89,4 +99,3 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
         }
     }
 }
-
