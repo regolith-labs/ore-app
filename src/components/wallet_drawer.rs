@@ -263,7 +263,7 @@ fn WalletTabs(tab: Signal<WalletTab>) -> Element {
             button {
                 class: "{tokens_class}",
                 onclick: move |_| tab.set(WalletTab::Tokens),
-                "Tokens"
+                "Balances"
             }
             button {
                 class: "{liquidity_class}",

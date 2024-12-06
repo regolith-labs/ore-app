@@ -10,7 +10,7 @@ mod utils;
 use dioxus::prelude::*;
 use tracing::Level;
 
-use crate::{hooks::use_wallet_status_provider, route::Route};
+use crate::{hooks::use_wallet_provider, route::Route};
 
 fn main() {
     #[cfg(feature = "web")]
@@ -20,7 +20,7 @@ fn main() {
 }
 
 pub fn App() -> Element {
-    use_wallet_status_provider();
+    use_wallet_provider();
     rsx! {
         Router::<Route> {}
     }

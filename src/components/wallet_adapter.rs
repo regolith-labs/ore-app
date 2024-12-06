@@ -1,12 +1,12 @@
 use dioxus::prelude::*;
 
 use crate::components::*;
-use crate::hooks::{use_wallet_status, WalletStatus};
+use crate::hooks::{use_wallet, Wallet};
 use crate::steel_app::solana::sdk::pubkey::Pubkey;
 use crate::components::wallet_drawer::WalletDrawer;
 
 pub fn WalletAdapter() -> Element {
-    let wallet_status = use_wallet_status();
+    let wallet = use_wallet();
 
     let mut wallet_mount = use_future(move || async move {
         let eval = eval(
@@ -20,8 +20,8 @@ pub fn WalletAdapter() -> Element {
 
     let mut wallet_remount = use_signal(|| false);
 
-    match wallet_status.cloned() {
-        WalletStatus::Connected(address) => {
+    match wallet.cloned() {
+        Wallet::Connected(address) => {
             rsx! {
                 ConnectedWalletAdapter {
                     address: address,
@@ -29,7 +29,7 @@ pub fn WalletAdapter() -> Element {
                 }
             }
         }
-        WalletStatus::Disconnected => {
+        Wallet::Disconnected => {
             if *wallet_remount.read() {
                 wallet_mount.restart();
                 wallet_remount.set(false);
