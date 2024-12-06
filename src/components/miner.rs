@@ -18,10 +18,10 @@ pub fn Miner(is_gold: Signal<bool>) -> Element {
 
     let el = match *wallet_status.read() {
         WalletStatus::Disconnected => {
-            // if wallet is not connected, do nothing
+            is_gold.set(false);
             rsx! {}
         }
-        WalletStatus::Connected(_) => {
+        WalletStatus::Connected(_pubkey) => {
             match *is_gold.read() {
                 false => {
                     // do nothing
