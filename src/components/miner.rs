@@ -1,7 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::hooks::{
-    use_member_db, use_member_onchain, use_register_onchain, use_wallet_status, WalletStatus, POOLS,
+    use_member_db, use_member_onchain, use_register_db, use_register_onchain, use_wallet_status,
+    WalletStatus, POOLS,
 };
 
 use super::{invoke_signature, InvokeSignatureStatus};
@@ -10,9 +11,12 @@ use super::{invoke_signature, InvokeSignatureStatus};
 pub fn Miner(is_gold: Signal<bool>) -> Element {
     let pool = POOLS.first().unwrap();
 
-    let member_db = use_member_db(pool.url.clone());
-    let member_onchain = use_member_onchain(pool.address);
+    let mut member_db = use_member_db(pool.url.clone());
+    let mut member_onchain = use_member_onchain(pool.address);
+    let mut register_db = use_register_db(pool.url.clone());
     let register_onchain = use_register_onchain(pool.address);
+
+    let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
 
     let wallet_status = use_wallet_status();
 
@@ -29,16 +33,11 @@ pub fn Miner(is_gold: Signal<bool>) -> Element {
                 }
                 true => {
                     match &*member_db.read_unchecked() {
-                        Some(Ok(_member_db)) => {
-                            match *is_gold.read() {
-                                true => {
-                                    // start mining
-                                    rsx! {}
-                                }
-                                false => {
-                                    // waiting
-                                    rsx! {}
-                                }
+                        Some(Ok(member_db)) => {
+                            // start mining
+                            log::info!("{:?}", member_db);
+                            rsx! {
+                                div { "start mining" }
                             }
                         }
                         Some(Err(err)) => {
@@ -48,34 +47,86 @@ pub fn Miner(is_gold: Signal<bool>) -> Element {
                                 Some(Ok(member_onchain)) => {
                                     log::info!("{:?}", member_onchain);
                                     // register member with the pool
-                                    rsx! {}
+                                    match &*register_db.read() {
+                                        Some(Ok(_)) => {
+                                            member_db.restart();
+                                            rsx! {
+                                                div { "restarting member db lookup" }
+                                            }
+                                        }
+                                        Some(Err(err)) => {
+                                            let err = format!("{:?}", err);
+                                            rsx! {
+                                                div { "{err}" }
+                                            }
+                                        }
+                                        None => {
+                                            rsx! {
+                                                div { "waiting for register db" }
+                                            }
+                                        }
+                                    }
                                 }
                                 Some(Err(err)) => {
                                     log::error!("{:?}", err);
                                     // register member on chain first
                                     match &*register_onchain.read() {
                                         Some(Ok(tx)) => {
-                                            let invoke_signature_status =
-                                                use_signal(|| InvokeSignatureStatus::Start);
-                                            invoke_signature(tx.clone(), invoke_signature_status);
-                                            rsx! {}
+                                            let tx = tx.clone();
+                                            let el = match *invoke_signature_status.read() {
+                                                InvokeSignatureStatus::Start => {
+                                                    invoke_signature(tx, invoke_signature_status);
+                                                    rsx! {}
+                                                }
+                                                InvokeSignatureStatus::Waiting => {
+                                                    rsx! {
+                                                        div {
+                                                            "waiting for register onchain signature"
+                                                        }
+                                                    }
+                                                }
+                                                InvokeSignatureStatus::Timeout
+                                                | InvokeSignatureStatus::DoneWithError => {
+                                                    rsx! {
+                                                        div {
+                                                            "error with register onchain signature"
+                                                        }
+                                                    }
+                                                }
+                                                InvokeSignatureStatus::Done(_sig) => {
+                                                    member_onchain.restart();
+                                                    register_db.restart();
+                                                    rsx! {
+                                                        div { "restarting register db" }
+                                                    }
+                                                }
+                                            };
+                                            el
                                         }
                                         Some(Err(err)) => {
-                                            log::error!("{:?}", err);
-                                            rsx! {}
+                                            let err = format!("{:?}", err);
+                                            rsx! {
+                                                div { "{err}" }
+                                            }
                                         }
                                         None => {
-                                            rsx! {}
+                                            rsx! {
+                                                div { "waiting for register onchain transaction builder" }
+                                            }
                                         }
                                     }
                                 }
                                 None => {
-                                    rsx! {}
+                                    rsx! {
+                                        div { "waiting for member onchain lookup" }
+                                    }
                                 }
                             }
                         }
                         None => {
-                            rsx! {}
+                            rsx! {
+                                div { "waiting for member db lookup" }
+                            }
                         }
                     }
                 }

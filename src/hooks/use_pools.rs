@@ -4,12 +4,14 @@ use dioxus::hooks::use_resource;
 use dioxus::hooks::Resource;
 use once_cell::sync::Lazy;
 use ore_pool_types::Member;
+use ore_pool_types::RegisterPayload;
 use serde::{Deserialize, Deserializer};
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 use solana_client_wasm::WasmClient;
 use steel::AccountDeserialize;
 
+use crate::steel_app::time::Duration;
 use crate::{gateway::GatewayResult, steel_app::solana::sdk::pubkey::Pubkey};
 
 use super::use_gateway;
@@ -65,6 +67,28 @@ pub fn use_register_onchain(pool_address: Pubkey) -> Resource<GatewayResult<Tran
     })
 }
 
+pub fn use_register_db(pool_url: String) -> Resource<GatewayResult<Member>> {
+    let wallet_status = use_wallet_status();
+    use_resource(move || {
+        let gateway = use_gateway();
+        let pool_url = pool_url.clone();
+        async move {
+            async_std::task::sleep(Duration::from_millis(5_500)).await;
+            let pubkey = wallet_status.get_pubkey()?;
+            let post_url = format!("{}/register", pool_url);
+            let body = RegisterPayload { authority: pubkey };
+            let resp = gateway.http.post(post_url).json(&body).send().await;
+            match resp {
+                Err(err) => {
+                    log::error!("{:?}", err);
+                    Err(err).map_err(From::from)
+                }
+                Ok(resp) => resp.json::<Member>().await.map_err(From::from),
+            }
+        }
+    })
+}
+
 pub fn use_member_db(pool_url: String) -> Resource<GatewayResult<Member>> {
     let wallet_status = use_wallet_status();
     use_resource(move || {
@@ -92,6 +116,7 @@ pub fn use_member_onchain(
     use_resource(move || {
         let gateway = use_gateway();
         async move {
+            async_std::task::sleep(Duration::from_millis(5_000)).await;
             let pubkey = wallet_status.get_pubkey()?;
             get_member_onchain(&gateway.rpc, pool_address, pubkey).await
         }

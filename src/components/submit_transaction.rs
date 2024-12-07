@@ -58,8 +58,6 @@ pub fn SubmitTransaction(
                     }
                 }
                 InvokeSignatureStatus::DoneWithError | InvokeSignatureStatus::Timeout => {
-                    // TODO: could add reset button here
-                    // or other signal to user
                     rsx! {
                         button {
                             class: "{button_class}",
@@ -85,21 +83,21 @@ pub fn SubmitTransaction(
 }
 
 pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatus>) {
-    signal.set(InvokeSignatureStatus::Waiting);
-    let mut eval = eval(
-        r#"
+    spawn(async move {
+        signal.set(InvokeSignatureStatus::Waiting);
+        let mut eval = eval(
+            r#"
         let msg = await dioxus.recv();
         let signed = await window.OreTxSigner({b64: msg});
         dioxus.send(signed);
         "#,
-    );
-    match bincode::serialize(&tx) {
-        Ok(vec) => {
-            let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
-            let res = eval.send(serde_json::Value::String(b64));
-            match res {
-                Ok(()) => {
-                    spawn(async move {
+        );
+        match bincode::serialize(&tx) {
+            Ok(vec) => {
+                let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
+                let res = eval.send(serde_json::Value::String(b64));
+                match res {
+                    Ok(()) => {
                         let res = eval.recv().await;
                         match res {
                             Ok(serde_json::Value::String(string)) => {
@@ -142,19 +140,19 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                 signal.set(InvokeSignatureStatus::DoneWithError)
                             }
                         };
-                    });
-                }
-                Err(_err) => {
-                    log::info!("err sending val");
-                    signal.set(InvokeSignatureStatus::DoneWithError)
+                    }
+                    Err(_err) => {
+                        log::info!("err sending val");
+                        signal.set(InvokeSignatureStatus::DoneWithError)
+                    }
                 }
             }
-        }
-        Err(err) => {
-            log::info!("err serializing tx: {}", err);
-            signal.set(InvokeSignatureStatus::DoneWithError)
-        }
-    };
+            Err(err) => {
+                log::info!("err serializing tx: {}", err);
+                signal.set(InvokeSignatureStatus::DoneWithError)
+            }
+        };
+    });
 }
 
 #[derive(PartialEq)]
