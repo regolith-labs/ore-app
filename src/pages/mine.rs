@@ -2,12 +2,13 @@ use dioxus::prelude::*;
 
 use crate::{
     components::*,
-    hooks::{Pool, POOLS},
+    hooks::{use_miner, Pool, POOLS},
     route::Route,
 };
 
 pub fn Mine() -> Element {
     let mut is_gold = use_signal(|| false);
+    let (from_miner, to_miner) = use_miner();
 
     rsx! {
         Col {
@@ -24,6 +25,10 @@ pub fn Mine() -> Element {
                 Orb { is_gold: *is_gold.read() }
             }
             Miner { is_gold }
+            button { onclick: move |_| { to_miner.send("hello from here".to_string()) },
+                "click me"
+            }
+            div { "{from_miner()}" }
         }
     }
 }

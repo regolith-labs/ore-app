@@ -3793,6 +3793,7 @@ dependencies = [
  "futures-util",
  "gloo 0.11.0",
  "gloo-storage 0.3.0",
+ "gloo-worker 0.5.0",
  "is-url",
  "js-sys",
  "lazy_static",
