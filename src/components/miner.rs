@@ -9,15 +9,16 @@ use super::{invoke_signature, InvokeSignatureStatus};
 
 #[component]
 pub fn Miner(is_gold: Signal<bool>) -> Element {
+    // register with first pool
     let pool = POOLS.first().unwrap();
-
+    // pool resources
     let mut member_db = use_member_db(pool.url.clone());
     let mut member_onchain = use_member_onchain(pool.address);
     let mut register_db = use_register_db(pool.url.clone());
     let register_onchain = use_register_onchain(pool.address);
-
+    // register with pool on chain signature status
     let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
-
+    // wallet
     let wallet = use_wallet();
 
     let el = match *wallet.read() {
