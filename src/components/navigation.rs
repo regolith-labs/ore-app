@@ -19,16 +19,6 @@ pub fn AppNavigation() -> Element {
     }
 }
 
-pub fn LandingNavigation() -> Element {
-    rsx! {
-        Col {
-            class: "w-screen h-screen",
-            LandingNavBar {}
-            Outlet::<Route> {}
-        }
-    }
-}
-
 fn AppNavBar() -> Element {
     rsx! {
         Row {
@@ -49,7 +39,17 @@ fn AppNavBar() -> Element {
     }
 }
 
-fn LandingNavBar() -> Element {
+pub fn VisitorNavigation() -> Element {
+    rsx! {
+        Col {
+            class: "w-screen h-screen",
+            VisitorNavBar {}
+            Outlet::<Route> {}
+        }
+    }
+}
+
+fn VisitorNavBar() -> Element {
     rsx! {
         Row {
             class: "w-screen shrink-0 h-16 sm:h-20 px-3 sm:px-6",
@@ -183,7 +183,7 @@ fn MobileTab(title: String, route: Route) -> Element {
 
 fn is_navbar_hidden(current_route: &Route) -> bool {
     match current_route {
-        Route::Swap {} | Route::Pay {} => true,
+        Route::Pay {} => true,
         _ => false,
     }
 }

@@ -3,12 +3,12 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{GatewayError, GatewayResult};
 
-pub fn use_wallet_status() -> Signal<WalletStatus> {
-    use_context::<Signal<WalletStatus>>()
+pub fn use_wallet() -> Signal<Wallet> {
+    use_context::<Signal<Wallet>>()
 }
 
-pub fn use_wallet_status_provider() {
-    let mut signal = use_context_provider(|| Signal::new(WalletStatus::Disconnected));
+pub fn use_wallet_provider() {
+    let mut signal = use_context_provider(|| Signal::new(Wallet::Disconnected));
     let mut eval = eval(
         r#"
             window.addEventListener("ore-pubkey", (event) => {
@@ -20,15 +20,15 @@ pub fn use_wallet_status_provider() {
         while let Ok(json_val) = eval.recv().await {
             let pubkey_result: Result<Pubkey, serde_json::Error> = serde_json::from_value(json_val);
             match pubkey_result {
-                Ok(pubkey) => signal.set(WalletStatus::Connected(pubkey)),
-                Err(_) => signal.set(WalletStatus::Disconnected),
+                Ok(pubkey) => signal.set(Wallet::Connected(pubkey)),
+                Err(_) => signal.set(Wallet::Disconnected),
             }
         }
     });
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum WalletStatus {
+pub enum Wallet {
     Connected(Pubkey),
     Disconnected,
 }
@@ -37,11 +37,11 @@ pub trait GetPubkey {
     fn get_pubkey(&self) -> GatewayResult<Pubkey>;
 }
 
-impl GetPubkey for Signal<WalletStatus> {
+impl GetPubkey for Signal<Wallet> {
     fn get_pubkey(&self) -> GatewayResult<Pubkey> {
         match *self.read() {
-            WalletStatus::Connected(pubkey) => Ok(pubkey),
-            WalletStatus::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
+            Wallet::Connected(pubkey) => Ok(pubkey),
+            Wallet::Disconnected => Err(GatewayError::WalletAdapterDisconnected),
         }
     }
 }

@@ -15,7 +15,7 @@ use crate::steel_app::time::Duration;
 use crate::{gateway::GatewayResult, steel_app::solana::sdk::pubkey::Pubkey};
 
 use super::use_gateway;
-use super::{use_wallet_status, GetPubkey};
+use super::{use_wallet, GetPubkey};
 
 pub static POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
     // Read the YAML file at compile time
@@ -52,11 +52,11 @@ where
 }
 
 pub fn use_register_onchain(pool_address: Pubkey) -> Resource<GatewayResult<Transaction>> {
-    let wallet_status = use_wallet_status();
+    let wallet = use_wallet();
     use_resource(move || {
         let gateway = use_gateway();
         async move {
-            let pubkey = wallet_status.get_pubkey()?;
+            let pubkey = wallet.get_pubkey()?;
             let compute_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(20_000);
             let join_ix = ore_pool_api::sdk::join(pubkey, pool_address, pubkey);
             let mut tx = Transaction::new_with_payer(&[compute_budget_ix, join_ix], Some(&pubkey));
@@ -68,13 +68,13 @@ pub fn use_register_onchain(pool_address: Pubkey) -> Resource<GatewayResult<Tran
 }
 
 pub fn use_register_db(pool_url: String) -> Resource<GatewayResult<Member>> {
-    let wallet_status = use_wallet_status();
+    let wallet = use_wallet();
     use_resource(move || {
         let gateway = use_gateway();
         let pool_url = pool_url.clone();
         async move {
             async_std::task::sleep(Duration::from_millis(5_500)).await;
-            let pubkey = wallet_status.get_pubkey()?;
+            let pubkey = wallet.get_pubkey()?;
             let post_url = format!("{}/register", pool_url);
             let body = RegisterPayload { authority: pubkey };
             let resp = gateway.http.post(post_url).json(&body).send().await;
@@ -90,12 +90,12 @@ pub fn use_register_db(pool_url: String) -> Resource<GatewayResult<Member>> {
 }
 
 pub fn use_member_db(pool_url: String) -> Resource<GatewayResult<Member>> {
-    let wallet_status = use_wallet_status();
+    let wallet = use_wallet();
     use_resource(move || {
         let gateway = use_gateway();
         let pool_url = pool_url.clone();
         async move {
-            let pubkey = wallet_status.get_pubkey()?;
+            let pubkey = wallet.get_pubkey()?;
             let get_url = format!("{}/member/{}", pool_url, pubkey);
             let resp = gateway.http.get(get_url).send().await?;
             match resp.error_for_status() {
@@ -112,12 +112,12 @@ pub fn use_member_db(pool_url: String) -> Resource<GatewayResult<Member>> {
 pub fn use_member_onchain(
     pool_address: Pubkey,
 ) -> Resource<GatewayResult<ore_pool_api::state::Member>> {
-    let wallet_status = use_wallet_status();
+    let wallet = use_wallet();
     use_resource(move || {
         let gateway = use_gateway();
         async move {
             async_std::task::sleep(Duration::from_millis(5_000)).await;
-            let pubkey = wallet_status.get_pubkey()?;
+            let pubkey = wallet.get_pubkey()?;
             get_member_onchain(&gateway.rpc, pool_address, pubkey).await
         }
     })

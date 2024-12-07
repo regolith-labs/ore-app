@@ -6,14 +6,14 @@ use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::gateway::{GatewayError, GatewayResult};
 
-use super::{use_gateway, use_wallet_status, WalletStatus};
+use super::{use_gateway, use_wallet, Wallet};
 
 pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
-    let wallet_status = use_wallet_status();
+    let wallet_status = use_wallet();
     use_resource(move || async move {
         match *wallet_status.read() {
-            WalletStatus::Disconnected => Err(GatewayError::AccountNotFound.into()),
-            WalletStatus::Connected(pubkey) => use_gateway()
+            Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+            Wallet::Connected(pubkey) => use_gateway()
                 .get_ore_balance(&pubkey)
                 .await
                 .map_err(GatewayError::from),
@@ -31,11 +31,11 @@ pub fn use_quote(mint: Pubkey) -> Resource<GatewayResult<u64>> {
 }
 
 pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
-    let wallet_status = use_wallet_status();
+    let wallet_status = use_wallet();
     use_resource(move || async move {
         match *wallet_status.read() {
-            WalletStatus::Disconnected => Err(GatewayError::AccountNotFound.into()),
-            WalletStatus::Connected(pubkey) => {
+            Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+            Wallet::Connected(pubkey) => {
                 if mint == Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap()
                 {
                     use_gateway()

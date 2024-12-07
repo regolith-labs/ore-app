@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::hooks::{
-    use_member_db, use_member_onchain, use_register_db, use_register_onchain, use_wallet_status,
-    WalletStatus, POOLS,
+    use_member_db, use_member_onchain, use_register_db, use_register_onchain, use_wallet, Wallet,
+    POOLS,
 };
 
 use super::{invoke_signature, InvokeSignatureStatus};
@@ -18,14 +18,14 @@ pub fn Miner(is_gold: Signal<bool>) -> Element {
 
     let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
 
-    let wallet_status = use_wallet_status();
+    let wallet = use_wallet();
 
-    let el = match *wallet_status.read() {
-        WalletStatus::Disconnected => {
+    let el = match *wallet.read() {
+        Wallet::Disconnected => {
             is_gold.set(false);
             rsx! {}
         }
-        WalletStatus::Connected(_pubkey) => {
+        Wallet::Connected(_pubkey) => {
             match *is_gold.read() {
                 false => {
                     // do nothing

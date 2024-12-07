@@ -28,45 +28,6 @@ pub fn Mine() -> Element {
     }
 }
 
-fn Header() -> Element {
-    rsx! {
-        Row { class: "justify-between h-10 px-5 sm:px-8", gap: 4,
-            span { class: "font-wide text-2xl sm:text-3xl font-semibold align-text-bottom my-auto",
-                "Mine"
-            }
-            StartButton {}
-        }
-    }
-}
-
-fn StartButton() -> Element {
-    rsx! {
-        Link {
-            to: Route::Swap {},
-            class: "h-10 controls-primary rounded-full px-4 gap-2 -mr-2",
-            PlayIcon { class: "h-5 w-5 mx-auto my-auto" }
-            span { class: "my-auto", "Start" }
-        }
-    }
-}
-
-fn DownloadButton() -> Element {
-    rsx! {
-        Link {
-            to: Route::Download {},
-            class: "flex rounded bg-controls-secondary p-2 sm:p-4",
-            Row { gap: 4,
-                DownloadIcon { class: "w-8 h-8 my-auto text-elements-midEmphasis" }
-                Col { class: "my-auto w-full",
-                    span { class: "text-elements-highEmphasis font-semibold", "Download" }
-                    span { class: "text-elements-midEmphasis text-sm",
-                        "Available for Mac, Windows, and Linux."
-                    }
-                }
-            }
-        }
-    }
-}
 fn PoolTable() -> Element {
     rsx! {
         Col { gap: 2,
