@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::{
-    hooks::{POOLS, Pool},
     components::*,
+    hooks::{Pool, POOLS},
     route::Route,
 };
 
@@ -21,26 +21,19 @@ pub fn Mine() -> Element {
             button {
                 class: "w-fit",
                 onclick: move |_| is_gold.set(!is_gold.cloned()),
-                Orb {
-                    is_gold: *is_gold.read()
-                }
+                Orb { is_gold: *is_gold.read() }
             }
+            Miner { is_gold }
         }
     }
 }
 
 fn PoolTable() -> Element {
     rsx! {
-        Col {
-            gap: 2, 
+        Col { gap: 2,
             Table {
                 header: rsx! {
-                    TableHeader {
-                        left: "Pool",
-                        right_1: "Hashpower",
-                        right_2: "Multiplier",
-                        right_3: "Yield",
-                    }
+                    TableHeader { left: "Pool", right_1: "Hashpower", right_2: "Multiplier", right_3: "Yield" }
                 },
                 rows: rsx! {
                     for pool in POOLS.iter() {
@@ -56,41 +49,31 @@ fn PoolTable() -> Element {
 fn PoolRow(pool: Pool) -> Element {
     rsx! {
         TableRowLink {
-            to: Route::Pool { pool: pool.name.clone() },
+            to: Route::Pool {
+                pool: pool.name.clone(),
+            },
             left: rsx! {
-                Row {
-                    gap: 4,
+                Row { gap: 4,
                     img {
                         class: "w-10 h-10 my-auto bg-gray-900 rounded",
                         src: "{pool.image}"
                     }
-                    Col {
-                        class: "my-auto",
-                        span {
-                            class: "font-medium",
-                            "{pool.name}"
-                        }
+                    Col { class: "my-auto",
+                        span { class: "font-medium", "{pool.name}" }
                     }
                 }
             },
             right_1: rsx! {
-                span {
-                    "64480"
-                }
+                span { "64480" }
             },
             right_2: rsx! {
-                span {
-                    "2.4x",
-                }
+                span { "2.4x" }
             },
             right_3: rsx! {
-                span {
-                    class: "text-elements-gold",
-                    OreValueSmall {
-                        ui_amount_string: "2.054"
-                    }
+                span { class: "text-elements-gold",
+                    OreValueSmall { ui_amount_string: "2.054" }
                 }
-            },
+            }
         }
     }
 }
