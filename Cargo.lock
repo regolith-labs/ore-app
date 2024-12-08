@@ -3801,6 +3801,7 @@ dependencies = [
  "num-format",
  "once_cell",
  "ore-api",
+ "ore-miner-web",
  "ore-pool-api",
  "ore-pool-types",
  "ore-program",
@@ -3843,6 +3844,15 @@ dependencies = [
  "static_assertions",
  "steel",
  "thiserror",
+]
+
+[[package]]
+name = "ore-miner-web"
+version = "0.1.0"
+dependencies = [
+ "gloo-worker 0.5.0",
+ "log",
+ "wasm-logger",
 ]
 
 [[package]]
