@@ -1,5 +1,5 @@
 use base64::Engine;
-use dioxus::prelude::*;
+use dioxus::{document::eval, prelude::*};
 use solana_client_wasm::solana_sdk::{signature::Signature, transaction::Transaction};
 
 use crate::{components::*, hooks::use_gateway};

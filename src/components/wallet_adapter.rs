@@ -1,3 +1,4 @@
+use dioxus::document::eval;
 use dioxus::prelude::*;
 
 use crate::components::wallet_drawer::WalletDrawer;

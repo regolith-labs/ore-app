@@ -1,3 +1,4 @@
+use dioxus::document::eval;
 use dioxus::prelude::*;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
@@ -209,7 +210,7 @@ fn LiquidityRow(asset: Asset, on_close: EventHandler<MouseEvent>) -> Element {
                         }
                         img {
                             class: "w-8 h-8 shrink-0 -ml-2 my-auto rounded-full",
-                            src: "icon.png"
+                            src: asset!("/public/icon.png")
                         }
                     }
                     Col {

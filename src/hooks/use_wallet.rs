@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{document::eval, prelude::*};
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{GatewayError, GatewayResult};
