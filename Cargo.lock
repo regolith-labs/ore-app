@@ -3331,6 +3331,7 @@ dependencies = [
  "futures-util",
  "gloo",
  "gloo-storage",
+ "gloo-utils",
  "gloo-worker",
  "is-url",
  "js-sys",
@@ -6150,8 +6151,3 @@ dependencies = [
  "quote",
  "syn 2.0.87",
 ]
-
-[[patch.unused]]
-name = "dioxus"
-version = "0.5.2"
-source = "git+https://github.com/DioxusLabs/dioxus?rev=742721bf#742721bfded2f6d0ea8e2d752be02dbc4b0e18a8"

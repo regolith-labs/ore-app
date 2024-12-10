@@ -27,7 +27,6 @@ pub fn App() -> Element {
         document::Link { rel: "icon", href: asset!("/public/favicon.png") }
         document::Link { rel: "icon", href: asset!("/public/icon.png") }
         document::Script { src: asset!("/public/wallet.js") }
-        // document::Script { src: asset!("/public/miner.js") }
         Router::<Route> {}
     }
 }

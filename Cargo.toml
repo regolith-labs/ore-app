@@ -17,7 +17,7 @@ desktop = ["solana-sdk", "dioxus-sdk/clipboard"]
 web = [
   "gloo",
   "gloo-storage",
-  "js-sys", 
+  "js-sys",
   "serde-wasm-bindgen",
   "solana-client-wasm",
   "solana-extra-wasm",
@@ -79,11 +79,13 @@ wasm-bindgen-futures = { version = "0.4.41", optional = true }
 wasm-logger = { version = "0.2.0", optional = true }
 web-time = { version = "1.0.0", optional = true }
 gloo-worker = "0.5.0"
+gloo-utils = "0.2.0"
 
 [dependencies.web-sys]
 version = "0.3"
 optional = true
 features = [
+  'BlobPropertyBag',
   'console',
   'Clipboard',
   'Document',
@@ -103,7 +105,6 @@ features = [
 ]
 
 [patch.crates-io]
-dioxus = { git = "https://github.com/DioxusLabs/dioxus", rev = "742721bf" }
 solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 

@@ -43,12 +43,6 @@ impl Worker for Miner {
     }
 }
 
-impl Miner {
-    pub fn path() -> &'static str {
-        "./public/miner.js"
-    }
-}
-
 #[cfg(feature = "worker")]
 #[wasm_bindgen(start)]
 pub async fn register_miner() {
