@@ -253,10 +253,7 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>, sh
     };
 
     let display_token = selected_token.read().to_string();
-    let image = ASSETS.get(&display_token)
-        .map(|asset| asset.image.clone())
-        .unwrap_or_else(|| "icon.png".to_string());
-
+    let image = ASSETS.get(&display_token).map(|asset| asset.image.clone());
     let balance = use_token_balance(mint);
 
     rsx! {
@@ -289,9 +286,16 @@ fn SwapInput(mint: Pubkey, mode: SwapInputMode, input_amount: Signal<String>, sh
                     Row {
                         class: "my-auto",
                         gap: 2,
-                        img {
-                            class: "w-8 h-8 rounded-full shrink-0",
-                            src: "{image}"
+                        if let Some(image) = image {
+                            img {
+                                class: "w-8 h-8 rounded-full shrink-0",
+                                src: "{image}"
+                            }
+                        } else {
+                            img {
+                                class: "w-8 h-8 rounded-full shrink-0",
+                                src: asset!("/public/icon.png")
+                            }
                         }
                         span {
                             class: "font-semibold my-auto",

@@ -1,10 +1,9 @@
 [application]
 
-# App (Project) Name
+# App name
 name = "ORE"
 
-# Dioxus App Default Platform
-# desktop, web, mobile, ssr
+# Default platform
 default_platform = "web"
 
 # `build` & `serve` dist path
@@ -28,22 +27,3 @@ watch_path = ["src", "public"]
 
 # resolves a hot reloading issue
 index_on_404 = true
-
-# include `assets` in web platform
-[web.resource]
-
-# CSS style file
-style = ["/tailwind.css"]
-
-# Javascript code file
-script = ["/wallet.js"]
-
-[web.resource.dev]
-
-# serve: [dev-server] only
-
-# CSS style file
-# style = []
-
-# Javascript code file
-# script = []

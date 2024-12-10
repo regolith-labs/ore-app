@@ -10,7 +10,7 @@ pub fn use_miner() -> (FromMiner, ToMiner) {
     // from miner receiver
     let from_miner = use_signal_sync(|| "init".to_string());
     // to miner sender
-    let to_miner = use_coroutine(|mut rx| async move {
+    let to_miner = use_coroutine(move |mut rx| async move {
         to_owned![from_miner];
         // build new miner
         let mut spawner = Miner::spawner();

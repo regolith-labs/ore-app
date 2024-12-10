@@ -13,11 +13,11 @@ keywords = ["solana", "crypto", "mining"]
 [features]
 default = ["web"]
 bundle = []
-desktop = ["solana-sdk"]
+desktop = ["solana-sdk", "dioxus-sdk/clipboard"]
 web = [
   "gloo",
   "gloo-storage",
-  "js-sys",
+  "js-sys", 
   "serde-wasm-bindgen",
   "solana-client-wasm",
   "solana-extra-wasm",
@@ -36,9 +36,9 @@ bincode = "1.3.3"
 bs58 = "0.4"
 cached = { version = "0.47.0", features = ["async"] }
 chrono = "0.4.34"
-dioxus = { version = "0.5", features = ["web", "router"] }
-dioxus-sdk = { version = "0.5", features = ["clipboard", "utils"] }
-dioxus-logger = { version = "0.5" }
+dioxus = { version = "0.6", features = ["web", "router"] }
+dioxus-sdk = "0.6"
+dioxus-logger = "0.6"
 drillx = "2.0.0"
 futures = "0.3.30"
 futures-util = "0.3.30"
@@ -106,5 +106,17 @@ features = [
 dioxus = { git = "https://github.com/DioxusLabs/dioxus", rev = "742721bf" }
 solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
 # solana-client-wasm = { version = "1.18", path = "../solana-playground/wasm/solana-client" }
 # solana-extra-wasm = { version = "1.18", path = "../solana-playground/wasm/utils/solana-extra" }

@@ -45,7 +45,7 @@ impl Worker for Miner {
 
 impl Miner {
     pub fn path() -> &'static str {
-        "./miner.js"
+        "./public/miner.js"
     }
 }
 
