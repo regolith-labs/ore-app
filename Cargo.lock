@@ -3850,8 +3850,11 @@ dependencies = [
 name = "ore-miner-web"
 version = "0.1.0"
 dependencies = [
+ "console_error_panic_hook",
  "gloo-worker 0.5.0",
  "log",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wasm-logger",
 ]
 

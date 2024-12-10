@@ -1,4 +1,8 @@
+#[cfg(feature = "worker")]
+use gloo_worker::Registrable;
 use gloo_worker::{Worker, WorkerScope};
+#[cfg(feature = "worker")]
+use wasm_bindgen::prelude::*;
 
 pub struct Miner;
 
@@ -41,6 +45,15 @@ impl Worker for Miner {
 
 impl Miner {
     pub fn path() -> &'static str {
-        "worker/miner.js"
+        "./miner.js"
     }
+}
+
+#[cfg(feature = "worker")]
+#[wasm_bindgen(start)]
+pub async fn register_miner() {
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    wasm_logger::init(wasm_logger::Config::default());
+    log::info!("starting miner");
+    Miner::registrar().register();
 }
