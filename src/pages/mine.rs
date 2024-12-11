@@ -2,12 +2,73 @@ use dioxus::prelude::*;
 
 use crate::{
     components::*,
-    hooks::{Pool, POOLS},
+    hooks::{
+        get_updated_challenge, use_gateway, use_member_db, use_miner, use_updated_challenge,
+        use_wallet, GetPubkey, Pool, POOLS,
+    },
     route::Route,
 };
 
-pub fn Mine() -> Element {
+#[component]
+pub fn Mine(pool_url: String) -> Element {
     let mut is_gold = use_signal(|| false);
+
+    let (from_miner, to_miner) = use_miner();
+
+    let member = use_member_db(pool_url);
+
+    let last_hash_at = use_signal(|| 0);
+
+    let wallet = use_wallet();
+
+    let challenge = use_resource(move || {
+        let gateway = use_gateway();
+        let pool_url = pool_url.clone();
+        let pubkey = wallet.get_pubkey();
+        if let Some(Ok(member)) = *member.read() {
+            if let Ok(pubkey) = pubkey {
+                async move {}
+            }
+        }
+    });
+
+    use_effect(move || {
+        let gateway = use_gateway();
+        let pool_url = pool_url.clone();
+        let pubkey = wallet.get_pubkey();
+        if let Some(Ok(member_read)) = *member.read() {
+            if let Ok(pubkey) = pubkey {
+                async move {
+                    let last_hash_at_read = *last_hash_at.read();
+                    let challenge =
+                        get_updated_challenge(&gateway.http, pool_url, pubkey, last_hash_at_read)
+                            .await;
+                    if let Ok(challenge) = challenge {
+                        to_miner.send(ore_miner_web::InputMessage {
+                            member: member_read,
+                            challenge,
+                            cutoff_time: 0,
+                        })
+                    }
+                };
+            };
+        }
+    });
+
+    use_effect(move || {
+        let from_miner_read = *from_miner.read();
+        if let ore_miner_web::OutputMessage::Solution(solution) = from_miner_read {
+            log::info!("solution received: {:?}", solution);
+        }
+        if let ore_miner_web::OutputMessage::Expired = from_miner_read {}
+    });
+
+    let mut counter = use_signal(|| 0);
+    use_effect(move || {
+        let count = counter.read();
+        let msg = format!("counter: {}", count);
+        to_miner.send(msg);
+    });
 
     rsx! {
         Col {
@@ -24,6 +85,10 @@ pub fn Mine() -> Element {
                 Orb { is_gold: *is_gold.read() }
             }
             Miner { is_gold }
+            button { onclick: move |_| { counter += 1 },
+                "click me"
+            }
+            div { "{from_miner()}" }
         }
     }
 }
