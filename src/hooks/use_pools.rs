@@ -101,6 +101,7 @@ pub async fn get_updated_challenge(
     loop {
         let challenge = get_challenge(http_client, pool_url, miner).await?;
         if challenge.challenge.lash_hash_at == last_hash_at {
+            log::info!("fetch new challenge retry");
             async_std::task::sleep(std::time::Duration::from_secs(1)).await;
         } else {
             return Ok(challenge);
@@ -108,9 +109,9 @@ pub async fn get_updated_challenge(
     }
 }
 
-async fn pool_pool_solution(
+pub async fn post_solution(
     http_client: &reqwest::Client,
-    pool_url: String,
+    pool_url: &str,
     miner: &Pubkey,
     solution: &drillx::Solution,
 ) -> GatewayResult<()> {

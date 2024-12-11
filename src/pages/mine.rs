@@ -3,21 +3,24 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     hooks::{
-        get_updated_challenge, use_gateway, use_member_db, use_miner, use_updated_challenge,
-        use_wallet, GetPubkey, Pool, POOLS,
+        get_updated_challenge, post_solution, use_gateway, use_member_db, use_miner, use_wallet,
+        GetPubkey, Pool, POOLS,
     },
     route::Route,
 };
 
-#[component]
-pub fn Mine(pool_url: String) -> Element {
+pub fn Mine() -> Element {
+    // register with first pool
+    let pool = POOLS.first().unwrap();
+    let pool_url = &pool.url;
+
     let mut is_gold = use_signal(|| false);
 
     let (from_miner, to_miner) = use_miner();
 
-    let member = use_member_db(pool_url);
+    let member = use_member_db(pool_url.clone());
 
-    let last_hash_at = use_signal(|| 0);
+    let mut last_hash_at = use_signal(|| 0);
 
     let wallet = use_wallet();
 
@@ -25,49 +28,42 @@ pub fn Mine(pool_url: String) -> Element {
         let gateway = use_gateway();
         let pool_url = pool_url.clone();
         let pubkey = wallet.get_pubkey();
-        if let Some(Ok(member)) = *member.read() {
-            if let Ok(pubkey) = pubkey {
-                async move {}
-            }
+        let last_hash_at = *last_hash_at.read();
+        async move {
+            let pubkey = pubkey?;
+            get_updated_challenge(&gateway.http, pool_url, pubkey, last_hash_at).await
+        }
+    });
+
+    use_effect(move || {
+        let member = &*member.read();
+        let challenge = &*challenge.read();
+        if let (Some(Ok(member)), Some(Ok(challenge))) = (member, challenge) {
+            to_miner.send(ore_miner_web::InputMessage {
+                member: member.clone(),
+                challenge: *challenge,
+                cutoff_time: 0,
+            });
         }
     });
 
     use_effect(move || {
         let gateway = use_gateway();
-        let pool_url = pool_url.clone();
         let pubkey = wallet.get_pubkey();
-        if let Some(Ok(member_read)) = *member.read() {
-            if let Ok(pubkey) = pubkey {
-                async move {
-                    let last_hash_at_read = *last_hash_at.read();
-                    let challenge =
-                        get_updated_challenge(&gateway.http, pool_url, pubkey, last_hash_at_read)
-                            .await;
-                    if let Ok(challenge) = challenge {
-                        to_miner.send(ore_miner_web::InputMessage {
-                            member: member_read,
-                            challenge,
-                            cutoff_time: 0,
-                        })
-                    }
-                };
-            };
-        }
-    });
-
-    use_effect(move || {
-        let from_miner_read = *from_miner.read();
+        let from_miner_read = &*from_miner.read();
         if let ore_miner_web::OutputMessage::Solution(solution) = from_miner_read {
+            let solution = solution.clone();
             log::info!("solution received: {:?}", solution);
+            if let Ok(pubkey) = pubkey {
+                spawn(async move {
+                    post_solution(&gateway.http, pool_url, &pubkey, &solution).await;
+                });
+            }
         }
-        if let ore_miner_web::OutputMessage::Expired = from_miner_read {}
-    });
-
-    let mut counter = use_signal(|| 0);
-    use_effect(move || {
-        let count = counter.read();
-        let msg = format!("counter: {}", count);
-        to_miner.send(msg);
+        if let ore_miner_web::OutputMessage::Expired(lha) = from_miner_read {
+            log::info!("expired: {}", lha);
+            last_hash_at.set(*lha);
+        }
     });
 
     rsx! {
@@ -84,11 +80,8 @@ pub fn Mine(pool_url: String) -> Element {
                 onclick: move |_| is_gold.set(!is_gold.cloned()),
                 Orb { is_gold: *is_gold.read() }
             }
-            Miner { is_gold }
-            button { onclick: move |_| { counter += 1 },
-                "click me"
-            }
-            div { "{from_miner()}" }
+            Miner { is_gold, pool: pool.clone() }
+            div { "{last_hash_at()}" }
         }
     }
 }

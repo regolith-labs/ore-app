@@ -21,8 +21,9 @@ pub struct InputMessage {
 pub enum OutputMessage {
     Init,
     Solution(drillx::Solution),
-    Expired,
+    Expired(LastHashAt),
 }
+type LastHashAt = i64;
 
 impl Worker for Miner {
     /// Update message type.
@@ -123,7 +124,9 @@ fn mine(
             let time_expired = timer.elapsed().as_secs().ge(&cutoff_time);
             let sufficient = best_difficulty.ge(&challenge.challenge.min_difficulty);
             if time_expired && sufficient {
-                if let Err(err) = sender.unbounded_send(OutputMessage::Expired) {
+                if let Err(err) =
+                    sender.unbounded_send(OutputMessage::Expired(challenge.challenge.lash_hash_at))
+                {
                     log::error!("{:?}", err);
                 }
                 break;
