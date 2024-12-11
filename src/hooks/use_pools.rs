@@ -3,7 +3,9 @@ use std::str::FromStr;
 use dioxus::hooks::use_resource;
 use dioxus::hooks::Resource;
 use once_cell::sync::Lazy;
+use ore_pool_types::ContributePayload;
 use ore_pool_types::Member;
+use ore_pool_types::MemberChallengeV2;
 use ore_pool_types::RegisterPayload;
 use serde::{Deserialize, Deserializer};
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
@@ -87,6 +89,60 @@ pub fn use_register_db(pool_url: String) -> Resource<GatewayResult<Member>> {
             }
         }
     })
+}
+
+pub async fn get_updated_challenge(
+    http_client: &reqwest::Client,
+    pool_url: String,
+    miner: Pubkey,
+    last_hash_at: i64,
+) -> GatewayResult<MemberChallengeV2> {
+    let pool_url = pool_url.as_str();
+    loop {
+        let challenge = get_challenge(http_client, pool_url, miner).await?;
+        if challenge.challenge.lash_hash_at == last_hash_at {
+            async_std::task::sleep(std::time::Duration::from_secs(1)).await;
+        } else {
+            return Ok(challenge);
+        }
+    }
+}
+
+async fn pool_pool_solution(
+    http_client: &reqwest::Client,
+    pool_url: String,
+    miner: &Pubkey,
+    solution: &drillx::Solution,
+) -> GatewayResult<()> {
+    let post_url = format!("{}/contribute", pool_url);
+    let payload = ContributePayload {
+        authority: *miner,
+        solution: *solution,
+    };
+    let resp = http_client.post(post_url).json(&payload).send().await?;
+    match resp.error_for_status() {
+        Err(err) => {
+            log::error!("{:?}", err);
+            Err(err).map_err(From::from)
+        }
+        Ok(_) => Ok(()),
+    }
+}
+
+async fn get_challenge(
+    http_client: &reqwest::Client,
+    pool_url: &str,
+    miner: Pubkey,
+) -> GatewayResult<MemberChallengeV2> {
+    let get_url = format!("{}/challenge/{}", pool_url, miner);
+    let resp = http_client.get(get_url).send().await?;
+    match resp.error_for_status() {
+        Err(err) => {
+            log::error!("{:?}", err);
+            Err(err).map_err(From::from)
+        }
+        Ok(resp) => resp.json::<MemberChallengeV2>().await.map_err(From::from),
+    }
 }
 
 pub fn use_member_db(pool_url: String) -> Resource<GatewayResult<Member>> {
