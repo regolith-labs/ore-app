@@ -57,7 +57,7 @@ ore-miner-web = { path = "./miner", features = [
   "app",
 ], default-features = false }
 ore-pool-api = "0.2.0"
-ore-pool-types = "0.2.2"
+ore-pool-types = { path = "../ore-pool/types" }
 ore-relayer-api = "2.2.0"
 ore-utils = "2.1.8"
 ore-types = "0.0.9"

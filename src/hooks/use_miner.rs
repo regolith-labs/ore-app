@@ -12,12 +12,12 @@ const JS: Asset = asset!(
 );
 const WASM: Asset = asset!("/public/miner_bg.wasm");
 
-type FromMiner = Signal<String>;
-type ToMiner = Coroutine<String>;
+type FromMiner = Signal<ore_miner_web::OutputMessage>;
+type ToMiner = Coroutine<ore_miner_web::InputMessage>;
 /// two way channel between us and miner (web worker)
 pub fn use_miner() -> (FromMiner, ToMiner) {
     // from miner receiver
-    let mut from_miner = use_signal(|| "init".to_string());
+    let mut from_miner = use_signal(|| ore_miner_web::OutputMessage::Init);
     // to miner sender
     let to_miner = use_coroutine(move |mut rx| async move {
         // build new miner
