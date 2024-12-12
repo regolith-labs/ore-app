@@ -8,11 +8,13 @@ use ore_pool_types::Member;
 use ore_pool_types::MemberChallengeV2;
 use ore_pool_types::RegisterPayload;
 use serde::{Deserialize, Deserializer};
+use solana_client_wasm::solana_sdk::clock::Clock;
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 use solana_client_wasm::WasmClient;
 use steel::AccountDeserialize;
 
+use crate::gateway::GatewayError;
 use crate::steel_app::time::Duration;
 use crate::{gateway::GatewayResult, steel_app::solana::sdk::pubkey::Pubkey};
 
@@ -164,6 +166,28 @@ pub fn use_member_db(pool_url: String) -> Resource<GatewayResult<Member>> {
             }
         }
     })
+}
+
+pub async fn get_cutoff(
+    rpc_client: &WasmClient,
+    last_hash_at: i64,
+    buffer_time: i64,
+) -> GatewayResult<i64> {
+    let clock = get_clock(rpc_client).await?;
+    let cutoff = last_hash_at
+        .saturating_add(60)
+        .saturating_sub(buffer_time)
+        .saturating_sub(clock.unix_timestamp)
+        .max(0);
+    Ok(cutoff)
+}
+
+async fn get_clock(rpc_client: &WasmClient) -> GatewayResult<Clock> {
+    let data = rpc_client
+        .get_account_data(&solana_client_wasm::solana_sdk::sysvar::clock::ID)
+        .await?;
+    bincode::deserialize::<Clock>(data.as_slice())
+        .map_err(|_err| GatewayError::FailedDeserialization)
 }
 
 pub fn use_member_onchain(

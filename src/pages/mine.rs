@@ -3,8 +3,8 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     hooks::{
-        get_updated_challenge, post_solution, use_gateway, use_member_db, use_miner, use_wallet,
-        GetPubkey, Pool, POOLS,
+        get_cutoff, get_updated_challenge, post_solution, use_gateway, use_member_db, use_miner,
+        use_wallet, GetPubkey, Pool, POOLS,
     },
     route::Route,
 };
@@ -38,13 +38,25 @@ pub fn Mine() -> Element {
     use_effect(move || {
         let member = &*member.read();
         let challenge = &*challenge.read();
-        if let (Some(Ok(member)), Some(Ok(challenge))) = (member, challenge) {
-            to_miner.send(ore_miner_web::InputMessage {
-                member: member.clone(),
-                challenge: *challenge,
-                cutoff_time: 0,
-            });
-        }
+        async move {
+            if let (Some(Ok(member)), Some(Ok(challenge))) = (member, challenge) {
+                let gateway = use_gateway();
+                let cutoff_time =
+                    get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
+                match cutoff_time {
+                    Ok(cutoff_time) => {
+                        to_miner.send(ore_miner_web::InputMessage {
+                            member: member.clone(),
+                            challenge: *challenge,
+                            cutoff_time: 0,
+                        });
+                    }
+                    Err(err) => {
+                        log::error!("{:?}", err);
+                    }
+                }
+            }
+        };
     });
 
     use_effect(move || {
