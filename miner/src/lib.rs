@@ -1,6 +1,5 @@
 use std::ops::Div;
 
-use futures::StreamExt;
 #[cfg(feature = "worker")]
 use gloo_worker::Registrable;
 use gloo_worker::{Worker, WorkerScope};
@@ -57,18 +56,8 @@ impl Worker for Miner {
         id: gloo_worker::HandlerId,
     ) {
         log::info!("challenge received: {:?}", msg);
-        // continuous submission channel
-        let (tx, mut rx) = futures::channel::mpsc::unbounded::<OutputMessage>();
-        // listen for solutions
-        let scope = scope.clone();
-        wasm_bindgen_futures::spawn_local(async move {
-            while let Some(msg) = rx.next().await {
-                log::info!("{:?}", msg);
-                scope.respond(id, msg)
-            }
-        });
         // mine for solutions
-        if let Err(err) = mine(msg.member, msg.challenge, msg.cutoff_time, tx) {
+        if let Err(err) = mine(msg.member, msg.challenge, msg.cutoff_time, &scope, id) {
             log::error!("{:?}", err);
         }
     }
@@ -97,7 +86,8 @@ fn mine(
     member: ore_pool_types::Member,
     challenge: ore_pool_types::MemberChallengeV2,
     cutoff_time: i64,
-    sender: futures::channel::mpsc::UnboundedSender<OutputMessage>,
+    scope: &WorkerScope<Miner>,
+    id: gloo_worker::HandlerId,
 ) -> Result<(), error::Error> {
     // build nonce indices
     let nonce_index = member.id as u64;
@@ -136,9 +126,7 @@ fn mine(
                         n: nonce,
                     };
                     log::info!("submitting solution to app: {:?}", solution);
-                    if let Err(err) = sender.unbounded_send(OutputMessage::Solution(solution)) {
-                        log::error!("{:?}", err);
-                    }
+                    scope.respond(id, OutputMessage::Solution(solution));
                 }
             }
         }
@@ -148,11 +136,7 @@ fn mine(
             let time_expired = elapsed(t0).ge(&cutoff_time);
             let sufficient = best_difficulty.ge(&challenge.challenge.min_difficulty);
             if time_expired && sufficient {
-                if let Err(err) =
-                    sender.unbounded_send(OutputMessage::Expired(challenge.challenge.lash_hash_at))
-                {
-                    log::error!("{:?}", err);
-                }
+                scope.respond(id, OutputMessage::Expired(challenge.challenge.lash_hash_at));
                 break;
             }
         }
