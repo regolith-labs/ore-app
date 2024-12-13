@@ -135,6 +135,7 @@ fn mine(
                         d: digest,
                         n: nonce,
                     };
+                    log::info!("submitting solution to app: {:?}", solution);
                     if let Err(err) = sender.unbounded_send(OutputMessage::Solution(solution)) {
                         log::error!("{:?}", err);
                     }
@@ -143,6 +144,7 @@ fn mine(
         }
         // exit if time has elapsed
         if nonce % 100 == 0 {
+            log::info!("nonce: {:?}", nonce);
             let time_expired = elapsed(t0).ge(&cutoff_time);
             let sufficient = best_difficulty.ge(&challenge.challenge.min_difficulty);
             if time_expired && sufficient {

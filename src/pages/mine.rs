@@ -38,25 +38,37 @@ pub fn Mine() -> Element {
     use_effect(move || {
         let member = &*member.read();
         let challenge = &*challenge.read();
-        async move {
-            if let (Some(Ok(member)), Some(Ok(challenge))) = (member, challenge) {
-                let gateway = use_gateway();
-                let cutoff_time =
-                    get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
-                match cutoff_time {
-                    Ok(cutoff_time) => {
-                        to_miner.send(ore_miner_web::InputMessage {
-                            member: member.clone(),
-                            challenge: *challenge,
-                            cutoff_time: 0,
-                        });
+        log::info!("member: {:?}", member);
+        log::info!("challenge here: {:?}", challenge);
+        spawn({
+            let member = member.clone();
+            let challenge = challenge.clone();
+            async move {
+                if let (Some(Ok(member)), Some(Ok(challenge))) = (member, challenge) {
+                    let gateway = use_gateway();
+                    let cutoff_time =
+                        get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
+                    match cutoff_time {
+                        Ok(cutoff_time) => {
+                            log::info!(
+                                "sending challenge to miner: {:?}",
+                                challenge.challenge.lash_hash_at
+                            );
+                            to_miner.send(ore_miner_web::InputMessage {
+                                member: member.clone(),
+                                challenge: challenge.clone(),
+                                cutoff_time,
+                            });
+                        }
+                        Err(err) => {
+                            log::error!("{:?}", err);
+                        }
                     }
-                    Err(err) => {
-                        log::error!("{:?}", err);
-                    }
+                } else {
+                    log::info!("not ready yet");
                 }
             }
-        };
+        });
     });
 
     use_effect(move || {

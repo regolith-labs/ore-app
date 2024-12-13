@@ -100,12 +100,14 @@ pub async fn get_updated_challenge(
     last_hash_at: i64,
 ) -> GatewayResult<MemberChallengeV2> {
     let pool_url = pool_url.as_str();
+    log::info!("last hash at: {:?}", last_hash_at);
     loop {
         let challenge = get_challenge(http_client, pool_url, miner).await?;
         if challenge.challenge.lash_hash_at == last_hash_at {
             log::info!("fetch new challenge retry");
             async_std::task::sleep(std::time::Duration::from_secs(1)).await;
         } else {
+            log::info!("challenge: {:?}", challenge);
             return Ok(challenge);
         }
     }

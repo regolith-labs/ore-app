@@ -52,7 +52,6 @@ fn shim_url() -> String {
     )
     .expect("failed to create url for javascript entrypoint")
     .to_string();
-    log::info!("js url: {:?}", js_shim_url);
     // build wasm url
     let wasm_url = Url::new_with_base(
         WASM.resolve().to_string_lossy().as_ref(),
@@ -60,38 +59,15 @@ fn shim_url() -> String {
     )
     .expect("failed to create url for wasm entrypoint")
     .to_string();
-    log::info!("wasm url: {:?}", wasm_url);
     // create bootstrap script
-    let script_content = format!(
-        r#"
-        console.log("fu");
-        import * as initWasm from "{js_shim_url}";
-        console.log(initWasm);
-        // initWasm("{wasm_url}").then((wasm) => {{
-        //     console.log("Wasm loaded:", wasm);
-        // }})
-        // .catch((err) => {{
-        //     console.error("Error loading WASM:", err);
-        // }});
-        "#
-    );
     let array = Array::new();
-    array.push(&script_content.into());
-    // array.push(&format!(r#"importScripts("{js_shim_url}");wasm_bindgen("{wasm_url}");"#).into());
-    // array.push(
-    //     &format!(
-    //         r#"console.log("herern");import initWasm from "{js_shim_url}";initWasm("{wasm_url}");"#
-    //     )
-    //     .into(),
-    // );
+    array.push(&format!(r#"importScripts("{js_shim_url}");wasm_bindgen("{wasm_url}");"#).into());
     let properties = BlobPropertyBag::new();
     properties.set_type("application/javascript");
     // encode as blob
     let blob = Blob::new_with_str_sequence_and_options(&array, &properties)
         .expect("failed to create blob");
-    log::info!("blob: {:?}", blob);
     // serve as url
     let url = Url::create_object_url_with_blob(&blob).expect("failed to create object url");
-    log::info!("url: {:?}", url);
     url
 }
