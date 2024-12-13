@@ -38,13 +38,13 @@ pub fn Mine() -> Element {
     use_effect(move || {
         let member = &*member.read();
         let challenge = &*challenge.read();
-        log::info!("member: {:?}", member);
-        log::info!("challenge here: {:?}", challenge);
+        let is_gold = *is_gold.read();
         spawn({
             let member = member.clone();
             let challenge = challenge.clone();
             async move {
-                if let (Some(Ok(member)), Some(Ok(challenge))) = (member, challenge) {
+                if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_gold)
+                {
                     let gateway = use_gateway();
                     let cutoff_time =
                         get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;

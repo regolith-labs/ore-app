@@ -79,7 +79,9 @@ fn now() -> i64 {
 }
 
 fn elapsed(t0: i64) -> i64 {
-    now() - t0
+    let diff = now() - t0;
+    log::info!("diff: {:?}", diff);
+    diff
 }
 
 fn mine(
@@ -131,11 +133,10 @@ fn mine(
             }
         }
         // exit if time has elapsed
-        if nonce % 100 == 0 {
+        if nonce % 10 == 0 {
             log::info!("nonce: {:?}", nonce);
             let time_expired = elapsed(t0).ge(&cutoff_time);
-            let sufficient = best_difficulty.ge(&challenge.challenge.min_difficulty);
-            if time_expired && sufficient {
+            if time_expired {
                 scope.respond(id, OutputMessage::Expired(challenge.challenge.lash_hash_at));
                 break;
             }
