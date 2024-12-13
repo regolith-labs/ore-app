@@ -16,7 +16,7 @@ pub fn Mine() -> Element {
 
     let mut is_gold = use_signal(|| false);
 
-    let (from_miner, to_miner) = use_miner();
+    let (from_miner, mut to_miner) = use_miner();
 
     let member = use_member_db(pool_url.clone());
 
@@ -24,6 +24,14 @@ pub fn Mine() -> Element {
 
     let wallet = use_wallet();
 
+    // restart miner
+    use_effect(move || {
+        if let true = *is_gold.read() {
+            to_miner.restart();
+        }
+    });
+
+    // next challenge resource
     let challenge = use_resource(move || {
         let gateway = use_gateway();
         let pool_url = pool_url.clone();
@@ -35,6 +43,7 @@ pub fn Mine() -> Element {
         }
     });
 
+    // challenge sender
     use_effect(move || {
         let member = &*member.read();
         let challenge = &*challenge.read();
@@ -71,6 +80,7 @@ pub fn Mine() -> Element {
         });
     });
 
+    // solutions receiver
     use_effect(move || {
         let gateway = use_gateway();
         let pubkey = wallet.get_pubkey();
@@ -86,7 +96,15 @@ pub fn Mine() -> Element {
         }
         if let ore_miner_web::OutputMessage::Expired(lha) = from_miner_read {
             log::info!("expired: {}", lha);
-            last_hash_at.set(*lha);
+            // there may be many workers with the same lha observation
+            // only update on the first expiration
+            let peek = *last_hash_at.peek();
+            if lha > &peek {
+                log::info!("updating lha: {:?}:{:?}", peek, lha);
+                last_hash_at.set(*lha);
+            } else {
+                log::info!("secondary lha: {:?}:{:?}", peek, lha);
+            }
         }
     });
 
