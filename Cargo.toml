@@ -57,7 +57,7 @@ ore-miner-web = { path = "./miner", features = [
   "app",
 ], default-features = false }
 ore-pool-api = "0.2.0"
-ore-pool-types = { path = "../ore-pool/types" }
+ore-pool-types = "0.2.2"
 ore-relayer-api = "2.2.0"
 ore-utils = "2.1.8"
 ore-types = "0.0.9"
@@ -105,6 +105,7 @@ features = [
 ]
 
 [patch.crates-io]
+ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool" }
 solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 

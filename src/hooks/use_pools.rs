@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::hooks::use_resource;
 use dioxus::hooks::Resource;
 use once_cell::sync::Lazy;
-use ore_pool_types::ContributePayload;
+use ore_pool_types::ContributePayloadV2;
 use ore_pool_types::Member;
 use ore_pool_types::MemberChallengeV2;
 use ore_pool_types::RegisterPayload;
@@ -118,7 +118,7 @@ pub async fn post_solution(
     solution: &drillx::Solution,
 ) -> GatewayResult<()> {
     let post_url = format!("{}/contribute", pool_url);
-    let payload = ContributePayload {
+    let payload = ContributePayloadV2 {
         authority: *miner,
         solution: *solution,
     };

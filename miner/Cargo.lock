@@ -1487,7 +1487,8 @@ dependencies = [
 
 [[package]]
 name = "ore-pool-types"
-version = "0.2.0"
+version = "0.2.2"
+source = "git+https://github.com/regolith-labs/ore-pool#2b560dfa946da3167629c644b3992a2436208004"
 dependencies = [
  "drillx",
  "serde",
