@@ -10,18 +10,18 @@ use crate::{
 };
 
 pub fn Mine() -> Element {
+    // on off button
+    let mut is_gold = use_signal(|| false);
     // register with first pool
     let pool = POOLS.first().unwrap();
     let pool_url = &pool.url;
-
-    let mut is_gold = use_signal(|| false);
-
+    // channel to and from miner
     let (from_miner, mut to_miner) = use_miner();
-
+    // pool member account
     let member = use_member_db(pool_url.clone());
-
+    // last challenge timestamp
     let mut last_hash_at = use_signal(|| 0);
-
+    // user wallet
     let wallet = use_wallet();
 
     // restart miner
@@ -45,47 +45,37 @@ pub fn Mine() -> Element {
 
     // challenge sender
     use_effect(move || {
-        let member = &*member.read();
-        let challenge = &*challenge.read();
         let is_gold = *is_gold.read();
-        spawn({
-            let member = member.clone();
-            let challenge = challenge.clone();
-            async move {
-                if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_gold)
-                {
-                    let gateway = use_gateway();
-                    let cutoff_time =
-                        get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
-                    match cutoff_time {
-                        Ok(cutoff_time) => {
-                            log::info!(
-                                "sending challenge to miner: {:?}",
-                                challenge.challenge.lash_hash_at
-                            );
-                            to_miner.send(ore_miner_web::InputMessage {
-                                member: member.clone(),
-                                challenge: challenge.clone(),
-                                cutoff_time,
-                            });
-                        }
-                        Err(err) => {
-                            log::error!("{:?}", err);
-                        }
+        let member = &*member.read();
+        let member = member.clone();
+        let challenge = *challenge.read();
+        if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_gold) {
+            spawn(async move {
+                let gateway = use_gateway();
+                let cutoff_time =
+                    get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
+                match cutoff_time {
+                    Ok(cutoff_time) => {
+                        to_miner.send(ore_miner_web::InputMessage {
+                            member,
+                            challenge,
+                            cutoff_time,
+                        });
                     }
-                } else {
-                    log::info!("not ready yet");
+                    Err(err) => {
+                        log::error!("{:?}", err);
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 
     // solutions receiver
     use_effect(move || {
-        let gateway = use_gateway();
         let pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
         if let ore_miner_web::OutputMessage::Solution(solution) = from_miner_read {
+            let gateway = use_gateway();
             let solution = solution.clone();
             log::info!("solution received: {:?}", solution);
             if let Ok(pubkey) = pubkey {
@@ -102,8 +92,6 @@ pub fn Mine() -> Element {
             if lha > &peek {
                 log::info!("updating lha: {:?}:{:?}", peek, lha);
                 last_hash_at.set(*lha);
-            } else {
-                log::info!("secondary lha: {:?}:{:?}", peek, lha);
             }
         }
     });

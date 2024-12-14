@@ -80,7 +80,6 @@ fn now() -> i64 {
 
 fn elapsed(t0: i64) -> i64 {
     let diff = now() - t0;
-    log::info!("diff: {:?}", diff);
     diff
 }
 
@@ -134,7 +133,7 @@ fn mine(
         }
         // exit if time has elapsed
         if nonce % 10 == 0 {
-            log::info!("nonce: {:?}", nonce);
+            log::info!("mining: {:?}", nonce);
             let time_expired = elapsed(t0).ge(&cutoff_time);
             if time_expired {
                 scope.respond(id, OutputMessage::Expired(challenge.challenge.lash_hash_at));
