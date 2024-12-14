@@ -1,10 +1,12 @@
-use futures::StreamExt;
+use std::ops::Div;
+
 #[cfg(feature = "worker")]
 use gloo_worker::Registrable;
 use gloo_worker::{Worker, WorkerScope};
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "worker")]
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::{JsCast, JsValue};
 
 mod error;
 
@@ -14,15 +16,16 @@ pub struct Miner;
 pub struct InputMessage {
     pub member: ore_pool_types::Member,
     pub challenge: ore_pool_types::MemberChallengeV2,
-    pub cutoff_time: u64,
+    pub cutoff_time: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum OutputMessage {
     Init,
     Solution(drillx::Solution),
-    Expired,
+    Expired(LastHashAt),
 }
+type LastHashAt = i64;
 
 impl Worker for Miner {
     /// Update message type.
@@ -53,28 +56,39 @@ impl Worker for Miner {
         id: gloo_worker::HandlerId,
     ) {
         log::info!("challenge received: {:?}", msg);
-        // continuous submission channel
-        let (tx, mut rx) = futures::channel::mpsc::unbounded::<OutputMessage>();
-        // listen for solutions
-        let scope = scope.clone();
-        wasm_bindgen_futures::spawn_local(async move {
-            while let Some(msg) = rx.next().await {
-                log::info!("{:?}", msg);
-                scope.respond(id, msg)
-            }
-        });
         // mine for solutions
-        if let Err(err) = mine(msg.member, msg.challenge, msg.cutoff_time, tx) {
+        if let Err(err) = mine(msg.member, msg.challenge, msg.cutoff_time, &scope, id) {
             log::error!("{:?}", err);
         }
     }
 }
 
+fn timer() -> web_sys::Performance {
+    let global = js_sys::global();
+    let performance = js_sys::Reflect::get(&global, &JsValue::from_str("performance"))
+        .expect("performance object should exist in a worker")
+        .dyn_into::<web_sys::Performance>()
+        .expect("performance should be a Performance object");
+    performance
+}
+
+fn now() -> i64 {
+    let ms = timer().now();
+    let seconds = ms.div(1000.0);
+    seconds as i64
+}
+
+fn elapsed(t0: i64) -> i64 {
+    let diff = now() - t0;
+    diff
+}
+
 fn mine(
     member: ore_pool_types::Member,
     challenge: ore_pool_types::MemberChallengeV2,
-    cutoff_time: u64,
-    sender: futures::channel::mpsc::UnboundedSender<OutputMessage>,
+    cutoff_time: i64,
+    scope: &WorkerScope<Miner>,
+    id: gloo_worker::HandlerId,
 ) -> Result<(), error::Error> {
     // build nonce indices
     let nonce_index = member.id as u64;
@@ -88,7 +102,7 @@ fn mine(
     let device_id = challenge.device_id.saturating_sub(1) as u64;
     let left_bound = u64_unit.saturating_mul(nonce_index) + device_id.saturating_mul(nonce_unit);
     // start hashing
-    let timer = instant::Instant::now();
+    let t0 = now();
     let mut nonce = left_bound;
     let mut best_difficulty = 0;
     let mut memory = drillx::equix::SolverMemory::new();
@@ -112,20 +126,17 @@ fn mine(
                         d: digest,
                         n: nonce,
                     };
-                    if let Err(err) = sender.unbounded_send(OutputMessage::Solution(solution)) {
-                        log::error!("{:?}", err);
-                    }
+                    log::info!("submitting solution to app: {:?}", solution);
+                    scope.respond(id, OutputMessage::Solution(solution));
                 }
             }
         }
         // exit if time has elapsed
-        if nonce % 100 == 0 {
-            let time_expired = timer.elapsed().as_secs().ge(&cutoff_time);
-            let sufficient = best_difficulty.ge(&challenge.challenge.min_difficulty);
-            if time_expired && sufficient {
-                if let Err(err) = sender.unbounded_send(OutputMessage::Expired) {
-                    log::error!("{:?}", err);
-                }
+        if nonce % 10 == 0 {
+            log::info!("mining: {:?}", nonce);
+            let time_expired = elapsed(t0).ge(&cutoff_time);
+            if time_expired {
+                scope.respond(id, OutputMessage::Expired(challenge.challenge.lash_hash_at));
                 break;
             }
         }

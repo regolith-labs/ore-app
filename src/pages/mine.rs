@@ -3,71 +3,107 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     hooks::{
-        get_updated_challenge, use_gateway, use_member_db, use_miner, use_updated_challenge,
+        get_cutoff, get_updated_challenge, post_solution, use_gateway, use_member_db, use_miner,
         use_wallet, GetPubkey, Pool, POOLS,
     },
     route::Route,
 };
 
-#[component]
-pub fn Mine(pool_url: String) -> Element {
+pub fn Mine() -> Element {
+    // on off button
     let mut is_gold = use_signal(|| false);
-
-    let (from_miner, to_miner) = use_miner();
-
-    let member = use_member_db(pool_url);
-
-    let last_hash_at = use_signal(|| 0);
-
+    // register with first pool
+    let pool = POOLS.first().unwrap();
+    let pool_url = &pool.url;
+    // channel to and from miner
+    let (from_miner, mut to_miner) = use_miner();
+    // pool member account
+    let member = use_member_db(pool_url.clone());
+    // last challenge timestamp
+    let mut last_hash_at = use_signal(|| 0);
+    // user wallet
     let wallet = use_wallet();
 
+    // restart miner
+    use_effect(move || {
+        if let true = *is_gold.read() {
+            to_miner.restart();
+        }
+    });
+
+    // next challenge resource
     let challenge = use_resource(move || {
         let gateway = use_gateway();
         let pool_url = pool_url.clone();
-        let pubkey = wallet.get_pubkey();
-        if let Some(Ok(member)) = *member.read() {
-            if let Ok(pubkey) = pubkey {
-                async move {}
+        let member = &*member.read();
+        let member = member.clone();
+        let last_hash_at = *last_hash_at.read();
+        async move {
+            if let Some(Ok(member)) = member {
+                get_updated_challenge(
+                    &gateway.http,
+                    pool_url.as_str(),
+                    member.authority.as_str(),
+                    last_hash_at,
+                )
+                .await
+            } else {
+                Err(crate::gateway::GatewayError::AccountNotFound)
             }
         }
     });
 
+    // challenge sender
     use_effect(move || {
-        let gateway = use_gateway();
-        let pool_url = pool_url.clone();
-        let pubkey = wallet.get_pubkey();
-        if let Some(Ok(member_read)) = *member.read() {
-            if let Ok(pubkey) = pubkey {
-                async move {
-                    let last_hash_at_read = *last_hash_at.read();
-                    let challenge =
-                        get_updated_challenge(&gateway.http, pool_url, pubkey, last_hash_at_read)
-                            .await;
-                    if let Ok(challenge) = challenge {
+        let is_gold = *is_gold.read();
+        let member = &*member.read();
+        let member = member.clone();
+        let challenge = *challenge.read();
+        if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_gold) {
+            spawn(async move {
+                let gateway = use_gateway();
+                let cutoff_time =
+                    get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
+                match cutoff_time {
+                    Ok(cutoff_time) => {
                         to_miner.send(ore_miner_web::InputMessage {
-                            member: member_read,
+                            member,
                             challenge,
-                            cutoff_time: 0,
-                        })
+                            cutoff_time,
+                        });
                     }
-                };
-            };
+                    Err(err) => {
+                        log::error!("{:?}", err);
+                    }
+                }
+            });
         }
     });
 
+    // solutions receiver
     use_effect(move || {
-        let from_miner_read = *from_miner.read();
+        let pubkey = wallet.get_pubkey();
+        let from_miner_read = &*from_miner.read();
         if let ore_miner_web::OutputMessage::Solution(solution) = from_miner_read {
+            let gateway = use_gateway();
+            let solution = solution.clone();
             log::info!("solution received: {:?}", solution);
+            if let Ok(pubkey) = pubkey {
+                spawn(async move {
+                    post_solution(&gateway.http, pool_url, &pubkey, &solution).await;
+                });
+            }
         }
-        if let ore_miner_web::OutputMessage::Expired = from_miner_read {}
-    });
-
-    let mut counter = use_signal(|| 0);
-    use_effect(move || {
-        let count = counter.read();
-        let msg = format!("counter: {}", count);
-        to_miner.send(msg);
+        if let ore_miner_web::OutputMessage::Expired(lha) = from_miner_read {
+            log::info!("expired: {}", lha);
+            // there may be many workers with the same lha observation
+            // only update on the first expiration
+            let peek = *last_hash_at.peek();
+            if lha > &peek {
+                log::info!("updating lha: {:?}:{:?}", peek, lha);
+                last_hash_at.set(*lha);
+            }
+        }
     });
 
     rsx! {
@@ -84,11 +120,8 @@ pub fn Mine(pool_url: String) -> Element {
                 onclick: move |_| is_gold.set(!is_gold.cloned()),
                 Orb { is_gold: *is_gold.read() }
             }
-            Miner { is_gold }
-            button { onclick: move |_| { counter += 1 },
-                "click me"
-            }
-            div { "{from_miner()}" }
+            Miner { is_gold, member_db: member,pool: pool.clone() }
+            div { "{last_hash_at()}" }
         }
     }
 }

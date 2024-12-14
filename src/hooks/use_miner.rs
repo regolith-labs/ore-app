@@ -65,8 +65,9 @@ fn shim_url() -> String {
     let properties = BlobPropertyBag::new();
     properties.set_type("application/javascript");
     // encode as blob
-    let blob = Blob::new_with_str_sequence_and_options(&array, &properties).unwrap();
+    let blob = Blob::new_with_str_sequence_and_options(&array, &properties)
+        .expect("failed to create blob");
     // serve as url
-    let url = Url::create_object_url_with_blob(&blob).unwrap();
+    let url = Url::create_object_url_with_blob(&blob).expect("failed to create object url");
     url
 }

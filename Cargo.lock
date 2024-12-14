@@ -2736,10 +2736,11 @@ dependencies = [
 
 [[package]]
 name = "js-sys"
-version = "0.3.72"
+version = "0.3.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a88f1bda2bd75b0452a14784937d796722fdebfe50df998aeb3f0b7603019a9"
+checksum = "6717b6b5b077764fb5966237269cb3c64edddde4b14ce42647430a78ced9e7b7"
 dependencies = [
+ "once_cell",
  "wasm-bindgen",
 ]
 
@@ -3391,18 +3392,17 @@ version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "drillx",
- "futures",
  "gloo-worker",
- "instant",
+ "js-sys",
  "log",
  "ore-pool-api",
  "ore-pool-types",
- "reqwest",
  "serde",
  "serde-wasm-bindgen 0.6.5",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",
+ "web-sys",
 ]
 
 [[package]]
@@ -3429,7 +3429,8 @@ dependencies = [
 
 [[package]]
 name = "ore-pool-types"
-version = "0.2.0"
+version = "0.2.2"
+source = "git+https://github.com/regolith-labs/ore-pool#2b560dfa946da3167629c644b3992a2436208004"
 dependencies = [
  "drillx",
  "serde",

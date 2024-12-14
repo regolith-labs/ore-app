@@ -3,16 +3,18 @@ use std::str::FromStr;
 use dioxus::hooks::use_resource;
 use dioxus::hooks::Resource;
 use once_cell::sync::Lazy;
-use ore_pool_types::ContributePayload;
+use ore_pool_types::ContributePayloadV2;
 use ore_pool_types::Member;
 use ore_pool_types::MemberChallengeV2;
 use ore_pool_types::RegisterPayload;
 use serde::{Deserialize, Deserializer};
+use solana_client_wasm::solana_sdk::clock::Clock;
 use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_client_wasm::solana_sdk::transaction::Transaction;
 use solana_client_wasm::WasmClient;
 use steel::AccountDeserialize;
 
+use crate::gateway::GatewayError;
 use crate::steel_app::time::Duration;
 use crate::{gateway::GatewayResult, steel_app::solana::sdk::pubkey::Pubkey};
 
@@ -93,29 +95,30 @@ pub fn use_register_db(pool_url: String) -> Resource<GatewayResult<Member>> {
 
 pub async fn get_updated_challenge(
     http_client: &reqwest::Client,
-    pool_url: String,
-    miner: Pubkey,
+    pool_url: &str,
+    miner: &str,
     last_hash_at: i64,
 ) -> GatewayResult<MemberChallengeV2> {
-    let pool_url = pool_url.as_str();
     loop {
         let challenge = get_challenge(http_client, pool_url, miner).await?;
         if challenge.challenge.lash_hash_at == last_hash_at {
+            log::info!("fetch new challenge retry");
             async_std::task::sleep(std::time::Duration::from_secs(1)).await;
         } else {
+            log::info!("challenge: {:?}", challenge);
             return Ok(challenge);
         }
     }
 }
 
-async fn pool_pool_solution(
+pub async fn post_solution(
     http_client: &reqwest::Client,
-    pool_url: String,
+    pool_url: &str,
     miner: &Pubkey,
     solution: &drillx::Solution,
 ) -> GatewayResult<()> {
     let post_url = format!("{}/contribute", pool_url);
-    let payload = ContributePayload {
+    let payload = ContributePayloadV2 {
         authority: *miner,
         solution: *solution,
     };
@@ -132,7 +135,7 @@ async fn pool_pool_solution(
 async fn get_challenge(
     http_client: &reqwest::Client,
     pool_url: &str,
-    miner: Pubkey,
+    miner: &str,
 ) -> GatewayResult<MemberChallengeV2> {
     let get_url = format!("{}/challenge/{}", pool_url, miner);
     let resp = http_client.get(get_url).send().await?;
@@ -165,6 +168,28 @@ pub fn use_member_db(pool_url: String) -> Resource<GatewayResult<Member>> {
     })
 }
 
+pub async fn get_cutoff(
+    rpc_client: &WasmClient,
+    last_hash_at: i64,
+    buffer_time: i64,
+) -> GatewayResult<i64> {
+    let clock = get_clock(rpc_client).await?;
+    let cutoff = last_hash_at
+        .saturating_add(60)
+        .saturating_sub(buffer_time)
+        .saturating_sub(clock.unix_timestamp)
+        .max(0);
+    Ok(cutoff)
+}
+
+async fn get_clock(rpc_client: &WasmClient) -> GatewayResult<Clock> {
+    let data = rpc_client
+        .get_account_data(&solana_client_wasm::solana_sdk::sysvar::clock::ID)
+        .await?;
+    bincode::deserialize::<Clock>(data.as_slice())
+        .map_err(|_err| GatewayError::FailedDeserialization)
+}
+
 pub fn use_member_onchain(
     pool_address: Pubkey,
 ) -> Resource<GatewayResult<ore_pool_api::state::Member>> {
@@ -174,17 +199,17 @@ pub fn use_member_onchain(
         async move {
             async_std::task::sleep(Duration::from_millis(5_000)).await;
             let pubkey = wallet.get_pubkey()?;
-            get_member_onchain(&gateway.rpc, pool_address, pubkey).await
+            get_member_onchain(&gateway.rpc, &pool_address, &pubkey).await
         }
     })
 }
 
 async fn get_member_onchain(
     rpc_client: &WasmClient,
-    pool_address: Pubkey,
-    miner: Pubkey,
+    pool_address: &Pubkey,
+    miner: &Pubkey,
 ) -> GatewayResult<ore_pool_api::state::Member> {
-    let (member_pda, _) = ore_pool_api::state::member_pda(miner, pool_address);
+    let (member_pda, _) = ore_pool_api::state::member_pda(*miner, *pool_address);
     let data = rpc_client.get_account_data(&member_pda).await?;
     let member = ore_pool_api::state::Member::try_from_bytes(data.as_slice())?;
     Ok(*member)
