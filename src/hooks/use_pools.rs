@@ -199,17 +199,17 @@ pub fn use_member_onchain(
         async move {
             async_std::task::sleep(Duration::from_millis(5_000)).await;
             let pubkey = wallet.get_pubkey()?;
-            get_member_onchain(&gateway.rpc, pool_address, pubkey).await
+            get_member_onchain(&gateway.rpc, &pool_address, &pubkey).await
         }
     })
 }
 
 async fn get_member_onchain(
     rpc_client: &WasmClient,
-    pool_address: Pubkey,
-    miner: Pubkey,
+    pool_address: &Pubkey,
+    miner: &Pubkey,
 ) -> GatewayResult<ore_pool_api::state::Member> {
-    let (member_pda, _) = ore_pool_api::state::member_pda(miner, pool_address);
+    let (member_pda, _) = ore_pool_api::state::member_pda(*miner, *pool_address);
     let data = rpc_client.get_account_data(&member_pda).await?;
     let member = ore_pool_api::state::Member::try_from_bytes(data.as_slice())?;
     Ok(*member)
