@@ -1,16 +1,23 @@
 use dioxus::prelude::*;
+use ore_pool_types::Member;
 
-use crate::hooks::{
-    use_member_db, use_member_onchain, use_register_db, use_register_onchain, use_wallet, Pool,
-    Wallet, POOLS,
+use crate::{
+    gateway::GatewayResult,
+    hooks::{
+        use_member_db, use_member_onchain, use_register_db, use_register_onchain, use_wallet, Pool,
+        Wallet,
+    },
 };
 
 use super::{invoke_signature, InvokeSignatureStatus};
 
 #[component]
-pub fn Miner(is_gold: Signal<bool>, pool: Pool) -> Element {
+pub fn Miner(
+    is_gold: Signal<bool>,
+    member_db: Resource<GatewayResult<Member>>,
+    pool: Pool,
+) -> Element {
     // pool resources
-    let mut member_db = use_member_db(pool.url.clone());
     let mut member_onchain = use_member_onchain(pool.address);
     let mut register_db = use_register_db(pool.url.clone());
     let register_onchain = use_register_onchain(pool.address);

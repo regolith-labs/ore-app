@@ -95,12 +95,10 @@ pub fn use_register_db(pool_url: String) -> Resource<GatewayResult<Member>> {
 
 pub async fn get_updated_challenge(
     http_client: &reqwest::Client,
-    pool_url: String,
-    miner: Pubkey,
+    pool_url: &str,
+    miner: &str,
     last_hash_at: i64,
 ) -> GatewayResult<MemberChallengeV2> {
-    let pool_url = pool_url.as_str();
-    log::info!("last hash at: {:?}", last_hash_at);
     loop {
         let challenge = get_challenge(http_client, pool_url, miner).await?;
         if challenge.challenge.lash_hash_at == last_hash_at {
@@ -137,7 +135,7 @@ pub async fn post_solution(
 async fn get_challenge(
     http_client: &reqwest::Client,
     pool_url: &str,
-    miner: Pubkey,
+    miner: &str,
 ) -> GatewayResult<MemberChallengeV2> {
     let get_url = format!("{}/challenge/{}", pool_url, miner);
     let resp = http_client.get(get_url).send().await?;

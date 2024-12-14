@@ -35,11 +35,21 @@ pub fn Mine() -> Element {
     let challenge = use_resource(move || {
         let gateway = use_gateway();
         let pool_url = pool_url.clone();
-        let pubkey = wallet.get_pubkey();
+        let member = &*member.read();
+        let member = member.clone();
         let last_hash_at = *last_hash_at.read();
         async move {
-            let pubkey = pubkey?;
-            get_updated_challenge(&gateway.http, pool_url, pubkey, last_hash_at).await
+            if let Some(Ok(member)) = member {
+                get_updated_challenge(
+                    &gateway.http,
+                    pool_url.as_str(),
+                    member.authority.as_str(),
+                    last_hash_at,
+                )
+                .await
+            } else {
+                Err(crate::gateway::GatewayError::AccountNotFound)
+            }
         }
     });
 
@@ -110,7 +120,7 @@ pub fn Mine() -> Element {
                 onclick: move |_| is_gold.set(!is_gold.cloned()),
                 Orb { is_gold: *is_gold.read() }
             }
-            Miner { is_gold, pool: pool.clone() }
+            Miner { is_gold, member_db: member,pool: pool.clone() }
             div { "{last_hash_at()}" }
         }
     }
