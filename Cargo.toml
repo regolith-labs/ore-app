@@ -46,6 +46,8 @@ gloo = { version = "0.11.0", optional = true }
 gloo-storage = { version = "0.3.0", optional = true }
 is-url = { version = "1.0.4" }
 js-sys = { version = "0.3.67", optional = true }
+jupiter-swap-api-client = { git = "https://github.com/regolith-labs/jupiter-swap-api-client", package = "jupiter-swap-api-client", rev = "5267615" }
+# jupiter-swap-api-client = { path = "../jupiter-swap-api-client/jupiter-swap-api-client" }
 lazy_static = "1.4"
 log = "0.4.20"
 num-format = "0.4.4"
