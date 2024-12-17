@@ -1,8 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{
-    components::*,  steel_app::solana::sdk::pubkey::Pubkey
-};
+use crate::{components::*, steel_app::solana::sdk::pubkey::Pubkey};
 
 pub fn Trade() -> Element {
     rsx! {
@@ -16,8 +14,6 @@ pub fn Trade() -> Element {
             }
             SwapForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                mint_a: Pubkey::new_unique(),
-                mint_b: Pubkey::new_unique(),
             }
         }
     }
