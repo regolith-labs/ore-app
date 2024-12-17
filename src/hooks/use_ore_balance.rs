@@ -31,34 +31,44 @@ pub fn use_quote(mint: Pubkey) -> Resource<GatewayResult<u64>> {
 }
 
 pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
+    log::info!("mint: {:?}", mint);
     let wallet_status = use_wallet();
     use_resource(move || async move {
         match *wallet_status.read() {
-            Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+            Wallet::Disconnected => {
+                log::info!("disconnected");
+                Err(GatewayError::AccountNotFound.into())
+            }
             Wallet::Connected(pubkey) => {
-                if mint == Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap()
-                {
-                    use_gateway()
-                        .rpc
-                        .get_balance(&pubkey)
-                        .await
-                        .map(|lamports| {
-                            let sol = lamports_to_sol(lamports);
-                            UiTokenAmount {
-                                ui_amount: Some(sol),
-                                decimals: 8,
-                                amount: format!("{}", lamports).to_owned(),
-                                ui_amount_string: format!("{}", sol).to_owned(),
-                            }
-                        })
-                        .map_err(GatewayError::from)
-                } else {
-                    use_gateway()
-                        .get_token_balance(&pubkey, &mint)
-                        .await
-                        .map_err(GatewayError::from)
-                }
+                log::info!("connected");
+                get_token_balance(pubkey, mint).await
             }
         }
     })
+}
+
+pub async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiTokenAmount> {
+    if mint == Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap() {
+        log::info!("native");
+        use_gateway()
+            .rpc
+            .get_balance(&pubkey)
+            .await
+            .map(|lamports| {
+                let sol = lamports_to_sol(lamports);
+                UiTokenAmount {
+                    ui_amount: Some(sol),
+                    decimals: 8,
+                    amount: format!("{}", lamports).to_owned(),
+                    ui_amount_string: format!("{}", sol).to_owned(),
+                }
+            })
+            .map_err(GatewayError::from)
+    } else {
+        log::info!("spl");
+        use_gateway()
+            .get_token_balance(&pubkey, &mint)
+            .await
+            .map_err(GatewayError::from)
+    }
 }

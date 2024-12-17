@@ -3,7 +3,7 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{Col, Row, SwitchIcon},
-    hooks::{use_token_balance, Asset, ASSETS},
+    hooks::{get_token_balance, use_token_balance, use_wallet, Asset, GetPubkey, ASSETS},
 };
 
 #[component]
@@ -48,14 +48,12 @@ pub fn SwapForm(class: Option<String>) -> Element {
             Col { class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
                 if *tokens_swapped.read() {
                     SwapInput {
-                        mint: token_b.read().mint,
                         mode: SwapInputMode::Buy,
                         input_amount: sell_input_amount,
                         show_selector: show_token_selector_b,
                         selected_token: token_b,
                     }
                     SwapInput {
-                        mint: token_a.read().mint,
                         mode: SwapInputMode::Sell,
                         input_amount: buy_input_amount,
                         show_selector: show_token_selector_a,
@@ -63,14 +61,12 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     }
                 } else {
                     SwapInput {
-                        mint: token_a.read().mint,
                         mode: SwapInputMode::Buy,
                         input_amount: buy_input_amount,
                         show_selector: show_token_selector_a,
                         selected_token: token_a,
                     }
                     SwapInput {
-                        mint: token_b.read().mint,
                         mode: SwapInputMode::Sell,
                         input_amount: sell_input_amount,
                         show_selector: show_token_selector_b,
@@ -253,7 +249,6 @@ enum SwapInputMode {
 
 #[component]
 fn SwapInput(
-    mint: Pubkey,
     mode: SwapInputMode,
     input_amount: Signal<String>,
     show_selector: Signal<bool>,
@@ -270,7 +265,13 @@ fn SwapInput(
 
     let display_token = selected_token.read().ticker.to_string();
     let image = ASSETS.get(&display_token).map(|asset| asset.image.clone());
-    let balance = use_token_balance(mint);
+    // let balance = use_token_balance(mint);
+    let wallet = use_wallet();
+    let balance = use_resource(move || async move {
+        let wallet = wallet.get_pubkey()?;
+        let asset = selected_token.read();
+        get_token_balance(wallet, asset.mint).await
+    });
 
     rsx! {
         Col { class: "w-full p-4 {border}", gap: 2,
@@ -281,7 +282,10 @@ fn SwapInput(
                     onclick: move |_| {
                         if let SwapInputMode::Sell = mode {
                             if let Some(Ok(balance)) = balance.read().as_ref() {
+                                log::info!("balance: ok {:?}", balance);
                                 input_amount.set(balance.ui_amount.unwrap_or(0.0).to_string());
+                            } else {
+                                log::info!("balance: {:?}", balance);
                             }
                         }
                     },
