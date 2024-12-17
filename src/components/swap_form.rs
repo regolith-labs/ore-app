@@ -46,19 +46,36 @@ pub fn SwapForm(class: Option<String>) -> Element {
     rsx! {
         Col { class: "w-full {class}", gap: 4,
             Col { class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
-                SwapInput {
-                    mint: token_a.read().mint,
-                    mode: SwapInputMode::Buy,
-                    input_amount: buy_input_amount,
-                    show_selector: show_token_selector_a,
-                    selected_token: token_a,
-                }
-                SwapInput {
-                    mint: token_b.read().mint,
-                    mode: SwapInputMode::Sell,
-                    input_amount: sell_input_amount,
-                    show_selector: show_token_selector_b,
-                    selected_token: token_b,
+                if *tokens_swapped.read() {
+                    SwapInput {
+                        mint: token_b.read().mint,
+                        mode: SwapInputMode::Buy,
+                        input_amount: sell_input_amount,
+                        show_selector: show_token_selector_b,
+                        selected_token: token_b,
+                    }
+                    SwapInput {
+                        mint: token_a.read().mint,
+                        mode: SwapInputMode::Sell,
+                        input_amount: buy_input_amount,
+                        show_selector: show_token_selector_a,
+                        selected_token: token_a,
+                    }
+                } else {
+                    SwapInput {
+                        mint: token_a.read().mint,
+                        mode: SwapInputMode::Buy,
+                        input_amount: buy_input_amount,
+                        show_selector: show_token_selector_a,
+                        selected_token: token_a,
+                    }
+                    SwapInput {
+                        mint: token_b.read().mint,
+                        mode: SwapInputMode::Sell,
+                        input_amount: sell_input_amount,
+                        show_selector: show_token_selector_b,
+                        selected_token: token_b,
+                    }
                 }
                 SwitchButton { tokens_swapped, token_a, token_b }
             }
