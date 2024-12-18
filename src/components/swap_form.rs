@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_sdk::utils::timing::{use_debounce, UseDebounce};
 
 use crate::{
     components::{Col, Row, SwitchIcon},
@@ -9,8 +10,8 @@ use crate::{
 pub fn SwapForm(class: Option<String>) -> Element {
     let class = class.unwrap_or_default();
     // inputs
-    let sell_input_amount = use_signal::<String>(|| "".to_owned());
-    let buy_input_amount = use_signal::<String>(|| "".to_owned());
+    let mut sell_input_amount = use_signal::<String>(|| "".to_owned());
+    let mut buy_input_amount = use_signal::<String>(|| "".to_owned());
     // enabled
     let mut enabled = use_signal(|| false);
     // show tokens
@@ -19,6 +20,26 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // tokens
     let token_a = use_signal(|| Asset::ore());
     let token_b = use_signal(|| Asset::first());
+
+    // quotes
+    let sell_quote_debounce =
+        use_debounce::<String>(std::time::Duration::from_secs(5), move |str| {
+            let s = format!("{}9", str);
+            spawn({
+                async move {
+                    sell_input_amount.set(s.clone());
+                }
+            });
+        });
+    let buy_quote_debounce =
+        use_debounce::<String>(std::time::Duration::from_secs(5), move |str| {
+            let s = format!("{}9", str);
+            spawn({
+                async move {
+                    buy_input_amount.set(s.clone());
+                }
+            });
+        });
 
     use_effect(move || {
         let amount_str = sell_input_amount.cloned();
@@ -48,12 +69,14 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     input_amount: buy_input_amount,
                     show_selector: show_token_selector_a,
                     selected_token: token_a,
+                    quote_debounce: buy_quote_debounce,
                 }
                 SwapInput {
                     mode: SwapInputMode::Sell,
                     input_amount: sell_input_amount,
                     show_selector: show_token_selector_b,
                     selected_token: token_b,
+                    quote_debounce: sell_quote_debounce,
                 }
                 SwitchButton {
                     token_a,
@@ -237,6 +260,7 @@ fn SwapInput(
     input_amount: Signal<String>,
     show_selector: Signal<bool>,
     selected_token: Signal<Asset>,
+    quote_debounce: UseDebounce<String>,
 ) -> Element {
     let border = match mode {
         SwapInputMode::Buy => "border-b border-gray-800",
@@ -309,11 +333,12 @@ fn SwapInput(
                         let s = e.value();
                         if s.len().eq(&0) || s.parse::<f64>().is_ok() {
                             log::info!("Ok... {s}");
-                            input_amount.set(s);
+                            quote_debounce.action(s);
                         } else {
                             let x = s[..s.len() - 1].to_string();
                             log::info!("Not ok... {s} yep {x}");
-                            input_amount.set(s[..s.len() - 1].to_string());
+                            let s = s[..s.len() - 1].to_string();
+                            quote_debounce.action(s);
                         }
                     },
                 }

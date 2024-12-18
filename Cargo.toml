@@ -37,7 +37,7 @@ bs58 = "0.4"
 cached = { version = "0.47.0", features = ["async"] }
 chrono = "0.4.34"
 dioxus = { version = "0.6", features = ["web", "router"] }
-dioxus-sdk = "0.6"
+dioxus-sdk = { version = "0.6", features = ["timing"] }
 dioxus-logger = "0.6"
 drillx = "2.0.0"
 futures = "0.3.30"
