@@ -1,9 +1,8 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{Col, Row, SwitchIcon},
-    hooks::{get_token_balance, use_token_balance, use_wallet, Asset, GetPubkey, ASSETS},
+    hooks::{get_token_balance, use_wallet, Asset, GetPubkey, ASSETS},
 };
 
 #[component]
@@ -20,8 +19,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // tokens
     let token_a = use_signal(|| Asset::ore());
     let token_b = use_signal(|| Asset::first());
-    // swapped
-    let tokens_swapped = use_signal(|| false);
 
     use_effect(move || {
         let amount_str = sell_input_amount.cloned();
@@ -46,36 +43,26 @@ pub fn SwapForm(class: Option<String>) -> Element {
     rsx! {
         Col { class: "w-full {class}", gap: 4,
             Col { class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
-                if *tokens_swapped.read() {
-                    SwapInput {
-                        mode: SwapInputMode::Buy,
-                        input_amount: sell_input_amount,
-                        show_selector: show_token_selector_b,
-                        selected_token: token_b,
-                    }
-                    SwapInput {
-                        mode: SwapInputMode::Sell,
-                        input_amount: buy_input_amount,
-                        show_selector: show_token_selector_a,
-                        selected_token: token_a,
-                    }
-                } else {
-                    SwapInput {
-                        mode: SwapInputMode::Buy,
-                        input_amount: buy_input_amount,
-                        show_selector: show_token_selector_a,
-                        selected_token: token_a,
-                    }
-                    SwapInput {
-                        mode: SwapInputMode::Sell,
-                        input_amount: sell_input_amount,
-                        show_selector: show_token_selector_b,
-                        selected_token: token_b,
-                    }
+                SwapInput {
+                    mode: SwapInputMode::Buy,
+                    input_amount: buy_input_amount,
+                    show_selector: show_token_selector_a,
+                    selected_token: token_a,
                 }
-                SwitchButton { tokens_swapped, token_a, token_b }
+                SwapInput {
+                    mode: SwapInputMode::Sell,
+                    input_amount: sell_input_amount,
+                    show_selector: show_token_selector_b,
+                    selected_token: token_b,
+                }
+                SwitchButton {
+                    token_a,
+                    token_b,
+                    input_amount_a: buy_input_amount,
+                    input_amount_b: sell_input_amount,
+                }
             }
-            SwapDetails { token_a, token_b, tokens_swapped }
+            SwapDetails { token_a, token_b }
             SwapButton { enabled }
             // Token selector popups
             if *show_token_selector_a.read() {
@@ -168,22 +155,11 @@ fn TokenPicker(
 }
 
 #[component]
-fn SwapDetails(
-    token_a: Signal<Asset>,
-    token_b: Signal<Asset>,
-    tokens_swapped: Signal<bool>,
-) -> Element {
-    let (from_token, to_token) = if tokens_swapped.cloned() {
-        (
-            token_b.read().ticker.to_string(),
-            token_a.read().ticker.to_string(),
-        )
-    } else {
-        (
-            token_a.read().ticker.to_string(),
-            token_b.read().ticker.to_string(),
-        )
-    };
+fn SwapDetails(token_a: Signal<Asset>, token_b: Signal<Asset>) -> Element {
+    let (from_token, to_token) = (
+        token_a.read().ticker.to_string(),
+        token_b.read().ticker.to_string(),
+    );
 
     rsx! {
         Col { class: "px-1", gap: 3,
@@ -226,15 +202,23 @@ fn SwapButton(enabled: Signal<bool>) -> Element {
 
 #[component]
 fn SwitchButton(
-    tokens_swapped: Signal<bool>,
-    token_a: Signal<Asset>,
-    token_b: Signal<Asset>,
+    mut token_a: Signal<Asset>,
+    mut token_b: Signal<Asset>,
+    input_amount_a: Signal<String>,
+    input_amount_b: Signal<String>,
 ) -> Element {
     rsx! {
         button {
             class: "absolute w-12 h-8 -mt-4 inset-y-1/2 -ml-4 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
             onclick: move |_| {
-                tokens_swapped.set(!tokens_swapped.cloned());
+                let token_a_peek = token_a.clone();
+                let token_a_peek = token_a_peek.peek().clone();
+                let token_b_peek = token_b.clone();
+                let token_b_peek = token_b_peek.peek().clone();
+                token_a.set(token_b_peek);
+                token_b.set(token_a_peek);
+                input_amount_a.set("0.0".to_string());
+                input_amount_b.set("0.0".to_string());
             },
             SwitchIcon { class: "h-4 mx-auto" }
         }
@@ -277,19 +261,19 @@ fn SwapInput(
         Col { class: "w-full p-4 {border}", gap: 2,
             Row { class: "justify-between",
                 span { class: "text-elements-midEmphasis my-auto pl-1", "{title}" }
-                button {
-                    class: "text-xs my-auto py-1 px-3 rounded-full bg-gray-800",
-                    onclick: move |_| {
-                        if let SwapInputMode::Sell = mode {
+                if let SwapInputMode::Sell = mode {
+                    button {
+                        class: "text-xs my-auto py-1 px-3 rounded-full bg-gray-800",
+                        onclick: move |_| {
                             if let Some(Ok(balance)) = balance.read().as_ref() {
                                 log::info!("balance: ok {:?}", balance);
                                 input_amount.set(balance.ui_amount.unwrap_or(0.0).to_string());
                             } else {
                                 log::info!("balance: {:?}", balance);
                             }
-                        }
-                    },
-                    "Max"
+                        },
+                        "Max"
+                    }
                 }
             }
             Row { gap: 4,
