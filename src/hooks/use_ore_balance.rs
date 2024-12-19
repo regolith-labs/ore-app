@@ -21,15 +21,6 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     })
 }
 
-pub fn use_quote(mint: Pubkey) -> Resource<GatewayResult<u64>> {
-    use_resource(move || async move {
-        use_gateway()
-            .get_quote(&mint)
-            .await
-            .map_err(GatewayError::from)
-    })
-}
-
 pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
     log::info!("mint: {:?}", mint);
     let wallet_status = use_wallet();

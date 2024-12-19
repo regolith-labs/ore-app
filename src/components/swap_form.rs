@@ -1,17 +1,17 @@
 use dioxus::prelude::*;
-use dioxus_sdk::utils::timing::{use_debounce, UseDebounce};
+use dioxus_sdk::utils::timing::UseDebounce;
 
 use crate::{
     components::{Col, Row, SwitchIcon},
-    hooks::{get_token_balance, use_swap, use_wallet, Asset, GetPubkey, ASSETS},
+    hooks::{get_token_balance, use_quote, use_wallet, Asset, GetPubkey, ASSETS},
 };
 
 #[component]
 pub fn SwapForm(class: Option<String>) -> Element {
     let class = class.unwrap_or_default();
     // inputs
-    let mut sell_input_amount = use_signal::<String>(|| "".to_owned());
-    let mut buy_input_amount = use_signal::<String>(|| "".to_owned());
+    let sell_input_amount = use_signal::<String>(|| "".to_owned());
+    let buy_input_amount = use_signal::<String>(|| "".to_owned());
     // enabled
     let mut enabled = use_signal(|| false);
     // show tokens
@@ -22,69 +22,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let sell_token = use_signal(|| Asset::first());
 
     // buy quotes
-    let buy_quote_debounce =
-        use_debounce::<String>(std::time::Duration::from_secs(5), move |input_amount| {
-            spawn({
-                async move {
-                    let input_token = &*buy_token.read();
-                    let output_token = &*sell_token.read();
-                    match use_swap::quote(
-                        input_amount,
-                        &input_token.decimals,
-                        &input_token.mint,
-                        &output_token.mint,
-                        500,
-                    )
-                    .await
-                    {
-                        Ok(quote) => {
-                            log::info!("{:?}", quote);
-                            let input_amount = quote.in_amount as f64;
-                            let input_amount = input_amount / (input_token.decimals as f64);
-                            let output_amount = quote.out_amount as f64;
-                            let output_amount = output_amount / (output_token.decimals as f64);
-                            buy_input_amount.set(input_amount.to_string());
-                            sell_input_amount.set(output_amount.to_string());
-                        }
-                        Err(err) => {
-                            log::error!("{:?}", err);
-                        }
-                    };
-                }
-            });
-        });
+    let buy_quote = use_quote(buy_token, buy_input_amount, sell_token, sell_input_amount);
     // sell quotes
-    let sell_quote_debounce =
-        use_debounce::<String>(std::time::Duration::from_secs(5), move |input_amount| {
-            spawn({
-                async move {
-                    let input_token = &*sell_token.read();
-                    let output_token = &*buy_token.read();
-                    match use_swap::quote(
-                        input_amount,
-                        &input_token.decimals,
-                        &input_token.mint,
-                        &output_token.mint,
-                        500,
-                    )
-                    .await
-                    {
-                        Ok(quote) => {
-                            log::info!("{:?}", quote);
-                            let input_amount = quote.in_amount as f64;
-                            let input_amount = input_amount / (input_token.decimals as f64);
-                            let output_amount = quote.out_amount as f64;
-                            let output_amount = output_amount / (output_token.decimals as f64);
-                            sell_input_amount.set(input_amount.to_string());
-                            buy_input_amount.set(output_amount.to_string());
-                        }
-                        Err(err) => {
-                            log::error!("{:?}", err);
-                        }
-                    };
-                }
-            });
-        });
+    let sell_quote = use_quote(sell_token, sell_input_amount, buy_token, buy_input_amount);
 
     use_effect(move || {
         let amount_str = sell_input_amount.cloned();
@@ -114,14 +54,14 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     input_amount: buy_input_amount,
                     show_selector: show_buy_token_selector,
                     selected_token: buy_token,
-                    quote_debounce: buy_quote_debounce,
+                    quote: buy_quote,
                 }
                 SwapInput {
                     mode: SwapInputMode::Sell,
                     input_amount: sell_input_amount,
                     show_selector: show_sell_token_selector,
                     selected_token: sell_token,
-                    quote_debounce: sell_quote_debounce,
+                    quote: sell_quote,
                 }
                 SwitchButton {
                     buy_token,
@@ -305,7 +245,7 @@ fn SwapInput(
     input_amount: Signal<String>,
     show_selector: Signal<bool>,
     selected_token: Signal<Asset>,
-    quote_debounce: UseDebounce<String>,
+    quote: UseDebounce<String>,
 ) -> Element {
     let border = match mode {
         SwapInputMode::Buy => "border-b border-gray-800",
@@ -377,13 +317,10 @@ fn SwapInput(
                     oninput: move |e| {
                         let s = e.value();
                         if s.len().eq(&0) || s.parse::<f64>().is_ok() {
-                            log::info!("Ok... {s}");
-                            quote_debounce.action(s);
+                            quote.action(s);
                         } else {
-                            let x = s[..s.len() - 1].to_string();
-                            log::info!("Not ok... {s} yep {x}");
                             let s = s[..s.len() - 1].to_string();
-                            quote_debounce.action(s);
+                            quote.action(s);
                         }
                     },
                 }
