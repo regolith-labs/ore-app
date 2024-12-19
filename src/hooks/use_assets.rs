@@ -34,6 +34,7 @@ pub struct Asset {
     pub image: String,
     pub twitter: String,
     pub homepage: String,
+    pub decimals: u8,
 }
 
 #[derive(Deserialize)]
@@ -65,6 +66,7 @@ impl Asset {
                 .to_string(),
             twitter: "https://twitter.com/oresupply".to_string(),
             homepage: "https://ore.supply".to_string(),
+            decimals: ore_api::consts::TOKEN_DECIMALS,
         }
     }
     pub fn first() -> Self {

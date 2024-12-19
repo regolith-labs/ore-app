@@ -1,10 +1,9 @@
-
-use async_std::future::{timeout, Future};
 use async_std::future::TimeoutError;
+use async_std::future::{timeout, Future};
 use solana_client_wasm::ClientError;
 
-use crate::steel_app::time::Duration;
 use crate::steel_app::solana::sdk::program_error::ProgramError;
+use crate::steel_app::time::Duration;
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
 
@@ -20,7 +19,23 @@ pub enum GatewayError {
     RequestFailed,
     ProgramBuilderFailed,
     WalletAdapterDisconnected,
+    JupSwapError,
+    ParseTokenStringAmmount,
     Unknown,
+}
+
+impl From<std::num::ParseFloatError> for GatewayError {
+    fn from(value: std::num::ParseFloatError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::ParseTokenStringAmmount
+    }
+}
+
+impl From<jupiter_swap_api_client::ClientError> for GatewayError {
+    fn from(value: jupiter_swap_api_client::ClientError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::JupSwapError
+    }
 }
 
 impl From<reqwest::Error> for GatewayError {
@@ -58,7 +73,6 @@ impl From<ProgramError> for GatewayError {
         GatewayError::ProgramBuilderFailed
     }
 }
-
 
 pub async fn retry<F, Fut, T>(f: F) -> GatewayResult<T>
 where

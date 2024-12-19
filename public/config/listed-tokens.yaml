@@ -6,6 +6,7 @@ assets:
     image: https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png
     twitter: https://twitter.com/solana
     homepage: https://solana.com
+    decimals: 9
   
   - mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
     name: USDC
@@ -14,6 +15,7 @@ assets:
     image: https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png
     twitter: https://twitter.com/circle
     homepage: https://www.circle.com/en/usdc
+    decimals: 6
   
   - mint: J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD
     name: International Stable Currency
@@ -22,6 +24,7 @@ assets:
     image: https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png
     twitter: https://twitter.com/ISC_money
     homepage: https://isc.money
+    decimals: 6
   
   - mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux
     name: Helium
@@ -30,6 +33,7 @@ assets:
     image: https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg
     twitter: https://twitter.com/helium
     homepage: https://www.helium.com
+    decimals: 8
   
   - mint: 4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy
     name: Honey
@@ -38,3 +42,4 @@ assets:
     image: https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png
     twitter: https://twitter.com/hivemapper
     homepage: https://hivemapper.com
+    decimals: 9

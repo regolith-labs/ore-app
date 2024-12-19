@@ -3,7 +3,7 @@ use dioxus_sdk::utils::timing::{use_debounce, UseDebounce};
 
 use crate::{
     components::{Col, Row, SwitchIcon},
-    hooks::{get_token_balance, use_wallet, Asset, GetPubkey, ASSETS},
+    hooks::{get_token_balance, use_swap, use_wallet, Asset, GetPubkey, ASSETS},
 };
 
 #[component]
@@ -15,28 +15,73 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // enabled
     let mut enabled = use_signal(|| false);
     // show tokens
-    let show_token_selector_a = use_signal(|| false);
-    let show_token_selector_b = use_signal(|| false);
+    let show_buy_token_selector = use_signal(|| false);
+    let show_sell_token_selector = use_signal(|| false);
     // tokens
-    let token_a = use_signal(|| Asset::ore());
-    let token_b = use_signal(|| Asset::first());
+    let buy_token = use_signal(|| Asset::ore());
+    let sell_token = use_signal(|| Asset::first());
 
-    // quotes
-    let sell_quote_debounce =
-        use_debounce::<String>(std::time::Duration::from_secs(5), move |str| {
-            let s = format!("{}9", str);
+    // buy quotes
+    let buy_quote_debounce =
+        use_debounce::<String>(std::time::Duration::from_secs(5), move |input_amount| {
             spawn({
                 async move {
-                    sell_input_amount.set(s.clone());
+                    let input_token = &*buy_token.read();
+                    let output_token = &*sell_token.read();
+                    match use_swap::quote(
+                        input_amount,
+                        &input_token.decimals,
+                        &input_token.mint,
+                        &output_token.mint,
+                        500,
+                    )
+                    .await
+                    {
+                        Ok(quote) => {
+                            log::info!("{:?}", quote);
+                            let input_amount = quote.in_amount as f64;
+                            let input_amount = input_amount / (input_token.decimals as f64);
+                            let output_amount = quote.out_amount as f64;
+                            let output_amount = output_amount / (output_token.decimals as f64);
+                            buy_input_amount.set(input_amount.to_string());
+                            sell_input_amount.set(output_amount.to_string());
+                        }
+                        Err(err) => {
+                            log::error!("{:?}", err);
+                        }
+                    };
                 }
             });
         });
-    let buy_quote_debounce =
-        use_debounce::<String>(std::time::Duration::from_secs(5), move |str| {
-            let s = format!("{}9", str);
+    // sell quotes
+    let sell_quote_debounce =
+        use_debounce::<String>(std::time::Duration::from_secs(5), move |input_amount| {
             spawn({
                 async move {
-                    buy_input_amount.set(s.clone());
+                    let input_token = &*sell_token.read();
+                    let output_token = &*buy_token.read();
+                    match use_swap::quote(
+                        input_amount,
+                        &input_token.decimals,
+                        &input_token.mint,
+                        &output_token.mint,
+                        500,
+                    )
+                    .await
+                    {
+                        Ok(quote) => {
+                            log::info!("{:?}", quote);
+                            let input_amount = quote.in_amount as f64;
+                            let input_amount = input_amount / (input_token.decimals as f64);
+                            let output_amount = quote.out_amount as f64;
+                            let output_amount = output_amount / (output_token.decimals as f64);
+                            sell_input_amount.set(input_amount.to_string());
+                            buy_input_amount.set(output_amount.to_string());
+                        }
+                        Err(err) => {
+                            log::error!("{:?}", err);
+                        }
+                    };
                 }
             });
         });
@@ -67,39 +112,39 @@ pub fn SwapForm(class: Option<String>) -> Element {
                 SwapInput {
                     mode: SwapInputMode::Buy,
                     input_amount: buy_input_amount,
-                    show_selector: show_token_selector_a,
-                    selected_token: token_a,
+                    show_selector: show_buy_token_selector,
+                    selected_token: buy_token,
                     quote_debounce: buy_quote_debounce,
                 }
                 SwapInput {
                     mode: SwapInputMode::Sell,
                     input_amount: sell_input_amount,
-                    show_selector: show_token_selector_b,
-                    selected_token: token_b,
+                    show_selector: show_sell_token_selector,
+                    selected_token: sell_token,
                     quote_debounce: sell_quote_debounce,
                 }
                 SwitchButton {
-                    token_a,
-                    token_b,
-                    input_amount_a: buy_input_amount,
-                    input_amount_b: sell_input_amount,
+                    buy_token,
+                    sell_token,
+                    buy_input_amount,
+                    sell_input_amount,
                 }
             }
-            SwapDetails { token_a, token_b }
+            SwapDetails { buy_token, sell_token }
             SwapButton { enabled }
             // Token selector popups
-            if *show_token_selector_a.read() {
+            if *show_buy_token_selector.read() {
                 TokenPicker {
-                    show_token_selector: show_token_selector_a,
-                    selected_token: token_a,
-                    other_token: token_b,
+                    show_token_selector: show_buy_token_selector,
+                    selected_token: buy_token,
+                    other_token: sell_token,
                 }
             }
-            if *show_token_selector_b.read() {
+            if *show_sell_token_selector.read() {
                 TokenPicker {
-                    show_token_selector: show_token_selector_b,
-                    selected_token: token_b,
-                    other_token: token_a,
+                    show_token_selector: show_sell_token_selector,
+                    selected_token: sell_token,
+                    other_token: buy_token,
                 }
             }
         }
@@ -178,10 +223,10 @@ fn TokenPicker(
 }
 
 #[component]
-fn SwapDetails(token_a: Signal<Asset>, token_b: Signal<Asset>) -> Element {
+fn SwapDetails(buy_token: Signal<Asset>, sell_token: Signal<Asset>) -> Element {
     let (from_token, to_token) = (
-        token_a.read().ticker.to_string(),
-        token_b.read().ticker.to_string(),
+        buy_token.read().ticker.to_string(),
+        sell_token.read().ticker.to_string(),
     );
 
     rsx! {
@@ -225,23 +270,23 @@ fn SwapButton(enabled: Signal<bool>) -> Element {
 
 #[component]
 fn SwitchButton(
-    mut token_a: Signal<Asset>,
-    mut token_b: Signal<Asset>,
-    input_amount_a: Signal<String>,
-    input_amount_b: Signal<String>,
+    mut buy_token: Signal<Asset>,
+    mut sell_token: Signal<Asset>,
+    buy_input_amount: Signal<String>,
+    sell_input_amount: Signal<String>,
 ) -> Element {
     rsx! {
         button {
             class: "absolute w-12 h-8 -mt-4 inset-y-1/2 -ml-4 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
             onclick: move |_| {
-                let token_a_peek = token_a.clone();
-                let token_a_peek = token_a_peek.peek().clone();
-                let token_b_peek = token_b.clone();
-                let token_b_peek = token_b_peek.peek().clone();
-                token_a.set(token_b_peek);
-                token_b.set(token_a_peek);
-                input_amount_a.set("0.0".to_string());
-                input_amount_b.set("0.0".to_string());
+                let buy_token_peek = buy_token.clone();
+                let buy_token_peek = buy_token_peek.peek().clone();
+                let sell_token_peek = sell_token.clone();
+                let sell_token_peek = sell_token_peek.peek().clone();
+                buy_token.set(sell_token_peek);
+                sell_token.set(buy_token_peek);
+                buy_input_amount.set("0.0".to_string());
+                sell_input_amount.set("0.0".to_string());
             },
             SwitchIcon { class: "h-4 mx-auto" }
         }
@@ -273,7 +318,7 @@ fn SwapInput(
 
     let display_token = selected_token.read().ticker.to_string();
     let image = ASSETS.get(&display_token).map(|asset| asset.image.clone());
-    // let balance = use_token_balance(mint);
+
     let wallet = use_wallet();
     let balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
