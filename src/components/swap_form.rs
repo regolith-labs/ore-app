@@ -276,7 +276,7 @@ fn SwapInput(
                         onclick: move |_| {
                             if let Some(Ok(balance)) = balance.read().as_ref() {
                                 log::info!("balance: ok {:?}", balance);
-                                input_amount.set(balance.ui_amount.unwrap_or(0.0).to_string());
+                                quote.action(balance.ui_amount.unwrap_or(0.0).to_string());
                             } else {
                                 log::info!("balance: {:?}", balance);
                             }
