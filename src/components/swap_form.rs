@@ -40,38 +40,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
         quote_response,
     );
 
-    // clear buy quote
-    // use_effect(move || {
-    //     let amount_str = buy_input_amount.cloned();
-    //     if amount_str.is_empty() {
-    //         quote_response.set(None);
-    //         return;
-    //     }
-    //     let Ok(amount) = amount_str.parse::<f64>() else {
-    //         quote_response.set(None);
-    //         return;
-    //     };
-    //     if amount == 0f64 {
-    //         quote_response.set(None);
-    //     }
-    // });
-
-    // // clear sell quote
-    // use_effect(move || {
-    //     let amount_str = sell_input_amount.cloned();
-    //     if amount_str.is_empty() {
-    //         quote_response.set(None);
-    //         return;
-    //     }
-    //     let Ok(amount) = amount_str.parse::<f64>() else {
-    //         quote_response.set(None);
-    //         return;
-    //     };
-    //     if amount == 0f64 {
-    //         quote_response.set(None);
-    //     }
-    // });
-
     rsx! {
         Col { class: "w-full {class}", gap: 4,
             Col { class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
@@ -345,12 +313,6 @@ fn SwapInput(
                     oninput: move |e| {
                         let s = e.value();
                             quote.action(s);
-                        // if s.len().eq(&0) || s.parse::<f64>().is_ok() {
-                        //     quote.action(s);
-                        // } else {
-                        //     let s = s[..s.len() - 1].to_string();
-                        //     quote.action(s);
-                        // }
                     },
                 }
             }
