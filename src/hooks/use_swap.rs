@@ -6,9 +6,7 @@ use jupiter_swap_api_client::{
     transaction_config::TransactionConfig,
     JupiterSwapApiClient,
 };
-use solana_client_wasm::solana_sdk::{
-    pubkey::Pubkey, transaction::Transaction, transaction::VersionedTransaction,
-};
+use solana_client_wasm::solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
 use crate::gateway::{GatewayError, GatewayResult};
 
@@ -16,7 +14,9 @@ use super::{use_wallet, Asset, GetPubkey};
 
 const API_URL: &str = "https://quote-api.jup.ag/v6";
 
-pub fn use_swap(quote: Signal<Option<QuoteResponse>>) -> Resource<GatewayResult<Transaction>> {
+pub fn use_swap(
+    quote: Signal<Option<QuoteResponse>>,
+) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || {
         let client = JupiterSwapApiClient::new(API_URL.to_string());
@@ -40,14 +40,7 @@ pub fn use_swap(quote: Signal<Option<QuoteResponse>>) -> Resource<GatewayResult<
                         GatewayError::FailedDeserialization
                     })?;
                     log::info!("vtx: {:?}", vtx);
-                    let transaction: Transaction = bincode::deserialize(
-                        response.swap_transaction.as_slice(),
-                    )
-                    .map_err(|err| {
-                        log::error!("{:?}", err);
-                        GatewayError::FailedDeserialization
-                    })?;
-                    Ok(transaction)
+                    Ok(vtx)
                 }
                 None => Err(GatewayError::JupSwapError),
             }

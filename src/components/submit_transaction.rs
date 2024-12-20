@@ -1,12 +1,12 @@
 use base64::Engine;
 use dioxus::{document::eval, prelude::*};
-use solana_client_wasm::solana_sdk::{signature::Signature, transaction::Transaction};
+use solana_client_wasm::solana_sdk::{signature::Signature, transaction::VersionedTransaction};
 
 use crate::{components::*, hooks::use_gateway};
 
 #[component]
 pub fn SubmitTransaction(
-    tx: Transaction,
+    tx: VersionedTransaction,
     signal: Signal<InvokeSignatureStatus>,
     start_msg: String,
 ) -> Element {
@@ -82,7 +82,7 @@ pub fn SubmitTransaction(
     }
 }
 
-pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatus>) {
+pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSignatureStatus>) {
     spawn(async move {
         signal.set(InvokeSignatureStatus::Waiting);
         let mut eval = eval(
@@ -105,7 +105,9 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                 let decode_res = base64::engine::general_purpose::STANDARD
                                     .decode(string)
                                     .ok()
-                                    .and_then(|buffer| bincode::deserialize(&buffer).ok());
+                                    .and_then(|buffer| {
+                                        bincode::deserialize::<VersionedTransaction>(&buffer).ok()
+                                    });
                                 let rpc_res = match decode_res {
                                     Some(tx) => {
                                         log::info!("Sending: {:?}", tx);

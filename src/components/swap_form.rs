@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::UseDebounce;
 use jupiter_swap_api_client::quote::QuoteResponse;
-use solana_client_wasm::solana_sdk::transaction::Transaction;
+use solana_client_wasm::solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
     components::{invoke_signature, Col, InvokeSignatureStatus, Row, SwitchIcon},
@@ -194,7 +194,7 @@ fn DetailLabel(title: String, value: String) -> Element {
 #[component]
 fn SwapButton(
     quote_response: Signal<Option<QuoteResponse>>,
-    swap: Resource<GatewayResult<Transaction>>,
+    swap: Resource<GatewayResult<VersionedTransaction>>,
     invoke_signature_status: Signal<InvokeSignatureStatus>,
 ) -> Element {
     let quote_response = &*quote_response.read();
