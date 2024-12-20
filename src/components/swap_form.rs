@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::UseDebounce;
+use jupiter_swap_api_client::quote::QuoteResponse;
 
 use crate::{
     components::{Col, Row, SwitchIcon},
@@ -12,8 +13,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // inputs
     let sell_input_amount = use_signal::<String>(|| "".to_owned());
     let buy_input_amount = use_signal::<String>(|| "".to_owned());
-    // enabled
-    let mut enabled = use_signal(|| false);
     // show tokens
     let show_buy_token_selector = use_signal(|| false);
     let show_sell_token_selector = use_signal(|| false);
@@ -21,30 +20,57 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let buy_token = use_signal(|| Asset::ore());
     let sell_token = use_signal(|| Asset::first());
 
+    // quote response
+    let mut quote_response = use_signal::<Option<QuoteResponse>>(|| None);
+
     // buy quotes
-    let buy_quote = use_quote(buy_token, buy_input_amount, sell_token, sell_input_amount);
+    let buy_quote = use_quote(
+        buy_token,
+        buy_input_amount,
+        sell_token,
+        sell_input_amount,
+        quote_response,
+    );
     // sell quotes
-    let sell_quote = use_quote(sell_token, sell_input_amount, buy_token, buy_input_amount);
+    let sell_quote = use_quote(
+        sell_token,
+        sell_input_amount,
+        buy_token,
+        buy_input_amount,
+        quote_response,
+    );
 
-    use_effect(move || {
-        let amount_str = sell_input_amount.cloned();
-        if amount_str.is_empty() {
-            enabled.set(false);
-            return;
-        }
+    // clear buy quote
+    // use_effect(move || {
+    //     let amount_str = buy_input_amount.cloned();
+    //     if amount_str.is_empty() {
+    //         quote_response.set(None);
+    //         return;
+    //     }
+    //     let Ok(amount) = amount_str.parse::<f64>() else {
+    //         quote_response.set(None);
+    //         return;
+    //     };
+    //     if amount == 0f64 {
+    //         quote_response.set(None);
+    //     }
+    // });
 
-        let Ok(amount) = amount_str.parse::<f64>() else {
-            enabled.set(false);
-            return;
-        };
-
-        if amount == 0f64 {
-            enabled.set(false);
-            return;
-        }
-
-        enabled.set(true);
-    });
+    // // clear sell quote
+    // use_effect(move || {
+    //     let amount_str = sell_input_amount.cloned();
+    //     if amount_str.is_empty() {
+    //         quote_response.set(None);
+    //         return;
+    //     }
+    //     let Ok(amount) = amount_str.parse::<f64>() else {
+    //         quote_response.set(None);
+    //         return;
+    //     };
+    //     if amount == 0f64 {
+    //         quote_response.set(None);
+    //     }
+    // });
 
     rsx! {
         Col { class: "w-full {class}", gap: 4,
@@ -71,7 +97,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                 }
             }
             SwapDetails { buy_token, sell_token }
-            SwapButton { enabled }
+            SwapButton { quote_response }
             // Token selector popups
             if *show_buy_token_selector.read() {
                 TokenPicker {
@@ -192,8 +218,8 @@ fn DetailLabel(title: String, value: String) -> Element {
 }
 
 #[component]
-fn SwapButton(enabled: Signal<bool>) -> Element {
-    let colors = if *enabled.read() {
+fn SwapButton(quote_response: Signal<Option<QuoteResponse>>) -> Element {
+    let colors = if (*quote_response.read()).is_some() {
         "controls-primary"
     } else {
         "bg-controls-disabled text-on-onDisabled"
@@ -201,8 +227,10 @@ fn SwapButton(enabled: Signal<bool>) -> Element {
     rsx! {
         button {
             class: "h-12 w-full rounded-full {colors}",
-            disabled: !*enabled.read(),
-            onclick: move |_| {},
+            disabled: (*quote_response.read()).is_none(),
+            onclick: move |_| {
+                log::info!("swap btn");
+            },
             span { class: "mx-auto my-auto font-semibold", "Swap" }
         }
     }
@@ -316,12 +344,13 @@ fn SwapInput(
                     value: input_amount.cloned(),
                     oninput: move |e| {
                         let s = e.value();
-                        if s.len().eq(&0) || s.parse::<f64>().is_ok() {
                             quote.action(s);
-                        } else {
-                            let s = s[..s.len() - 1].to_string();
-                            quote.action(s);
-                        }
+                        // if s.len().eq(&0) || s.parse::<f64>().is_ok() {
+                        //     quote.action(s);
+                        // } else {
+                        //     let s = s[..s.len() - 1].to_string();
+                        //     quote.action(s);
+                        // }
                     },
                 }
             }
