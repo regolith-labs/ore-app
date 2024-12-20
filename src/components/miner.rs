@@ -4,7 +4,7 @@ use ore_pool_types::Member;
 use crate::{
     gateway::GatewayResult,
     hooks::{
-        use_member_db, use_member_onchain, use_register_db, use_register_onchain, use_wallet, Pool,
+         use_member_onchain, use_register_db, use_register_onchain, use_wallet, Pool,
         Wallet,
     },
 };

@@ -1,10 +1,12 @@
 use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::UseDebounce;
 use jupiter_swap_api_client::quote::QuoteResponse;
+use solana_client_wasm::solana_sdk::transaction::Transaction;
 
 use crate::{
-    components::{Col, Row, SwitchIcon},
-    hooks::{get_token_balance, use_quote, use_wallet, Asset, GetPubkey, ASSETS},
+    components::{invoke_signature, Col, InvokeSignatureStatus, Row, SwitchIcon},
+    gateway::GatewayResult,
+    hooks::{get_token_balance, use_quote, use_swap, use_wallet, Asset, GetPubkey, ASSETS},
 };
 
 #[component]
@@ -21,7 +23,8 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let sell_token = use_signal(|| Asset::first());
 
     // quote response
-    let mut quote_response = use_signal::<Option<QuoteResponse>>(|| None);
+    let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
+    let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
 
     // buy quotes
     let buy_quote = use_quote(
@@ -40,6 +43,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
         quote_response,
     );
 
+    // swap
+    let swap = use_swap(quote_response);
+
     rsx! {
         Col { class: "w-full {class}", gap: 4,
             Col { class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
@@ -48,14 +54,14 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     input_amount: buy_input_amount,
                     show_selector: show_buy_token_selector,
                     selected_token: buy_token,
-                    quote: buy_quote,
+                    new_quote: buy_quote,
                 }
                 SwapInput {
                     mode: SwapInputMode::Sell,
                     input_amount: sell_input_amount,
                     show_selector: show_sell_token_selector,
                     selected_token: sell_token,
-                    quote: sell_quote,
+                    new_quote: sell_quote,
                 }
                 SwitchButton {
                     buy_token,
@@ -65,7 +71,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                 }
             }
             SwapDetails { buy_token, sell_token }
-            SwapButton { quote_response }
+            SwapButton { quote_response ,swap, invoke_signature_status }
             // Token selector popups
             if *show_buy_token_selector.read() {
                 TokenPicker {
@@ -186,8 +192,13 @@ fn DetailLabel(title: String, value: String) -> Element {
 }
 
 #[component]
-fn SwapButton(quote_response: Signal<Option<QuoteResponse>>) -> Element {
-    let colors = if (*quote_response.read()).is_some() {
+fn SwapButton(
+    quote_response: Signal<Option<QuoteResponse>>,
+    swap: Resource<GatewayResult<Transaction>>,
+    invoke_signature_status: Signal<InvokeSignatureStatus>,
+) -> Element {
+    let quote_response = &*quote_response.read();
+    let colors = if (quote_response).is_some() {
         "controls-primary"
     } else {
         "bg-controls-disabled text-on-onDisabled"
@@ -195,9 +206,14 @@ fn SwapButton(quote_response: Signal<Option<QuoteResponse>>) -> Element {
     rsx! {
         button {
             class: "h-12 w-full rounded-full {colors}",
-            disabled: (*quote_response.read()).is_none(),
+            disabled: quote_response.is_none() && swap().is_some_and(|res| res.is_ok()),
             onclick: move |_| {
                 log::info!("swap btn");
+                let swap = &*swap.read();
+                if let Some(Ok(transaction)) = swap {
+                    log::info!("{:?}", transaction);
+                    invoke_signature(transaction.clone(), invoke_signature_status);
+                }
             },
             span { class: "mx-auto my-auto font-semibold", "Swap" }
         }
@@ -241,7 +257,7 @@ fn SwapInput(
     input_amount: Signal<String>,
     show_selector: Signal<bool>,
     selected_token: Signal<Asset>,
-    quote: UseDebounce<String>,
+    new_quote: UseDebounce<String>,
 ) -> Element {
     let border = match mode {
         SwapInputMode::Buy => "border-b border-gray-800",
@@ -272,7 +288,7 @@ fn SwapInput(
                         onclick: move |_| {
                             if let Some(Ok(balance)) = balance.read().as_ref() {
                                 log::info!("balance: ok {:?}", balance);
-                                quote.action(balance.ui_amount.unwrap_or(0.0).to_string());
+                                new_quote.action(balance.ui_amount.unwrap_or(0.0).to_string());
                             } else {
                                 log::info!("balance: {:?}", balance);
                             }
@@ -312,7 +328,7 @@ fn SwapInput(
                     value: input_amount.cloned(),
                     oninput: move |e| {
                         let s = e.value();
-                            quote.action(s);
+                        new_quote.action(s);
                     },
                 }
             }
