@@ -10,7 +10,7 @@ use super::utils::retry;
 use super::{Gateway, GatewayError, GatewayResult, RPC_URL};
 
 const CONFIRM_RETRIES: usize = 20;
-const CONFIRM_DELAY: u64 = 500;
+const CONFIRM_DELAY: u64 = 1_500;
 
 impl Gateway {
     pub async fn get_clock(&self) -> GatewayResult<Clock> {

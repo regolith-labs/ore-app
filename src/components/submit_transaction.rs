@@ -153,7 +153,7 @@ pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSigna
     });
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum InvokeSignatureStatus {
     Start,
     Waiting,

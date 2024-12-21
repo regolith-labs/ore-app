@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::UseDebounce;
 use jupiter_swap_api_client::quote::QuoteResponse;
 use solana_client_wasm::solana_sdk::transaction::VersionedTransaction;
+use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
     components::{invoke_signature, Col, InvokeSignatureStatus, Row, SwitchIcon},
@@ -12,6 +13,8 @@ use crate::{
 #[component]
 pub fn SwapForm(class: Option<String>) -> Element {
     let class = class.unwrap_or_default();
+    // wallet
+    let wallet = use_wallet();
     // inputs
     let sell_input_amount = use_signal::<String>(|| "".to_owned());
     let buy_input_amount = use_signal::<String>(|| "".to_owned());
@@ -21,10 +24,29 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // tokens
     let buy_token = use_signal(|| Asset::ore());
     let sell_token = use_signal(|| Asset::first());
+    // token balances
+    let mut buy_token_balance = use_resource(move || async move {
+        let wallet = wallet.get_pubkey()?;
+        let buy_token = buy_token.read();
+        get_token_balance(wallet, buy_token.mint).await
+    });
+    let mut sell_token_balance = use_resource(move || async move {
+        let wallet = wallet.get_pubkey()?;
+        let sell_token = sell_token.read();
+        get_token_balance(wallet, sell_token.mint).await
+    });
 
     // quote response
     let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
-    let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
+    let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
+
+    use_effect(move || {
+        if let InvokeSignatureStatus::Done(_sig) = invoke_signature_status.cloned() {
+            buy_token_balance.restart();
+            sell_token_balance.restart();
+            invoke_signature_status.set(InvokeSignatureStatus::Start);
+        }
+    });
 
     // buy quotes
     let buy_quote = use_quote(
@@ -54,6 +76,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     input_amount: buy_input_amount,
                     show_selector: show_buy_token_selector,
                     selected_token: buy_token,
+                    selected_token_balance: buy_token_balance,
                     new_quote: buy_quote,
                 }
                 SwapInput {
@@ -61,6 +84,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     input_amount: sell_input_amount,
                     show_selector: show_sell_token_selector,
                     selected_token: sell_token,
+                    selected_token_balance: sell_token_balance,
                     new_quote: sell_quote,
                 }
                 SwitchButton {
@@ -257,6 +281,7 @@ fn SwapInput(
     input_amount: Signal<String>,
     show_selector: Signal<bool>,
     selected_token: Signal<Asset>,
+    selected_token_balance: Resource<GatewayResult<UiTokenAmount>>,
     new_quote: UseDebounce<String>,
 ) -> Element {
     let border = match mode {
@@ -267,16 +292,8 @@ fn SwapInput(
         SwapInputMode::Buy => "Buy",
         SwapInputMode::Sell => "Sell",
     };
-
     let display_token = selected_token.read().ticker.to_string();
     let image = ASSETS.get(&display_token).map(|asset| asset.image.clone());
-
-    let wallet = use_wallet();
-    let balance = use_resource(move || async move {
-        let wallet = wallet.get_pubkey()?;
-        let asset = selected_token.read();
-        get_token_balance(wallet, asset.mint).await
-    });
 
     rsx! {
         Col { class: "w-full p-4 {border}", gap: 2,
@@ -286,11 +303,11 @@ fn SwapInput(
                     button {
                         class: "text-xs my-auto py-1 px-3 rounded-full bg-gray-800",
                         onclick: move |_| {
-                            if let Some(Ok(balance)) = balance.read().as_ref() {
+                            if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
                                 log::info!("balance: ok {:?}", balance);
                                 new_quote.action(balance.ui_amount.unwrap_or(0.0).to_string());
                             } else {
-                                log::info!("balance: {:?}", balance);
+                                log::info!("balance: {:?}", selected_token_balance);
                             }
                         },
                         "Max"
