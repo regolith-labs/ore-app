@@ -1,9 +1,9 @@
 use serde_json::{json, Value};
 
+use crate::steel_app::solana::sdk::{clock::Clock, hash::Hash, sysvar};
 use crate::steel_app::solana::{
     sdk::signature::Signature, transaction_status::TransactionConfirmationStatus,
 };
-use crate::steel_app::solana::sdk::{clock::Clock, hash::Hash, sysvar};
 use crate::steel_app::time::Duration;
 
 use super::utils::retry;
@@ -13,7 +13,6 @@ const CONFIRM_RETRIES: usize = 20;
 const CONFIRM_DELAY: u64 = 500;
 
 impl Gateway {
-
     pub async fn get_clock(&self) -> GatewayResult<Clock> {
         retry(|| async {
             let data = self
@@ -38,7 +37,7 @@ impl Gateway {
 
     pub async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
         // Confirm tx
-        for _ in 0..CONFIRM_RETRIES {
+        for retry in 0..CONFIRM_RETRIES {
             // Delay before confirming
             async_std::task::sleep(Duration::from_millis(CONFIRM_DELAY)).await;
 
@@ -72,6 +71,7 @@ impl Gateway {
                     log::error!("Error confirming: {:?}", err);
                 }
             }
+            log::info!("retry: {}", retry);
         }
 
         return Err(GatewayError::TransactionTimeout);

@@ -104,23 +104,19 @@ pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSigna
                                 let gateway = use_gateway();
                                 let decode_res = base64::engine::general_purpose::STANDARD
                                     .decode(string)
-                                    .ok()
-                                    .and_then(|buffer| {
-                                        bincode::deserialize::<VersionedTransaction>(&buffer).ok()
-                                    });
+                                    .ok();
+                                let decode_res = decode_res.and_then(|buffer| {
+                                    bincode::deserialize::<VersionedTransaction>(&buffer).ok()
+                                });
                                 let rpc_res = match decode_res {
                                     Some(tx) => {
-                                        log::info!("Sending: {:?}", tx);
-                                        let x = gateway.rpc.send_transaction(&tx).await;
-                                        log::info!("Sent: {:?}", x);
-                                        x.ok()
+                                        gateway.rpc.send_versioned_transaction(&tx).await.ok()
                                     }
                                     None => {
                                         log::info!("error decoding tx");
                                         None
                                     }
                                 };
-                                log::info!("Dec: {:?}", rpc_res);
                                 match rpc_res {
                                     Some(sig) => {
                                         log::info!("sig: {}", sig);

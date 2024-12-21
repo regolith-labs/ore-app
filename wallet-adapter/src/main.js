@@ -103,13 +103,13 @@ function SignTransaction() {
           "base64"
         )
       );
-      console.log(tx);
       const signed = await signTransaction(
         tx
       );
-      return signed
-        .serialize()
-        .toString("base64");
+      const b64 = Buffer.from(
+        signed.serialize()
+      ).toString("base64");
+      return b64
     } catch (err) {
       console.log(err);
     }
