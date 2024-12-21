@@ -95,7 +95,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
                 }
             }
             SwapDetails { buy_token, sell_token }
-            SwapButton { quote_response ,swap, invoke_signature_status }
+            SwapButton { quote_response, swap, invoke_signature_status }
+
+            div { "{invoke_signature_status}" }
             // Token selector popups
             if *show_buy_token_selector.read() {
                 TokenPicker {

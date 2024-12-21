@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use base64::Engine;
 use dioxus::{document::eval, prelude::*};
 use solana_client_wasm::solana_sdk::{signature::Signature, transaction::VersionedTransaction};
@@ -153,11 +155,17 @@ pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSigna
     });
 }
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(PartialEq, Copy, Clone, Debug)]
 pub enum InvokeSignatureStatus {
     Start,
     Waiting,
     DoneWithError,
     Timeout,
     Done(Signature),
+}
+
+impl Display for InvokeSignatureStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
