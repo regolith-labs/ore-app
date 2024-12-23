@@ -3,10 +3,7 @@ use ore_pool_types::Member;
 
 use crate::{
     gateway::GatewayResult,
-    hooks::{
-        use_member_db, use_member_onchain, use_register_db, use_register_onchain, use_wallet, Pool,
-        Wallet,
-    },
+    hooks::{use_member_onchain, use_register_db, use_register_onchain, use_wallet, Pool, Wallet},
 };
 
 use super::{invoke_signature, InvokeSignatureStatus};
@@ -81,7 +78,10 @@ pub fn Miner(
                                             let tx = tx.clone();
                                             let el = match *invoke_signature_status.read() {
                                                 InvokeSignatureStatus::Start => {
-                                                    invoke_signature(tx, invoke_signature_status);
+                                                    invoke_signature(
+                                                        tx.into(),
+                                                        invoke_signature_status,
+                                                    );
                                                     rsx! {}
                                                 }
                                                 InvokeSignatureStatus::Waiting => {

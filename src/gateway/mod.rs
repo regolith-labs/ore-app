@@ -1,10 +1,10 @@
-mod solana;
 mod ore;
-mod utils;
+mod solana;
 mod spl;
+mod utils;
 
-pub use utils::*;
 use solana_client_wasm::WasmClient;
+pub use utils::*;
 
 // pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";

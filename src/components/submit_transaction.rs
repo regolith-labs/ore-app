@@ -1,12 +1,14 @@
+use std::fmt::Display;
+
 use base64::Engine;
 use dioxus::{document::eval, prelude::*};
-use solana_client_wasm::solana_sdk::{signature::Signature, transaction::Transaction};
+use solana_client_wasm::solana_sdk::{signature::Signature, transaction::VersionedTransaction};
 
 use crate::{components::*, hooks::use_gateway};
 
 #[component]
 pub fn SubmitTransaction(
-    tx: Transaction,
+    tx: VersionedTransaction,
     signal: Signal<InvokeSignatureStatus>,
     start_msg: String,
 ) -> Element {
@@ -82,7 +84,7 @@ pub fn SubmitTransaction(
     }
 }
 
-pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatus>) {
+pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSignatureStatus>) {
     spawn(async move {
         signal.set(InvokeSignatureStatus::Waiting);
         let mut eval = eval(
@@ -104,21 +106,19 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                 let gateway = use_gateway();
                                 let decode_res = base64::engine::general_purpose::STANDARD
                                     .decode(string)
-                                    .ok()
-                                    .and_then(|buffer| bincode::deserialize(&buffer).ok());
+                                    .ok();
+                                let decode_res = decode_res.and_then(|buffer| {
+                                    bincode::deserialize::<VersionedTransaction>(&buffer).ok()
+                                });
                                 let rpc_res = match decode_res {
                                     Some(tx) => {
-                                        log::info!("Sending: {:?}", tx);
-                                        let x = gateway.rpc.send_transaction(&tx).await;
-                                        log::info!("Sent: {:?}", x);
-                                        x.ok()
+                                        gateway.rpc.send_versioned_transaction(&tx).await.ok()
                                     }
                                     None => {
                                         log::info!("error decoding tx");
                                         None
                                     }
                                 };
-                                log::info!("Dec: {:?}", rpc_res);
                                 match rpc_res {
                                     Some(sig) => {
                                         log::info!("sig: {}", sig);
@@ -155,11 +155,17 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
     });
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone, Debug)]
 pub enum InvokeSignatureStatus {
     Start,
     Waiting,
     DoneWithError,
     Timeout,
     Done(Signature),
+}
+
+impl Display for InvokeSignatureStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }

@@ -5,7 +5,7 @@ import {
   BaseWalletMultiButton,
   WalletModalProvider,
 } from '@solana/wallet-adapter-react-ui';
-import { Transaction } from '@solana/web3.js';
+import { Transaction, VersionedTransaction } from '@solana/web3.js';
 import * as buffer from "buffer";
 window.Buffer = buffer.Buffer;
 
@@ -97,7 +97,7 @@ function SignTransaction() {
   const { publicKey, signTransaction } = useWallet();
   const callback = useCallback(async (msg) => {
     try {
-      const tx = Transaction.from(
+      const tx = VersionedTransaction.deserialize(
         Buffer.from(
           msg.b64,
           "base64"
@@ -106,9 +106,10 @@ function SignTransaction() {
       const signed = await signTransaction(
         tx
       );
-      return signed
-        .serialize()
-        .toString("base64");
+      const b64 = Buffer.from(
+        signed.serialize()
+      ).toString("base64");
+      return b64
     } catch (err) {
       console.log(err);
     }
