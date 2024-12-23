@@ -2893,7 +2893,7 @@ dependencies = [
 [[package]]
 name = "jupiter-swap-api-client"
 version = "0.1.0"
-source = "git+https://github.com/regolith-labs/jupiter-swap-api-client?rev=0943e49#0943e49e4fea9d1280a334251ddc8fa5594a4a3c"
+source = "git+https://github.com/regolith-labs/jupiter-swap-api-client?branch=main#0943e49e4fea9d1280a334251ddc8fa5594a4a3c"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -4952,7 +4952,7 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=mrmizz/vtx#bd4043170b35631304a9aa2937ef5eb988a124af"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#bd4043170b35631304a9aa2937ef5eb988a124af"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -4972,7 +4972,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=mrmizz/vtx#bd4043170b35631304a9aa2937ef5eb988a124af"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#bd4043170b35631304a9aa2937ef5eb988a124af"
 dependencies = [
  "Inflector",
  "arrayref",

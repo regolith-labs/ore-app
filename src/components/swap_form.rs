@@ -26,12 +26,12 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let buy_token = use_signal(|| Asset::ore());
     let sell_token = use_signal(|| Asset::first());
     // token balances
-    let buy_token_balance = use_resource(move || async move {
+    let mut buy_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let buy_token = buy_token.read();
         get_token_balance(wallet, buy_token.mint).await
     });
-    let sell_token_balance = use_resource(move || async move {
+    let mut sell_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let sell_token = sell_token.read();
         get_token_balance(wallet, sell_token.mint).await
@@ -46,6 +46,13 @@ pub fn SwapForm(class: Option<String>) -> Element {
         let _ = buy_input_amount.read();
         let _ = sell_input_amount.read();
         invoke_signature_status.set(InvokeSignatureStatus::Start);
+    });
+    use_effect(move || {
+        if let InvokeSignatureStatus::Done(_sig) = invoke_signature_status.cloned() {
+            buy_token_balance.restart();
+            sell_token_balance.restart();
+            invoke_signature_status.set(InvokeSignatureStatus::Start);
+        }
     });
 
     // buy quotes
@@ -266,10 +273,8 @@ fn SwapButton(
             class: "h-12 w-full rounded-full {colors}",
             disabled: quote_response.is_none() && swap().is_some_and(|res| res.is_ok()),
             onclick: move |_| {
-                log::info!("swap btn");
                 let swap = &*swap.read();
                 if let Some(Ok(transaction)) = swap {
-                    log::info!("{:?}", transaction);
                     invoke_signature(transaction.clone(), invoke_signature_status);
                 }
             },
