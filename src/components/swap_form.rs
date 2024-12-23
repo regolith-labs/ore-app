@@ -26,12 +26,12 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let buy_token = use_signal(|| Asset::ore());
     let sell_token = use_signal(|| Asset::first());
     // token balances
-    let mut buy_token_balance = use_resource(move || async move {
+    let buy_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let buy_token = buy_token.read();
         get_token_balance(wallet, buy_token.mint).await
     });
-    let mut sell_token_balance = use_resource(move || async move {
+    let sell_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let sell_token = sell_token.read();
         get_token_balance(wallet, sell_token.mint).await
@@ -340,10 +340,7 @@ fn SwapInput(
                         class: "text-xs my-auto py-1 px-3 rounded-full bg-gray-800",
                         onclick: move |_| {
                             if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
-                                log::info!("balance: ok {:?}", balance);
                                 new_quote.action(balance.ui_amount.unwrap_or(0.0).to_string());
-                            } else {
-                                log::info!("balance: {:?}", selected_token_balance);
                             }
                         },
                         "Max"

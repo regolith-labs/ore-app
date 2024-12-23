@@ -34,7 +34,6 @@ pub fn use_swap(
                         config: TransactionConfig::default(),
                     };
                     let response = client.swap(&request, None).await?;
-                    log::info!("swap resp: {:?}", response);
                     let vtx: VersionedTransaction = bincode::deserialize(
                         response.swap_transaction.as_slice(),
                     )
@@ -42,7 +41,6 @@ pub fn use_swap(
                         log::error!("{:?}", err);
                         GatewayError::FailedDeserialization
                     })?;
-                    log::info!("vtx: {:?}", vtx);
                     Ok(vtx)
                 }
                 None => Err(GatewayError::JupSwapError),
