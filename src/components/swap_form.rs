@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::UseDebounce;
 use jupiter_swap_api_client::quote::QuoteResponse;
+use rust_decimal::Decimal;
 use solana_client_wasm::solana_sdk::transaction::VersionedTransaction;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
@@ -40,6 +41,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
     let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
 
+    // reset signature
     use_effect(move || {
         if let InvokeSignatureStatus::Done(_sig) = invoke_signature_status.cloned() {
             buy_token_balance.restart();
@@ -92,9 +94,10 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     sell_token,
                     buy_input_amount,
                     sell_input_amount,
+                    quote_response
                 }
             }
-            SwapDetails { buy_token, sell_token }
+            SwapDetails { buy_token, sell_token, quote_response }
             SwapButton { quote_response, swap, invoke_signature_status }
 
             div { "{invoke_signature_status}" }
@@ -189,19 +192,48 @@ fn TokenPicker(
 }
 
 #[component]
-fn SwapDetails(buy_token: Signal<Asset>, sell_token: Signal<Asset>) -> Element {
-    let (from_token, to_token) = (
-        buy_token.read().ticker.to_string(),
-        sell_token.read().ticker.to_string(),
-    );
+fn SwapDetails(
+    buy_token: Signal<Asset>,
+    sell_token: Signal<Asset>,
+    quote_response: Signal<Option<QuoteResponse>>,
+) -> Element {
+    let (price_value, price_impact_value) = {
+        let quote_response = &*quote_response.read();
+        log::info!("quote resp: {:?}", quote_response);
+        match quote_response {
+            Some(quote_response) => {
+                // price value
+                let sell_token = sell_token.read();
+                let buy_token = buy_token.read();
+                let price_ratio_numerator = (quote_response.out_amount as f64)
+                    / (10u64.pow(buy_token.decimals as u32) as f64);
+                let price_ratio_denomintaor = (quote_response.in_amount as f64)
+                    / (10u64.pow(sell_token.decimals as u32) as f64);
+                let price_ratio = price_ratio_numerator / price_ratio_denomintaor;
+                let price_value = format!(
+                    "1 {} = {:.2} {}",
+                    sell_token.ticker, price_ratio, buy_token.ticker
+                );
+                // price impact value
+                let price_impact_value = format!(
+                    "{:.2}%",
+                    quote_response
+                        .price_impact_pct
+                        .saturating_mul(Decimal::new(100, 0))
+                );
+                (price_value, price_impact_value)
+            }
+            None => ("".to_string(), "".to_string()),
+        }
+    };
 
     rsx! {
         Col { class: "px-1", gap: 3,
             DetailLabel {
                 title: "Price",
-                value: format!("1 {from_token} = 0.5 {to_token}"),
+                value: price_value,
             }
-            DetailLabel { title: "Price impact", value: "0.5%" }
+            DetailLabel { title: "Price impact", value: price_impact_value }
             DetailLabel { title: "Transaction fee", value: "0.00005 SOL" }
         }
     }
@@ -252,6 +284,7 @@ fn SwitchButton(
     mut sell_token: Signal<Asset>,
     buy_input_amount: Signal<String>,
     sell_input_amount: Signal<String>,
+    mut quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
     rsx! {
         button {
@@ -265,6 +298,7 @@ fn SwitchButton(
                 sell_token.set(buy_token_peek);
                 buy_input_amount.set("0.0".to_string());
                 sell_input_amount.set("0.0".to_string());
+                quote_response.set(None);
             },
             SwitchIcon { class: "h-4 mx-auto" }
         }
