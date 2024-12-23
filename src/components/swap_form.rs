@@ -43,11 +43,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
 
     // reset signature
     use_effect(move || {
-        if let InvokeSignatureStatus::Done(_sig) = invoke_signature_status.cloned() {
-            buy_token_balance.restart();
-            sell_token_balance.restart();
-            invoke_signature_status.set(InvokeSignatureStatus::Start);
-        }
+        let _ = buy_input_amount.read();
+        let _ = sell_input_amount.read();
+        invoke_signature_status.set(InvokeSignatureStatus::Start);
     });
 
     // buy quotes
@@ -197,7 +195,7 @@ fn SwapDetails(
     sell_token: Signal<Asset>,
     quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
-    let (price_value, price_impact_value) = {
+    let (price_value, price_impact_value, slippage) = {
         let quote_response = &*quote_response.read();
         log::info!("quote resp: {:?}", quote_response);
         match quote_response {
@@ -221,9 +219,11 @@ fn SwapDetails(
                         .price_impact_pct
                         .saturating_mul(Decimal::new(100, 0))
                 );
-                (price_value, price_impact_value)
+                // slippage
+                let slippage = format!("{:.2}%", (quote_response.slippage_bps as f64) / 1000f64);
+                (price_value, price_impact_value, slippage)
             }
-            None => ("".to_string(), "".to_string()),
+            None => ("".to_string(), "".to_string(), "".to_string()),
         }
     };
 
@@ -234,7 +234,7 @@ fn SwapDetails(
                 value: price_value,
             }
             DetailLabel { title: "Price impact", value: price_impact_value }
-            DetailLabel { title: "Transaction fee", value: "0.00005 SOL" }
+            DetailLabel { title: "Slippage", value: slippage }
         }
     }
 }

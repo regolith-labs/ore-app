@@ -8,7 +8,10 @@ use jupiter_swap_api_client::{
 };
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
-use crate::gateway::{GatewayError, GatewayResult};
+use crate::{
+    components::InvokeSignatureStatus,
+    gateway::{GatewayError, GatewayResult},
+};
 
 use super::{use_wallet, Asset, GetPubkey};
 
