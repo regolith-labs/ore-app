@@ -13,7 +13,12 @@ keywords = ["solana", "crypto", "mining"]
 [features]
 default = ["web"]
 bundle = []
-desktop = ["solana-sdk", "dioxus-sdk/clipboard"]
+desktop = [
+  "solana-account-decoder",
+  "solana-sdk",
+  "solana-transaction-status",
+  "dioxus-sdk/clipboard",
+]
 web = [
   "gloo",
   "gloo-storage",
@@ -72,6 +77,8 @@ serde_yaml = "0.9"
 solana-client-wasm = { version = "1.18", optional = true }
 solana-extra-wasm = { version = "1.18", optional = true }
 solana-sdk = { version = "1.18", optional = true }
+solana-account-decoder = { version = "1.18", optional = true }
+solana-transaction-status = { version = "1.18", optional = true }
 steel = "2.1.1"
 tracing = "0.1.40"
 url = "2.5.0"

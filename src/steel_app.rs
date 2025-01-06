@@ -1,12 +1,10 @@
 pub mod solana {
-    #[cfg(feature = "desktop")]
     pub mod sdk {
-        pub use solana_sdk::*;
-    }
-
-    #[cfg(feature = "web")]
-    pub mod sdk {
+        #[cfg(feature = "web")]
         pub use solana_client_wasm::solana_sdk::*;
+
+        #[cfg(feature = "desktop")]
+        pub use solana_sdk::*;
     }
 
     #[cfg(feature = "web")]
