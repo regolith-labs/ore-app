@@ -90,7 +90,7 @@ pub fn Mine() -> Element {
             log::info!("solution received: {:?}", solution);
             if let Ok(pubkey) = pubkey {
                 spawn(async move {
-                    post_solution(&gateway.http, pool_url, &pubkey, &solution).await;
+                    let _ = post_solution(&gateway.http, pool_url, &pubkey, &solution).await;
                 });
             }
         }

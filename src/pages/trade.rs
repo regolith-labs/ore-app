@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{components::*, steel_app::solana::sdk::pubkey::Pubkey};
+use crate::components::*;
 
 pub fn Trade() -> Element {
     rsx! {
