@@ -9,21 +9,21 @@ pub fn Landing() -> Element {
             Col {
                 class: "mx-auto my-auto gap-16",
                 gap: 16,
+                // Col {
+                //     class: "mx-auto gap-12",
+                //     gap: 12,
+                // }
+                OrbInteractive {}
                 Col {
-                    class: "mx-auto gap-12",
-                    gap: 12,
-                    OrbInteractive {}
-                    Col {
-                        class: "mx-auto",
-                        gap: 2,
-                        span {
-                            class: "mx-auto font-wide text-4xl sm:text-5xl font-bold",
-                            "Digital gold."
-                        }
-                        span {
-                            class: "mx-auto font-wide text-4xl sm:text-5xl font-bold opacity-50",
-                            "On Solana."
-                        }
+                    class: "mx-auto",
+                    gap: 2,
+                    span {
+                        class: "mx-auto font-wide text-4xl sm:text-5xl font-bold",
+                        "Digital gold."
+                    }
+                    span {
+                        class: "mx-auto font-wide text-4xl sm:text-5xl font-bold opacity-50",
+                        "On Solana."
                     }
                 }
                 Link {
