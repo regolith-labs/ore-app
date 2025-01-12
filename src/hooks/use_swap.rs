@@ -83,7 +83,7 @@ pub fn use_quote(
                             let output_amount = output_amount / output_decimals;
                             
                             // swap
-                            input_token_amount.set(Some(input_amount.to_string()));
+                            // input_token_amount.set(Some(input_amount.to_string()));
                             output_token_amount.set(Some(output_amount.to_string()));
                             quote_response.set(Some(quote));
                         }

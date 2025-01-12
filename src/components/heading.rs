@@ -10,7 +10,7 @@ pub fn Heading(class: Option<String>, title: String, subtitle: Option<String>) -
             gap: 2,
             class: "{class}",
             span {
-                class: "font-wide text-3xl sm:text-4xl font-bold",
+                class: "font-extended text-3xl sm:text-4xl font-bold",
                 "{title}"
             }
             if let Some(subtitle) = subtitle {

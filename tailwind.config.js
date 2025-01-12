@@ -68,7 +68,8 @@ module.exports = {
         mono: ['ui-monospace', 'monospace'],
         sans: ['Pilat', 'ui-sans-serif', 'system-ui'],
         serif: ['ui-serif'],
-        wide: ['PilatWide', 'ui-sans-serif', 'system-ui']
+        wide: ['PilatWide', 'ui-sans-serif', 'system-ui'],
+        extended: ['PilatExtended', 'PilatWide', 'ui-sans-serif', 'system-ui']
       },
       animation: {
         'orb-spin-slow': 'orbSpin 12000ms steps(1) infinite',

@@ -6,7 +6,7 @@ use solana_client_wasm::solana_sdk::transaction::VersionedTransaction;
 use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
-    components::{invoke_signature, Col, InvokeSignatureStatus, Row, SwitchIcon},
+    components::{invoke_signature, CarrotDownIcon, Col, InvokeSignatureStatus, Row, SwitchIcon, WalletIcon},
     gateway::GatewayResult,
     hooks::{get_token_balance, use_quote, use_swap_transaction, use_wallet, Asset, GetPubkey, ASSETS},
 };
@@ -14,21 +14,19 @@ use crate::{
 #[component]
 pub fn SwapForm(class: Option<String>) -> Element {
     let class = class.unwrap_or_default();
-
-    // wallet
     let wallet = use_wallet();
 
-    // inputs
+    // input amounts
     let sell_input_amount = use_signal::<Option<String>>(|| Some("".to_owned()));
     let buy_input_amount = use_signal::<Option<String>>(|| Some("".to_owned()));
 
-    // show tokens
+    // token picker modal flags
     let show_buy_token_selector = use_signal(|| false);
     let show_sell_token_selector = use_signal(|| false);
 
-    // tokens
+    // selected tokens
     let buy_token = use_signal(|| Asset::ore());
-    let sell_token = use_signal(|| Asset::first());
+    let sell_token = use_signal(|| Asset::sol());
 
     // token balances
     let mut buy_token_balance = use_resource(move || async move {
@@ -80,38 +78,46 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let swap_tx = use_swap_transaction(quote_response);
 
     rsx! {
-        Col { class: "w-full {class}", gap: 4,
-            Col { class: "relative lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
-                SwapInput {
-                    mode: SwapInputMode::Buy,
-                    input_amount: buy_input_amount,
-                    output_amount: sell_input_amount,
-                    show_selector: show_buy_token_selector,
-                    selected_token: buy_token,
-                    selected_token_balance: buy_token_balance,
-                    new_quote: buy_quote,
-                }
+        Col { 
+            class: "w-full gap-4 {class}",
+            Col { 
+                class: "lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
                 SwapInput {
                     mode: SwapInputMode::Sell,
                     input_amount: sell_input_amount,
-                    output_amount: buy_input_amount,
+                    other_amount: buy_input_amount,
                     show_selector: show_sell_token_selector,
                     selected_token: sell_token,
                     selected_token_balance: sell_token_balance,
                     new_quote: sell_quote,
+                    quote_response,
                 }
-                SwitchButton {
-                    buy_token,
-                    sell_token,
-                    buy_input_amount,
-                    sell_input_amount,
-                    quote_response
+                div {
+                    class: "relative",
+                    SwapInput {
+                        mode: SwapInputMode::Buy,
+                        input_amount: buy_input_amount,
+                        other_amount: sell_input_amount,
+                        show_selector: show_buy_token_selector,
+                        selected_token: buy_token,
+                        selected_token_balance: buy_token_balance,
+                        new_quote: buy_quote,
+                        quote_response,
+                    }
+                    SwitchButton {
+                        buy_token,
+                        sell_token,
+                        buy_input_amount,
+                        sell_input_amount,
+                        new_quote: sell_quote,
+                        quote_response
+                    }
                 }
             }
             SwapDetails { buy_token, sell_token, quote_response }
             SwapButton { quote_response, swap_tx, invoke_signature_status }
 
-            div { "{invoke_signature_status}" }
+            // TODO Signature status as toasts
 
             // Token selector popups
             if *show_buy_token_selector.read() {
@@ -119,6 +125,10 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     show_token_selector: show_buy_token_selector,
                     selected_token: buy_token,
                     other_token: sell_token,
+                    buy_input_amount,
+                    sell_input_amount,
+                    sell_quote,
+                    quote_response,
                 }
             }
             if *show_sell_token_selector.read() {
@@ -126,17 +136,26 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     show_token_selector: show_sell_token_selector,
                     selected_token: sell_token,
                     other_token: buy_token,
+                    buy_input_amount,
+                    sell_input_amount,
+                    sell_quote,
+                    quote_response,
                 }
             }
         }
     }
 }
 
+// TODO Close on ESC click
 #[component]
 fn TokenPicker(
     show_token_selector: Signal<bool>,
     selected_token: Signal<Asset>,
     other_token: Signal<Asset>,
+    buy_input_amount: Signal<Option<String>>,
+    sell_input_amount: Signal<Option<String>>,
+    sell_quote: UseDebounce<String>,
+    quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
     let assets = ASSETS.values().collect::<Vec<_>>();
     let mut search = use_signal(|| String::new());
@@ -169,24 +188,33 @@ fn TokenPicker(
                 class: "bg-black rounded-lg p-4 w-96 border border-gray-800",
                 onclick: move |e| e.stop_propagation(),
 
-                Col { gap: 4,
+                Col { 
+                    gap: 4,
+
                     // Search input
                     input {
-                        class: "w-full p-2 rounded bg-surface-secondary text-black",
-                        placeholder: "Search by token name...",
+                        class: "w-full p-2 rounded bg-transparent text-elements-highEmphasis",
+                        placeholder: "Search...",
                         oninput: move |e| search.set(e.value().clone()),
                     }
 
                     // Token list
-                    Col { gap: 2,
+                    Col { 
+                        gap: 2,
                         for asset in filtered_assets {
                             button {
                                 class: "flex items-center gap-2 p-2 hover:bg-controls-secondaryHover rounded transition-colors duration-200",
                                 onclick: {
                                     let asset = asset.clone();
                                     move |_| {
+                                        // Select the new token
                                         selected_token.set(asset.clone());
                                         show_token_selector.set(false);
+
+                                        // Get a new quote
+                                        buy_input_amount.set(None);
+                                        quote_response.set(None);
+                                        sell_quote.action(sell_input_amount.cloned().unwrap_or_default());
                                     }
                                 },
                                 img {
@@ -209,23 +237,10 @@ fn SwapDetails(
     sell_token: Signal<Asset>,
     quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
-    let (price_value, price_impact_value, slippage) = {
+    let (price_impact_value, _slippage, transaction_fee) = {
         let quote_response = &*quote_response.read();
         match quote_response {
             Some(quote_response) => {
-                // price value
-                let sell_token = sell_token.read();
-                let buy_token = buy_token.read();
-                let price_ratio_numerator = (quote_response.out_amount as f64)
-                    / (10u64.pow(buy_token.decimals as u32) as f64);
-                let price_ratio_denomintaor = (quote_response.in_amount as f64)
-                    / (10u64.pow(sell_token.decimals as u32) as f64);
-                let price_ratio = price_ratio_numerator / price_ratio_denomintaor;
-                let price_value = format!(
-                    "1 {} = {:.2} {}",
-                    sell_token.ticker, price_ratio, buy_token.ticker
-                );
-
                 // price impact value
                 let price_impact_value = format!(
                     "{:.2}%",
@@ -236,28 +251,33 @@ fn SwapDetails(
 
                 // slippage
                 let slippage = format!("{:.2}%", (quote_response.slippage_bps as f64) / 1000f64);
-                (price_value, price_impact_value, slippage)
+
+                // transaction fee
+                let transaction_fee = "0.00005 SOL".to_string(); // TODO Get priority fee
+
+
+                (price_impact_value, slippage, transaction_fee)
             }
-            None => ("".to_string(), "".to_string(), "".to_string()),
+            None => ("–".to_string(), "–".to_string(), "–".to_string()),
         }
     };
 
     rsx! {
-        Col { class: "px-1", gap: 3,
-            DetailLabel {
-                title: "Price",
-                value: price_value,
-            }
-            DetailLabel { title: "Price impact", value: price_impact_value }
-            DetailLabel { title: "Slippage", value: slippage }
+        Col { 
+            class: "px-5", 
+            gap: 3,
+            SwapDetailLabel { title: "Price impact", value: price_impact_value }
+            // SwapDetailLabel { title: "Slippage", value: slippage }
+            SwapDetailLabel { title: "Transaction fee", value: transaction_fee }
         }
     }
 }
 
 #[component]
-fn DetailLabel(title: String, value: String) -> Element {
+fn SwapDetailLabel(title: String, value: String) -> Element {
     rsx! {
-        Row { class: "w-full justify-between text-sm",
+        Row { 
+            class: "w-full justify-between text-sm",
             span { class: "text-elements-lowEmphasis", "{title}" }
             span { class: "text-elements-midEmphasis", "{value}" }
         }
@@ -272,7 +292,7 @@ fn SwapButton(
 ) -> Element {
     let quote_response = &*quote_response.read();
     let colors = if (quote_response).is_some() {
-        "controls-primary"
+        "controls-primary hover:ring hover:ring-offset-2"
     } else {
         "bg-controls-disabled text-on-onDisabled"
     };
@@ -298,10 +318,11 @@ fn SwitchButton(
     buy_input_amount: Signal<Option<String>>,
     sell_input_amount: Signal<Option<String>>,
     mut quote_response: Signal<Option<QuoteResponse>>,
+    mut new_quote: UseDebounce<String>,
 ) -> Element {
     rsx! {
         button {
-            class: "absolute w-12 h-8 -mt-4 inset-y-1/2 -ml-4 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
+            class: "absolute w-12 h-8 -mt-4 inset-y-0 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
             onclick: move |_| {
                 // Swap tokens
                 let buy_token_peek = buy_token.peek().clone();
@@ -311,12 +332,12 @@ fn SwitchButton(
                 
                 // Swap input amounts
                 let buy_input_peek = buy_input_amount.peek().clone();
-                let sell_input_peek = sell_input_amount.peek().clone();
-                buy_input_amount.set(sell_input_peek);
-                sell_input_amount.set(buy_input_peek);
+                sell_input_amount.set(buy_input_peek.clone());
+                buy_input_amount.set(None);
 
                 // Clear quote response
                 quote_response.set(None);
+                new_quote.action(buy_input_peek.unwrap_or_default());
             },
             SwitchIcon { class: "h-4 mx-auto" }
         }
@@ -329,78 +350,95 @@ enum SwapInputMode {
     Sell,
 }
 
+// TODO Amount too large error
+
 #[component]
 fn SwapInput(
     mode: SwapInputMode,
     input_amount: Signal<Option<String>>,
-    output_amount: Signal<Option<String>>,
+    other_amount: Signal<Option<String>>,
     show_selector: Signal<bool>,
     selected_token: Signal<Asset>,
     selected_token_balance: Resource<GatewayResult<UiTokenAmount>>,
     new_quote: UseDebounce<String>,
+    quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
+    let mut error_msg = use_signal(|| None);
     let border = match mode {
-        SwapInputMode::Buy => "border-b border-gray-800",
-        SwapInputMode::Sell => "",
+        SwapInputMode::Buy => "",
+        SwapInputMode::Sell => "border-b border-gray-800",
     };
     let title = match mode {
-        SwapInputMode::Buy => "Buy",
-        SwapInputMode::Sell => "Sell",
+        SwapInputMode::Buy => "Buying",
+        SwapInputMode::Sell => "Selling",
     };
-    let display_token = selected_token.read().ticker.to_string();
-    let image = ASSETS.get(&display_token).map(|asset| asset.image.clone());
 
-    rsx! {
-        Col { class: "w-full p-4 {border}", gap: 2,
-            Row { class: "justify-between",
-                span { class: "text-elements-midEmphasis my-auto pl-1", "{title}" }
-                if let SwapInputMode::Sell = mode {
-                    button {
-                        class: "text-xs my-auto py-1 px-3 rounded-full bg-gray-800",
-                        onclick: move |_| {
-                            if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
-                                new_quote.action(balance.ui_amount.unwrap_or(0.0).to_string());
-                            }
-                        },
-                        "Max"
+    // Set error message
+    use_effect({
+        let mode = mode.clone();
+        move || {
+            let mut is_error = false;
+            if SwapInputMode::Sell == mode.clone() {
+                if let Some(input_amount_str) = input_amount.cloned() {
+                    let input_amount_f64 = input_amount_str.parse::<f64>().unwrap_or(0.0);
+                    if let Some(Ok(balance)) = selected_token_balance.cloned() {
+                        if balance.ui_amount.unwrap_or(0.0) < input_amount_f64 { 
+                            error_msg.set(Some("Insufficient balance".to_string()));
+                            is_error = true;
+                        }
+                    } else if input_amount_f64 > 0.0 {
+                        error_msg.set(Some("Insufficient balance".to_string()));
+                        is_error = true;
                     }
                 }
             }
+            if !is_error {
+                error_msg.set(None);
+            }
+        }
+    });
+
+    rsx! {
+        Col { 
+            class: "w-full p-4 {border}", 
+            gap: 2,
             Row { 
                 class: "justify-between",
-                gap: 4,
-                button {
-                    class: "flex items-center gap-2 p-2 -ml-1 -mt-1 hover:bg-controls-secondaryHover rounded cursor-pointer shrink-0",
-                    onclick: move |_| {
-                        if display_token.ne(&Asset::ore_ticker()) {
-                            show_selector.set(true)
-                        }
-                    },
-                    Row { class: "my-auto", gap: 2,
-                        if let Some(image) = image {
-                            img {
-                                class: "w-8 h-8 rounded-full shrink-0",
-                                src: "{image}",
-                            }
-                        } else {
-                            img {
-                                class: "w-8 h-8 rounded-full shrink-0",
-                                src: asset!("/public/icon.png"),
-                            }
-                        }
-                        span { class: "font-semibold my-auto", "{display_token}" }
+                span { class: "text-elements-midEmphasis my-auto pl-1", "{title}" }
+                Row {
+                    gap: 2,
+                    if let Some(error_msg) = error_msg.cloned() {
+                        span { class: "text-red-500 font-medium text-xs my-auto", "{error_msg}" }
                     }
+                    MaxButton { selected_token_balance, input_amount, other_amount, error_msg, quote_response, new_quote }
                 }
-                if let Some(input_amount) = input_amount.cloned() {
+            }
+            Row {
+                class: "justify-between",
+                gap: 4,
+                TokenButton { token: selected_token, show_selector: show_selector.clone() }
+                if let Some(input_amount_str) = input_amount.cloned() {
                     input {
                         class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                         placeholder: "0",
                         r#type: "number",
                         inputmode: "decimal",
-                        value: input_amount,
+                        value: input_amount_str,
                         oninput: move |e| {
-                            new_quote.action(e.value());
-                            output_amount.set(None);
+                            // Nullify quote response
+                            quote_response.set(None);
+
+                            // Trigger updated quote
+                            let s = e.value();
+                            input_amount.set(Some(s.clone()));
+                            new_quote.action(s.clone());
+
+                            // Nullify other amount input field
+                            if s.is_empty() {
+                                other_amount.set(Some("".to_string()));
+                            } else {
+                                other_amount.set(None);
+                            }
                         },
                     }
                 } else {
@@ -409,6 +447,79 @@ fn SwapInput(
                     }
                 }
             }
+        }
+    }
+}
+
+#[component]
+fn TokenButton(token: Signal<Asset>, show_selector: Signal<bool>) -> Element {
+    let display_token = token.read().ticker.to_string();
+    let image = ASSETS.get(&display_token).map(|asset| asset.image.clone());
+    rsx! {
+        button {
+            class: "flex items-center gap-2 p-2 -ml-1 -mt-1 hover:bg-controls-secondaryHover rounded cursor-pointer shrink-0",
+            onclick: move |_| show_selector.set(true),
+            Row { 
+                class: "my-auto", 
+                gap: 2,
+                if let Some(image) = image {
+                    img {
+                        class: "w-8 h-8 rounded-full shrink-0",
+                        src: "{image}",
+                    }
+                } else {
+                    img {
+                        class: "w-8 h-8 rounded-full shrink-0",
+                        src: asset!("/public/icon.png"),
+                    }
+                }
+                span { 
+                    class: "font-semibold my-auto", 
+                    "{display_token}" 
+                }
+                CarrotDownIcon { class: "w-4 my-auto opacity-50" }
+            }
+        }
+    }
+}
+
+#[component]
+fn MaxButton(selected_token_balance: Resource<GatewayResult<UiTokenAmount>>, input_amount: Signal<Option<String>>, other_amount: Signal<Option<String>>, error_msg: Signal<Option<String>>, quote_response: Signal<Option<QuoteResponse>>, new_quote: UseDebounce<String>) -> Element {
+    // Normalize token balance
+    let token_balance = if let Some(Ok(balance)) = selected_token_balance.cloned() {
+        balance.ui_amount.unwrap_or(0.0)
+    } else {
+        0.0
+    };
+
+    rsx! {
+        button {
+            gap: 2,
+            class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:text-elements-highEmphasis my-auto",
+            onclick: move |_| {
+                if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
+                    let max_amount = balance.ui_amount.unwrap_or(0.0);
+                    if max_amount == 0.0 {
+                        input_amount.set(Some("0".to_string()));
+                        other_amount.set(Some("0".to_string()));
+                        quote_response.set(None);
+                        error_msg.set(None);
+                    } else {
+                        input_amount.set(Some(max_amount.to_string()));
+                        other_amount.set(None);
+                        quote_response.set(None);
+                        new_quote.action(max_amount.to_string());
+                        error_msg.set(None);
+                    }
+                } else {
+                    input_amount.set(Some("0".to_string()));
+                    other_amount.set(Some("0".to_string()));
+                    quote_response.set(None);
+                    error_msg.set(None);
+                }
+            },
+            WalletIcon { class: "h-4 my-auto" }
+            span { class: "my-auto text-xs font-medium", "{token_balance}" }
         }
     }
 }
