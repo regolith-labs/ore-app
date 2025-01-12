@@ -1,10 +1,9 @@
-use warp::{Filter, Reply};
-use std::path::Path;
+use warp::Filter;
 
 #[tokio::main]
 async fn main() {
     // Define the directory to serve files from with conditional caching
-    let dir = warp::fs::dir("../dist")
+    let dir = warp::fs::dir("../target/dx/ore-app/release/web/public")
         .and(warp::path::full())
         .map(|reply, path: warp::path::FullPath| {
             let path_str = path.as_str();
@@ -25,7 +24,7 @@ async fn main() {
 
     // Route to handle unknown paths
     let index = warp::path::end()
-        .and(warp::fs::file("../dist/index.html"))
+        .and(warp::fs::file("../target/dx/ore-app/release/web/public/index.html"))
         .map(|reply| {
             warp::reply::with_header(
                 reply,
@@ -36,7 +35,7 @@ async fn main() {
 
     // Route to handle any other paths (fallback to index.html)
     let fallback = warp::any()
-        .map(|| warp::reply::html(include_str!("../../dist/index.html")))
+        .map(|| warp::reply::html(include_str!("../../target/dx/ore-app/release/web/public/index.html")))
         .map(|reply| {
             warp::reply::with_header(
                 reply,
