@@ -22,12 +22,28 @@ pub fn Landing() -> Element {
                         "On Solana."
                     }
                 }
-                Link {
-                    class: "flex mx-auto h-16 w-full px-4 rounded-full controls-primary transition-transform hover:scale-105",
-                    to: Route::Mine {},
+                // Link {
+                //     class: "flex mx-auto h-16 w-full px-4 rounded-full controls-primary transition-transform hover:scale-105",
+                //     to: Route::Mine {},
+                //     span {
+                //         class: "font-semibold text-lg sm:text-xl mx-auto my-auto",
+                //         "Start mining →"
+                //     }
+                // }
+                Col {
+                    class: "mx-auto gap-5",
+                    gap: 5,
                     span {
-                        class: "font-semibold text-lg sm:text-xl mx-auto my-auto",
-                        "Start mining →"
+                        class: "mx-auto font-medium text-lg sm:text-xl bg-white rounded-full px-6 py-3 text-black",
+                        "Coming soon..."
+                    }
+                    a {
+                        class: "mx-auto px-4 py-2 text-white opacity-50 hover:opacity-100 hover:underline",
+                        href: "https://crates.io/crates/ore-cli",
+                        target: "_blank",
+                        span {
+                            "Install the CLI"
+                        }
                     }
                 }
             }
@@ -48,3 +64,4 @@ fn ActionTab(title: String, to: Route) -> Element {
         }
     }
 }
+

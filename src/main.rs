@@ -23,10 +23,16 @@ fn main() {
 pub fn App() -> Element {
     use_wallet_provider();
     rsx! {
-        document::Link { rel: "stylesheet", href: asset!("/public/tailwind.css") }
+        // Icons
         document::Link { rel: "icon", href: asset!("/public/favicon.png") }
         document::Link { rel: "icon", href: asset!("/public/icon.png") }
+
+        // Tailwind
+        document::Link { rel: "stylesheet", href: asset!("/public/tailwind.css") }
+
+        // Scripts
         document::Script { src: asset!("/public/wallet.js") }
+
         Router::<Route> {}
     }
 }

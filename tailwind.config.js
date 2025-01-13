@@ -69,7 +69,7 @@ module.exports = {
         sans: ['Pilat', 'ui-sans-serif', 'system-ui'],
         serif: ['ui-serif'],
         wide: ['PilatWide', 'ui-sans-serif', 'system-ui'],
-        extended: ['PilatExtended', 'PilatWide', 'ui-sans-serif', 'system-ui']
+        extended: ['PilatExtended', 'ui-sans-serif', 'system-ui']
       },
       animation: {
         'orb-spin-slow': 'orbSpin 12000ms steps(1) infinite',
