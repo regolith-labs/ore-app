@@ -1,8 +1,8 @@
 use dioxus::document::eval;
 use dioxus::prelude::*;
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::components::*;
+use crate::gateway::ui_token_amount::UiTokenAmount;
 use crate::gateway::GatewayResult;
 use crate::hooks::{use_token_balance, Asset, ASSETS};
 use crate::route::Route;
@@ -21,7 +21,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
         div {
             class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
             onclick: move |e| e.stop_propagation(),
-            
+
             // "TODO: Wallet address + copy button"
 
             DisconnectButton { wallet_remount },
@@ -145,14 +145,14 @@ fn TokenValue(token: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> 
     use_effect(move || {
         if let Some(balance) = balance.cloned() {
             match balance {
-               Err(_) => {
-                   value.set("0.000".to_string());
-               }
-               Ok(balance) => {
-                   if let Some(ui_amount) = balance.ui_amount {
-                       value.set(format!("{:.3}", ui_amount * price));
-                   }
-               }
+                Err(_) => {
+                    value.set("0.000".to_string());
+                }
+                Ok(balance) => {
+                    if let Some(ui_amount) = balance.ui_amount {
+                        value.set(format!("{:.3}", ui_amount * price));
+                    }
+                }
             }
         }
     });
@@ -177,7 +177,7 @@ fn LiquidityTable(on_close: EventHandler<MouseEvent>) -> Element {
         TableSimple {
             rows: rsx! {
                 for asset in listed_assets {
-                    LiquidityRow { 
+                    LiquidityRow {
                         asset: asset.clone(),
                         on_close: on_close
                     }
@@ -191,7 +191,7 @@ fn LiquidityTable(on_close: EventHandler<MouseEvent>) -> Element {
 fn LiquidityRow(asset: Asset, on_close: EventHandler<MouseEvent>) -> Element {
     rsx! {
         TableSimpleRowLink {
-            // to: Route::Pair { 
+            // to: Route::Pair {
             //     pair: format!("{}-ORE", asset.ticker.clone())
             // },
             to: Route::Stake {},
@@ -242,11 +242,9 @@ fn LiquidityRow(asset: Asset, on_close: EventHandler<MouseEvent>) -> Element {
     }
 }
 
-
-
 #[component]
 fn WalletTabs(tab: Signal<WalletTab>) -> Element {
-    let tokens_class = if *tab.read() == WalletTab::Tokens { 
+    let tokens_class = if *tab.read() == WalletTab::Tokens {
         "flex-1 h-12 transition-colors text-elements-highEmphasis border-b-2 border-white hover:bg-controls-tertiary"
     } else {
         "flex-1 h-12 transition-colors text-elements-lowEmphasis hover:bg-controls-tertiary"

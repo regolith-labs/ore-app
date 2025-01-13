@@ -2,12 +2,11 @@ use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::UseDebounce;
 use jupiter_swap_api_client::quote::QuoteResponse;
 use rust_decimal::Decimal;
-use solana_client_wasm::solana_sdk::transaction::VersionedTransaction;
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
+use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
     components::{invoke_signature, Col, InvokeSignatureStatus, Row, SwitchIcon},
-    gateway::GatewayResult,
+    gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
     hooks::{get_token_balance, use_quote, use_swap, use_wallet, Asset, GetPubkey, ASSETS},
 };
 

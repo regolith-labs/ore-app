@@ -1,22 +1,25 @@
 pub mod solana {
-    pub mod sdk {
+    pub mod client {
         #[cfg(feature = "web")]
-        pub use solana_client_wasm::solana_sdk::*;
+        pub use solana_client_wasm::*;
 
-        #[cfg(feature = "desktop")]
-        pub use solana_sdk::*;
+        #[cfg(not(feature = "web"))]
+        pub use solana_client::*;
     }
 
-    #[cfg(feature = "web")]
     pub mod program {
-        pub use solana_extra_wasm::program::*;
+        #[cfg(feature = "web")]
+        pub use solana_extra_wasm::program::spl_associated_token_account::*;
+
+        #[cfg(not(feature = "web"))]
+        pub use spl_associated_token_account::*;
     }
 
     pub mod account_decoder {
         #[cfg(feature = "web")]
         pub use solana_extra_wasm::account_decoder::*;
 
-        #[cfg(feature = "desktop")]
+        #[cfg(not(feature = "web"))]
         pub use solana_account_decoder::*;
     }
 
@@ -24,15 +27,15 @@ pub mod solana {
         #[cfg(feature = "web")]
         pub use solana_extra_wasm::transaction_status::*;
 
-        #[cfg(feature = "desktop")]
+        #[cfg(not(feature = "web"))]
         pub use solana_transaction_status::*;
     }
 }
 
 pub mod time {
-    #[cfg(feature = "desktop")]
-    pub use std::time::*;
-
     #[cfg(feature = "web")]
     pub use web_time::*;
+
+    #[cfg(not(feature = "web"))]
+    pub use std::time::*;
 }

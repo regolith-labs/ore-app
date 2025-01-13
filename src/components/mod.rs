@@ -15,6 +15,7 @@ mod table;
 mod table_simple;
 #[cfg(feature = "web")]
 mod wallet_adapter;
+mod wallet_adapter_web;
 mod wallet_drawer;
 
 pub use balance::*;

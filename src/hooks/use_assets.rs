@@ -4,8 +4,7 @@ use dioxus::prelude::asset;
 use dioxus::prelude::manganis;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer};
-
-use crate::steel_app::solana::sdk::pubkey::Pubkey;
+use solana_sdk::pubkey::Pubkey;
 
 // Create a static HashMap indexed by ticker
 pub static ASSETS: Lazy<HashMap<String, Asset>> = Lazy::new(|| {

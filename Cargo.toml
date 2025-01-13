@@ -15,8 +15,9 @@ default = ["web"]
 bundle = []
 desktop = [
   "solana-account-decoder",
-  "solana-sdk",
+  "solana-client",
   "solana-transaction-status",
+  "spl-associated-token-account",
   "dioxus-sdk/clipboard",
 ]
 web = [
@@ -76,9 +77,13 @@ serde_json = "1.0"
 serde_yaml = "0.9"
 solana-client-wasm = { version = "1.18", optional = true }
 solana-extra-wasm = { version = "1.18", optional = true }
-solana-sdk = { version = "1.18", optional = true }
+solana-sdk = "1.18"
+solana-client = { version = "1.18", optional = true }
 solana-account-decoder = { version = "1.18", optional = true }
 solana-transaction-status = { version = "1.18", optional = true }
+spl-associated-token-account = { version = "3.0", optional = true, features = [
+  "no-entrypoint",
+] }
 steel = "2.1.1"
 tracing = "0.1.40"
 url = "2.5.0"

@@ -5,13 +5,17 @@ use ore_api::{
 use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
-use super::{retry, Gateway, GatewayError, GatewayResult};
+use super::{retry, GatewayError, GatewayResult, Rpc};
 
-impl Gateway {
-    pub async fn get_config(&self) -> GatewayResult<Config> {
+pub trait OreGateway {
+    async fn get_config(&self) -> GatewayResult<Config>;
+    async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof>;
+}
+
+impl<R: Rpc> OreGateway for R {
+    async fn get_config(&self) -> GatewayResult<Config> {
         retry(|| async {
             let data = self
-                .rpc
                 .get_account_data(&CONFIG_ADDRESS)
                 .await
                 .map_err(GatewayError::from)?;
@@ -20,10 +24,9 @@ impl Gateway {
         .await
     }
 
-    pub async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
+    async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof> {
         retry(|| async {
             let data = self
-                .rpc
                 .get_account_data(&proof_pda(authority).0)
                 .await
                 .map_err(GatewayError::from)?;

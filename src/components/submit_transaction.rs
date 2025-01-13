@@ -2,9 +2,13 @@ use std::fmt::Display;
 
 use base64::Engine;
 use dioxus::{document::eval, prelude::*};
-use solana_client_wasm::solana_sdk::{signature::Signature, transaction::VersionedTransaction};
+use solana_sdk::{signature::Signature, transaction::VersionedTransaction};
 
-use crate::{components::*, hooks::use_gateway};
+use crate::{
+    components::*,
+    gateway::{solana::SolanaGateway, Rpc},
+    hooks::use_gateway,
+};
 
 #[component]
 pub fn SubmitTransaction(
@@ -111,9 +115,7 @@ pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSigna
                                     bincode::deserialize::<VersionedTransaction>(&buffer).ok()
                                 });
                                 let rpc_res = match decode_res {
-                                    Some(tx) => {
-                                        gateway.rpc.send_versioned_transaction(&tx).await.ok()
-                                    }
+                                    Some(tx) => gateway.rpc.send_transaction(&tx).await.ok(),
                                     None => {
                                         log::info!("error decoding tx");
                                         None
@@ -122,7 +124,7 @@ pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSigna
                                 match rpc_res {
                                     Some(sig) => {
                                         log::info!("sig: {}", sig);
-                                        let confirmed = gateway.confirm_signature(sig).await;
+                                        let confirmed = gateway.rpc.confirm_signature(sig).await;
                                         if confirmed.is_ok() {
                                             signal.set(InvokeSignatureStatus::Done(sig));
                                         } else {

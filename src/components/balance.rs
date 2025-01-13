@@ -1,9 +1,8 @@
 use dioxus::prelude::*;
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
 
 use crate::{
     components::{CircleStackIcon, Col, OreValue, QrCodeIcon, Row},
-    gateway::GatewayResult,
+    gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
     hooks::use_ore_balance,
     route::Route,
 };

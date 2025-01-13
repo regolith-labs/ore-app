@@ -1,8 +1,7 @@
 use async_std::future::TimeoutError;
 use async_std::future::{timeout, Future};
-use solana_client_wasm::ClientError;
+use steel::ProgramError;
 
-use crate::steel_app::solana::sdk::program_error::ProgramError;
 use crate::steel_app::time::Duration;
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
@@ -50,8 +49,9 @@ impl From<TimeoutError> for GatewayError {
     }
 }
 
-impl From<ClientError> for GatewayError {
-    fn from(value: ClientError) -> Self {
+#[cfg(feature = "web")]
+impl From<solana_client_wasm::ClientError> for GatewayError {
+    fn from(value: solana_client_wasm::ClientError) -> Self {
         let msg = value.to_string();
         if msg.starts_with("Client error: Invalid param: could not find account")
             || msg.starts_with("Client error: AccountNotFound: ")
@@ -64,6 +64,14 @@ impl From<ClientError> for GatewayError {
             log::info!("Err: {:?}", msg);
             GatewayError::Unknown
         }
+    }
+}
+
+#[cfg(feature = "desktop")]
+impl From<solana_client::client_error::ClientError> for GatewayError {
+    fn from(value: solana_client::client_error::ClientError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::RequestFailed
     }
 }
 
