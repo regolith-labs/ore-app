@@ -74,7 +74,7 @@ pub fn YieldBalance() -> Element {
                     class: "flex flex-col gap-2",
                     p {
                         class: "font-medium text-sm text-gray-300",
-                        "Stake"
+                        "Yield"
                     }
                     div {
                         class: "flex flex-row gap-2",

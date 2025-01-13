@@ -53,7 +53,7 @@ pub fn MinerToolbar(hidden: bool) -> Element {
         div {
             class: "{class} {height} {bg} {display}",
             onclick: move |e| {
-                nav.push(Route::Mine {});
+                // nav.push(Route::Mine {});
                 e.stop_propagation();
             },
             div {

@@ -21,36 +21,30 @@ pub enum Route {
     #[end_layout]
 
     #[layout(Navbar)]
-        #[layout(MinerToolbarLayout)]
-            #[route("/home")]
-            Home {},
-            #[route("/claim")]
-            Claim {},
-            #[route("/claim-v1")]
-            ClaimV1 {},
-            #[route("/mine")]
-            Mine {},
-            // #[route("/stake")]
-            // Stake {},
-            #[route("/settings")]
-            Settings {},
-            #[route("/send/:to")]
-            Send {
-                to: String
-            },
-            #[route("/pay")]
-            Pay {},
-            #[route("/tx/:sig")]
-            Tx {
-                sig: String,
-            },
-            #[route("/u/:id")]
-            User {
-                id: String,
-            },
-            #[route("/upgrade")]
-            Upgrade {}, 
-        #[end_layout]
+        #[route("/home")]
+        Home {},
+        #[route("/claim")]
+        Claim {},
+        #[route("/claim-v1")]
+        ClaimV1 {},
+        #[route("/settings")]
+        Settings {},
+        #[route("/send/:to")]
+        Send {
+            to: String
+        },
+        #[route("/pay")]
+        Pay {},
+        #[route("/tx/:sig")]
+        Tx {
+            sig: String,
+        },
+        #[route("/u/:id")]
+        User {
+            id: String,
+        },
+        #[route("/upgrade")]
+        Upgrade {}, 
     #[end_layout]
 
     #[route("/:.._route")]

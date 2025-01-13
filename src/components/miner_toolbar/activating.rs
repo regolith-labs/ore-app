@@ -32,9 +32,9 @@ pub fn MinerToolbarActivating(miner: Signal<Miner>) -> Element {
         }
     });
 
-    if proof.read().is_none() {
-        nav.push(Route::Mine {});
-    }
+    // if proof.read().is_none() {
+    //     nav.push(Route::Mine {});
+    // }
 
     rsx! {
         div {
