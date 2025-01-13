@@ -319,7 +319,7 @@ fn SwitchButton(
 ) -> Element {
     rsx! {
         button {
-            class: "absolute w-12 h-8 -mt-4 inset-y-0 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
+            class: "absolute w-12 h-8 -mt-4 -ml-6 inset-y-0 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
             onclick: move |_| {
                 // Swap tokens
                 let buy_token_peek = buy_token.peek().clone();
