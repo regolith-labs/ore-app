@@ -14,16 +14,20 @@ pub fn Landing() -> Element {
                     class: "mx-auto",
                     gap: 2,
                     span {
-                        class: "mx-auto font-wide text-4xl sm:text-5xl font-bold",
+                        class: "mx-auto font-extended font-bold text-4xl sm:text-5xl text-elements-highEmphasis",
                         "Digital gold."
                     }
                     span {
-                        class: "mx-auto font-wide text-4xl sm:text-5xl font-bold opacity-50",
+                        class: "mx-auto font-extended font-bold text-4xl sm:text-5xl text-elements-lowEmphasis",
                         "On Solana."
+                    }
+                    span {  
+                        class: "mx-auto mt-8 font-wide font-light text-xl sm:text-2xl text-center text-elements-midEmphasis",
+                        "A hard money standard for tokenized commodities and stablecoins."
                     }
                 }
                 Link {
-                    class: "flex mx-auto h-16 w-full px-4 rounded-full controls-primary transition-transform hover:scale-105",
+                    class: "flex mx-auto h-16 w-full sm:max-w-xs px-4 rounded-full controls-primary transition-transform hover:scale-105",
                     to: Route::Mine {},
                     span {
                         class: "font-semibold text-lg sm:text-xl mx-auto my-auto",

@@ -330,11 +330,20 @@ fn SwitchButton(
                 // Swap input amounts
                 let buy_input_peek = buy_input_amount.peek().clone();
                 sell_input_amount.set(buy_input_peek.clone());
-                buy_input_amount.set(None);
 
-                // Clear quote response
-                quote_response.set(None);
-                new_quote.action(buy_input_peek.unwrap_or_default());
+                // Get a new quote
+                let mut needs_quote = false;
+                if let Some(buy_input_peek) = buy_input_peek.clone() {
+                    if !buy_input_peek.is_empty() {
+                        buy_input_amount.set(None);
+                        quote_response.set(None);
+                        new_quote.action(buy_input_peek);
+                        needs_quote = true;
+                    }
+                }
+                if !needs_quote {
+                    buy_input_amount.set(Some("".to_string()));
+                }
             },
             SwitchIcon { class: "h-4 mx-auto" }
         }

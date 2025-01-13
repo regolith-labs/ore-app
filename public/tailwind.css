@@ -620,10 +620,6 @@ body {
   inset: 0px;
 }
 
-.inset-1\/2 {
-  inset: 50%;
-}
-
 .inset-x-1\/2 {
   left: 50%;
   right: 50%;
@@ -634,13 +630,12 @@ body {
   bottom: 0px;
 }
 
-.inset-y-1\/2 {
-  top: 50%;
-  bottom: 50%;
-}
-
 .bottom-0 {
   bottom: 0px;
+}
+
+.left-0 {
+  left: 0px;
 }
 
 .left-1\/2 {
@@ -655,20 +650,16 @@ body {
   top: 0px;
 }
 
-.left-0 {
-  left: 0px;
-}
-
 .z-0 {
   z-index: 0;
 }
 
-.z-50 {
-  z-index: 50;
-}
-
 .z-10 {
   z-index: 10;
+}
+
+.z-50 {
+  z-index: 50;
 }
 
 .mx-5 {
@@ -681,29 +672,14 @@ body {
   margin-right: auto;
 }
 
-.my-auto {
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.my-16 {
-  margin-top: 4rem;
-  margin-bottom: 4rem;
-}
-
-.my-32 {
-  margin-top: 8rem;
-  margin-bottom: 8rem;
-}
-
-.my-12 {
-  margin-top: 3rem;
-  margin-bottom: 3rem;
-}
-
 .my-8 {
   margin-top: 2rem;
   margin-bottom: 2rem;
+}
+
+.my-auto {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .-ml-1 {
@@ -748,6 +724,10 @@ body {
 
 .mt-auto {
   margin-top: auto;
+}
+
+.mt-8 {
+  margin-top: 2rem;
 }
 
 .flex {
@@ -814,6 +794,10 @@ body {
   height: 2rem;
 }
 
+.h-\[16rem\] {
+  height: 16rem;
+}
+
 .h-full {
   height: 100%;
 }
@@ -825,14 +809,6 @@ body {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[12rem\] {
-  height: 12rem;
-}
-
-.h-\[16rem\] {
-  height: 16rem;
 }
 
 .w-10 {
@@ -891,9 +867,8 @@ body {
   width: 24rem;
 }
 
-.w-fit {
-  width: -moz-fit-content;
-  width: fit-content;
+.w-\[16rem\] {
+  width: 16rem;
 }
 
 .w-full {
@@ -909,14 +884,6 @@ body {
   width: 100vw;
 }
 
-.w-\[12rem\] {
-  width: 12rem;
-}
-
-.w-\[16rem\] {
-  width: 16rem;
-}
-
 .min-w-max {
   min-width: -moz-max-content;
   min-width: max-content;
@@ -928,6 +895,14 @@ body {
 
 .max-w-\[80rem\] {
   max-width: 80rem;
+}
+
+.max-w-lg {
+  max-width: 32rem;
+}
+
+.max-w-md {
+  max-width: 28rem;
 }
 
 .flex-1 {
@@ -2950,10 +2925,6 @@ body {
   gap: 0.375rem;
 }
 
-.gap-12 {
-  gap: 3rem;
-}
-
 .gap-16 {
   gap: 4rem;
 }
@@ -3168,16 +3139,6 @@ body {
   padding-bottom: 2rem;
 }
 
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
 .pb-20 {
   padding-bottom: 5rem;
 }
@@ -3264,6 +3225,14 @@ body {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-normal {
+  font-weight: 400;
 }
 
 .text-black {
@@ -3366,7 +3335,7 @@ body {
 @font-face {
   font-family: 'Pilat';
 
-  src: url('/fonts/Pilat/Pilat-Light.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Light.otf') format('opentype');
 
   font-weight: 300;
 
@@ -3376,7 +3345,7 @@ body {
 @font-face {
   font-family: 'Pilat';
 
-  src: url('/fonts/Pilat/Pilat-Regular.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Regular.otf') format('opentype');
 
   font-weight: 400;
 
@@ -3386,7 +3355,7 @@ body {
 @font-face {
   font-family: 'Pilat';
 
-  src: url('/fonts/Pilat/Pilat-Book.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Book.otf') format('opentype');
 
   font-weight: 500;
 
@@ -3396,7 +3365,7 @@ body {
 @font-face {
   font-family: 'Pilat';
 
-  src: url('/fonts/Pilat/Pilat-Demi.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Demi.otf') format('opentype');
 
   font-weight: 600;
 
@@ -3406,7 +3375,7 @@ body {
 @font-face {
   font-family: 'Pilat';
 
-  src: url('/fonts/Pilat/Pilat-Bold.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Bold.otf') format('opentype');
 
   font-weight: 700;
 
@@ -3416,7 +3385,7 @@ body {
 @font-face {
   font-family: 'PilatWide';
 
-  src: url('/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
 
   font-weight: 300;
 
@@ -3426,7 +3395,7 @@ body {
 @font-face {
   font-family: 'PilatWide';
 
-  src: url('/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
 
   font-weight: 400;
 
@@ -3436,7 +3405,7 @@ body {
 @font-face {
   font-family: 'PilatWide';
 
-  src: url('/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
 
   font-weight: 500;
 
@@ -3446,7 +3415,7 @@ body {
 @font-face {
   font-family: 'PilatWide';
 
-  src: url('/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
 
   font-weight: 600;
 
@@ -3456,7 +3425,7 @@ body {
 @font-face {
   font-family: 'PilatWide';
 
-  src: url('/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
 
   font-weight: 700;
 
@@ -3466,7 +3435,7 @@ body {
 @font-face {
   font-family: 'PilatExtended';
 
-  src: url('/fonts/PilatExtended/PilatExtended-Light.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Light.otf') format('opentype');
 
   font-weight: 300;
 
@@ -3476,7 +3445,7 @@ body {
 @font-face {
   font-family: 'PilatExtended';
 
-  src: url('/fonts/PilatExtended/PilatExtended-Regular.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Regular.otf') format('opentype');
 
   font-weight: 400;
 
@@ -3486,7 +3455,7 @@ body {
 @font-face {
   font-family: 'PilatExtended';
 
-  src: url('/fonts/PilatExtended/PilatExtended-Book.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Book.otf') format('opentype');
 
   font-weight: 500;
 
@@ -3496,7 +3465,7 @@ body {
 @font-face {
   font-family: 'PilatExtended';
 
-  src: url('/fonts/PilatExtended/PilatExtended-Demi.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Demi.otf') format('opentype');
 
   font-weight: 600;
 
@@ -3506,7 +3475,7 @@ body {
 @font-face {
   font-family: 'PilatExtended';
 
-  src: url('/fonts/PilatExtended/PilatExtended-Bold.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Bold.otf') format('opentype');
 
   font-weight: 700;
 
@@ -3621,11 +3590,6 @@ body {
     margin-right: 2rem;
   }
 
-  .sm\:my-32 {
-    margin-top: 8rem;
-    margin-bottom: 8rem;
-  }
-
   .sm\:my-16 {
     margin-top: 4rem;
     margin-bottom: 4rem;
@@ -3685,6 +3649,27 @@ body {
 
   .sm\:w-full {
     width: 100%;
+  }
+
+  .sm\:w-min {
+    width: -moz-min-content;
+    width: min-content;
+  }
+
+  .sm\:max-w-lg {
+    max-width: 32rem;
+  }
+
+  .sm\:max-w-md {
+    max-width: 28rem;
+  }
+
+  .sm\:max-w-sm {
+    max-width: 24rem;
+  }
+
+  .sm\:max-w-xs {
+    max-width: 20rem;
   }
 
   .sm\:grow {
@@ -3772,16 +3757,6 @@ body {
 }
 
 @media (min-width: 768px) {
-  .md\:my-32 {
-    margin-top: 8rem;
-    margin-bottom: 8rem;
-  }
-
-  .md\:my-24 {
-    margin-top: 6rem;
-    margin-bottom: 6rem;
-  }
-
   .md\:-ml-3 {
     margin-left: -0.75rem;
   }

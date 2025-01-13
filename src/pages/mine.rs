@@ -110,7 +110,7 @@ pub fn Mine() -> Element {
             Heading {
                 class: "w-full",
                 title: "Mine",
-                subtitle: "Harvest ORE by expending compute power."
+                subtitle: "Utilize spare computing power to harvest ORE."
             }
             StopStartButton { is_active }
             MinerStatus { is_active, member_db: member, pool: pool.clone() }
