@@ -9,27 +9,23 @@ use crate::{
 use super::{invoke_signature, InvokeSignatureStatus};
 
 #[component]
-pub fn Miner(
-    is_gold: Signal<bool>,
+pub fn MinerStatus(
+    is_active: Signal<bool>,
     member_db: Resource<GatewayResult<Member>>,
     pool: Pool,
 ) -> Element {
-    // pool resources
+    let wallet = use_wallet();
     let mut member_onchain = use_member_onchain(pool.address);
     let mut register_db = use_register_db(pool.url.clone());
     let register_onchain = use_register_onchain(pool.address);
-    // register with pool on chain signature status
     let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
-    // wallet
-    let wallet = use_wallet();
-
     let el = match *wallet.read() {
         Wallet::Disconnected => {
-            is_gold.set(false);
+            is_active.set(false);
             rsx! {}
         }
         Wallet::Connected(_pubkey) => {
-            match *is_gold.read() {
+            match *is_active.read() {
                 false => {
                     // do nothing
                     rsx! {}

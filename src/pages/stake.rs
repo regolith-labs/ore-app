@@ -11,7 +11,7 @@ pub fn Stake() -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake",
-                subtitle: "Earn yield by providing liquidity for traders."
+                subtitle: "Earn yield by providing liquidity for spot markets."
             }
             StakeForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",

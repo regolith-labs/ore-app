@@ -9,11 +9,7 @@ pub fn Landing() -> Element {
             Col {
                 class: "mx-auto my-auto gap-16",
                 gap: 16,
-                // Col {
-                //     class: "mx-auto gap-12",
-                //     gap: 12,
-                // }
-                OrbInteractive {}
+                OrbHero {}
                 Col {
                     class: "mx-auto",
                     gap: 2,

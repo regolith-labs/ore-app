@@ -620,6 +620,10 @@ body {
   inset: 0px;
 }
 
+.inset-1\/2 {
+  inset: 50%;
+}
+
 .inset-x-1\/2 {
   left: 50%;
   right: 50%;
@@ -628,6 +632,11 @@ body {
 .inset-y-0 {
   top: 0px;
   bottom: 0px;
+}
+
+.inset-y-1\/2 {
+  top: 50%;
+  bottom: 50%;
 }
 
 .bottom-0 {
@@ -646,12 +655,20 @@ body {
   top: 0px;
 }
 
+.left-0 {
+  left: 0px;
+}
+
 .z-0 {
   z-index: 0;
 }
 
 .z-50 {
   z-index: 50;
+}
+
+.z-10 {
+  z-index: 10;
 }
 
 .mx-5 {
@@ -667,6 +684,26 @@ body {
 .my-auto {
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.my-16 {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+
+.my-32 {
+  margin-top: 8rem;
+  margin-bottom: 8rem;
+}
+
+.my-12 {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+.my-8 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .-ml-1 {
@@ -790,6 +827,14 @@ body {
   height: 100vh;
 }
 
+.h-\[12rem\] {
+  height: 12rem;
+}
+
+.h-\[16rem\] {
+  height: 16rem;
+}
+
 .w-10 {
   width: 2.5rem;
 }
@@ -862,6 +907,14 @@ body {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-\[12rem\] {
+  width: 12rem;
+}
+
+.w-\[16rem\] {
+  width: 16rem;
 }
 
 .min-w-max {
@@ -3115,6 +3168,16 @@ body {
   padding-bottom: 2rem;
 }
 
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
 .pb-20 {
   padding-bottom: 5rem;
 }
@@ -3534,6 +3597,16 @@ body {
   background-color: rgb(0 163 110 / var(--tw-bg-opacity));
 }
 
+.group:hover .group-hover\:ring {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.group:hover .group-hover\:ring-offset-2 {
+  --tw-ring-offset-width: 2px;
+}
+
 @media (min-width: 640px) {
   .sm\:sticky {
     position: sticky;
@@ -3546,6 +3619,16 @@ body {
   .sm\:mx-8 {
     margin-left: 2rem;
     margin-right: 2rem;
+  }
+
+  .sm\:my-32 {
+    margin-top: 8rem;
+    margin-bottom: 8rem;
+  }
+
+  .sm\:my-16 {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
   }
 
   .sm\:mb-\[7px\] {
@@ -3689,6 +3772,16 @@ body {
 }
 
 @media (min-width: 768px) {
+  .md\:my-32 {
+    margin-top: 8rem;
+    margin-bottom: 8rem;
+  }
+
+  .md\:my-24 {
+    margin-top: 6rem;
+    margin-bottom: 6rem;
+  }
+
   .md\:-ml-3 {
     margin-left: -0.75rem;
   }

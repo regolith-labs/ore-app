@@ -183,11 +183,9 @@ fn TokenPicker(
         div {
             class: "fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center",
             onclick: move |_| show_token_selector.set(false),
-
             div {
                 class: "bg-black rounded-lg p-4 w-96 border border-gray-800",
                 onclick: move |e| e.stop_propagation(),
-
                 Col { 
                     gap: 4,
 
@@ -254,7 +252,6 @@ fn SwapDetails(
 
                 // transaction fee
                 let transaction_fee = "0.00005 SOL".to_string(); // TODO Get priority fee
-
 
                 (price_impact_value, slippage, transaction_fee)
             }

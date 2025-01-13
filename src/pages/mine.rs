@@ -11,22 +11,19 @@ use crate::{
 
 pub fn Mine() -> Element {
     // on off button
-    let mut is_gold = use_signal(|| false);
+    let mut is_active = use_signal(|| false);
+    
     // register with first pool
     let pool = POOLS.first().unwrap();
     let pool_url = &pool.url;
-    // channel to and from miner
     let (from_miner, mut to_miner) = use_miner();
-    // pool member account
     let member = use_member_db(pool_url.clone());
-    // last challenge timestamp
     let mut last_hash_at = use_signal(|| 0);
-    // user wallet
     let wallet = use_wallet();
 
     // restart miner
     use_effect(move || {
-        if let true = *is_gold.read() {
+        if let true = *is_active.read() {
             to_miner.restart();
         }
     });
@@ -55,11 +52,11 @@ pub fn Mine() -> Element {
 
     // challenge sender
     use_effect(move || {
-        let is_gold = *is_gold.read();
+        let is_active = *is_active.read();
         let member = &*member.read();
         let member = member.clone();
         let challenge = *challenge.read();
-        if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_gold) {
+        if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_active) {
             spawn(async move {
                 let gateway = use_gateway();
                 let cutoff_time =
@@ -113,15 +110,35 @@ pub fn Mine() -> Element {
             Heading {
                 class: "w-full",
                 title: "Mine",
-                subtitle: "Forge new ORE by mining with your phone or computer."
+                subtitle: "Harvest ORE by expending compute power."
             }
-            button {
-                class: "w-fit",
-                onclick: move |_| is_gold.set(!is_gold.cloned()),
-                Orb { is_gold: *is_gold.read() }
-            }
-            Miner { is_gold, member_db: member,pool: pool.clone() }
+            StopStartButton { is_active }
+            MinerStatus { is_active, member_db: member, pool: pool.clone() }
             div { "{last_hash_at()}" }
+        }
+    }
+}
+
+#[component]
+fn StopStartButton(is_active: Signal<bool>) -> Element {
+    rsx! {
+        button {
+            class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16 group",
+            onclick: move |_| is_active.set(!is_active.cloned()),
+            OrbMiner { 
+                class: "absolute top-0 left-0 z-0",
+                gold: *is_active.read()
+            }
+            if !is_active.cloned() {
+                span {
+                    class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:ring group-hover:ring-offset-2",
+                    PlayIcon { class: "my-auto h-5" }
+                    span {
+                        class: "my-auto",
+                        "Start mining"
+                    }
+                }
+            }
         }
     }
 }

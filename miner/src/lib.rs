@@ -94,6 +94,7 @@ fn mine(
     let nonce_index = member.id as u64;
     let num_total_members = challenge.num_total_members.max(1);
     let u64_unit = u64::MAX.saturating_div(num_total_members);
+
     // split member nonce space for multiple devices
     let nonce_unit = u64_unit.saturating_div(challenge.num_devices as u64);
     if challenge.device_id.gt(&challenge.num_devices) {
@@ -101,6 +102,7 @@ fn mine(
     }
     let device_id = challenge.device_id.saturating_sub(1) as u64;
     let left_bound = u64_unit.saturating_mul(nonce_index) + device_id.saturating_mul(nonce_unit);
+
     // start hashing
     let t0 = now();
     let mut nonce = left_bound;
@@ -113,6 +115,7 @@ fn mine(
             &challenge.challenge.challenge,
             &nonce.to_le_bytes(),
         );
+
         // look for best difficulty score in all hashes
         for hx in hxs {
             let difficulty = hx.difficulty() as u64;
@@ -131,6 +134,7 @@ fn mine(
                 }
             }
         }
+
         // exit if time has elapsed
         if nonce % 10 == 0 {
             log::info!("mining: {:?}", nonce);
@@ -151,6 +155,5 @@ fn mine(
 pub async fn register_miner() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     wasm_logger::init(wasm_logger::Config::default());
-    log::info!("starting miner");
     Miner::registrar().register();
 }

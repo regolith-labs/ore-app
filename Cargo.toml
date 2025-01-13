@@ -54,9 +54,7 @@ once_cell = "1.18"
 ore-api = "2.1.8"
 ore-api-v1 = { package = "ore-program", version = "1.2" }
 # ore-boost-api = { path = "../ore-boost/api", versio = "0.1.0" }
-ore-miner-web = { path = "./miner", features = [
-  "app",
-], default-features = false }
+ore-miner-web = { path = "./miner", features = ["app"], default-features = false }
 ore-pool-api = "0.2.0"
 ore-pool-types = "0.2.2"
 ore-relayer-api = "2.2.0"
