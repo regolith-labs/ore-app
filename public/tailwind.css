@@ -698,6 +698,10 @@ body {
   margin-left: -1.25rem;
 }
 
+.-ml-6 {
+  margin-left: -1.5rem;
+}
+
 .-mr-2 {
   margin-right: -0.5rem;
 }
@@ -728,10 +732,6 @@ body {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.-ml-6 {
-  margin-left: -1.5rem;
 }
 
 .flex {
