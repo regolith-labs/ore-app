@@ -21,15 +21,11 @@ pub fn Landing() -> Element {
                         class: "mx-auto font-wide text-4xl sm:text-5xl font-bold opacity-50",
                         "On Solana."
                     }
+                    span {  
+                        class: "mx-auto mt-8 font-wide font-light text-xl sm:text-2xl text-center text-elements-midEmphasis",
+                        "A hard money standard for tokenized commodity markets."
+                    }
                 }
-                // Link {
-                //     class: "flex mx-auto h-16 w-full px-4 rounded-full controls-primary transition-transform hover:scale-105",
-                //     to: Route::Mine {},
-                //     span {
-                //         class: "font-semibold text-lg sm:text-xl mx-auto my-auto",
-                //         "Start mining →"
-                //     }
-                // }
                 Col {
                     class: "mx-auto gap-5",
                     gap: 5,
@@ -37,12 +33,23 @@ pub fn Landing() -> Element {
                         class: "mx-auto font-medium text-lg sm:text-xl bg-white rounded-full px-6 py-3 text-black",
                         "Coming soon..."
                     }
-                    a {
-                        class: "mx-auto px-4 py-2 text-white opacity-50 hover:opacity-100 hover:underline",
-                        href: "https://crates.io/crates/ore-cli",
-                        target: "_blank",
-                        span {
-                            "Install the CLI"
+                    Row {
+                        gap: 2,
+                        // a {
+                        //     class: "mx-auto px-4 py-2 text-white opacity-50 hover:opacity-100 hover:underline",
+                        //     href: "https://crates.io/crates/ore-cli",
+                        //     target: "_blank",
+                        //     span {
+                        //         "Install the CLI"
+                        //     }
+                        // }
+                        a {
+                            class: "mx-auto px-4 py-2 text-white opacity-50 hover:opacity-100 hover:underline",
+                            href: "https://legacy.ore.supply/home",
+                            target: "_blank",
+                            span {
+                                "Visit legacy site"
+                            }
                         }
                     }
                 }
