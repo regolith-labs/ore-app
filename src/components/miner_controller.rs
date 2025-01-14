@@ -105,6 +105,7 @@ pub fn MinerController() -> Element {
         }
     });
 
+    // TODO: render animation on true, etc
     let mut is_mining = use_signal(|| false);
     use_effect(move || {
         if is_active.read().0 {
@@ -114,6 +115,9 @@ pub fn MinerController() -> Element {
         }
     });
 
+    // TODO: rendering lash-hash-at here
+    // to demonstrate that we can read messages from the miner
+    // here in the controller and also from any other page or component
     rsx! {
         "{last_hash_at}"
         "{is_mining}"

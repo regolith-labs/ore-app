@@ -20,7 +20,8 @@ pub fn Mine() -> Element {
     let pool_url = &pool.url;
     let member = use_member_db(pool_url.clone());
 
-    // read from miner (as demonstration)
+    // TODO: rendering lash-hash-at here
+    // to demonstrate that we can read messages from the miner
     let (from_miner, _to_miner) = use_miner();
     let mut last_hash_at = use_signal(|| 0);
     use_effect(move || {

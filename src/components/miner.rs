@@ -31,7 +31,7 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
                 }
                 true => {
                     match &*member_db.read_unchecked() {
-                        Some(Ok(member_db)) => {
+                        Some(Ok(_member_db)) => {
                             // start mining
                             rsx! {
                                 div { "start mining" }
