@@ -14,16 +14,16 @@ pub fn Landing() -> Element {
                     class: "mx-auto",
                     gap: 2,
                     span {
-                        class: "mx-auto font-extended font-bold text-4xl sm:text-5xl text-elements-highEmphasis",
+                        class: "mx-auto font-wide font-bold text-4xl sm:text-5xl text-elements-highEmphasis",
                         "Digital gold."
                     }
                     span {
-                        class: "mx-auto font-extended font-bold text-4xl sm:text-5xl text-elements-lowEmphasis",
+                        class: "mx-auto font-wide font-bold text-4xl sm:text-5xl text-elements-lowEmphasis",
                         "On Solana."
                     }
                     span {  
                         class: "mx-auto mt-8 font-wide font-light text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                        "A hard money standard for tokenized commodities markets."
+                        "A hard money standard for tokenized commodity markets."
                     }
                 }
                 Link {

@@ -110,7 +110,7 @@ pub fn Mine() -> Element {
             Heading {
                 class: "w-full",
                 title: "Mine",
-                subtitle: "Utilize compute power to harvest ORE."
+                subtitle: "Utilize spare compute power to harvest ORE."
             }
             StopStartButton { is_active }
             MinerStatus { is_active, member_db: member, pool: pool.clone() }
@@ -131,7 +131,7 @@ fn StopStartButton(is_active: Signal<bool>) -> Element {
             }
             if !is_active.cloned() {
                 span {
-                    class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105",
+                    class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
                     PlayIcon { class: "my-auto h-5" }
                     span {
                         class: "my-auto",

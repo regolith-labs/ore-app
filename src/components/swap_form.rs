@@ -289,7 +289,7 @@ fn SwapButton(
 ) -> Element {
     let quote_response = &*quote_response.read();
     let colors = if (quote_response).is_some() {
-        "controls-primary hover:scale-105"
+        "controls-primary hover:scale-105 transition-transform"
     } else {
         "bg-controls-disabled text-on-onDisabled"
     };
