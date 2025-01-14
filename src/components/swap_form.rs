@@ -27,6 +27,10 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let show_buy_token_selector = use_signal(|| false);
     let show_sell_token_selector = use_signal(|| false);
 
+    // quote response
+    let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
+    let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
+
     // selected tokens
     let buy_token = use_signal(|| Asset::ore());
     let sell_token = use_signal(|| Asset::sol());
@@ -35,6 +39,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let mut buy_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let buy_token = buy_token.read();
+        invoke_signature_status.set(InvokeSignatureStatus::Start);
         get_token_balance(wallet, buy_token.mint).await
     });
     let mut sell_token_balance = use_resource(move || async move {
@@ -42,10 +47,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
         let sell_token = sell_token.read();
         get_token_balance(wallet, sell_token.mint).await
     });
-
-    // quote response
-    let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
-    let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
 
     // reset signature
     use_effect(move || {
@@ -57,7 +58,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
         if let InvokeSignatureStatus::Done(_sig) = invoke_signature_status.cloned() {
             buy_token_balance.restart();
             sell_token_balance.restart();
-            invoke_signature_status.set(InvokeSignatureStatus::Start);
         }
     });
 
@@ -539,4 +539,3 @@ fn MaxButton(
         }
     }
 }
-
