@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     hooks::{
-        use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActive, Pool,
+        use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, Pool,
         FIRST_POOL, POOLS,
     },
     route::Route,
@@ -48,11 +48,11 @@ pub fn Mine() -> Element {
 }
 
 #[component]
-fn StopStartButton(is_active: Signal<IsActive>) -> Element {
+fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
     rsx! {
         button {
             class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16 group",
-            onclick: move |_| is_active.set(IsActive(!is_active.cloned().0)),
+            onclick: move |_| is_active.set(IsActiveMiner(!is_active.cloned().0)),
             OrbMiner {
                 class: "absolute top-0 left-0 z-0",
                 gold: is_active.read().0

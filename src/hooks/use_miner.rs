@@ -47,12 +47,12 @@ pub fn use_miner_provider() {
 }
 
 #[derive(Clone)]
-pub struct IsActive(pub bool);
+pub struct IsActiveMiner(pub bool);
 pub fn use_miner_is_active_provider() {
-    use_context_provider(|| Signal::new(IsActive(false)));
+    use_context_provider(|| Signal::new(IsActiveMiner(false)));
 }
-pub fn use_miner_is_active() -> Signal<IsActive> {
-    use_context::<Signal<IsActive>>()
+pub fn use_miner_is_active() -> Signal<IsActiveMiner> {
+    use_context::<Signal<IsActiveMiner>>()
 }
 
 fn shim_url() -> String {

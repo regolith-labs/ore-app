@@ -3,15 +3,15 @@ use solana_client_wasm::solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{GatewayError, GatewayResult};
 
-use super::{use_miner_is_active, IsActive};
+use super::{use_miner_is_active, IsActiveMiner};
 
 pub fn use_wallet() -> Signal<Wallet> {
     use_context::<Signal<Wallet>>()
 }
 
 pub fn use_wallet_provider() {
-    let mut signal = use_context_provider(|| Signal::new(Wallet::Disconnected));
     let mut miner_is_active = use_miner_is_active();
+    let mut signal = use_context_provider(|| Signal::new(Wallet::Disconnected));
     let mut eval = eval(
         r#"
             window.addEventListener("ore-pubkey", (event) => {
@@ -28,7 +28,7 @@ pub fn use_wallet_provider() {
                 }
                 Err(_) => {
                     signal.set(Wallet::Disconnected);
-                    miner_is_active.set(IsActive(false));
+                    miner_is_active.set(IsActiveMiner(false));
                 }
             }
         }
