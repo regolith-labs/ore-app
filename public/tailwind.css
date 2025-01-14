@@ -2373,4 +2373,3 @@ h2:where(.dark, .dark *) {
   --tw-placeholder-opacity: 1;
   color: rgb(70 70 72 / var(--tw-placeholder-opacity));
 }
-

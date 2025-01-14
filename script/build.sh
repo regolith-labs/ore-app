@@ -1,4 +1,5 @@
-cargo install dioxus-cli --version 0.6.1 --locked
+cargo install dioxus-cli --version 0.5.7 --locked
+cargo install wasm-bindgen-cli --version 0.2.93
 rustup target add wasm32-unknown-unknown 
 dx build --release 
 cd serve 

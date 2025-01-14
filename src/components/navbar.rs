@@ -18,10 +18,10 @@ pub fn Navbar() -> Element {
     rsx! {
         div {
             class: "relative min-h-screen flex flex-col text-black dark:bg-black dark:text-white {dark}",
-            Banner {
-                style: BannerStyle::Info,
-                "Mining on this page may be throttled if left in the background."
-            }
+            // Banner {
+            //     style: BannerStyle::Info,
+            //     "Mining on this page may be throttled if left in the background."
+            // }
             div {
                 class: "flex w-full",
                 div {
