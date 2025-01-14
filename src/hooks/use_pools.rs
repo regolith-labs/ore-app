@@ -32,6 +32,13 @@ pub static POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
     config.pools
 });
 
+pub const FIRST_POOL: Lazy<Pool> = Lazy::new(|| {
+    POOLS
+        .first()
+        .expect("Must be at least one entry in listed-pools.yaml")
+        .clone()
+});
+
 #[derive(Clone, PartialEq, Eq, Deserialize)]
 pub struct Pool {
     #[serde(deserialize_with = "deserialize_pubkey")]

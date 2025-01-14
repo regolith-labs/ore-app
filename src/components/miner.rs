@@ -3,29 +3,28 @@ use ore_pool_types::Member;
 
 use crate::{
     gateway::GatewayResult,
-    hooks::{use_member_onchain, use_register_db, use_register_onchain, use_wallet, Pool, Wallet},
+    hooks::{
+        use_member_onchain, use_miner_is_active, use_register_db, use_register_onchain, use_wallet,
+        Pool, Wallet,
+    },
 };
 
 use super::{invoke_signature, InvokeSignatureStatus};
 
 #[component]
-pub fn MinerStatus(
-    is_active: Signal<bool>,
-    member_db: Resource<GatewayResult<Member>>,
-    pool: Pool,
-) -> Element {
+pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> Element {
     let wallet = use_wallet();
+    let is_active = use_miner_is_active();
     let mut member_onchain = use_member_onchain(pool.address);
     let mut register_db = use_register_db(pool.url.clone());
     let register_onchain = use_register_onchain(pool.address);
     let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
     let el = match *wallet.read() {
         Wallet::Disconnected => {
-            is_active.set(false);
             rsx! {}
         }
         Wallet::Connected(_pubkey) => {
-            match *is_active.read() {
+            match is_active.read().0 {
                 false => {
                     // do nothing
                     rsx! {}
