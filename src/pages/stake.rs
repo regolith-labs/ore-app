@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use solana_sdk::pubkey::Pubkey;
 
 use crate::components::*;
 

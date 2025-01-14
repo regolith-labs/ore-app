@@ -6,7 +6,7 @@ use jupiter_swap_api_client::{
     transaction_config::TransactionConfig,
     JupiterSwapApiClient,
 };
-use solana_client_wasm::solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
+use solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
 use crate::gateway::{GatewayError, GatewayResult};
 
@@ -81,7 +81,7 @@ pub fn use_quote(
                             let output_amount = quote.out_amount as f64;
                             let output_decimals = 10u64.pow(output_token.decimals as u32) as f64;
                             let output_amount = output_amount / output_decimals;
-                            
+
                             // swap
                             // input_token_amount.set(Some(input_amount.to_string()));
                             output_token_amount.set(Some(output_amount.to_string()));

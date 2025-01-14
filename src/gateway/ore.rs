@@ -2,7 +2,7 @@ use ore_api::{
     consts::CONFIG_ADDRESS,
     state::{proof_pda, Config, Proof},
 };
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
 use super::{retry, GatewayError, GatewayResult, Rpc};

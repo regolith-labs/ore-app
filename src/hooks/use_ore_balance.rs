@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
+use solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
 
 use crate::gateway::{
     spl::SplGateway, ui_token_amount::UiTokenAmount, GatewayError, GatewayResult, Rpc,
