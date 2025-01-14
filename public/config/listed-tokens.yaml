@@ -7,6 +7,15 @@ assets:
     twitter: https://twitter.com/solana
     homepage: https://solana.com
     decimals: 9
+
+  - mint: oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp
+    name: ORE
+    ticker: ORE
+    description: "ORE is digital gold on Solana."
+    image: https://ore.supply/icon.png
+    twitter: https://twitter.com/OREsupply
+    homepage: https://ore.supply
+    decimals: 11
   
   - mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
     name: USDC
@@ -30,7 +39,7 @@ assets:
     name: Helium
     ticker: HNT
     description: "Helium is a decentralized wireless network protocol that incentivizes individuals to provide and validate wireless coverage. Originally focused on IoT connectivity through its LongFi network, Helium has expanded to include 5G cellular coverage. Network participants earn HNT tokens by operating hotspots that provide coverage or validating network transactions. This innovative 'proof-of-coverage' model has created one of the fastest-growing decentralized networks, transforming traditional telecom infrastructure into a community-powered system."
-    image: https://pbs.twimg.com/profile_images/1308416884434444291/aoNGZ6zz_400x400.jpg
+    image: https://shdw-drive.genesysgo.net/6tcnBSybPG7piEDShBcrVtYJDPSvGrDbVvXmXKpzBvWP/hnt.png
     twitter: https://twitter.com/helium
     homepage: https://www.helium.com
     decimals: 8

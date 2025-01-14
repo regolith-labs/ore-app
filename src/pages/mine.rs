@@ -3,106 +3,32 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     hooks::{
-        get_cutoff, get_updated_challenge, post_solution, use_gateway, use_member_db, use_miner,
-        use_wallet, GetPubkey, Pool, POOLS,
+        use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, Pool,
+        FIRST_POOL, POOLS,
     },
     route::Route,
 };
 
 pub fn Mine() -> Element {
-    // on off button
-    let mut is_gold = use_signal(|| false);
-    // register with first pool
-    let pool = POOLS.first().unwrap();
-    let pool_url = &pool.url;
-    // channel to and from miner
-    let (from_miner, mut to_miner) = use_miner();
-    // pool member account
-    let member = use_member_db(pool_url.clone());
-    // last challenge timestamp
-    let mut last_hash_at = use_signal(|| 0);
-    // user wallet
     let wallet = use_wallet();
 
-    // restart miner
-    use_effect(move || {
-        if let true = *is_gold.read() {
-            to_miner.restart();
-        }
-    });
+    // on off button
+    let is_active = use_miner_is_active();
 
-    // next challenge resource
-    let challenge = use_resource(move || {
-        let gateway = use_gateway();
-        let pool_url = pool_url.clone();
-        let member = &*member.read();
-        let member = member.clone();
-        let last_hash_at = *last_hash_at.read();
-        async move {
-            if let Some(Ok(member)) = member {
-                get_updated_challenge(
-                    &gateway.http,
-                    pool_url.as_str(),
-                    member.authority.as_str(),
-                    last_hash_at,
-                )
-                .await
-            } else {
-                Err(crate::gateway::GatewayError::AccountNotFound)
-            }
-        }
-    });
+    // register with first pool
+    let pool = FIRST_POOL;
+    let pool_url = &pool.url;
+    let member = use_member_db(pool_url.clone());
 
-    // challenge sender
+    // TODO: rendering lash-hash-at here
+    // to demonstrate that we can read messages from the miner
+    let (from_miner, _to_miner) = use_miner();
+    let mut last_hash_at = use_signal(|| 0);
     use_effect(move || {
-        let is_gold = *is_gold.read();
-        let member = &*member.read();
-        let member = member.clone();
-        let challenge = *challenge.read();
-        if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_gold) {
-            spawn(async move {
-                let gateway = use_gateway();
-                let cutoff_time =
-                    get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
-                match cutoff_time {
-                    Ok(cutoff_time) => {
-                        to_miner.send(ore_miner_web::InputMessage {
-                            member,
-                            challenge,
-                            cutoff_time,
-                        });
-                    }
-                    Err(err) => {
-                        log::error!("{:?}", err);
-                    }
-                }
-            });
-        }
-    });
-
-    // solutions receiver
-    use_effect(move || {
-        let pubkey = wallet.get_pubkey();
+        let _pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
-        if let ore_miner_web::OutputMessage::Solution(solution) = from_miner_read {
-            let gateway = use_gateway();
-            let solution = solution.clone();
-            log::info!("solution received: {:?}", solution);
-            if let Ok(pubkey) = pubkey {
-                spawn(async move {
-                    post_solution(&gateway.http, pool_url, &pubkey, &solution).await;
-                });
-            }
-        }
         if let ore_miner_web::OutputMessage::Expired(lha) = from_miner_read {
-            log::info!("expired: {}", lha);
-            // there may be many workers with the same lha observation
-            // only update on the first expiration
-            let peek = *last_hash_at.peek();
-            if lha > &peek {
-                log::info!("updating lha: {:?}:{:?}", peek, lha);
-                last_hash_at.set(*lha);
-            }
+            last_hash_at.set(*lha);
         }
     });
 
@@ -113,15 +39,35 @@ pub fn Mine() -> Element {
             Heading {
                 class: "w-full",
                 title: "Mine",
-                subtitle: "Forge new ORE by mining with your phone or computer."
+                subtitle: "Utilize spare compute power to harvest ORE."
             }
-            button {
-                class: "w-fit",
-                onclick: move |_| is_gold.set(!is_gold.cloned()),
-                Orb { is_gold: *is_gold.read() }
+            StopStartButton { is_active }
+            MinerStatus { member_db: member, pool: pool.clone() }
+            div { "{last_hash_at}" }
+        }
+    }
+}
+
+#[component]
+fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
+    rsx! {
+        button {
+            class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16 group",
+            onclick: move |_| is_active.set(IsActiveMiner(!is_active.cloned().0)),
+            OrbMiner {
+                class: "absolute top-0 left-0 z-0",
+                gold: is_active.read().0
             }
-            Miner { is_gold, member_db: member,pool: pool.clone() }
-            div { "{last_hash_at()}" }
+            if !is_active.cloned().0 {
+                span {
+                    class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
+                    PlayIcon { class: "my-auto h-5" }
+                    span {
+                        class: "my-auto",
+                        "Start mining"
+                    }
+                }
+            }
         }
     }
 }

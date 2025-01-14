@@ -1,3 +1,4 @@
+mod error;
 pub mod ore;
 pub mod solana;
 pub mod spl;
@@ -5,6 +6,7 @@ pub mod transaction_confirmation_status;
 pub mod ui_token_amount;
 mod utils;
 
+pub use error::*;
 use serde_json::{json, Value};
 #[cfg(not(feature = "web"))]
 use solana_client::nonblocking::rpc_client::RpcClient;

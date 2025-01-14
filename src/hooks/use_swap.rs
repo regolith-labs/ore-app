@@ -8,16 +8,13 @@ use jupiter_swap_api_client::{
 };
 use solana_client_wasm::solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
-use crate::{
-    components::InvokeSignatureStatus,
-    gateway::{GatewayError, GatewayResult},
-};
+use crate::gateway::{GatewayError, GatewayResult};
 
 use super::{use_wallet, Asset, GetPubkey};
 
 const API_URL: &str = "https://quote-api.jup.ag/v6";
 
-pub fn use_swap(
+pub fn use_swap_transaction(
     quote: Signal<Option<QuoteResponse>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
@@ -51,9 +48,9 @@ pub fn use_swap(
 
 pub fn use_quote(
     input_token: Signal<Asset>,
-    mut input_token_amount: Signal<String>,
+    mut input_token_amount: Signal<Option<String>>,
     output_token: Signal<Asset>,
-    mut output_token_amount: Signal<String>,
+    mut output_token_amount: Signal<Option<String>>,
     mut quote_response: Signal<Option<QuoteResponse>>,
 ) -> UseDebounce<String> {
     use_debounce::<String>(std::time::Duration::from_millis(750), move |input_str| {
@@ -63,10 +60,8 @@ pub fn use_quote(
                 if float == 0f64 {
                     clear = true;
                 } else {
-                    let input_token = &*input_token.read();
-                    let input_token = input_token.clone();
-                    let output_token = &*output_token.read();
-                    let output_token = output_token.clone();
+                    let input_token = input_token.read().clone();
+                    let output_token = output_token.read().clone();
                     match quote(
                         float,
                         &input_token.decimals,
@@ -81,13 +76,15 @@ pub fn use_quote(
                             let input_amount = quote.in_amount as f64;
                             let input_decimals = 10u64.pow(input_token.decimals as u32) as f64;
                             let input_amount = input_amount / input_decimals;
+
                             // output amount
                             let output_amount = quote.out_amount as f64;
                             let output_decimals = 10u64.pow(output_token.decimals as u32) as f64;
                             let output_amount = output_amount / output_decimals;
+                            
                             // swap
-                            input_token_amount.set(input_amount.to_string());
-                            output_token_amount.set(output_amount.to_string());
+                            // input_token_amount.set(Some(input_amount.to_string()));
+                            output_token_amount.set(Some(output_amount.to_string()));
                             quote_response.set(Some(quote));
                         }
                         Err(err) => {
@@ -99,9 +96,10 @@ pub fn use_quote(
             } else {
                 clear = true;
             }
+
             if clear {
-                input_token_amount.set("0.0".to_string());
-                output_token_amount.set("0.0".to_string());
+                input_token_amount.set(Some("".to_string()));
+                output_token_amount.set(Some("".to_string()));
                 quote_response.set(None);
             }
         });

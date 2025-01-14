@@ -50,26 +50,15 @@ where
 }
 
 impl Asset {
-    pub fn ore_ticker() -> String {
-        "ORE".to_string()
-    }
     pub fn ore() -> Self {
-        Self {
-            mint: ore_api::consts::MINT_ADDRESS,
-            name: "ORE".to_string(),
-            ticker: Self::ore_ticker(),
-            description: "Digital Gold".to_string(),
-            image: asset!("/public/icon.png")
-                .resolve()
-                .to_string_lossy()
-                .to_string(),
-            twitter: "https://twitter.com/oresupply".to_string(),
-            homepage: "https://ore.supply".to_string(),
-            decimals: ore_api::consts::TOKEN_DECIMALS,
-        }
+        ASSETS.get("ORE").cloned().unwrap()
     }
-    pub fn first() -> Self {
-        let assets = ASSETS.values().collect::<Vec<_>>();
-        assets.first().cloned().cloned().unwrap_or(Self::ore())
+
+    pub fn sol() -> Self {
+        ASSETS.get("SOL").cloned().unwrap()
+    }
+
+    pub fn usdc() -> Self {
+        ASSETS.get("USDC").cloned().unwrap()
     }
 }

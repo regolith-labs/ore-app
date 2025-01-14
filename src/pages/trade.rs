@@ -2,6 +2,8 @@ use dioxus::prelude::*;
 
 use crate::components::*;
 
+// TODO Price chart component
+// TODO Activity component
 pub fn Trade() -> Element {
     rsx! {
         Col {

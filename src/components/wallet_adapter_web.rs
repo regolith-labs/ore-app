@@ -1,6 +1,5 @@
 use dioxus::document::eval;
 use dioxus::prelude::*;
-
 use solana_sdk::pubkey::Pubkey;
 
 use crate::components::wallet_drawer::WalletDrawer;
@@ -8,7 +7,6 @@ use crate::components::*;
 use crate::hooks::{use_wallet, Wallet};
 use crate::steel_app::time::Duration;
 
-#[cfg(feature = "web")]
 pub fn WalletAdapter() -> Element {
     let wallet = use_wallet();
 
@@ -35,7 +33,7 @@ pub fn WalletAdapter() -> Element {
             }
         }
         Wallet::Disconnected => {
-            if *wallet_remount.read() {
+            if *wallet_remount.peek() {
                 wallet_mount.restart();
                 wallet_remount.set(false);
             }

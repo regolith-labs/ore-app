@@ -33,6 +33,13 @@ pub static POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
     config.pools
 });
 
+pub const FIRST_POOL: Lazy<Pool> = Lazy::new(|| {
+    POOLS
+        .first()
+        .expect("Must be at least one entry in listed-pools.yaml")
+        .clone()
+});
+
 #[derive(Clone, PartialEq, Eq, Deserialize)]
 pub struct Pool {
     #[serde(deserialize_with = "deserialize_pubkey")]
@@ -103,10 +110,8 @@ pub async fn get_updated_challenge(
     loop {
         let challenge = get_challenge(http_client, pool_url, miner).await?;
         if challenge.challenge.lash_hash_at == last_hash_at {
-            log::info!("fetch new challenge retry");
             async_std::task::sleep(std::time::Duration::from_secs(1)).await;
         } else {
-            log::info!("challenge: {:?}", challenge);
             return Ok(challenge);
         }
     }
