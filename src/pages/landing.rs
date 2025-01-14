@@ -6,8 +6,8 @@ pub fn Landing() -> Element {
     rsx! {
         Col {
             class: "flex h-full w-full overflow-y-auto mx-auto px-5 py-8 pb-20 sm:pb-16",
-            gap: 16,
             Hero {}
+            ChartSection {}
             SupplyStats {}
         }
     }
@@ -47,11 +47,24 @@ fn Hero() -> Element {
     }
 }
 
+
+fn ChartSection() -> Element {
+    rsx! {
+        Col {
+            class: "flex w-full",
+            img {
+                class: "w-full",
+                src: "/assets/blurchart_1920.png",
+            }
+        }
+    }
+}
+
 fn SupplyStats() -> Element {
     let circulating_supply = use_ore_supply();
     rsx! {
         Row {
-            class: "mx-auto gap-16 sm:gap-32",
+            class: "mx-auto py-16 gap-16 sm:gap-32",
             if let Some(Ok(circulating_supply)) = circulating_supply.cloned() {
                 SupplyValue {
                     title: "Circulating supply",
