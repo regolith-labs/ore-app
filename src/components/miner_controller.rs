@@ -79,17 +79,15 @@ pub fn MinerController() -> Element {
     // solutions receiver
     use_effect(move || {
         let pubkey = wallet.get_pubkey();
-        let from_miner_read = &*from_miner.read();
         let pool_url = pool.url.clone();
+        let from_miner_read = &*from_miner.read();
         if let ore_miner_web::OutputMessage::Solution(solution) = from_miner_read {
             let gateway = use_gateway();
             let solution = solution.clone();
-            log::info!("solution received: {:?}", solution);
             if let Ok(pubkey) = pubkey {
                 spawn(async move {
                     if let Err(err) =
-                        post_solution(&gateway.http, pool_url.clone().as_str(), &pubkey, &solution)
-                            .await
+                        post_solution(&gateway.http, pool_url.as_str(), &pubkey, &solution).await
                     {
                         log::error!("{:?}", err);
                     }
@@ -97,7 +95,6 @@ pub fn MinerController() -> Element {
             }
         }
         if let ore_miner_web::OutputMessage::Expired(lha) = from_miner_read {
-            log::info!("expired: {}", lha);
             // there may be many workers with the same lha observation
             // only update on the first expiration
             let peek = *last_hash_at.peek();
@@ -108,7 +105,17 @@ pub fn MinerController() -> Element {
         }
     });
 
+    let mut is_mining = use_signal(|| false);
+    use_effect(move || {
+        if is_active.read().0 {
+            is_mining.set(true);
+        } else {
+            is_mining.set(false);
+        }
+    });
+
     rsx! {
         "{last_hash_at}"
+        "{is_mining}"
     }
 }
