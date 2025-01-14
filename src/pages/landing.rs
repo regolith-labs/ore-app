@@ -23,7 +23,7 @@ pub fn Landing() -> Element {
                     }
                     span {  
                         class: "mx-auto mt-8 font-wide font-light text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                        "A hard money standard for tokenized commodities and stablecoins."
+                        "A hard money standard for tokenized commodities markets."
                     }
                 }
                 Link {
