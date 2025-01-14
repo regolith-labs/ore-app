@@ -33,6 +33,8 @@ pub fn App() -> Element {
         document::Link { rel: "icon", href: asset!("/public/favicon.png") }
         document::Link { rel: "icon", href: asset!("/public/icon.png") }
         document::Script { src: asset!("/public/wallet.js") }
+        // TODO: could move to its own layout
+        // just needs to be mounted always like the navbar and wallet
         MinerController {}
         Router::<Route> {}
     }

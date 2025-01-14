@@ -115,10 +115,7 @@ pub fn MinerController() -> Element {
         }
     });
 
-    // TODO: rendering lash-hash-at here
-    // to demonstrate that we can read messages from the miner
-    // here in the controller and also from any other page or component
-    // although, the miner rewards etc is just a simple use-resource http request
+    // TODO: pretty
     rsx! {
         "{last_hash_at}"
         "{is_mining}"
