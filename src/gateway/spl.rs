@@ -34,6 +34,10 @@ impl Gateway {
         Ok(token_account.token_amount)
     }
 
+    pub async fn get_token_supply(&self, mint: &Pubkey) -> GatewayResult<UiTokenAmount> {
+        self.rpc.get_token_supply(mint).await.map_err(GatewayError::from)
+    }
+
     pub async fn get_ore_balance(&self, owner: &Pubkey) -> GatewayResult<UiTokenAmount> {
         self.get_token_balance(owner, &MINT_ADDRESS).await
     }

@@ -12,7 +12,7 @@ assets:
     name: ORE
     ticker: ORE
     description: "ORE is digital gold on Solana."
-    image: https://ore.supply/icon.png
+    image: https://ore.supply/assets/icon.png
     twitter: https://twitter.com/OREsupply
     homepage: https://ore.supply
     decimals: 11

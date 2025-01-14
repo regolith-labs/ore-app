@@ -47,6 +47,49 @@ pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
     }
 }
 
+
+#[component]
+pub fn OreValueWhole(ui_amount_string: String, class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    let units: Vec<_> = ui_amount_string.split('.').collect();
+    let big_units = units[0];
+    // let small_units = units[1];
+
+
+    // Add commas to the big units
+    let big_units = if big_units.len() > 3 {
+        let mut result = String::new();
+        let mut count = 0;
+        for c in big_units.chars().rev() {
+            if count > 0 && count % 3 == 0 {
+                result.push(',');
+            }
+            result.push(c);
+            count += 1;
+        }
+        result.chars().rev().collect::<String>()
+    } else {
+        big_units.to_string()
+    };
+
+    rsx! {
+        Row {
+            class: "sm:gap-3 h-10 w-min {class}",
+            gap: 2,
+            OreIcon {
+                class: "h-5 w-5 sm:h-8 sm:w-8 my-auto"
+            }
+            Row {
+                class: "my-auto",
+                span {
+                    class: "mt-auto font-semibold text-xl sm:text-3xl",
+                    "{big_units}"
+                }
+            }
+        }
+    }
+}
+
 #[component]
 pub fn OrePrice(ui_amount_string: String, change: Option<f64>) -> Element {
     let units: Vec<_> = ui_amount_string.split('.').collect();

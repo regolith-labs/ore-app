@@ -117,7 +117,7 @@ pub fn MinerController() -> Element {
 
     // TODO: pretty
     rsx! {
-        "{last_hash_at}"
-        "{is_mining}"
+        // "{last_hash_at}"
+        // "{is_mining}"
     }
 }

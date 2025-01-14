@@ -766,10 +766,6 @@ body {
   height: 5rem;
 }
 
-.h-24 {
-  height: 6rem;
-}
-
 .h-3 {
   height: 0.75rem;
 }
@@ -813,6 +809,10 @@ body {
 
 .h-screen {
   height: 100vh;
+}
+
+.min-h-screen {
+  min-height: 100vh;
 }
 
 .w-10 {
@@ -886,6 +886,14 @@ body {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-16 {
+  width: 4rem;
+}
+
+.w-48 {
+  width: 12rem;
 }
 
 .min-w-max {
@@ -2941,12 +2949,28 @@ body {
   gap: 2rem;
 }
 
+.gap-32 {
+  gap: 8rem;
+}
+
+.gap-24 {
+  gap: 6rem;
+}
+
 .overflow-clip {
   overflow: clip;
 }
 
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
 .overflow-x-scroll {
   overflow-x: scroll;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll;
 }
 
 .truncate {
@@ -3049,6 +3073,11 @@ body {
   background-color: rgb(250 250 250 / var(--tw-bg-opacity));
 }
 
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -3135,6 +3164,11 @@ body {
   padding-bottom: 2rem;
 }
 
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
 .pb-20 {
   padding-bottom: 5rem;
 }
@@ -3161,10 +3195,6 @@ body {
 
 .align-top {
   vertical-align: top;
-}
-
-.font-extended {
-  font-family: PilatExtended, PilatWide, ui-sans-serif, system-ui;
 }
 
 .font-wide {
@@ -3613,10 +3643,6 @@ body {
     width: 1.5rem;
   }
 
-  .sm\:w-64 {
-    width: 16rem;
-  }
-
   .sm\:w-8 {
     width: 2rem;
   }
@@ -3651,6 +3677,10 @@ body {
 
   .sm\:gap-4 {
     gap: 1rem;
+  }
+
+  .sm\:gap-32 {
+    gap: 8rem;
   }
 
   .sm\:rounded-md {
@@ -3714,6 +3744,11 @@ body {
   .sm\:text-xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
+  }
+
+  .sm\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
   }
 }
 
