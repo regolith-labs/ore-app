@@ -33,7 +33,7 @@ pub fn WalletAdapter() -> Element {
             }
         }
         Wallet::Disconnected => {
-            if *wallet_remount.read() {
+            if *wallet_remount.peek() {
                 wallet_mount.restart();
                 wallet_remount.set(false);
             }

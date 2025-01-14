@@ -15,13 +15,18 @@ const WASM: Asset = asset!("/public/miner_bg.wasm");
 type FromMiner = Signal<ore_miner_web::OutputMessage>;
 type ToMiner = Coroutine<ore_miner_web::InputMessage>;
 
-/// two way channel between us and miner (web worker)
 pub fn use_miner() -> (FromMiner, ToMiner) {
-    // from miner receiver
-    let mut from_miner = use_signal(|| ore_miner_web::OutputMessage::Init);
+    let from = use_context::<Signal<ore_miner_web::OutputMessage>>();
+    let to = use_coroutine_handle::<ore_miner_web::InputMessage>();
+    (from, to)
+}
 
+/// two way channel between us and miner (web worker)
+pub fn use_miner_provider() {
+    // from miner receiver
+    let mut from_miner = use_context_provider(|| Signal::new(ore_miner_web::OutputMessage::Init));
     // to miner sender
-    let to_miner = use_coroutine(move |mut rx| async move {
+    let _to_miner = use_coroutine(move |mut rx| async move {
         // callback for miner to send messages back to us
         let mut spawner = Miner::spawner();
         let miner = spawner
@@ -39,9 +44,15 @@ pub fn use_miner() -> (FromMiner, ToMiner) {
             miner.send(msg);
         }
     });
+}
 
-    // two way channel
-    (from_miner, to_miner)
+#[derive(Clone)]
+pub struct IsActiveMiner(pub bool);
+pub fn use_miner_is_active_provider() {
+    use_context_provider(|| Signal::new(IsActiveMiner(false)));
+}
+pub fn use_miner_is_active() -> Signal<IsActiveMiner> {
+    use_context::<Signal<IsActiveMiner>>()
 }
 
 fn shim_url() -> String {
