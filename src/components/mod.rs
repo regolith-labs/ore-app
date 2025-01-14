@@ -14,7 +14,6 @@ mod submit_transaction;
 mod swap_form;
 mod table;
 mod table_simple;
-#[cfg(feature = "web")]
 mod wallet_adapter;
 mod wallet_adapter_web;
 mod wallet_drawer;
@@ -35,6 +34,5 @@ pub use submit_transaction::*;
 pub use swap_form::*;
 pub use table::*;
 pub use table_simple::*;
-#[cfg(feature = "web")]
 pub use wallet_adapter::*;
 pub use wallet_drawer::*;

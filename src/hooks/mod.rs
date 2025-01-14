@@ -1,6 +1,10 @@
 mod use_assets;
 mod use_gateway;
 mod use_miner;
+#[cfg(not(feature = "web"))]
+mod use_miner_native;
+#[cfg(feature = "web")]
+mod use_miner_web;
 mod use_ore_balance;
 #[cfg(feature = "web")]
 mod use_persistent;
