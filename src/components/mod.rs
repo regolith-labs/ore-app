@@ -15,8 +15,15 @@ mod swap_form;
 mod table;
 mod table_simple;
 mod wallet_adapter;
+#[cfg(not(feature = "web"))]
+mod wallet_adapter_native;
+#[cfg(feature = "web")]
 mod wallet_adapter_web;
 mod wallet_drawer;
+#[cfg(not(feature = "web"))]
+mod wallet_drawer_native;
+#[cfg(feature = "web")]
+mod wallet_drawer_web;
 
 pub use balance::*;
 pub use breadcrumbs::*;

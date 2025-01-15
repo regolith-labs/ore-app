@@ -7,6 +7,12 @@ use crate::gateway::GatewayResult;
 use crate::hooks::{use_token_balance, Asset, ASSETS};
 use crate::route::Route;
 
+#[cfg(feature = "web")]
+pub use wallet_drawer_web::WalletDrawer;
+
+#[cfg(not(feature = "web"))]
+pub use wallet_drawer_native::WalletDrawer;
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum WalletTab {
     Tokens,
@@ -14,50 +20,7 @@ pub enum WalletTab {
 }
 
 #[component]
-pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<bool>) -> Element {
-    let tab = use_signal(|| WalletTab::Tokens);
-
-    rsx! {
-        div {
-            class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
-            onclick: move |e| e.stop_propagation(),
-
-            // "TODO: Wallet address + copy button"
-
-            DisconnectButton { wallet_remount },
-            Col {
-                WalletTabs { tab },
-                match *tab.read() {
-                    WalletTab::Tokens => rsx! {
-                        TokenTable { on_close }
-                    },
-                    WalletTab::Liquidity => rsx! {
-                        LiquidityTable { on_close }
-                    }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn DisconnectButton(wallet_remount: Signal<bool>) -> Element {
-    rsx! {
-        button {
-            onclick: move |_| {
-                wallet_remount.set(true);
-                let disconnect = eval(r#"window.OreWalletDisconnecter(); return"#);
-                spawn(async move {
-                    let _ = disconnect.await;
-                });
-            },
-            "Disconnect"
-        }
-    }
-}
-
-#[component]
-fn TokenTable(on_close: EventHandler<MouseEvent>) -> Element {
+pub(super) fn TokenTable(on_close: EventHandler<MouseEvent>) -> Element {
     let listed_tokens = ASSETS.values().collect::<Vec<_>>();
     rsx! {
         Col {
@@ -171,7 +134,7 @@ fn TokenValue(token: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> 
 }
 
 #[component]
-fn LiquidityTable(on_close: EventHandler<MouseEvent>) -> Element {
+pub(super) fn LiquidityTable(on_close: EventHandler<MouseEvent>) -> Element {
     let listed_assets = ASSETS.values().collect::<Vec<_>>();
     rsx! {
         TableSimple {
@@ -243,7 +206,7 @@ fn LiquidityRow(asset: Asset, on_close: EventHandler<MouseEvent>) -> Element {
 }
 
 #[component]
-fn WalletTabs(tab: Signal<WalletTab>) -> Element {
+pub(super) fn WalletTabs(tab: Signal<WalletTab>) -> Element {
     let tokens_class = if *tab.read() == WalletTab::Tokens {
         "flex-1 h-12 transition-colors text-elements-highEmphasis border-b-2 border-white hover:bg-controls-tertiary"
     } else {
