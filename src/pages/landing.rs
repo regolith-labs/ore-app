@@ -7,7 +7,7 @@ pub fn Landing() -> Element {
         Col {
             class: "relative flex h-full w-full overflow-y-auto mx-auto pb-20 sm:pb-16",
             Col {
-                class: "flex flex-col w-full min-h-screen justify-between bg-[url('/assets/dot-grid.png')] bg-auto bg-no-repeat bg-top",
+                class: "flex flex-col w-full h-full min-h-[calc(100vh-2rem)] sm:min-h-[calc(100vh-8rem)] justify-between bg-[url('/assets/dot-grid.png')] bg-auto bg-no-repeat bg-top",
                 Hero {}
                 MarqeeSection {}
             }
@@ -37,7 +37,7 @@ fn Hero() -> Element {
                 }
                 span {  
                     class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                    "The hard money standard for onchain assets and commodities."
+                    "The hard money standard for tokenized assets and commodities."
                 }
             }
             Link {
@@ -145,14 +145,17 @@ fn ChartSection() -> Element {
 fn LiquiditySection() -> Element {
     rsx! {
         Col {
-            class: "w-full mt-24 sm:mt-32 pt-0 pb-64 sm:pb-64 gap-2 sm:gap-4 px-3 sm:px-8 md:px-16 lg:px-24 bg-[url('/assets/blurchart-1920.png')] bg-cover bg-center",
-            span {
-                class: "font-wide font-semibold text-2xl sm:text-3xl text-elements-highEmphasis",
-                "Solving for liquidity."
-            }
-            span {
-                class: "max-w-xl sm:text-lg text-elements-lowEmphasis",
-                "ORE works with issuers of novel defi assets to supply market liquidity and connect with a community of likeminded investors."
+            class: "w-full mt-24 sm:mt-32 pt-0 pb-64 sm:pb-64 px-3 sm:px-8 md:px-16 lg:px-24 bg-[url('/assets/blurchart-1920.png')] bg-contain bg-no-repeat bg-center",
+            Col {
+                class: "gap-2 sm:gap-4 mx-auto w-full max-w-[96rem]",
+                span {
+                    class: "font-wide font-semibold text-2xl sm:text-3xl text-elements-highEmphasis text-center sm:text-left",
+                    "Solving for liquidity."
+                }
+                span {
+                    class: "max-w-xl sm:text-lg text-elements-lowEmphasis text-center sm:text-left",
+                    "ORE works with issuers of novel defi assets to provide market liquidity and connect with a community of likeminded investors."
+                }
             }
         }
     }
@@ -172,7 +175,7 @@ fn SupplySection() -> Element {
                 }
                 span {
                     class: "max-w-xl text-center sm:text-lg text-elements-lowEmphasis mx-auto my-auto",
-                    "ORE follows a fixed supply schedule with a deflationary emissions curve."
+                    "ORE follows a fixed emissions schedule and deflationary supply curve."
                 }
             }
             Row {
@@ -224,21 +227,24 @@ fn SupplyValue(title: String, value: Option<String>) -> Element {
 fn MiningSection() -> Element {
     rsx! {
         div {
-            class: "flex flex-col-reverse md:flex-row w-full mt-24 sm:mt-32 pt-0 pb-64 sm:pb-64 px-3 sm:px-8 md:px-16 lg:px-24",
-            Col {
-                class: "w-full gap-2 sm:gap-4 -mt-64 md:mt-0",
-                span {
-                    class: "font-wide font-semibold text-2xl sm:text-3xl text-elements-highEmphasis",
-                    "Mine everywhere."
+            class: "mt-24 sm:mt-40 pt-0 pb-64 sm:pb-64 px-3 sm:px-8 md:px-16 lg:px-24",
+            div {
+                class: "flex flex-col-reverse md:flex-row w-full max-w-[96rem] mx-auto",
+                Col {
+                    class: "w-full gap-2 sm:gap-4 -mt-64 md:mt-0",
+                    span {
+                        class: "font-wide font-semibold text-2xl sm:text-3xl text-elements-highEmphasis",
+                        "Mine everywhere."
+                    }
+                    span {
+                        class: "max-w-xl sm:text-lg text-elements-lowEmphasis",
+                        "No advanced hardware required."
+                    }
                 }
-                span {
-                    class: "max-w-xl sm:text-lg text-elements-lowEmphasis",
-                    "No advanced hardware required."
+                img {
+                    class: "w-96 mx-auto md:mx-0 lg:mx-16 xl:mx-32",
+                    src: "/assets/demo-miner.png",
                 }
-            }
-            img {
-                class: "w-96 mx-auto md:mx-0 lg:mx-16 xl:mx-32",
-                src: "/assets/demo-miner.png",
             }
         }
     }

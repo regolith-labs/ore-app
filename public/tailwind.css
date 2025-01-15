@@ -866,6 +866,38 @@ body {
   min-height: 100%;
 }
 
+.min-h-\[100vh-20rem\] {
+  min-height: 100vh-20rem;
+}
+
+.min-h-\[calc\(100vh-20rem\)\] {
+  min-height: calc(100vh - 20rem);
+}
+
+.min-h-\[calc\(100vh-16rem\)\] {
+  min-height: calc(100vh - 16rem);
+}
+
+.min-h-\[calc\(100vh-4rem\)\] {
+  min-height: calc(100vh - 4rem);
+}
+
+.min-h-\[calc\(100vh-8rem\)\] {
+  min-height: calc(100vh - 8rem);
+}
+
+.min-h-\[calc\(100vh-2rem\)\] {
+  min-height: calc(100vh - 2rem);
+}
+
+.min-h-\[calc\(100vh\)\] {
+  min-height: calc(100vh);
+}
+
+.min-h-\[100vh\] {
+  min-height: 100vh;
+}
+
 .w-10 {
   width: 2.5rem;
 }
@@ -958,6 +990,18 @@ body {
 
 .max-w-xl {
   max-width: 36rem;
+}
+
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+.max-w-7xl {
+  max-width: 80rem;
+}
+
+.max-w-\[96rem\] {
+  max-width: 96rem;
 }
 
 .flex-1 {
@@ -1251,6 +1295,10 @@ body {
 
 .bg-auto {
   background-size: auto;
+}
+
+.bg-contain {
+  background-size: contain;
 }
 
 .bg-center {
@@ -1843,6 +1891,10 @@ body {
     margin-top: 8rem;
   }
 
+  .sm\:mt-40 {
+    margin-top: 10rem;
+  }
+
   .sm\:block {
     display: block;
   }
@@ -1869,6 +1921,10 @@ body {
 
   .sm\:h-8 {
     height: 2rem;
+  }
+
+  .sm\:min-h-\[calc\(100vh-8rem\)\] {
+    min-height: calc(100vh - 8rem);
   }
 
   .sm\:w-56 {
@@ -1976,6 +2032,16 @@ body {
     padding-right: 6rem;
   }
 
+  .sm\:px-5 {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .sm\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .sm\:pb-16 {
     padding-bottom: 4rem;
   }
@@ -1994,6 +2060,10 @@ body {
 
   .sm\:pt-0 {
     padding-top: 0px;
+  }
+
+  .sm\:text-left {
+    text-align: left;
   }
 
   .sm\:text-2xl {
