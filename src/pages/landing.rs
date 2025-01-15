@@ -175,7 +175,7 @@ fn SupplySection() -> Element {
                 }
                 span {
                     class: "max-w-xl text-center sm:text-lg text-elements-lowEmphasis mx-auto my-auto",
-                    "ORE follows a fixed emissions schedule and deflationary supply curve."
+                    "ORE follows a fixed supply curve and deflationary emissions schedule."
                 }
             }
             Row {
