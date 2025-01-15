@@ -687,6 +687,16 @@ body {
   margin-bottom: auto;
 }
 
+.mx-32 {
+  margin-left: 8rem;
+  margin-right: 8rem;
+}
+
+.mx-0 {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
 .-ml-1 {
   margin-left: -0.25rem;
 }
@@ -741,6 +751,30 @@ body {
 
 .mt-auto {
   margin-top: auto;
+}
+
+.mt-0 {
+  margin-top: 0px;
+}
+
+.mt-32 {
+  margin-top: 8rem;
+}
+
+.mt-12 {
+  margin-top: 3rem;
+}
+
+.mt-20 {
+  margin-top: 5rem;
+}
+
+.mt-24 {
+  margin-top: 6rem;
+}
+
+.-mt-64 {
+  margin-top: -16rem;
 }
 
 .inline-block {
@@ -824,6 +858,14 @@ body {
   height: 100vh;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.min-h-full {
+  min-height: 100%;
+}
+
 .w-10 {
   width: 2.5rem;
 }
@@ -900,6 +942,10 @@ body {
 .min-w-max {
   min-width: -moz-max-content;
   min-width: max-content;
+}
+
+.min-w-full {
+  min-width: 100%;
 }
 
 .max-w-2xl {
@@ -994,6 +1040,10 @@ body {
   flex-direction: column;
 }
 
+.flex-col-reverse {
+  flex-direction: column-reverse;
+}
+
 .flex-nowrap {
   flex-wrap: nowrap;
 }
@@ -1040,6 +1090,10 @@ body {
 
 .gap-8 {
   gap: 2rem;
+}
+
+.gap-12 {
+  gap: 3rem;
 }
 
 .overflow-clip {
@@ -1154,6 +1208,11 @@ body {
   background-color: rgb(250 250 250 / var(--tw-bg-opacity));
 }
 
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -1174,16 +1233,37 @@ body {
   background-image: url('assets/orb_gold_sprite.webp');
 }
 
+.bg-\[url\(\'\/assets\/blurchart-1920\.png\'\)\] {
+  background-image: url('/assets/blurchart-1920.png');
+}
+
+.bg-\[url\(\'\/assets\/dot-grid\.png\'\)\] {
+  background-image: url('/assets/dot-grid.png');
+}
+
 .bg-cover {
   background-size: cover;
+}
+
+.bg-auto {
+  background-size: auto;
 }
 
 .bg-center {
   background-position: center;
 }
 
+.bg-top {
+  background-position: top;
+}
+
 .bg-no-repeat {
   background-repeat: no-repeat;
+}
+
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .p-1 {
@@ -1289,6 +1369,26 @@ body {
 
 .pt-4 {
   padding-top: 1rem;
+}
+
+.pt-32 {
+  padding-top: 8rem;
+}
+
+.pt-48 {
+  padding-top: 12rem;
+}
+
+.pt-40 {
+  padding-top: 10rem;
+}
+
+.pt-8 {
+  padding-top: 2rem;
+}
+
+.pt-0 {
+  padding-top: 0px;
 }
 
 .text-center {
@@ -1705,12 +1805,38 @@ body {
     margin-bottom: 4rem;
   }
 
+  .sm\:mx-16 {
+    margin-left: 4rem;
+    margin-right: 4rem;
+  }
+
+  .sm\:mx-0 {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
   .sm\:mb-\[7px\] {
     margin-bottom: 7px;
   }
 
   .sm\:ml-0 {
     margin-left: 0px;
+  }
+
+  .sm\:mt-8 {
+    margin-top: 2rem;
+  }
+
+  .sm\:mt-4 {
+    margin-top: 1rem;
+  }
+
+  .sm\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .sm\:mt-32 {
+    margin-top: 8rem;
   }
 
   .sm\:block {
@@ -1767,6 +1893,10 @@ body {
 
   .sm\:grow {
     flex-grow: 1;
+  }
+
+  .sm\:flex-row {
+    flex-direction: row;
   }
 
   .sm\:justify-between {
@@ -1827,12 +1957,39 @@ body {
     padding-bottom: 2rem;
   }
 
+  .sm\:px-16 {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  .sm\:px-32 {
+    padding-left: 8rem;
+    padding-right: 8rem;
+  }
+
+  .sm\:px-24 {
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+
   .sm\:pb-16 {
     padding-bottom: 4rem;
   }
 
   .sm\:pb-64 {
     padding-bottom: 16rem;
+  }
+
+  .sm\:pt-32 {
+    padding-top: 8rem;
+  }
+
+  .sm\:pt-16 {
+    padding-top: 4rem;
+  }
+
+  .sm\:pt-0 {
+    padding-top: 0px;
   }
 
   .sm\:text-2xl {
@@ -1877,12 +2034,35 @@ body {
 }
 
 @media (min-width: 768px) {
+  .md\:mx-16 {
+    margin-left: 4rem;
+    margin-right: 4rem;
+  }
+
+  .md\:mx-8 {
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+
+  .md\:mx-0 {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
   .md\:-ml-3 {
     margin-left: -0.75rem;
   }
 
   .md\:ml-auto {
     margin-left: auto;
+  }
+
+  .md\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .md\:flex-row {
+    flex-direction: row;
   }
 
   .md\:flex-col {
@@ -1896,11 +2076,43 @@ body {
   .md\:gap-2 {
     gap: 0.5rem;
   }
+
+  .md\:px-24 {
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+
+  .md\:px-16 {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
 }
 
 @media (min-width: 1024px) {
+  .lg\:mx-16 {
+    margin-left: 4rem;
+    margin-right: 4rem;
+  }
+
+  .lg\:mx-32 {
+    margin-left: 8rem;
+    margin-right: 8rem;
+  }
+
   .lg\:flex {
     display: flex;
+  }
+
+  .lg\:px-24 {
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:mx-32 {
+    margin-left: 8rem;
+    margin-right: 8rem;
   }
 }
 

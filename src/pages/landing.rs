@@ -5,12 +5,15 @@ use crate::{components::*, hooks::use_ore_supply, route::Route};
 pub fn Landing() -> Element {
     rsx! {
         Col {
-            class: "flex h-full w-full overflow-y-auto mx-auto py-8 pb-20 sm:pb-16",
-            Hero {}
-            TickerTape {}
-            // ChartSection {}
-            // LiquiditySection {}
-            // SupplyStats {}
+            class: "relative flex h-full w-full overflow-y-auto mx-auto pb-20 sm:pb-16",
+            Col {
+                class: "flex flex-col w-full min-h-screen justify-between bg-[url('/assets/dot-grid.png')] bg-auto bg-no-repeat bg-top",
+                Hero {}
+                MarqeeSection {}
+            }
+            LiquiditySection {}
+            SupplySection {}
+            MiningSection {}
         }
     }
 }
@@ -18,7 +21,7 @@ pub fn Landing() -> Element {
 fn Hero() -> Element {
     rsx! {
         Col {
-            class: "mx-auto my-auto px-5 gap-16",
+            class: "mx-auto my-auto pt-0 px-5 gap-16",
             gap: 16,
             OrbHero {}
             Col {
@@ -34,7 +37,7 @@ fn Hero() -> Element {
                 }
                 span {  
                     class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                    "A hard money standard for onchain commodities."
+                    "The hard money standard for onchain assets and commodities."
                 }
             }
             Link {
@@ -49,10 +52,10 @@ fn Hero() -> Element {
     }
 }
 
-fn TickerTape() -> Element {
+fn MarqeeSection() -> Element {
     rsx! {
         div {
-            class: "relative flex w-full h-12 mt-16",
+            class: "relative flex w-full mt-8",
 
             // First set of items
             div {
@@ -142,41 +145,53 @@ fn ChartSection() -> Element {
 fn LiquiditySection() -> Element {
     rsx! {
         Col {
-            // class: "w-full py-32 pb-64 sm:py-48 sm:pb-64 gap-2 sm:gap-4 px-5 bg-[url('/assets/blurchart_390.png')] sm:bg-[url('/assets/blurchart_1920.png')] bg-cover bg-center",
-            class: "w-full pt-16 pb-64 sm:pb-64 gap-2 sm:gap-4 px-3 sm:px-6 bg-[url('/assets/blurchart_1920.png')] bg-cover bg-center",
-
-            // class: "w-full sm:py-48 gap-2 sm:gap-4 px-5",
+            class: "w-full mt-24 sm:mt-32 pt-0 pb-64 sm:pb-64 gap-2 sm:gap-4 px-3 sm:px-8 md:px-16 lg:px-24 bg-[url('/assets/blurchart-1920.png')] bg-cover bg-center",
             span {
                 class: "font-wide font-semibold text-2xl sm:text-3xl text-elements-highEmphasis",
                 "Solving for liquidity."
             }
             span {
                 class: "max-w-xl sm:text-lg text-elements-lowEmphasis",
-                "ORE works with teams issuing novel defi products such as RWAs and DePIN credits to seed market liquidity and connect with likeminded traders."
+                "ORE works with issuers of novel defi assets to supply market liquidity and connect with a community of likeminded investors."
             }
         }
     }
 }
 
-fn SupplyStats() -> Element {
+fn SupplySection() -> Element {
     let circulating_supply = use_ore_supply();
     rsx! {
-        Row {
-            class: "mx-auto py-16 gap-16 sm:gap-32",
-            if let Some(Ok(circulating_supply)) = circulating_supply.cloned() {
-                SupplyValue {
-                    title: "Circulating",
-                    value: circulating_supply.ui_amount_string,
+        Col {   
+            class: "w-full py-16 gap-12",
+            Col {
+                class: "px-3 sm:px-8",
+                gap: 4,
+                span {
+                    class: "font-wide font-semibold mx-auto text-2xl sm:text-3xl text-elements-highEmphasis",
+                    "Supply is limited."
                 }
-            } else {
-                SupplyValue {
-                    title: "Circulating",
-                    value: None,
+                span {
+                    class: "max-w-xl text-center sm:text-lg text-elements-lowEmphasis mx-auto my-auto",
+                    "ORE follows a fixed supply schedule with a deflationary emissions curve."
                 }
             }
-            SupplyValue {
-                title: "Total",
-                value: Some("5000000".to_string()),
+            Row {
+                class: "mx-auto gap-16 sm:gap-32",
+                if let Some(Ok(circulating_supply)) = circulating_supply.cloned() {
+                SupplyValue {
+                    title: "CURRENT",
+                    value: circulating_supply.ui_amount_string,
+                    }
+                } else {
+                    SupplyValue {
+                        title: "CURRENT",
+                        value: None,
+                    }
+                }
+                SupplyValue {
+                    title: "TOTAL",
+                    value: Some("5000000".to_string()),
+                }
             }
         }
     }
@@ -187,10 +202,6 @@ fn SupplyValue(title: String, value: Option<String>) -> Element {
     rsx! {
         Col {
             gap: 2,
-            span {
-                class: "font-wide text-sm text-center text-nowrap sm:text-base text-elements-lowEmphasis mx-auto my-auto",
-                "{title}"
-            }
             if let Some(value) = value {
                 OreValueWhole {
                     class: "mx-auto",
@@ -201,7 +212,34 @@ fn SupplyValue(title: String, value: Option<String>) -> Element {
                     class: "h-10 w-32 mx-auto loading rounded"
                 }
             }
+            span {
+                class: "font-wide font-semibold text-xs sm:text-sm text-center text-nowrap text-elements-lowEmphasis mx-auto my-auto",
+                "{title}"
+            }
         }
     }
 }
 
+
+fn MiningSection() -> Element {
+    rsx! {
+        div {
+            class: "flex flex-col-reverse md:flex-row w-full mt-24 sm:mt-32 pt-0 pb-64 sm:pb-64 px-3 sm:px-8 md:px-16 lg:px-24",
+            Col {
+                class: "w-full gap-2 sm:gap-4 -mt-64 md:mt-0",
+                span {
+                    class: "font-wide font-semibold text-2xl sm:text-3xl text-elements-highEmphasis",
+                    "Mine everywhere."
+                }
+                span {
+                    class: "max-w-xl sm:text-lg text-elements-lowEmphasis",
+                    "No advanced hardware required."
+                }
+            }
+            img {
+                class: "w-96 mx-auto md:mx-0 lg:mx-16 xl:mx-32",
+                src: "/assets/demo-miner.png",
+            }
+        }
+    }
+}
