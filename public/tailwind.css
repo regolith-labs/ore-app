@@ -620,10 +620,6 @@ body {
   inset: 0px;
 }
 
-.inset-1\/2 {
-  inset: 50%;
-}
-
 .inset-x-1\/2 {
   left: 50%;
   right: 50%;
@@ -654,10 +650,6 @@ body {
   top: 0px;
 }
 
-.top-1\/2 {
-  top: 50%;
-}
-
 .z-0 {
   z-index: 0;
 }
@@ -668,6 +660,11 @@ body {
 
 .z-50 {
   z-index: 50;
+}
+
+.mx-16 {
+  margin-left: 4rem;
+  margin-right: 4rem;
 }
 
 .mx-5 {
@@ -734,12 +731,20 @@ body {
   margin-left: auto;
 }
 
+.mt-16 {
+  margin-top: 4rem;
+}
+
 .mt-8 {
   margin-top: 2rem;
 }
 
 .mt-auto {
   margin-top: auto;
+}
+
+.inline-block {
+  display: inline-block;
 }
 
 .flex {
@@ -905,6 +910,10 @@ body {
   max-width: 80rem;
 }
 
+.max-w-xl {
+  max-width: 36rem;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -936,11 +945,6 @@ body {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.-translate-y-1\/2 {
-  --tw-translate-y: -50%;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
 .rotate-45 {
   --tw-rotate: 45deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -950,1944 +954,32 @@ body {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-@keyframes orbSpin {
-  0.000% {
-    background-position: 0 0;
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
   }
 
-  0.417% {
-    background-position: -128px 0;
-  }
-
-  0.833% {
-    background-position: -256px 0;
-  }
-
-  1.250% {
-    background-position: -384px 0;
-  }
-
-  1.667% {
-    background-position: -512px 0;
-  }
-
-  2.083% {
-    background-position: -640px 0;
-  }
-
-  2.500% {
-    background-position: -768px 0;
-  }
-
-  2.917% {
-    background-position: -896px 0;
-  }
-
-  3.333% {
-    background-position: -1024px 0;
-  }
-
-  3.750% {
-    background-position: -1152px 0;
-  }
-
-  4.167% {
-    background-position: -1280px 0;
-  }
-
-  4.583% {
-    background-position: -1408px 0;
-  }
-
-  5.000% {
-    background-position: -1536px 0;
-  }
-
-  5.417% {
-    background-position: -1664px 0;
-  }
-
-  5.833% {
-    background-position: -1792px 0;
-  }
-
-  6.250% {
-    background-position: -1920px 0;
-  }
-
-  6.667% {
-    background-position: 0 -128px;
-  }
-
-  7.083% {
-    background-position: -128px -128px;
-  }
-
-  7.500% {
-    background-position: -256px -128px;
-  }
-
-  7.917% {
-    background-position: -384px -128px;
-  }
-
-  8.333% {
-    background-position: -512px -128px;
-  }
-
-  8.750% {
-    background-position: -640px -128px;
-  }
-
-  9.167% {
-    background-position: -768px -128px;
-  }
-
-  9.583% {
-    background-position: -896px -128px;
-  }
-
-  10.000% {
-    background-position: -1024px -128px;
-  }
-
-  10.417% {
-    background-position: -1152px -128px;
-  }
-
-  10.833% {
-    background-position: -1280px -128px;
-  }
-
-  11.250% {
-    background-position: -1408px -128px;
-  }
-
-  11.667% {
-    background-position: -1536px -128px;
-  }
-
-  12.083% {
-    background-position: -1664px -128px;
-  }
-
-  12.500% {
-    background-position: -1792px -128px;
-  }
-
-  12.917% {
-    background-position: -1920px -128px;
-  }
-
-  13.333% {
-    background-position: 0 -256px;
-  }
-
-  13.750% {
-    background-position: -128px -256px;
-  }
-
-  14.167% {
-    background-position: -256px -256px;
-  }
-
-  14.583% {
-    background-position: -384px -256px;
-  }
-
-  15.000% {
-    background-position: -512px -256px;
-  }
-
-  15.417% {
-    background-position: -640px -256px;
-  }
-
-  15.833% {
-    background-position: -768px -256px;
-  }
-
-  16.250% {
-    background-position: -896px -256px;
-  }
-
-  16.667% {
-    background-position: -1024px -256px;
-  }
-
-  17.083% {
-    background-position: -1152px -256px;
-  }
-
-  17.500% {
-    background-position: -1280px -256px;
-  }
-
-  17.917% {
-    background-position: -1408px -256px;
-  }
-
-  18.333% {
-    background-position: -1536px -256px;
-  }
-
-  18.750% {
-    background-position: -1664px -256px;
-  }
-
-  19.167% {
-    background-position: -1792px -256px;
-  }
-
-  19.583% {
-    background-position: -1920px -256px;
-  }
-
-  20.000% {
-    background-position: 0 -384px;
-  }
-
-  20.417% {
-    background-position: -128px -384px;
-  }
-
-  20.833% {
-    background-position: -256px -384px;
-  }
-
-  21.250% {
-    background-position: -384px -384px;
-  }
-
-  21.667% {
-    background-position: -512px -384px;
-  }
-
-  22.083% {
-    background-position: -640px -384px;
-  }
-
-  22.500% {
-    background-position: -768px -384px;
-  }
-
-  22.917% {
-    background-position: -896px -384px;
-  }
-
-  23.333% {
-    background-position: -1024px -384px;
-  }
-
-  23.750% {
-    background-position: -1152px -384px;
-  }
-
-  24.167% {
-    background-position: -1280px -384px;
-  }
-
-  24.583% {
-    background-position: -1408px -384px;
-  }
-
-  25.000% {
-    background-position: -1536px -384px;
-  }
-
-  25.417% {
-    background-position: -1664px -384px;
-  }
-
-  25.833% {
-    background-position: -1792px -384px;
-  }
-
-  26.250% {
-    background-position: -1920px -384px;
-  }
-
-  26.667% {
-    background-position: 0 -512px;
-  }
-
-  27.083% {
-    background-position: -128px -512px;
-  }
-
-  27.500% {
-    background-position: -256px -512px;
-  }
-
-  27.917% {
-    background-position: -384px -512px;
-  }
-
-  28.333% {
-    background-position: -512px -512px;
-  }
-
-  28.750% {
-    background-position: -640px -512px;
-  }
-
-  29.167% {
-    background-position: -768px -512px;
-  }
-
-  29.583% {
-    background-position: -896px -512px;
-  }
-
-  30.000% {
-    background-position: -1024px -512px;
-  }
-
-  30.417% {
-    background-position: -1152px -512px;
-  }
-
-  30.833% {
-    background-position: -1280px -512px;
-  }
-
-  31.250% {
-    background-position: -1408px -512px;
-  }
-
-  31.667% {
-    background-position: -1536px -512px;
-  }
-
-  32.083% {
-    background-position: -1664px -512px;
-  }
-
-  32.500% {
-    background-position: -1792px -512px;
-  }
-
-  32.917% {
-    background-position: -1920px -512px;
-  }
-
-  33.333% {
-    background-position: 0 -640px;
-  }
-
-  33.750% {
-    background-position: -128px -640px;
-  }
-
-  34.167% {
-    background-position: -256px -640px;
-  }
-
-  34.583% {
-    background-position: -384px -640px;
-  }
-
-  35.000% {
-    background-position: -512px -640px;
-  }
-
-  35.417% {
-    background-position: -640px -640px;
-  }
-
-  35.833% {
-    background-position: -768px -640px;
-  }
-
-  36.250% {
-    background-position: -896px -640px;
-  }
-
-  36.667% {
-    background-position: -1024px -640px;
-  }
-
-  37.083% {
-    background-position: -1152px -640px;
-  }
-
-  37.500% {
-    background-position: -1280px -640px;
-  }
-
-  37.917% {
-    background-position: -1408px -640px;
-  }
-
-  38.333% {
-    background-position: -1536px -640px;
-  }
-
-  38.750% {
-    background-position: -1664px -640px;
-  }
-
-  39.167% {
-    background-position: -1792px -640px;
-  }
-
-  39.583% {
-    background-position: -1920px -640px;
-  }
-
-  40.000% {
-    background-position: 0 -768px;
-  }
-
-  40.417% {
-    background-position: -128px -768px;
-  }
-
-  40.833% {
-    background-position: -256px -768px;
-  }
-
-  41.250% {
-    background-position: -384px -768px;
-  }
-
-  41.667% {
-    background-position: -512px -768px;
-  }
-
-  42.083% {
-    background-position: -640px -768px;
-  }
-
-  42.500% {
-    background-position: -768px -768px;
-  }
-
-  42.917% {
-    background-position: -896px -768px;
-  }
-
-  43.333% {
-    background-position: -1024px -768px;
-  }
-
-  43.750% {
-    background-position: -1152px -768px;
-  }
-
-  44.167% {
-    background-position: -1280px -768px;
-  }
-
-  44.583% {
-    background-position: -1408px -768px;
-  }
-
-  45.000% {
-    background-position: -1536px -768px;
-  }
-
-  45.417% {
-    background-position: -1664px -768px;
-  }
-
-  45.833% {
-    background-position: -1792px -768px;
-  }
-
-  46.250% {
-    background-position: -1920px -768px;
-  }
-
-  46.667% {
-    background-position: 0 -896px;
-  }
-
-  47.083% {
-    background-position: -128px -896px;
-  }
-
-  47.500% {
-    background-position: -256px -896px;
-  }
-
-  47.917% {
-    background-position: -384px -896px;
-  }
-
-  48.333% {
-    background-position: -512px -896px;
-  }
-
-  48.750% {
-    background-position: -640px -896px;
-  }
-
-  49.167% {
-    background-position: -768px -896px;
-  }
-
-  49.583% {
-    background-position: -896px -896px;
-  }
-
-  50.000% {
-    background-position: -1024px -896px;
-  }
-
-  50.417% {
-    background-position: -1152px -896px;
-  }
-
-  50.833% {
-    background-position: -1280px -896px;
-  }
-
-  51.250% {
-    background-position: -1408px -896px;
-  }
-
-  51.667% {
-    background-position: -1536px -896px;
-  }
-
-  52.083% {
-    background-position: -1664px -896px;
-  }
-
-  52.500% {
-    background-position: -1792px -896px;
-  }
-
-  52.917% {
-    background-position: -1920px -896px;
-  }
-
-  53.333% {
-    background-position: 0 -1024px;
-  }
-
-  53.750% {
-    background-position: -128px -1024px;
-  }
-
-  54.167% {
-    background-position: -256px -1024px;
-  }
-
-  54.583% {
-    background-position: -384px -1024px;
-  }
-
-  55.000% {
-    background-position: -512px -1024px;
-  }
-
-  55.417% {
-    background-position: -640px -1024px;
-  }
-
-  55.833% {
-    background-position: -768px -1024px;
-  }
-
-  56.250% {
-    background-position: -896px -1024px;
-  }
-
-  56.667% {
-    background-position: -1024px -1024px;
-  }
-
-  57.083% {
-    background-position: -1152px -1024px;
-  }
-
-  57.500% {
-    background-position: -1280px -1024px;
-  }
-
-  57.917% {
-    background-position: -1408px -1024px;
-  }
-
-  58.333% {
-    background-position: -1536px -1024px;
-  }
-
-  58.750% {
-    background-position: -1664px -1024px;
-  }
-
-  59.167% {
-    background-position: -1792px -1024px;
-  }
-
-  59.583% {
-    background-position: -1920px -1024px;
-  }
-
-  60.000% {
-    background-position: 0 -1152px;
-  }
-
-  60.417% {
-    background-position: -128px -1152px;
-  }
-
-  60.833% {
-    background-position: -256px -1152px;
-  }
-
-  61.250% {
-    background-position: -384px -1152px;
-  }
-
-  61.667% {
-    background-position: -512px -1152px;
-  }
-
-  62.083% {
-    background-position: -640px -1152px;
-  }
-
-  62.500% {
-    background-position: -768px -1152px;
-  }
-
-  62.917% {
-    background-position: -896px -1152px;
-  }
-
-  63.333% {
-    background-position: -1024px -1152px;
-  }
-
-  63.750% {
-    background-position: -1152px -1152px;
-  }
-
-  64.167% {
-    background-position: -1280px -1152px;
-  }
-
-  64.583% {
-    background-position: -1408px -1152px;
-  }
-
-  65.000% {
-    background-position: -1536px -1152px;
-  }
-
-  65.417% {
-    background-position: -1664px -1152px;
-  }
-
-  65.833% {
-    background-position: -1792px -1152px;
-  }
-
-  66.250% {
-    background-position: -1920px -1152px;
-  }
-
-  66.667% {
-    background-position: 0 -1280px;
-  }
-
-  67.083% {
-    background-position: -128px -1280px;
-  }
-
-  67.500% {
-    background-position: -256px -1280px;
-  }
-
-  67.917% {
-    background-position: -384px -1280px;
-  }
-
-  68.333% {
-    background-position: -512px -1280px;
-  }
-
-  68.750% {
-    background-position: -640px -1280px;
-  }
-
-  69.167% {
-    background-position: -768px -1280px;
-  }
-
-  69.583% {
-    background-position: -896px -1280px;
-  }
-
-  70.000% {
-    background-position: -1024px -1280px;
-  }
-
-  70.417% {
-    background-position: -1152px -1280px;
-  }
-
-  70.833% {
-    background-position: -1280px -1280px;
-  }
-
-  71.250% {
-    background-position: -1408px -1280px;
-  }
-
-  71.667% {
-    background-position: -1536px -1280px;
-  }
-
-  72.083% {
-    background-position: -1664px -1280px;
-  }
-
-  72.500% {
-    background-position: -1792px -1280px;
-  }
-
-  72.917% {
-    background-position: -1920px -1280px;
-  }
-
-  73.333% {
-    background-position: 0 -1408px;
-  }
-
-  73.750% {
-    background-position: -128px -1408px;
-  }
-
-  74.167% {
-    background-position: -256px -1408px;
-  }
-
-  74.583% {
-    background-position: -384px -1408px;
-  }
-
-  75.000% {
-    background-position: -512px -1408px;
-  }
-
-  75.417% {
-    background-position: -640px -1408px;
-  }
-
-  75.833% {
-    background-position: -768px -1408px;
-  }
-
-  76.250% {
-    background-position: -896px -1408px;
-  }
-
-  76.667% {
-    background-position: -1024px -1408px;
-  }
-
-  77.083% {
-    background-position: -1152px -1408px;
-  }
-
-  77.500% {
-    background-position: -1280px -1408px;
-  }
-
-  77.917% {
-    background-position: -1408px -1408px;
-  }
-
-  78.333% {
-    background-position: -1536px -1408px;
-  }
-
-  78.750% {
-    background-position: -1664px -1408px;
-  }
-
-  79.167% {
-    background-position: -1792px -1408px;
-  }
-
-  79.583% {
-    background-position: -1920px -1408px;
-  }
-
-  80.000% {
-    background-position: 0 -1536px;
-  }
-
-  80.417% {
-    background-position: -128px -1536px;
-  }
-
-  80.833% {
-    background-position: -256px -1536px;
-  }
-
-  81.250% {
-    background-position: -384px -1536px;
-  }
-
-  81.667% {
-    background-position: -512px -1536px;
-  }
-
-  82.083% {
-    background-position: -640px -1536px;
-  }
-
-  82.500% {
-    background-position: -768px -1536px;
-  }
-
-  82.917% {
-    background-position: -896px -1536px;
-  }
-
-  83.333% {
-    background-position: -1024px -1536px;
-  }
-
-  83.750% {
-    background-position: -1152px -1536px;
-  }
-
-  84.167% {
-    background-position: -1280px -1536px;
-  }
-
-  84.583% {
-    background-position: -1408px -1536px;
-  }
-
-  85.000% {
-    background-position: -1536px -1536px;
-  }
-
-  85.417% {
-    background-position: -1664px -1536px;
-  }
-
-  85.833% {
-    background-position: -1792px -1536px;
-  }
-
-  86.250% {
-    background-position: -1920px -1536px;
-  }
-
-  86.667% {
-    background-position: 0 -1664px;
-  }
-
-  87.083% {
-    background-position: -128px -1664px;
-  }
-
-  87.500% {
-    background-position: -256px -1664px;
-  }
-
-  87.917% {
-    background-position: -384px -1664px;
-  }
-
-  88.333% {
-    background-position: -512px -1664px;
-  }
-
-  88.750% {
-    background-position: -640px -1664px;
-  }
-
-  89.167% {
-    background-position: -768px -1664px;
-  }
-
-  89.583% {
-    background-position: -896px -1664px;
-  }
-
-  90.000% {
-    background-position: -1024px -1664px;
-  }
-
-  90.417% {
-    background-position: -1152px -1664px;
-  }
-
-  90.833% {
-    background-position: -1280px -1664px;
-  }
-
-  91.250% {
-    background-position: -1408px -1664px;
-  }
-
-  91.667% {
-    background-position: -1536px -1664px;
-  }
-
-  92.083% {
-    background-position: -1664px -1664px;
-  }
-
-  92.500% {
-    background-position: -1792px -1664px;
-  }
-
-  92.917% {
-    background-position: -1920px -1664px;
-  }
-
-  93.333% {
-    background-position: 0 -1792px;
-  }
-
-  93.750% {
-    background-position: -128px -1792px;
-  }
-
-  94.167% {
-    background-position: -256px -1792px;
-  }
-
-  94.583% {
-    background-position: -384px -1792px;
-  }
-
-  95.000% {
-    background-position: -512px -1792px;
-  }
-
-  95.417% {
-    background-position: -640px -1792px;
-  }
-
-  95.833% {
-    background-position: -768px -1792px;
-  }
-
-  96.250% {
-    background-position: -896px -1792px;
-  }
-
-  96.667% {
-    background-position: -1024px -1792px;
-  }
-
-  97.083% {
-    background-position: -1152px -1792px;
-  }
-
-  97.500% {
-    background-position: -1280px -1792px;
-  }
-
-  97.917% {
-    background-position: -1408px -1792px;
-  }
-
-  98.333% {
-    background-position: -1536px -1792px;
-  }
-
-  98.750% {
-    background-position: -1664px -1792px;
-  }
-
-  99.167% {
-    background-position: -1792px -1792px;
-  }
-
-  99.583% {
-    background-position: -1920px -1792px;
-  }
-
-  100.000% {
-    background-position: 0 0;
+  100% {
+    transform: translateX(-100%);
   }
 }
 
-.animate-orb-spin-fast {
-  animation: orbSpin 6000ms steps(1) infinite;
+.animate-marquee {
+  animation: marquee 30s linear infinite;
 }
 
-@keyframes orbSpin {
-  0.000% {
-    background-position: 0 0;
+@keyframes marquee2 {
+  0% {
+    transform: translateX(100%);
   }
 
-  0.417% {
-    background-position: -128px 0;
-  }
-
-  0.833% {
-    background-position: -256px 0;
-  }
-
-  1.250% {
-    background-position: -384px 0;
-  }
-
-  1.667% {
-    background-position: -512px 0;
-  }
-
-  2.083% {
-    background-position: -640px 0;
-  }
-
-  2.500% {
-    background-position: -768px 0;
-  }
-
-  2.917% {
-    background-position: -896px 0;
-  }
-
-  3.333% {
-    background-position: -1024px 0;
-  }
-
-  3.750% {
-    background-position: -1152px 0;
-  }
-
-  4.167% {
-    background-position: -1280px 0;
-  }
-
-  4.583% {
-    background-position: -1408px 0;
-  }
-
-  5.000% {
-    background-position: -1536px 0;
-  }
-
-  5.417% {
-    background-position: -1664px 0;
-  }
-
-  5.833% {
-    background-position: -1792px 0;
-  }
-
-  6.250% {
-    background-position: -1920px 0;
-  }
-
-  6.667% {
-    background-position: 0 -128px;
-  }
-
-  7.083% {
-    background-position: -128px -128px;
-  }
-
-  7.500% {
-    background-position: -256px -128px;
-  }
-
-  7.917% {
-    background-position: -384px -128px;
-  }
-
-  8.333% {
-    background-position: -512px -128px;
-  }
-
-  8.750% {
-    background-position: -640px -128px;
-  }
-
-  9.167% {
-    background-position: -768px -128px;
-  }
-
-  9.583% {
-    background-position: -896px -128px;
-  }
-
-  10.000% {
-    background-position: -1024px -128px;
-  }
-
-  10.417% {
-    background-position: -1152px -128px;
-  }
-
-  10.833% {
-    background-position: -1280px -128px;
-  }
-
-  11.250% {
-    background-position: -1408px -128px;
-  }
-
-  11.667% {
-    background-position: -1536px -128px;
-  }
-
-  12.083% {
-    background-position: -1664px -128px;
-  }
-
-  12.500% {
-    background-position: -1792px -128px;
-  }
-
-  12.917% {
-    background-position: -1920px -128px;
-  }
-
-  13.333% {
-    background-position: 0 -256px;
-  }
-
-  13.750% {
-    background-position: -128px -256px;
-  }
-
-  14.167% {
-    background-position: -256px -256px;
-  }
-
-  14.583% {
-    background-position: -384px -256px;
-  }
-
-  15.000% {
-    background-position: -512px -256px;
-  }
-
-  15.417% {
-    background-position: -640px -256px;
-  }
-
-  15.833% {
-    background-position: -768px -256px;
-  }
-
-  16.250% {
-    background-position: -896px -256px;
-  }
-
-  16.667% {
-    background-position: -1024px -256px;
-  }
-
-  17.083% {
-    background-position: -1152px -256px;
-  }
-
-  17.500% {
-    background-position: -1280px -256px;
-  }
-
-  17.917% {
-    background-position: -1408px -256px;
-  }
-
-  18.333% {
-    background-position: -1536px -256px;
-  }
-
-  18.750% {
-    background-position: -1664px -256px;
-  }
-
-  19.167% {
-    background-position: -1792px -256px;
-  }
-
-  19.583% {
-    background-position: -1920px -256px;
-  }
-
-  20.000% {
-    background-position: 0 -384px;
-  }
-
-  20.417% {
-    background-position: -128px -384px;
-  }
-
-  20.833% {
-    background-position: -256px -384px;
-  }
-
-  21.250% {
-    background-position: -384px -384px;
-  }
-
-  21.667% {
-    background-position: -512px -384px;
-  }
-
-  22.083% {
-    background-position: -640px -384px;
-  }
-
-  22.500% {
-    background-position: -768px -384px;
-  }
-
-  22.917% {
-    background-position: -896px -384px;
-  }
-
-  23.333% {
-    background-position: -1024px -384px;
-  }
-
-  23.750% {
-    background-position: -1152px -384px;
-  }
-
-  24.167% {
-    background-position: -1280px -384px;
-  }
-
-  24.583% {
-    background-position: -1408px -384px;
-  }
-
-  25.000% {
-    background-position: -1536px -384px;
-  }
-
-  25.417% {
-    background-position: -1664px -384px;
-  }
-
-  25.833% {
-    background-position: -1792px -384px;
-  }
-
-  26.250% {
-    background-position: -1920px -384px;
-  }
-
-  26.667% {
-    background-position: 0 -512px;
-  }
-
-  27.083% {
-    background-position: -128px -512px;
-  }
-
-  27.500% {
-    background-position: -256px -512px;
-  }
-
-  27.917% {
-    background-position: -384px -512px;
-  }
-
-  28.333% {
-    background-position: -512px -512px;
-  }
-
-  28.750% {
-    background-position: -640px -512px;
-  }
-
-  29.167% {
-    background-position: -768px -512px;
-  }
-
-  29.583% {
-    background-position: -896px -512px;
-  }
-
-  30.000% {
-    background-position: -1024px -512px;
-  }
-
-  30.417% {
-    background-position: -1152px -512px;
-  }
-
-  30.833% {
-    background-position: -1280px -512px;
-  }
-
-  31.250% {
-    background-position: -1408px -512px;
-  }
-
-  31.667% {
-    background-position: -1536px -512px;
-  }
-
-  32.083% {
-    background-position: -1664px -512px;
-  }
-
-  32.500% {
-    background-position: -1792px -512px;
-  }
-
-  32.917% {
-    background-position: -1920px -512px;
-  }
-
-  33.333% {
-    background-position: 0 -640px;
-  }
-
-  33.750% {
-    background-position: -128px -640px;
-  }
-
-  34.167% {
-    background-position: -256px -640px;
-  }
-
-  34.583% {
-    background-position: -384px -640px;
-  }
-
-  35.000% {
-    background-position: -512px -640px;
-  }
-
-  35.417% {
-    background-position: -640px -640px;
-  }
-
-  35.833% {
-    background-position: -768px -640px;
-  }
-
-  36.250% {
-    background-position: -896px -640px;
-  }
-
-  36.667% {
-    background-position: -1024px -640px;
-  }
-
-  37.083% {
-    background-position: -1152px -640px;
-  }
-
-  37.500% {
-    background-position: -1280px -640px;
-  }
-
-  37.917% {
-    background-position: -1408px -640px;
-  }
-
-  38.333% {
-    background-position: -1536px -640px;
-  }
-
-  38.750% {
-    background-position: -1664px -640px;
-  }
-
-  39.167% {
-    background-position: -1792px -640px;
-  }
-
-  39.583% {
-    background-position: -1920px -640px;
-  }
-
-  40.000% {
-    background-position: 0 -768px;
-  }
-
-  40.417% {
-    background-position: -128px -768px;
-  }
-
-  40.833% {
-    background-position: -256px -768px;
-  }
-
-  41.250% {
-    background-position: -384px -768px;
-  }
-
-  41.667% {
-    background-position: -512px -768px;
-  }
-
-  42.083% {
-    background-position: -640px -768px;
-  }
-
-  42.500% {
-    background-position: -768px -768px;
-  }
-
-  42.917% {
-    background-position: -896px -768px;
-  }
-
-  43.333% {
-    background-position: -1024px -768px;
-  }
-
-  43.750% {
-    background-position: -1152px -768px;
-  }
-
-  44.167% {
-    background-position: -1280px -768px;
-  }
-
-  44.583% {
-    background-position: -1408px -768px;
-  }
-
-  45.000% {
-    background-position: -1536px -768px;
-  }
-
-  45.417% {
-    background-position: -1664px -768px;
-  }
-
-  45.833% {
-    background-position: -1792px -768px;
-  }
-
-  46.250% {
-    background-position: -1920px -768px;
-  }
-
-  46.667% {
-    background-position: 0 -896px;
-  }
-
-  47.083% {
-    background-position: -128px -896px;
-  }
-
-  47.500% {
-    background-position: -256px -896px;
-  }
-
-  47.917% {
-    background-position: -384px -896px;
-  }
-
-  48.333% {
-    background-position: -512px -896px;
-  }
-
-  48.750% {
-    background-position: -640px -896px;
-  }
-
-  49.167% {
-    background-position: -768px -896px;
-  }
-
-  49.583% {
-    background-position: -896px -896px;
-  }
-
-  50.000% {
-    background-position: -1024px -896px;
-  }
-
-  50.417% {
-    background-position: -1152px -896px;
-  }
-
-  50.833% {
-    background-position: -1280px -896px;
-  }
-
-  51.250% {
-    background-position: -1408px -896px;
-  }
-
-  51.667% {
-    background-position: -1536px -896px;
-  }
-
-  52.083% {
-    background-position: -1664px -896px;
-  }
-
-  52.500% {
-    background-position: -1792px -896px;
-  }
-
-  52.917% {
-    background-position: -1920px -896px;
-  }
-
-  53.333% {
-    background-position: 0 -1024px;
-  }
-
-  53.750% {
-    background-position: -128px -1024px;
-  }
-
-  54.167% {
-    background-position: -256px -1024px;
-  }
-
-  54.583% {
-    background-position: -384px -1024px;
-  }
-
-  55.000% {
-    background-position: -512px -1024px;
-  }
-
-  55.417% {
-    background-position: -640px -1024px;
-  }
-
-  55.833% {
-    background-position: -768px -1024px;
-  }
-
-  56.250% {
-    background-position: -896px -1024px;
-  }
-
-  56.667% {
-    background-position: -1024px -1024px;
-  }
-
-  57.083% {
-    background-position: -1152px -1024px;
-  }
-
-  57.500% {
-    background-position: -1280px -1024px;
-  }
-
-  57.917% {
-    background-position: -1408px -1024px;
-  }
-
-  58.333% {
-    background-position: -1536px -1024px;
-  }
-
-  58.750% {
-    background-position: -1664px -1024px;
-  }
-
-  59.167% {
-    background-position: -1792px -1024px;
-  }
-
-  59.583% {
-    background-position: -1920px -1024px;
-  }
-
-  60.000% {
-    background-position: 0 -1152px;
-  }
-
-  60.417% {
-    background-position: -128px -1152px;
-  }
-
-  60.833% {
-    background-position: -256px -1152px;
-  }
-
-  61.250% {
-    background-position: -384px -1152px;
-  }
-
-  61.667% {
-    background-position: -512px -1152px;
-  }
-
-  62.083% {
-    background-position: -640px -1152px;
-  }
-
-  62.500% {
-    background-position: -768px -1152px;
-  }
-
-  62.917% {
-    background-position: -896px -1152px;
-  }
-
-  63.333% {
-    background-position: -1024px -1152px;
-  }
-
-  63.750% {
-    background-position: -1152px -1152px;
-  }
-
-  64.167% {
-    background-position: -1280px -1152px;
-  }
-
-  64.583% {
-    background-position: -1408px -1152px;
-  }
-
-  65.000% {
-    background-position: -1536px -1152px;
-  }
-
-  65.417% {
-    background-position: -1664px -1152px;
-  }
-
-  65.833% {
-    background-position: -1792px -1152px;
-  }
-
-  66.250% {
-    background-position: -1920px -1152px;
-  }
-
-  66.667% {
-    background-position: 0 -1280px;
-  }
-
-  67.083% {
-    background-position: -128px -1280px;
-  }
-
-  67.500% {
-    background-position: -256px -1280px;
-  }
-
-  67.917% {
-    background-position: -384px -1280px;
-  }
-
-  68.333% {
-    background-position: -512px -1280px;
-  }
-
-  68.750% {
-    background-position: -640px -1280px;
-  }
-
-  69.167% {
-    background-position: -768px -1280px;
-  }
-
-  69.583% {
-    background-position: -896px -1280px;
-  }
-
-  70.000% {
-    background-position: -1024px -1280px;
-  }
-
-  70.417% {
-    background-position: -1152px -1280px;
-  }
-
-  70.833% {
-    background-position: -1280px -1280px;
-  }
-
-  71.250% {
-    background-position: -1408px -1280px;
-  }
-
-  71.667% {
-    background-position: -1536px -1280px;
-  }
-
-  72.083% {
-    background-position: -1664px -1280px;
-  }
-
-  72.500% {
-    background-position: -1792px -1280px;
-  }
-
-  72.917% {
-    background-position: -1920px -1280px;
-  }
-
-  73.333% {
-    background-position: 0 -1408px;
-  }
-
-  73.750% {
-    background-position: -128px -1408px;
-  }
-
-  74.167% {
-    background-position: -256px -1408px;
-  }
-
-  74.583% {
-    background-position: -384px -1408px;
-  }
-
-  75.000% {
-    background-position: -512px -1408px;
-  }
-
-  75.417% {
-    background-position: -640px -1408px;
-  }
-
-  75.833% {
-    background-position: -768px -1408px;
-  }
-
-  76.250% {
-    background-position: -896px -1408px;
-  }
-
-  76.667% {
-    background-position: -1024px -1408px;
-  }
-
-  77.083% {
-    background-position: -1152px -1408px;
-  }
-
-  77.500% {
-    background-position: -1280px -1408px;
-  }
-
-  77.917% {
-    background-position: -1408px -1408px;
-  }
-
-  78.333% {
-    background-position: -1536px -1408px;
-  }
-
-  78.750% {
-    background-position: -1664px -1408px;
-  }
-
-  79.167% {
-    background-position: -1792px -1408px;
-  }
-
-  79.583% {
-    background-position: -1920px -1408px;
-  }
-
-  80.000% {
-    background-position: 0 -1536px;
-  }
-
-  80.417% {
-    background-position: -128px -1536px;
-  }
-
-  80.833% {
-    background-position: -256px -1536px;
-  }
-
-  81.250% {
-    background-position: -384px -1536px;
-  }
-
-  81.667% {
-    background-position: -512px -1536px;
-  }
-
-  82.083% {
-    background-position: -640px -1536px;
-  }
-
-  82.500% {
-    background-position: -768px -1536px;
-  }
-
-  82.917% {
-    background-position: -896px -1536px;
-  }
-
-  83.333% {
-    background-position: -1024px -1536px;
-  }
-
-  83.750% {
-    background-position: -1152px -1536px;
-  }
-
-  84.167% {
-    background-position: -1280px -1536px;
-  }
-
-  84.583% {
-    background-position: -1408px -1536px;
-  }
-
-  85.000% {
-    background-position: -1536px -1536px;
-  }
-
-  85.417% {
-    background-position: -1664px -1536px;
-  }
-
-  85.833% {
-    background-position: -1792px -1536px;
-  }
-
-  86.250% {
-    background-position: -1920px -1536px;
-  }
-
-  86.667% {
-    background-position: 0 -1664px;
-  }
-
-  87.083% {
-    background-position: -128px -1664px;
-  }
-
-  87.500% {
-    background-position: -256px -1664px;
-  }
-
-  87.917% {
-    background-position: -384px -1664px;
-  }
-
-  88.333% {
-    background-position: -512px -1664px;
-  }
-
-  88.750% {
-    background-position: -640px -1664px;
-  }
-
-  89.167% {
-    background-position: -768px -1664px;
-  }
-
-  89.583% {
-    background-position: -896px -1664px;
-  }
-
-  90.000% {
-    background-position: -1024px -1664px;
-  }
-
-  90.417% {
-    background-position: -1152px -1664px;
-  }
-
-  90.833% {
-    background-position: -1280px -1664px;
-  }
-
-  91.250% {
-    background-position: -1408px -1664px;
-  }
-
-  91.667% {
-    background-position: -1536px -1664px;
-  }
-
-  92.083% {
-    background-position: -1664px -1664px;
-  }
-
-  92.500% {
-    background-position: -1792px -1664px;
-  }
-
-  92.917% {
-    background-position: -1920px -1664px;
-  }
-
-  93.333% {
-    background-position: 0 -1792px;
-  }
-
-  93.750% {
-    background-position: -128px -1792px;
-  }
-
-  94.167% {
-    background-position: -256px -1792px;
-  }
-
-  94.583% {
-    background-position: -384px -1792px;
-  }
-
-  95.000% {
-    background-position: -512px -1792px;
-  }
-
-  95.417% {
-    background-position: -640px -1792px;
-  }
-
-  95.833% {
-    background-position: -768px -1792px;
-  }
-
-  96.250% {
-    background-position: -896px -1792px;
-  }
-
-  96.667% {
-    background-position: -1024px -1792px;
-  }
-
-  97.083% {
-    background-position: -1152px -1792px;
-  }
-
-  97.500% {
-    background-position: -1280px -1792px;
-  }
-
-  97.917% {
-    background-position: -1408px -1792px;
-  }
-
-  98.333% {
-    background-position: -1536px -1792px;
-  }
-
-  98.750% {
-    background-position: -1664px -1792px;
-  }
-
-  99.167% {
-    background-position: -1792px -1792px;
-  }
-
-  99.583% {
-    background-position: -1920px -1792px;
-  }
-
-  100.000% {
-    background-position: 0 0;
+  100% {
+    transform: translateX(0%);
   }
 }
 
-.animate-orb-spin-slow {
-  animation: orbSpin 12000ms steps(1) infinite;
+.animate-marquee2 {
+  animation: marquee2 30s linear infinite;
 }
 
 .cursor-pointer {
@@ -3066,12 +1158,28 @@ body {
   --tw-bg-opacity: 0.5;
 }
 
+.bg-\[url\(\'\/assets\/blurchart_1920\.png\'\)\] {
+  background-image: url('/assets/blurchart_1920.png');
+}
+
+.bg-\[url\(\'\/assets\/blurchart_390\.png\'\)\] {
+  background-image: url('/assets/blurchart_390.png');
+}
+
 .bg-\[url\(\'assets\/orb_black_sprite\.webp\'\)\] {
   background-image: url('assets/orb_black_sprite.webp');
 }
 
 .bg-\[url\(\'assets\/orb_gold_sprite\.webp\'\)\] {
   background-image: url('assets/orb_gold_sprite.webp');
+}
+
+.bg-cover {
+  background-size: cover;
+}
+
+.bg-center {
+  background-position: center;
 }
 
 .bg-no-repeat {
@@ -3129,9 +1237,24 @@ body {
   padding-bottom: 0.25rem;
 }
 
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.py-16 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
 .py-3 {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+
+.py-32 {
+  padding-top: 8rem;
+  padding-bottom: 8rem;
 }
 
 .py-5 {
@@ -3144,13 +1267,12 @@ body {
   padding-bottom: 2rem;
 }
 
-.py-16 {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
 .pb-20 {
   padding-bottom: 5rem;
+}
+
+.pb-64 {
+  padding-bottom: 16rem;
 }
 
 .pl-1 {
@@ -3159,6 +1281,10 @@ body {
 
 .pr-1 {
   padding-right: 0.25rem;
+}
+
+.pt-16 {
+  padding-top: 4rem;
 }
 
 .pt-4 {
@@ -3223,10 +1349,6 @@ body {
 
 .font-bold {
   font-weight: 700;
-}
-
-.font-light {
-  font-weight: 300;
 }
 
 .font-medium {
@@ -3591,6 +1713,10 @@ body {
     margin-left: 0px;
   }
 
+  .sm\:block {
+    display: block;
+  }
+
   .sm\:flex {
     display: flex;
   }
@@ -3667,6 +1793,10 @@ body {
     border-radius: 0.375rem;
   }
 
+  .sm\:bg-\[url\(\'\/assets\/blurchart_1920\.png\'\)\] {
+    background-image: url('/assets/blurchart_1920.png');
+  }
+
   .sm\:px-0 {
     padding-left: 0px;
     padding-right: 0px;
@@ -3687,6 +1817,11 @@ body {
     padding-right: 2rem;
   }
 
+  .sm\:py-48 {
+    padding-top: 12rem;
+    padding-bottom: 12rem;
+  }
+
   .sm\:py-8 {
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -3694,6 +1829,10 @@ body {
 
   .sm\:pb-16 {
     padding-bottom: 4rem;
+  }
+
+  .sm\:pb-64 {
+    padding-bottom: 16rem;
   }
 
   .sm\:text-2xl {
@@ -3719,6 +1858,11 @@ body {
   .sm\:text-base {
     font-size: 1rem;
     line-height: 1.5rem;
+  }
+
+  .sm\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 
   .sm\:text-sm {

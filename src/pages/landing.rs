@@ -5,10 +5,12 @@ use crate::{components::*, hooks::use_ore_supply, route::Route};
 pub fn Landing() -> Element {
     rsx! {
         Col {
-            class: "flex h-full w-full overflow-y-auto mx-auto px-5 py-8 pb-20 sm:pb-16",
+            class: "flex h-full w-full overflow-y-auto mx-auto py-8 pb-20 sm:pb-16",
             Hero {}
-            ChartSection {}
-            SupplyStats {}
+            TickerTape {}
+            // ChartSection {}
+            // LiquiditySection {}
+            // SupplyStats {}
         }
     }
 }
@@ -16,7 +18,7 @@ pub fn Landing() -> Element {
 fn Hero() -> Element {
     rsx! {
         Col {
-            class: "mx-auto my-auto gap-16",
+            class: "mx-auto my-auto px-5 gap-16",
             gap: 16,
             OrbHero {}
             Col {
@@ -31,8 +33,8 @@ fn Hero() -> Element {
                     "On Solana."
                 }
                 span {  
-                    class: "mx-auto mt-8 font-wide font-light text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                    "A hard money standard for tokenized commodity markets."
+                    class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
+                    "A hard money standard for onchain commodities."
                 }
             }
             Link {
@@ -47,14 +49,110 @@ fn Hero() -> Element {
     }
 }
 
+fn TickerTape() -> Element {
+    rsx! {
+        div {
+            class: "relative flex w-full h-12 mt-16",
+
+            // First set of items
+            div {
+                class: "animate-marquee whitespace-nowrap py-12",
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "SOL/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis", 
+                    "USDC/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "USDT/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "wBTC/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "HNT/ORE" 
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "HONEY/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "ISC/ORE"
+                }
+            }
+            
+            // Duplicate set for seamless loop
+            div {
+                class: "absolute top-0 animate-marquee2 whitespace-nowrap py-12",
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "SOL/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "USDC/ORE" 
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "USDT/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "wBTC/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "HNT/ORE" 
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "HONEY/ORE"
+                }
+                span {
+                    class: "inline-block mx-16 font-wide text-elements-lowEmphasis",
+                    "ISC/ORE"
+                }
+            }
+        }
+    }
+}
 
 fn ChartSection() -> Element {
     rsx! {
         Col {
             class: "flex w-full",
             img {
-                class: "w-full",
+                class: "w-full sm:hidden",
+                src: "/assets/blurchart_390.png",
+            }
+            img {
+                class: "w-full hidden sm:block", 
                 src: "/assets/blurchart_1920.png",
+            }
+        }
+    }
+}
+
+fn LiquiditySection() -> Element {
+    rsx! {
+        Col {
+            // class: "w-full py-32 pb-64 sm:py-48 sm:pb-64 gap-2 sm:gap-4 px-5 bg-[url('/assets/blurchart_390.png')] sm:bg-[url('/assets/blurchart_1920.png')] bg-cover bg-center",
+            class: "w-full pt-16 pb-64 sm:pb-64 gap-2 sm:gap-4 px-3 sm:px-6 bg-[url('/assets/blurchart_1920.png')] bg-cover bg-center",
+
+            // class: "w-full sm:py-48 gap-2 sm:gap-4 px-5",
+            span {
+                class: "font-wide font-semibold text-2xl sm:text-3xl text-elements-highEmphasis",
+                "Solving for liquidity."
+            }
+            span {
+                class: "max-w-xl sm:text-lg text-elements-lowEmphasis",
+                "ORE works with teams issuing novel defi products such as RWAs and DePIN credits to seed market liquidity and connect with likeminded traders."
             }
         }
     }
@@ -67,17 +165,17 @@ fn SupplyStats() -> Element {
             class: "mx-auto py-16 gap-16 sm:gap-32",
             if let Some(Ok(circulating_supply)) = circulating_supply.cloned() {
                 SupplyValue {
-                    title: "Circulating supply",
+                    title: "Circulating",
                     value: circulating_supply.ui_amount_string,
                 }
             } else {
                 SupplyValue {
-                    title: "Circulating supply",
+                    title: "Circulating",
                     value: None,
                 }
             }
             SupplyValue {
-                title: "Total supply",
+                title: "Total",
                 value: Some("5000000".to_string()),
             }
         }
@@ -106,3 +204,4 @@ fn SupplyValue(title: String, value: Option<String>) -> Element {
         }
     }
 }
+

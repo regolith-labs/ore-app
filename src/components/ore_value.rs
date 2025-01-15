@@ -82,7 +82,7 @@ pub fn OreValueWhole(ui_amount_string: String, class: Option<String>) -> Element
             Row {
                 class: "my-auto",
                 span {
-                    class: "mt-auto font-semibold text-xl sm:text-3xl",
+                    class: "mt-auto font-semibold text-2xl sm:text-3xl",
                     "{big_units}"
                 }
             }
