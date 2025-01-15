@@ -55,7 +55,7 @@ fn Hero() -> Element {
 fn MarqeeSection() -> Element {
     rsx! {
         div {
-            class: "relative flex w-full mt-8",
+            class: "relative flex w-full mt-8 overflow-clip",
 
             // First set of items
             div {

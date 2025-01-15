@@ -1096,6 +1096,10 @@ body {
   gap: 3rem;
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
 .overflow-clip {
   overflow: clip;
 }
