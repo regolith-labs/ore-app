@@ -32,7 +32,7 @@ pub fn ClaimConfirm(amount: u64, claim_step: Signal<ClaimStep>) -> Element {
             if let WalletAdapter::Connected(signer) = *wallet_adapter.read() {
                 // Cu limit
                 let price = gateway::get_recent_priority_fee_estimate(true).await + 20_000;
-                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(40_000);
+                let cu_limit_ix = ComputeBudgetInstruction::set_compute_unit_limit(100_000);
                 let cu_price_ix = ComputeBudgetInstruction::set_compute_unit_price(price);
                 let mut ixs = vec![cu_limit_ix, cu_price_ix];
                 let token_account_address = ore_token_account_address(signer);

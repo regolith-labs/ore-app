@@ -119,35 +119,39 @@ pub fn invoke_signature(tx: Transaction, mut signal: Signal<InvokeSignatureStatu
                                     }
                                     None => {
                                         log::info!("error sending tx");
-                                        signal.set(InvokeSignatureStatus::DoneWithError)
+                                        signal.set(InvokeSignatureStatus::DoneWithError(
+                                            "Failed to send transaction".to_string(),
+                                        ))
                                     }
                                 }
                             }
                             _ => {
                                 log::info!("err recv val");
-                                signal.set(InvokeSignatureStatus::DoneWithError)
+                                signal.set(InvokeSignatureStatus::DoneWithError(
+                                    format!("{:?}", res),
+                                ))
                             }
                         };
                     });
                 }
-                Err(_err) => {
+                Err(err) => {
                     log::info!("err sending val");
-                    signal.set(InvokeSignatureStatus::DoneWithError)
+                    signal.set(InvokeSignatureStatus::DoneWithError(format!("{:?}", err)))
                 }
             }
         }
         Err(err) => {
             log::info!("err serializing tx: {}", err);
-            signal.set(InvokeSignatureStatus::DoneWithError)
+            signal.set(InvokeSignatureStatus::DoneWithError(err.to_string()))
         }
     };
 }
 
-#[derive(PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum InvokeSignatureStatus {
     Start,
     Waiting,
-    DoneWithError,
+    DoneWithError(String),
     Timeout,
     Done(Signature),
 }

@@ -50,13 +50,13 @@ pub fn InvokeSignature(
     rsx! {
         div {
             class: "flex flex-col gap-6",
-            if let InvokeSignatureStatus::DoneWithError = *signal.read() {
+            if let InvokeSignatureStatus::DoneWithError(err) = signal.cloned() {
                 p {
                     class: "{error_class}",
                     WarningIcon {
                         class: "w-3.5 h-3.5 my-auto"
                     }
-                    "Transaction failed"
+                    "Transaction failed: {err}"
                 }
             }
             if let InvokeSignatureStatus::Timeout = *signal.read() {
@@ -92,7 +92,7 @@ pub fn InvokeSignature(
                         }
                     }
                 }
-                InvokeSignatureStatus::DoneWithError | InvokeSignatureStatus::Timeout => {
+                InvokeSignatureStatus::DoneWithError(_) | InvokeSignatureStatus::Timeout => {
                     // TODO: could add reset button here
                     // or other signal to user
                     rsx! {
