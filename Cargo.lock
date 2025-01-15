@@ -4015,6 +4015,7 @@ dependencies = [
  "num-format",
  "once_cell",
  "ore-api",
+ "ore-miner-types",
  "ore-miner-web",
  "ore-pool-api",
  "ore-pool-types",
@@ -4066,6 +4067,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ore-miner-types"
+version = "0.1.0"
+dependencies = [
+ "drillx",
+ "ore-pool-types",
+ "serde",
+]
+
+[[package]]
 name = "ore-miner-web"
 version = "0.1.0"
 dependencies = [
@@ -4074,10 +4084,9 @@ dependencies = [
  "gloo-worker",
  "js-sys",
  "log",
+ "ore-miner-types",
  "ore-pool-api",
  "ore-pool-types",
- "serde",
- "serde-wasm-bindgen 0.6.5",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",

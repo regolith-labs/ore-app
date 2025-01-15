@@ -62,7 +62,7 @@ pub fn MinerController() -> Element {
                     get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
                 match cutoff_time {
                     Ok(cutoff_time) => {
-                        to_miner.send(ore_miner_web::InputMessage {
+                        to_miner.send(ore_miner_types::InputMessage {
                             member,
                             challenge,
                             cutoff_time,
@@ -81,7 +81,7 @@ pub fn MinerController() -> Element {
         let pubkey = wallet.get_pubkey();
         let pool_url = pool.url.clone();
         let from_miner_read = &*from_miner.read();
-        if let ore_miner_web::OutputMessage::Solution(solution) = from_miner_read {
+        if let ore_miner_types::OutputMessage::Solution(solution) = from_miner_read {
             let gateway = use_gateway();
             let solution = solution.clone();
             if let Ok(pubkey) = pubkey {
@@ -94,7 +94,7 @@ pub fn MinerController() -> Element {
                 });
             }
         }
-        if let ore_miner_web::OutputMessage::Expired(lha) = from_miner_read {
+        if let ore_miner_types::OutputMessage::Expired(lha) = from_miner_read {
             // there may be many workers with the same lha observation
             // only update on the first expiration
             let peek = *last_hash_at.peek();

@@ -3,6 +3,7 @@ use futures::StreamExt;
 use gloo_utils::window;
 use gloo_worker::Spawnable;
 use js_sys::Array;
+use ore_miner_types::OutputMessage;
 use ore_miner_web::Miner;
 use web_sys::{Blob, BlobPropertyBag, Url};
 
@@ -15,7 +16,7 @@ const WASM: Asset = asset!("/public/miner_bg.wasm");
 /// two way channel between us and miner (web worker)
 pub fn use_miner_provider() {
     // from miner receiver
-    let mut from_miner = use_context_provider(|| Signal::new(ore_miner_web::OutputMessage::Init));
+    let mut from_miner = use_context_provider(|| Signal::new(OutputMessage::Init));
     // to miner sender
     let _to_miner = use_coroutine(move |mut rx| async move {
         // callback for miner to send messages back to us

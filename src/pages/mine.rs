@@ -27,7 +27,7 @@ pub fn Mine() -> Element {
     use_effect(move || {
         let _pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
-        if let ore_miner_web::OutputMessage::Expired(lha) = from_miner_read {
+        if let ore_miner_types::OutputMessage::Expired(lha) = from_miner_read {
             last_hash_at.set(*lha);
         }
     });

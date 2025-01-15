@@ -1445,6 +1445,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "ore-miner-types"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "ore-miner-web"
 version = "0.1.0"
 dependencies = [
@@ -1453,6 +1460,7 @@ dependencies = [
  "gloo-worker",
  "js-sys",
  "log",
+ "ore-miner-types",
  "ore-pool-api",
  "ore-pool-types",
  "serde",

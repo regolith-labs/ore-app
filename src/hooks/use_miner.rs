@@ -1,16 +1,18 @@
 use dioxus::prelude::*;
 
+use ore_miner_types::{InputMessage, OutputMessage};
+
 #[cfg(not(feature = "web"))]
 pub use super::use_miner_native::use_miner_provider;
 #[cfg(feature = "web")]
 pub use super::use_miner_web::use_miner_provider;
 
-type FromMiner = Signal<ore_miner_web::OutputMessage>;
-type ToMiner = Coroutine<ore_miner_web::InputMessage>;
+type FromMiner = Signal<OutputMessage>;
+type ToMiner = Coroutine<InputMessage>;
 
 pub fn use_miner() -> (FromMiner, ToMiner) {
-    let from = use_context::<Signal<ore_miner_web::OutputMessage>>();
-    let to = use_coroutine_handle::<ore_miner_web::InputMessage>();
+    let from = use_context::<Signal<OutputMessage>>();
+    let to = use_coroutine_handle::<InputMessage>();
     (from, to)
 }
 

@@ -24,7 +24,10 @@ desktop = [
 web = [
   "gloo",
   "gloo-storage",
+  "gloo-worker",
+  "gloo-utils",
   "js-sys",
+  "ore-miner-web",
   "serde-wasm-bindgen",
   "solana-client-wasm",
   "solana-extra-wasm",
@@ -52,6 +55,8 @@ futures = "0.3.30"
 futures-util = "0.3.30"
 gloo = { version = "0.11.0", optional = true }
 gloo-storage = { version = "0.3.0", optional = true }
+gloo-worker = { version = "0.5.0", optional = true }
+gloo-utils = { version = "0.2.0", optional = true }
 is-url = { version = "1.0.4" }
 js-sys = { version = "0.3.67", optional = true }
 jupiter-swap-api-client = { git = "https://github.com/regolith-labs/jupiter-swap-api-client", package = "jupiter-swap-api-client", branch = "main" }
@@ -62,9 +67,10 @@ once_cell = "1.18"
 ore-api = "2.1.8"
 ore-api-v1 = { package = "ore-program", version = "1.2" }
 # ore-boost-api = { path = "../ore-boost/api", versio = "0.1.0" }
-ore-miner-web = { path = "./miner", features = [
+ore-miner-types = { path = "./miner-types" }
+ore-miner-web = { path = "./miner-web", features = [
   "app",
-], default-features = false }
+], default-features = false, optional = true }
 ore-pool-api = "0.2.0"
 ore-pool-types = "0.2.2"
 ore-relayer-api = "2.2.0"
@@ -93,8 +99,6 @@ wasm-bindgen = { version = "0.2.99", optional = true }
 wasm-bindgen-futures = { version = "0.4.41", optional = true }
 wasm-logger = { version = "0.2.0", optional = true }
 web-time = { version = "1.0.0", optional = true }
-gloo-worker = "0.5.0"
-gloo-utils = "0.2.0"
 rust_decimal = "1.36.0"
 
 [dependencies.web-sys]
