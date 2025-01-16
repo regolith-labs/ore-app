@@ -11,7 +11,7 @@ mod use_persistent;
 mod use_pools;
 mod use_swap;
 mod use_wallet;
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 mod use_wallet_native;
 #[cfg(feature = "web")]
 mod use_wallet_web;

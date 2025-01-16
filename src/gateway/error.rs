@@ -15,7 +15,17 @@ pub enum GatewayError {
     WalletAdapterDisconnected,
     JupSwapError,
     ParseTokenStringAmmount,
+    Keyring,
+    BincodeSerialize,
+    BincodeDeserialize,
     Unknown,
+}
+
+impl From<keyring::Error> for GatewayError {
+    fn from(value: keyring::Error) -> Self {
+        println!("{:?}", value);
+        Self::Keyring
+    }
 }
 
 impl From<std::num::ParseFloatError> for GatewayError {
