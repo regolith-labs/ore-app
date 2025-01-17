@@ -1,5 +1,4 @@
 use async_std::future::TimeoutError;
-use solana_client_wasm::ClientError;
 use steel::ProgramError;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -10,13 +9,30 @@ pub enum GatewayError {
     AccountNotFound,
     RetryFailed,
     TimeoutError,
-    SignatureDenied,
+    SignatureFailed,
     RequestFailed,
     ProgramBuilderFailed,
     WalletAdapterDisconnected,
     JupSwapError,
     ParseTokenStringAmmount,
+    Keyring,
+    BincodeSerialize,
+    BincodeDeserialize,
     Unknown,
+}
+
+impl From<solana_sdk::signer::SignerError> for GatewayError {
+    fn from(value: solana_sdk::signer::SignerError) -> Self {
+        println!("{:?}", value);
+        Self::SignatureFailed
+    }
+}
+
+impl From<keyring::Error> for GatewayError {
+    fn from(value: keyring::Error) -> Self {
+        println!("{:?}", value);
+        Self::Keyring
+    }
 }
 
 impl From<std::num::ParseFloatError> for GatewayError {
@@ -45,8 +61,9 @@ impl From<TimeoutError> for GatewayError {
     }
 }
 
-impl From<ClientError> for GatewayError {
-    fn from(value: ClientError) -> Self {
+#[cfg(feature = "web")]
+impl From<solana_client_wasm::ClientError> for GatewayError {
+    fn from(value: solana_client_wasm::ClientError) -> Self {
         let msg = value.to_string();
         if msg.starts_with("Client error: Invalid param: could not find account")
             || msg.starts_with("Client error: AccountNotFound: ")
@@ -59,6 +76,14 @@ impl From<ClientError> for GatewayError {
             log::info!("Err: {:?}", msg);
             GatewayError::Unknown
         }
+    }
+}
+
+#[cfg(feature = "desktop")]
+impl From<solana_client::client_error::ClientError> for GatewayError {
+    fn from(value: solana_client::client_error::ClientError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::RequestFailed
     }
 }
 

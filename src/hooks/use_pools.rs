@@ -8,15 +8,16 @@ use ore_pool_types::Member;
 use ore_pool_types::MemberChallengeV2;
 use ore_pool_types::RegisterPayload;
 use serde::{Deserialize, Deserializer};
-use solana_client_wasm::solana_sdk::clock::Clock;
-use solana_client_wasm::solana_sdk::compute_budget::ComputeBudgetInstruction;
-use solana_client_wasm::solana_sdk::transaction::Transaction;
-use solana_client_wasm::WasmClient;
+use solana_sdk::clock::Clock;
+use solana_sdk::compute_budget::ComputeBudgetInstruction;
+use solana_sdk::pubkey::Pubkey;
+use solana_sdk::transaction::Transaction;
 use steel::AccountDeserialize;
 
 use crate::gateway::GatewayError;
+use crate::gateway::GatewayResult;
+use crate::gateway::Rpc;
 use crate::steel_app::time::Duration;
-use crate::{gateway::GatewayResult, steel_app::solana::sdk::pubkey::Pubkey};
 
 use super::use_gateway;
 use super::{use_wallet, GetPubkey};
@@ -173,8 +174,8 @@ pub fn use_member_db(pool_url: String) -> Resource<GatewayResult<Member>> {
     })
 }
 
-pub async fn get_cutoff(
-    rpc_client: &WasmClient,
+pub async fn get_cutoff<R: Rpc>(
+    rpc_client: &R,
     last_hash_at: i64,
     buffer_time: i64,
 ) -> GatewayResult<i64> {
@@ -187,9 +188,9 @@ pub async fn get_cutoff(
     Ok(cutoff)
 }
 
-async fn get_clock(rpc_client: &WasmClient) -> GatewayResult<Clock> {
+async fn get_clock<R: Rpc>(rpc_client: &R) -> GatewayResult<Clock> {
     let data = rpc_client
-        .get_account_data(&solana_client_wasm::solana_sdk::sysvar::clock::ID)
+        .get_account_data(&solana_sdk::sysvar::clock::ID)
         .await?;
     bincode::deserialize::<Clock>(data.as_slice())
         .map_err(|_err| GatewayError::FailedDeserialization)
@@ -209,8 +210,8 @@ pub fn use_member_onchain(
     })
 }
 
-async fn get_member_onchain(
-    rpc_client: &WasmClient,
+async fn get_member_onchain<R: Rpc>(
+    rpc_client: &R,
     pool_address: &Pubkey,
     miner: &Pubkey,
 ) -> GatewayResult<ore_pool_api::state::Member> {

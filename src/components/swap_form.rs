@@ -2,13 +2,16 @@ use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::UseDebounce;
 use jupiter_swap_api_client::quote::QuoteResponse;
 use rust_decimal::Decimal;
-use solana_client_wasm::solana_sdk::transaction::VersionedTransaction;
-use solana_extra_wasm::account_decoder::parse_token::UiTokenAmount;
+use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
-    components::{invoke_signature, CarrotDownIcon, Col, InvokeSignatureStatus, Row, SwitchIcon, WalletIcon},
-    gateway::GatewayResult,
-    hooks::{get_token_balance, use_quote, use_swap_transaction, use_wallet, Asset, GetPubkey, ASSETS},
+    components::{
+        invoke_signature, CarrotDownIcon, Col, InvokeSignatureStatus, Row, SwitchIcon, WalletIcon,
+    },
+    gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
+    hooks::{
+        get_token_balance, use_quote, use_swap_transaction, use_wallet, Asset, GetPubkey, ASSETS,
+    },
 };
 
 #[component]
@@ -24,6 +27,10 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let show_buy_token_selector = use_signal(|| false);
     let show_sell_token_selector = use_signal(|| false);
 
+    // quote response
+    let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
+    let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
+
     // selected tokens
     let buy_token = use_signal(|| Asset::ore());
     let sell_token = use_signal(|| Asset::sol());
@@ -32,6 +39,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let mut buy_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let buy_token = buy_token.read();
+        invoke_signature_status.set(InvokeSignatureStatus::Start);
         get_token_balance(wallet, buy_token.mint).await
     });
     let mut sell_token_balance = use_resource(move || async move {
@@ -39,10 +47,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
         let sell_token = sell_token.read();
         get_token_balance(wallet, sell_token.mint).await
     });
-
-    // quote response
-    let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
-    let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
 
     // reset signature
     use_effect(move || {
@@ -54,7 +58,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
         if let InvokeSignatureStatus::Done(_sig) = invoke_signature_status.cloned() {
             buy_token_balance.restart();
             sell_token_balance.restart();
-            invoke_signature_status.set(InvokeSignatureStatus::Start);
         }
     });
 
@@ -78,9 +81,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let swap_tx = use_swap_transaction(quote_response);
 
     rsx! {
-        Col { 
+        Col {
             class: "w-full gap-4 {class}",
-            Col { 
+            Col {
                 class: "lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
                 SwapInput {
                     mode: SwapInputMode::Sell,
@@ -186,7 +189,7 @@ fn TokenPicker(
             div {
                 class: "bg-black rounded-lg p-4 w-96 border border-gray-800",
                 onclick: move |e| e.stop_propagation(),
-                Col { 
+                Col {
                     gap: 4,
 
                     // Search input
@@ -197,7 +200,7 @@ fn TokenPicker(
                     }
 
                     // Token list
-                    Col { 
+                    Col {
                         gap: 2,
                         for asset in filtered_assets {
                             button {
@@ -260,8 +263,8 @@ fn SwapDetails(
     };
 
     rsx! {
-        Col { 
-            class: "px-5", 
+        Col {
+            class: "px-5",
             gap: 3,
             SwapDetailLabel { title: "Price impact", value: price_impact_value }
             // SwapDetailLabel { title: "Slippage", value: slippage }
@@ -273,7 +276,7 @@ fn SwapDetails(
 #[component]
 fn SwapDetailLabel(title: String, value: String) -> Element {
     rsx! {
-        Row { 
+        Row {
             class: "w-full justify-between text-sm",
             span { class: "text-elements-lowEmphasis", "{title}" }
             span { class: "text-elements-midEmphasis", "{value}" }
@@ -326,7 +329,7 @@ fn SwitchButton(
                 let sell_token_peek = sell_token.peek().clone();
                 buy_token.set(sell_token_peek);
                 sell_token.set(buy_token_peek);
-                
+
                 // Swap input amounts
                 let buy_input_peek = buy_input_amount.peek().clone();
                 sell_input_amount.set(buy_input_peek.clone());
@@ -388,7 +391,7 @@ fn SwapInput(
                 if let Some(input_amount_str) = input_amount.cloned() {
                     let input_amount_f64 = input_amount_str.parse::<f64>().unwrap_or(0.0);
                     if let Some(Ok(balance)) = selected_token_balance.cloned() {
-                        if balance.ui_amount.unwrap_or(0.0) < input_amount_f64 { 
+                        if balance.ui_amount.unwrap_or(0.0) < input_amount_f64 {
                             error_msg.set(Some("Insufficient balance".to_string()));
                             is_error = true;
                         }
@@ -405,10 +408,10 @@ fn SwapInput(
     });
 
     rsx! {
-        Col { 
-            class: "w-full p-4 {border}", 
+        Col {
+            class: "w-full p-4 {border}",
             gap: 2,
-            Row { 
+            Row {
                 class: "justify-between",
                 span { class: "text-elements-midEmphasis my-auto pl-1", "{title}" }
                 Row {
@@ -465,8 +468,8 @@ fn TokenButton(token: Signal<Asset>, show_selector: Signal<bool>) -> Element {
         button {
             class: "flex items-center gap-2 p-2 -ml-1 -mt-1 hover:bg-controls-secondaryHover rounded cursor-pointer shrink-0",
             onclick: move |_| show_selector.set(true),
-            Row { 
-                class: "my-auto", 
+            Row {
+                class: "my-auto",
                 gap: 2,
                 if let Some(image) = image {
                     img {
@@ -479,9 +482,9 @@ fn TokenButton(token: Signal<Asset>, show_selector: Signal<bool>) -> Element {
                         src: asset!("/public/icon.png"),
                     }
                 }
-                span { 
-                    class: "font-semibold my-auto", 
-                    "{display_token}" 
+                span {
+                    class: "font-semibold my-auto",
+                    "{display_token}"
                 }
                 CarrotDownIcon { class: "w-4 my-auto opacity-50" }
             }
@@ -490,7 +493,14 @@ fn TokenButton(token: Signal<Asset>, show_selector: Signal<bool>) -> Element {
 }
 
 #[component]
-fn MaxButton(selected_token_balance: Resource<GatewayResult<UiTokenAmount>>, input_amount: Signal<Option<String>>, other_amount: Signal<Option<String>>, error_msg: Signal<Option<String>>, quote_response: Signal<Option<QuoteResponse>>, new_quote: UseDebounce<String>) -> Element {
+fn MaxButton(
+    selected_token_balance: Resource<GatewayResult<UiTokenAmount>>,
+    input_amount: Signal<Option<String>>,
+    other_amount: Signal<Option<String>>,
+    error_msg: Signal<Option<String>>,
+    quote_response: Signal<Option<QuoteResponse>>,
+    new_quote: UseDebounce<String>,
+) -> Element {
     // Normalize token balance
     let token_balance = if let Some(Ok(balance)) = selected_token_balance.cloned() {
         balance.ui_amount.unwrap_or(0.0)

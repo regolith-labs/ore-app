@@ -19,8 +19,9 @@ use crate::{
 fn main() {
     #[cfg(feature = "web")]
     wasm_logger::init(wasm_logger::Config::default());
+    #[cfg(not(feature = "web"))]
+    env_logger::init();
     dioxus_logger::init(Level::INFO).expect("failed to init logger");
-    #[cfg(feature = "web")]
     launch(App);
 }
 

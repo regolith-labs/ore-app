@@ -15,6 +15,7 @@ app = []             # App-specific logic
 drillx = "2.0.0"
 gloo-worker = "0.5.0"
 log = "0.4.20"
+ore-miner-types = { path = "../miner-types" }
 ore-pool-api = "0.2.0"
 ore-pool-types = "0.2.2"
 wasm-logger = "0.2.0"
@@ -22,8 +23,6 @@ wasm-bindgen = "0.2.99"
 wasm-bindgen-futures = "0.4.41"
 web-sys = { version = "0.3", features = ["Performance"] }
 console_error_panic_hook = "0.1.7"
-serde = { version = "1.0", features = ["derive"] }
-serde-wasm-bindgen = { version = "0.6.3" }
 js-sys = "0.3.76"
 
 [patch.crates-io]

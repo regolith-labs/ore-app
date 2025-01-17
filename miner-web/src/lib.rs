@@ -3,7 +3,7 @@ use std::ops::Div;
 #[cfg(feature = "worker")]
 use gloo_worker::Registrable;
 use gloo_worker::{Worker, WorkerScope};
-use serde::{Deserialize, Serialize};
+use ore_miner_types::{InputMessage, OutputMessage};
 #[cfg(feature = "worker")]
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::{JsCast, JsValue};
@@ -11,21 +11,6 @@ use wasm_bindgen::{JsCast, JsValue};
 mod error;
 
 pub struct Miner;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct InputMessage {
-    pub member: ore_pool_types::Member,
-    pub challenge: ore_pool_types::MemberChallengeV2,
-    pub cutoff_time: i64,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum OutputMessage {
-    Init,
-    Solution(drillx::Solution),
-    Expired(LastHashAt),
-}
-type LastHashAt = i64;
 
 impl Worker for Miner {
     /// Update message type.

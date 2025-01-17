@@ -1,14 +1,13 @@
 use dioxus::prelude::*;
-use solana_client_wasm::solana_sdk::pubkey::Pubkey;
+use solana_sdk::pubkey::Pubkey;
 
-use crate::{components::{Col, Row}, hooks::{use_token_balance, ASSETS}};
-
+use crate::{
+    components::{Col, Row},
+    hooks::{use_token_balance, ASSETS},
+};
 
 #[component]
-pub fn StakeForm(
-    class: Option<String>,
-    mint: Pubkey
-) -> Element {
+pub fn StakeForm(class: Option<String>, mint: Pubkey) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);
 
@@ -43,7 +42,7 @@ pub enum StakeTab {
 
 #[component]
 fn StakeTabs(tab: Signal<StakeTab>) -> Element {
-    let deposit_class = if *tab.read() == StakeTab::Deposit { 
+    let deposit_class = if *tab.read() == StakeTab::Deposit {
         "flex-1 h-12 transition-colors text-elements-highEmphasis border-b-2 border-white"
     } else {
         "flex-1 h-12 transition-colors text-elements-lowEmphasis hover:bg-surface-elevated"
@@ -67,17 +66,14 @@ fn StakeTabs(tab: Signal<StakeTab>) -> Element {
             button {
                 class: "{withdraw_class}",
                 onclick: move |_| tab.set(StakeTab::Withdraw),
-                "Withdraw" 
+                "Withdraw"
             }
         }
     }
 }
 
 #[component]
-pub fn WithdrawForm(
-    class: Option<String>,
-    mint: Pubkey
-) -> Element {
+pub fn WithdrawForm(class: Option<String>, mint: Pubkey) -> Element {
     let class = class.unwrap_or_default();
     let mut withdraw_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
@@ -105,7 +101,8 @@ pub fn WithdrawForm(
 
     let balance = use_token_balance(mint);
     let token = "SOL".to_string(); // This should be dynamically determined based on mint
-    let image = ASSETS.get(&token)
+    let image = ASSETS
+        .get(&token)
         .map(|asset| asset.image.clone())
         .unwrap_or_else(|| "icon.png".to_string());
 
@@ -178,10 +175,7 @@ pub fn WithdrawForm(
 }
 
 #[component]
-pub fn DepositForm(
-    class: Option<String>,
-    mint: Pubkey
-) -> Element {
+pub fn DepositForm(class: Option<String>, mint: Pubkey) -> Element {
     let class = class.unwrap_or_default();
     let stake_amount_a = use_signal::<String>(|| "".to_owned());
     let stake_amount_b = use_signal::<String>(|| "".to_owned());
@@ -358,7 +352,12 @@ fn WithdrawButton(enabled: Signal<bool>) -> Element {
     }
 }
 #[component]
-fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>, pair_deposit: Signal<bool>) -> Element {
+fn StakeInputs(
+    mint: Pubkey,
+    amount_a: Signal<String>,
+    amount_b: Signal<String>,
+    pair_deposit: Signal<bool>,
+) -> Element {
     rsx! {
         Col {
             class: "w-full p-4",
@@ -396,7 +395,7 @@ fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>,
                     input {
                         class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                         placeholder: "0",
-                        r#type: "number", 
+                        r#type: "number",
                         inputmode: "decimal",
                         value: amount_a.cloned(),
                         oninput: move |e| {
@@ -429,7 +428,7 @@ fn StakeInputs(mint: Pubkey, amount_a: Signal<String>, amount_b: Signal<String>,
                             class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                             placeholder: "0",
                             r#type: "number",
-                            inputmode: "decimal", 
+                            inputmode: "decimal",
                             value: amount_b.cloned(),
                             oninput: move |e| {
                                 let s = e.value();

@@ -3,6 +3,7 @@ dioxusin
 /dist
 /node_modules
 /target
-/miner/target/
+/miner-web/target/
+/miner-types/target/
 wallet-adapter/node_modules/
 *.br
