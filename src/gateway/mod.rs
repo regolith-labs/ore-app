@@ -73,6 +73,7 @@ pub trait Rpc {
         signatures: &[Signature],
     ) -> GatewayResult<Vec<Option<TransactionConfirmationStatus>>>;
     async fn get_token_account(&self, pubkey: &Pubkey) -> GatewayResult<Option<UiTokenAmount>>;
+    async fn get_token_supply(&self, mint: &Pubkey) -> GatewayResult<UiTokenAmount>;
     async fn send_transaction(
         &self,
         transaction: &VersionedTransaction,
@@ -143,6 +144,19 @@ impl Rpc for NativeRpc {
         })
         .await
     }
+    async fn get_token_supply(&self, mint: &Pubkey) -> GatewayResult<UiTokenAmount> {
+        retry(|| async {
+            let ta = self.0.get_token_supply(mint).await?;
+            let ta = UiTokenAmount {
+                ui_amount: ta.ui_amount,
+                decimals: ta.decimals,
+                amount: ta.amount,
+                ui_amount_string: ta.ui_amount_string,
+            };
+            Ok(ta)
+        })
+        .await
+    }
     async fn send_transaction(
         &self,
         transaction: &VersionedTransaction,
@@ -209,6 +223,19 @@ impl Rpc for WebRpc {
                 ui_amount_string: ta.token_amount.ui_amount_string,
             });
             Ok(option)
+        })
+        .await
+    }
+    async fn get_token_supply(&self, mint: &Pubkey) -> GatewayResult<UiTokenAmount> {
+        retry(|| async {
+            let ta = self.0.get_token_supply(mint).await?;
+            let ta = UiTokenAmount {
+                ui_amount: ta.ui_amount,
+                decimals: ta.decimals,
+                amount: ta.amount,
+                ui_amount_string: ta.ui_amount_string,
+            };
+            Ok(ta)
         })
         .await
     }

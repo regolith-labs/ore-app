@@ -52,7 +52,7 @@ pub fn VisitorNavigation() -> Element {
 fn VisitorNavBar() -> Element {
     rsx! {
         Row {
-            class: "w-screen shrink-0 h-16 sm:h-20 px-3 sm:px-6",
+            class: "w-screen shrink-0 h-16 sm:h-20 px-2 sm:px-6",
             Row {
                 class: "w-full my-auto",
                 Logo {}

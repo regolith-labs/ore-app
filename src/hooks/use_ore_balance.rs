@@ -19,6 +19,16 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     })
 }
 
+pub fn use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
+    use_resource(move || async move {
+        use_gateway()
+            .rpc
+            .get_token_supply(&ore_api::consts::MINT_ADDRESS)
+            .await
+            .map_err(GatewayError::from)
+    })
+}
+
 pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
     let wallet_status = use_wallet();
     use_resource(move || async move {
