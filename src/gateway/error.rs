@@ -9,7 +9,7 @@ pub enum GatewayError {
     AccountNotFound,
     RetryFailed,
     TimeoutError,
-    SignatureDenied,
+    SignatureFailed,
     RequestFailed,
     ProgramBuilderFailed,
     WalletAdapterDisconnected,
@@ -19,6 +19,13 @@ pub enum GatewayError {
     BincodeSerialize,
     BincodeDeserialize,
     Unknown,
+}
+
+impl From<solana_sdk::signer::SignerError> for GatewayError {
+    fn from(value: solana_sdk::signer::SignerError) -> Self {
+        println!("{:?}", value);
+        Self::SignatureFailed
+    }
 }
 
 impl From<keyring::Error> for GatewayError {

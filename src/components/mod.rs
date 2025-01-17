@@ -11,6 +11,10 @@ mod ore_value;
 mod page_title;
 mod stake_form;
 mod submit_transaction;
+#[cfg(not(feature = "web"))]
+mod submit_transaction_native;
+#[cfg(feature = "web")]
+mod submit_transaction_web;
 mod swap_form;
 mod table;
 mod table_simple;
@@ -20,7 +24,7 @@ mod wallet_adapter_native;
 #[cfg(feature = "web")]
 mod wallet_adapter_web;
 mod wallet_drawer;
-// #[cfg(not(feature = "web"))]
+#[cfg(not(feature = "web"))]
 mod wallet_drawer_native;
 #[cfg(feature = "web")]
 mod wallet_drawer_web;
