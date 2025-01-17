@@ -89,26 +89,25 @@ impl Rpc for NativeRpc {
         NativeRpc(RpcClient::new(rpc_url))
     }
     async fn get_account_data(&self, pubkey: &Pubkey) -> GatewayResult<Vec<u8>> {
-        retry(|| async { self.0.get_account_data(pubkey).await.map_err(From::from) }).await
+        self.0.get_account_data(pubkey).await.map_err(From::from)
     }
     async fn get_balance(&self, pubkey: &Pubkey) -> GatewayResult<u64> {
-        retry(|| async { self.0.get_balance(pubkey).await.map_err(From::from) }).await
+        self.0.get_balance(pubkey).await.map_err(From::from)
     }
     async fn get_latest_blockhash(&self) -> GatewayResult<Hash> {
-        retry(|| async { self.0.get_latest_blockhash().await.map_err(From::from) }).await
+        self.0.get_latest_blockhash().await.map_err(From::from)
     }
     async fn get_signature_statuses(
         &self,
         signatures: &[Signature],
     ) -> GatewayResult<Vec<Option<TransactionConfirmationStatus>>> {
-        retry(|| async {
-            let vec = self.0.get_signature_statuses(signatures).await?.value;
-            let vec = vec
-                .into_iter()
-                .map(|opt| {
-                    if let Some(status) = opt {
-                        if let Some(status) = status.confirmation_status {
-                            match status {
+        let vec = self.0.get_signature_statuses(signatures).await?.value;
+        let vec = vec
+            .into_iter()
+            .map(|opt| {
+                if let Some(status) = opt {
+                    if let Some(status) = status.confirmation_status {
+                        match status {
                             solana_transaction_status::TransactionConfirmationStatus::Processed => {
                                 Some(TransactionConfirmationStatus::Processed)
                             }
@@ -119,55 +118,44 @@ impl Rpc for NativeRpc {
                                 Some(TransactionConfirmationStatus::Finalized)
                             }
                         }
-                        } else {
-                            None
-                        }
                     } else {
                         None
                     }
-                })
-                .collect();
-            Ok(vec)
-        })
-        .await
+                } else {
+                    None
+                }
+            })
+            .collect();
+        Ok(vec)
     }
     async fn get_token_account(&self, pubkey: &Pubkey) -> GatewayResult<Option<UiTokenAmount>> {
-        retry(|| async {
-            let option = self.0.get_token_account(pubkey).await?;
-            let option = option.map(|ta| UiTokenAmount {
-                ui_amount: ta.token_amount.ui_amount,
-                decimals: ta.token_amount.decimals,
-                amount: ta.token_amount.amount,
-                ui_amount_string: ta.token_amount.ui_amount_string,
-            });
-            Ok(option)
-        })
-        .await
+        let option = self.0.get_token_account(pubkey).await?;
+        let option = option.map(|ta| UiTokenAmount {
+            ui_amount: ta.token_amount.ui_amount,
+            decimals: ta.token_amount.decimals,
+            amount: ta.token_amount.amount,
+            ui_amount_string: ta.token_amount.ui_amount_string,
+        });
+        Ok(option)
     }
     async fn get_token_supply(&self, mint: &Pubkey) -> GatewayResult<UiTokenAmount> {
-        retry(|| async {
-            let ta = self.0.get_token_supply(mint).await?;
-            let ta = UiTokenAmount {
-                ui_amount: ta.ui_amount,
-                decimals: ta.decimals,
-                amount: ta.amount,
-                ui_amount_string: ta.ui_amount_string,
-            };
-            Ok(ta)
-        })
-        .await
+        let ta = self.0.get_token_supply(mint).await?;
+        let ta = UiTokenAmount {
+            ui_amount: ta.ui_amount,
+            decimals: ta.decimals,
+            amount: ta.amount,
+            ui_amount_string: ta.ui_amount_string,
+        };
+        Ok(ta)
     }
     async fn send_transaction(
         &self,
         transaction: &VersionedTransaction,
     ) -> GatewayResult<Signature> {
-        retry(|| async {
-            self.0
-                .send_transaction(transaction)
-                .await
-                .map_err(From::from)
-        })
-        .await
+        self.0
+            .send_transaction(transaction)
+            .await
+            .map_err(From::from)
     }
 }
 
@@ -180,20 +168,19 @@ impl Rpc for WebRpc {
         WebRpc(WasmClient::new(rpc_url.as_str()))
     }
     async fn get_account_data(&self, pubkey: &Pubkey) -> GatewayResult<Vec<u8>> {
-        retry(|| async { self.0.get_account_data(pubkey).await.map_err(From::from) }).await
+        self.0.get_account_data(pubkey).await.map_err(From::from)
     }
     async fn get_balance(&self, pubkey: &Pubkey) -> GatewayResult<u64> {
-        retry(|| async { self.0.get_balance(pubkey).await.map_err(From::from) }).await
+        self.0.get_balance(pubkey).await.map_err(From::from)
     }
     async fn get_latest_blockhash(&self) -> GatewayResult<Hash> {
-        retry(|| async { self.0.get_latest_blockhash().await.map_err(From::from) }).await
+        self.0.get_latest_blockhash().await.map_err(From::from)
     }
     async fn get_signature_statuses(
         &self,
         signatures: &[Signature],
     ) -> GatewayResult<Vec<Option<TransactionConfirmationStatus>>> {
-        retry(|| async {
-            let vec = self.0.get_signature_statuses(signatures).await?;
+        let vec = self.0.get_signature_statuses(signatures).await?;
         let vec = vec.into_iter().map(|opt| {
             if let Some(status) = opt {
                 if let Some(status) = status.confirmation_status {
@@ -209,46 +196,35 @@ impl Rpc for WebRpc {
                 None
             }
         }).collect();
-            Ok(vec)
-        })
-        .await
+        Ok(vec)
     }
     async fn get_token_account(&self, pubkey: &Pubkey) -> GatewayResult<Option<UiTokenAmount>> {
-        retry(|| async {
-            let option = self.0.get_token_account(pubkey).await?;
-            let option = option.map(|ta| UiTokenAmount {
-                ui_amount: ta.token_amount.ui_amount,
-                decimals: ta.token_amount.decimals,
-                amount: ta.token_amount.amount,
-                ui_amount_string: ta.token_amount.ui_amount_string,
-            });
-            Ok(option)
-        })
-        .await
+        let option = self.0.get_token_account(pubkey).await?;
+        let option = option.map(|ta| UiTokenAmount {
+            ui_amount: ta.token_amount.ui_amount,
+            decimals: ta.token_amount.decimals,
+            amount: ta.token_amount.amount,
+            ui_amount_string: ta.token_amount.ui_amount_string,
+        });
+        Ok(option)
     }
     async fn get_token_supply(&self, mint: &Pubkey) -> GatewayResult<UiTokenAmount> {
-        retry(|| async {
-            let ta = self.0.get_token_supply(mint).await?;
-            let ta = UiTokenAmount {
-                ui_amount: ta.ui_amount,
-                decimals: ta.decimals,
-                amount: ta.amount,
-                ui_amount_string: ta.ui_amount_string,
-            };
-            Ok(ta)
-        })
-        .await
+        let ta = self.0.get_token_supply(mint).await?;
+        let ta = UiTokenAmount {
+            ui_amount: ta.ui_amount,
+            decimals: ta.decimals,
+            amount: ta.amount,
+            ui_amount_string: ta.ui_amount_string,
+        };
+        Ok(ta)
     }
     async fn send_transaction(
         &self,
         transaction: &VersionedTransaction,
     ) -> GatewayResult<Signature> {
-        retry(|| async {
-            self.0
-                .send_versioned_transaction(transaction)
-                .await
-                .map_err(From::from)
-        })
-        .await
+        self.0
+            .send_versioned_transaction(transaction)
+            .await
+            .map_err(From::from)
     }
 }

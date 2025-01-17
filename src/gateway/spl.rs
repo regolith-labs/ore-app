@@ -22,13 +22,10 @@ impl<R: Rpc> SplGateway for R {
         owner: &Pubkey,
         mint: &Pubkey,
     ) -> GatewayResult<UiTokenAmount> {
-        retry(|| async {
-            let ata_address = get_associated_token_address(owner, &mint);
-            let Some(token_account) = self.get_token_account(&ata_address).await? else {
-                return Err(GatewayError::AccountNotFound.into());
-            };
-            Ok(token_account)
-        })
-        .await
+        let ata_address = get_associated_token_address(owner, &mint);
+        let Some(token_account) = self.get_token_account(&ata_address).await? else {
+            return Err(GatewayError::AccountNotFound.into());
+        };
+        Ok(token_account)
     }
 }

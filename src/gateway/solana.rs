@@ -15,14 +15,11 @@ pub trait SolanaGateway {
 
 impl<R: Rpc> SolanaGateway for R {
     async fn get_clock(&self) -> GatewayResult<Clock> {
-        retry(|| async {
-            let data = self
-                .get_account_data(&solana_sdk::sysvar::clock::ID)
-                .await
-                .map_err(GatewayError::from)?;
-            bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
-        })
-        .await
+        let data = self
+            .get_account_data(&solana_sdk::sysvar::clock::ID)
+            .await
+            .map_err(GatewayError::from)?;
+        bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
     }
     async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
         // Confirm tx
