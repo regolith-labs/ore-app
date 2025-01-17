@@ -445,4 +445,3 @@ fn StakeInputs(
         }
     }
 }
-

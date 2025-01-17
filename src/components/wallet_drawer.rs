@@ -7,11 +7,10 @@ use crate::gateway::GatewayResult;
 use crate::hooks::{use_token_balance, Asset, ASSETS};
 use crate::route::Route;
 
-#[cfg(feature = "web")]
-pub use wallet_drawer_web::WalletDrawer;
-
 #[cfg(not(feature = "web"))]
 pub use wallet_drawer_native::WalletDrawer;
+#[cfg(feature = "web")]
+pub use wallet_drawer_web::WalletDrawer;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum WalletTab {
