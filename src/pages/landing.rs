@@ -98,7 +98,7 @@ fn MarqeePanel(
 
             // SOL
             img {
-                class: "inline-block w-10 h-10 ml-16 mr-4",
+                class: "inline-block my-auto w-10 h-10 ml-16 mr-4 ",
                 src: "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
                 alt: "Solana logo"
             }
@@ -113,13 +113,13 @@ fn MarqeePanel(
                 }
             } else {
                 span {
-                    class: "inline-block h-10 w-16 loading rounded mr-16",
+                    class: "inline-block my-auto h-10 w-16 loading rounded mr-16",
                 }
             }
 
             // USDC
             img {
-                class: "inline-block w-10 h-10 ml-16 mr-4",
+                class: "inline-block my-auto w-10 h-10 ml-16 mr-4 ",
                 src: "https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png",
                 alt: "USDC logo"
             }
@@ -134,13 +134,13 @@ fn MarqeePanel(
                 }
             } else {
                 span {
-                    class: "inline-block h-10 w-16 loading rounded mr-16",
+                    class: "inline-block my-auto h-10 w-16 loading rounded mr-16",
                 }
             }
 
             // BTC
             img {
-                class: "inline-block w-10 h-10 ml-16 mr-4",
+                class: "inline-block my-auto w-10 h-10 ml-16 mr-4 ",
                 src: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
                 alt: "BTC logo"
             }
@@ -155,13 +155,13 @@ fn MarqeePanel(
                 }
             } else {
                 span {
-                    class: "inline-block h-10 w-16 loading rounded mr-16",
+                    class: "inline-block my-auto h-10 w-16 loading rounded mr-16",
                 }
             }
 
             // Gold
             img {
-                class: "inline-block h-8 ml-16 mr-4",
+                class: "inline-block my-auto h-8 ml-16 mr-4 ",
                 src: "https://wallpapers.com/images/hd/gold-bars-transparent-background-v7dez4tziavzufj7.jpg",
                 alt: "Gold ingots",
             }
@@ -176,13 +176,13 @@ fn MarqeePanel(
                 }
             } else {
                 span {
-                    class: "inline-block h-10 w-16 loading rounded mr-16",
+                    class: "inline-block my-auto h-10 w-16 loading rounded mr-16",
                 }
             }
 
             // Oil
             img {
-                class: "inline-block w-10 h-10 ml-16 mr-4 rounded-full",
+                class: "inline-block my-auto w-10 h-10 ml-16 mr-4 rounded-full ",
                 src: "https://as2.ftcdn.net/v2/jpg/01/18/15/67/1000_F_118156739_YaqIIHto5LeAsroscdOHwtKWqoWIipv6.jpg",
                 // src: "https://img.freepik.com/premium-photo/oil-barrel_172429-567.jpg",
                 // src: "https://img.pikbest.com/origin/09/28/78/29spIkbEsTgfS.png!sw800",
@@ -200,7 +200,7 @@ fn MarqeePanel(
                 }
             } else {
                 span {
-                    class: "inline-block h-10 w-16 loading rounded mr-16",
+                    class: "inline-block my-auto h-10 w-16 loading rounded mr-16",
                 }
             }
         }
