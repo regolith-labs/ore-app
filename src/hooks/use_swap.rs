@@ -106,6 +106,25 @@ pub fn use_quote(
     })
 }
 
+pub fn use_ore_quote(
+    output_token: Pubkey,
+) -> Resource<GatewayResult<QuoteResponse>> {
+    use_resource(move || {
+        async move {
+            let client = JupiterSwapApiClient::new(API_URL.to_string());
+            let request = QuoteRequest {
+                amount: ore_api::consts::ONE_ORE,
+                input_mint: ore_api::consts::MINT_ADDRESS,
+                output_mint: output_token,
+                slippage_bps: 500,
+                ..QuoteRequest::default()
+            };
+            let response = client.quote(&request).await?;
+            Ok(response)
+        }
+    })
+}
+
 async fn quote(
     float: f64,
     input_decimals: &u8,

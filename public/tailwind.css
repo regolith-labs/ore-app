@@ -777,12 +777,32 @@ body {
   margin-top: -16rem;
 }
 
+.ml-16 {
+  margin-left: 4rem;
+}
+
+.mr-16 {
+  margin-right: 4rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.mr-4 {
+  margin-right: 1rem;
+}
+
 .inline-block {
   display: inline-block;
 }
 
 .flex {
   display: flex;
+}
+
+.inline-flex {
+  display: inline-flex;
 }
 
 .table {
@@ -969,6 +989,10 @@ body {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-16 {
+  width: 4rem;
 }
 
 .min-w-max {
@@ -1311,6 +1335,18 @@ body {
 
 .bg-no-repeat {
   background-repeat: no-repeat;
+}
+
+.fill-none {
+  fill: none;
+}
+
+.stroke-purple-500 {
+  stroke: #a855f7;
+}
+
+.stroke-\[3px\] {
+  stroke-width: 3px;
 }
 
 .object-cover {
@@ -1925,6 +1961,10 @@ body {
 
   .sm\:min-h-\[calc\(100vh-8rem\)\] {
     min-height: calc(100vh - 8rem);
+  }
+
+  .sm\:min-h-\[calc\(100vh-4rem\)\] {
+    min-height: calc(100vh - 4rem);
   }
 
   .sm\:w-56 {
