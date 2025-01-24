@@ -1,11 +1,13 @@
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 use solana_sdk::pubkey::Pubkey;
 
+use super::utils::deserialize_pubkey;
+
 // Create a static HashMap indexed by ticker
-pub static TOKENS: Lazy<HashMap<String, Token>> = Lazy::new(|| {
+pub static LISTED_TOKENS: Lazy<HashMap<String, Token>> = Lazy::new(|| {
     // Read the YAML file at compile time
     let yaml_str = include_str!("../../public/config/listed-tokens.yaml");
 
@@ -39,20 +41,12 @@ struct Config {
     tokens: Vec<Token>,
 }
 
-fn deserialize_pubkey<'de, D>(deserializer: D) -> Result<Pubkey, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let s: String = Deserialize::deserialize(deserializer)?;
-    Pubkey::from_str(&s).map_err(serde::de::Error::custom)
-}
-
 impl Token {
     pub fn ore() -> Self {
-        TOKENS.get("ORE").cloned().unwrap()
+        LISTED_TOKENS.get("ORE").cloned().unwrap()
     }
 
     pub fn sol() -> Self {
-        TOKENS.get("SOL").cloned().unwrap()
+        LISTED_TOKENS.get("SOL").cloned().unwrap()
     }
 }

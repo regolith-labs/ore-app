@@ -1,4 +1,3 @@
-mod use_tokens;
 mod use_boosts;
 mod use_gateway;
 mod use_miner;
@@ -17,7 +16,6 @@ pub mod use_wallet_native;
 #[cfg(feature = "web")]
 mod use_wallet_web;
 
-pub use use_tokens::*;
 pub use use_boosts::*;
 pub use use_gateway::*;
 pub use use_miner::*;

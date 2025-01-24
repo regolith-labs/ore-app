@@ -2,9 +2,9 @@ use dioxus::prelude::*;
 
 use crate::{
     components::*,
+    config::{Pool, FIRST_POOL, LISTED_POOLS},
     hooks::{
-        use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, Pool,
-        FIRST_POOL, POOLS,
+        use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
     },
     route::Route,
 };
@@ -80,7 +80,7 @@ fn _PoolTable() -> Element {
                     TableHeader { left: "Pool", right_1: "Hashpower", right_2: "Multiplier", right_3: "Yield" }
                 },
                 rows: rsx! {
-                    for pool in POOLS.iter() {
+                    for pool in LISTED_POOLS.iter() {
                         PoolRow { pool: pool.clone() }
                     }
                 }

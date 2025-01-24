@@ -2,8 +2,9 @@ use dioxus::prelude::*;
 
 use crate::hooks::{
     get_cutoff, get_updated_challenge, post_solution, use_gateway, use_member_db, use_miner,
-    use_miner_is_active, use_wallet, GetPubkey, FIRST_POOL,
+    use_miner_is_active, use_wallet, GetPubkey,
 };
+use crate::config::FIRST_POOL;
 
 pub fn MinerController() -> Element {
     let wallet = use_wallet();
@@ -12,6 +13,7 @@ pub fn MinerController() -> Element {
     let is_active = use_miner_is_active();
 
     // register with first pool
+    // TODO: round robin select
     let pool = FIRST_POOL.clone();
     let pool_url = pool.url.clone();
     let member = use_member_db(pool_url.clone());

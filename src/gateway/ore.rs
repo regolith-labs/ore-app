@@ -12,6 +12,7 @@ pub trait OreGateway {
     async fn get_config(&self) -> GatewayResult<Config>;
     async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof>;
     async fn get_boosts(&self) -> GatewayResult<Vec<Boost>>;
+    async fn get_boost(&self, mint: Pubkey) -> GatewayResult<Boost>;
     async fn get_directory(&self) -> GatewayResult<Directory>;
 }
 
@@ -32,16 +33,21 @@ impl<R: Rpc> OreGateway for R {
         Ok(*Proof::try_from_bytes(&data)?)
     }
 
+    async fn get_boost(&self, mint: Pubkey) -> GatewayResult<Boost> {
+        let data = self
+            .get_account_data(&mint)
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(*Boost::try_from_bytes(&data)?)
+    }
+
     async fn get_boosts(&self) -> GatewayResult<Vec<Boost>> {
         let directory = self.get_directory().await?;
         let mut boosts = vec![];
         for address in directory.boosts {
             if address != Pubkey::default() {
-                let data = self
-                    .get_account_data(&address)
-                    .await
-                    .map_err(GatewayError::from)?;
-                boosts.push(*Boost::try_from_bytes(&data)?);
+                let boost = self.get_boost(address).await?;
+                boosts.push(boost);
             } else {
                 break;
             }

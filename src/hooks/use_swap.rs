@@ -9,8 +9,9 @@ use jupiter_swap_api_client::{
 use solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
 use crate::gateway::{GatewayError, GatewayResult};
+use crate::config::Token;
 
-use super::{use_wallet, Token, GetPubkey};
+use super::{use_wallet, GetPubkey};
 
 const API_URL: &str = "https://quote-api.jup.ag/v6";
 

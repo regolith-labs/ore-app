@@ -1,13 +1,9 @@
-use std::str::FromStr;
-
 use dioxus::hooks::use_resource;
 use dioxus::hooks::Resource;
-use once_cell::sync::Lazy;
 use ore_pool_types::ContributePayloadV2;
 use ore_pool_types::Member;
 use ore_pool_types::MemberChallenge;
 use ore_pool_types::RegisterPayload;
-use serde::{Deserialize, Deserializer};
 use solana_sdk::clock::Clock;
 use solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_sdk::pubkey::Pubkey;
@@ -22,46 +18,6 @@ use crate::time::Duration;
 use super::use_gateway;
 use super::{use_wallet, GetPubkey};
 
-pub static POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
-    // Read the YAML file at compile time
-    let yaml_str = include_str!("../../public/config/listed-pools.yaml");
-
-    // Parse the config
-    let config: PoolConfig =
-        serde_yaml::from_str(yaml_str).expect("Failed to parse listed-pools.yaml");
-
-    config.pools
-});
-
-pub const FIRST_POOL: Lazy<Pool> = Lazy::new(|| {
-    POOLS
-        .first()
-        .expect("Must be at least one entry in listed-pools.yaml")
-        .clone()
-});
-
-#[derive(Clone, PartialEq, Eq, Deserialize)]
-pub struct Pool {
-    #[serde(deserialize_with = "deserialize_pubkey")]
-    pub address: Pubkey,
-    pub url: String,
-    pub name: String,
-    pub description: String,
-    pub image: String,
-}
-
-#[derive(Deserialize)]
-struct PoolConfig {
-    pools: Vec<Pool>,
-}
-
-fn deserialize_pubkey<'de, D>(deserializer: D) -> Result<Pubkey, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let s: String = Deserialize::deserialize(deserializer)?;
-    Pubkey::from_str(&s).map_err(serde::de::Error::custom)
-}
 
 pub fn use_register_onchain(pool_address: Pubkey) -> Resource<GatewayResult<Transaction>> {
     let wallet = use_wallet();

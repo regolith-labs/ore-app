@@ -1,13 +1,10 @@
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
-use dioxus::prelude::*;
 use once_cell::sync::Lazy;
-use ore_boost_api::state::Boost;
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 use steel::Pubkey;
 
-use crate::gateway::{ore::OreGateway, GatewayError, GatewayResult};
-use super::use_gateway;
+use super::utils::deserialize_pubkey;
 
 // Create a static HashMap indexed by ticker
 pub static LISTED_BOOSTS: Lazy<HashMap<String, BoostMeta>> = Lazy::new(|| {
@@ -26,18 +23,6 @@ pub static LISTED_BOOSTS: Lazy<HashMap<String, BoostMeta>> = Lazy::new(|| {
         .collect()
 });
 
-pub fn use_boosts() -> Resource<GatewayResult<Vec<Boost>>> {
-    use_resource(move || async move {
-        use_gateway().rpc.get_boosts().await.map_err(GatewayError::from)
-    })
-}
-
-pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
-    use_resource(move || async move {
-        use_gateway().rpc.get_boost(mint).await.map_err(GatewayError::from)
-    })
-}
-
 #[derive(Clone, PartialEq, Eq, Deserialize)]
 pub struct BoostMeta {
     #[serde(deserialize_with = "deserialize_pubkey")]
@@ -51,18 +36,7 @@ pub struct BoostMeta {
     pub link: String,
 }
 
-
 #[derive(Deserialize)]
 struct Config {
     boosts: Vec<BoostMeta>,
 }
-
-fn deserialize_pubkey<'de, D>(deserializer: D) -> Result<Pubkey, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let s: String = Deserialize::deserialize(deserializer)?;
-    Pubkey::from_str(&s).map_err(serde::de::Error::custom)
-}
-
-impl BoostMeta {}

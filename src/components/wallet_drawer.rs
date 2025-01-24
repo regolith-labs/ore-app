@@ -3,7 +3,8 @@ use dioxus::prelude::*;
 use crate::components::*;
 use crate::gateway::ui_token_amount::UiTokenAmount;
 use crate::gateway::GatewayResult;
-use crate::hooks::{use_token_balance, Token, TOKENS};
+use crate::hooks::use_token_balance;
+use crate::config::{Token, LISTED_TOKENS};
 use crate::route::Route;
 
 #[cfg(not(feature = "web"))]
@@ -19,7 +20,7 @@ pub enum WalletTab {
 
 #[component]
 pub(super) fn TokenTable(on_close: EventHandler<MouseEvent>) -> Element {
-    let listed_tokens = TOKENS.values().collect::<Vec<_>>();
+    let listed_tokens = LISTED_TOKENS.values().collect::<Vec<_>>();
     rsx! {
         Col {
             gap: 4,
@@ -133,7 +134,7 @@ fn TokenValue(token: Token, balance: Resource<GatewayResult<UiTokenAmount>>) -> 
 
 #[component]
 pub(super) fn LiquidityTable(on_close: EventHandler<MouseEvent>) -> Element {
-    let listed_tokens = TOKENS.values().collect::<Vec<_>>();
+    let listed_tokens = LISTED_TOKENS.values().collect::<Vec<_>>();
     rsx! {
         TableSimple {
             rows: rsx! {

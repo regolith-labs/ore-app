@@ -5,8 +5,9 @@ use crate::{
     gateway::GatewayResult,
     hooks::{
         use_member_onchain, use_miner_is_active, use_register_db, use_register_onchain, use_wallet,
-        Pool, Wallet,
+        Wallet,
     },
+    config::Pool,
 };
 
 use super::{invoke_signature, InvokeSignatureStatus};
