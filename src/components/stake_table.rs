@@ -36,7 +36,7 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
     let stake = use_stake(boost_meta.lp_mint);
     rsx! {
         TableRowLink {
-            to: Route::Landing {},
+            to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
             left: rsx! {
                 StakeTableRowTitle {
                     ticker: boost_meta.ticker,

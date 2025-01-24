@@ -15,6 +15,10 @@ pub enum Route {
         Pool { pool: String },
         #[route("/stake")]
         Stake {},
+        #[route("/stake/:lp_mint")]
+        Pair { lp_mint: String },
+        #[route("/stake/vault")]
+        Vault {},
         #[route("/trade")]
         Trade {},
     #[end_layout]
