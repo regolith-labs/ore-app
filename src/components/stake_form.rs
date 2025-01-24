@@ -3,7 +3,7 @@ use solana_sdk::pubkey::Pubkey;
 
 use crate::{
     components::{Col, Row},
-    hooks::{use_token_balance, ASSETS},
+    hooks::{use_token_balance, TOKENS},
 };
 
 #[component]
@@ -101,9 +101,9 @@ pub fn WithdrawForm(class: Option<String>, mint: Pubkey) -> Element {
 
     let balance = use_token_balance(mint);
     let token = "SOL".to_string(); // This should be dynamically determined based on mint
-    let image = ASSETS
+    let image = TOKENS
         .get(&token)
-        .map(|asset| asset.image.clone())
+        .map(|token| token.image.clone())
         .unwrap_or_else(|| "icon.png".to_string());
 
     rsx! {

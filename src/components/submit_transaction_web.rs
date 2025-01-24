@@ -1,6 +1,6 @@
 use base64::Engine;
 use dioxus::{document::eval, prelude::*};
-use solana_sdk::{signature::Signature, transaction::VersionedTransaction};
+use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
     components::*,
@@ -13,10 +13,10 @@ pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSigna
         signal.set(InvokeSignatureStatus::Waiting);
         let mut eval = eval(
             r#"
-        let msg = await dioxus.recv();
-        let signed = await window.OreTxSigner({b64: msg});
-        dioxus.send(signed);
-        "#,
+            let msg = await dioxus.recv();
+            let signed = await window.OreTxSigner({b64: msg});
+            dioxus.send(signed);
+            "#,
         );
         match bincode::serialize(&tx) {
             Ok(vec) => {

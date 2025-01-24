@@ -8,8 +8,6 @@ use ore_miner_types::{InputMessage, OutputMessage};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::{JsCast, JsValue};
 
-mod error;
-
 pub struct Miner;
 
 impl Worker for Miner {
@@ -74,7 +72,7 @@ fn mine(
     cutoff_time: i64,
     scope: &WorkerScope<Miner>,
     id: gloo_worker::HandlerId,
-) -> Result<(), error::Error> {
+) -> Result<(), anyhow::Error> {
     // build nonce indices
     let nonce_index = member.id as u64;
     let num_total_members = challenge.num_total_members.max(1);

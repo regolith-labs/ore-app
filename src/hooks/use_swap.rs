@@ -10,7 +10,7 @@ use solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
 use crate::gateway::{GatewayError, GatewayResult};
 
-use super::{use_wallet, Asset, GetPubkey};
+use super::{use_wallet, Token, GetPubkey};
 
 const API_URL: &str = "https://quote-api.jup.ag/v6";
 
@@ -47,9 +47,9 @@ pub fn use_swap_transaction(
 }
 
 pub fn use_quote(
-    input_token: Signal<Asset>,
+    input_token: Signal<Token>,
     mut input_token_amount: Signal<Option<String>>,
-    output_token: Signal<Asset>,
+    output_token: Signal<Token>,
     mut output_token_amount: Signal<Option<String>>,
     mut quote_response: Signal<Option<QuoteResponse>>,
 ) -> UseDebounce<String> {

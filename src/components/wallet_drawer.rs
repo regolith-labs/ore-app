@@ -1,10 +1,9 @@
-use dioxus::document::eval;
 use dioxus::prelude::*;
 
 use crate::components::*;
 use crate::gateway::ui_token_amount::UiTokenAmount;
 use crate::gateway::GatewayResult;
-use crate::hooks::{use_token_balance, Asset, ASSETS};
+use crate::hooks::{use_token_balance, Token, TOKENS};
 use crate::route::Route;
 
 #[cfg(not(feature = "web"))]
@@ -20,7 +19,7 @@ pub enum WalletTab {
 
 #[component]
 pub(super) fn TokenTable(on_close: EventHandler<MouseEvent>) -> Element {
-    let listed_tokens = ASSETS.values().collect::<Vec<_>>();
+    let listed_tokens = TOKENS.values().collect::<Vec<_>>();
     rsx! {
         Col {
             gap: 4,
@@ -36,7 +35,7 @@ pub(super) fn TokenTable(on_close: EventHandler<MouseEvent>) -> Element {
 }
 
 #[component]
-fn TokenRow(token: Asset, on_close: EventHandler<MouseEvent>) -> Element {
+fn TokenRow(token: Token, on_close: EventHandler<MouseEvent>) -> Element {
     let balance = use_token_balance(token.mint);
     rsx! {
         TableSimpleRowLink {
@@ -51,7 +50,7 @@ fn TokenRow(token: Asset, on_close: EventHandler<MouseEvent>) -> Element {
 }
 
 #[component]
-fn TokenNameAndBalance(token: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> Element {
+fn TokenNameAndBalance(token: Token, balance: Resource<GatewayResult<UiTokenAmount>>) -> Element {
     rsx! {
         Row {
             gap: 4,
@@ -84,7 +83,7 @@ fn TokenNameAndBalance(token: Asset, balance: Resource<GatewayResult<UiTokenAmou
 }
 
 #[component]
-fn TokenQuote(token: Asset) -> Element {
+fn TokenQuote(token: Token) -> Element {
     rsx! {
         Col {
             class: "text-right",
@@ -100,7 +99,7 @@ fn TokenQuote(token: Asset) -> Element {
 }
 
 #[component]
-fn TokenValue(token: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> Element {
+fn TokenValue(token: Token, balance: Resource<GatewayResult<UiTokenAmount>>) -> Element {
     let mut value = use_signal(|| "0.000".to_string());
     let price = 1.2; // TODO
 
@@ -134,13 +133,13 @@ fn TokenValue(token: Asset, balance: Resource<GatewayResult<UiTokenAmount>>) -> 
 
 #[component]
 pub(super) fn LiquidityTable(on_close: EventHandler<MouseEvent>) -> Element {
-    let listed_assets = ASSETS.values().collect::<Vec<_>>();
+    let listed_tokens = TOKENS.values().collect::<Vec<_>>();
     rsx! {
         TableSimple {
             rows: rsx! {
-                for asset in listed_assets {
+                for token in listed_tokens {
                     LiquidityRow {
-                        asset: asset.clone(),
+                        token: token.clone(),
                         on_close: on_close
                     }
                 }
@@ -150,7 +149,7 @@ pub(super) fn LiquidityTable(on_close: EventHandler<MouseEvent>) -> Element {
 }
 
 #[component]
-fn LiquidityRow(asset: Asset, on_close: EventHandler<MouseEvent>) -> Element {
+fn LiquidityRow(token: Token, on_close: EventHandler<MouseEvent>) -> Element {
     rsx! {
         TableSimpleRowLink {
             // to: Route::Pair {
@@ -168,7 +167,7 @@ fn LiquidityRow(asset: Asset, on_close: EventHandler<MouseEvent>) -> Element {
                         class: "shrink-0",
                         img {
                             class: "w-8 h-8 shrink-0 my-auto rounded-full",
-                            src: "{asset.image}"
+                            src: "{token.image}"
                         }
                         img {
                             class: "w-8 h-8 shrink-0 -ml-2 my-auto rounded-full",
@@ -179,7 +178,7 @@ fn LiquidityRow(asset: Asset, on_close: EventHandler<MouseEvent>) -> Element {
                         class: "my-auto min-w-32 shrink-0",
                         span {
                             class: "font-medium whitespace-nowrap",
-                            "{asset.ticker}-ORE"
+                            "{token.ticker}-ORE"
                         }
                         span {
                             class: "font-medium text-gray-700 h-5 text-sm",

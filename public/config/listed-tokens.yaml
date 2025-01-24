@@ -1,4 +1,4 @@
-assets:
+tokens:
   - mint: So11111111111111111111111111111111111111112
     name: Solana
     ticker: SOL
@@ -24,15 +24,6 @@ assets:
     image: https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png
     twitter: https://twitter.com/circle
     homepage: https://www.circle.com/en/usdc
-    decimals: 6
-  
-  - mint: J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD
-    name: International Stable Currency
-    ticker: ISC
-    description: "ISC (International Stable Currency) is a decentralized stablecoin designed to maintain a stable value against a basket of major world currencies. By using an algorithmic stabilization mechanism and robust collateral system, ISC aims to provide a globally accessible, low-volatility digital currency that serves as a reliable medium of exchange and store of value across international borders."
-    image: https://raw.githubusercontent.com/theISCTeam/isc_meta/master/logo.png
-    twitter: https://twitter.com/ISC_money
-    homepage: https://isc.money
     decimals: 6
   
   - mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux

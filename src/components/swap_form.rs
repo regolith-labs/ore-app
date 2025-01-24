@@ -10,7 +10,7 @@ use crate::{
     },
     gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
     hooks::{
-        get_token_balance, use_quote, use_swap_transaction, use_wallet, Asset, GetPubkey, ASSETS,
+        get_token_balance, use_quote, use_swap_transaction, use_wallet, Token, GetPubkey, TOKENS,
     },
 };
 
@@ -32,8 +32,8 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
 
     // selected tokens
-    let buy_token = use_signal(|| Asset::ore());
-    let sell_token = use_signal(|| Asset::sol());
+    let buy_token = use_signal(|| Token::ore());
+    let sell_token = use_signal(|| Token::sol());
 
     // token balances
     let mut buy_token_balance = use_resource(move || async move {
@@ -153,28 +153,28 @@ pub fn SwapForm(class: Option<String>) -> Element {
 #[component]
 fn TokenPicker(
     show_token_selector: Signal<bool>,
-    selected_token: Signal<Asset>,
-    other_token: Signal<Asset>,
+    selected_token: Signal<Token>,
+    other_token: Signal<Token>,
     buy_input_amount: Signal<Option<String>>,
     sell_input_amount: Signal<Option<String>>,
     sell_quote: UseDebounce<String>,
     quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
-    let assets = ASSETS.values().collect::<Vec<_>>();
+    let tokens = TOKENS.values().collect::<Vec<_>>();
     let mut search = use_signal(|| String::new());
     let search_str = search.cloned();
     let selected = selected_token.read().ticker.to_string();
     let other = other_token.read().ticker.to_string();
-    let filtered_assets = assets
+    let filtered_assets = tokens
         .iter()
-        .map(|a| (*a).clone())
-        .filter(move |asset| {
+        .map(|t| (*t).clone())
+        .filter(move |token| {
             if search_str.is_empty() {
-                asset.ticker != other && asset.ticker != selected
+                token.ticker != other && token.ticker != selected
             } else {
-                asset.ticker != other
-                    && asset.ticker != selected
-                    && asset
+                token.ticker != other
+                    && token.ticker != selected
+                    && token
                         .ticker
                         .to_lowercase()
                         .contains(&search_str.to_lowercase())
@@ -234,8 +234,8 @@ fn TokenPicker(
 
 #[component]
 fn SwapDetails(
-    buy_token: Signal<Asset>,
-    sell_token: Signal<Asset>,
+    buy_token: Signal<Token>,
+    sell_token: Signal<Token>,
     quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
     let (price_impact_value, _slippage, transaction_fee) = {
@@ -313,8 +313,8 @@ fn SwapButton(
 
 #[component]
 fn SwitchButton(
-    mut buy_token: Signal<Asset>,
-    mut sell_token: Signal<Asset>,
+    mut buy_token: Signal<Token>,
+    mut sell_token: Signal<Token>,
     buy_input_amount: Signal<Option<String>>,
     sell_input_amount: Signal<Option<String>>,
     mut quote_response: Signal<Option<QuoteResponse>>,
@@ -367,7 +367,7 @@ fn SwapInput(
     input_amount: Signal<Option<String>>,
     other_amount: Signal<Option<String>>,
     show_selector: Signal<bool>,
-    selected_token: Signal<Asset>,
+    selected_token: Signal<Token>,
     selected_token_balance: Resource<GatewayResult<UiTokenAmount>>,
     new_quote: UseDebounce<String>,
     quote_response: Signal<Option<QuoteResponse>>,
@@ -461,9 +461,9 @@ fn SwapInput(
 }
 
 #[component]
-fn TokenButton(token: Signal<Asset>, show_selector: Signal<bool>) -> Element {
+fn TokenButton(token: Signal<Token>, show_selector: Signal<bool>) -> Element {
     let display_token = token.read().ticker.to_string();
-    let image = ASSETS.get(&display_token).map(|asset| asset.image.clone());
+    let image = TOKENS.get(&display_token).map(|token| token.image.clone());
     rsx! {
         button {
             class: "flex items-center gap-2 p-2 -ml-1 -mt-1 hover:bg-controls-secondaryHover rounded cursor-pointer shrink-0",
