@@ -10,6 +10,7 @@ mod orb;
 mod ore_value;
 mod page_title;
 mod stake_form;
+mod stake_table;
 mod submit_transaction;
 #[cfg(not(feature = "web"))]
 mod submit_transaction_native;
@@ -41,6 +42,7 @@ pub use orb::*;
 pub use ore_value::*;
 pub use page_title::*;
 pub use stake_form::*;
+pub use stake_table::*;
 pub use submit_transaction::*;
 pub use swap_form::*;
 pub use table::*;

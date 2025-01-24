@@ -2,9 +2,7 @@ use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::{
-    components::{Col, Row},
-    hooks::use_token_balance,
-    config::LISTED_TOKENS,
+    components::{Col, Row}, config::LISTED_TOKENS_BY_TICKER, hooks::use_token_balance
 };
 
 #[component]
@@ -102,7 +100,7 @@ pub fn WithdrawForm(class: Option<String>, mint: Pubkey) -> Element {
 
     let balance = use_token_balance(mint);
     let token = "SOL".to_string(); // This should be dynamically determined based on mint
-    let image = LISTED_TOKENS
+    let image = LISTED_TOKENS_BY_TICKER
         .get(&token)
         .map(|token| token.image.clone())
         .unwrap_or_else(|| "icon.png".to_string());

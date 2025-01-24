@@ -2,7 +2,7 @@ use ore_api::{
     consts::CONFIG_ADDRESS,
     state::{proof_pda, Config, Proof},
 };
-use ore_boost_api::state::{directory_pda, Boost, Directory};
+use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
@@ -11,9 +11,8 @@ use super::{GatewayError, GatewayResult, Rpc};
 pub trait OreGateway {
     async fn get_config(&self) -> GatewayResult<Config>;
     async fn get_proof(&self, authority: Pubkey) -> GatewayResult<Proof>;
-    async fn get_boosts(&self) -> GatewayResult<Vec<Boost>>;
     async fn get_boost(&self, mint: Pubkey) -> GatewayResult<Boost>;
-    async fn get_directory(&self) -> GatewayResult<Directory>;
+    async fn get_stake(&self, address: Pubkey) -> GatewayResult<Stake>;
 }
 
 impl<R: Rpc> OreGateway for R {
@@ -33,33 +32,19 @@ impl<R: Rpc> OreGateway for R {
         Ok(*Proof::try_from_bytes(&data)?)
     }
 
-    async fn get_boost(&self, mint: Pubkey) -> GatewayResult<Boost> {
+    async fn get_boost(&self, address: Pubkey) -> GatewayResult<Boost> {
         let data = self
-            .get_account_data(&mint)
+            .get_account_data(&address)
             .await
             .map_err(GatewayError::from)?;
         Ok(*Boost::try_from_bytes(&data)?)
     }
 
-    async fn get_boosts(&self) -> GatewayResult<Vec<Boost>> {
-        let directory = self.get_directory().await?;
-        let mut boosts = vec![];
-        for address in directory.boosts {
-            if address != Pubkey::default() {
-                let boost = self.get_boost(address).await?;
-                boosts.push(boost);
-            } else {
-                break;
-            }
-        }
-        Ok(boosts)
-    }
-
-    async fn get_directory(&self) -> GatewayResult<Directory> {
+    async fn get_stake(&self, address: Pubkey) -> GatewayResult<Stake> {
         let data = self
-            .get_account_data(&directory_pda().0)
+            .get_account_data(&address)
             .await
             .map_err(GatewayError::from)?;
-        Ok(*Directory::try_from_bytes(&data)?)
+        Ok(*Stake::try_from_bytes(&data)?)
     }
 }

@@ -274,7 +274,6 @@ fn _YieldSection() -> Element {
     }
 }
 
-
 fn _SupplySection() -> Element {
     let circulating_supply = use_ore_supply();
     rsx! {

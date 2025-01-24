@@ -12,7 +12,7 @@ pub enum GatewayError {
     SignatureFailed,
     RequestFailed,
     ProgramBuilderFailed,
-    WalletAdapterDisconnected,
+    WalletDisconnected,
     JupSwapError,
     ParseTokenStringAmmount,
     Keyring,

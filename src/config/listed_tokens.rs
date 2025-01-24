@@ -7,7 +7,7 @@ use solana_sdk::pubkey::Pubkey;
 use super::utils::deserialize_pubkey;
 
 // Create a static HashMap indexed by ticker
-pub static LISTED_TOKENS: Lazy<HashMap<String, Token>> = Lazy::new(|| {
+pub static LISTED_TOKENS_BY_TICKER: Lazy<HashMap<String, Token>> = Lazy::new(|| {
     // Read the YAML file at compile time
     let yaml_str = include_str!("../../public/config/listed-tokens.yaml");
 
@@ -23,7 +23,24 @@ pub static LISTED_TOKENS: Lazy<HashMap<String, Token>> = Lazy::new(|| {
         .collect()
 });
 
-#[derive(Clone, PartialEq, Eq, Deserialize)]
+// Create a static HashMap indexed by ticker
+pub static LISTED_TOKENS: Lazy<HashMap<Pubkey, Token>> = Lazy::new(|| {
+    // Read the YAML file at compile time
+    let yaml_str = include_str!("../../public/config/listed-tokens.yaml");
+
+    // Parse the config
+    let config: Config =
+        serde_yaml::from_str(yaml_str).expect("Failed to parse listed-tokens.yaml");
+
+    // Convert Vec<Asset> into HashMap<Pubkey, Asset>
+    config
+        .tokens
+        .into_iter()
+        .map(|asset| (asset.mint, asset))
+        .collect()
+});
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 pub struct Token {
     #[serde(deserialize_with = "deserialize_pubkey")]
     pub mint: Pubkey,
@@ -43,10 +60,10 @@ struct Config {
 
 impl Token {
     pub fn ore() -> Self {
-        LISTED_TOKENS.get("ORE").cloned().unwrap()
+        LISTED_TOKENS_BY_TICKER.get("ORE").cloned().unwrap()
     }
 
     pub fn sol() -> Self {
-        LISTED_TOKENS.get("SOL").cloned().unwrap()
+        LISTED_TOKENS_BY_TICKER.get("SOL").cloned().unwrap()
     }
 }

@@ -115,3 +115,12 @@ pub fn TableRowLink(
         }
     }
 }
+
+pub fn TableCellLoading() -> Element {
+    rsx! {
+        span {
+            class: "w-16 h-8 rounded my-auto loading",
+            ""
+        }
+    }
+}

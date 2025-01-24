@@ -8,7 +8,7 @@ use crate::{
     components::{
         invoke_signature, CarrotDownIcon, Col, InvokeSignatureStatus, Row, SwitchIcon, WalletIcon,
     },
-    config::{Token, LISTED_TOKENS},
+    config::{Token, LISTED_TOKENS_BY_TICKER},
     gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
     hooks::{
         get_token_balance, use_quote, use_swap_transaction, use_wallet, GetPubkey,
@@ -161,7 +161,7 @@ fn TokenPicker(
     sell_quote: UseDebounce<String>,
     quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
-    let tokens = LISTED_TOKENS.values().collect::<Vec<_>>();
+    let tokens = LISTED_TOKENS_BY_TICKER.values().collect::<Vec<_>>();
     let mut search = use_signal(|| String::new());
     let search_str = search.cloned();
     let selected = selected_token.read().ticker.to_string();
@@ -463,8 +463,8 @@ fn SwapInput(
 
 #[component]
 fn TokenButton(token: Signal<Token>, show_selector: Signal<bool>) -> Element {
-    let display_token = token.read().ticker.to_string();
-    let image = LISTED_TOKENS.get(&display_token).map(|token| token.image.clone());
+    let ticker = token.read().ticker.to_string();
+    let image = LISTED_TOKENS_BY_TICKER.get(&ticker).map(|token| token.image.clone());
     rsx! {
         button {
             class: "flex items-center gap-2 p-2 -ml-1 -mt-1 hover:bg-controls-secondaryHover rounded cursor-pointer shrink-0",
@@ -485,9 +485,11 @@ fn TokenButton(token: Signal<Token>, show_selector: Signal<bool>) -> Element {
                 }
                 span {
                     class: "font-semibold my-auto",
-                    "{display_token}"
+                    "{ticker}"
                 }
-                CarrotDownIcon { class: "w-4 my-auto opacity-50" }
+                CarrotDownIcon {
+                    class: "w-4 my-auto opacity-50" 
+                }
             }
         }
     }

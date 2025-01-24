@@ -39,7 +39,7 @@ pub fn Mine() -> Element {
             Heading {
                 class: "w-full",
                 title: "Mine",
-                subtitle: "Utilize your computer's hashpower to harvest ORE."
+                subtitle: "Utilize your hashpower to harvest ORE."
             }
             StopStartButton { is_active }
             MinerStatus { member_db: member, pool: pool.clone() }

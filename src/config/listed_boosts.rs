@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use steel::Pubkey;
@@ -7,20 +5,11 @@ use steel::Pubkey;
 use super::utils::deserialize_pubkey;
 
 // Create a static HashMap indexed by ticker
-pub static LISTED_BOOSTS: Lazy<HashMap<String, BoostMeta>> = Lazy::new(|| {
-    // Read the YAML file at compile time
+pub static LISTED_BOOSTS: Lazy<Vec<BoostMeta>> = Lazy::new(|| {
     let yaml_str = include_str!("../../public/config/listed-boosts.yaml");
-
-    // Parse the config
     let config: Config =
         serde_yaml::from_str(yaml_str).expect("Failed to parse listed-boosts.yaml");
-
-    // Convert Vec<Asset> into HashMap<String, Asset>
-    config
-        .boosts
-        .into_iter()
-        .map(|boost| (boost.ticker.clone(), boost))
-        .collect()
+    config.boosts
 });
 
 #[derive(Clone, PartialEq, Eq, Deserialize)]
