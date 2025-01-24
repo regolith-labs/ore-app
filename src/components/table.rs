@@ -6,10 +6,11 @@ use crate::{
 };
 
 #[component]
-pub fn Table(header: Element, rows: Element) -> Element {
+pub fn Table(header: Element, rows: Element, class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
     rsx! {
         Col {
-            class: "overflow-x-scroll",
+            class: "overflow-x-scroll {class}",
             {header}
             {rows}
         }

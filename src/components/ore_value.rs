@@ -47,6 +47,33 @@ pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
     }
 }
 
+#[component]
+pub fn OreValueGold(ui_amount_string: String, class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    let units: Vec<_> = ui_amount_string.split('.').collect();
+    let big_units = units[0];
+    let small_units = units[1];
+    rsx! {
+        Row {
+            class: "sm:gap-3 h-10 w-min {class}",
+            gap: 2,
+            OreIcon {
+                class: "h-6 w-6 sm:h-8 sm:w-8 my-auto text-elements-gold"
+            }
+            Row {
+                class: "my-auto",
+                span {
+                    class: "mt-auto font-bold text-2xl sm:text-3xl text-elements-gold",
+                    "{big_units}"
+                }
+                span {
+                    class: "mt-auto font-bold text-xl sm:text-2xl text-elements-gold opacity-50",
+                    ".{small_units}"
+                }
+            }
+        }
+    }
+}
 
 #[component]
 pub fn OreValueWhole(ui_amount_string: String, class: Option<String>) -> Element {

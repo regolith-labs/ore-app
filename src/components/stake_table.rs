@@ -11,6 +11,7 @@ use crate::{
 pub fn StakeTable() -> Element {
     rsx! {
         Table {
+            class: "mx-0 sm:mx-8",
             header: rsx! {
                 TableHeader {
                     left: "Pair",
@@ -129,8 +130,9 @@ fn StakeTableRowYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<Gat
                     ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
                 }
             } else {
-                OreValueSmall {
-                    ui_amount_string: "0.00".to_string(),
+                span {
+                    class: "font-medium",
+                    "–"
                 }
             }
         } else {
