@@ -5,7 +5,7 @@ use dioxus::hooks::Resource;
 use once_cell::sync::Lazy;
 use ore_pool_types::ContributePayloadV2;
 use ore_pool_types::Member;
-use ore_pool_types::MemberChallengeV2;
+use ore_pool_types::MemberChallenge;
 use ore_pool_types::RegisterPayload;
 use serde::{Deserialize, Deserializer};
 use solana_sdk::clock::Clock;
@@ -106,7 +106,7 @@ pub async fn get_updated_challenge(
     pool_url: &str,
     miner: &str,
     last_hash_at: i64,
-) -> GatewayResult<MemberChallengeV2> {
+) -> GatewayResult<MemberChallenge> {
     loop {
         let challenge = get_challenge(http_client, pool_url, miner).await?;
         if challenge.challenge.lash_hash_at == last_hash_at {
@@ -142,7 +142,7 @@ async fn get_challenge(
     http_client: &reqwest::Client,
     pool_url: &str,
     miner: &str,
-) -> GatewayResult<MemberChallengeV2> {
+) -> GatewayResult<MemberChallenge> {
     let get_url = format!("{}/challenge/{}", pool_url, miner);
     let resp = http_client.get(get_url).send().await?;
     match resp.error_for_status() {
@@ -150,7 +150,7 @@ async fn get_challenge(
             log::error!("{:?}", err);
             Err(err).map_err(From::from)
         }
-        Ok(resp) => resp.json::<MemberChallengeV2>().await.map_err(From::from),
+        Ok(resp) => resp.json::<MemberChallenge>().await.map_err(From::from),
     }
 }
 

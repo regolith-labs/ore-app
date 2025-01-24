@@ -70,7 +70,7 @@ fn elapsed(t0: i64) -> i64 {
 
 fn mine(
     member: ore_pool_types::Member,
-    challenge: ore_pool_types::MemberChallengeV2,
+    challenge: ore_pool_types::MemberChallenge,
     cutoff_time: i64,
     scope: &WorkerScope<Miner>,
     id: gloo_worker::HandlerId,
@@ -81,11 +81,8 @@ fn mine(
     let u64_unit = u64::MAX.saturating_div(num_total_members);
 
     // split member nonce space for multiple devices
+    let device_id = 0u64;
     let nonce_unit = u64_unit.saturating_div(challenge.num_devices as u64);
-    if challenge.device_id.gt(&challenge.num_devices) {
-        return Err(error::Error::TooManyDevices);
-    }
-    let device_id = challenge.device_id.saturating_sub(1) as u64;
     let left_bound = u64_unit.saturating_mul(nonce_index) + device_id.saturating_mul(nonce_unit);
 
     // start hashing
