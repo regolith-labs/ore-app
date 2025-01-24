@@ -1,9 +1,9 @@
 use solana_sdk::signature::Signature;
 use steel::Clock;
 
-use crate::{gateway::transaction_confirmation_status::TransactionConfirmationStatus, steel_app};
+use crate::gateway::transaction_confirmation_status::TransactionConfirmationStatus;
 
-use super::{retry, GatewayError, GatewayResult, Rpc};
+use super::{GatewayError, GatewayResult, Rpc};
 
 const CONFIRM_RETRIES: usize = 20;
 const CONFIRM_DELAY: u64 = 1_500;
@@ -25,7 +25,7 @@ impl<R: Rpc> SolanaGateway for R {
         // Confirm tx
         for retry in 0..CONFIRM_RETRIES {
             // Delay before confirming
-            async_std::task::sleep(steel_app::time::Duration::from_millis(CONFIRM_DELAY)).await;
+            async_std::task::sleep(crate::time::Duration::from_millis(CONFIRM_DELAY)).await;
             // Fetch transaction status
             match self.get_signature_statuses(&[sig]).await {
                 Ok(signature_statuses) => {

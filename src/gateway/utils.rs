@@ -1,6 +1,6 @@
 use async_std::future::{timeout, Future};
 
-use crate::steel_app::time::Duration;
+use crate::time::Duration;
 
 use super::GatewayError;
 

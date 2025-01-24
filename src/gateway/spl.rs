@@ -1,9 +1,8 @@
 use ore_api::consts::MINT_ADDRESS;
+use solana_extra_wasm::program::spl_associated_token_account::get_associated_token_address;
 use solana_sdk::pubkey::Pubkey;
 
-use crate::steel_app::solana::program::get_associated_token_address;
-
-use super::{retry, ui_token_amount::UiTokenAmount, GatewayError, GatewayResult, Rpc};
+use super::{ui_token_amount::UiTokenAmount, GatewayError, GatewayResult, Rpc};
 
 pub trait SplGateway {
     async fn get_token_balance(
@@ -11,6 +10,7 @@ pub trait SplGateway {
         owner: &Pubkey,
         mint: &Pubkey,
     ) -> GatewayResult<UiTokenAmount>;
+    
     async fn get_ore_balance(&self, owner: &Pubkey) -> GatewayResult<UiTokenAmount> {
         self.get_token_balance(owner, &MINT_ADDRESS).await
     }

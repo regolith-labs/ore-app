@@ -1,9 +1,7 @@
-use dioxus::{document::eval, prelude::*};
+use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{GatewayError, GatewayResult};
-
-use super::{use_miner_is_active, IsActiveMiner};
 
 #[cfg(not(feature = "web"))]
 pub use super::use_wallet_native::use_wallet_provider;

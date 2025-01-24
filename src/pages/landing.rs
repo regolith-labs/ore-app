@@ -207,7 +207,7 @@ fn MarqeePanel(
     }
 }
 
-fn LiquiditySection() -> Element {
+fn _LiquiditySection() -> Element {
     rsx! {
         Col {
             // class: "w-full mt-24 sm:mt-32 pt-0 pb-64 sm:pb-64 px-3 sm:px-8 md:px-16 lg:px-24 bg-[url('/assets/blurchart-1920.png')] bg-contain bg-no-repeat bg-center",
@@ -255,7 +255,7 @@ fn LiquiditySection() -> Element {
     }
 }
 
-fn YieldSection() -> Element {
+fn _YieldSection() -> Element {
     rsx! {
         Col {
             class: "w-full mt-24 sm:mt-32 pt-0 pb-64 sm:pb-64 px-3 sm:px-8 md:px-16 lg:px-24",
@@ -275,7 +275,7 @@ fn YieldSection() -> Element {
 }
 
 
-fn SupplySection() -> Element {
+fn _SupplySection() -> Element {
     let circulating_supply = use_ore_supply();
     rsx! {
         Col {   
@@ -338,7 +338,7 @@ fn SupplyValue(title: String, value: Option<String>) -> Element {
 }
 
 
-fn MiningSection() -> Element {
+fn _MiningSection() -> Element {
     rsx! {
         div {
             class: "mt-24 sm:mt-40 pt-0 px-3 sm:px-8 md:px-16 lg:px-24",

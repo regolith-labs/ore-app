@@ -1,7 +1,5 @@
 use std::{collections::HashMap, str::FromStr};
 
-use dioxus::prelude::asset;
-use dioxus::prelude::manganis;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer};
 use solana_sdk::pubkey::Pubkey;
@@ -56,9 +54,5 @@ impl Asset {
 
     pub fn sol() -> Self {
         ASSETS.get("SOL").cloned().unwrap()
-    }
-
-    pub fn usdc() -> Self {
-        ASSETS.get("USDC").cloned().unwrap()
     }
 }

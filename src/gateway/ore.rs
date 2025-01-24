@@ -4,9 +4,9 @@ use ore_api::{
 };
 use ore_boost_api::state::{directory_pda, Boost, Directory};
 use solana_sdk::pubkey::Pubkey;
-use steel::{AccountDeserialize, Discriminator};
+use steel::AccountDeserialize;
 
-use super::{retry, GatewayError, GatewayResult, Rpc};
+use super::{GatewayError, GatewayResult, Rpc};
 
 pub trait OreGateway {
     async fn get_config(&self) -> GatewayResult<Config>;

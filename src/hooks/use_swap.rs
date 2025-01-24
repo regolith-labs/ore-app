@@ -75,7 +75,7 @@ pub fn use_quote(
                             // input amount
                             let input_amount = quote.in_amount as f64;
                             let input_decimals = 10u64.pow(input_token.decimals as u32) as f64;
-                            let input_amount = input_amount / input_decimals;
+                            let _input_amount = input_amount / input_decimals;
 
                             // output amount
                             let output_amount = quote.out_amount as f64;

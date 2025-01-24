@@ -17,7 +17,7 @@ use steel::AccountDeserialize;
 use crate::gateway::GatewayError;
 use crate::gateway::GatewayResult;
 use crate::gateway::Rpc;
-use crate::steel_app::time::Duration;
+use crate::time::Duration;
 
 use super::use_gateway;
 use super::{use_wallet, GetPubkey};

@@ -72,7 +72,7 @@ fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
     }
 }
 
-fn PoolTable() -> Element {
+fn _PoolTable() -> Element {
     rsx! {
         Col { gap: 2,
             Table {

@@ -18,7 +18,7 @@ impl Display for AppEvent {
 }
 
 // Track an app event.
-pub fn track(event: AppEvent) {
+pub fn _track(event: AppEvent) {
     trackEvent(event.to_string().as_str(), None).ok();
 }
 

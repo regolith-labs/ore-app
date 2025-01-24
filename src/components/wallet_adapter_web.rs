@@ -5,7 +5,7 @@ use solana_sdk::pubkey::Pubkey;
 use crate::components::wallet_drawer::WalletDrawer;
 use crate::components::*;
 use crate::hooks::{use_wallet, Wallet};
-use crate::steel_app::time::Duration;
+use crate::time::Duration;
 
 pub fn WalletAdapter() -> Element {
     let wallet = use_wallet();
