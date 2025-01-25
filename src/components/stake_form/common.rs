@@ -30,7 +30,7 @@ pub(crate) fn StakeTabs(tab: Signal<StakeTab>) -> Element {
     };
 
     let withdraw_class = if *tab.read() == StakeTab::Withdraw {
-        "flex-1 h-12 transition-colors rounded-full text-elements-highEmphasis font-semibold bg-controls-secondary"
+        "flex-1 h-12 transition-colors rounded-full text-elements-highEmphasis font-semibold bg-controls-tertiary"
     } else {
         "flex-1 h-12 transition-colors rounded-full text-elements-lowEmphasis font-semibold"
     };

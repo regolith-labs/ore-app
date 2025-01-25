@@ -26,8 +26,20 @@ fn VaultStats() -> Element {
     let boost = use_boost(ore_api::consts::MINT_ADDRESS);
     let stake = use_stake(ore_api::consts::MINT_ADDRESS);
 
+    let boost_deposits = if let Some(Ok(boost)) = boost.read().as_ref() {
+        amount_to_ui_amount_string(boost.total_deposits, TOKEN_DECIMALS)
+    } else {
+        "0.000".to_string()
+    };
+
     let stake_balance = if let Some(Ok(stake)) = stake.read().as_ref() {
         amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS)
+    } else {
+        "0.000".to_string()
+    };
+
+    let stake_yield = if let Some(Ok(stake)) = stake.read().as_ref() {
+        amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS)
     } else {
         "0.000".to_string()
     };
@@ -35,16 +47,38 @@ fn VaultStats() -> Element {
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
-            gap: 8,
+            gap: 4,
             Row {
-                class: "w-full justify-between",
+                class: "w-full justify-between px-4",
                 span {
-                    class: "text-elements-midEmphasis font-semibold",
-                    "Deposits"
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Balance"
                 }
                 OreValueSmall {
                     class: "text-elements-highEmphasis",
                     ui_amount_string: stake_balance,
+                }
+            }
+            Row {
+                class: "w-full justify-between px-4",
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Deposits"
+                }
+                OreValueSmall {
+                    class: "text-elements-highEmphasis",
+                    ui_amount_string: boost_deposits,
+                }
+            }
+            Row {
+                class: "w-full justify-between px-4",
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Yield"
+                }
+                OreValueSmall {
+                    class: "text-elements-highEmphasis",
+                    ui_amount_string: stake_yield,
                 }
             }
             // Col {

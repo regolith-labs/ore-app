@@ -1,11 +1,57 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-    body {
-        @apply bg-base-bg text-elements-highEmphasis;
+@theme {
+    /* Colors */
+    /* --color-transparent: 'transparent'; */
+    --color-white: #FAFAFA;
+    --color-black: #0F0E11;
+    --color-base-bg: #0F0E11;
+    --color-base-canvas: #0C0C0E;
+    --color-elements-highEmphasis: #FAFAFA;
+    --color-elements-midEmphasis: #D1D1D1;
+    --color-elements-lowEmphasis: #707070;
+    --color-elements-gold: #ECC771;
+    --color-surface-elevated: #131216;
+    --color-surface-elevatedHover: #151419;
+    --color-surface-floating: #1A191F;
+    --color-controls-primary: #F5F5F5;
+    --color-controls-primaryHover: #FAFAFA;
+    --color-controls-secondary: #26242D;
+    --color-controls-secondaryHover: #2B2932;
+    --color-controls-tertiary: #1D1C22;
+    --color-controls-tertiaryHover: #222027;
+    --color-controls-danger: #CC3B28;
+    --color-controls-dangerHover: #BC3625;
+    --color-controls-disabled: #18171C;
+    --color-controls-handle: '#302E38';
+    --color-on-onColor: '#0D0D0D';
+    --color-on-onDisabled: '#585661';
+    --color-on-onHighContrast: '#0F0E11';
+
+    /* Fonts */
+    --font-mono: ui-monospace, monospace;
+    --font-serif: ui-serif;
+    --font-sans: Pilat, ui-sans-serif, system-ui;
+    --font-wide: PilatWide, ui-sans-serif, system-ui;
+    --font-extended: PilatExtended, ui-sans-serif, system-ui;
+
+    /* Animations */
+    --animate-marquee: marquee 30s linear infinite;
+    --animate-marquee2: marquee2 30s linear infinite;
+
+    /* Keyframes */
+    @keyframes marquee {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-100%); }
     }
+    @keyframes marquee2 {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(0%); }
+    }
+}
+
+body {
+    @apply bg-base-bg text-elements-highEmphasis;
 }
 
 @layer components {
@@ -18,7 +64,7 @@
     }
 
     .elevated-control {
-        @apply transition elevated hover:bg-surface-elevatedHover;
+        @apply transition bg-surface-elevated hover:bg-surface-elevatedHover;
     }
 
     .elevated-border {
@@ -47,6 +93,7 @@
     }
 }
 
+/* Pilat */
 @font-face {
     font-family: 'Pilat';
     src: url('/assets/fonts/Pilat/Pilat-Light.otf') format('opentype');
@@ -78,6 +125,7 @@
     font-style: normal;
 }
 
+/* PilatWide */
 @font-face {
     font-family: 'PilatWide';
     src: url('/assets/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
@@ -109,7 +157,7 @@
     font-style: normal;
 }
 
-
+/* PilatExtended */
 @font-face {
     font-family: 'PilatExtended';
     src: url('/assets/fonts/PilatExtended/PilatExtended-Light.otf') format('opentype');

@@ -22,7 +22,7 @@ pub fn Stake() -> Element {
 fn VaultPreview() -> Element {
     rsx! {
         Link {
-            class: "flex flex-col sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 bg-surface-elevated mx-5 sm:mx-8",
+            class: "flex flex-col sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 bg-surface-elevated",
             to: Route::Vault {},
             Col {
                 gap: 2,
