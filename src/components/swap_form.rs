@@ -379,8 +379,8 @@ fn SwapInput(
         SwapInputMode::Sell => "border-b border-gray-800",
     };
     let title = match mode {
-        SwapInputMode::Buy => "Buying",
-        SwapInputMode::Sell => "Selling",
+        SwapInputMode::Buy => "Buy",
+        SwapInputMode::Sell => "Sell",
     };
 
     // Set error message
@@ -513,7 +513,6 @@ fn MaxButton(
 
     rsx! {
         button {
-            gap: 2,
             class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:text-elements-highEmphasis my-auto",
             onclick: move |_| {
                 if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
@@ -538,7 +537,10 @@ fn MaxButton(
                 }
             },
             WalletIcon { class: "h-4 my-auto" }
-            span { class: "my-auto text-xs font-medium", "{token_balance}" }
+            span { 
+                class: "my-auto text-xs font-medium", 
+                "{token_balance}" 
+            }
         }
     }
 }

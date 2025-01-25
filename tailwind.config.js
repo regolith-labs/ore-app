@@ -7,12 +7,12 @@ module.exports = {
     // include all html files in the output (dist) directory
     "./dist/**/*.html",
   ],
-  darkMode: 'selector',
+  darkMode: 'class',
   plugins: [],
   theme: {
     colors: ({ colors }) => ({
       ...colors,
-      transparent: colors.transparent,
+      transparent: 'transparent',
       white: '#FAFAFA',
       black: '#0F0E11',
       base: {

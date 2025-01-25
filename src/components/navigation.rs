@@ -82,7 +82,7 @@ fn TabBar() -> Element {
     };
     rsx! {
         Row {
-            class: "{hidden} h-full rounded-full elevated elevated-border overflow-clip",
+            class: "{hidden} h-full rounded-full elevated elevated-border overflow-hidden",
             Tab {
                 title: "Mine",
                 route: Route::Mine {}
