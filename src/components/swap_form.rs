@@ -292,14 +292,9 @@ fn SwapButton(
     invoke_signature_status: Signal<InvokeSignatureStatus>,
 ) -> Element {
     let quote_response = &*quote_response.read();
-    let colors = if (quote_response).is_some() {
-        "controls-primary hover:scale-105 transition-transform"
-    } else {
-        "bg-controls-disabled text-on-onDisabled"
-    };
     rsx! {
         button {
-            class: "h-12 w-full rounded-full {colors}",
+            class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
             disabled: quote_response.is_none() && swap_tx().is_some_and(|res| res.is_ok()),
             onclick: move |_| {
                 let swap_tx = &*swap_tx.read();

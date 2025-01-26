@@ -255,7 +255,7 @@ fn MaxButton(
 
     rsx! {
         button {
-            class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:text-elements-highEmphasis my-auto",
+            class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:cursor-pointer hover:text-elements-highEmphasis my-auto",
             onclick: move |_| {
                 input_amount.set(balance.to_string());
             },

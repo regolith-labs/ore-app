@@ -1,5 +1,10 @@
 use dioxus::prelude::*;
 
+#[cfg(not(feature = "web"))]
+mod wallet_drawer_native;
+#[cfg(feature = "web")]
+mod wallet_drawer_web;
+
 use crate::components::*;
 use crate::gateway::ui_token_amount::UiTokenAmount;
 use crate::gateway::GatewayResult;
@@ -88,7 +93,7 @@ fn TokenQuote(token: Token) -> Element {
     rsx! {
         Col {
             class: "text-right",
-            OreValueSmall {
+            OreValueSmallAbbreviated {
                 ui_amount_string: "1.20245"
             }
             span {
@@ -121,7 +126,7 @@ fn TokenValue(token: Token, balance: Resource<GatewayResult<UiTokenAmount>>) -> 
 
     rsx! {
         if let Some(_balance) = balance.cloned() {
-            OreValueSmall {
+            OreValueSmallAbbreviated {
                 ui_amount_string: "{*value.read()}"
             }
         } else {
@@ -191,7 +196,7 @@ fn LiquidityRow(token: Token, on_close: EventHandler<MouseEvent>) -> Element {
             right: rsx! {
                 Col {
                     class: "text-right",
-                    OreValueSmall {
+                    OreValueSmallAbbreviated {
                         ui_amount_string: "2.054"
                     }
                     span {

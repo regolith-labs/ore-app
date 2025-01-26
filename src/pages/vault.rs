@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 
-use crate::{components::{Col, Heading, OreValue, OreValueSmall, Row, VaultStakeForm}, hooks::{use_boost, use_stake}};
+use crate::{components::{Col, Heading, OreValueSmallAbbreviated, OreValueSmallWhole, Row, VaultStakeForm}, hooks::{use_boost, use_stake}};
 
 pub fn Vault() -> Element {
     rsx! {
@@ -14,10 +14,10 @@ pub fn Vault() -> Element {
                 title: "Vault",
                 subtitle: "Stake unpaired ORE to earn the idle yield rate."
             }
-            VaultStats {}
             VaultStakeForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
             }
+            VaultStats {}
         }
     }
 }
@@ -46,15 +46,19 @@ fn VaultStats() -> Element {
 
     rsx! {
         Col {
-            class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
+            class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8 mt-8",
             gap: 4,
+            span {
+                class: "text-elements-highEmphasis font-medium text-2xl",
+                "Summary"
+            }
             Row {
                 class: "w-full justify-between px-4",
                 span {
                     class: "text-elements-lowEmphasis font-medium",
                     "Balance"
                 }
-                OreValueSmall {
+                OreValueSmallAbbreviated {
                     class: "text-elements-highEmphasis",
                     ui_amount_string: stake_balance,
                 }
@@ -65,7 +69,7 @@ fn VaultStats() -> Element {
                     class: "text-elements-lowEmphasis font-medium",
                     "Deposits"
                 }
-                OreValueSmall {
+                OreValueSmallWhole {
                     class: "text-elements-highEmphasis",
                     ui_amount_string: boost_deposits,
                 }
@@ -76,19 +80,11 @@ fn VaultStats() -> Element {
                     class: "text-elements-lowEmphasis font-medium",
                     "Yield"
                 }
-                OreValueSmall {
+                OreValueSmallAbbreviated {
                     class: "text-elements-highEmphasis",
                     ui_amount_string: stake_yield,
                 }
             }
-            // Col {
-            //     gap: 2,
-                
-            //     span {
-            //         class: "text-elements-midEmphasis",
-            //         "Deposits"
-            //     }
-            // }
         }
     }
 }

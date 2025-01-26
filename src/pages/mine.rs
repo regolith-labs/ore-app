@@ -115,7 +115,7 @@ fn PoolRow(pool: Pool) -> Element {
             },
             right_3: rsx! {
                 span { class: "text-elements-gold",
-                    OreValueSmall { ui_amount_string: "2.054" }
+                    OreValueSmallAbbreviated { ui_amount_string: "2.054" }
                 }
             }
         }

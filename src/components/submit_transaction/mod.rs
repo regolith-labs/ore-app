@@ -1,12 +1,17 @@
+#[cfg(not(feature = "web"))]
+mod submit_transaction_native;
+#[cfg(feature = "web")]
+mod submit_transaction_web;
+
 use std::fmt::Display;
 
 use dioxus::prelude::*;
 use solana_sdk::{signature::Signature, transaction::VersionedTransaction};
 
 #[cfg(not(feature = "web"))]
-pub use super::submit_transaction_native::invoke_signature;
+pub use submit_transaction_native::invoke_signature;
 #[cfg(feature = "web")]
-pub use super::submit_transaction_web::invoke_signature;
+pub use submit_transaction_web::invoke_signature;
 
 use crate::components::*;
 

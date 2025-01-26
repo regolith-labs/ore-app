@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::{OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink}, config::{BoostMeta, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_stake}, route::Route
+    components::{OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink}, config::{BoostMeta, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_stake}, route::Route
 };
 
 pub fn StakeTable() -> Element {
@@ -126,7 +126,7 @@ fn StakeTableRowYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<Gat
     rsx! {
         if let Some(stake) = stake.cloned() {
             if let Ok(stake) = stake {
-                OreValueSmall {
+                OreValueSmallAbbreviated {
                     ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
                 }
             } else {

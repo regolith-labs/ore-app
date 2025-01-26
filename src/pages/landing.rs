@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use jupiter_swap_api_client::quote::QuoteResponse;
 use steel::Pubkey;
 
-use crate::{components::*, gateway::GatewayResult, hooks::{use_ore_quote, use_ore_supply, use_quote}, route::Route};
+use crate::{components::*, gateway::GatewayResult, hooks::{use_ore_quote, use_ore_supply}, route::Route};
 
 pub fn Landing() -> Element {
     rsx! {

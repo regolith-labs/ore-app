@@ -80,25 +80,7 @@ pub fn OreValueWhole(ui_amount_string: String, class: Option<String>) -> Element
     let class = class.unwrap_or("".to_string());
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
-    // let small_units = units[1];
-
-
-    // Add commas to the big units
-    let big_units = if big_units.len() > 3 {
-        let mut result = String::new();
-        let mut count = 0;
-        for c in big_units.chars().rev() {
-            if count > 0 && count % 3 == 0 {
-                result.push(',');
-            }
-            result.push(c);
-            count += 1;
-        }
-        result.chars().rev().collect::<String>()
-    } else {
-        big_units.to_string()
-    };
-
+    let big_units = format_with_commas(big_units);
     rsx! {
         Row {
             class: "sm:gap-3 h-10 w-min {class}",
@@ -146,7 +128,30 @@ pub fn OrePrice(ui_amount_string: String, change: Option<f64>) -> Element {
 }
 
 #[component]
-pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element {
+pub fn OreValueSmallWhole(class: Option<String>, ui_amount_string: String) -> Element {
+    let class: String = class.unwrap_or("".to_string());
+    let units: Vec<_> = ui_amount_string.split('.').collect();
+    let big_units = units[0];
+    let big_units = format_with_commas(big_units);
+    rsx! {
+        Row {
+            class: "gap-1.5 w-min {class}",
+            OreIcon {
+                class: "h-4 w-4 my-auto"
+            }
+            Row {
+                class: "font-medium my-auto",
+                span {
+                    class: "mt-auto",
+                    "{big_units}"
+                }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn OreValueSmallAbbreviated(class: Option<String>, ui_amount_string: String) -> Element {
     let class: String = class.unwrap_or("".to_string());
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
@@ -185,7 +190,6 @@ pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element
     }
 }
 
-
 #[component]
 pub fn TokenValueSmall(class: Option<String>, amount: String, image: String) -> Element {
     let class = class.unwrap_or("".to_string());
@@ -202,4 +206,21 @@ pub fn TokenValueSmall(class: Option<String>, amount: String, image: String) -> 
             }
         }
     }
+}
+
+fn format_with_commas(number: &str) -> String {
+    if number.len() <= 3 {
+        return number.to_string();
+    }
+
+    let mut result = String::new();
+    let mut count = 0;
+    for c in number.chars().rev() {
+        if count > 0 && count % 3 == 0 {
+            result.push(',');
+        }
+        result.push(c);
+        count += 1;
+    }
+    result.chars().rev().collect::<String>()
 }

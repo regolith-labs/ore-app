@@ -23,30 +23,31 @@ pub(crate) fn StakeTabs(tab: Signal<StakeTab>) -> Element {
     //     "flex-1 h-12 transition-colors text-elements-lowEmphasis hover:bg-surface-elevated"
     // };
 
+    let common_class = "flex-1 h-12 transition-colors rounded-full font-semibold hover:cursor-pointer";
+
     let deposit_class = if *tab.read() == StakeTab::Deposit {
-        "flex-1 h-12 transition-colors rounded-full text-elements-highEmphasis font-semibold bg-controls-secondary"
+        "text-elements-highEmphasis bg-controls-secondary"
     } else {
-        "flex-1 h-12 transition-colors rounded-full text-elements-lowEmphasis font-semibold"
+        "text-elements-lowEmphasis"
     };
 
     let withdraw_class = if *tab.read() == StakeTab::Withdraw {
-        "flex-1 h-12 transition-colors rounded-full text-elements-highEmphasis font-semibold bg-controls-tertiary"
+        "text-elements-highEmphasis bg-controls-secondary"
     } else {
-        "flex-1 h-12 transition-colors rounded-full text-elements-lowEmphasis font-semibold"
+        "text-elements-lowEmphasis"
     };
 
     rsx! {
         Row {
-            // class: "w-full mb-4",
             class: "w-full mb-4 rounded-full border-elevated bg-surface-elevated border border-gray-800 p-1",
             gap: 1,
             button {
-                class: "{deposit_class}",
+                class: "{common_class} {deposit_class}",
                 onclick: move |_| tab.set(StakeTab::Deposit),
                 "Deposit"
             }
             button {
-                class: "{withdraw_class}",
+                class: "{common_class} {withdraw_class}",
                 onclick: move |_| tab.set(StakeTab::Withdraw),
                 "Withdraw"
             }
@@ -103,14 +104,9 @@ pub(crate) fn DetailLabel(title: String, value: String) -> Element {
 
 #[component]
 pub(crate) fn StakeButton(enabled: Signal<bool>) -> Element {
-    let colors = if *enabled.read() {
-        "controls-primary"
-    } else {
-        "bg-controls-disabled text-on-onDisabled"
-    };
     rsx! {
         button {
-            class: "h-12 w-full rounded-full {colors}",
+            class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
             disabled: !*enabled.read(),
             onclick: move |_| {
                 // TODO: Implement staking logic
@@ -125,14 +121,9 @@ pub(crate) fn StakeButton(enabled: Signal<bool>) -> Element {
 
 #[component]
 pub(crate) fn WithdrawButton(enabled: Signal<bool>) -> Element {
-    let colors = if *enabled.read() {
-        "controls-primary"
-    } else {
-        "bg-controls-disabled text-on-onDisabled"
-    };
     rsx! {
         button {
-            class: "h-12 w-full rounded-full {colors}",
+            class: "h-12 w-full rounded-full controls-primary",
             disabled: !*enabled.read(),
             onclick: move |_| {
                 // TODO: Implement withdraw logic
