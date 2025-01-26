@@ -12,6 +12,7 @@
     --color-elements-lowEmphasis: #707070;
     --color-elements-disabled: #585661;
     --color-elements-gold: #ECC771;
+    --color-elements-contrast: #0F0E11;
     --color-surface-elevated: #131216;
     --color-surface-elevatedHover: #151419;
     --color-surface-floating: #1A191F;
@@ -25,9 +26,6 @@
     --color-controls-dangerHover: #BC3625;
     --color-controls-disabled: #18171C;
     --color-controls-handle: '#302E38';
-    /* --color-on-onColor: '#0D0D0D'; */
-    /* --color-on-onDisabled: '#585661'; */
-    /* --color-on-onHighContrast: '#0F0E11'; */
 
     /* Fonts */
     --font-mono: ui-monospace, monospace;
@@ -78,19 +76,19 @@ body {
     }
 
     .controls-primary {
-        @apply flex font-medium transition font-medium bg-controls-primary text-black;
-        @apply hover:bg-controls-primaryHover hover:not-disabled:cursor-pointer hover:not-disabled:scale-105;
-        @apply disabled:bg-controls-disabled disabled:text-elements-disabled;
+        @apply flex font-semibold transition bg-controls-primary text-black hover:bg-controls-primaryHover hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled;
     }
 
     .controls-secondary {
-        @apply flex font-medium text-center transition bg-controls-secondary text-elements-midEmphasis;
-        @pply hover:bg-controls-secondaryHover;
+        @apply flex font-semibold text-center transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
     }
 
     .controls-tertiary {
-        @apply flex font-medium transition bg-controls-tertiary text-elements-lowEmphasis;
-        @apply hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis;
+        @apply flex font-semibold transition bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis;
+    }
+
+    .controls-gold {
+        @apply flex font-semibold transition font-medium border border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-elements-highEmphasis hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
     }
 }
 

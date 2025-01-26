@@ -383,6 +383,7 @@
     --color-elements-lowEmphasis: #707070;
     --color-elements-disabled: #585661;
     --color-elements-gold: #ECC771;
+    --color-elements-contrast: #0F0E11;
     --color-surface-elevated: #131216;
     --color-surface-elevatedHover: #151419;
     --color-surface-floating: #1A191F;
@@ -604,17 +605,11 @@
   .z-0 {
     z-index: 0;
   }
-  .z-1 {
-    z-index: 1;
-  }
   .z-10 {
     z-index: 10;
   }
   .z-50 {
     z-index: 50;
-  }
-  .z-\[J\] {
-    z-index: J;
   }
   .\!container {
     width: 100% !important;
@@ -654,9 +649,6 @@
   }
   .m-2 {
     margin: calc(var(--spacing) * 2);
-  }
-  .m-8 {
-    margin: calc(var(--spacing) * 8);
   }
   .mx-0 {
     margin-inline: calc(var(--spacing) * 0);
@@ -760,15 +752,6 @@
   .table {
     display: table;
   }
-  .h-0 {
-    height: calc(var(--spacing) * 0);
-  }
-  .h-3 {
-    height: calc(var(--spacing) * 3);
-  }
-  .h-3\.5 {
-    height: calc(var(--spacing) * 3.5);
-  }
   .h-4 {
     height: calc(var(--spacing) * 4);
   }
@@ -811,14 +794,8 @@
   .min-h-dvh {
     min-height: 100dvh;
   }
-  .w-2 {
-    width: calc(var(--spacing) * 2);
-  }
   .w-3 {
     width: calc(var(--spacing) * 3);
-  }
-  .w-3\.5 {
-    width: calc(var(--spacing) * 3.5);
   }
   .w-4 {
     width: calc(var(--spacing) * 4);
@@ -959,12 +936,6 @@
   .flex-row {
     flex-direction: row;
   }
-  .flex-nowrap {
-    flex-wrap: nowrap;
-  }
-  .flex-wrap {
-    flex-wrap: wrap;
-  }
   .items-center {
     align-items: center;
   }
@@ -1067,12 +1038,6 @@
   .bg-gray-900 {
     background-color: var(--color-gray-900);
   }
-  .bg-green-500 {
-    background-color: var(--color-green-500);
-  }
-  .bg-red-500 {
-    background-color: var(--color-red-500);
-  }
   .bg-surface-elevated {
     background-color: var(--color-surface-elevated);
   }
@@ -1133,9 +1098,6 @@
   .p-5 {
     padding: calc(var(--spacing) * 5);
   }
-  .p-7 {
-    padding: calc(var(--spacing) * 7);
-  }
   .px-1 {
     padding-inline: calc(var(--spacing) * 1);
   }
@@ -1159,9 +1121,6 @@
   }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
-  }
-  .py-3 {
-    padding-block: calc(var(--spacing) * 3);
   }
   .py-5 {
     padding-block: calc(var(--spacing) * 5);
@@ -1427,13 +1386,6 @@
       }
     }
   }
-  .hover\:bg-green-600 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-green-600);
-      }
-    }
-  }
   .hover\:bg-surface-elevated {
     &:hover {
       @media (hover: hover) {
@@ -1477,13 +1429,6 @@
   .active\:bg-controls-tertiaryHover {
     &:active {
       background-color: var(--color-controls-tertiaryHover);
-    }
-  }
-  .active\:enabled\:bg-green-700 {
-    &:active {
-      &:enabled {
-        background-color: var(--color-green-700);
-      }
     }
   }
   .sm\:sticky {
@@ -1827,8 +1772,8 @@ body {
   .controls-primary {
     display: flex;
     background-color: var(--color-controls-primary);
-    --tw-font-weight: var(--font-weight-medium);
-    font-weight: var(--font-weight-medium);
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-black);
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -1866,19 +1811,23 @@ body {
     display: flex;
     background-color: var(--color-controls-secondary);
     text-align: center;
-    --tw-font-weight: var(--font-weight-medium);
-    font-weight: var(--font-weight-medium);
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-elements-midEmphasis);
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
-    @pply hover:bg-controls-secondaryHover;
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-controls-secondaryHover);
+      }
+    }
   }
   .controls-tertiary {
     display: flex;
     background-color: var(--color-controls-tertiary);
-    --tw-font-weight: var(--font-weight-medium);
-    font-weight: var(--font-weight-medium);
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-elements-lowEmphasis);
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -1892,6 +1841,57 @@ body {
       @media (hover: hover) {
         color: var(--color-elements-midEmphasis);
       }
+    }
+  }
+  .controls-gold {
+    display: flex;
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-elements-gold);
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-elements-gold);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-elements-gold);
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-elements-highEmphasis);
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        &:not(*:disabled) {
+          --tw-scale-x: 105%;
+          --tw-scale-y: 105%;
+          --tw-scale-z: 105%;
+          scale: var(--tw-scale-x) var(--tw-scale-y);
+        }
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        &:not(*:disabled) {
+          cursor: pointer;
+        }
+      }
+    }
+    &:disabled {
+      --tw-border-style: none;
+      border-style: none;
+    }
+    &:disabled {
+      background-color: var(--color-controls-disabled);
+    }
+    &:disabled {
+      color: var(--color-elements-disabled);
     }
   }
 }

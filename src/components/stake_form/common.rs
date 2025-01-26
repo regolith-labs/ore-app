@@ -103,14 +103,12 @@ pub(crate) fn DetailLabel(title: String, value: String) -> Element {
 }
 
 #[component]
-pub(crate) fn StakeButton(enabled: Signal<bool>) -> Element {
+pub(crate) fn SubmitButton(enabled: Signal<bool>, onclick: EventHandler<MouseEvent>) -> Element {
     rsx! {
         button {
             class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
             disabled: !*enabled.read(),
-            onclick: move |_| {
-                // TODO: Implement staking logic
-            },
+            onclick: onclick,
             span {
                 class: "mx-auto my-auto font-semibold",
                 "Submit"

@@ -10,7 +10,7 @@ use crate::{
     config::Pool,
 };
 
-use super::{invoke_signature, InvokeSignatureStatus};
+use crate::components::{submit_transaction, TransactionStatus};
 
 #[component]
 pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> Element {
@@ -19,7 +19,7 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
     let mut member_onchain = use_member_onchain(pool.address);
     let mut register_db = use_register_db(pool.url.clone());
     let register_onchain = use_register_onchain(pool.address);
-    let invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
+    let transaction_status = use_signal(|| TransactionStatus::Start);
     let el = match *wallet.read() {
         Wallet::Disconnected => {
             rsx! {}
@@ -71,30 +71,30 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
                                     match &*register_onchain.read() {
                                         Some(Ok(tx)) => {
                                             let tx = tx.clone();
-                                            let el = match *invoke_signature_status.read() {
-                                                InvokeSignatureStatus::Start => {
-                                                    invoke_signature(
+                                            let el = match *transaction_status.read() {
+                                                TransactionStatus::Start => {
+                                                    submit_transaction(
                                                         tx.into(),
-                                                        invoke_signature_status,
+                                                        transaction_status,
                                                     );
                                                     rsx! {}
                                                 }
-                                                InvokeSignatureStatus::Waiting => {
+                                                TransactionStatus::Waiting => {
                                                     rsx! {
                                                         div {
                                                             "waiting for register onchain signature"
                                                         }
                                                     }
                                                 }
-                                                InvokeSignatureStatus::Timeout
-                                                | InvokeSignatureStatus::DoneWithError => {
+                                                TransactionStatus::Timeout
+                                                | TransactionStatus::Error => {
                                                     rsx! {
                                                         div {
                                                             "error with register onchain signature"
                                                         }
                                                     }
                                                 }
-                                                InvokeSignatureStatus::Done(_sig) => {
+                                                TransactionStatus::Done(_sig) => {
                                                     member_onchain.restart();
                                                     register_db.restart();
                                                     rsx! {

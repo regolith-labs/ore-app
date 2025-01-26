@@ -6,7 +6,7 @@ use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
     components::{
-        invoke_signature, CarrotDownIcon, Col, InvokeSignatureStatus, Row, SwitchIcon, WalletIcon,
+        submit_transaction, CarrotDownIcon, Col, TransactionStatus, Row, SwitchIcon, WalletIcon,
     },
     config::{Token, LISTED_TOKENS_BY_TICKER},
     gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
@@ -30,7 +30,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
 
     // quote response
     let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
-    let mut invoke_signature_status = use_signal(|| InvokeSignatureStatus::Start);
+    let mut transaction_status = use_signal(|| TransactionStatus::Start);
 
     // selected tokens
     let buy_token = use_signal(|| Token::ore());
@@ -40,7 +40,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let mut buy_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let buy_token = buy_token.read();
-        invoke_signature_status.set(InvokeSignatureStatus::Start);
+        transaction_status.set(TransactionStatus::Start);
         get_token_balance(wallet, buy_token.mint).await
     });
     let mut sell_token_balance = use_resource(move || async move {
@@ -53,10 +53,10 @@ pub fn SwapForm(class: Option<String>) -> Element {
     use_effect(move || {
         let _ = buy_input_amount.read();
         let _ = sell_input_amount.read();
-        invoke_signature_status.set(InvokeSignatureStatus::Start);
+        transaction_status.set(TransactionStatus::Start);
     });
     use_effect(move || {
-        if let InvokeSignatureStatus::Done(_sig) = invoke_signature_status.cloned() {
+        if let TransactionStatus::Done(_sig) = transaction_status.cloned() {
             buy_token_balance.restart();
             sell_token_balance.restart();
         }
@@ -119,7 +119,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                 }
             }
             SwapDetails { buy_token, sell_token, quote_response }
-            SwapButton { quote_response, swap_tx, invoke_signature_status }
+            SwapButton { quote_response, swap_tx, transaction_status }
 
             // TODO Signature status as toasts
 
@@ -289,7 +289,7 @@ fn SwapDetailLabel(title: String, value: String) -> Element {
 fn SwapButton(
     quote_response: Signal<Option<QuoteResponse>>,
     swap_tx: Resource<GatewayResult<VersionedTransaction>>,
-    invoke_signature_status: Signal<InvokeSignatureStatus>,
+    transaction_status: Signal<TransactionStatus>,
 ) -> Element {
     let quote_response = &*quote_response.read();
     rsx! {
@@ -299,7 +299,7 @@ fn SwapButton(
             onclick: move |_| {
                 let swap_tx = &*swap_tx.read();
                 if let Some(Ok(tx)) = swap_tx {
-                    invoke_signature(tx.clone(), invoke_signature_status);
+                    submit_transaction(tx.clone(), transaction_status);
                 }
             },
             span { class: "mx-auto my-auto font-semibold", "Swap" }

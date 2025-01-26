@@ -1,6 +1,6 @@
 use base64::Engine;
 use dioxus::{document::eval, prelude::*};
-use solana_sdk::transaction::VersionedTransaction;
+use solana_sdk::{message::VersionedMessage, transaction::VersionedTransaction};
 
 use crate::{
     components::*,
@@ -8,9 +8,23 @@ use crate::{
     hooks::use_gateway,
 };
 
-pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSignatureStatus>) {
+pub fn submit_transaction(mut tx: VersionedTransaction, mut signal: Signal<TransactionStatus>) {
     spawn(async move {
-        signal.set(InvokeSignatureStatus::Waiting);
+        // Set blockhash
+        let gateway = use_gateway();
+        if let Ok(hash) = gateway.rpc.get_latest_blockhash().await {
+            match &mut tx.message {
+                VersionedMessage::V0(message) => {
+                    message.recent_blockhash = hash;
+                }
+                VersionedMessage::Legacy(message) => {
+                    message.recent_blockhash = hash;
+                }
+            }
+        }
+
+        // Send for signing
+        signal.set(TransactionStatus::Waiting);
         let mut eval = eval(
             r#"
             let msg = await dioxus.recv();
@@ -46,32 +60,32 @@ pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSigna
                                         log::info!("sig: {}", sig);
                                         let confirmed = gateway.rpc.confirm_signature(sig).await;
                                         if confirmed.is_ok() {
-                                            signal.set(InvokeSignatureStatus::Done(sig));
+                                            signal.set(TransactionStatus::Done(sig));
                                         } else {
-                                            signal.set(InvokeSignatureStatus::Timeout)
+                                            signal.set(TransactionStatus::Timeout)
                                         }
                                     }
                                     None => {
                                         log::info!("error sending tx");
-                                        signal.set(InvokeSignatureStatus::DoneWithError)
+                                        signal.set(TransactionStatus::Error)
                                     }
                                 }
                             }
                             _ => {
                                 log::info!("err recv val");
-                                signal.set(InvokeSignatureStatus::DoneWithError)
+                                signal.set(TransactionStatus::Error)
                             }
                         };
                     }
                     Err(_err) => {
                         log::info!("err sending val");
-                        signal.set(InvokeSignatureStatus::DoneWithError)
+                        signal.set(TransactionStatus::Error)
                     }
                 }
             }
             Err(err) => {
                 log::info!("err serializing tx: {}", err);
-                signal.set(InvokeSignatureStatus::DoneWithError)
+                signal.set(TransactionStatus::Error)
             }
         };
     });

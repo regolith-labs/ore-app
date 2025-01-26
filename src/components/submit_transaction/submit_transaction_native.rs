@@ -11,7 +11,7 @@ use crate::{
     hooks::{use_gateway, use_wallet},
 };
 
-pub fn invoke_signature(tx: VersionedTransaction, mut signal: Signal<InvokeSignatureStatus>) {
+pub fn submit_transaction(tx: VersionedTransaction, mut signal: Signal<InvokeSignatureStatus>) {
     spawn(async move {
         signal.set(InvokeSignatureStatus::Waiting);
         // get signer

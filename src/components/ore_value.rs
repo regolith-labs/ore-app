@@ -191,6 +191,35 @@ pub fn OreValueSmallAbbreviated(class: Option<String>, ui_amount_string: String)
 }
 
 #[component]
+pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element {
+    let class: String = class.unwrap_or("".to_string());
+    let units: Vec<_> = ui_amount_string.split('.').collect();
+    let big_units = units[0];
+    let small_units = units[1];
+    let big_units_display = format_with_commas(big_units);
+    let small_units_display = small_units.trim_end_matches('0');
+    rsx! {
+        Row {
+            class: "gap-1.5 w-min {class}",
+            OreIcon {
+                class: "h-4 w-4 my-auto"
+            }
+            Row {
+                class: "font-medium my-auto",
+                span {
+                    class: "mt-auto",
+                    if small_units_display.is_empty() {
+                        "{big_units_display}"
+                    } else {
+                        "{big_units_display}.{small_units_display}"
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[component]
 pub fn TokenValueSmall(class: Option<String>, amount: String, image: String) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {

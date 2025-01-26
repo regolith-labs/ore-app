@@ -18,7 +18,8 @@ pub fn use_stake(mint: Pubkey) -> Resource<GatewayResult<Stake>> {
         match *wallet.read() {
             Wallet::Disconnected => Err(GatewayError::WalletDisconnected),
             Wallet::Connected(address) => {
-                let stake_address = stake_pda(address, mint).0;
+                let boost_address = boost_pda(mint).0;
+                let stake_address = stake_pda(address, boost_address).0;
                 use_gateway().rpc.get_stake(stake_address).await.map_err(GatewayError::from)
             }
         }

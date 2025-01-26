@@ -5087,7 +5087,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af1844ef2428cc3e1cb900be36181049ef3d3193c63e43026cfe202983b27a56"
 dependencies = [
- "proc-macro-crate 3.2.0",
+ "proc-macro-crate 2.0.0",
  "proc-macro2",
  "quote",
  "syn 2.0.96",
@@ -7307,7 +7307,7 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#bd4043170b35631304a9aa2937ef5eb988a124af"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#73142edce6f35f05bb5dcc579b441327ba0a9073"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -7363,7 +7363,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "1.18.0"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#bd4043170b35631304a9aa2937ef5eb988a124af"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=master#73142edce6f35f05bb5dcc579b441327ba0a9073"
 dependencies = [
  "Inflector",
  "arrayref",

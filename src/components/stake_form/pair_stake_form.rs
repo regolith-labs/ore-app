@@ -214,8 +214,11 @@ fn PairDepositForm(class: Option<String>, mint: Pubkey) -> Element {
                 }
             }
             StakeDetails {}
-            StakeButton {
-                enabled: enabled
+            SubmitButton {
+                enabled: enabled,
+                onclick: move |_| {
+                    // TODO: Implement staking logic
+                }
             }
         }
     }

@@ -1,10 +1,11 @@
 use dioxus::prelude::*;
-use ore_api::consts::TOKEN_DECIMALS;
+use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
+use solana_extra_wasm::program::{spl_associated_token_account, spl_token::{amount_to_ui_amount, ui_amount_to_amount}};
+use solana_sdk::transaction::Transaction;
 
 use crate::{
-    components::{Col, Row, WalletIcon}, hooks::{use_ore_balance, use_stake}
+    components::{submit_transaction, Col, Row, TransactionStatus, WalletIcon}, hooks::{use_ore_balance, use_stake, use_wallet, Wallet}
 };
 use crate::gateway::{ui_token_amount::UiTokenAmount, GatewayResult};
 use super::common::*;
@@ -46,34 +47,41 @@ fn VaultDepositForm(
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     ore_stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
+    let wallet = use_wallet();
     let deposit_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
+    let transaction_status = use_signal(|| TransactionStatus::Start);
 
-    // Enable submit button
+    // Build the transaction
     use_effect(move || {
-        let amount_str = deposit_amount.cloned();
+        // Get wallet address
+        let Wallet::Connected(_authority) = *wallet.read() else {
+            enabled.set(false);
+            return;
+        };
 
-        // If empty, disable
-        if amount_str.is_empty() {
+         // If empty, disable
+         let amount_str = deposit_amount.cloned();
+         if amount_str.is_empty() {
             enabled.set(false);
             return;
         }
 
         // If input isn't a number, disable
-        let Ok(amount) = amount_str.parse::<f64>() else {
+        let Ok(amount_f64) = amount_str.parse::<f64>() else {
             enabled.set(false);
             return;
         };
 
         // If amount is 0, disable
-        if amount == 0f64 {
+        if amount_f64 == 0f64 {
             enabled.set(false);
             return;
         }
 
         // If amount is greater than ore balance, disable
         if let Some(Ok(ore_balance)) = ore_balance.read().as_ref() {
-            if ore_balance.ui_amount.unwrap_or(0.0) < amount {
+            if ore_balance.ui_amount.unwrap_or(0.0) < amount_f64 {
                 enabled.set(false);
                 return;
             }
@@ -91,7 +99,7 @@ fn VaultDepositForm(
             gap: 4,
             Col {
                 class: "lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0",
-                VaultStakeInput {
+                VaultInput {
                     tab: StakeTab::Deposit,
                     input_amount: deposit_amount,
                     ore_balance: ore_balance,
@@ -99,15 +107,31 @@ fn VaultDepositForm(
                 }
             }
             StakeDetails {}
-            StakeButton {
-                enabled: enabled
+            SubmitButton {
+                enabled: enabled,
+                onclick: move |_| {
+                    let mut ixs = vec![];
+                    let Wallet::Connected(authority) = *wallet.read() else {
+                        return;
+                    };
+                    if let Some(Ok(_)) = *ore_stake.read() {
+                        // Do nothing
+                    } else {
+                        ixs.push(ore_boost_api::sdk::open(authority, authority, MINT_ADDRESS));
+                    }
+                    let amount_f64 = deposit_amount.cloned().parse::<f64>().unwrap();
+                    let amount_u64 = ui_amount_to_amount(amount_f64, TOKEN_DECIMALS);
+                    ixs.push(ore_boost_api::sdk::deposit(authority, MINT_ADDRESS, amount_u64));
+                    let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+                    submit_transaction(tx, transaction_status);
+                }
             }
         }
     }
 }
 
 #[component]
-fn VaultStakeInput(
+fn VaultInput(
     tab: StakeTab,
     input_amount: Signal<String>,
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
@@ -173,29 +197,41 @@ fn VaultWithdrawForm(
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     ore_stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
+    let wallet = use_wallet();
     let withdraw_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
+    let transaction_status = use_signal(|| TransactionStatus::Start);
 
+    // Build the transaction
     use_effect(move || {
-        let amount_str = withdraw_amount.cloned();
+        // Get wallet address
+        let Wallet::Connected(_authority) = *wallet.read() else {
+            enabled.set(false);
+            return;
+        };
 
+        // If empty, disable
+        let amount_str = withdraw_amount.cloned();
         if amount_str.is_empty() {
             enabled.set(false);
             return;
         }
 
+        // If input isn't a number, disable
         let Ok(amount) = amount_str.parse::<f64>() else {
             enabled.set(false);
             return;
         };
 
+        // If amount is 0, disable
         if amount == 0f64 {
             enabled.set(false);
             return;
         }
 
+        // If amount is greater than stake balance, disable
         if let Some(Ok(stake)) = ore_stake.read().as_ref() {
-            if amount_to_ui_amount(stake.balance, TOKEN_DECIMALS) < amount {
+            if amount_to_ui_amount(stake.balance + stake.balance_pending, TOKEN_DECIMALS) < amount {
                 enabled.set(false);
                 return;
             }
@@ -214,7 +250,7 @@ fn VaultWithdrawForm(
             gap: 4,
             Col {
                 class: "lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0",
-                VaultStakeInput {
+                VaultInput {
                     tab: StakeTab::Withdraw,
                     input_amount: withdraw_amount,
                     ore_balance: ore_balance,
@@ -222,8 +258,21 @@ fn VaultWithdrawForm(
                 }
             }
             StakeDetails {}
-            StakeButton {
-                enabled: enabled
+            SubmitButton {
+                enabled: enabled,
+                onclick: move |_| {
+                    let mut ixs = vec![];
+                    let Wallet::Connected(authority) = *wallet.read() else {
+                        return;
+                    };
+                    let x = spl_associated_token_account::get_associated_token_address(&authority, &MINT_ADDRESS);
+                    log::info!("x: {:?}", x);
+                    let amount_f64 = withdraw_amount.cloned().parse::<f64>().unwrap();
+                    let amount_u64 = ui_amount_to_amount(amount_f64, TOKEN_DECIMALS);
+                    ixs.push(ore_boost_api::sdk::withdraw(authority, MINT_ADDRESS, amount_u64));
+                    let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+                    submit_transaction(tx, transaction_status);
+                }
             }
         }
     }
@@ -246,7 +295,7 @@ fn MaxButton(
         }
         StakeTab::Withdraw => {
             if let Some(Ok(stake)) = ore_stake.cloned() {
-                amount_to_ui_amount(stake.balance, TOKEN_DECIMALS)
+                amount_to_ui_amount(stake.balance + stake.balance_pending, TOKEN_DECIMALS)
             } else {
                 0.0
             }
