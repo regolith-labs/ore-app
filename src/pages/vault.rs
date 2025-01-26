@@ -1,8 +1,9 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
+use solana_extra_wasm::program::{spl_associated_token_account, spl_token::amount_to_ui_amount_string};
+use solana_sdk::transaction::Transaction;
 
-use crate::{components::{Col, Heading, OreValueSmall, Row, VaultStakeForm}, hooks::{use_boost, use_stake}};
+use crate::{components::{submit_transaction, Col, Heading, OreValueSmall, Row, TransactionStatus, VaultStakeForm}, hooks::{use_boost, use_stake, use_wallet, Wallet}};
 
 pub fn Vault() -> Element {
     rsx! {
@@ -27,8 +28,10 @@ pub fn Vault() -> Element {
 }
 
 fn PositionSummary() -> Element {
+    let wallet = use_wallet();
     let stake = use_stake(ore_api::consts::MINT_ADDRESS);
     let mut enabled = use_signal(|| false);
+    let transaction_status = use_signal(|| TransactionStatus::Start);
 
     // Enable claim button
     use_effect(move || {
@@ -107,7 +110,17 @@ fn PositionSummary() -> Element {
             ClaimButton {
                 enabled: enabled.clone(),
                 onclick: move |_| {
-                    // TODO: Implement claim logic
+                    let mut ixs = vec![];
+                    let Wallet::Connected(authority) = *wallet.read() else {
+                        return;
+                    };
+                    let Some(Ok(stake)) = *stake.read() else {
+                        return;
+                    };
+                    let beneficiary = spl_associated_token_account::get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
+                    ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, ore_api::consts::MINT_ADDRESS, stake.rewards));
+                    let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
+                    submit_transaction(transaction.into(), transaction_status);
                 },
             }
         }
@@ -159,7 +172,7 @@ fn VaultSummary() -> Element {
             gap: 4,
             span {
                 class: "text-elements-highEmphasis font-medium text-2xl",
-                "Overall"
+                "Totals"
             }
             Row {
                 class: "w-full justify-between px-4",
