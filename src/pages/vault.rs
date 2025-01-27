@@ -31,7 +31,6 @@ fn PositionSummary() -> Element {
     let wallet = use_wallet();
     let stake = use_stake(ore_api::consts::MINT_ADDRESS);
     let mut enabled = use_signal(|| false);
-    let transaction_status = use_signal(|| TransactionStatus::Start);
 
     // Enable claim button
     use_effect(move || {
@@ -120,7 +119,7 @@ fn PositionSummary() -> Element {
                     let beneficiary = spl_associated_token_account::get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
                     ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, ore_api::consts::MINT_ADDRESS, stake.rewards));
                     let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
-                    submit_transaction(transaction.into(), transaction_status);
+                    submit_transaction(transaction.into());
                 },
             }
         }

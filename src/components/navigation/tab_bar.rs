@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BeakerIcon, BoltIcon, Col, GlobeIcon, OreWordmarkIcon, Row, WalletAdapter},
+    components::{BeakerIcon, BoltIcon, Col, GlobeIcon, OreWordmarkIcon, Row, ToastDisplay, WalletAdapter},
     route::Route,
 };
 
@@ -15,6 +15,7 @@ pub fn AppNavigation() -> Element {
                 class: "py-5 sm:py-8 w-full max-w-[80rem] mx-auto",
                 Outlet::<Route> {}
             }
+            ToastDisplay {}
         }
     }
 }

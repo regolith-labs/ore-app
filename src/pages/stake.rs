@@ -12,7 +12,6 @@ pub fn Stake() -> Element {
                 title: "Stake",
                 subtitle: "Provide market liquidity and earn yield."
             }
-            // YieldOverview {}
             VaultPreview {}
             StakeTable {}
         }
@@ -21,25 +20,28 @@ pub fn Stake() -> Element {
 
 fn VaultPreview() -> Element {
     rsx! {
-        Link {
-            class: "flex flex-col sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 bg-surface-elevated border-elevated",
-            to: Route::Vault {},
-            Col {
-                gap: 2,
-                span {
-                    class: "font-semibold text-2xl",
-                    "Vault"
+        div {
+            class: "flex mx-auto w-full px-5 sm:px-8",
+            Link {
+                class: "flex flex-col w-full sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 bg-surface-elevated border border-gray-800",
+                to: Route::Vault {},
+                Col {
+                    gap: 2,
+                    span {
+                        class: "font-semibold text-2xl",
+                        "Vault"
+                    }
+                    span {
+                        class: "text-elements-midEmphasis",
+                        "Stake unpaired ORE to earn the idle yield rate."
+                    }
                 }
-                span {
-                    class: "text-elements-midEmphasis",
-                    "Stake unpaired ORE to earn the idle yield rate."
-                }
-            }
-            div {
-                class: "flex bg-white my-auto px-4 py-2 rounded-full",
-                span {
-                    class: "mx-auto my-auto font-semibold text-black",
-                    "Stake now"
+                div {
+                    class: "flex bg-white my-auto px-4 py-2 rounded-full transition-transform hover:scale-105",
+                    span {
+                        class: "mx-auto my-auto font-semibold text-black",
+                        "Stake now"
+                    }
                 }
             }
         }

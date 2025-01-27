@@ -25,3 +25,4 @@ pub fn use_stake(mint: Pubkey) -> Resource<GatewayResult<Stake>> {
         }
     })
 }
+

@@ -5,7 +5,7 @@ use solana_extra_wasm::program::{spl_associated_token_account, spl_token::{amoun
 use solana_sdk::transaction::Transaction;
 
 use crate::{
-    components::{submit_transaction, Col, Row, TransactionStatus, WalletIcon}, hooks::{use_ore_balance, use_stake, use_wallet, Wallet}
+    components::{submit_transaction, Col, Row, WalletIcon}, hooks::{use_ore_balance, use_stake, use_wallet, Wallet}
 };
 use crate::gateway::{ui_token_amount::UiTokenAmount, GatewayResult};
 use super::common::*;
@@ -50,7 +50,6 @@ fn VaultDepositForm(
     let wallet = use_wallet();
     let deposit_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
-    let transaction_status = use_signal(|| TransactionStatus::Start);
 
     // Build the transaction
     use_effect(move || {
@@ -123,7 +122,7 @@ fn VaultDepositForm(
                     let amount_u64 = ui_amount_to_amount(amount_f64, TOKEN_DECIMALS);
                     ixs.push(ore_boost_api::sdk::deposit(authority, MINT_ADDRESS, amount_u64));
                     let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
-                    submit_transaction(tx, transaction_status);
+                    submit_transaction(tx);
                 }
             }
         }
@@ -200,7 +199,6 @@ fn VaultWithdrawForm(
     let wallet = use_wallet();
     let withdraw_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
-    let transaction_status = use_signal(|| TransactionStatus::Start);
 
     // Build the transaction
     use_effect(move || {
@@ -271,7 +269,7 @@ fn VaultWithdrawForm(
                     let amount_u64 = ui_amount_to_amount(amount_f64, TOKEN_DECIMALS);
                     ixs.push(ore_boost_api::sdk::withdraw(authority, MINT_ADDRESS, amount_u64));
                     let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
-                    submit_transaction(tx, transaction_status);
+                    submit_transaction(tx);
                 }
             }
         }

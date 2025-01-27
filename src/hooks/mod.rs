@@ -10,6 +10,7 @@ mod use_ore_balance;
 mod use_persistent;
 mod use_pools;
 mod use_swap;
+mod use_transaction_status;
 mod use_wallet;
 #[cfg(not(feature = "web"))]
 pub mod use_wallet_native;
@@ -22,5 +23,6 @@ pub use use_miner::*;
 pub use use_ore_balance::*;
 pub use use_pools::*;
 pub use use_swap::*;
+pub use use_transaction_status::*;
 pub use use_wallet::*;
 

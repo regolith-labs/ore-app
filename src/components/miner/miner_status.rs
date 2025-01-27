@@ -2,12 +2,9 @@ use dioxus::prelude::*;
 use ore_pool_types::Member;
 
 use crate::{
-    gateway::GatewayResult,
-    hooks::{
-        use_member_onchain, use_miner_is_active, use_register_db, use_register_onchain, use_wallet,
-        Wallet,
-    },
-    config::Pool,
+    config::Pool, gateway::GatewayResult, hooks::{
+        use_member_onchain, use_miner_is_active, use_register_db, use_register_onchain, use_transaction_status, use_wallet, Wallet
+    }
 };
 
 use crate::components::{submit_transaction, TransactionStatus};
@@ -19,7 +16,8 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
     let mut member_onchain = use_member_onchain(pool.address);
     let mut register_db = use_register_db(pool.url.clone());
     let register_onchain = use_register_onchain(pool.address);
-    let transaction_status = use_signal(|| TransactionStatus::Start);
+    let transaction_status = use_transaction_status();
+
     let el = match *wallet.read() {
         Wallet::Disconnected => {
             rsx! {}
@@ -67,40 +65,40 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
                                 }
                                 Some(Err(err)) => {
                                     log::error!("{:?}", err);
+
                                     // register member on chain first
                                     match &*register_onchain.read() {
                                         Some(Ok(tx)) => {
                                             let tx = tx.clone();
-                                            let el = match *transaction_status.read() {
-                                                TransactionStatus::Start => {
-                                                    submit_transaction(
-                                                        tx.into(),
-                                                        transaction_status,
-                                                    );
-                                                    rsx! {}
-                                                }
-                                                TransactionStatus::Waiting => {
-                                                    rsx! {
-                                                        div {
-                                                            "waiting for register onchain signature"
+                                            let el = if let Some(transaction_status) = transaction_status.cloned() {
+                                                match transaction_status {
+                                                    TransactionStatus::Waiting => {
+                                                        rsx! {
+                                                            div {
+                                                                "waiting for register onchain signature"
+                                                            }
+                                                        }
+                                                    }
+                                                    TransactionStatus::Denied
+                                                    | TransactionStatus::Timeout
+                                                    | TransactionStatus::Error => {
+                                                        rsx! {
+                                                            div {
+                                                                "error with register onchain signature"
+                                                            }
+                                                        }
+                                                    }
+                                                    TransactionStatus::Done(_sig) => {
+                                                        member_onchain.restart();
+                                                        register_db.restart();
+                                                        rsx! {
+                                                            div { "restarting register db" }
                                                         }
                                                     }
                                                 }
-                                                TransactionStatus::Timeout
-                                                | TransactionStatus::Error => {
-                                                    rsx! {
-                                                        div {
-                                                            "error with register onchain signature"
-                                                        }
-                                                    }
-                                                }
-                                                TransactionStatus::Done(_sig) => {
-                                                    member_onchain.restart();
-                                                    register_db.restart();
-                                                    rsx! {
-                                                        div { "restarting register db" }
-                                                    }
-                                                }
+                                            } else {
+                                                submit_transaction(tx.into());
+                                                rsx! {}
                                             };
                                             el
                                         }

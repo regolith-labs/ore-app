@@ -6,12 +6,12 @@ use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
     components::{
-        submit_transaction, CarrotDownIcon, Col, TransactionStatus, Row, SwitchIcon, WalletIcon,
+        submit_transaction, CarrotDownIcon, Col, Row, SwitchIcon, TransactionStatus, WalletIcon
     },
     config::{Token, LISTED_TOKENS_BY_TICKER},
     gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
     hooks::{
-        get_token_balance, use_quote, use_swap_transaction, use_wallet, GetPubkey,
+        get_token_balance, use_quote, use_swap_transaction, use_transaction_status, use_wallet, GetPubkey
     },
 };
 
@@ -23,6 +23,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // input amounts
     let sell_input_amount = use_signal::<Option<String>>(|| Some("".to_owned()));
     let buy_input_amount = use_signal::<Option<String>>(|| Some("".to_owned()));
+    let transaction_status = use_transaction_status();
 
     // token picker modal flags
     let show_buy_token_selector = use_signal(|| false);
@@ -30,7 +31,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
 
     // quote response
     let quote_response = use_signal::<Option<QuoteResponse>>(|| None);
-    let mut transaction_status = use_signal(|| TransactionStatus::Start);
 
     // selected tokens
     let buy_token = use_signal(|| Token::ore());
@@ -40,7 +40,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let mut buy_token_balance = use_resource(move || async move {
         let wallet = wallet.get_pubkey()?;
         let buy_token = buy_token.read();
-        transaction_status.set(TransactionStatus::Start);
         get_token_balance(wallet, buy_token.mint).await
     });
     let mut sell_token_balance = use_resource(move || async move {
@@ -53,10 +52,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
     use_effect(move || {
         let _ = buy_input_amount.read();
         let _ = sell_input_amount.read();
-        transaction_status.set(TransactionStatus::Start);
     });
     use_effect(move || {
-        if let TransactionStatus::Done(_sig) = transaction_status.cloned() {
+        if let Some(TransactionStatus::Done(_sig)) = transaction_status.cloned() {
             buy_token_balance.restart();
             sell_token_balance.restart();
         }
@@ -119,7 +117,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                 }
             }
             SwapDetails { buy_token, sell_token, quote_response }
-            SwapButton { quote_response, swap_tx, transaction_status }
+            SwapButton { quote_response, swap_tx }
 
             // TODO Signature status as toasts
 
@@ -289,17 +287,21 @@ fn SwapDetailLabel(title: String, value: String) -> Element {
 fn SwapButton(
     quote_response: Signal<Option<QuoteResponse>>,
     swap_tx: Resource<GatewayResult<VersionedTransaction>>,
-    transaction_status: Signal<TransactionStatus>,
 ) -> Element {
     let quote_response = &*quote_response.read();
+    let is_tx_ready = if let Some(Ok(_tx)) = swap_tx.cloned() {
+        true
+    } else {
+        false
+    };
     rsx! {
         button {
             class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
-            disabled: quote_response.is_none() && swap_tx().is_some_and(|res| res.is_ok()),
+            disabled: quote_response.is_none() || !is_tx_ready,
             onclick: move |_| {
                 let swap_tx = &*swap_tx.read();
                 if let Some(Ok(tx)) = swap_tx {
-                    submit_transaction(tx.clone(), transaction_status);
+                    submit_transaction(tx.clone());
                 }
             },
             span { class: "mx-auto my-auto font-semibold", "Swap" }

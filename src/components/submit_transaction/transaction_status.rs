@@ -4,8 +4,8 @@ use solana_sdk::signature::Signature;
 
 #[derive(PartialEq, Copy, Clone, Debug)]
 pub enum TransactionStatus {
-    Start,
     Waiting,
+    Denied,
     Error,
     Timeout,
     Done(Signature),
