@@ -2,7 +2,7 @@ use once_cell::sync::Lazy;
 use serde::Deserialize;
 use steel::Pubkey;
 
-use super::utils::deserialize_pubkey;
+use crate::utils::deserialize_pubkey;
 
 pub static LISTED_POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
     // Read the YAML file at compile time

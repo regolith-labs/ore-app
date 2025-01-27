@@ -267,7 +267,7 @@ fn SwapDetails(
             gap: 3,
             SwapDetailLabel { title: "Price impact", value: price_impact_value }
             // SwapDetailLabel { title: "Slippage", value: slippage }
-            SwapDetailLabel { title: "Transaction fee", value: transaction_fee }
+            // SwapDetailLabel { title: "Transaction fee", value: transaction_fee }
         }
     }
 }

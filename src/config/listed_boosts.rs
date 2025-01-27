@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 use serde::Deserialize;
 use steel::Pubkey;
 
-use super::utils::deserialize_pubkey;
+use crate::utils::deserialize_pubkey;
 
 // Create a static HashMap indexed by ticker
 pub static LISTED_BOOSTS: Lazy<Vec<BoostMeta>> = Lazy::new(|| {
@@ -33,9 +33,19 @@ pub struct BoostMeta {
     pub lp_mint: Pubkey,
     #[serde(deserialize_with = "deserialize_pubkey")]
     pub pair_mint: Pubkey,
+    #[serde(deserialize_with = "deserialize_pubkey")]
+    pub lp_id: Pubkey,
+    pub lp_type: LpType,
     pub name: String,
     pub ticker: String,
-    pub link: String,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Deserialize)]
+pub enum LpType {
+    #[serde(rename = "kamino")]
+    Kamino,
+    #[serde(rename = "meteora")]
+    Meteora,
 }
 
 #[derive(Deserialize)]

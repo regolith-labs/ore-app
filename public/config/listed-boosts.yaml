@@ -1,21 +1,24 @@
 boosts:
   - address: 48J2TSpVpwmrwW84sMERcZigeAeFuUnC8bKHp7ET6RXt
+    pair_mint: So11111111111111111111111111111111111111112
     lp_mint: 8H8rPiWW4iTFCfEkSnf7jpqeNpFfvdH9gLouAL3Fe2Zx
-    pair_mint: So11111111111111111111111111111111111111112 
+    lp_id: 6TFdY15Mxty9sRCtzMXG8eHSbZy4oiAEQUvLQdz9YwEn
+    lp_type: kamino 
     name: SOL-ORE Kamino LP
     ticker: SOL-ORE kLP
-    link: https://app.kamino.finance/liquidity/6TFdY15Mxty9sRCtzMXG8eHSbZy4oiAEQUvLQdz9YwEn
 
   - address: D4qtrWeNpJnZpmT9Fe2kx5oJf3E4ovorZgE6K6ux7Lqt
-    lp_mint: DrSS5RM7zUd9qjUEdDaf31vnDUSbCrMto6mjqTrHFifN
     pair_mint: So11111111111111111111111111111111111111112
+    lp_mint: DrSS5RM7zUd9qjUEdDaf31vnDUSbCrMto6mjqTrHFifN
+    lp_id: GgaDTFbqdgjoZz3FP7zrtofGwnRS4E6MCzmmD5Ni1Mxj
+    lp_type: meteora
     name: SOL-ORE Meteora LP
     ticker: SOL-ORE mLP
-    link: https://app.meteora.ag/pools/GgaDTFbqdgjoZz3FP7zrtofGwnRS4E6MCzmm
 
   - address: EExSorxnhxVKqnhNT4dNPNa8zvRBNBgju6n91F9cnKKy
     lp_mint: 7G3dfZkSk1HpDGnyL37LMBbPEgT4Ca6vZmZPUyi2syWt
     pair_mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux 
+    lp_id: 9XsAPjk1yp4U6hKZj9r9szhcxBi3RidGuyxiC2Y8JtAe
+    lp_type: kamino
     name: HNT-ORE Kamino LP
     ticker: HNT-ORE kLP
-    link: https://app.kamino.finance/liquidity/9XsAPjk1yp4U6hKZj9r9szhcxBi3RidGuyxiC2Y8JtAe

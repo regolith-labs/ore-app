@@ -23,7 +23,7 @@ fn VaultPreview() -> Element {
         div {
             class: "flex mx-auto w-full px-5 sm:px-8",
             Link {
-                class: "flex flex-col w-full sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 bg-surface-elevated border border-gray-800",
+                class: "flex flex-col w-full sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 transition bg-surface-elevated border border-gray-800",
                 to: Route::Vault {},
                 Col {
                     gap: 2,
@@ -37,7 +37,7 @@ fn VaultPreview() -> Element {
                     }
                 }
                 div {
-                    class: "flex bg-white my-auto px-4 py-2 rounded-full transition-transform hover:scale-105",
+                    class: "flex bg-white my-auto px-4 py-2 rounded-full transition hover:scale-105",
                     span {
                         class: "mx-auto my-auto font-semibold text-black",
                         "Stake now"

@@ -35,7 +35,7 @@ fn Hero() -> Element {
                 }
                 span {  
                     class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                    "The hard money standard for tokenized assets and commodities."
+                    "Defi-native hard money with native yield."
                 }
             }
             Link {

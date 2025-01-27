@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::{OreIcon, Row};
+use crate::{components::{OreIcon, Row}, config::LISTED_TOKENS_BY_TICKER};
 
 #[component]
 pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
@@ -224,19 +224,39 @@ pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element
 }
 
 #[component]
-pub fn TokenValueSmall(class: Option<String>, amount: String, image: String) -> Element {
+pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String) -> Element {
     let class = class.unwrap_or("".to_string());
+    let image = if let Some(token) = LISTED_TOKENS_BY_TICKER.get(&ticker) {
+        token.image.clone()
+    } else {
+        "".to_string()
+    };
+
+    let units: Vec<_> = amount.split('.').collect();
+    let big_units = units[0];
+    let small_units = units[1];
+    let big_units = format_with_commas(big_units);
+
     rsx! {
         Row {
             class: "gap-1.5 {class}",
+            span {
+                class: "my-auto font-medium", 
+                "{big_units}.{small_units[..2].to_string()}"
+            }
             img {
                 class: "w-6 h-6 my-auto bg-gray-900 rounded-full border border-gray-800",
                 src: "{image}"
             }
-            span {
-                class: "my-auto font-medium", 
-                "{amount}"
-            }
+        }
+    }
+}
+
+pub fn NullValue() -> Element {
+    rsx! {
+        span {
+            class: "text-elements-midEmphasis font-medium",
+            "–"
         }
     }
 }

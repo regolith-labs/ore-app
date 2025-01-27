@@ -21,6 +21,7 @@ impl<R: Rpc> SolanaGateway for R {
             .map_err(GatewayError::from)?;
         bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
     }
+    
     async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
         // Confirm tx
         for retry in 0..CONFIRM_RETRIES {

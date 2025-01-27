@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::{OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink}, config::{BoostMeta, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_stake}, route::Route
+    components::{Col, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake}, route::Route
 };
 
 pub fn StakeTable() -> Element {
@@ -16,7 +16,7 @@ pub fn StakeTable() -> Element {
                 TableHeader {
                     left: "Pair",
                     right_1: "Multiplier",
-                    right_2: "Deposits",
+                    right_2: "TVL",
                     right_3: "Yield",
                 }
             },
@@ -40,7 +40,7 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
             left: rsx! {
                 StakeTableRowTitle {
-                    ticker: boost_meta.ticker,
+                    ticker: boost_meta.ticker.clone(),
                     pair_mint: boost_meta.pair_mint,
                 }
             },
@@ -51,7 +51,8 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
             },
             right_2: rsx! {
                 StakeTableRowDeposits {
-                    boost
+                    boost,
+                    boost_meta
                 }
             },
             right_3: rsx! {
@@ -108,12 +109,22 @@ fn StakeTableRowMultiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-fn StakeTableRowDeposits(boost: Resource<GatewayResult<Boost>>) -> Element {
+fn StakeTableRowDeposits(boost: Resource<GatewayResult<Boost>>, boost_meta: BoostMeta) -> Element {
+    let boost_deposits = use_boost_deposits(boost_meta);
     rsx! {
-        if let Some(Ok(boost)) = boost.cloned() {
-            span {
-                class: "font-medium",
-                "{boost.total_deposits}"
+        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+            Col {
+                gap: 2,
+                TokenValueSmall {
+                    class: "ml-auto",
+                    amount: boost_deposits.balance_a.to_string(),
+                    ticker: boost_deposits.token_a.clone(),
+                }
+                TokenValueSmall {
+                    class: "ml-auto",
+                    amount: boost_deposits.balance_b.to_string(),
+                    ticker: boost_deposits.token_b.clone(),
+                }
             }
         } else {
             TableCellLoading {}

@@ -85,21 +85,21 @@ pub fn ToastDisplay() -> Element {
                 }
                 TransactionStatus::Sending(_attempt) => {
                     rsx! {
-                        Row {
-                            class: "{toast_class} border-l-4 border-elements-lowEmphasis",
-                            gap: 2, 
-                            Spinner {
-                                class: "my-auto",
-                            }
-                            Col {
+                        Col {
+                            class: "{toast_class} border-l-4 border-blue-500",
+                            Row {
+                                gap: 2,
+                                Spinner {
+                                    class: "my-auto",
+                                }
                                 span {
                                     class: "{title_class} my-auto",
                                     "Submitting transaction"
                                 }
-                                span {
-                                    class: "{detail_class}",
-                                    "Waiting for confirmation..."
-                                }
+                            }   
+                            span {
+                                class: "{detail_class} ml-8",
+                                "Waiting for confirmation..."
                             }
                         }
                     }

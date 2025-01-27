@@ -5,13 +5,6 @@ use steel::Pubkey;
 use crate::gateway::{ore::OreGateway, GatewayError, GatewayResult};
 use super::{use_gateway, use_wallet, Wallet};
 
-pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
-    use_resource(move || async move {
-        let boost_address = boost_pda(mint).0;
-        use_gateway().rpc.get_boost(boost_address).await.map_err(GatewayError::from)
-    })
-}
-
 pub fn use_stake(mint: Pubkey) -> Resource<GatewayResult<Stake>> {
     let wallet = use_wallet();
     use_resource(move || async move {

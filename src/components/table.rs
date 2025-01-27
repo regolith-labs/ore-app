@@ -27,7 +27,7 @@ pub fn TableHeader(
 ) -> Element {
     rsx! {
         Row {
-            class: "h-8 sm:h-10 w-full min-w-max px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-gray-700",
+            class: "h-8 sm:h-10 w-full min-w-max px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-elements-lowEmphasis",
             span {
                 class: "flex w-screen sm:w-full sm:min-w-96 -ml-5 sm:ml-0 px-5 sm:px-0",
                 Row {

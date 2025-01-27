@@ -383,6 +383,7 @@
     --color-elements-lowEmphasis: #707070;
     --color-elements-disabled: #585661;
     --color-elements-gold: #ECC771;
+    --color-elements-purple: #5949B7;
     --color-elements-contrast: #0F0E11;
     --color-surface-elevated: #131216;
     --color-surface-elevatedHover: #151419;
@@ -713,6 +714,9 @@
   .-ml-6 {
     margin-left: calc(var(--spacing) * -6);
   }
+  .ml-8 {
+    margin-left: calc(var(--spacing) * 8);
+  }
   .ml-16 {
     margin-left: calc(var(--spacing) * 16);
   }
@@ -1002,6 +1006,9 @@
   .border-l-4 {
     border-left-style: var(--tw-border-style);
     border-left-width: 4px;
+  }
+  .border-blue-500 {
+    border-color: var(--color-blue-500);
   }
   .border-elements-highEmphasis\/30 {
     border-color: color-mix(in oklab, var(--color-elements-highEmphasis) 30%, transparent);
@@ -1352,6 +1359,13 @@
       }
     }
   }
+  .hover\:border-elements-lowEmphasis {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-elements-lowEmphasis);
+      }
+    }
+  }
   .hover\:bg-controls-secondaryHover {
     &:hover {
       @media (hover: hover) {
@@ -1377,13 +1391,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-gray-800);
-      }
-    }
-  }
-  .hover\:bg-surface-elevated {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-surface-elevated);
       }
     }
   }

@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 use serde::Deserialize;
 use solana_sdk::pubkey::Pubkey;
 
-use super::utils::deserialize_pubkey;
+use crate::utils::deserialize_pubkey;
 
 // Create a static HashMap indexed by ticker
 pub static LISTED_TOKENS_BY_TICKER: Lazy<HashMap<String, Token>> = Lazy::new(|| {

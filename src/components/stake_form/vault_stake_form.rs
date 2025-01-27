@@ -1,22 +1,23 @@
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::{spl_associated_token_account, spl_token::{amount_to_ui_amount, ui_amount_to_amount}};
+use solana_extra_wasm::program::{spl_token::{amount_to_ui_amount, ui_amount_to_amount}};
 use solana_sdk::transaction::Transaction;
 
 use crate::{
-    components::{submit_transaction, Col, Row, WalletIcon}, hooks::{use_ore_balance, use_stake, use_wallet, Wallet}
+    components::{submit_transaction, Col, Row, TransactionStatus, WalletIcon}, hooks::{use_transaction_status, use_wallet, Wallet}
 };
 use crate::gateway::{ui_token_amount::UiTokenAmount, GatewayResult};
 use super::common::*;
 
 #[component]
-pub fn VaultStakeForm(class: Option<String>) -> Element {
+pub fn VaultStakeForm(
+    class: Option<String>,
+    ore_balance: Resource<GatewayResult<UiTokenAmount>>,
+    ore_stake: Resource<GatewayResult<Stake>>
+) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);
-    let ore_balance = use_ore_balance();
-    let ore_stake = use_stake(ore_api::consts::MINT_ADDRESS);
-
     rsx! {
         Col {
             class: "{class}",
@@ -48,8 +49,9 @@ fn VaultDepositForm(
     ore_stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let wallet = use_wallet();
-    let deposit_amount = use_signal::<String>(|| "".to_owned());
+    let mut deposit_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
+    let transaction_status = use_transaction_status();
 
     // Build the transaction
     use_effect(move || {
@@ -92,6 +94,15 @@ fn VaultDepositForm(
         enabled.set(true);
     });
 
+    // Refresh data if successful transaction
+    use_effect(move || {
+        if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
+            ore_balance.restart();
+            ore_stake.restart();
+            deposit_amount.set("".to_owned());
+        }
+    });
+
     rsx! {
         Col {
             class: "w-full",
@@ -109,6 +120,7 @@ fn VaultDepositForm(
             SubmitButton {
                 enabled: enabled,
                 onclick: move |_| {
+                    // Build transaction
                     let mut ixs = vec![];
                     let Wallet::Connected(authority) = *wallet.read() else {
                         return;
@@ -122,6 +134,8 @@ fn VaultDepositForm(
                     let amount_u64 = ui_amount_to_amount(amount_f64, TOKEN_DECIMALS);
                     ixs.push(ore_boost_api::sdk::deposit(authority, MINT_ADDRESS, amount_u64));
                     let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+                    // Submit
                     submit_transaction(tx);
                 }
             }
@@ -197,8 +211,9 @@ fn VaultWithdrawForm(
     ore_stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let wallet = use_wallet();
-    let withdraw_amount = use_signal::<String>(|| "".to_owned());
+    let mut withdraw_amount = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
+    let transaction_status = use_transaction_status();
 
     // Build the transaction
     use_effect(move || {
@@ -241,7 +256,15 @@ fn VaultWithdrawForm(
         enabled.set(true);
     });
 
-    // let balance = use_token_balance(mint);
+    // Refresh if successful transaction
+    use_effect(move || {
+        if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
+            ore_balance.restart();
+            ore_stake.restart();
+            withdraw_amount.set("".to_owned());
+        }
+    });
+
     rsx! {
         Col {
             class: "w-full",
@@ -259,16 +282,17 @@ fn VaultWithdrawForm(
             SubmitButton {
                 enabled: enabled,
                 onclick: move |_| {
+                    // Build transaction
                     let mut ixs = vec![];
                     let Wallet::Connected(authority) = *wallet.read() else {
                         return;
                     };
-                    let x = spl_associated_token_account::get_associated_token_address(&authority, &MINT_ADDRESS);
-                    log::info!("x: {:?}", x);
                     let amount_f64 = withdraw_amount.cloned().parse::<f64>().unwrap();
                     let amount_u64 = ui_amount_to_amount(amount_f64, TOKEN_DECIMALS);
                     ixs.push(ore_boost_api::sdk::withdraw(authority, MINT_ADDRESS, amount_u64));
                     let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+                    // Submit
                     submit_transaction(tx);
                 }
             }
