@@ -105,7 +105,7 @@ fn VaultDepositForm(
                     ore_stake: ore_stake
                 }
             }
-            StakeDetails {}
+            // StakeDetails {}
             SubmitButton {
                 enabled: enabled,
                 onclick: move |_| {
@@ -255,7 +255,7 @@ fn VaultWithdrawForm(
                     ore_stake: ore_stake
                 }
             }
-            StakeDetails {}
+            // StakeDetails {}
             SubmitButton {
                 enabled: enabled,
                 onclick: move |_| {

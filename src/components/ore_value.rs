@@ -211,8 +211,12 @@ pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element
                     if small_units_display.is_empty() {
                         "{big_units_display}"
                     } else {
-                        "{big_units_display}.{small_units_display}"
+                        "{big_units_display}."
                     }
+                }
+                span {
+                    class: "mt-auto font-medium opacity-50",
+                    "{small_units_display}"
                 }
             }
         }

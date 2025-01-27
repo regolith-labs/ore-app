@@ -276,9 +276,9 @@ fn SwapDetails(
 fn SwapDetailLabel(title: String, value: String) -> Element {
     rsx! {
         Row {
-            class: "w-full justify-between text-sm",
-            span { class: "text-elements-lowEmphasis", "{title}" }
-            span { class: "text-elements-midEmphasis", "{value}" }
+            class: "w-full justify-between",
+            span { class: "text-elements-lowEmphasis font-medium", "{title}" }
+            span { class: "text-elements-midEmphasis font-medium", "{value}" }
         }
     }
 }

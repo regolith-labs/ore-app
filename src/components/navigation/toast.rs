@@ -15,7 +15,7 @@ pub fn ToastDisplay() -> Element {
             match transaction_status {
                 TransactionStatus::Denied | TransactionStatus::Error | TransactionStatus::Timeout | TransactionStatus::Done(_) => {
                     spawn(async move {
-                        async_std::task::sleep(Duration::from_secs(5)).await;
+                        async_std::task::sleep(Duration::from_secs(8)).await;
                         transaction_status_signal.set(None);
                     });
                 }
@@ -24,9 +24,8 @@ pub fn ToastDisplay() -> Element {
         }
     });
 
-    log::info!("toast: {:?}", transaction_status.cloned());
-    let toast_class = "fixed bottom-4 right-4 ml-auto z-100 bg-surface-floating py-4 px-6 rounded";
-    let title_class = "text-elements-highEmphasis font-medium text-lg my-auto";
+    let toast_class = "fixed bottom-4 right-4 ml-auto z-100 bg-surface-floating p-4 rounded";
+    let title_class = "text-elements-highEmphasis font-medium text-lg";
     let detail_class = "text-elements-lowEmphasis";
 
     rsx! {
@@ -35,13 +34,13 @@ pub fn ToastDisplay() -> Element {
                 TransactionStatus::Waiting => {
                     rsx! {
                         Row {
-                            class: "{toast_class}",
+                            class: "{toast_class} border-l-4 border-elements-lowEmphasis",
                             gap: 2, 
                             Spinner {
                                 class: "my-auto",
                             }
                             span {
-                                class: "{title_class}",
+                                class: "{title_class} my-auto",
                                 "Waiting for signature..."
                             }
                         }
@@ -50,9 +49,9 @@ pub fn ToastDisplay() -> Element {
                 TransactionStatus::Denied => {
                     rsx! {
                         Row {
-                            class: "{toast_class}",
+                            class: "{toast_class} border-l-4 border-red-500",
                             span {
-                                class: "{title_class}",
+                                class: "{title_class} my-auto",
                                 "Signature denied"
                             }
                         }
@@ -61,9 +60,9 @@ pub fn ToastDisplay() -> Element {
                 TransactionStatus::Error => {
                     rsx! {
                         Row {
-                            class: "{toast_class}",
+                            class: "{toast_class} border-l-4 border-red-500",
                             span {
-                                class: "{title_class}",
+                                class: "{title_class} my-auto",
                                 "Transaction failed"
                             }
                         }
@@ -72,9 +71,9 @@ pub fn ToastDisplay() -> Element {
                 TransactionStatus::Timeout => {
                     rsx! {
                         Row {
-                            class: "{toast_class}",
+                            class: "{toast_class} border-l-4 border-red-500",
                             span {
-                                class: "{title_class}",
+                                class: "{title_class} my-auto",
                                 "Transaction timed out"
                             }
                             span {
@@ -84,22 +83,44 @@ pub fn ToastDisplay() -> Element {
                         }
                     }
                 }
-                TransactionStatus::Done(sig) => {
+                TransactionStatus::Sending(_attempt) => {
                     rsx! {
                         Row {
-                            class: "{toast_class}",
-                            span {
-                                class: "{title_class}",
-                                "Done"
+                            class: "{toast_class} border-l-4 border-elements-lowEmphasis",
+                            gap: 2, 
+                            Spinner {
+                                class: "my-auto",
                             }
-                            span {
-                                class: "{detail_class}",
-                                "{sig}"
+                            Col {
+                                span {
+                                    class: "{title_class} my-auto",
+                                    "Submitting transaction"
+                                }
+                                span {
+                                    class: "{detail_class}",
+                                    "Waiting for confirmation..."
+                                }
                             }
                         }
                     }
                 }
-                _ => rsx! {}
+                TransactionStatus::Done(sig) => {
+                    rsx! {
+                        a {
+                            class: "flex flex-col {toast_class} border-l-4 border-green-500 hover:cursor-pointer",
+                            href: "https://solscan.io/tx/{sig}",
+                            target: "_blank",
+                            span {
+                                class: "{title_class}",
+                                "Transaction confirmed!"
+                            }
+                            span {
+                                class: "{detail_class}",
+                                "View on Solscan"
+                            }
+                        }
+                    }
+                }
             }
         }
     }

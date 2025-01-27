@@ -61,6 +61,7 @@ pub fn submit_transaction(mut tx: VersionedTransaction) {
                                 });
 
                                 // Send transaction to rpc
+                                transaction_status.set(Some(TransactionStatus::Sending(0)));
                                 let rpc_res = match decode_res {
                                     Some(tx) => gateway.rpc.send_transaction(&tx).await.ok(),
                                     None => {

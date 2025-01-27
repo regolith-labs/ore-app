@@ -8,6 +8,7 @@ pub enum TransactionStatus {
     Denied,
     Error,
     Timeout,
+    Sending(u8),
     Done(Signature),
 }
 

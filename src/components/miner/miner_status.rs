@@ -88,6 +88,13 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
                                                             }
                                                         }
                                                     }
+                                                    TransactionStatus::Sending(attempt) => {
+                                                        rsx! {
+                                                            div {
+                                                                "sending register onchain transaction, attempt {attempt}"
+                                                            }
+                                                        }
+                                                    }
                                                     TransactionStatus::Done(_sig) => {
                                                         member_onchain.restart();
                                                         register_db.restart();
