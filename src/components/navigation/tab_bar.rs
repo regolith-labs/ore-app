@@ -147,7 +147,7 @@ fn MobileTabBar() -> Element {
 fn MobileTab(title: String, route: Route) -> Element {
     let current_route: Route = use_route();
     let selected = is_tab_selected(&route, &current_route);
-    let color = if !selected { "text-gray-700" } else { "" };
+    let color = if !selected { "text-elements-lowEmphasis hover:text-elements-midEmphasis" } else { "" };
     rsx! {
         Link {
             class: "flex h-16 w-full",
