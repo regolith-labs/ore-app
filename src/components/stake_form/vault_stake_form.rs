@@ -256,7 +256,7 @@ fn VaultWithdrawForm(
         enabled.set(true);
     });
 
-    // Refresh if successful transaction
+    // Refresh data if successful transaction
     use_effect(move || {
         if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
             ore_balance.restart();

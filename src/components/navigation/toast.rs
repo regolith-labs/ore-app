@@ -24,7 +24,7 @@ pub fn ToastDisplay() -> Element {
         }
     });
 
-    let toast_class = "fixed bottom-4 right-4 ml-auto z-100 bg-surface-floating p-4 rounded";
+    let toast_class = "fixed bottom-4 left-4 ml-auto z-100 bg-surface-floating p-4 rounded";
     let title_class = "text-elements-highEmphasis font-medium text-lg";
     let detail_class = "text-elements-lowEmphasis";
 

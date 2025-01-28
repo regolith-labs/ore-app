@@ -45,6 +45,7 @@ pub fn PairWithdrawForm(class: Option<String>, boost_meta: BoostMeta) -> Element
                     gap: 2,
                     Col {
                         class: "flex-1",
+                        gap: 4,
                         Row {
                             class: "justify-between mb-2",
                             span {

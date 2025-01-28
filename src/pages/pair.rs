@@ -16,6 +16,7 @@ pub fn Pair(lp_mint: String) -> Element {
     let boost = use_boost(lp_mint);
     let boost_deposits = use_boost_deposits(boost_meta.clone());
     let stake = use_stake(lp_mint);
+    let pair_balance = use_token_balance(boost_meta.pair_mint);
     let ore_balance = use_ore_balance();
     let lp_balance = use_token_balance(lp_mint);
 
@@ -35,7 +36,12 @@ pub fn Pair(lp_mint: String) -> Element {
                 gap: 16,
                 PairStakeForm {
                     class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                    boost_meta: boost_meta.clone()
+                    boost_meta: boost_meta.clone(),
+                    boost_deposits: boost_deposits,
+                    lp_balance: lp_balance,
+                    stake: stake,
+                    token_a_balance: pair_balance,
+                    token_b_balance: ore_balance,
                 }
                 AccountMetrics {
                     ore_balance,
@@ -299,23 +305,30 @@ fn UnstakedMetrics(
                 "You have unstaked LP tokens in your connected wallet. To deposit these tokens and earn boosted yield, use the button below."
             }
             button {
-                class: "h-12 w-full rounded-full controls-primary",
+                class: "h-12 w-full rounded-full controls-secondary",
                 onclick: move |_| {
-                    // Deposit LP tokens
+                    // Compile instructions
                     let mut ixs = vec![];
+
+                    // Get the wallet authority
                     let Wallet::Connected(authority) = *wallet.read() else {
                         return;
                     };
-                    let Some(Ok(lp_token_balance)) = lp_balance.cloned() else {
+
+                    // Check if LP tokens are in the wallet
+                    let Some(Ok(_lp_token_balance)) = lp_balance.cloned() else {
                         return;
                     };
+
+                    // Open the stake account, if needed
                     if let Some(Ok(_stake)) = stake.read().as_ref() {
                         // Do nothing
                     } else {
                         ixs.push(ore_boost_api::sdk::open(authority, authority, boost_meta.lp_mint));
                     }
-                    let amount = lp_token_balance.amount.parse::<u64>().unwrap();
-                    ixs.push(ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, amount));
+
+                    // Deposit LP tokens
+                    ixs.push(ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, u64::MAX));
                     let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
                     submit_transaction(transaction.into());
                 },

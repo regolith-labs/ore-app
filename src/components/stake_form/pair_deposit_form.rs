@@ -1,13 +1,25 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
-use solana_sdk::pubkey::Pubkey;
+use ore_boost_api::state::Stake;
+use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::{create_associated_token_account, create_associated_token_account_idempotent}}, spl_token::{self, instruction::{close_account, sync_native, transfer_checked}}};
+use solana_sdk::{native_token::sol_to_lamports, pubkey::Pubkey, system_instruction::transfer, transaction::Transaction};
 
 use crate::{
-    components::{Col, PairWithdrawForm, Row}, config::{BoostMeta, LISTED_TOKENS}, gateway::{kamino::KaminoGateway, GatewayError}, hooks::{use_gateway, use_wallet, Wallet}
+    components::{submit_transaction, Col, PairWithdrawForm, Row, TransactionStatus}, config::{BoostMeta, LISTED_TOKENS}, gateway::{kamino::{KaminoGateway, KaminoStrategyMetrics}, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_boost_deposits, use_gateway, use_stake, use_strategy_metrics, use_token_balance, use_transaction_status, use_wallet, BoostDeposits, Wallet}
 };
 use super::common::*;
 
 #[component]
-pub fn PairStakeForm(class: Option<String>, boost_meta: BoostMeta) -> Element {
+pub fn PairStakeForm(
+    class: Option<String>, 
+    boost_meta: BoostMeta,
+    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    lp_balance: Resource<GatewayResult<UiTokenAmount>>,
+    stake: Resource<GatewayResult<Stake>>,
+    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);
     rsx! {
@@ -19,7 +31,12 @@ pub fn PairStakeForm(class: Option<String>, boost_meta: BoostMeta) -> Element {
             match *tab.read() {
                 StakeTab::Deposit => rsx! {
                     PairDepositForm {
-                        boost_meta: boost_meta
+                        boost_meta: boost_meta,
+                        boost_deposits: boost_deposits,
+                        lp_balance: lp_balance,
+                        stake: stake,
+                        token_a_balance: token_a_balance,
+                        token_b_balance: token_b_balance,
                     }
                 },
                 StakeTab::Withdraw => rsx! {
@@ -33,12 +50,34 @@ pub fn PairStakeForm(class: Option<String>, boost_meta: BoostMeta) -> Element {
 }
 
 #[component]
-fn PairDepositForm(class: Option<String>, boost_meta: BoostMeta) -> Element {
+fn PairDepositForm(
+    class: Option<String>, 
+    boost_meta: BoostMeta,
+    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    lp_balance: Resource<GatewayResult<UiTokenAmount>>,
+    stake: Resource<GatewayResult<Stake>>,
+    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+) -> Element {
     let class = class.unwrap_or_default();
     let wallet = use_wallet();
-    let stake_amount_a = use_signal::<String>(|| "".to_owned());
-    let stake_amount_b = use_signal::<String>(|| "".to_owned());
+    let mut stake_amount_a = use_signal::<String>(|| "".to_owned());
+    let mut stake_amount_b = use_signal::<String>(|| "".to_owned());
+    let transaction_status = use_transaction_status();
  
+    // Refresh data, if transaction success
+    use_effect(move || {
+        if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
+            boost_deposits.restart();
+            token_a_balance.restart();
+            token_b_balance.restart();
+            lp_balance.restart();
+            stake.restart();
+            stake_amount_a.set("".to_owned());
+            stake_amount_b.set("".to_owned());
+        }
+    });
+
     // Build the deposit instruction
     let deposit_ix = use_resource(move || async move {
         // Check if wallet is connected
@@ -66,8 +105,6 @@ fn PairDepositForm(class: Option<String>, boost_meta: BoostMeta) -> Element {
         ).await
     });
 
-    log::info!("{:?}", deposit_ix);
-
     rsx! {
         Col {
             class: "w-full {class}",
@@ -78,6 +115,7 @@ fn PairDepositForm(class: Option<String>, boost_meta: BoostMeta) -> Element {
                     mint: boost_meta.pair_mint,
                     amount_a: stake_amount_a,
                     amount_b: stake_amount_b,
+                    boost_deposits: boost_deposits,
                 }
             }
             // StakeDetails {}
@@ -88,7 +126,71 @@ fn PairDepositForm(class: Option<String>, boost_meta: BoostMeta) -> Element {
                     false
                 },
                 onclick: move |_| {
-                    // TODO: Implement staking logic
+                    // Compile instructions
+                    let mut ixs = vec![];
+
+                    // Return if wallet is not connected
+                    let Wallet::Connected(authority) = *wallet.read() else {
+                        return;
+                    };
+
+                    // Return if amount is not valid
+                    let Ok(amount_a_f64) = stake_amount_a.cloned().parse::<f64>() else {
+                        return;
+                    };
+
+                    // Create ata for lp shares, if needed
+                    if let Some(Ok(_)) = lp_balance.cloned() {
+                        // Do nothing
+                    } else {
+                        ixs.push(
+                            create_associated_token_account(&authority, &authority, &boost_meta.lp_mint, &spl_token::ID)
+                        );
+                    }
+
+                    // Handle wrapped SOL, if needed
+                    let token_a_ata = get_associated_token_address(&authority, &boost_meta.pair_mint);
+                    let is_sol = boost_meta.pair_mint == Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap();
+                    if is_sol {
+                        ixs.push(
+                            create_associated_token_account_idempotent(&authority, &authority, &boost_meta.pair_mint, &spl_token::ID)
+                        );
+                        ixs.push(
+                            transfer(&authority, &token_a_ata, sol_to_lamports(amount_a_f64))
+                        );
+                        ixs.push(
+                            sync_native(&spl_token::ID, &token_a_ata).unwrap()
+                        );
+                    }
+
+                    // Append deposit instruction
+                    let Some(Ok(deposit_ix)) = deposit_ix.cloned() else {
+                        return;
+                    };
+                    ixs.push(deposit_ix);
+
+                    // Close the wSOL ata
+                    if is_sol {
+                        ixs.push(
+                            close_account(&spl_token::ID, &token_a_ata, &authority, &authority, &[&authority]).unwrap()
+                        );
+                    }
+
+                    // Open the stake account, if needed
+                    if let Some(Ok(_stake)) = stake.read().as_ref() {
+                        // Do nothing
+                    } else {
+                        ixs.push(ore_boost_api::sdk::open(authority, authority, boost_meta.lp_mint));
+                    }
+
+                    // Stake LP tokens into boost program
+                    ixs.push(
+                        ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, u64::MAX)
+                    );
+
+                    // Submit transaction
+                    let tx = Transaction::new_with_payer(&ixs, Some(&authority));
+                    submit_transaction(tx.into());
                 }
             }
         }
@@ -100,12 +202,13 @@ fn StakeInputs(
     mint: Pubkey,
     amount_a: Signal<String>,
     amount_b: Signal<String>,
+    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
 ) -> Element {
     let token = LISTED_TOKENS.get(&mint).unwrap();
     rsx! {
         Col {
             class: "w-full p-4",
-            gap: 2,
+            gap: 4,
             Row {
                 class: "justify-between",
                 span {
@@ -137,11 +240,29 @@ fn StakeInputs(
                         inputmode: "decimal",
                         value: amount_a.cloned(),
                         oninput: move |e| {
-                            let s = e.value();
-                            if s.len().eq(&0) || s.parse::<f64>().is_ok() {
-                                amount_a.set(s);
+                            let Some(Ok(deposits)) = boost_deposits.cloned() else {
+                                return;
+                            };
+
+                            let ratio = deposits.balance_a / deposits.balance_b;
+
+                            let val = e.value();
+                            if val.len().eq(&0) {
+                                amount_a.set(val.clone());
+                                amount_b.set(val);
+                                return;
+                            }
+
+                            if let Ok(val_f64) = val.parse::<f64>() {
+                                if val_f64 >= 0f64 {
+                                    amount_a.set(val);
+                                    amount_b.set((val_f64 / ratio).to_string());
+                                } else {
+                                    amount_a.set("".to_string());
+                                    amount_b.set("".to_string());
+                                }
                             } else {
-                                amount_a.set(s[..s.len()-1].to_string());
+                                amount_a.set(val[..val.len()-1].to_string());
                             }
                         }
                     }
@@ -167,11 +288,29 @@ fn StakeInputs(
                         inputmode: "decimal",
                         value: amount_b.cloned(),
                         oninput: move |e| {
-                            let s = e.value();
-                            if s.len().eq(&0) || s.parse::<f64>().is_ok() {
-                                amount_b.set(s);
+                            let Some(Ok(deposits)) = boost_deposits.cloned() else {
+                                return;
+                            };
+
+                            let ratio = deposits.balance_a / deposits.balance_b;
+
+                            let val = e.value();
+                            if val.len().eq(&0) {
+                                amount_a.set(val.clone());
+                                amount_b.set(val);
+                                return;
+                            }
+
+                            if let Ok(val_f64) = val.parse::<f64>() {
+                                if val_f64 >= 0f64 {
+                                    amount_a.set((val_f64 * ratio).to_string());
+                                    amount_b.set(val);
+                                } else {
+                                    amount_a.set("".to_string());
+                                    amount_b.set("".to_string());
+                                }
                             } else {
-                                amount_b.set(s[..s.len()-1].to_string());
+                                amount_b.set(val[..val.len()-1].to_string());
                             }
                         }
                     }

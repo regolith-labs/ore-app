@@ -27,7 +27,7 @@ impl<R: Rpc> KaminoGateway for Gateway<R> {
     }
 
     async fn get_global_config(&self) -> GatewayResult<GlobalConfig> {
-        let address = Pubkey::from_str("7D9KE8xxqvsSsPbpTK9DbvkYaodda1wVevPvZJbLGJ71").unwrap();
+        let address = Pubkey::from_str("GKnHiWh3RRrE1zsNzWxRkomymHc374TvJPSTv2wPeYdB").unwrap();
         let account_data = self.rpc.get_account_data(&address).await?;
         let config = GlobalConfig::from_bytes(&account_data)?;
         Ok(config)
@@ -54,7 +54,7 @@ impl<R: Rpc> KaminoGateway for Gateway<R> {
         let strategy = self.get_whirlpool_strategy(strategy_address).await?;
 
         // Get token accounts
-        let shares_ata = get_associated_token_address(&owner, &strategy.shares_mint);
+        let user_shares_ata = get_associated_token_address(&owner, &strategy.shares_mint);
         let token_a_ata = get_associated_token_address(&owner, &strategy.token_a_mint);
         let token_b_ata = get_associated_token_address(&owner, &strategy.token_b_mint);
 
@@ -82,7 +82,7 @@ impl<R: Rpc> KaminoGateway for Gateway<R> {
             token_b_ata,
             token_a_mint: strategy.token_a_mint,
             token_b_mint: strategy.token_b_mint,
-            user_shares_ata: shares_ata,
+            user_shares_ata,
             shares_mint: strategy.shares_mint,
             shares_mint_authority: strategy.shares_mint_authority,
             scope_prices: strategy.scope_prices,

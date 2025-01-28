@@ -81,11 +81,11 @@ body {
     }
 
     .controls-secondary {
-        @apply flex font-semibold text-center transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover;
+        @apply flex font-semibold text-center transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover hover:not-disabled:cursor-pointer;
     }
 
     .controls-tertiary {
-        @apply flex font-semibold transition bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis;
+        @apply flex font-semibold transition bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis hover:not-disabled:cursor-pointer;
     }
 
     .controls-gold {

@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::{Col, OreValueSmall, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
+    components::{Col, NullValue, OreValueSmall, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
 };
 
 pub fn StakeTable() -> Element {
@@ -170,14 +170,16 @@ fn StakeTableRowYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<Gat
     rsx! {
         if let Some(stake) = stake.cloned() {
             if let Ok(stake) = stake {
-                OreValueSmallAbbreviated {
-                    ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                if stake.rewards > 0 {
+                    OreValueSmall {
+                        class: "text-elements-gold",
+                        ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                    }
+                } else {
+                    NullValue {}
                 }
             } else {
-                span {
-                    class: "font-medium",
-                    "–"
-                }
+                NullValue {}
             }
         } else {
             TableCellLoading {}

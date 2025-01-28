@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use ore_boost_api::state::{boost_pda, Boost};
 use steel::Pubkey;
 
-use crate::{config::{BoostMeta, LpType, LISTED_TOKENS}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, ore::OreGateway, GatewayError, GatewayResult}};
+use crate::{config::{BoostMeta, LpType, LISTED_TOKENS}, gateway::{kamino::{KaminoGateway, KaminoStrategyMetrics}, meteora::MeteoraGateway, ore::OreGateway, GatewayError, GatewayResult}};
 use super::use_gateway;
 
 pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
@@ -15,6 +15,12 @@ pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
 pub fn use_kamino_global_config() -> Resource<GatewayResult<kliquidity_sdk::accounts::GlobalConfig>> {
     use_resource(|| async move {
         use_gateway().get_global_config().await.map_err(GatewayError::from)
+    })
+}
+
+pub fn use_strategy_metrics(lp_id: Pubkey) -> Resource<GatewayResult<KaminoStrategyMetrics>> {
+    use_resource(move || async move {
+        use_gateway().get_strategy_metrics(lp_id).await.map_err(GatewayError::from)
     })
 }
 

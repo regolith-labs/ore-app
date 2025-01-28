@@ -4358,7 +4358,8 @@ dependencies = [
 [[package]]
 name = "kliquidity-sdk"
 version = "0.0.1"
-source = "git+https://github.com/regolith-labs/kliquidity-sdk?branch=master#f969cc6a169005555e8c52aee279f4ed080603bf"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55fa60a927e0bb97cb867cfbe877f26975c077a5e1d1ababfb280c42389f0a69"
 dependencies = [
  "borsh 0.10.4",
  "num-derive 0.4.2",
