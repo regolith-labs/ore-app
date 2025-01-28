@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::{Col, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake}, route::Route
+    components::{Col, OreValueSmall, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
 };
 
 pub fn StakeTable() -> Element {
@@ -15,9 +15,10 @@ pub fn StakeTable() -> Element {
             header: rsx! {
                 TableHeader {
                     left: "Pair",
-                    right_1: "Multiplier",
-                    right_2: "TVL",
-                    right_3: "Yield",
+                    right_1: "Deposits",
+                    right_2: "Liquidity",
+                    right_3: "Multiplier",
+                    right_4: "Yield",
                 }
             },
             rows: rsx! {
@@ -35,6 +36,7 @@ pub fn StakeTable() -> Element {
 fn StakeTableRow(boost_meta: BoostMeta) -> Element {
     let boost = use_boost(boost_meta.lp_mint);
     let stake = use_stake(boost_meta.lp_mint);
+    let boost_deposits = use_boost_deposits(boost_meta.clone());
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -45,17 +47,21 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
                 }
             },
             right_1: rsx! {
+                StakeTableRowBasis {
+                    boost_deposits
+                }
+            },
+            right_2: rsx! {
+                StakeTableRowLiquidity {
+                    boost_deposits
+                }
+            },
+            right_3: rsx! {
                 StakeTableRowMultiplier {
                     boost
                 }
             },
-            right_2: rsx! {
-                StakeTableRowDeposits {
-                    boost,
-                    boost_meta
-                }
-            },
-            right_3: rsx! {
+            right_4: rsx! {
                 StakeTableRowYield {
                     boost,
                     stake,
@@ -109,8 +115,34 @@ fn StakeTableRowMultiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-fn StakeTableRowDeposits(boost: Resource<GatewayResult<Boost>>, boost_meta: BoostMeta) -> Element {
-    let boost_deposits = use_boost_deposits(boost_meta);
+fn StakeTableRowBasis(boost_deposits: Resource<GatewayResult<BoostDeposits>>) -> Element {
+    rsx! {
+        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+            Col {
+                gap: 2,
+                // TokenValueSmall {
+                //     class: "ml-auto",
+                //     amount: boost_deposits.balance_a.to_string(),
+                //     ticker: boost_deposits.token_a.clone(),
+                // }
+                OreValueSmall {
+                    ui_amount_string: boost_deposits.balance_b.to_string(),
+                    hide_small_units: true,
+                }
+                // TokenValueSmall {
+                //     class: "ml-auto",
+                //     amount: boost_deposits.balance_b.to_string(),
+                //     ticker: boost_deposits.token_b.clone(),
+                // }
+            }
+        } else {
+            TableCellLoading {}
+        }
+    }
+}
+
+#[component]
+fn StakeTableRowLiquidity(boost_deposits: Resource<GatewayResult<BoostDeposits>>) -> Element {
     rsx! {
         if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
             Col {
@@ -119,12 +151,13 @@ fn StakeTableRowDeposits(boost: Resource<GatewayResult<Boost>>, boost_meta: Boos
                     class: "ml-auto",
                     amount: boost_deposits.balance_a.to_string(),
                     ticker: boost_deposits.token_a.clone(),
+                    hide_small_units: true,
                 }
-                TokenValueSmall {
-                    class: "ml-auto",
-                    amount: boost_deposits.balance_b.to_string(),
-                    ticker: boost_deposits.token_b.clone(),
-                }
+                // TokenValueSmall {
+                //     class: "ml-auto",
+                //     amount: boost_deposits.balance_b.to_string(),
+                //     ticker: boost_deposits.token_b.clone(),
+                // }
             }
         } else {
             TableCellLoading {}

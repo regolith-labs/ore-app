@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use ore_boost_api::state::{boost_pda, Boost};
 use steel::Pubkey;
 
-use crate::{config::{BoostMeta, LpType}, gateway::{kamino::KaminoGateway, ore::OreGateway, GatewayError, GatewayResult}};
+use crate::{config::{BoostMeta, LpType, LISTED_TOKENS}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, ore::OreGateway, GatewayError, GatewayResult}};
 use super::use_gateway;
 
 pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
@@ -27,7 +27,19 @@ pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<Boost
                 });
             }
             LpType::Meteora => {
-                return Err(GatewayError::Unknown);
+                let amm = use_gateway().get_amm_metrics(boost_meta.lp_id).await?;
+                let token_a = LISTED_TOKENS.get(&amm.pool_token_mints[0]).unwrap().ticker.to_string();
+                let token_b = LISTED_TOKENS.get(&amm.pool_token_mints[1]).unwrap().ticker.to_string();
+                let balance_a = amm.pool_token_amounts[0];
+                let balance_b = amm.pool_token_amounts[1];
+                let reverse = token_a == "ORE";
+                return Ok(BoostDeposits {
+                    token_a: if reverse { token_b.clone() } else { token_a.clone() },
+                    token_b: if reverse { token_a } else { token_b },
+                    balance_a: if reverse { balance_b } else { balance_a },
+                    balance_b: if reverse { balance_a } else { balance_b },
+                    total_value_usd: amm.pool_tvl,
+                });
             }
         }
     })

@@ -70,7 +70,7 @@ fn VaultPosition(
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
             gap: 4,
             span {
-                class: "text-elements-highEmphasis font-medium text-2xl",
+                class: "text-elements-highEmphasis font-semibold text-2xl",
                 "Account"
             }
             Row {
@@ -174,7 +174,7 @@ fn VaultTotals(
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
             gap: 4,
             span {
-                class: "text-elements-highEmphasis font-medium text-2xl",
+                class: "text-elements-highEmphasis font-semibold text-2xl",
                 "Totals"
             }
             Row {

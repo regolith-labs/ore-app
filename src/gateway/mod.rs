@@ -1,5 +1,6 @@
 mod error;
 pub mod kamino;
+pub mod meteora;
 pub mod ore;
 pub mod solana;
 pub mod spl;

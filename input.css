@@ -89,7 +89,7 @@ body {
     }
 
     .controls-gold {
-        @apply flex font-semibold transition font-medium border border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
+        @apply flex font-semibold transition font-medium border-2 border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
     }
 }
 

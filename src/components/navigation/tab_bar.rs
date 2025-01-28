@@ -104,13 +104,13 @@ fn TabBar() -> Element {
 fn Tab(title: String, route: Route) -> Element {
     let current_route = use_route();
     let selected = is_tab_selected(&route, &current_route);
-    let color = if !selected { "text-gray-700" } else { "" };
+    let color = if !selected { "text-elements-lowEmphasis hover:text-elements-midEmphasis" } else { "" };
     rsx! {
         Link {
-            class: "flex px-8 h-12 elevated-control",
+            class: "flex px-8 h-12 elevated-control transition-colors {color}",
             to: route,
             span {
-                class: "text-sm font-medium my-auto font-semibold {color}",
+                class: "text-sm font-medium font-semibold my-auto",
                 "{title}"
             }
         }

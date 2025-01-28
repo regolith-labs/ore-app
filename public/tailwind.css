@@ -852,6 +852,9 @@
   .max-w-\[96rem\] {
     max-width: 96rem;
   }
+  .max-w-full {
+    max-width: 100%;
+  }
   .max-w-xl {
     max-width: var(--container-xl);
   }
@@ -965,8 +968,8 @@
   .overflow-hidden {
     overflow: hidden;
   }
-  .overflow-x-scroll {
-    overflow-x: scroll;
+  .overflow-x-auto {
+    overflow-x: auto;
   }
   .overflow-y-auto {
     overflow-y: auto;
@@ -1359,13 +1362,6 @@
       }
     }
   }
-  .hover\:border-elements-lowEmphasis {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-elements-lowEmphasis);
-      }
-    }
-  }
   .hover\:bg-controls-secondaryHover {
     &:hover {
       @media (hover: hover) {
@@ -1405,6 +1401,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-elements-highEmphasis);
+      }
+    }
+  }
+  .hover\:text-elements-midEmphasis {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-elements-midEmphasis);
       }
     }
   }
@@ -1847,7 +1850,7 @@ body {
   .controls-gold {
     display: flex;
     border-style: var(--tw-border-style);
-    border-width: 1px;
+    border-width: 2px;
     border-color: var(--color-elements-gold);
     --tw-font-weight: var(--font-weight-medium);
     font-weight: var(--font-weight-medium);

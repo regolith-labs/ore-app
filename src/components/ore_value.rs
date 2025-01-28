@@ -191,8 +191,9 @@ pub fn OreValueSmallAbbreviated(class: Option<String>, ui_amount_string: String)
 }
 
 #[component]
-pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element {
+pub fn OreValueSmall(class: Option<String>, ui_amount_string: String, hide_small_units: Option<bool>) -> Element {
     let class: String = class.unwrap_or("".to_string());
+    let hide_small_units = hide_small_units.unwrap_or(false);
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
     let small_units = units[1];
@@ -208,15 +209,17 @@ pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element
                 class: "font-medium my-auto",
                 span {
                     class: "mt-auto",
-                    if small_units_display.is_empty() {
+                    if small_units_display.is_empty() || hide_small_units {
                         "{big_units_display}"
                     } else {
                         "{big_units_display}."
                     }
                 }
-                span {
-                    class: "mt-auto font-medium opacity-50",
-                    "{small_units_display}"
+                if !hide_small_units {
+                    span {
+                        class: "mt-auto font-medium opacity-50",
+                        "{small_units_display}"
+                    }
                 }
             }
         }
@@ -224,8 +227,9 @@ pub fn OreValueSmall(class: Option<String>, ui_amount_string: String) -> Element
 }
 
 #[component]
-pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String) -> Element {
+pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, hide_small_units: Option<bool>) -> Element {
     let class = class.unwrap_or("".to_string());
+    let hide_small_units = hide_small_units.unwrap_or(false);
     let image = if let Some(token) = LISTED_TOKENS_BY_TICKER.get(&ticker) {
         token.image.clone()
     } else {
@@ -234,15 +238,19 @@ pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String) ->
 
     let units: Vec<_> = amount.split('.').collect();
     let big_units = units[0];
-    let small_units = units[1];
     let big_units = format_with_commas(big_units);
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
 
     rsx! {
         Row {
             class: "gap-1.5 {class}",
             span {
                 class: "my-auto font-medium", 
-                "{big_units}.{small_units[..2].to_string()}"
+                if hide_small_units {
+                    "{big_units}"
+                } else {
+                    "{big_units}.{small_units[..2].to_string()}"
+                }
             }
             img {
                 class: "w-6 h-6 my-auto bg-gray-900 rounded-full border border-gray-800",

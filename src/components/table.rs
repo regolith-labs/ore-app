@@ -10,7 +10,7 @@ pub fn Table(header: Element, rows: Element, class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {
         Col {
-            class: "overflow-x-scroll {class}",
+            class: "overflow-x-auto max-w-full {class}",
             {header}
             {rows}
         }
@@ -27,7 +27,7 @@ pub fn TableHeader(
 ) -> Element {
     rsx! {
         Row {
-            class: "h-8 sm:h-10 w-full min-w-max px-5 sm:px-3 justify-between font-medium text-xs sm:text-sm text-elements-lowEmphasis",
+            class: "h-8 sm:h-10 w-full min-w-max px-5 sm:px-3 justify-between font-medium text-sm text-elements-lowEmphasis",
             span {
                 class: "flex w-screen sm:w-full sm:min-w-96 -ml-5 sm:ml-0 px-5 sm:px-0",
                 Row {
@@ -84,7 +84,7 @@ pub fn TableRowLink(
                 Row {
                     class: "w-full sm:min-w-96 my-auto grow-0 shrink-0 sm:grow justify-between",
                     span {
-                        class: "w-min sm:w-56",
+                        class: "w-min sm:w-56 text-nowrap",
                         {left}
                     }
                     span {
