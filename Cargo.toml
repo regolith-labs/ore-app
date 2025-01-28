@@ -42,6 +42,7 @@ web = [
 ]
 
 [dependencies]
+anyhow = "1.0"
 async-retry = "0.3.1"
 async-std = "1.12.0"
 base64 = "0.22.1"
@@ -64,6 +65,7 @@ gloo-utils = { version = "0.2.0", optional = true }
 is-url = { version = "1.0.4" }
 js-sys = { version = "0.3.67", optional = true }
 jupiter-swap-api-client = { git = "https://github.com/regolith-labs/jupiter-swap-api-client", package = "jupiter-swap-api-client", branch = "main" }
+kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }
 keyring = { version = "3.6.1", features = ["apple-native", "windows-native"] }
 lazy_static = "1.4"
 log = "0.4.20"

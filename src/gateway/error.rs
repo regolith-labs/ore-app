@@ -23,15 +23,22 @@ pub enum GatewayError {
 
 impl From<solana_sdk::signer::SignerError> for GatewayError {
     fn from(value: solana_sdk::signer::SignerError) -> Self {
-        println!("{:?}", value);
+        log::error!("{:?}", value);
         Self::SignatureFailed
     }
 }
 
 impl From<keyring::Error> for GatewayError {
     fn from(value: keyring::Error) -> Self {
-        println!("{:?}", value);
+        log::error!("{:?}", value);
         Self::Keyring
+    }
+}
+
+impl From<std::io::Error> for GatewayError {
+    fn from(value: std::io::Error) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::FailedDeserialization
     }
 }
 
@@ -50,13 +57,15 @@ impl From<jupiter_swap_api_client::ClientError> for GatewayError {
 }
 
 impl From<reqwest::Error> for GatewayError {
-    fn from(_value: reqwest::Error) -> Self {
+    fn from(value: reqwest::Error) -> Self {
+        log::error!("{:?}", value);
         GatewayError::RequestFailed
     }
 }
 
 impl From<TimeoutError> for GatewayError {
-    fn from(_value: TimeoutError) -> Self {
+    fn from(value: TimeoutError) -> Self {
+        log::error!("{:?}", value);
         GatewayError::TimeoutError
     }
 }

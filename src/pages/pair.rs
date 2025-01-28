@@ -7,7 +7,7 @@ use solana_extra_wasm::program::{spl_associated_token_account, spl_token::amount
 use solana_sdk::transaction::Transaction;
 use steel::Pubkey;
 
-use crate::{components::{submit_transaction, Col, Heading, NullValue, OreValueSmall, PairStakeForm, Row, TokenValueSmall, TransactionStatus, UsdValueSmall}, config::LISTED_BOOSTS_BY_MINT, gateway::{ui_token_amount::UiTokenAmount, GatewayResult}, hooks::{use_boost, use_boost_deposits, use_ore_balance, use_stake, use_transaction_status, use_wallet, BoostDeposits, Wallet}, pages::ClaimButton};
+use crate::{components::{submit_transaction, Col, Heading, NullValue, OreValueSmall, PairStakeForm, Row, TokenValueSmall, TransactionStatus, UsdValueSmall}, config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, gateway::{GatewayResult, UiTokenAmount}, hooks::{use_boost, use_boost_deposits, use_kamino_global_config, use_ore_balance, use_stake, use_token_balance, use_transaction_status, use_wallet, BoostDeposits, Wallet}, pages::ClaimButton};
 
 #[component]
 pub fn Pair(lp_mint: String) -> Element {
@@ -17,7 +17,8 @@ pub fn Pair(lp_mint: String) -> Element {
     let boost_deposits = use_boost_deposits(boost_meta.clone());
     let stake = use_stake(lp_mint);
     let ore_balance = use_ore_balance();
-    
+    let lp_balance = use_token_balance(lp_mint);
+
     // TODO Get the boost
     // TODO Show error if boost is not listed
     
@@ -28,13 +29,13 @@ pub fn Pair(lp_mint: String) -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: boost_meta.name.clone(),
-                subtitle: "Manage your liquidity position."
+                subtitle: "Manage your stake position."
             }
             Col {
                 gap: 16,
                 PairStakeForm {
                     class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                    mint: lp_mint
+                    boost_meta: boost_meta.clone()
                 }
                 AccountMetrics {
                     ore_balance,
@@ -42,7 +43,19 @@ pub fn Pair(lp_mint: String) -> Element {
                 }
                 BoostMetrics {
                     boost,
-                    boost_deposits
+                    boost_deposits,
+                    boost_meta: boost_meta.clone()
+                }
+                if let Some(Ok(lp_token_balance)) = lp_balance.read().as_ref() {  
+                    if lp_token_balance.ui_amount.unwrap_or(0.0) > 0.0 {
+                        UnstakedMetrics {
+                            boost_meta: boost_meta.clone(),
+                            lp_balance: lp_balance,
+                            boost_deposits: boost_deposits,
+                            boost: boost,
+                            stake: stake,
+                        }
+                    }
                 }
             }
         }
@@ -91,9 +104,9 @@ fn AccountMetrics(
                 }
                 if let Some(Ok(stake)) = stake.read().as_ref() {
                     if stake.balance > 0 {
-                        OreValueSmall {
-                            class: "text-elements-highEmphasis",
-                            ui_amount_string: amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
+                        span {
+                            class: "text-elements-highEmphasis font-medium",
+                            "{stake.balance}"
                         }
                     } else {
                         NullValue {}
@@ -110,9 +123,9 @@ fn AccountMetrics(
                 }
                 if let Some(Ok(stake)) = stake.read().as_ref() {
                     if stake.balance_pending > 0 {
-                        OreValueSmall {
-                            class: "text-elements-highEmphasis",
-                            ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
+                        span {
+                            class: "text-elements-highEmphasis font-medium",
+                            "{stake.balance_pending}"
                         }
                     } else {
                         NullValue {}
@@ -163,6 +176,7 @@ fn AccountMetrics(
 #[component]
 fn BoostMetrics(
     boost: Resource<GatewayResult<Boost>>,
+    boost_meta: BoostMeta,
     boost_deposits: Resource<GatewayResult<BoostDeposits>>
 ) -> Element {
     rsx! {
@@ -206,6 +220,22 @@ fn BoostMetrics(
                 class: "w-full justify-between px-4",
                 span {
                     class: "text-elements-lowEmphasis font-medium",
+                    "Operator"
+                }
+                a {
+                    class: "text-elements-highEmphasis font-medium hover:underline",
+                    href: match boost_meta.lp_type {
+                        LpType::Kamino => format!("https://app.kamino.finance/liquidity/{}", boost_meta.lp_id),
+                        LpType::Meteora => format!("https://app.meteora.ag/pools/{}", boost_meta.lp_id),
+                    },
+                    target: "_blank",
+                    "{boost_meta.lp_type}"
+                }
+            }
+            Row {
+                class: "w-full justify-between px-4",
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
                     "Stakers"
                 }
                 if let Some(Ok(boost)) = boost.read().as_ref() {
@@ -230,6 +260,69 @@ fn BoostMetrics(
                 } else {
                     NullValue {}
                 }   
+            }
+        }
+    }
+}
+
+#[component]
+fn UnstakedMetrics(
+    boost_meta: BoostMeta,
+    lp_balance: Resource<GatewayResult<UiTokenAmount>>,
+    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    boost: Resource<GatewayResult<Boost>>,
+    stake: Resource<GatewayResult<Stake>>,
+) -> Element {
+    let wallet = use_wallet();
+    let transaction_status = use_transaction_status();
+
+    // Refresh data if successful transaction
+    use_effect(move || {
+        if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
+            lp_balance.restart();
+            boost_deposits.restart();
+            boost.restart();
+            stake.restart();
+        }
+    });
+
+    rsx! {
+        Col {
+            class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
+            gap: 4,
+            span {
+                class: "text-elements-highEmphasis font-semibold text-2xl",
+                "Unstaked"
+            }
+            span {
+                class: "text-elements-lowEmphasis px-2",
+                "You have unstaked LP tokens in your connected wallet. To deposit these tokens and earn boosted yield, use the button below."
+            }
+            button {
+                class: "h-12 w-full rounded-full controls-primary",
+                onclick: move |_| {
+                    // Deposit LP tokens
+                    let mut ixs = vec![];
+                    let Wallet::Connected(authority) = *wallet.read() else {
+                        return;
+                    };
+                    let Some(Ok(lp_token_balance)) = lp_balance.cloned() else {
+                        return;
+                    };
+                    if let Some(Ok(_stake)) = stake.read().as_ref() {
+                        // Do nothing
+                    } else {
+                        ixs.push(ore_boost_api::sdk::open(authority, authority, boost_meta.lp_mint));
+                    }
+                    let amount = lp_token_balance.amount.parse::<u64>().unwrap();
+                    ixs.push(ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, amount));
+                    let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
+                    submit_transaction(transaction.into());
+                },
+                span {
+                    class: "mx-auto my-auto font-semibold",
+                    "Deposit {boost_meta.ticker}"
+                }
             }
         }
     }

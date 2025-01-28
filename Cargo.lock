@@ -4356,6 +4356,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "kliquidity-sdk"
+version = "0.0.1"
+source = "git+https://github.com/regolith-labs/kliquidity-sdk?branch=master#f969cc6a169005555e8c52aee279f4ed080603bf"
+dependencies = [
+ "borsh 0.10.4",
+ "num-derive 0.4.2",
+ "num-traits",
+ "solana-program",
+ "thiserror 2.0.11",
+]
+
+[[package]]
 name = "kuchikiki"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5351,6 +5363,7 @@ dependencies = [
 name = "ore-app"
 version = "1.1.0"
 dependencies = [
+ "anyhow",
  "async-retry",
  "async-std",
  "base64 0.22.1",
@@ -5374,6 +5387,7 @@ dependencies = [
  "js-sys",
  "jupiter-swap-api-client",
  "keyring",
+ "kliquidity-sdk",
  "lazy_static",
  "log",
  "num-format",

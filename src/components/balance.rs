@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     components::{CircleStackIcon, Col, OreValue, QrCodeIcon, Row},
-    gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
+    gateway::{UiTokenAmount, GatewayResult},
     hooks::use_ore_balance,
     route::Route,
 };

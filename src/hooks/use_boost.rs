@@ -12,6 +12,12 @@ pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
     })
 }
 
+pub fn use_kamino_global_config() -> Resource<GatewayResult<kliquidity_sdk::accounts::GlobalConfig>> {
+    use_resource(|| async move {
+        use_gateway().get_global_config().await.map_err(GatewayError::from)
+    })
+}
+
 pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<BoostDeposits>> {
     let lp_type: LpType = boost_meta.lp_type;
     use_resource(move || async move {

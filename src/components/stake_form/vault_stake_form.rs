@@ -7,7 +7,7 @@ use solana_sdk::transaction::Transaction;
 use crate::{
     components::{submit_transaction, Col, Row, TransactionStatus, WalletIcon}, hooks::{use_transaction_status, use_wallet, Wallet}
 };
-use crate::gateway::{ui_token_amount::UiTokenAmount, GatewayResult};
+use crate::gateway::{UiTokenAmount, GatewayResult};
 use super::common::*;
 
 #[component]
@@ -118,7 +118,7 @@ fn VaultDepositForm(
             }
             // StakeDetails {}
             SubmitButton {
-                enabled: enabled,
+                enabled: *enabled.read(),
                 onclick: move |_| {
                     // Build transaction
                     let mut ixs = vec![];
@@ -280,7 +280,7 @@ fn VaultWithdrawForm(
             }
             // StakeDetails {}
             SubmitButton {
-                enabled: enabled,
+                enabled: *enabled.read(),
                 onclick: move |_| {
                     // Build transaction
                     let mut ixs = vec![];

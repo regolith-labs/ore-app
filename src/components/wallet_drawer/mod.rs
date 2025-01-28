@@ -6,7 +6,7 @@ mod wallet_drawer_native;
 mod wallet_drawer_web;
 
 use crate::components::*;
-use crate::gateway::ui_token_amount::UiTokenAmount;
+use crate::gateway::UiTokenAmount;
 use crate::gateway::GatewayResult;
 use crate::hooks::use_token_balance;
 use crate::config::{Token, LISTED_TOKENS};

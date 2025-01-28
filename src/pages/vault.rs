@@ -4,7 +4,7 @@ use ore_boost_api::state::{Boost, Stake};
 use solana_extra_wasm::program::{spl_associated_token_account, spl_token::amount_to_ui_amount_string};
 use solana_sdk::transaction::Transaction;
 
-use crate::{components::*, gateway::{ui_token_amount::UiTokenAmount, GatewayResult}, hooks::{use_boost, use_ore_balance, use_stake, use_transaction_status, use_wallet, Wallet}};
+use crate::{components::*, gateway::{UiTokenAmount, GatewayResult}, hooks::{use_boost, use_ore_balance, use_stake, use_transaction_status, use_wallet, Wallet}};
 
 pub fn Vault() -> Element {
     let ore_balance = use_ore_balance();

@@ -48,6 +48,15 @@ pub enum LpType {
     Meteora,
 }
 
+impl std::fmt::Display for LpType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LpType::Kamino => write!(f, "Kamino"),
+            LpType::Meteora => write!(f, "Meteora"),
+        }
+    }
+}
+
 #[derive(Deserialize)]
 struct Config {
     boosts: Vec<BoostMeta>,

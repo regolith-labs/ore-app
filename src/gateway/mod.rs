@@ -4,8 +4,6 @@ pub mod meteora;
 pub mod ore;
 pub mod solana;
 pub mod spl;
-pub mod transaction_confirmation_status;
-pub mod ui_token_amount;
 mod utils;
 
 pub use error::*;
@@ -17,10 +15,7 @@ use solana_client_wasm::WasmClient;
 use solana_sdk::{
     hash::Hash, pubkey::Pubkey, signature::Signature, transaction::VersionedTransaction,
 };
-use ui_token_amount::UiTokenAmount;
 pub use utils::*;
-
-use super::gateway::transaction_confirmation_status::TransactionConfirmationStatus;
 
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 // pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";

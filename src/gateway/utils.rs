@@ -1,4 +1,5 @@
 use async_std::future::{timeout, Future};
+use serde::{Deserialize, Serialize};
 
 use crate::time::Duration;
 
@@ -38,3 +39,24 @@ where
 
     Err(GatewayError::AccountNotFound)
 }
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum TransactionConfirmationStatus {
+    Processed,
+    Confirmed,
+    Finalized,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct UiTokenAmount {
+    pub ui_amount: Option<f64>,
+    pub decimals: u8,
+    pub amount: StringAmount,
+    pub ui_amount_string: StringDecimals,
+}
+
+pub type StringAmount = String;
+pub type StringDecimals = String;
+

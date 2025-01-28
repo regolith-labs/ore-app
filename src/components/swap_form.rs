@@ -9,7 +9,7 @@ use crate::{
         submit_transaction, CarrotDownIcon, Col, Row, SwitchIcon, TransactionStatus, WalletIcon
     },
     config::{Token, LISTED_TOKENS_BY_TICKER},
-    gateway::{ui_token_amount::UiTokenAmount, GatewayResult},
+    gateway::{UiTokenAmount, GatewayResult},
     hooks::{
         get_token_balance, use_quote, use_swap_transaction, use_transaction_status, use_wallet, GetPubkey
     },

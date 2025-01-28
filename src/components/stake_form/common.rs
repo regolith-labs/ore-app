@@ -90,11 +90,11 @@ pub(crate) fn DetailLabel(title: String, value: String) -> Element {
 }
 
 #[component]
-pub(crate) fn SubmitButton(enabled: Signal<bool>, onclick: EventHandler<MouseEvent>) -> Element {
+pub(crate) fn SubmitButton(enabled: bool, onclick: EventHandler<MouseEvent>) -> Element {
     rsx! {
         button {
             class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
-            disabled: !*enabled.read(),
+            disabled: !enabled,
             onclick: onclick,
             span {
                 class: "mx-auto my-auto font-semibold",

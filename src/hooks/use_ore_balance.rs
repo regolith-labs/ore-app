@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
 
 use crate::gateway::{
-    spl::SplGateway, ui_token_amount::UiTokenAmount, GatewayError, GatewayResult, Rpc,
+    spl::SplGateway, UiTokenAmount, GatewayError, GatewayResult, Rpc,
 };
 
 use super::{use_gateway, use_wallet, Wallet};

@@ -1,9 +1,7 @@
 use solana_sdk::signature::Signature;
 use steel::Clock;
 
-use crate::gateway::transaction_confirmation_status::TransactionConfirmationStatus;
-
-use super::{GatewayError, GatewayResult, Rpc};
+use super::{GatewayError, GatewayResult, Rpc, TransactionConfirmationStatus};
 
 const CONFIRM_RETRIES: usize = 20;
 const CONFIRM_DELAY: u64 = 1_500;
@@ -21,7 +19,7 @@ impl<R: Rpc> SolanaGateway for R {
             .map_err(GatewayError::from)?;
         bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))
     }
-    
+
     async fn confirm_signature(&self, sig: Signature) -> GatewayResult<Signature> {
         // Confirm tx
         for retry in 0..CONFIRM_RETRIES {

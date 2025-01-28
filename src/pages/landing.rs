@@ -35,7 +35,7 @@ fn Hero() -> Element {
                 }
                 span {  
                     class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                    "Defi-native hard money with native yield."
+                    "Hard money with defi native yield."
                 }
             }
             Link {
