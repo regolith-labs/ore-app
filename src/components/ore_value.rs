@@ -260,6 +260,30 @@ pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, hi
     }
 }
 
+#[component]
+pub fn UsdValueSmall(class: Option<String>, amount: String, hide_small_units: Option<bool>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    let hide_small_units = hide_small_units.unwrap_or(false);
+    let units: Vec<_> = amount.split('.').collect();
+    let big_units = units[0];
+    let big_units = format_with_commas(big_units);
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
+    rsx! {
+        Row {
+            class: "gap-1.5 {class}",
+            span {
+                class: "my-auto font-medium", 
+                if hide_small_units {
+                    "${big_units}"
+                } else {
+                    "${big_units}.{small_units[..2].to_string()}"
+                }
+            }
+        }
+    }
+}
+
+
 pub fn NullValue() -> Element {
     rsx! {
         span {

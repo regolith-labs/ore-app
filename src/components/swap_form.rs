@@ -510,7 +510,7 @@ fn MaxButton(
 
     rsx! {
         button {
-            class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:text-elements-highEmphasis my-auto",
+            class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer my-auto",
             onclick: move |_| {
                 if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
                     let max_amount = balance.ui_amount.unwrap_or(0.0);

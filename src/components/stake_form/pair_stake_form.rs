@@ -140,7 +140,7 @@ fn PairDepositForm(class: Option<String>, mint: Pubkey) -> Element {
     let stake_amount_a = use_signal::<String>(|| "".to_owned());
     let stake_amount_b = use_signal::<String>(|| "".to_owned());
     let mut enabled = use_signal(|| false);
-    let mut pair_deposit = use_signal(|| false);
+    let mut pair_deposit = use_signal(|| true);
 
     use_effect(move || {
         let amount_str_a = stake_amount_a.cloned();
@@ -199,21 +199,21 @@ fn PairDepositForm(class: Option<String>, mint: Pubkey) -> Element {
                     pair_deposit: pair_deposit
                 }
             }
-            Row {
-                class: "px-1",
-                label {
-                    class: "flex items-center gap-2 text-sm text-elements-lowEmphasis cursor-pointer",
-                    input {
-                        r#type: "checkbox",
-                        checked: *pair_deposit.read(),
-                        oninput: move |_| {
-                            pair_deposit.set(!pair_deposit.cloned())
-                        }
-                    }
-                    "Deposit as pair"
-                }
-            }
-            StakeDetails {}
+            // Row {
+            //     class: "px-1",
+            //     label {
+            //         class: "flex items-center gap-2 text-sm text-elements-lowEmphasis cursor-pointer",
+            //         input {
+            //             r#type: "checkbox",
+            //             checked: *pair_deposit.read(),
+            //             oninput: move |_| {
+            //                 pair_deposit.set(!pair_deposit.cloned())
+            //             }
+            //         }
+            //         "Deposit as pair"
+            //     }
+            // }
+            // StakeDetails {}
             SubmitButton {
                 enabled: enabled,
                 onclick: move |_| {

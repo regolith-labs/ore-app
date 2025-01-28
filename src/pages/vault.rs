@@ -151,7 +151,7 @@ fn VaultPosition(
 }
 
 #[component]
-fn ClaimButton(enabled: Signal<bool>, onclick: EventHandler<MouseEvent>) -> Element {
+pub fn ClaimButton(enabled: Signal<bool>, onclick: EventHandler<MouseEvent>) -> Element {
     rsx! {
         button {
             class: "h-12 w-full rounded-full controls-gold",
@@ -196,7 +196,7 @@ fn VaultTotals(
                 class: "w-full justify-between px-4",
                 span {
                     class: "text-elements-lowEmphasis font-medium",
-                    "TVL"
+                    "Deposits"
                 }
                 if let Some(Ok(boost)) = ore_boost.read().as_ref() {
                     OreValueSmall {
