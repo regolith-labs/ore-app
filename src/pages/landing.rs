@@ -35,7 +35,7 @@ fn Hero() -> Element {
                 }
                 span {  
                     class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                    "Hard money with defi native yield."
+                    "Liquid hard money with defi native yield."
                 }
             }
             Link {
@@ -172,7 +172,7 @@ fn MarqeePanel(
                 }
                 span {
                     class: "inline-block my-auto mr-16 text-elements-lowEmphasis",
-                    "grams"
+                    "grams of gold"
                 }
             } else {
                 span {
@@ -196,7 +196,7 @@ fn MarqeePanel(
                 }
                 span {
                     class: "inline-block my-auto mr-16 text-elements-lowEmphasis",
-                    "barrels"
+                    "barrels of oil"
                 }
             } else {
                 span {
