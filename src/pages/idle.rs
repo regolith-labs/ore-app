@@ -6,7 +6,7 @@ use solana_sdk::transaction::Transaction;
 
 use crate::{components::*, gateway::{UiTokenAmount, GatewayResult}, hooks::{use_boost, use_ore_balance, use_stake, use_transaction_status, use_wallet, Wallet}};
 
-pub fn Vault() -> Element {
+pub fn Idle() -> Element {
     let ore_balance = use_ore_balance();
     let ore_boost = use_boost(ore_api::consts::MINT_ADDRESS);
     let ore_stake = use_stake(ore_api::consts::MINT_ADDRESS);
@@ -17,8 +17,8 @@ pub fn Vault() -> Element {
             gap: 8,
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: "Vault",
-                subtitle: "Stake unpaired ORE to earn the idle yield rate."
+                title: "Idle yield",
+                subtitle: "Stake unpaired ORE and earn the idle yield rate."
             }
             Col {
                 gap: 16,
@@ -89,26 +89,22 @@ fn VaultPosition(
                         NullValue {}
                     }
                 } else {
-                    NullValue {}
+                    LoadingValue {}
                 }
             }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Pending deposits"
-                }
-                if let Some(Ok(stake)) = ore_stake.read().as_ref() {
-                    if stake.balance_pending > 0 {
+            if let Some(Ok(stake)) = ore_stake.read().as_ref() {
+                if stake.balance_pending > 0 {
+                    Row {
+                        class: "w-full justify-between px-4",
+                        span {
+                            class: "text-elements-lowEmphasis font-medium",
+                            "Deposits (pending)"
+                        }
                         OreValueSmall {
                             class: "text-elements-highEmphasis",
                             ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
                         }
-                    } else {
-                        NullValue {}
                     }
-                } else {
-                    NullValue {}
                 }
             }
             Row {
@@ -127,7 +123,7 @@ fn VaultPosition(
                         NullValue {}
                     }
                 } else {
-                    NullValue {}
+                    LoadingValue {}
                 }
             }
             ClaimButton {
@@ -175,13 +171,13 @@ fn VaultTotals(
             gap: 4,
             span {
                 class: "text-elements-highEmphasis font-semibold text-2xl",
-                "Totals"
+                "Summary"
             }
             Row {
                 class: "w-full justify-between px-4",
                 span {
                     class: "text-elements-lowEmphasis font-medium",
-                    "Stakers"
+                    "Total stakers"
                 }
                 if let Some(Ok(boost)) = ore_boost.read().as_ref() {
                     span {
@@ -189,14 +185,14 @@ fn VaultTotals(
                         "{boost.total_stakers}"
                     }
                 } else {
-                    NullValue {}
+                    LoadingValue {}
                 }   
             }
             Row {
                 class: "w-full justify-between px-4",
                 span {
                     class: "text-elements-lowEmphasis font-medium",
-                    "Deposits"
+                    "Total deposits"
                 }
                 if let Some(Ok(boost)) = ore_boost.read().as_ref() {
                     OreValueSmall {
@@ -204,7 +200,7 @@ fn VaultTotals(
                         ui_amount_string: amount_to_ui_amount_string(boost.total_deposits, TOKEN_DECIMALS),
                     }
                 } else {
-                    NullValue {}
+                    LoadingValue {}
                 }   
             }
         }

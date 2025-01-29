@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::{Col, NullValue, OreValueSmall, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
+    components::{Col, NullValue, OreValueSmall, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
 };
 
 pub fn StakeTable() -> Element {
@@ -15,10 +15,9 @@ pub fn StakeTable() -> Element {
             header: rsx! {
                 TableHeader {
                     left: "Pair",
-                    right_1: "Deposits",
-                    right_2: "Liquidity",
-                    right_3: "Multiplier",
-                    right_4: "Yield",
+                    right_1: "Multiplier",
+                    right_2: "TVL",
+                    right_3: "Yield",
                 }
             },
             rows: rsx! {
@@ -47,21 +46,16 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
                 }
             },
             right_1: rsx! {
-                StakeTableRowBasis {
-                    boost_deposits
-                }
-            },
-            right_2: rsx! {
-                StakeTableRowLiquidity {
-                    boost_deposits
-                }
-            },
-            right_3: rsx! {
                 StakeTableRowMultiplier {
                     boost
                 }
             },
-            right_4: rsx! {
+            right_2: rsx! {
+                StakeTableRowTVL {
+                    boost_deposits
+                }
+            },
+            right_3: rsx! {
                 StakeTableRowYield {
                     boost,
                     stake,
@@ -107,6 +101,22 @@ fn StakeTableRowMultiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
             span {
                 class: "text-right my-auto font-medium",
                 "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+            }
+        } else {
+            TableCellLoading {}
+        }
+    }
+}
+
+#[component]
+fn StakeTableRowTVL(boost_deposits: Resource<GatewayResult<BoostDeposits>>) -> Element {
+    rsx! {
+        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+            Col {
+                gap: 2,
+                UsdValueSmall {
+                    amount: boost_deposits.total_value_usd.to_string(),
+                }
             }
         } else {
             TableCellLoading {}

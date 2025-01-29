@@ -196,7 +196,7 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
             _ => false,
         },
         Route::Stake {} => match current_route {
-            Route::Stake {} | Route::Pair { lp_mint: _ } | Route::Vault {} => true,
+            Route::Stake {} | Route::Idle {} | Route::Pair { lp_mint: _ }  => true,
             _ => false,
         },
         Route::Trade {} => match current_route {

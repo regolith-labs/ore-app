@@ -10,30 +10,30 @@ pub fn Stake() -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake",
-                subtitle: "Provide market liquidity and earn yield."
+                subtitle: "Provide liquidity for traders and earn yield."
             }
-            VaultPreview {}
+            IdlePreview {}
             StakeTable {}
         }
     }
 }
 
-fn VaultPreview() -> Element {
+fn IdlePreview() -> Element {
     rsx! {
         div {
             class: "flex mx-auto w-full px-5 sm:px-8",
             Link {
                 class: "flex flex-col w-full sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 transition bg-surface-elevated border border-gray-800",
-                to: Route::Vault {},
+                to: Route::Idle {},
                 Col {
                     gap: 2,
                     span {
                         class: "font-semibold text-2xl",
-                        "Vault"
+                        "Idle yield"
                     }
                     span {
                         class: "text-elements-midEmphasis",
-                        "Stake unpaired ORE to earn the idle yield rate."
+                        "Stake unpaired ORE and earn the idle yield rate."
                     }
                 }
                 div {

@@ -9,9 +9,9 @@ use crate::{components::*, gateway::GatewayResult, hooks::{use_ore_quote, use_or
 pub fn Landing() -> Element {
     rsx! {
         Col {
-            class: "relative flex h-full justify-between w-full overflow-y-auto mx-auto pt-8 pb-20 sm:pb-16 gap-16 bg-[url('/assets/dot-grid.png')] bg-auto bg-no-repeat bg-top",
+            class: "relative flex h-full justify-between w-full overflow-y-auto mx-auto pt-8 pb-20 sm:pb-16 gap-16",
             Hero {}
-            MarqeeSection {}
+            // MarqeeSection {}
         }
     }
 }
