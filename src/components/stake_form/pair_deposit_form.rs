@@ -6,7 +6,7 @@ use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_t
 use solana_sdk::{native_token::sol_to_lamports, pubkey::Pubkey, system_instruction::transfer, transaction::Transaction};
 
 use crate::{
-    components::{submit_transaction, Col, PairWithdrawForm, Row, TransactionStatus}, config::{BoostMeta, LISTED_TOKENS}, gateway::{kamino::KaminoGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_transaction_status, use_wallet, BoostDeposits, Wallet}
+    components::{submit_transaction, Col, PairWithdrawForm, Row, TransactionStatus, WalletIcon}, config::{BoostMeta, LISTED_TOKENS}, gateway::{kamino::KaminoGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_transaction_status, use_wallet, BoostDeposits, Wallet}
 };
 use super::common::*;
 
@@ -216,10 +216,10 @@ fn StakeInputs(
             Row {
                 class: "justify-between",
                 span {
-                    class: "text-elements-midEmphasis my-auto pl-1",
+                    class: "text-elements-lowEmphasis my-auto pl-1",
                     "Deposit"
                 }
-                MaxButton {
+                MaxButtonA {
                     amount_a: amount_a,
                     amount_b: amount_b,
                     token_a_balance: token_a_balance,
@@ -227,101 +227,112 @@ fn StakeInputs(
                     boost_deposits: boost_deposits,
                 }
             }
-            Col {
+            Row {
                 gap: 4,
                 Row {
-                    gap: 4,
-                    Row {
-                        class: "my-auto",
-                        gap: 2,
-                        img {
-                            class: "w-8 h-8 rounded-full",
-                            src: "{token.image}",
-                        }
-                        span {
-                            class: "font-semibold my-auto",
-                            "{token.ticker}"
-                        }
+                    class: "my-auto",
+                    gap: 2,
+                    img {
+                        class: "w-8 h-8 rounded-full",
+                        src: "{token.image}",
                     }
-                    input {
-                        class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                        placeholder: "0",
-                        r#type: "number",
-                        inputmode: "decimal",
-                        value: amount_a.cloned(),
-                        oninput: move |e| {
-                            let Some(Ok(deposits)) = boost_deposits.cloned() else {
-                                return;
-                            };
+                    span {
+                        class: "font-semibold my-auto",
+                        "{token.ticker}"
+                    }
+                }
+                input {
+                    class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                    placeholder: "0",
+                    r#type: "number",
+                    inputmode: "decimal",
+                    value: amount_a.cloned(),
+                    oninput: move |e| {
+                        let Some(Ok(deposits)) = boost_deposits.cloned() else {
+                            return;
+                        };
 
-                            let ratio = deposits.balance_a / deposits.balance_b;
+                        let ratio = deposits.balance_a / deposits.balance_b;
 
-                            let val = e.value();
-                            if val.len().eq(&0) {
-                                amount_a.set(val.clone());
-                                amount_b.set(val);
-                                return;
-                            }
+                        let val = e.value();
+                        if val.len().eq(&0) {
+                            amount_a.set(val.clone());
+                            amount_b.set(val);
+                            return;
+                        }
 
-                            if let Ok(val_f64) = val.parse::<f64>() {
-                                if val_f64 >= 0f64 {
-                                    amount_a.set(val);
-                                    amount_b.set((val_f64 / ratio).to_string());
-                                } else {
-                                    amount_a.set("".to_string());
-                                    amount_b.set("".to_string());
-                                }
+                        if let Ok(val_f64) = val.parse::<f64>() {
+                            if val_f64 >= 0f64 {
+                                amount_a.set(val);
+                                amount_b.set((val_f64 / ratio).to_string());
                             } else {
-                                amount_a.set(val[..val.len()-1].to_string());
+                                amount_a.set("".to_string());
+                                amount_b.set("".to_string());
                             }
+                        } else {
+                            amount_a.set(val[..val.len()-1].to_string());
                         }
                     }
                 }
+            }
+            Row {
+                class: "justify-between",
+                span {
+                    class: "text-elements-lowEmphasis my-auto pl-1",
+                    "And"
+                }
+                MaxButtonB {
+                    amount_a: amount_a,
+                    amount_b: amount_b,
+                    token_a_balance: token_a_balance,
+                    token_b_balance: token_b_balance,
+                    boost_deposits: boost_deposits,
+                }
+            }
+            Row {
+                gap: 4,
                 Row {
-                    gap: 4,
-                    Row {
-                        class: "my-auto",
-                        gap: 2,
-                        img {
-                            class: "w-8 h-8 rounded-full",
-                            src: asset!("/public/icon.png"),
-                        }
-                        span {
-                            class: "font-semibold my-auto",
-                            "ORE"
-                        }
+                    class: "my-auto",
+                    gap: 2,
+                    img {
+                        class: "w-8 h-8 rounded-full",
+                        src: asset!("/public/icon.png"),
                     }
-                    input {
-                        class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                        placeholder: "0",
-                        r#type: "number",
-                        inputmode: "decimal",
-                        value: amount_b.cloned(),
-                        oninput: move |e| {
-                            let Some(Ok(deposits)) = boost_deposits.cloned() else {
-                                return;
-                            };
+                    span {
+                        class: "font-semibold my-auto",
+                        "ORE"
+                    }
+                }
+                input {
+                    class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                    placeholder: "0",
+                    r#type: "number",
+                    inputmode: "decimal",
+                    value: amount_b.cloned(),
+                    oninput: move |e| {
+                        let Some(Ok(deposits)) = boost_deposits.cloned() else {
+                            return;
+                        };
 
-                            let ratio = deposits.balance_a / deposits.balance_b;
+                        let ratio = deposits.balance_a / deposits.balance_b;
 
-                            let val = e.value();
-                            if val.len().eq(&0) {
-                                amount_a.set(val.clone());
+                        let val = e.value();
+                        if val.len().eq(&0) {
+                            amount_a.set(val.clone());
+                            amount_b.set(val);
+                            return;
+                        }
+
+                        if let Ok(val_f64) = val.parse::<f64>() {
+                            if val_f64 >= 0f64 {
+                                amount_a.set((val_f64 * ratio).to_string());
                                 amount_b.set(val);
-                                return;
-                            }
-
-                            if let Ok(val_f64) = val.parse::<f64>() {
-                                if val_f64 >= 0f64 {
-                                    amount_a.set((val_f64 * ratio).to_string());
-                                    amount_b.set(val);
-                                } else {
-                                    amount_a.set("".to_string());
-                                    amount_b.set("".to_string());
-                                }
                             } else {
-                                amount_b.set(val[..val.len()-1].to_string());
+                                amount_a.set("".to_string());
+                                amount_b.set("".to_string());
                             }
+                        } else {
+                            amount_b.set(val[..val.len()-1].to_string());
                         }
                     }
                 }
@@ -332,7 +343,7 @@ fn StakeInputs(
 
 
 #[component]
-fn MaxButton(
+fn MaxButtonA(
     amount_a: Signal<String>,
     amount_b: Signal<String>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
@@ -340,36 +351,67 @@ fn MaxButton(
     boost_deposits: Resource<GatewayResult<BoostDeposits>>,
 ) -> Element {
     rsx! {
-        button {
-            class: "text-xs my-auto py-1 px-1 font-medium text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer",
-            onclick: move |_| {
-                let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
-                    return;
-                };
-                let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
-                    return;
-                };
-                let Some(Ok(boost_deposits)) = boost_deposits.cloned() else {
-                    return;
-                };
-
-                let token_a_amount = token_a_balance.ui_amount.unwrap_or(0.0);
-                let token_b_amount = token_b_balance.ui_amount.unwrap_or(0.0);
-
-                let ratio = boost_deposits.balance_a / boost_deposits.balance_b;
-
-                let max_b = token_a_amount / ratio;
-                let max_a = token_b_amount * ratio;
-
-                if max_a <= token_a_amount {
-                    amount_a.set(max_a.to_string());
-                    amount_b.set(token_b_amount.to_string());
-                } else {
-                    amount_a.set(token_a_amount.to_string());
-                    amount_b.set(max_b.to_string());
+        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+            Row {
+                class: "w-full justify-end",
+                gap: 4,
+                if let Some(Ok(token_a_balance)) = token_a_balance.cloned() {
+                    button {
+                        class: "flex flex-row gap-2 text-xs my-auto py-1 px-1 font-medium text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer",
+                        onclick: move |_| {
+                            let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
+                                return;
+                            };
+                            let token_a_amount = token_a_balance.ui_amount.unwrap_or(0.0);
+                            let ratio = boost_deposits.balance_a / boost_deposits.balance_b;
+                            amount_a.set(token_a_amount.to_string());
+                            amount_b.set(format!("{:.1$}", (token_a_amount / ratio), token_b_balance.decimals as usize));
+                        },
+                        WalletIcon { 
+                            class: "h-4 my-auto" 
+                        }
+                        span { 
+                            class: "my-auto text-xs font-medium", 
+                            "{token_a_balance.ui_amount_string} {boost_deposits.token_a}" 
+                        }
+                    }
                 }
-            },
-            "Max"
+            }
+        }
+    }
+}
+
+#[component]
+fn MaxButtonB(
+    amount_a: Signal<String>,
+    amount_b: Signal<String>,
+    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+) -> Element {
+    rsx! {
+        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+            if let Some(Ok(token_b_balance)) = token_b_balance.cloned() {
+                button {
+                    class: "flex flex-row gap-2 text-xs my-auto py-1 px-1 font-medium text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer",
+                    onclick: move |_| {
+                        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
+                            return;
+                        };
+                        let token_b_amount = token_b_balance.ui_amount.unwrap_or(0.0);
+                        let ratio = boost_deposits.balance_a / boost_deposits.balance_b;
+                        amount_a.set(format!("{:.1$}", (token_b_amount * ratio), token_a_balance.decimals as usize));
+                        amount_b.set(token_b_amount.to_string());
+                    },
+                    WalletIcon { 
+                        class: "h-4 my-auto" 
+                    }
+                    span { 
+                        class: "my-auto text-xs font-medium", 
+                        "{token_b_balance.ui_amount_string} {boost_deposits.token_b}" 
+                    }
+                }
+            }
         }
     }
 }

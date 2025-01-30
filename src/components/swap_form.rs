@@ -463,7 +463,10 @@ fn SwapInput(
             gap: 2,
             Row {
                 class: "justify-between",
-                span { class: "text-elements-midEmphasis my-auto pl-1", "{title}" }
+                span { 
+                    class: "text-elements-lowEmphasis my-auto pl-1", 
+                    "{title}" 
+                }
                 Row {
                     gap: 2,
                     MaxButton { selected_token_balance, input_amount, other_amount, error_msg, quote_response, new_quote }

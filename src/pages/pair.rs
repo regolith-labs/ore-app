@@ -91,8 +91,7 @@ fn AccountMetrics(
 
     rsx! {
         Col {
-            class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
-            gap: 4,
+            class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8 gap-8",
             span {
                 class: "text-elements-highEmphasis font-semibold text-2xl",
                 "Account"
@@ -236,7 +235,7 @@ fn SummaryMetrics(
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
-            gap: 4,
+            gap: 8,
             span {
                 class: "text-elements-highEmphasis font-semibold text-2xl",
                 "Summary"

@@ -161,7 +161,7 @@ fn VaultInput(
             Row {
                 class: "justify-between",
                 span {
-                    class: "text-elements-midEmphasis my-auto pl-1",
+                    class: "text-elements-lowEmphasis my-auto pl-1",
                     "{title}"
                 }
                 MaxButton {

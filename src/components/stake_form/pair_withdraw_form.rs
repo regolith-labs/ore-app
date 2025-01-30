@@ -146,7 +146,7 @@ fn StakeInputs(
             Row {
                 class: "justify-between",
                 span {
-                    class: "text-elements-midEmphasis my-auto pl-1",
+                    class: "text-elements-lowEmphasis my-auto pl-1",
                     "Withdraw"
                 }
                 MaxButton {
@@ -206,6 +206,20 @@ fn StakeInputs(
                             // }
                         }
                     }
+                }
+                Row {
+                    class: "justify-between",
+                    span {
+                        class: "text-elements-lowEmphasis my-auto pl-1",
+                        "And"
+                    }
+                    // MaxButton {
+                    //     amount_a: amount_a,
+                    //     amount_b: amount_b,
+                    //     stake: stake,
+                    //     withdraw_amount: withdraw_amount,
+                    //     boost_deposits: boost_deposits,
+                    // }
                 }
                 Row {
                     gap: 4,
