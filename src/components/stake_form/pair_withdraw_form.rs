@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::create_associated_token_account_idempotent}, spl_token::{self, instruction::{close_account, sync_native}}};
-use solana_sdk::transaction::Transaction;
+use solana_sdk::{hash::Hash, message::{v0, VersionedMessage}, transaction::{Transaction, VersionedTransaction}};
 use steel::Pubkey;
 
 use crate::{components::{stake_form::common::WithdrawButton, submit_transaction, Col, Row}, config::{BoostMeta, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, gateway::{kamino::KaminoGateway, GatewayError, GatewayResult}, hooks::{use_boost_deposits, use_gateway, use_stake, use_wallet, BoostDeposits, Wallet}};
@@ -111,8 +111,19 @@ pub fn PairWithdrawForm(class: Option<String>, boost_meta: BoostMeta) -> Element
                     }
 
                     // Send instructions
-                    let tx = Transaction::new_with_payer(&ixs, Some(&authority));
-                    submit_transaction(tx.into());
+                    let _tx_legacy = Transaction::new_with_payer(&ixs, Some(&authority));
+                    let tx = VersionedTransaction {
+                        signatures: vec![],
+                        message: VersionedMessage::V0(
+                            v0::Message::try_compile(
+                                &authority,
+                                &ixs,
+                                &[], // TODO LUT
+                                Hash::default(),
+                            ).unwrap()
+                        ),
+                    };
+                    submit_transaction(tx);
                 },
             }
         }
