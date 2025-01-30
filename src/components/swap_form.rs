@@ -145,12 +145,6 @@ pub fn SwapForm(class: Option<String>) -> Element {
                 swap_tx,
                 error_msg,
             }
-            if let Some(error_msg) = error_msg.cloned() {
-                span { 
-                    class: "text-red-500 font-semibold text-sm mx-auto my-auto", 
-                    "{error_msg.to_string()}" 
-                }
-            }
 
             // TODO Signature status as toasts
 
@@ -341,7 +335,17 @@ fn SwapButton(
                     submit_transaction(tx.clone());
                 }
             },
-            span { class: "mx-auto my-auto font-semibold", "Swap" }
+            if let Some(error_msg) = error_msg.cloned() {
+                span { 
+                    class: "mx-auto my-auto font-semibold", 
+                    "{error_msg.to_string()}" 
+                }
+            } else {
+                span { 
+                    class: "mx-auto my-auto font-semibold", 
+                    "Swap" 
+                }
+            }   
         }
     }
 }

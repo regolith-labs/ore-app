@@ -176,7 +176,7 @@ fn VaultTotals(
             gap: 8,
             span {
                 class: "text-elements-highEmphasis font-semibold text-2xl",
-                "Summary"
+                "Boost"
             }
             Row {
                 class: "w-full justify-between px-4",

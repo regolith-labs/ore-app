@@ -238,7 +238,22 @@ fn SummaryMetrics(
             gap: 8,
             span {
                 class: "text-elements-highEmphasis font-semibold text-2xl",
-                "Summary"
+                "Boost"
+            }
+            Row {
+                class: "w-full justify-between px-4",
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Multiplier"
+                }
+                if let Some(Ok(boost)) = boost.read().as_ref() {
+                    span {
+                        class: "text-elements-highEmphasis font-medium",
+                        "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+                    }
+                } else {
+                    LoadingValue {}
+                }   
             }
             Row {
                 class: "w-full justify-between px-4",

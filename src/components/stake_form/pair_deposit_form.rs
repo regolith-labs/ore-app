@@ -10,6 +10,19 @@ use crate::{
 };
 use super::common::*;
 
+#[derive(Clone, PartialEq, Eq)]
+pub enum PairDepositError {
+    InsufficientBalance(String),
+}
+
+impl ToString for PairDepositError {
+    fn to_string(&self) -> String {
+        match self {
+            PairDepositError::InsufficientBalance(ticker) => format!("Not enough {}", ticker),
+        }
+    }
+}
+
 #[component]
 pub fn PairStakeForm(
     class: Option<String>, 
@@ -64,6 +77,7 @@ fn PairDepositForm(
     let mut stake_amount_a = use_signal::<String>(|| "".to_owned());
     let mut stake_amount_b = use_signal::<String>(|| "".to_owned());
     let transaction_status = use_transaction_status();
+    let mut error_msg = use_signal::<Option<PairDepositError>>(|| None);
  
     // Refresh data, if transaction success
     use_effect(move || {
@@ -76,6 +90,45 @@ fn PairDepositForm(
             stake_amount_a.set("".to_owned());
             stake_amount_b.set("".to_owned());
         }
+    });
+
+    // Set the error message
+    use_effect(move || {
+        let Some(Ok(boost_deposits)) = boost_deposits.cloned() else {
+            error_msg.set(None);
+            return;
+        };
+        let Ok(amount_a) = stake_amount_a.cloned().parse::<f64>() else {
+            error_msg.set(None);
+            return;
+        };
+        let Ok(amount_b) = stake_amount_b.cloned().parse::<f64>() else {
+            error_msg.set(None);
+            return;
+        };
+        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
+            error_msg.set(None);
+            return;
+        };
+        let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
+            error_msg.set(None);
+            return;
+        };
+
+        if amount_a == 0f64 || amount_b == 0f64 {
+            error_msg.set(None);
+            return;
+        }
+
+        if amount_a > token_a_balance.ui_amount.unwrap_or(0.0) {
+            error_msg.set(Some(PairDepositError::InsufficientBalance(boost_deposits.token_a.clone())));
+            return;
+        }
+        if amount_b > token_b_balance.ui_amount.unwrap_or(0.0) {
+            error_msg.set(Some(PairDepositError::InsufficientBalance(boost_deposits.token_b.clone())));
+            return;
+        }
+        error_msg.set(None);
     });
 
     // Build the deposit instruction
@@ -118,12 +171,14 @@ fn PairDepositForm(
                     token_a_balance: token_a_balance,
                     token_b_balance: token_b_balance,
                     boost_deposits: boost_deposits,
+                    error_msg: error_msg,
                 }
             }
             // StakeDetails {}
             SubmitButton {
+                error_msg: error_msg,
                 enabled: if let Some(Ok(_ix)) = deposit_ix.cloned() {
-                    true
+                    error_msg.cloned().is_none()
                 } else {
                     false
                 },
@@ -207,6 +262,7 @@ fn StakeInputs(
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
     token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
     boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    error_msg: Signal<Option<PairDepositError>>,
 ) -> Element {
     let token = LISTED_TOKENS.get(&mint).unwrap();
     rsx! {
@@ -251,6 +307,9 @@ fn StakeInputs(
                         let Some(Ok(deposits)) = boost_deposits.cloned() else {
                             return;
                         };
+                        let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
+                            return;
+                        };
 
                         let ratio = deposits.balance_a / deposits.balance_b;
 
@@ -264,7 +323,7 @@ fn StakeInputs(
                         if let Ok(val_f64) = val.parse::<f64>() {
                             if val_f64 >= 0f64 {
                                 amount_a.set(val);
-                                amount_b.set((val_f64 / ratio).to_string());
+                                amount_b.set(format!("{:.1$}", (val_f64 / ratio), token_b_balance.decimals as usize));
                             } else {
                                 amount_a.set("".to_string());
                                 amount_b.set("".to_string());
@@ -313,6 +372,9 @@ fn StakeInputs(
                         let Some(Ok(deposits)) = boost_deposits.cloned() else {
                             return;
                         };
+                        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
+                            return;
+                        };
 
                         let ratio = deposits.balance_a / deposits.balance_b;
 
@@ -325,7 +387,7 @@ fn StakeInputs(
 
                         if let Ok(val_f64) = val.parse::<f64>() {
                             if val_f64 >= 0f64 {
-                                amount_a.set((val_f64 * ratio).to_string());
+                                amount_a.set(format!("{:.1$}", (val_f64 * ratio), token_a_balance.decimals as usize));
                                 amount_b.set(val);
                             } else {
                                 amount_a.set("".to_string());
@@ -341,6 +403,27 @@ fn StakeInputs(
     }
 }
 
+#[component]
+fn SubmitButton(enabled: bool, onclick: EventHandler<MouseEvent>, error_msg: Signal<Option<PairDepositError>>) -> Element {
+    rsx! {
+        button {
+            class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
+            disabled: !enabled,
+            onclick: onclick,
+            if let Some(error) = error_msg.cloned() {
+                span {
+                    class: "mx-auto my-auto font-semibold",
+                    "{error.to_string()}"
+                }
+            } else {
+                span {
+                    class: "mx-auto my-auto font-semibold",
+                    "Submit"
+                }
+            }
+        }
+    }
+}
 
 #[component]
 fn MaxButtonA(
