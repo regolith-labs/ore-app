@@ -18,8 +18,6 @@ pub fn PairWithdrawForm(class: Option<String>, boost_meta: BoostMeta) -> Element
     let amount_b = use_signal::<String>(|| "".to_owned());
     let stake = use_stake(boost_meta.lp_mint);
     let boost_deposits = use_boost_deposits(boost_meta.clone());
-
-    // let token = LISTED_TOKENS.get(&boost_meta.pair_mint).unwrap();
  
     // Build the deposit instruction
     let withdraw_ix = use_resource(move || async move {
