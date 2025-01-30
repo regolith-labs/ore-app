@@ -37,7 +37,7 @@ pub fn TableHeader(
                         {left}
                     }
                     span {
-                        class: "text-right w-40 my-auto",
+                        class: "text-right w-56 my-auto",
                         {right_1}
                     }
                 }
@@ -45,19 +45,19 @@ pub fn TableHeader(
             Row {
                 if let Some(right_2) = right_2 {
                     span {
-                        class: "text-right w-40 my-auto",
+                        class: "text-right w-56 my-auto",
                         {right_2}
                     }
                 }
                 if let Some(right_3) = right_3 {
                     span {
-                        class: "text-right w-40 my-auto",
+                        class: "text-right w-56 my-auto",
                         {right_3}
                     }
                 }
                 if let Some(right_4) = right_4 {
                     span {
-                        class: "text-right w-40 my-auto",
+                        class: "text-right w-56 my-auto",
                         {right_4}
                     }
                 }
@@ -88,7 +88,7 @@ pub fn TableRowLink(
                         {left}
                     }
                     span {
-                        class: "flex text-right w-40 my-auto justify-end",
+                        class: "flex text-right w-56 my-auto justify-end",
                         {right_1}
                     }
                 }
@@ -96,19 +96,19 @@ pub fn TableRowLink(
             Row {
                 if let Some(right_2) = right_2 {
                     span {
-                        class: "flex text-right w-40 my-auto justify-end",
+                        class: "flex text-right w-56 my-auto justify-end",
                         {right_2}
                     }
                 }
                 if let Some(right_3) = right_3 {
                     span {
-                        class: "flex text-right w-40 my-auto justify-end",
+                        class: "flex text-right w-56 my-auto justify-end",
                         {right_3}
                     }
                 }
                 if let Some(right_4) = right_4 {
                     span {
-                        class: "flex text-right w-40 my-auto justify-end",
+                        class: "flex text-right w-56 my-auto justify-end",
                         {right_4}
                     }
                 }

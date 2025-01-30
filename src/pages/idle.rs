@@ -28,6 +28,7 @@ pub fn Idle() -> Element {
                     ore_stake,
                 }
                 VaultPosition {
+                    ore_boost: ore_boost,
                     ore_balance,
                     ore_stake,
                 }
@@ -41,6 +42,7 @@ pub fn Idle() -> Element {
 
 #[component]
 fn VaultPosition(
+    ore_boost: Resource<GatewayResult<Boost>>,
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     ore_stake: Resource<GatewayResult<Stake>>
 ) -> Element {
@@ -84,6 +86,7 @@ fn VaultPosition(
                         OreValueSmall {
                             class: "text-elements-highEmphasis",
                             ui_amount_string: amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
+                            small_units: true,
                         }
                     } else {
                         NullValue {}
@@ -103,6 +106,7 @@ fn VaultPosition(
                         OreValueSmall {
                             class: "text-elements-highEmphasis",
                             ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
+                            small_units: true,
                         }
                     }
                 }
@@ -118,6 +122,7 @@ fn VaultPosition(
                         OreValueSmall {
                             class: "text-elements-gold",
                             ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                            small_units: true,
                         }
                     } else {
                         NullValue {}
@@ -177,12 +182,13 @@ fn VaultTotals(
                 class: "w-full justify-between px-4",
                 span {
                     class: "text-elements-lowEmphasis font-medium",
-                    "Total stakers"
+                    "Total deposits"
                 }
                 if let Some(Ok(boost)) = ore_boost.read().as_ref() {
-                    span {
-                        class: "text-elements-highEmphasis font-medium",
-                        "{boost.total_stakers}"
+                    OreValueSmall {
+                        class: "text-elements-highEmphasis",
+                        ui_amount_string: amount_to_ui_amount_string(boost.total_deposits, TOKEN_DECIMALS),
+                        small_units: true,
                     }
                 } else {
                     LoadingValue {}
@@ -192,12 +198,12 @@ fn VaultTotals(
                 class: "w-full justify-between px-4",
                 span {
                     class: "text-elements-lowEmphasis font-medium",
-                    "Total deposits"
+                    "Total stakers"
                 }
                 if let Some(Ok(boost)) = ore_boost.read().as_ref() {
-                    OreValueSmall {
-                        class: "text-elements-highEmphasis",
-                        ui_amount_string: amount_to_ui_amount_string(boost.total_deposits, TOKEN_DECIMALS),
+                    span {
+                        class: "text-elements-highEmphasis font-medium",
+                        "{boost.total_stakers}"
                     }
                 } else {
                     LoadingValue {}

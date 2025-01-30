@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use solana_extra_wasm::program::{spl_associated_token_account::get_associated_token_address, spl_token};
+use solana_extra_wasm::program::{spl_associated_token_account::get_associated_token_address, spl_memo, spl_token, spl_token_2022};
 use steel::{sysvar, Instruction, Pubkey};
 use serde::Deserialize;
 use kliquidity_sdk::accounts::{GlobalConfig, WhirlpoolStrategy};
@@ -16,6 +16,7 @@ pub trait KaminoGateway {
 
     // Build instructions
     async fn build_deposit_instruction(&self, strategy: Pubkey, amount_a: f64, amount_b: f64, owner: Pubkey) -> GatewayResult<Instruction>;
+    async fn build_withdraw_instruction(&self, strategy_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction>;
 }
 
 impl<R: Rpc> KaminoGateway for Gateway<R> {
@@ -91,6 +92,72 @@ impl<R: Rpc> KaminoGateway for Gateway<R> {
             token_a_token_program: strategy.token_a_token_program,
             token_b_token_program: strategy.token_b_token_program,
             instruction_sysvar_account: sysvar::instructions::ID,
+        };
+        Ok(accounts.instruction(args))
+    }
+
+    /// Builds a withdraw instruction for a Kamino strategy.
+    /// 
+    /// Logic copied from kliquidity typescript sdk.
+    /// https://github.com/Kamino-Finance/kliquidity-sdk/blob/9787fcec784a5a19baede4b6b4819d6883c7e954/src/Kamino.ts#L2550
+    async fn build_withdraw_instruction(&self, strategy_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction> {
+        // Parse amounts
+        if shares_amount == 0 {
+            return Err(GatewayError::Unknown);
+        }
+
+        // Get strategy state
+        let strategy = self.get_whirlpool_strategy(strategy_address).await?;
+
+        // Get treasury pda vaults
+        let treasury_fee_token_a_vault = Pubkey::find_program_address(&[b"treasury_fee_vault", strategy.token_a_mint.as_ref()], &kliquidity_sdk::programs::YVAULTS_ID).0;
+        let treasury_fee_token_b_vault = Pubkey::find_program_address(&[b"treasury_fee_vault", strategy.token_b_mint.as_ref()], &kliquidity_sdk::programs::YVAULTS_ID).0;
+
+        // Get event authority
+        let event_authority = kliquidity_sdk::programs::YVAULTS_ID;
+
+        // Get atas
+        let user_shares_ata = get_associated_token_address(&owner, &strategy.shares_mint);
+        let token_a_ata = get_associated_token_address(&owner, &strategy.token_a_mint);
+        let token_b_ata = get_associated_token_address(&owner, &strategy.token_b_mint);
+
+        // Get whirlpool program id
+        let whirlpool_program_id = Pubkey::from_str("whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc").unwrap();
+
+        // Build instruction
+        let args = kliquidity_sdk::instructions::WithdrawInstructionArgs {
+            shares_amount,
+        };
+        let accounts = kliquidity_sdk::instructions::Withdraw {
+            user: owner,
+            strategy: strategy_address,
+            global_config: strategy.global_config,
+            pool: strategy.pool,
+            position: strategy.position,
+            tick_array_lower: strategy.tick_array_lower,
+            tick_array_upper: strategy.tick_array_upper,
+            token_a_vault: strategy.token_a_vault,
+            token_b_vault: strategy.token_b_vault,
+            base_vault_authority: strategy.base_vault_authority,
+            pool_token_vault_a: strategy.pool_token_vault_a,
+            pool_token_vault_b: strategy.pool_token_vault_b,
+            token_a_ata,
+            token_b_ata,
+            token_a_mint: strategy.token_a_mint,
+            token_b_mint: strategy.token_b_mint,
+            user_shares_ata,
+            shares_mint: strategy.shares_mint,
+            treasury_fee_token_a_vault,
+            treasury_fee_token_b_vault,
+            token_program: spl_token::ID,
+            token_program2022: spl_token_2022::ID,
+            token_a_token_program: strategy.token_a_token_program,
+            token_b_token_program: strategy.token_b_token_program,
+            memo_program: spl_memo::ID,
+            position_token_account: strategy.position_token_account,
+            pool_program: whirlpool_program_id,
+            instruction_sysvar_account: sysvar::instructions::ID,
+            event_authority: Some(event_authority)
         };
         Ok(accounts.instruction(args))
     }

@@ -15,6 +15,20 @@ use crate::{
     },
 };
 
+#[derive(Clone, PartialEq, Eq)]
+pub enum SwapError {
+    InsufficientBalance(String),
+}
+
+impl ToString for SwapError {
+    fn to_string(&self) -> String {
+        match self {
+            SwapError::InsufficientBalance(ticker) => format!("Not enough {}", ticker),
+        }
+    }
+}
+
+
 #[component]
 pub fn SwapForm(class: Option<String>) -> Element {
     let class = class.unwrap_or_default();
@@ -35,6 +49,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // selected tokens
     let buy_token = use_signal(|| Token::ore());
     let sell_token = use_signal(|| Token::sol());
+
+    // Errors
+    let mut error_msg = use_signal(|| None);
 
     // token balances
     let mut buy_token_balance = use_resource(move || async move {
@@ -93,6 +110,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     selected_token_balance: sell_token_balance,
                     new_quote: sell_quote,
                     quote_response,
+                    error_msg,
                 }
                 div {
                     class: "relative",
@@ -105,6 +123,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
                         selected_token_balance: buy_token_balance,
                         new_quote: buy_quote,
                         quote_response,
+                        error_msg,
                     }
                     SwitchButton {
                         buy_token,
@@ -116,8 +135,22 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     }
                 }
             }
-            SwapDetails { buy_token, sell_token, quote_response }
-            SwapButton { quote_response, swap_tx }
+            SwapDetails { 
+                buy_token, 
+                sell_token, 
+                quote_response,
+            }
+            SwapButton { 
+                quote_response, 
+                swap_tx,
+                error_msg,
+            }
+            if let Some(error_msg) = error_msg.cloned() {
+                span { 
+                    class: "text-red-500 font-semibold text-sm mx-auto my-auto", 
+                    "{error_msg.to_string()}" 
+                }
+            }
 
             // TODO Signature status as toasts
 
@@ -287,6 +320,7 @@ fn SwapDetailLabel(title: String, value: String) -> Element {
 fn SwapButton(
     quote_response: Signal<Option<QuoteResponse>>,
     swap_tx: Resource<GatewayResult<VersionedTransaction>>,
+    error_msg: Signal<Option<SwapError>>,
 ) -> Element {
     let quote_response = &*quote_response.read();
     let is_tx_ready = if let Some(Ok(_tx)) = swap_tx.cloned() {
@@ -294,10 +328,13 @@ fn SwapButton(
     } else {
         false
     };
+
+    let is_disabled = quote_response.is_none() || !is_tx_ready || error_msg.read().is_some();
+
     rsx! {
         button {
             class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
-            disabled: quote_response.is_none() || !is_tx_ready,
+            disabled: is_disabled,
             onclick: move |_| {
                 let swap_tx = &*swap_tx.read();
                 if let Some(Ok(tx)) = swap_tx {
@@ -369,8 +406,8 @@ fn SwapInput(
     selected_token_balance: Resource<GatewayResult<UiTokenAmount>>,
     new_quote: UseDebounce<String>,
     quote_response: Signal<Option<QuoteResponse>>,
+    error_msg: Signal<Option<SwapError>>,
 ) -> Element {
-    let mut error_msg = use_signal(|| None);
     let border = match mode {
         SwapInputMode::Buy => "",
         SwapInputMode::Sell => "border-b border-gray-800",
@@ -390,11 +427,11 @@ fn SwapInput(
                     let input_amount_f64 = input_amount_str.parse::<f64>().unwrap_or(0.0);
                     if let Some(Ok(balance)) = selected_token_balance.cloned() {
                         if balance.ui_amount.unwrap_or(0.0) < input_amount_f64 {
-                            error_msg.set(Some("Insufficient balance".to_string()));
+                            error_msg.set(Some(SwapError::InsufficientBalance(selected_token.read().ticker.to_string())));
                             is_error = true;
                         }
                     } else if input_amount_f64 > 0.0 {
-                        error_msg.set(Some("Insufficient balance".to_string()));
+                        error_msg.set(Some(SwapError::InsufficientBalance(selected_token.read().ticker.to_string())));
                         is_error = true;
                     }
                 }
@@ -405,6 +442,21 @@ fn SwapInput(
         }
     });
 
+    // Set input color
+    let input_color = if let Some(error_msg) = error_msg.cloned() {
+        match error_msg {
+            SwapError::InsufficientBalance(ticker) => {
+                if ticker == selected_token.read().ticker.to_string() {
+                    "text-red-500"
+                } else {
+                    "text-elements-highEmphasis"
+                }
+            }
+        }
+    } else {
+        "text-elements-highEmphasis"
+    };
+
     rsx! {
         Col {
             class: "w-full p-4 {border}",
@@ -414,9 +466,6 @@ fn SwapInput(
                 span { class: "text-elements-midEmphasis my-auto pl-1", "{title}" }
                 Row {
                     gap: 2,
-                    if let Some(error_msg) = error_msg.cloned() {
-                        span { class: "text-red-500 font-medium text-xs my-auto", "{error_msg}" }
-                    }
                     MaxButton { selected_token_balance, input_amount, other_amount, error_msg, quote_response, new_quote }
                 }
             }
@@ -426,7 +475,7 @@ fn SwapInput(
                 TokenButton { token: selected_token, show_selector: show_selector.clone() }
                 if let Some(input_amount_str) = input_amount.cloned() {
                     input {
-                        class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                        class: "{input_color} text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                         placeholder: "0",
                         r#type: "number",
                         inputmode: "decimal",
@@ -497,7 +546,7 @@ fn MaxButton(
     selected_token_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<Option<String>>,
     other_amount: Signal<Option<String>>,
-    error_msg: Signal<Option<String>>,
+    error_msg: Signal<Option<SwapError>>,
     quote_response: Signal<Option<QuoteResponse>>,
     new_quote: UseDebounce<String>,
 ) -> Element {
@@ -510,7 +559,7 @@ fn MaxButton(
 
     rsx! {
         button {
-            class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer my-auto",
+            class: "flex flex-row gap-2 py-1 px-1 font-medium text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer my-auto",
             onclick: move |_| {
                 if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
                     let max_amount = balance.ui_amount.unwrap_or(0.0);

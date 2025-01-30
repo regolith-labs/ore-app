@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
+use ore_api::consts::TOKEN_DECIMALS;
+use ore_boost_api::state::Stake;
 
-use crate::{components::{OreIcon, Row}, config::LISTED_TOKENS_BY_TICKER};
+use crate::{components::{Col, OreIcon, Row}, config::{LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, hooks::BoostDeposits};
 
 #[component]
 pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
@@ -191,9 +193,9 @@ pub fn OreValueSmallAbbreviated(class: Option<String>, ui_amount_string: String)
 }
 
 #[component]
-pub fn OreValueSmall(class: Option<String>, ui_amount_string: String, hide_small_units: Option<bool>) -> Element {
+pub fn OreValueSmall(class: Option<String>, ui_amount_string: String, small_units: Option<bool>) -> Element {
     let class: String = class.unwrap_or("".to_string());
-    let hide_small_units = hide_small_units.unwrap_or(false);
+    let display_small_units = small_units.unwrap_or(false);
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
     let small_units = units[1];
@@ -209,16 +211,12 @@ pub fn OreValueSmall(class: Option<String>, ui_amount_string: String, hide_small
                 class: "font-medium my-auto",
                 span {
                     class: "mt-auto",
-                    if small_units_display.is_empty() || hide_small_units {
-                        "{big_units_display}"
-                    } else {
-                        "{big_units_display}."
-                    }
+                    "{big_units_display}"
                 }
-                if !hide_small_units {
+                if display_small_units {
                     span {
                         class: "mt-auto font-medium opacity-50",
-                        "{small_units_display}"
+                        ".{small_units_display}"
                     }
                 }
             }
@@ -227,9 +225,9 @@ pub fn OreValueSmall(class: Option<String>, ui_amount_string: String, hide_small
 }
 
 #[component]
-pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, hide_small_units: Option<bool>) -> Element {
+pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, small_units: Option<bool>) -> Element {
     let class = class.unwrap_or("".to_string());
-    let hide_small_units = hide_small_units.unwrap_or(false);
+    let display_small_units = small_units.unwrap_or(false);
     let image = if let Some(token) = LISTED_TOKENS_BY_TICKER.get(&ticker) {
         token.image.clone()
     } else {
@@ -244,17 +242,19 @@ pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, hi
     rsx! {
         Row {
             class: "gap-1.5 {class}",
-            span {
-                class: "my-auto font-medium", 
-                if hide_small_units {
-                    "{big_units}"
-                } else {
-                    "{big_units}.{small_units[..2].to_string()}"
-                }
-            }
             img {
                 class: "w-6 h-6 my-auto bg-gray-900 rounded-full border border-gray-800",
                 src: "{image}"
+            }
+            span {
+                class: "my-auto font-medium", 
+                "{big_units}"
+                if display_small_units {
+                    span {
+                        class: "mt-auto font-medium opacity-50",
+                        ".{small_units}"
+                    }
+                }
             }
         }
     }
@@ -278,6 +278,60 @@ pub fn UsdValueSmall(class: Option<String>, amount: String, small_units: Option<
                 } else {
                     "${big_units}"
                 }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn PairValue(class: Option<String>, boost_deposits: BoostDeposits, small_units: Option<bool>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        Col {
+            class: "gap-2 {class}",
+            OreValueSmall {
+                class: "ml-auto",
+                ui_amount_string: boost_deposits.balance_b.to_string(),
+                small_units: small_units,
+            }
+            TokenValueSmall {
+                class: "ml-auto",
+                amount: boost_deposits.balance_a.to_string(),
+                ticker: boost_deposits.token_a.clone(),
+                small_units: small_units,
+            }
+        }
+    }
+}
+
+
+#[component]
+pub fn PairStakeValue(
+    class: Option<String>, 
+    stake: Stake, 
+    boost_deposits: BoostDeposits, 
+    small_units: Option<bool>
+) -> Element {
+    let class = class.unwrap_or("".to_string());
+
+    let lp_share = stake.balance as f64 / boost_deposits.shares as f64;
+    let token_amount_a = boost_deposits.balance_a * lp_share;
+    let token_amount_b = boost_deposits.balance_b * lp_share;
+    let token_a_decimals = LISTED_TOKENS_BY_TICKER.get(&boost_deposits.token_a).unwrap().decimals;
+
+    rsx! {
+        Col {
+            class: "gap-2 {class}",
+            OreValueSmall {
+                class: "ml-auto",
+                ui_amount_string: format!("{:.1$}", token_amount_b, TOKEN_DECIMALS as usize),
+                small_units: small_units,
+            }
+            TokenValueSmall {
+                class: "ml-auto",
+                amount: format!("{:.1$}", token_amount_a, token_a_decimals as usize),
+                ticker: boost_deposits.token_a.clone(),
+                small_units: small_units,
             }
         }
     }

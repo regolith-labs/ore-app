@@ -7,7 +7,7 @@ use solana_extra_wasm::program::{spl_associated_token_account, spl_token::amount
 use solana_sdk::transaction::Transaction;
 use steel::Pubkey;
 
-use crate::{components::{submit_transaction, Col, Heading, LoadingValue, NullValue, OreValueSmall, PairStakeForm, Row, TokenValueSmall, TransactionStatus, UsdValueSmall}, config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, gateway::{GatewayResult, UiTokenAmount}, hooks::{use_boost, use_boost_deposits, use_kamino_global_config, use_ore_balance, use_stake, use_token_balance, use_transaction_status, use_wallet, BoostDeposits, Wallet}, pages::ClaimButton};
+use crate::{components::{submit_transaction, Col, Heading, LoadingValue, NullValue, OreValueSmall, PairStakeForm, PairStakeValue, PairValue, Row, TransactionStatus, UsdValueSmall}, config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, gateway::{GatewayResult, UiTokenAmount}, hooks::{use_boost, use_boost_deposits, use_ore_balance, use_stake, use_token_balance, use_transaction_status, use_wallet, BoostDeposits, Wallet}, pages::ClaimButton};
 
 #[component]
 pub fn Pair(lp_mint: String) -> Element {
@@ -33,7 +33,7 @@ pub fn Pair(lp_mint: String) -> Element {
                 subtitle: "Manage your liquidity pair."
             }
             Col {
-                gap: 16,
+                class: "w-full h-full gap-16",
                 PairStakeForm {
                     class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                     boost_meta: boost_meta.clone(),
@@ -45,26 +45,16 @@ pub fn Pair(lp_mint: String) -> Element {
                 }
                 AccountMetrics {
                     boost_meta: boost_meta.clone(),
+                    boost_deposits: boost_deposits,
                     ore_balance,
                     lp_balance,
                     stake
                 }
-                BoostMetrics {
+                SummaryMetrics {
                     boost,
                     boost_deposits,
                     boost_meta: boost_meta.clone()
                 }
-                // if let Some(Ok(lp_token_balance)) = lp_balance.read().as_ref() {  
-                //     if lp_token_balance.ui_amount.unwrap_or(0.0) > 0.0 {
-                //         UnstakedMetrics {
-                //             boost_meta: boost_meta.clone(),
-                //             lp_balance: lp_balance,
-                //             boost_deposits: boost_deposits,
-                //             boost: boost,
-                //             stake: stake,
-                //         }
-                //     }
-                // }
             }
         }
     }
@@ -73,6 +63,7 @@ pub fn Pair(lp_mint: String) -> Element {
 #[component]
 fn AccountMetrics(
     boost_meta: BoostMeta,
+    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
@@ -112,14 +103,23 @@ fn AccountMetrics(
                     class: "text-elements-lowEmphasis font-medium",
                     "Deposits"
                 }
-                if let Some(Ok(stake)) = stake.read().as_ref() {
-                    if stake.balance > 0 {
-                        span {
-                            class: "text-elements-highEmphasis font-medium",
-                            "{stake.balance}"
+                if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+                    if let Some(stake) = stake.read().as_ref() {
+                        if let Ok(stake) = stake {
+                            if stake.balance > 0 {
+                                PairStakeValue {
+                                    stake: stake.clone(),
+                                    boost_deposits: boost_deposits.clone(),
+                                    small_units: Some(true),
+                                }
+                            } else {
+                                NullValue {}
+                            }
+                        } else {
+                            NullValue {}
                         }
                     } else {
-                        NullValue {}
+                        LoadingValue {}
                     }
                 } else {
                     LoadingValue {}
@@ -189,11 +189,16 @@ fn AccountMetrics(
                     class: "text-elements-lowEmphasis font-medium",
                     "Yield"
                 }
-                if let Some(Ok(stake)) = stake.read().as_ref() {
-                    if stake.rewards > 0 {
-                        OreValueSmall {
-                            class: "text-elements-gold",
-                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                if let Some(stake) = stake.read().as_ref() {
+                    if let Ok(stake) = stake {
+                        if stake.rewards > 0 {
+                            OreValueSmall {
+                                class: "text-elements-gold",
+                                ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                                small_units: true,
+                            }
+                        } else {
+                            NullValue {}
                         }
                     } else {
                         NullValue {}
@@ -223,7 +228,7 @@ fn AccountMetrics(
 }
 
 #[component]
-fn BoostMetrics(
+fn SummaryMetrics(
     boost: Resource<GatewayResult<Boost>>,
     boost_meta: BoostMeta,
     boost_deposits: Resource<GatewayResult<BoostDeposits>>
@@ -259,12 +264,9 @@ fn BoostMetrics(
                     "Total deposits"
                 }
                 if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
-                    TokenValueSmall {
-                        amount: boost_deposits.balance_a.to_string(),
-                        ticker: boost_deposits.token_a.clone(),
-                    }
-                    OreValueSmall {
-                        ui_amount_string: boost_deposits.balance_b.to_string(),
+                    PairValue {
+                        boost_deposits: boost_deposits.clone(),
+                        small_units: true,
                     }
                 } else {
                     LoadingValue {}

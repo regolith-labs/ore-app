@@ -105,14 +105,12 @@ pub(crate) fn SubmitButton(enabled: bool, onclick: EventHandler<MouseEvent>) -> 
 }
 
 #[component]
-pub(crate) fn WithdrawButton(enabled: Signal<bool>) -> Element {
+pub(crate) fn WithdrawButton(enabled: bool, onclick: EventHandler<MouseEvent>) -> Element {
     rsx! {
         button {
             class: "h-12 w-full rounded-full controls-primary",
-            disabled: !*enabled.read(),
-            onclick: move |_| {
-                // TODO: Implement withdraw logic
-            },
+            disabled: !enabled,
+            onclick: onclick,
             span {
                 class: "mx-auto my-auto font-semibold",
                 "Submit"

@@ -137,7 +137,6 @@ fn StakeTableRowBasis(boost_deposits: Resource<GatewayResult<BoostDeposits>>) ->
                 // }
                 OreValueSmall {
                     ui_amount_string: boost_deposits.balance_b.to_string(),
-                    hide_small_units: true,
                 }
                 // TokenValueSmall {
                 //     class: "ml-auto",
@@ -161,7 +160,6 @@ fn StakeTableRowLiquidity(boost_deposits: Resource<GatewayResult<BoostDeposits>>
                     class: "ml-auto",
                     amount: boost_deposits.balance_a.to_string(),
                     ticker: boost_deposits.token_a.clone(),
-                    hide_small_units: true,
                 }
                 // TokenValueSmall {
                 //     class: "ml-auto",
@@ -184,6 +182,7 @@ fn StakeTableRowYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<Gat
                     OreValueSmall {
                         class: "text-elements-gold",
                         ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                        small_units: true,
                     }
                 } else {
                     NullValue {}

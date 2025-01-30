@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use ore_boost_api::state::{boost_pda, Boost};
 use steel::Pubkey;
 
-use crate::{config::{BoostMeta, LpType, LISTED_TOKENS}, gateway::{kamino::{KaminoGateway, KaminoStrategyMetrics}, meteora::MeteoraGateway, ore::OreGateway, GatewayError, GatewayResult}};
+use crate::{config::{BoostMeta, LpType, LISTED_TOKENS}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, ore::OreGateway, GatewayError, GatewayResult, Rpc}};
 use super::use_gateway;
 
 pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
@@ -12,21 +12,13 @@ pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
     })
 }
 
-pub fn use_kamino_global_config() -> Resource<GatewayResult<kliquidity_sdk::accounts::GlobalConfig>> {
-    use_resource(|| async move {
-        use_gateway().get_global_config().await.map_err(GatewayError::from)
-    })
-}
-
-pub fn use_strategy_metrics(lp_id: Pubkey) -> Resource<GatewayResult<KaminoStrategyMetrics>> {
-    use_resource(move || async move {
-        use_gateway().get_strategy_metrics(lp_id).await.map_err(GatewayError::from)
-    })
-}
-
 pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<BoostDeposits>> {
     let lp_type: LpType = boost_meta.lp_type;
     use_resource(move || async move {
+        // Get lp mint supply
+        let lp_mint_supply = use_gateway().rpc.get_token_supply(&boost_meta.lp_mint).await?;
+
+        // Get strategy metrics
         match lp_type {
             LpType::Kamino => {
                 let strategy = use_gateway().get_strategy_metrics(boost_meta.lp_id).await?;
@@ -36,6 +28,7 @@ pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<Boost
                     balance_a: strategy.vault_balances.token_a.total,
                     balance_b: strategy.vault_balances.token_b.total,
                     total_value_usd: strategy.total_value_locked,
+                    shares: lp_mint_supply.amount.parse::<u64>().unwrap_or(0),
                 });
             }
             LpType::Meteora => {
@@ -51,17 +44,19 @@ pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<Boost
                     balance_a: if reverse { balance_b } else { balance_a },
                     balance_b: if reverse { balance_a } else { balance_b },
                     total_value_usd: amm.pool_tvl,
+                    shares: lp_mint_supply.amount.parse::<u64>().unwrap_or(0),
                 });
             }
         }
     })
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct BoostDeposits {
     pub token_a: String,
     pub token_b: String,
     pub balance_a: f64,
     pub balance_b: f64,
     pub total_value_usd: f64,
+    pub shares: u64,
 }

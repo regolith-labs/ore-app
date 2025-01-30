@@ -51,7 +51,7 @@
 }
 
 body {
-    @apply bg-base-bg text-elements-highEmphasis;
+    @apply bg-base-bg text-elements-highEmphasis overflow-x-hidden;
 }
 
 @layer components {
