@@ -473,7 +473,15 @@ fn SwapInput(
                 }
                 Row {
                     gap: 2,
-                    MaxButton { selected_token_balance, input_amount, other_amount, error_msg, quote_response, new_quote }
+                    MaxButton { 
+                        mode,
+                        selected_token_balance, 
+                        input_amount, 
+                        other_amount, 
+                        error_msg, 
+                        quote_response, 
+                        new_quote 
+                    }
                 }
             }
             Row {
@@ -550,6 +558,7 @@ fn TokenButton(token: Signal<Token>, show_selector: Signal<bool>) -> Element {
 
 #[component]
 fn MaxButton(
+    mode: SwapInputMode,
     selected_token_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<Option<String>>,
     other_amount: Signal<Option<String>>,
@@ -565,34 +574,80 @@ fn MaxButton(
     };
 
     rsx! {
-        button {
-            class: "flex flex-row gap-2 py-1 px-1 font-medium text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer my-auto",
-            onclick: move |_| {
-                if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
-                    let max_amount = balance.ui_amount.unwrap_or(0.0);
-                    if max_amount == 0.0 {
-                        input_amount.set(Some("0".to_string()));
-                        other_amount.set(Some("0".to_string()));
-                        quote_response.set(None);
-                        error_msg.set(None);
-                    } else {
-                        input_amount.set(Some(max_amount.to_string()));
-                        other_amount.set(None);
-                        quote_response.set(None);
-                        new_quote.action(max_amount.to_string());
-                        error_msg.set(None);
-                    }
-                } else {
-                    input_amount.set(Some("0".to_string()));
-                    other_amount.set(Some("0".to_string()));
-                    quote_response.set(None);
-                    error_msg.set(None);
+        Row {
+            gap: 2,
+            Row {
+                class: "py-1 px-1 font-medium text-elements-lowEmphasis my-auto",
+                gap: 2,
+                WalletIcon { 
+                    class: "h-4 my-auto" 
                 }
-            },
-            WalletIcon { class: "h-4 my-auto" }
-            span { 
-                class: "my-auto text-xs font-medium", 
-                "{token_balance}" 
+                span { 
+                    class: "my-auto text-xs font-medium", 
+                    "{token_balance}" 
+                }
+            }
+            if mode == SwapInputMode::Sell {
+                button {
+                    class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto",
+                    onclick: move |_| {
+                        if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
+                            let half_amount = balance.ui_amount.unwrap_or(0.0) / 2.0;
+                            if half_amount == 0.0 {
+                                input_amount.set(Some("0".to_string()));
+                                other_amount.set(Some("0".to_string()));
+                                quote_response.set(None);
+                                error_msg.set(None);
+                            } else {
+                                input_amount.set(Some(half_amount.to_string()));
+                                other_amount.set(None);
+                                quote_response.set(None);
+                                new_quote.action(half_amount.to_string());
+                                error_msg.set(None);
+                            }
+                        } else {
+                            input_amount.set(Some("0".to_string()));
+                            other_amount.set(Some("0".to_string()));
+                            quote_response.set(None);
+                            error_msg.set(None);
+                        }
+                    },
+                    // WalletIcon { class: "h-4 my-auto" }
+                    span { 
+                        class: "my-auto text-xs font-semibold font-sans", 
+                        "HALF" 
+                    }
+                }
+                button {
+                    class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto",
+                    onclick: move |_| {
+                        if let Some(Ok(balance)) = selected_token_balance.read().as_ref() {
+                            let max_amount = balance.ui_amount.unwrap_or(0.0);
+                            if max_amount == 0.0 {
+                                input_amount.set(Some("0".to_string()));
+                                other_amount.set(Some("0".to_string()));
+                                quote_response.set(None);
+                                error_msg.set(None);
+                            } else {
+                                input_amount.set(Some(max_amount.to_string()));
+                                other_amount.set(None);
+                                quote_response.set(None);
+                                new_quote.action(max_amount.to_string());
+                                error_msg.set(None);
+                            }
+                        } else {
+                            input_amount.set(Some("0".to_string()));
+                            other_amount.set(Some("0".to_string()));
+                            quote_response.set(None);
+                            error_msg.set(None);
+                        }
+                    },
+                    // WalletIcon { class: "h-4 my-auto" }
+                    span { 
+                        class: "my-auto text-xs font-semibold font-sans", 
+                        "MAX" 
+                    }
+                }
             }
         }
     }

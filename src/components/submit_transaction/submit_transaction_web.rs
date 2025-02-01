@@ -10,6 +10,7 @@ use crate::{
 
 pub fn submit_transaction(mut tx: VersionedTransaction) {
     let mut transaction_status = use_transaction_status();
+    log::info!("submitting transaction: {:?}", tx.message);
     spawn(async move {
         // Set blockhash
         let gateway = use_gateway();

@@ -436,11 +436,34 @@ fn MaxButtonA(
     rsx! {
         if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
             Row {
-                class: "w-full justify-end",
-                gap: 4,
+                gap: 2,
                 if let Some(Ok(token_a_balance)) = token_a_balance.cloned() {
+                    Row {
+                        class: "py-1 px-1 font-medium text-elements-lowEmphasis my-auto",
+                        gap: 2,
+                        WalletIcon { 
+                            class: "h-4 my-auto" 
+                        }
+                        span { 
+                            class: "my-auto text-xs font-medium", 
+                            "{token_a_balance.ui_amount_string} {boost_deposits.token_a}" 
+                        }
+                    }
                     button {
-                        class: "flex flex-row gap-2 text-xs my-auto py-1 px-1 font-medium text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer",
+                        class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
+                        onclick: move |_| {
+                            let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
+                                return;
+                            };
+                            let token_a_amount = token_a_balance.ui_amount.unwrap_or(0.0) / 2.0;
+                            let ratio = boost_deposits.balance_a / boost_deposits.balance_b;
+                            amount_a.set(token_a_amount.to_string());
+                            amount_b.set(format!("{:.1$}", (token_a_amount / ratio), token_b_balance.decimals as usize));
+                        },
+                        "HALF"
+                    }
+                    button {
+                        class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
                         onclick: move |_| {
                             let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
                                 return;
@@ -450,13 +473,7 @@ fn MaxButtonA(
                             amount_a.set(token_a_amount.to_string());
                             amount_b.set(format!("{:.1$}", (token_a_amount / ratio), token_b_balance.decimals as usize));
                         },
-                        WalletIcon { 
-                            class: "h-4 my-auto" 
-                        }
-                        span { 
-                            class: "my-auto text-xs font-medium", 
-                            "{token_a_balance.ui_amount_string} {boost_deposits.token_a}" 
-                        }
+                        "MAX"
                     }
                 }
             }

@@ -325,19 +325,35 @@ fn MaxButton(
     };
 
     rsx! {
-        button {
-            class: "flex flex-row gap-2 py-1 px-1 text-elements-lowEmphasis hover:cursor-pointer hover:text-elements-highEmphasis my-auto",
-            onclick: move |_| {
-                input_amount.set(balance.to_string());
-            },
-            WalletIcon { 
-                class: "h-4 my-auto" 
+        Row {
+            gap: 2,
+            Row {
+                class: "py-1 px-1 font-medium text-elements-lowEmphasis my-auto",
+                gap: 2,
+                WalletIcon { 
+                    class: "h-4 my-auto" 
+                }
+                span { 
+                    class: "my-auto text-xs font-medium", 
+                    "{balance}" 
+                }
             }
-            span { 
-                class: "my-auto text-xs font-medium", 
-                "{balance}" 
+            button {
+                class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
+                onclick: move |_| {
+                    input_amount.set((balance / 2.0).to_string());
+                },
+                "HALF"
+            }
+            button {
+                class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
+                onclick: move |_| {
+                    input_amount.set(balance.to_string());
+                },
+                "MAX"
             }
         }
+        
     }
 }
 

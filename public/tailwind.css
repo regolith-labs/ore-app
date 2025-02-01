@@ -939,6 +939,9 @@
   .justify-end {
     justify-content: flex-end;
   }
+  .gap-1 {
+    gap: calc(var(--spacing) * 1);
+  }
   .gap-1\.5 {
     gap: calc(var(--spacing) * 1.5);
   }
@@ -1161,6 +1164,9 @@
   }
   .align-top {
     vertical-align: top;
+  }
+  .font-sans {
+    font-family: var(--font-sans);
   }
   .font-wide {
     font-family: var(--font-wide);

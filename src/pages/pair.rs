@@ -107,7 +107,7 @@ fn AccountMetrics(
                         if let Ok(stake) = stake {
                             if stake.balance > 0 {
                                 PairStakeValue {
-                                    stake: stake.clone(),
+                                    shares: stake.balance,
                                     boost_deposits: boost_deposits.clone(),
                                     small_units: Some(true),
                                 }
@@ -124,60 +124,70 @@ fn AccountMetrics(
                     LoadingValue {}
                 }
             }
-            if let Some(Ok(stake)) = stake.read().as_ref() {
-                if stake.balance_pending > 0 {
-                    Row {
-                        class: "w-full justify-between px-4",
-                        span {
-                            class: "text-elements-lowEmphasis font-medium",
-                            "Deposits (pending)"
-                        }
-                        span {
-                            class: "text-elements-highEmphasis font-medium",
-                            "{stake.balance_pending}"
+            if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+                if let Some(Ok(stake)) = stake.read().as_ref() {
+                    if stake.balance_pending > 0 {
+                        Row {
+                            class: "w-full justify-between px-4",
+                            span {
+                                class: "text-elements-lowEmphasis font-medium",
+                                "Deposits (pending)"
+                            }
+                            PairStakeValue {
+                                shares: stake.balance_pending,
+                                boost_deposits: boost_deposits.clone(),
+                                small_units: Some(true),
+                            }
                         }
                     }
                 }
             }
-            if let Some(Ok(lp_balance)) = lp_balance.read().as_ref() {
-                if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
-                    Row {
-                        class: "w-full justify-between px-4",
-                        span {
-                            class: "text-elements-lowEmphasis font-medium",
-                            "Unstaked"
-                        }
-                        span {
-                            class: "text-elements-highEmphasis font-medium",
-                            "{lp_balance.ui_amount_string} {boost_meta.ticker}"
-                        }
-                    }
-                    button {
-                        class: "h-12 w-full rounded-full controls-tertiary",
-                        onclick: move |_| {
-                            // Compile instructions
-                            let mut ixs = vec![];
-        
-                            // Get the wallet authority
-                            let Wallet::Connected(authority) = *wallet.read() else {
-                                return;
-                            };
-        
-                            // Open the stake account, if needed
-                            if let Some(Ok(_stake)) = stake.read().as_ref() {
-                                // Do nothing
-                            } else {
-                                ixs.push(ore_boost_api::sdk::open(authority, authority, boost_meta.lp_mint));
+            if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+                if let Some(Ok(lp_balance)) = lp_balance.read().as_ref() {
+                    if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
+                        Row {
+                            class: "w-full justify-between px-4",
+                            span {
+                                class: "text-elements-lowEmphasis font-medium",
+                                "Unstaked"
                             }
-        
-                            // Deposit LP tokens
-                            ixs.push(ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, u64::MAX));
-                            let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
-                            submit_transaction(transaction.into());
-                        },
-                        span {
-                            class: "mx-auto my-auto font-semibold",
-                            "Deposit {boost_meta.ticker}"
+                            PairStakeValue {
+                                shares: lp_balance.amount.parse::<u64>().unwrap_or(0),
+                                boost_deposits: boost_deposits.clone(),
+                                small_units: Some(true),
+                            }
+                            // span {
+                            //     class: "text-elements-highEmphasis font-medium",
+                            //     "{lp_balance.ui_amount_string} {boost_meta.ticker}"
+                            // }
+                        }
+                        button {
+                            class: "h-12 w-full rounded-full controls-tertiary",
+                            onclick: move |_| {
+                                // Compile instructions
+                                let mut ixs = vec![];
+            
+                                // Get the wallet authority
+                                let Wallet::Connected(authority) = *wallet.read() else {
+                                    return;
+                                };
+            
+                                // Open the stake account, if needed
+                                if let Some(Ok(_stake)) = stake.read().as_ref() {
+                                    // Do nothing
+                                } else {
+                                    ixs.push(ore_boost_api::sdk::open(authority, authority, boost_meta.lp_mint));
+                                }
+            
+                                // Deposit LP tokens
+                                ixs.push(ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, u64::MAX));
+                                let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
+                                submit_transaction(transaction.into());
+                            },
+                            span {
+                                class: "mx-auto my-auto font-semibold",
+                                "Deposit {boost_meta.ticker}"
+                            }
                         }
                     }
                 }
@@ -217,7 +227,7 @@ fn AccountMetrics(
                         return;
                     };
                     let beneficiary = spl_associated_token_account::get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
-                    ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, ore_api::consts::MINT_ADDRESS, stake.rewards));
+                    ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, boost_meta.lp_mint, stake.rewards));
                     let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
                     submit_transaction(transaction.into());
                 },

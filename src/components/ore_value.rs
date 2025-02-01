@@ -308,13 +308,13 @@ pub fn PairValue(class: Option<String>, boost_deposits: BoostDeposits, small_uni
 #[component]
 pub fn PairStakeValue(
     class: Option<String>, 
-    stake: Stake, 
+    shares: u64, 
     boost_deposits: BoostDeposits, 
     small_units: Option<bool>
 ) -> Element {
     let class = class.unwrap_or("".to_string());
 
-    let lp_share = stake.balance as f64 / boost_deposits.shares as f64;
+    let lp_share = shares as f64 / boost_deposits.shares as f64;
     let token_amount_a = boost_deposits.balance_a * lp_share;
     let token_amount_b = boost_deposits.balance_b * lp_share;
     let token_a_decimals = LISTED_TOKENS_BY_TICKER.get(&boost_deposits.token_a).unwrap().decimals;
