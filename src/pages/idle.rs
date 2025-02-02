@@ -1,10 +1,9 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::{spl_associated_token_account, spl_token::amount_to_ui_amount_string};
-use solana_sdk::transaction::Transaction;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 
-use crate::{components::*, gateway::{GatewayResult, UiTokenAmount}, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_stake, use_transaction_status, use_wallet, Wallet}};
+use crate::{components::*, gateway::{GatewayResult, UiTokenAmount}, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_stake}};
 
 pub fn Idle() -> Element {
     let ore_balance = use_ore_balance();
