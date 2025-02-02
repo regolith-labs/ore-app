@@ -291,13 +291,13 @@ pub fn PairValue(class: Option<String>, boost_deposits: BoostDeposits, small_uni
             class: "gap-2 {class}",
             OreValueSmall {
                 class: "ml-auto",
-                ui_amount_string: boost_deposits.balance_b.to_string(),
+                ui_amount_string: boost_deposits.balance_b_f64.to_string(),
                 small_units: small_units,
             }
             TokenValueSmall {
                 class: "ml-auto",
-                amount: boost_deposits.balance_a.to_string(),
-                ticker: boost_deposits.token_a.clone(),
+                amount: boost_deposits.balance_a_f64.to_string(),
+                ticker: boost_deposits.token_a.ticker.clone(),
                 small_units: small_units,
             }
         }
@@ -315,9 +315,9 @@ pub fn PairStakeValue(
     let class = class.unwrap_or("".to_string());
 
     let lp_share = shares as f64 / boost_deposits.shares as f64;
-    let token_amount_a = boost_deposits.balance_a * lp_share;
-    let token_amount_b = boost_deposits.balance_b * lp_share;
-    let token_a_decimals = LISTED_TOKENS_BY_TICKER.get(&boost_deposits.token_a).unwrap().decimals;
+    let token_amount_a = boost_deposits.balance_a_f64 * lp_share;
+    let token_amount_b = boost_deposits.balance_b_f64 * lp_share;
+    let token_a_decimals = boost_deposits.token_a.decimals;
 
     rsx! {
         Col {
@@ -330,7 +330,7 @@ pub fn PairStakeValue(
             TokenValueSmall {
                 class: "ml-auto",
                 amount: format!("{:.1$}", token_amount_a, token_a_decimals as usize),
-                ticker: boost_deposits.token_a.clone(),
+                ticker: boost_deposits.token_a.ticker.clone(),
                 small_units: small_units,
             }
         }

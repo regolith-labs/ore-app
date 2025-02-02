@@ -30,7 +30,7 @@ pub fn Pair(lp_mint: String) -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: boost_meta.name.clone(),
-                subtitle: "Manage your liquidity pair."
+                subtitle: "Manage your liquidity position."
             }
             Col {
                 class: "w-full h-full gap-16",

@@ -1,37 +1,25 @@
-use std::str::FromStr;
-
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::{create_associated_token_account, create_associated_token_account_idempotent}}, spl_token::{self, instruction::{close_account, sync_native}}};
-use solana_sdk::{native_token::sol_to_lamports, pubkey::Pubkey, system_instruction::transfer, transaction::Transaction};
+use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
-    components::{submit_transaction, Col, PairWithdrawForm, Row, TransactionStatus, WalletIcon}, config::{BoostMeta, LISTED_TOKENS}, gateway::{kamino::KaminoGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_transaction_status, use_wallet, BoostDeposits, Wallet}
+    components::{stake_form::common::{StakeTab, StakeTabs}, submit_transaction, Col, PairWithdrawForm, TokenInputError}, 
+    config::BoostMeta, 
+    gateway::{GatewayResult, UiTokenAmount}, 
+    hooks::{on_transaction_done, use_pair_deposit_transaction, BoostDeposits}
 };
-use super::common::*;
+use super::token_input_form::*;
 
-#[derive(Clone, PartialEq, Eq)]
-pub enum PairDepositError {
-    InsufficientBalance(String),
-}
-
-impl ToString for PairDepositError {
-    fn to_string(&self) -> String {
-        match self {
-            PairDepositError::InsufficientBalance(ticker) => format!("Not enough {}", ticker),
-        }
-    }
-}
 
 #[component]
 pub fn PairStakeForm(
-    class: Option<String>, 
+    class: Option<String>,
     boost_meta: BoostMeta,
     boost_deposits: Resource<GatewayResult<BoostDeposits>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>
 ) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);
@@ -54,7 +42,12 @@ pub fn PairStakeForm(
                 },
                 StakeTab::Withdraw => rsx! {
                     PairWithdrawForm {
-                        boost_meta: boost_meta
+                        boost_meta: boost_meta,
+                        boost_deposits: boost_deposits,
+                        lp_balance: lp_balance,
+                        stake: stake,
+                        token_a_balance: token_a_balance,
+                        token_b_balance: token_b_balance,
                     }
                 }
             }
@@ -62,354 +55,178 @@ pub fn PairStakeForm(
     }
 }
 
+
 #[component]
-fn PairDepositForm(
-    class: Option<String>, 
+pub fn PairDepositForm(
+    class: Option<String>,
     boost_meta: BoostMeta,
     boost_deposits: Resource<GatewayResult<BoostDeposits>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>
 ) -> Element {
     let class = class.unwrap_or_default();
-    let wallet = use_wallet();
-    let mut stake_amount_a = use_signal::<String>(|| "".to_owned());
-    let mut stake_amount_b = use_signal::<String>(|| "".to_owned());
-    let transaction_status = use_transaction_status();
-    let mut error_msg = use_signal::<Option<PairDepositError>>(|| None);
+    let mut input_amount_a = use_signal::<String>(|| "".to_owned());
+    let mut input_amount_b = use_signal::<String>(|| "".to_owned());
+    let err = use_signal::<Option<TokenInputError>>(|| None);
  
     // Refresh data, if transaction success
-    use_effect(move || {
-        if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
-            boost_deposits.restart();
-            token_a_balance.restart();
-            token_b_balance.restart();
-            lp_balance.restart();
-            stake.restart();
-            stake_amount_a.set("".to_owned());
-            stake_amount_b.set("".to_owned());
-        }
+    on_transaction_done(move |_sig| {
+        boost_deposits.restart();
+        token_a_balance.restart();
+        token_b_balance.restart();
+        lp_balance.restart();
+        stake.restart();
     });
 
-    // Set the error message
-    use_effect(move || {
-        let Some(Ok(boost_deposits)) = boost_deposits.cloned() else {
-            error_msg.set(None);
-            return;
+    // Build pair deposit transaction
+    let tx = use_pair_deposit_transaction(
+        boost_meta, 
+        boost_deposits, 
+        lp_balance, 
+        stake, 
+        token_a_balance, 
+        token_b_balance, 
+        input_amount_a, 
+        input_amount_b, 
+        err
+    );
+    
+    // Get tokens
+    let (token_a, token_b) = if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+        (Some(boost_deposits.token_a), Some(boost_deposits.token_b))
+    } else {
+        (None, None)
+    };
+
+
+    let mut process_input = move |val: String, prior_val: String, flag: bool| {
+         // Define function to safely update input values
+         let mut safe_update = move |new_val: String| {
+            let new_val_f64 = new_val.parse::<f64>().unwrap_or(0.0);
+            let prior_val_f64 = prior_val.parse::<f64>().unwrap_or(0.0);
+            if new_val_f64 != prior_val_f64 {
+                if flag {
+                    input_amount_b.set(new_val);
+                } else {
+                    input_amount_a.set(new_val);
+                }
+            }
         };
-        let Ok(amount_a) = stake_amount_a.cloned().parse::<f64>() else {
-            error_msg.set(None);
+
+        // Parse event value
+        if val.len().eq(&0) {
+            safe_update(val.clone());
             return;
-        };
-        let Ok(amount_b) = stake_amount_b.cloned().parse::<f64>() else {
-            error_msg.set(None);
+        }
+
+        // Get resources
+        let Some(Ok(deposits)) = boost_deposits.cloned() else {
             return;
         };
         let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
-            error_msg.set(None);
             return;
         };
         let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
-            error_msg.set(None);
             return;
         };
 
-        if amount_a == 0f64 || amount_b == 0f64 {
-            error_msg.set(None);
-            return;
-        }
+        // Calculate deposit ratio
+        let ratio = deposits.balance_a_f64 / deposits.balance_b_f64;
 
-        if amount_a > token_a_balance.ui_amount.unwrap_or(0.0) {
-            error_msg.set(Some(PairDepositError::InsufficientBalance(boost_deposits.token_a.clone())));
-            return;
+        // Update input values
+        if let Ok(val_f64) = val.parse::<f64>() {
+            if val_f64 >= 0f64 {
+                if flag {
+                    safe_update(format!("{:.1$}", (val_f64 / ratio), token_b_balance.decimals as usize));
+                } else {
+                    safe_update(format!("{:.1$}", (val_f64 * ratio), token_a_balance.decimals as usize));
+                }
+            } else {
+                safe_update("".to_string());
+            }
+        } else {
+            // Reject invalid input
+            let last_valid_input = val[..val.len()-1].to_string();
+            if flag {
+                input_amount_a.set(last_valid_input.clone());
+            } else {
+                input_amount_b.set(last_valid_input.clone());
+            }
+            // safe_update(last_valid_input);
         }
-        if amount_b > token_b_balance.ui_amount.unwrap_or(0.0) {
-            error_msg.set(Some(PairDepositError::InsufficientBalance(boost_deposits.token_b.clone())));
-            return;
-        }
-        error_msg.set(None);
+    };
+
+    // Process input stream a
+    let b = input_amount_b.cloned();
+    use_effect(move || {
+        process_input(input_amount_a.read().clone(), b.clone(), true);
     });
 
-    // Build the deposit instruction
-    let deposit_ix = use_resource(move || async move {
-        // Check if wallet is connected
-        let Wallet::Connected(authority) = *wallet.read() else {
-            return Err(GatewayError::WalletDisconnected);
-        };
-
-        // Parse amounts
-        let Ok(amount_a) = stake_amount_a.cloned().parse::<f64>() else {
-            return Err(GatewayError::Unknown);
-        };
-        let Ok(amount_b) = stake_amount_b.cloned().parse::<f64>() else {
-            return Err(GatewayError::Unknown);
-        };
-        if amount_a == 0f64 || amount_b == 0f64 {
-            return Err(GatewayError::Unknown);
-        }
-
-        // Build the instruction
-        use_gateway().build_deposit_instruction(
-            boost_meta.lp_id,
-            amount_a,
-            amount_b,
-            authority,
-        ).await
+    // Process input stream b
+    let a = input_amount_a.cloned();
+    use_effect(move || {
+        process_input(input_amount_b.read().clone(), a.clone(), false);
     });
 
     rsx! {
         Col {
-            class: "w-full {class}",
             gap: 4,
             Col {
-                class: "lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0",
-                StakeInputs {
-                    mint: boost_meta.pair_mint,
-                    amount_a: stake_amount_a,
-                    amount_b: stake_amount_b,
-                    token_a_balance: token_a_balance,
-                    token_b_balance: token_b_balance,
-                    boost_deposits: boost_deposits,
-                    error_msg: error_msg,
+                class: "w-full p-4 lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0 {class}",
+                gap: 4,
+                TokenInputForm {
+                    title: "Deposit".to_string(),
+                    balance: token_a_balance,
+                    token: token_a,
+                    value: input_amount_a,
+                    toolbar_shortcuts: true,
+                    err: err
+                }
+                TokenInputForm {
+                    title: "And".to_string(),
+                    balance: token_b_balance,
+                    token: token_b,
+                    value: input_amount_b,
+                    err: err
                 }
             }
-            // StakeDetails {}
             SubmitButton {
-                error_msg: error_msg,
-                enabled: if let Some(Ok(_ix)) = deposit_ix.cloned() {
-                    error_msg.cloned().is_none()
-                } else {
-                    false
-                },
-                onclick: move |_| {
-                    // Compile instructions
-                    let mut ixs = vec![];
-
-                    // Return if wallet is not connected
-                    let Wallet::Connected(authority) = *wallet.read() else {
-                        return;
-                    };
-
-                    // Return if amount is not valid
-                    let Ok(amount_a_f64) = stake_amount_a.cloned().parse::<f64>() else {
-                        return;
-                    };
-
-                    // Create ata for lp shares, if needed
-                    if let Some(Ok(_)) = lp_balance.cloned() {
-                        // Do nothing
-                    } else {
-                        ixs.push(
-                            create_associated_token_account(&authority, &authority, &boost_meta.lp_mint, &spl_token::ID)
-                        );
-                    }
-
-                    // Handle wrapped SOL, if needed
-                    let token_a_ata = get_associated_token_address(&authority, &boost_meta.pair_mint);
-                    let is_sol = boost_meta.pair_mint == Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap();
-                    if is_sol {
-                        ixs.push(
-                            create_associated_token_account_idempotent(&authority, &authority, &boost_meta.pair_mint, &spl_token::ID)
-                        );
-                        ixs.push(
-                            transfer(&authority, &token_a_ata, sol_to_lamports(amount_a_f64))
-                        );
-                        ixs.push(
-                            sync_native(&spl_token::ID, &token_a_ata).unwrap()
-                        );
-                    }
-
-                    // Append deposit instruction
-                    let Some(Ok(deposit_ix)) = deposit_ix.cloned() else {
-                        return;
-                    };
-                    ixs.push(deposit_ix);
-
-                    // Close the wSOL ata
-                    if is_sol {
-                        ixs.push(
-                            close_account(&spl_token::ID, &token_a_ata, &authority, &authority, &[&authority]).unwrap()
-                        );
-                    }
-
-                    // Open the stake account, if needed
-                    if let Some(Ok(_stake)) = stake.read().as_ref() {
-                        // Do nothing
-                    } else {
-                        ixs.push(ore_boost_api::sdk::open(authority, authority, boost_meta.lp_mint));
-                    }
-
-                    // Stake LP tokens into boost program
-                    ixs.push(
-                        ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, u64::MAX)
-                    );
-
-                    // Submit transaction
-                    let tx = Transaction::new_with_payer(&ixs, Some(&authority));
-                    submit_transaction(tx.into());
-                }
+                title: "Submit".to_string(),
+                transaction: tx,
+                error_msg: err
             }
         }
     }
 }
 
+
 #[component]
-fn StakeInputs(
-    mint: Pubkey,
-    amount_a: Signal<String>,
-    amount_b: Signal<String>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
-    error_msg: Signal<Option<PairDepositError>>,
+pub fn SubmitButton(
+    title: String,
+    transaction: Resource<GatewayResult<VersionedTransaction>>,
+    error_msg: Signal<Option<TokenInputError>>
 ) -> Element {
-    let token = LISTED_TOKENS.get(&mint).unwrap();
-    rsx! {
-        Col {
-            class: "w-full p-4",
-            gap: 4,
-            Row {
-                class: "justify-between",
-                span {
-                    class: "text-elements-lowEmphasis my-auto pl-1",
-                    "Deposit"
-                }
-                MaxButtonA {
-                    amount_a: amount_a,
-                    amount_b: amount_b,
-                    token_a_balance: token_a_balance,
-                    token_b_balance: token_b_balance,
-                    boost_deposits: boost_deposits,
-                }
-            }
-            Row {
-                gap: 4,
-                Row {
-                    class: "my-auto",
-                    gap: 2,
-                    img {
-                        class: "w-8 h-8 rounded-full",
-                        src: "{token.image}",
-                    }
-                    span {
-                        class: "font-semibold my-auto",
-                        "{token.ticker}"
-                    }
-                }
-                input {
-                    class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                    placeholder: "0",
-                    r#type: "number",
-                    inputmode: "decimal",
-                    value: amount_a.cloned(),
-                    oninput: move |e| {
-                        let Some(Ok(deposits)) = boost_deposits.cloned() else {
-                            return;
-                        };
-                        let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
-                            return;
-                        };
-
-                        let ratio = deposits.balance_a / deposits.balance_b;
-
-                        let val = e.value();
-                        if val.len().eq(&0) {
-                            amount_a.set(val.clone());
-                            amount_b.set(val);
-                            return;
-                        }
-
-                        if let Ok(val_f64) = val.parse::<f64>() {
-                            if val_f64 >= 0f64 {
-                                amount_a.set(val);
-                                amount_b.set(format!("{:.1$}", (val_f64 / ratio), token_b_balance.decimals as usize));
-                            } else {
-                                amount_a.set("".to_string());
-                                amount_b.set("".to_string());
-                            }
-                        } else {
-                            amount_a.set(val[..val.len()-1].to_string());
-                        }
-                    }
-                }
-            }
-            Row {
-                class: "justify-between",
-                span {
-                    class: "text-elements-lowEmphasis my-auto pl-1",
-                    "And"
-                }
-                MaxButtonB {
-                    amount_a: amount_a,
-                    amount_b: amount_b,
-                    token_a_balance: token_a_balance,
-                    token_b_balance: token_b_balance,
-                    boost_deposits: boost_deposits,
-                }
-            }
-            Row {
-                gap: 4,
-                Row {
-                    class: "my-auto",
-                    gap: 2,
-                    img {
-                        class: "w-8 h-8 rounded-full",
-                        src: asset!("/public/icon.png"),
-                    }
-                    span {
-                        class: "font-semibold my-auto",
-                        "ORE"
-                    }
-                }
-                input {
-                    class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                    placeholder: "0",
-                    r#type: "number",
-                    inputmode: "decimal",
-                    value: amount_b.cloned(),
-                    oninput: move |e| {
-                        let Some(Ok(deposits)) = boost_deposits.cloned() else {
-                            return;
-                        };
-                        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
-                            return;
-                        };
-
-                        let ratio = deposits.balance_a / deposits.balance_b;
-
-                        let val = e.value();
-                        if val.len().eq(&0) {
-                            amount_a.set(val.clone());
-                            amount_b.set(val);
-                            return;
-                        }
-
-                        if let Ok(val_f64) = val.parse::<f64>() {
-                            if val_f64 >= 0f64 {
-                                amount_a.set(format!("{:.1$}", (val_f64 * ratio), token_a_balance.decimals as usize));
-                                amount_b.set(val);
-                            } else {
-                                amount_a.set("".to_string());
-                                amount_b.set("".to_string());
-                            }
-                        } else {
-                            amount_b.set(val[..val.len()-1].to_string());
-                        }
-                    }
-                }
-            }
+    let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
+        if let Some(_) = error_msg.cloned() {
+            false
+        } else {
+            true
         }
-    }
-}
+    } else {
+        false
+    };
 
-#[component]
-fn SubmitButton(enabled: bool, onclick: EventHandler<MouseEvent>, error_msg: Signal<Option<PairDepositError>>) -> Element {
     rsx! {
         button {
             class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
             disabled: !enabled,
-            onclick: onclick,
+            onclick: move |_| {
+                if let Some(Ok(transaction)) = transaction.cloned() {
+                    submit_transaction(transaction);
+                }
+            },
             if let Some(error) = error_msg.cloned() {
                 span {
                     class: "mx-auto my-auto font-semibold",
@@ -418,98 +235,7 @@ fn SubmitButton(enabled: bool, onclick: EventHandler<MouseEvent>, error_msg: Sig
             } else {
                 span {
                     class: "mx-auto my-auto font-semibold",
-                    "Submit"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn MaxButtonA(
-    amount_a: Signal<String>,
-    amount_b: Signal<String>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
-) -> Element {
-    rsx! {
-        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
-            Row {
-                gap: 2,
-                if let Some(Ok(token_a_balance)) = token_a_balance.cloned() {
-                    Row {
-                        class: "py-1 px-1 font-medium text-elements-lowEmphasis my-auto",
-                        gap: 2,
-                        WalletIcon { 
-                            class: "h-4 my-auto" 
-                        }
-                        span { 
-                            class: "my-auto text-xs font-medium", 
-                            "{token_a_balance.ui_amount_string} {boost_deposits.token_a}" 
-                        }
-                    }
-                    button {
-                        class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
-                        onclick: move |_| {
-                            let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
-                                return;
-                            };
-                            let token_a_amount = token_a_balance.ui_amount.unwrap_or(0.0) / 2.0;
-                            let ratio = boost_deposits.balance_a / boost_deposits.balance_b;
-                            amount_a.set(token_a_amount.to_string());
-                            amount_b.set(format!("{:.1$}", (token_a_amount / ratio), token_b_balance.decimals as usize));
-                        },
-                        "HALF"
-                    }
-                    button {
-                        class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
-                        onclick: move |_| {
-                            let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
-                                return;
-                            };
-                            let token_a_amount = token_a_balance.ui_amount.unwrap_or(0.0);
-                            let ratio = boost_deposits.balance_a / boost_deposits.balance_b;
-                            amount_a.set(token_a_amount.to_string());
-                            amount_b.set(format!("{:.1$}", (token_a_amount / ratio), token_b_balance.decimals as usize));
-                        },
-                        "MAX"
-                    }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn MaxButtonB(
-    amount_a: Signal<String>,
-    amount_b: Signal<String>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
-) -> Element {
-    rsx! {
-        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
-            if let Some(Ok(token_b_balance)) = token_b_balance.cloned() {
-                button {
-                    class: "flex flex-row gap-2 text-xs my-auto py-1 px-1 font-medium text-elements-lowEmphasis hover:text-elements-highEmphasis hover:cursor-pointer",
-                    onclick: move |_| {
-                        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
-                            return;
-                        };
-                        let token_b_amount = token_b_balance.ui_amount.unwrap_or(0.0);
-                        let ratio = boost_deposits.balance_a / boost_deposits.balance_b;
-                        amount_a.set(format!("{:.1$}", (token_b_amount * ratio), token_a_balance.decimals as usize));
-                        amount_b.set(token_b_amount.to_string());
-                    },
-                    WalletIcon { 
-                        class: "h-4 my-auto" 
-                    }
-                    span { 
-                        class: "my-auto text-xs font-medium", 
-                        "{token_b_balance.ui_amount_string} {boost_deposits.token_b}" 
-                    }
+                    "{title}"
                 }
             }
         }

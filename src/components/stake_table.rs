@@ -136,7 +136,7 @@ fn StakeTableRowBasis(boost_deposits: Resource<GatewayResult<BoostDeposits>>) ->
                 //     ticker: boost_deposits.token_a.clone(),
                 // }
                 OreValueSmall {
-                    ui_amount_string: boost_deposits.balance_b.to_string(),
+                    ui_amount_string: boost_deposits.balance_b_f64.to_string(),
                 }
                 // TokenValueSmall {
                 //     class: "ml-auto",
@@ -158,8 +158,8 @@ fn StakeTableRowLiquidity(boost_deposits: Resource<GatewayResult<BoostDeposits>>
                 gap: 2,
                 TokenValueSmall {
                     class: "ml-auto",
-                    amount: boost_deposits.balance_a.to_string(),
-                    ticker: boost_deposits.token_a.clone(),
+                    amount: boost_deposits.balance_a_f64.to_string(),
+                    ticker: boost_deposits.token_a.ticker.clone(),
                 }
                 // TokenValueSmall {
                 //     class: "ml-auto",
