@@ -45,10 +45,10 @@ pub fn Landing() -> Element {
                         // }
                         a {
                             class: "mx-auto px-4 py-2 text-white opacity-50 hover:opacity-100 hover:underline",
-                            href: "https://legacy.ore.supply/home",
+                            href: "https://github.com/regolith-labs/ore-cli",
                             target: "_blank",
                             span {
-                                "Visit legacy site"
+                                "Install the CLI"
                             }
                         }
                     }
