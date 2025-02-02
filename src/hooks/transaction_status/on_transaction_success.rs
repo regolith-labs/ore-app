@@ -12,7 +12,7 @@ pub fn on_transaction_done(
     // Get transaction status
     let transaction_status = use_transaction_status();
 
-    // Refresh data, if transaction success
+    // Callback if transaction success
     use_effect(move || {
         if let Some(TransactionStatus::Done(signature)) = *transaction_status.read() {
             callback(signature);

@@ -3,14 +3,17 @@ use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{components::submit_transaction, gateway::GatewayResult};
 
-use super::TokenInputError;
+use crate::components::TokenInputError;
 
 #[component]
 pub fn SubmitButton(
+    class: Option<String>,
     title: String,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
     err: Signal<Option<TokenInputError>>
 ) -> Element {
+    let class = class.unwrap_or("controls-primary".to_string());
+
     let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
         if let Some(_) = err.cloned() {
             false
@@ -23,7 +26,7 @@ pub fn SubmitButton(
 
     rsx! {
         button {
-            class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
+            class: "h-12 w-full rounded-full {class} transition-transform hover:not-disabled:scale-105",
             disabled: !enabled,
             onclick: move |_| {
                 if let Some(Ok(transaction)) = transaction.cloned() {

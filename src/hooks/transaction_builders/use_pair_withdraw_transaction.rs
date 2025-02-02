@@ -1,21 +1,17 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::{create_associated_token_account, create_associated_token_account_idempotent}}, spl_token::{self, instruction::{close_account, sync_native}}};
-use solana_sdk::{hash::Hash, message::{v0, VersionedMessage}, native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
+use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::create_associated_token_account_idempotent}, spl_token::{self, instruction::{close_account, sync_native}}};
+use solana_sdk::{hash::Hash, message::{v0, VersionedMessage}, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
-    components::TokenInputError, config::BoostMeta, gateway::{GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
+    components::TokenInputError, config::{BoostMeta, LpType}, gateway::{GatewayError, kamino::KaminoGateway, meteora::MeteoraGateway, GatewayResult}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
 };
-use crate::gateway::kamino::KaminoGateway;
 
 // Build pair deposit transaction
 pub fn use_pair_withdraw_transaction(
     boost_meta: BoostMeta,
     boost_deposits: Resource<GatewayResult<BoostDeposits>>,
-    lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
     mut err: Signal<Option<TokenInputError>>
@@ -62,14 +58,29 @@ pub fn use_pair_withdraw_transaction(
         }
 
         // Append kamino withdraw instructions
-        // TODO Generalize for Kamino and Meteora
-        let Ok(withdraw_ix) = use_gateway().build_withdraw_instruction(
-            boost_meta.lp_id,
-            shares_amount,
-            authority,
-        ).await else {
-            // TODO set error message
-            return Err(GatewayError::Unknown);
+        let withdraw_ix = match boost_meta.lp_type {
+            LpType::Kamino => {
+                let Ok(ix) = use_gateway().build_kamino_withdraw_instruction(
+                    boost_meta.lp_id,
+                    shares_amount,
+                    authority,
+                ).await else {
+                    err.set(None);
+                    return Err(GatewayError::Unknown);
+                };
+                ix
+            }
+            LpType::Meteora => {
+                let Ok(ix) = use_gateway().build_meteora_withdraw_instruction(
+                    boost_meta.lp_id,
+                    shares_amount,
+                    authority,
+                ).await else {
+                    err.set(None);
+                    return Err(GatewayError::Unknown);
+                };
+                ix
+            }
         };
         ixs.push(withdraw_ix);
 

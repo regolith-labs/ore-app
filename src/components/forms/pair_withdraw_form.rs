@@ -39,10 +39,7 @@ pub fn PairWithdrawForm(
     let tx = use_pair_withdraw_transaction(
         boost_meta, 
         boost_deposits, 
-        lp_balance, 
         stake, 
-        token_a_balance, 
-        token_b_balance, 
         input_amount_a, 
         input_amount_b, 
         err

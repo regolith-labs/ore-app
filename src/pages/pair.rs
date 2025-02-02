@@ -3,11 +3,15 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::{spl_associated_token_account, spl_token::amount_to_ui_amount_string};
-use solana_sdk::transaction::Transaction;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
-use crate::{components::{submit_transaction, Col, Heading, LoadingValue, NullValue, OreValueSmall, PairStakeForm, PairStakeValue, PairValue, Row, TransactionStatus, UsdValueSmall}, config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, gateway::{GatewayResult, UiTokenAmount}, hooks::{use_boost, use_boost_deposits, use_ore_balance, use_stake, use_token_balance, use_transaction_status, use_wallet, BoostDeposits, Wallet}, pages::ClaimButton};
+use crate::{
+    components::*, 
+    config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, 
+    gateway::{GatewayResult, UiTokenAmount}, 
+    hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_boost_deposits, use_lp_deposit_transaction, use_ore_balance, use_stake, use_token_balance, BoostDeposits}
+};
 
 #[component]
 pub fn Pair(lp_mint: String) -> Element {
@@ -48,6 +52,7 @@ pub fn Pair(lp_mint: String) -> Element {
                     boost_deposits: boost_deposits,
                     ore_balance,
                     lp_balance,
+                    boost,
                     stake
                 }
                 SummaryMetrics {
@@ -66,28 +71,21 @@ fn AccountMetrics(
     boost_deposits: Resource<GatewayResult<BoostDeposits>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
+    boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
-    let wallet = use_wallet();
-    let mut enabled = use_signal(|| false);
-    let transaction_status = use_transaction_status();
-
-    // Enable claim button
-    use_effect(move || {
-        if let Some(Ok(stake)) = stake.read().as_ref() {
-            enabled.set(stake.rewards > 0);
-        } else {
-            enabled.set(false);
-        };
-    });
+    let err = use_signal(|| None);
 
     // Refresh data if successful transaction
-    use_effect(move || {
-        if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
-            ore_balance.restart();
-            stake.restart();
-        }
+    on_transaction_done(move |_sig| {
+        ore_balance.restart();
+        stake.restart();
+        boost.restart();
     });
+
+    // Build transactions
+    let claim_tx = use_boost_claim_transaction(boost, stake);
+    let lp_deposit_tx = use_lp_deposit_transaction(boost, stake);
 
     rsx! {
         Col {
@@ -156,38 +154,12 @@ fn AccountMetrics(
                                 boost_deposits: boost_deposits.clone(),
                                 small_units: Some(true),
                             }
-                            // span {
-                            //     class: "text-elements-highEmphasis font-medium",
-                            //     "{lp_balance.ui_amount_string} {boost_meta.ticker}"
-                            // }
                         }
-                        button {
-                            class: "h-12 w-full rounded-full controls-tertiary",
-                            onclick: move |_| {
-                                // Compile instructions
-                                let mut ixs = vec![];
-            
-                                // Get the wallet authority
-                                let Wallet::Connected(authority) = *wallet.read() else {
-                                    return;
-                                };
-            
-                                // Open the stake account, if needed
-                                if let Some(Ok(_stake)) = stake.read().as_ref() {
-                                    // Do nothing
-                                } else {
-                                    ixs.push(ore_boost_api::sdk::open(authority, authority, boost_meta.lp_mint));
-                                }
-            
-                                // Deposit LP tokens
-                                ixs.push(ore_boost_api::sdk::deposit(authority, boost_meta.lp_mint, u64::MAX));
-                                let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
-                                submit_transaction(transaction.into());
-                            },
-                            span {
-                                class: "mx-auto my-auto font-semibold",
-                                "Deposit {boost_meta.ticker}"
-                            }
+                        SubmitButton {
+                            class: "controls-tertiary",
+                            title: "Deposit {boost_meta.ticker}",
+                            transaction: lp_deposit_tx.clone(),
+                            err: err.clone(),
                         }
                     }
                 }
@@ -217,20 +189,7 @@ fn AccountMetrics(
                 }
             }
             ClaimButton {
-                enabled: enabled.clone(),
-                onclick: move |_| {
-                    let mut ixs = vec![];
-                    let Wallet::Connected(authority) = *wallet.read() else {
-                        return;
-                    };
-                    let Some(Ok(stake)) = *stake.read() else {
-                        return;
-                    };
-                    let beneficiary = spl_associated_token_account::get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
-                    ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, boost_meta.lp_mint, stake.rewards));
-                    let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
-                    submit_transaction(transaction.into());
-                },
+                transaction: claim_tx.clone(),
             }
         }
     }

@@ -4,7 +4,7 @@ use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_t
 use solana_sdk::{native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
-    components::TokenInputError, config::BoostMeta, gateway::{kamino::KaminoGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
+    components::TokenInputError, config::{BoostMeta, LpType}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
 };
 
 // Build pair deposit transaction
@@ -93,17 +93,33 @@ pub fn use_pair_deposit_transaction(
         }
     
         // Build the instruction
-        // TODO Generalize for Kamino and Meteora
-        let Ok(ix) = use_gateway().build_deposit_instruction(
-            boost_meta.lp_id,
-            amount_a_f64,
-            amount_b_f64,
-            authority,
-        ).await else {
-            err.set(Some(TokenInputError::InsufficientBalance(boost_deposits.token_a.clone())));
-            return Err(GatewayError::Unknown);
+        let deposit_ix = match boost_meta.lp_type {
+            LpType::Kamino => {
+                let Ok(ix) = use_gateway().build_kamino_deposit_instruction(
+                    boost_meta.lp_id,
+                    amount_a_f64,
+                    amount_b_f64,
+                    authority,
+                ).await else {
+                    err.set(None);
+                    return Err(GatewayError::Unknown);
+                };
+                ix
+            }
+            LpType::Meteora => {
+                let Ok(ix) = use_gateway().build_meteora_deposit_instruction(
+                    boost_meta.lp_id,
+                    amount_a_f64,
+                    amount_b_f64,
+                    authority,
+                ).await else {
+                    err.set(None);
+                    return Err(GatewayError::Unknown);
+                };
+                ix
+            }
         };
-        ixs.push(ix);
+        ixs.push(deposit_ix);
     
         // Close the wSOL ata
         if is_sol {

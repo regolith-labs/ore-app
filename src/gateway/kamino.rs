@@ -10,31 +10,31 @@ use crate::{gateway::GatewayError, utils::deserialize_string_to_f64};
 
 pub trait KaminoGateway {
     // Fetch data
-    async fn get_strategy_metrics(&self, strategy: Pubkey) -> GatewayResult<KaminoStrategyMetrics>;   
-    async fn get_whirlpool_strategy(&self, strategy: Pubkey) -> GatewayResult<WhirlpoolStrategy>;
-    async fn get_global_config(&self) -> GatewayResult<GlobalConfig>;
+    async fn get_kamino_strategy_metrics(&self, strategy: Pubkey) -> GatewayResult<KaminoStrategyMetrics>;   
+    async fn get_kamino_whirlpool_strategy(&self, strategy: Pubkey) -> GatewayResult<WhirlpoolStrategy>;
+    async fn get_kamino_global_config(&self) -> GatewayResult<GlobalConfig>;
 
-    // Build instructions
-    async fn build_deposit_instruction(&self, strategy: Pubkey, amount_a: f64, amount_b: f64, owner: Pubkey) -> GatewayResult<Instruction>;
-    async fn build_withdraw_instruction(&self, strategy_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction>;
+    // Instruction builders
+    async fn build_kamino_deposit_instruction(&self, strategy: Pubkey, amount_a: f64, amount_b: f64, owner: Pubkey) -> GatewayResult<Instruction>;
+    async fn build_kamino_withdraw_instruction(&self, strategy_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction>;
 }
 
 impl<R: Rpc> KaminoGateway for Gateway<R> {
-    async fn get_strategy_metrics(&self, strategy: Pubkey) -> GatewayResult<KaminoStrategyMetrics> {
+    async fn get_kamino_strategy_metrics(&self, strategy: Pubkey) -> GatewayResult<KaminoStrategyMetrics> {
         let url = format!("https://api.kamino.finance/strategies/{strategy}/metrics/?env=mainnet-beta&status=LIVE");
         let resp = self.http.get(url).send().await?;
         let metrics = resp.json::<KaminoStrategyMetrics>().await?;
         Ok(metrics)
     }
 
-    async fn get_global_config(&self) -> GatewayResult<GlobalConfig> {
+    async fn get_kamino_global_config(&self) -> GatewayResult<GlobalConfig> {
         let address = Pubkey::from_str("GKnHiWh3RRrE1zsNzWxRkomymHc374TvJPSTv2wPeYdB").unwrap();
         let account_data = self.rpc.get_account_data(&address).await?;
         let config = GlobalConfig::from_bytes(&account_data)?;
         Ok(config)
     }
 
-    async fn get_whirlpool_strategy(&self, strategy: Pubkey) -> GatewayResult<WhirlpoolStrategy> {
+    async fn get_kamino_whirlpool_strategy(&self, strategy: Pubkey) -> GatewayResult<WhirlpoolStrategy> {
         let account_data = self.rpc.get_account_data(&strategy).await?;
         let strategy = WhirlpoolStrategy::from_bytes(&account_data)?;
         Ok(strategy)
@@ -44,15 +44,15 @@ impl<R: Rpc> KaminoGateway for Gateway<R> {
     /// 
     /// Logic copied from kliquidity typescript sdk.
     /// https://github.com/Kamino-Finance/kliquidity-sdk/blob/9787fcec784a5a19baede4b6b4819d6883c7e954/src/Kamino.ts#L2910
-    async fn build_deposit_instruction(&self, strategy_address: Pubkey, amount_a: f64, amount_b: f64, owner: Pubkey) -> GatewayResult<Instruction> {
+    async fn build_kamino_deposit_instruction(&self, strategy_address: Pubkey, amount_a: f64, amount_b: f64, owner: Pubkey) -> GatewayResult<Instruction> {
         // Check amounts
         if amount_a <= 0.0 || amount_b <= 0.0 {
             return Err(GatewayError::Unknown);
         }
 
         // Get onchain kamino accounts
-        let config = self.get_global_config().await?;
-        let strategy = self.get_whirlpool_strategy(strategy_address).await?;
+        let config = self.get_kamino_global_config().await?;
+        let strategy = self.get_kamino_whirlpool_strategy(strategy_address).await?;
 
         // Get token accounts
         let user_shares_ata = get_associated_token_address(&owner, &strategy.shares_mint);
@@ -100,14 +100,14 @@ impl<R: Rpc> KaminoGateway for Gateway<R> {
     /// 
     /// Logic copied from kliquidity typescript sdk.
     /// https://github.com/Kamino-Finance/kliquidity-sdk/blob/9787fcec784a5a19baede4b6b4819d6883c7e954/src/Kamino.ts#L2550
-    async fn build_withdraw_instruction(&self, strategy_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction> {
+    async fn build_kamino_withdraw_instruction(&self, strategy_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction> {
         // Parse amounts
         if shares_amount == 0 {
             return Err(GatewayError::Unknown);
         }
 
         // Get strategy state
-        let strategy = self.get_whirlpool_strategy(strategy_address).await?;
+        let strategy = self.get_kamino_whirlpool_strategy(strategy_address).await?;
 
         // Get treasury pda vaults
         let treasury_fee_token_a_vault = Pubkey::find_program_address(&[b"treasury_fee_vault", strategy.token_a_mint.as_ref()], &kliquidity_sdk::programs::YVAULTS_ID).0;

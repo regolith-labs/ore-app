@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, ui_amount_to_am
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
 
 use crate::{
-    components::TokenInputError, config::Token, gateway::{GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_wallet, Wallet}
+    components::TokenInputError, config::Token, gateway::{GatewayError, GatewayResult}, hooks::{use_wallet, Wallet}
 };
 
 pub fn use_idle_withdraw_transaction(

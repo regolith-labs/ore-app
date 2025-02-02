@@ -21,7 +21,7 @@ pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<Boost
         // Get strategy metrics
         match lp_type {
             LpType::Kamino => {
-                let strategy = use_gateway().get_strategy_metrics(boost_meta.lp_id).await?;
+                let strategy = use_gateway().get_kamino_strategy_metrics(boost_meta.lp_id).await?;
                 let token_a = LISTED_TOKENS_BY_TICKER.get(&strategy.token_a).unwrap();
                 let token_b = LISTED_TOKENS_BY_TICKER.get(&strategy.token_b).unwrap();
                 return Ok(BoostDeposits {
@@ -34,7 +34,7 @@ pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<Boost
                 });
             }
             LpType::Meteora => {
-                let amm = use_gateway().get_amm_metrics(boost_meta.lp_id).await?;
+                let amm = use_gateway().get_meteora_amm_metrics(boost_meta.lp_id).await?;
                 let token_a = LISTED_TOKENS.get(&amm.pool_token_mints[0]).unwrap();
                 let token_b = LISTED_TOKENS.get(&amm.pool_token_mints[1]).unwrap();
                 let balance_a = amm.pool_token_amounts[0];

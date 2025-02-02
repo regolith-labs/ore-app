@@ -4,7 +4,7 @@ use ore_boost_api::state::{Boost, Stake};
 use solana_extra_wasm::program::{spl_associated_token_account, spl_token::amount_to_ui_amount_string};
 use solana_sdk::transaction::Transaction;
 
-use crate::{components::*, gateway::{UiTokenAmount, GatewayResult}, hooks::{use_boost, use_ore_balance, use_stake, use_transaction_status, use_wallet, Wallet}};
+use crate::{components::*, gateway::{GatewayResult, UiTokenAmount}, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_stake, use_transaction_status, use_wallet, Wallet}};
 
 pub fn Idle() -> Element {
     let ore_balance = use_ore_balance();
@@ -46,26 +46,15 @@ fn AccountDetails(
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     ore_stake: Resource<GatewayResult<Stake>>
 ) -> Element {
-    let wallet = use_wallet();
-    let mut enabled = use_signal(|| false);
-    let transaction_status = use_transaction_status();
-
-    // Enable claim button
-    use_effect(move || {
-        if let Some(Ok(stake)) = ore_stake.read().as_ref() {
-            enabled.set(stake.rewards > 0);
-        } else {
-            enabled.set(false);
-        };
-    });
-
     // Refresh data if successful transaction
-    use_effect(move || {
-        if let Some(TransactionStatus::Done(_)) = *transaction_status.read() {
-            ore_balance.restart();
-            ore_stake.restart();
-        }
+    on_transaction_done(move |_sig| {
+        ore_balance.restart();
+        ore_stake.restart();
+        ore_boost.restart();
     });
+
+    // Build claim transaction
+    let claim_tx = use_boost_claim_transaction(ore_boost, ore_stake);
 
     rsx! {
         Col {
@@ -132,35 +121,7 @@ fn AccountDetails(
                 }
             }
             ClaimButton {
-                enabled: enabled.clone(),
-                onclick: move |_| {
-                    let mut ixs = vec![];
-                    let Wallet::Connected(authority) = *wallet.read() else {
-                        return;
-                    };
-                    let Some(Ok(stake)) = *ore_stake.read() else {
-                        return;
-                    };
-                    let beneficiary = spl_associated_token_account::get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
-                    ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, ore_api::consts::MINT_ADDRESS, stake.rewards));
-                    let transaction = Transaction::new_with_payer(&ixs, Some(&authority));
-                    submit_transaction(transaction.into());
-                },
-            }
-        }
-    }
-}
-
-#[component]
-pub fn ClaimButton(enabled: Signal<bool>, onclick: EventHandler<MouseEvent>) -> Element {
-    rsx! {
-        button {
-            class: "h-12 w-full rounded-full controls-gold",
-            disabled: !*enabled.read(),
-            onclick: onclick,
-            span {
-                class: "mx-auto my-auto",
-                "Claim"
+                transaction: claim_tx.clone(),
             }
         }
     }
