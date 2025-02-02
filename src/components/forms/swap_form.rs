@@ -8,8 +8,8 @@ use crate::{
     components::{
         submit_transaction, CarrotDownIcon, Col, Row, SwitchIcon, TransactionStatus, WalletIcon
     },
-    config::{Token, LISTED_TOKENS_BY_TICKER},
-    gateway::{UiTokenAmount, GatewayResult},
+    config::{Token, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER},
+    gateway::{GatewayResult, UiTokenAmount},
     hooks::{
         get_token_balance, use_quote, use_swap_transaction, use_transaction_status, use_wallet, GetPubkey
     },
@@ -27,7 +27,6 @@ impl ToString for SwapError {
         }
     }
 }
-
 
 #[component]
 pub fn SwapForm(class: Option<String>) -> Element {
@@ -51,7 +50,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let sell_token = use_signal(|| Token::sol());
 
     // Errors
-    let mut error_msg = use_signal(|| None);
+    let error_msg = use_signal(|| None);
 
     // token balances
     let mut buy_token_balance = use_resource(move || async move {
@@ -186,7 +185,7 @@ fn TokenPicker(
     sell_quote: UseDebounce<String>,
     quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
-    let tokens = LISTED_TOKENS_BY_TICKER.values().collect::<Vec<_>>();
+    let tokens = LISTED_TOKENS.values().collect::<Vec<_>>();
     let mut search = use_signal(|| String::new());
     let search_str = search.cloned();
     let selected = selected_token.read().ticker.to_string();
@@ -230,7 +229,7 @@ fn TokenPicker(
                         gap: 2,
                         for asset in filtered_assets {
                             button {
-                                class: "flex items-center gap-2 p-2 hover:bg-controls-secondaryHover rounded transition-colors duration-200",
+                                class: "flex items-center gap-2 p-2 hover:bg-controls-secondaryHover rounded transition-colors duration-200 hover:cursor-pointer",
                                 onclick: {
                                     let asset = asset.clone();
                                     move |_| {
@@ -264,7 +263,7 @@ fn SwapDetails(
     sell_token: Signal<Token>,
     quote_response: Signal<Option<QuoteResponse>>,
 ) -> Element {
-    let (price_impact_value, _slippage, transaction_fee) = {
+    let (price_impact_value, _slippage, _transaction_fee) = {
         let quote_response = &*quote_response.read();
         match quote_response {
             Some(quote_response) => {

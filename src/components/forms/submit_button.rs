@@ -9,10 +9,10 @@ use super::TokenInputError;
 pub fn SubmitButton(
     title: String,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
-    error_msg: Signal<Option<TokenInputError>>
+    err: Signal<Option<TokenInputError>>
 ) -> Element {
     let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
-        if let Some(_) = error_msg.cloned() {
+        if let Some(_) = err.cloned() {
             false
         } else {
             true
@@ -30,10 +30,10 @@ pub fn SubmitButton(
                     submit_transaction(transaction);
                 }
             },
-            if let Some(error) = error_msg.cloned() {
+            if let Some(err) = err.cloned() {
                 span {
                     class: "mx-auto my-auto font-semibold",
-                    "{error.to_string()}"
+                    "{err.to_string()}"
                 }
             } else {
                 span {

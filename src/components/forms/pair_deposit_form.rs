@@ -149,7 +149,7 @@ pub fn PairDepositForm(
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
-                error_msg: err
+                err: err
             }
         }
     }

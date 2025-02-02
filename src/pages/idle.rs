@@ -22,17 +22,17 @@ pub fn Idle() -> Element {
             }
             Col {
                 gap: 16,
-                VaultStakeForm {
+                IdleStakeForm {
                     class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                     ore_balance,
                     ore_stake,
                 }
-                VaultPosition {
+                AccountDetails {
                     ore_boost: ore_boost,
                     ore_balance,
                     ore_stake,
                 }
-                VaultTotals {
+                BoostDetails {
                     ore_boost,
                 }
             }
@@ -41,7 +41,7 @@ pub fn Idle() -> Element {
 }
 
 #[component]
-fn VaultPosition(
+fn AccountDetails(
     ore_boost: Resource<GatewayResult<Boost>>,
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     ore_stake: Resource<GatewayResult<Stake>>
@@ -167,7 +167,7 @@ pub fn ClaimButton(enabled: Signal<bool>, onclick: EventHandler<MouseEvent>) -> 
 }
 
 #[component]
-fn VaultTotals(
+fn BoostDetails(
     ore_boost: Resource<GatewayResult<Boost>>
 ) -> Element {
     rsx! {

@@ -73,7 +73,6 @@ pub fn PairWithdrawForm(
             decimals: token_a_decimals as u8,
         })
     });
-
     let stake_b_balance = use_resource(move || async move {
         let Some(Ok(stake)) = stake.cloned() else {
             return Err(GatewayError::Unknown);
@@ -181,7 +180,7 @@ pub fn PairWithdrawForm(
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
-                error_msg: err
+                err: err
             }
         }
     }
