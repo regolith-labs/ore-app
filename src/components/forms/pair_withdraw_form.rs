@@ -93,7 +93,7 @@ pub fn PairWithdrawForm(
          let mut safe_update = move |new_val: String| {
             let new_val_f64 = new_val.parse::<f64>().unwrap_or(0.0);
             let prior_val_f64 = prior_val.parse::<f64>().unwrap_or(0.0);
-            if new_val_f64 != prior_val_f64 {
+            if new_val_f64 != prior_val_f64 || new_val.len() != prior_val.len() {
                 if flag {
                     input_amount_b.set(new_val);
                 } else {
@@ -101,6 +101,12 @@ pub fn PairWithdrawForm(
                 }
             }
         };
+
+        // Empty input
+        if val.len().eq(&0) {
+            safe_update(val.clone());
+            return;
+        }
 
         // Get resources
         let Some(Ok(stake)) = stake.cloned() else {
@@ -113,7 +119,7 @@ pub fn PairWithdrawForm(
         // Parse input value
         let val_f64 = val.parse::<f64>().unwrap_or(0.0);
         if val_f64 == 0.0 {
-            safe_update(val);
+            safe_update("0".to_string());
             return;
         }
 
@@ -126,16 +132,18 @@ pub fn PairWithdrawForm(
         if flag {
             let percent_to_withdraw = val_f64 / token_a_shares;
             safe_update(
-                format!("{:.1$}", 
-                token_b_shares * percent_to_withdraw, 
-                boost_deposits.token_b.decimals as usize)
+                format!("{:.1$}", token_b_shares * percent_to_withdraw, boost_deposits.token_b.decimals as usize)
+                    .trim_end_matches('0')
+                    .trim_end_matches('.')
+                    .to_string()
             );
         } else {
             let percent_to_withdraw = val_f64 / token_b_shares;
             safe_update(
-                format!("{:.1$}", 
-                token_a_shares * percent_to_withdraw, 
-                boost_deposits.token_a.decimals as usize)
+                format!("{:.1$}", token_a_shares * percent_to_withdraw, boost_deposits.token_a.decimals as usize)
+                    .trim_end_matches('0')
+                    .trim_end_matches('.')
+                    .to_string()
             );
         }
     };

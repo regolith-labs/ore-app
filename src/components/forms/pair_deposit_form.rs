@@ -60,7 +60,7 @@ pub fn PairDepositForm(
          let mut safe_update = move |new_val: String| {
             let new_val_f64 = new_val.parse::<f64>().unwrap_or(0.0);
             let prior_val_f64 = prior_val.parse::<f64>().unwrap_or(0.0);
-            if new_val_f64 != prior_val_f64 {
+            if new_val_f64 != prior_val_f64 || new_val.len() != prior_val.len() {
                 if flag {
                     input_amount_b.set(new_val);
                 } else {
@@ -93,12 +93,22 @@ pub fn PairDepositForm(
         if let Ok(val_f64) = val.parse::<f64>() {
             if val_f64 >= 0f64 {
                 if flag {
-                    safe_update(format!("{:.1$}", (val_f64 / ratio), token_b_balance.decimals as usize));
+                    safe_update(
+                        format!("{:.1$}", (val_f64 / ratio), token_b_balance.decimals as usize)
+                            .trim_end_matches('0')
+                            .trim_end_matches('.')
+                            .to_string()
+                    );
                 } else {
-                    safe_update(format!("{:.1$}", (val_f64 * ratio), token_a_balance.decimals as usize));
+                    safe_update(
+                        format!("{:.1$}", (val_f64 * ratio), token_a_balance.decimals as usize)
+                            .trim_end_matches('0')
+                            .trim_end_matches('.')
+                            .to_string()
+                    );
                 }
             } else {
-                safe_update("".to_string());
+                safe_update("0".to_string());
             }
         } else {
             // Reject invalid input
@@ -108,7 +118,6 @@ pub fn PairDepositForm(
             } else {
                 input_amount_b.set(last_valid_input.clone());
             }
-            // safe_update(last_valid_input);
         }
     };
 
@@ -143,6 +152,7 @@ pub fn PairDepositForm(
                     balance: token_b_balance,
                     token: token_b,
                     value: input_amount_b,
+                    toolbar_shortcuts: true,
                     err: err
                 }
             }

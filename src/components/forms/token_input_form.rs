@@ -154,7 +154,12 @@ fn ToolbarButton(
     rsx! {
         button {
             class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
-            onclick: move |_| value.set(shortcut_value.clone()),
+            onclick: move |_| value.set(
+                shortcut_value.clone()
+                    .trim_end_matches('0')
+                    .trim_end_matches('.')
+                    .to_string()
+            ),
             "{title}"
         }
     }
