@@ -1,34 +1,24 @@
 mod balance;
 mod common;
-mod icons;
 mod miner;
 mod navigation;
 mod orb;
 mod ore_value;
-mod spinner;
-mod stake_form;
-mod stake_table;
+mod forms;
+mod tables;
 mod submit_transaction;
-mod swap_form;
-mod table;
-mod table_simple;
 mod wallet_adapter;
 mod wallet_drawer;
 
 
 pub use balance::*;
 pub use common::*;
-pub use icons::*;
 pub use miner::*;
 pub use navigation::*;
 pub use orb::*;
 pub use ore_value::*;
-pub use spinner::*;
-pub use stake_form::*;
-pub use stake_table::*;
+pub use forms::*;
+pub use tables::*;
 pub use submit_transaction::*;
-pub use swap_form::*;
-pub use table::*;
-pub use table_simple::*;
 pub use wallet_adapter::*;
 pub use wallet_drawer::*;

@@ -2,7 +2,7 @@ use dioxus::document::eval;
 use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 
-use super::{use_miner_is_active, IsActiveMiner, Wallet};
+use crate::hooks::{IsActiveMiner, use_miner_is_active, Wallet};
 
 pub fn use_wallet_provider() {
     let mut miner_is_active = use_miner_is_active();

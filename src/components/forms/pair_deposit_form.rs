@@ -1,59 +1,13 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
-use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
-    components::{stake_form::common::{StakeTab, StakeTabs}, submit_transaction, Col, PairWithdrawForm, TokenInputError}, 
+    components::{Col, SubmitButton, TokenInputError}, 
     config::BoostMeta, 
     gateway::{GatewayResult, UiTokenAmount}, 
     hooks::{on_transaction_done, use_pair_deposit_transaction, BoostDeposits}
 };
 use super::token_input_form::*;
-
-
-#[component]
-pub fn PairStakeForm(
-    class: Option<String>,
-    boost_meta: BoostMeta,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
-    lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>
-) -> Element {
-    let class = class.unwrap_or_default();
-    let tab = use_signal(|| StakeTab::Deposit);
-    rsx! {
-        Col {
-            class: "{class}",
-            StakeTabs {
-                tab: tab
-            }
-            match *tab.read() {
-                StakeTab::Deposit => rsx! {
-                    PairDepositForm {
-                        boost_meta: boost_meta,
-                        boost_deposits: boost_deposits,
-                        lp_balance: lp_balance,
-                        stake: stake,
-                        token_a_balance: token_a_balance,
-                        token_b_balance: token_b_balance,
-                    }
-                },
-                StakeTab::Withdraw => rsx! {
-                    PairWithdrawForm {
-                        boost_meta: boost_meta,
-                        boost_deposits: boost_deposits,
-                        lp_balance: lp_balance,
-                        stake: stake,
-                        token_a_balance: token_a_balance,
-                        token_b_balance: token_b_balance,
-                    }
-                }
-            }
-        }
-    }
-}
 
 
 #[component]
@@ -201,43 +155,3 @@ pub fn PairDepositForm(
     }
 }
 
-
-#[component]
-pub fn SubmitButton(
-    title: String,
-    transaction: Resource<GatewayResult<VersionedTransaction>>,
-    error_msg: Signal<Option<TokenInputError>>
-) -> Element {
-    let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
-        if let Some(_) = error_msg.cloned() {
-            false
-        } else {
-            true
-        }
-    } else {
-        false
-    };
-
-    rsx! {
-        button {
-            class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
-            disabled: !enabled,
-            onclick: move |_| {
-                if let Some(Ok(transaction)) = transaction.cloned() {
-                    submit_transaction(transaction);
-                }
-            },
-            if let Some(error) = error_msg.cloned() {
-                span {
-                    class: "mx-auto my-auto font-semibold",
-                    "{error.to_string()}"
-                }
-            } else {
-                span {
-                    class: "mx-auto my-auto font-semibold",
-                    "{title}"
-                }
-            }
-        }
-    }
-}

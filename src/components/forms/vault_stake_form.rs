@@ -1,14 +1,13 @@
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::{spl_token::{amount_to_ui_amount, ui_amount_to_amount}};
+use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, ui_amount_to_amount};
 use solana_sdk::transaction::Transaction;
 
 use crate::{
-    components::{submit_transaction, Col, Row, TransactionStatus, WalletIcon}, hooks::{use_transaction_status, use_wallet, Wallet}
+    components::{submit_transaction, Col, Row, StakeTab, StakeTabs, TransactionStatus, WalletIcon}, hooks::{use_transaction_status, use_wallet, Wallet}
 };
 use crate::gateway::{UiTokenAmount, GatewayResult};
-use super::common::*;
 
 #[component]
 pub fn VaultStakeForm(

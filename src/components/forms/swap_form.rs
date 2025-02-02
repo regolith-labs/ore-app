@@ -361,7 +361,7 @@ fn SwitchButton(
 ) -> Element {
     rsx! {
         button {
-            class: "absolute w-12 h-8 -mt-4 -ml-6 inset-y-0 inset-x-1/2 rounded elevated-control elevated-border text-elements-midEmphasis",
+            class: "absolute flex w-12 h-12 -mt-6 -ml-6 inset-y-0 inset-x-1/2 rounded-full controls-tertiary hover:cursor-pointer",
             onclick: move |_| {
                 // Swap tokens
                 let buy_token_peek = buy_token.peek().clone();
@@ -387,7 +387,9 @@ fn SwitchButton(
                     buy_input_amount.set(Some("".to_string()));
                 }
             },
-            SwitchIcon { class: "h-4 mx-auto" }
+            SwitchIcon { 
+                class: "h-4 mx-auto my-auto" 
+            }
         }
     }
 }
