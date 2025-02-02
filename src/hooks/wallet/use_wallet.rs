@@ -3,11 +3,6 @@ use solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{GatewayError, GatewayResult};
 
-#[cfg(not(feature = "web"))]
-pub use super::use_wallet_native::use_wallet_provider;
-#[cfg(feature = "web")]
-pub use super::use_wallet_web::use_wallet_provider;
-
 pub fn use_wallet() -> Signal<Wallet> {
     use_context::<Signal<Wallet>>()
 }
