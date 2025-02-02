@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::{Col, NullValue, OreValueSmall, OreValueSmallAbbreviated, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
+    components::{Col, NullValue, OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
 };
 
 pub fn StakeTable() -> Element {

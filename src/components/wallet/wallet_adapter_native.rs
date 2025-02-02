@@ -1,7 +1,6 @@
 use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 
-use crate::components::wallet_drawer::WalletDrawer;
 use crate::components::*;
 use crate::hooks::{use_wallet, Wallet};
 

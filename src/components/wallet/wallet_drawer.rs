@@ -1,27 +1,11 @@
 use dioxus::prelude::*;
 
-#[cfg(not(feature = "web"))]
-mod wallet_drawer_native;
-#[cfg(feature = "web")]
-mod wallet_drawer_web;
-
 use crate::components::*;
 use crate::gateway::UiTokenAmount;
 use crate::gateway::GatewayResult;
 use crate::hooks::use_token_balance;
 use crate::config::{Token, LISTED_TOKENS};
 use crate::route::Route;
-
-#[cfg(not(feature = "web"))]
-pub use wallet_drawer_native::WalletDrawer;
-#[cfg(feature = "web")]
-pub use wallet_drawer_web::WalletDrawer;
-
-#[derive(Clone, Copy, PartialEq)]
-pub enum WalletTab {
-    Tokens,
-    Liquidity,
-}
 
 #[component]
 pub(super) fn TokenTable(on_close: EventHandler<MouseEvent>) -> Element {
@@ -204,37 +188,6 @@ fn LiquidityRow(token: Token, on_close: EventHandler<MouseEvent>) -> Element {
                         "+0.123"
                     }
                 }
-            }
-        }
-    }
-}
-
-#[component]
-pub(super) fn WalletTabs(tab: Signal<WalletTab>) -> Element {
-    let tokens_class = if *tab.read() == WalletTab::Tokens {
-        "flex-1 h-12 transition-colors text-elements-highEmphasis border-b-2 border-white hover:bg-controls-tertiary"
-    } else {
-        "flex-1 h-12 transition-colors text-elements-lowEmphasis hover:bg-controls-tertiary"
-    };
-
-    let liquidity_class = if *tab.read() == WalletTab::Liquidity {
-        "flex-1 h-12 transition-colors text-elements-highEmphasis border-b-2 border-white hover:bg-controls-tertiary"
-    } else {
-        "flex-1 h-12 transition-colors text-elements-lowEmphasis hover:bg-controls-tertiary"
-    };
-
-    rsx! {
-        Row {
-            class: "w-full",
-            button {
-                class: "{tokens_class}",
-                onclick: move |_| tab.set(WalletTab::Tokens),
-                "Balances"
-            }
-            button {
-                class: "{liquidity_class}",
-                onclick: move |_| tab.set(WalletTab::Liquidity),
-                "Liquidity"
             }
         }
     }

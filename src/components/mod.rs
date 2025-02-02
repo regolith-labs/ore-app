@@ -7,8 +7,7 @@ mod ore_value;
 mod forms;
 mod tables;
 mod submit_transaction;
-mod wallet_adapter;
-mod wallet_drawer;
+mod wallet;
 
 
 pub use balance::*;
@@ -20,5 +19,4 @@ pub use ore_value::*;
 pub use forms::*;
 pub use tables::*;
 pub use submit_transaction::*;
-pub use wallet_adapter::*;
-pub use wallet_drawer::*;
+pub use wallet::*;
