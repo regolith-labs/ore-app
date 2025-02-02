@@ -1,6 +1,6 @@
 mod miner;
 mod transaction_status;
-mod transactions;
+mod transaction_builders;
 mod wallet;
 
 mod use_boost;
@@ -14,7 +14,7 @@ mod use_stake;
 
 pub use miner::*;
 pub use transaction_status::*;
-pub use transactions::*;
+pub use transaction_builders::*;
 pub use wallet::*;
 
 pub use use_boost::*;

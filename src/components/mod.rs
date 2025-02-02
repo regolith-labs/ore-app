@@ -1,7 +1,7 @@
 mod balance;
 mod common;
 mod miner;
-mod navigation;
+mod layout;
 mod orb;
 mod ore_value;
 mod forms;
@@ -14,7 +14,7 @@ mod wallet_drawer;
 pub use balance::*;
 pub use common::*;
 pub use miner::*;
-pub use navigation::*;
+pub use layout::*;
 pub use orb::*;
 pub use ore_value::*;
 pub use forms::*;

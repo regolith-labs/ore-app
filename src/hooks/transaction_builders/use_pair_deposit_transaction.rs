@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::{create_associated_token_account, create_associated_token_account_idempotent}}, spl_token::{self, instruction::{close_account, sync_native}}};
-use solana_sdk::{hash::Hash, message::{v0, VersionedMessage}, native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
+use solana_sdk::{native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
     components::TokenInputError, config::BoostMeta, gateway::{kamino::KaminoGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
