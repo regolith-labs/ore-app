@@ -48,7 +48,7 @@ pub fn ToastDisplay() -> Element {
                 }
                 TransactionStatus::Denied => {
                     rsx! {
-                        Row {
+                        Col {
                             class: "{toast_class} border-l-4 border-red-500",
                             span {
                                 class: "{title_class} my-auto",
@@ -59,7 +59,7 @@ pub fn ToastDisplay() -> Element {
                 }
                 TransactionStatus::Error => {
                     rsx! {
-                        Row {
+                        Col {
                             class: "{toast_class} border-l-4 border-red-500",
                             span {
                                 class: "{title_class} my-auto",
@@ -70,7 +70,7 @@ pub fn ToastDisplay() -> Element {
                 }
                 TransactionStatus::Timeout => {
                     rsx! {
-                        Row {
+                        Col {
                             class: "{toast_class} border-l-4 border-red-500",
                             span {
                                 class: "{title_class} my-auto",

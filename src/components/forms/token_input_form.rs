@@ -21,7 +21,8 @@ pub fn TokenInputForm(
     title: String,
     token: Option<Token>,
     balance: Resource<GatewayResult<UiTokenAmount>>,
-    mut value: Signal<String>,
+    value: Signal<String>,
+    mut update: Signal<String>,
     err: Signal<Option<TokenInputError>>,
     toolbar_shortcuts: Option<bool>,
 ) -> Element {
@@ -53,7 +54,7 @@ pub fn TokenInputForm(
                         Toolbar {
                             balance: balance.clone(),
                             token: token.clone(),
-                            value: value.clone(),
+                            update: update.clone(),
                             toolbar_shortcuts,
                         }
                     }
@@ -80,7 +81,7 @@ pub fn TokenInputForm(
                         r#type: "number",
                         inputmode: "decimal",
                         value: value.read().clone(),
-                        oninput: move |e: FormEvent| value.set(e.value()),
+                        oninput: move |e: FormEvent| update.set(e.value()),
                     }
                 } else {
                     LoadingValue {}
@@ -94,13 +95,13 @@ pub fn TokenInputForm(
 fn Toolbar(
     balance: UiTokenAmount,
     token: Token,
-    value: Signal<String>,
+    update: Signal<String>,
     toolbar_shortcuts: Option<bool>,
 ) -> Element {
     let (half_value, max_value) = if let Some(ui_amount) = balance.ui_amount {
         (
             format!("{:.1$}", (ui_amount / 2.0), balance.decimals as usize),
-            format!("{:.1$}", (ui_amount), balance.decimals as usize)
+            balance.ui_amount_string.clone()
         )
     } else {
         ("0".to_string(), "0".to_string())
@@ -117,12 +118,12 @@ fn Toolbar(
                 ToolbarButton {
                     title: "HALF".to_string(),
                     shortcut_value: half_value.to_string(),
-                    value: value.clone(),
+                    update: update.clone(),
                 }
                 ToolbarButton {
                     title: "MAX".to_string(),
                     shortcut_value: max_value.to_string(),
-                    value: value.clone(),
+                    update: update.clone(),
                 }
             }
         }
@@ -149,12 +150,12 @@ fn ToolbarBalance(
 fn ToolbarButton(
     title: String,
     shortcut_value: String,
-    value: Signal<String>,
+    update: Signal<String>,
 ) -> Element {
     rsx! {
         button {
             class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",
-            onclick: move |_| value.set(
+            onclick: move |_| update.set(
                 shortcut_value.clone()
                     .trim_end_matches('0')
                     .trim_end_matches('.')

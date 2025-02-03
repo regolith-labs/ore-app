@@ -23,6 +23,8 @@ pub fn PairDepositForm(
     let class = class.unwrap_or_default();
     let mut input_amount_a = use_signal::<String>(|| "".to_owned());
     let mut input_amount_b = use_signal::<String>(|| "".to_owned());
+    let input_stream_a = use_signal::<String>(|| "".to_owned());
+    let input_stream_b = use_signal::<String>(|| "".to_owned());
     let err = use_signal::<Option<TokenInputError>>(|| None);
  
     // Refresh data, if transaction success
@@ -56,24 +58,12 @@ pub fn PairDepositForm(
         (None, None)
     };
 
-    // Process input stream
-    let mut process_input = move |val: String, prior_val: String, flag: bool| {
-         // Define function to safely update input values
-         let mut safe_update = move |new_val: String| {
-            let new_val_f64 = new_val.parse::<f64>().unwrap_or(0.0);
-            let prior_val_f64 = prior_val.parse::<f64>().unwrap_or(0.0);
-            if new_val_f64 != prior_val_f64 || new_val.len() != prior_val.len() {
-                if flag {
-                    input_amount_b.set(new_val);
-                } else {
-                    input_amount_a.set(new_val);
-                }
-            }
-        };
-
+    // Update input values based on updates from the form
+    let mut process_input_stream = move |val: String, flag: bool| {
         // Parse event value
         if val.len().eq(&0) {
-            safe_update(val.clone());
+            input_amount_a.set(val.clone());
+            input_amount_b.set(val.clone());
             return;
         }
 
@@ -95,14 +85,16 @@ pub fn PairDepositForm(
         if let Ok(val_f64) = val.parse::<f64>() {
             if val_f64 >= 0f64 {
                 if flag {
-                    safe_update(
+                    input_amount_a.set(val.clone());
+                    input_amount_b.set(
                         format!("{:.1$}", (val_f64 / ratio), token_b_balance.decimals as usize)
                             .trim_end_matches('0')
                             .trim_end_matches('.')
                             .to_string()
                     );
                 } else {
-                    safe_update(
+                    input_amount_b.set(val.clone());
+                    input_amount_a.set(
                         format!("{:.1$}", (val_f64 * ratio), token_a_balance.decimals as usize)
                             .trim_end_matches('0')
                             .trim_end_matches('.')
@@ -110,29 +102,18 @@ pub fn PairDepositForm(
                     );
                 }
             } else {
-                safe_update("0".to_string());
-            }
-        } else {
-            // Reject invalid input
-            let last_valid_input = val[..val.len()-1].to_string();
-            if flag {
-                input_amount_a.set(last_valid_input.clone());
-            } else {
-                input_amount_b.set(last_valid_input.clone());
+                input_amount_a.set("0".to_string());
+                input_amount_b.set("0".to_string());
             }
         }
     };
 
-    // Process input stream a
-    let b = input_amount_b.cloned();
+    // Process input streams
     use_effect(move || {
-        process_input(input_amount_a.read().clone(), b.clone(), true);
+        process_input_stream(input_stream_a.read().clone(), true);
     });
-
-    // Process input stream b
-    let a = input_amount_a.cloned();
     use_effect(move || {
-        process_input(input_amount_b.read().clone(), a.clone(), false);
+        process_input_stream(input_stream_b.read().clone(), false);
     });
 
     rsx! {
@@ -146,6 +127,7 @@ pub fn PairDepositForm(
                     balance: token_a_balance,
                     token: token_a,
                     value: input_amount_a,
+                    update: input_stream_a,
                     toolbar_shortcuts: true,
                     err: err
                 }
@@ -154,6 +136,7 @@ pub fn PairDepositForm(
                     balance: token_b_balance,
                     token: token_b,
                     value: input_amount_b,
+                    update: input_stream_b,
                     toolbar_shortcuts: true,
                     err: err
                 }

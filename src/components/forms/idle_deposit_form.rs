@@ -34,6 +34,7 @@ pub fn IdleDepositForm(
                 balance: ore_balance,
                 token: Token::ore(),
                 value: input_amount,
+                update: input_amount,
                 toolbar_shortcuts: true,
                 err: err
             }
