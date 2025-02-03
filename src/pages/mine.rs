@@ -23,12 +23,10 @@ pub fn Mine() -> Element {
     // TODO: rendering lash-hash-at here
     // to demonstrate that we can read messages from the miner
     let (from_miner, _to_miner) = use_miner();
-    
     let mut last_hash_at: Signal<i64> = use_signal(|| 0);
     use_effect(move || {
         let _pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
-        println!("from_miner_read: {:?}", from_miner_read);
         if let ore_miner_types::OutputMessage::Expired(lha) = from_miner_read {
             last_hash_at.set(*lha);
         }
@@ -45,7 +43,7 @@ pub fn Mine() -> Element {
             }
             StopStartButton { is_active }
             MinerStatus { member_db: member, pool: pool.clone() }
-            div { "{last_hash_at}" }                        
+            div { "{last_hash_at}" }   
         }
     }
 }
