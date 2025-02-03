@@ -4709,6 +4709,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "meteora-pools-sdk"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "914f35424d7e3c43e0922aeadd597b70a616eb4ce0bde1c9143a47188ca8c69b"
+dependencies = [
+ "borsh 0.10.4",
+ "num-derive 0.4.2",
+ "num-traits",
+ "solana-program",
+ "thiserror 2.0.11",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5100,7 +5113,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af1844ef2428cc3e1cb900be36181049ef3d3193c63e43026cfe202983b27a56"
 dependencies = [
- "proc-macro-crate 2.0.0",
+ "proc-macro-crate 3.2.0",
  "proc-macro2",
  "quote",
  "syn 2.0.96",
@@ -5391,6 +5404,7 @@ dependencies = [
  "kliquidity-sdk",
  "lazy_static",
  "log",
+ "meteora-pools-sdk",
  "num-format",
  "once_cell",
  "ore-api",

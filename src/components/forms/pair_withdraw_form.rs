@@ -33,6 +33,8 @@ pub fn PairWithdrawForm(
         token_b_balance.restart();
         lp_balance.restart();
         stake.restart();
+        input_amount_a.set("".to_owned());
+        input_amount_b.set("".to_owned());
     });
 
     // Build pair deposit transaction

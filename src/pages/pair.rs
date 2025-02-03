@@ -9,23 +9,39 @@ use steel::Pubkey;
 use crate::{
     components::*, 
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, 
-    gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_boost_deposits, use_lp_deposit_transaction, use_ore_balance, use_stake, use_token_balance, BoostDeposits}
+    gateway::{GatewayError, GatewayResult, UiTokenAmount}, 
+    hooks::{get_token_balance, on_transaction_done, use_boost, use_boost_claim_transaction, use_boost_deposits, use_lp_deposit_transaction, use_ore_balance, use_stake, use_token_balance, use_wallet, BoostDeposits, Wallet}
 };
 
 #[component]
 pub fn Pair(lp_mint: String) -> Element {
+    let wallet = use_wallet();
     let lp_mint = Pubkey::from_str(&lp_mint).unwrap();
     let boost_meta = LISTED_BOOSTS_BY_MINT.get(&lp_mint).unwrap();
     let boost = use_boost(lp_mint);
     let boost_deposits = use_boost_deposits(boost_meta.clone());
     let stake = use_stake(lp_mint);
-    let pair_balance = use_token_balance(boost_meta.pair_mint);
-    let ore_balance = use_ore_balance();
     let lp_balance = use_token_balance(lp_mint);
-
-    // TODO Get the boost
-    // TODO Show error if boost is not listed
+    let token_a_balance = use_resource(move || async move {
+        if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+            match *wallet.read() {
+                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+                Wallet::Connected(pubkey) => get_token_balance(pubkey, boost_deposits.token_a.mint).await,
+            }
+        } else {
+            Err(GatewayError::Unknown)
+        }
+    });
+    let token_b_balance = use_resource(move || async move {
+        if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+            match *wallet.read() {
+                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+                Wallet::Connected(pubkey) => get_token_balance(pubkey, boost_deposits.token_b.mint).await,
+            }
+        } else {
+            Err(GatewayError::Unknown)
+        }
+    });
     
     rsx! {
         Col {
@@ -44,14 +60,15 @@ pub fn Pair(lp_mint: String) -> Element {
                     boost_deposits: boost_deposits,
                     lp_balance: lp_balance,
                     stake: stake,
-                    token_a_balance: pair_balance,
-                    token_b_balance: ore_balance,
+                    token_a_balance: token_a_balance,
+                    token_b_balance: token_b_balance,
                 }
                 AccountMetrics {
                     boost_meta: boost_meta.clone(),
                     boost_deposits: boost_deposits,
-                    ore_balance,
-                    lp_balance,
+                    lp_balance: lp_balance,
+                    token_a_balance: token_a_balance,
+                    token_b_balance: token_b_balance,
                     boost,
                     stake
                 }
@@ -70,7 +87,8 @@ fn AccountMetrics(
     boost_meta: BoostMeta,
     boost_deposits: Resource<GatewayResult<BoostDeposits>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    ore_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
@@ -78,7 +96,8 @@ fn AccountMetrics(
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
-        ore_balance.restart();
+        token_a_balance.restart();
+        token_b_balance.restart();
         stake.restart();
         boost.restart();
     });

@@ -32,6 +32,8 @@ pub fn PairDepositForm(
         token_b_balance.restart();
         lp_balance.restart();
         stake.restart();
+        input_amount_a.set("".to_owned());
+        input_amount_b.set("".to_owned());
     });
 
     // Build pair deposit transaction
@@ -54,7 +56,7 @@ pub fn PairDepositForm(
         (None, None)
     };
 
-
+    // Process input stream
     let mut process_input = move |val: String, prior_val: String, flag: bool| {
          // Define function to safely update input values
          let mut safe_update = move |new_val: String| {
