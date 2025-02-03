@@ -1,5 +1,6 @@
 use async_std::future::{timeout, Future};
 use serde::{Deserialize, Serialize};
+use solana_sdk::transaction::TransactionError;
 
 use crate::time::Duration;
 
@@ -60,3 +61,13 @@ pub struct UiTokenAmount {
 pub type StringAmount = String;
 pub type StringDecimals = String;
 
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct SimulateTransactionResponse {
+    pub err: Option<TransactionError>,
+    pub logs: Option<Vec<String>>,
+    // pub accounts: Option<Vec<Option<UiAccount>>>,
+    pub units_consumed: Option<u64>,
+    // pub return_data: Option<UiTransactionReturnData>,
+}

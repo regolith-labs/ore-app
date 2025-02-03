@@ -4,7 +4,7 @@ use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_t
 use solana_sdk::{native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
+    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
 };
 
 // Build pair deposit transaction
@@ -66,7 +66,7 @@ pub fn use_pair_deposit_transaction(
         }
     
         // Aggregate instructions
-        let mut ixs = vec![];
+        let mut ixs: Vec<steel::Instruction> = vec![];
 
         // Create ata for lp shares, if needed
         if let Some(Ok(_)) = lp_balance.cloned() {
@@ -76,19 +76,26 @@ pub fn use_pair_deposit_transaction(
                 create_associated_token_account(&authority, &authority, &boost_meta.lp_mint, &spl_token::ID)
             );
         }
-    
-        // Wrap SOL, if needed
-        let token_a_ata = get_associated_token_address(&authority, &boost_meta.pair_mint);
-        let is_sol = boost_deposits.token_a.ticker == "SOL";
-        if is_sol {
+
+        // Wrap SOL, if needed 
+        let sol_mint = Token::sol().mint;
+        let wsol_amount = if boost_deposits.token_a.ticker == "SOL" {
+            amount_a_f64
+        } else if boost_deposits.token_b.ticker == "SOL" {
+            amount_b_f64
+        } else {
+            0f64
+        };
+        let wsol_ata = get_associated_token_address(&authority, &sol_mint);
+        if wsol_amount > 0f64 {
             ixs.push(
-                create_associated_token_account_idempotent(&authority, &authority, &boost_meta.pair_mint, &spl_token::ID)
+                create_associated_token_account_idempotent(&authority, &authority, &sol_mint, &spl_token::ID)
             );
             ixs.push(
-                transfer(&authority, &token_a_ata, sol_to_lamports(amount_a_f64))
+                transfer(&authority, &wsol_ata, sol_to_lamports(wsol_amount))
             );
             ixs.push(
-                sync_native(&spl_token::ID, &token_a_ata).unwrap()
+                sync_native(&spl_token::ID, &wsol_ata).unwrap()
             );
         }
     
@@ -107,10 +114,15 @@ pub fn use_pair_deposit_transaction(
                 ix
             }
             LpType::Meteora => {
+                // let amount_a_u64 = ui_amount_to_amount(amount_a_f64, token_a_balance.decimals) as u64;
+                // let amount_b_u64 = ui_amount_to_amount(amount_b_f64, token_b_balance.decimals) as u64;
+                let amount_a_u64 = token_a_balance.amount.parse::<u64>().unwrap();
+                let amount_b_u64 = token_b_balance.amount.parse::<u64>().unwrap();
                 let Ok(ix) = use_gateway().build_meteora_deposit_instruction(
                     boost_meta.lp_id,
-                    amount_a_f64,
-                    amount_b_f64,
+                    amount_a_u64,
+                    amount_b_u64,
+                    1,
                     authority,
                 ).await else {
                     err.set(None);
@@ -122,12 +134,12 @@ pub fn use_pair_deposit_transaction(
         ixs.push(deposit_ix);
     
         // Close the wSOL ata
-        if is_sol {
+        if wsol_amount > 0f64 {
             ixs.push(
-                close_account(&spl_token::ID, &token_a_ata, &authority, &authority, &[&authority]).unwrap()
+                close_account(&spl_token::ID, &wsol_ata, &authority, &authority, &[&authority]).unwrap()
             );
         }
-    
+
         // Open the stake account, if needed
         if let Some(Ok(_stake)) = stake.read().as_ref() {
             // Do nothing
@@ -143,6 +155,5 @@ pub fn use_pair_deposit_transaction(
         // Build transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority));
         Ok(tx.into())
-    })
-        
+    })        
 }

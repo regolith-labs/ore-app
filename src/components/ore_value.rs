@@ -286,18 +286,23 @@ pub fn UsdValueSmall(class: Option<String>, amount: String, small_units: Option<
 #[component]
 pub fn PairValue(class: Option<String>, boost_deposits: BoostDeposits, small_units: Option<bool>) -> Element {
     let class = class.unwrap_or("".to_string());
+    let (ore_amount_f64, token_amount_f64, token_ticker) = if boost_deposits.token_a.ticker == "ORE" {
+        (boost_deposits.balance_a_f64, boost_deposits.balance_b_f64, boost_deposits.token_b.ticker.clone())
+    } else {
+        (boost_deposits.balance_b_f64, boost_deposits.balance_a_f64, boost_deposits.token_a.ticker.clone())
+    };
     rsx! {
         Col {
             class: "gap-2 {class}",
             OreValueSmall {
                 class: "ml-auto",
-                ui_amount_string: boost_deposits.balance_b_f64.to_string(),
+                ui_amount_string: ore_amount_f64.to_string(),
                 small_units: small_units,
             }
             TokenValueSmall {
                 class: "ml-auto",
-                amount: boost_deposits.balance_a_f64.to_string(),
-                ticker: boost_deposits.token_a.ticker.clone(),
+                amount: token_amount_f64.to_string(),
+                ticker: token_ticker.clone(),
                 small_units: small_units,
             }
         }
@@ -315,22 +320,27 @@ pub fn PairStakeValue(
     let class = class.unwrap_or("".to_string());
 
     let lp_share = shares as f64 / boost_deposits.shares as f64;
-    let token_amount_a = boost_deposits.balance_a_f64 * lp_share;
-    let token_amount_b = boost_deposits.balance_b_f64 * lp_share;
-    let token_a_decimals = boost_deposits.token_a.decimals;
+    let stake_amount_a = boost_deposits.balance_a_f64 * lp_share;
+    let stake_amount_b = boost_deposits.balance_b_f64 * lp_share;
+    
+    let (ore_amount_f64, token_amount_f64, token_ticker, token_decimals) = if boost_deposits.token_a.ticker == "ORE" {
+        (stake_amount_a, stake_amount_b, boost_deposits.token_b.ticker.clone(), boost_deposits.token_b.decimals)
+    } else {
+        (stake_amount_b, stake_amount_a, boost_deposits.token_a.ticker.clone(), boost_deposits.token_a.decimals)
+    };
 
     rsx! {
         Col {
             class: "gap-2 {class}",
             OreValueSmall {
                 class: "ml-auto",
-                ui_amount_string: format!("{:.1$}", token_amount_b, TOKEN_DECIMALS as usize),
+                ui_amount_string: format!("{:.1$}", ore_amount_f64, TOKEN_DECIMALS as usize),
                 small_units: small_units,
             }
             TokenValueSmall {
                 class: "ml-auto",
-                amount: format!("{:.1$}", token_amount_a, token_a_decimals as usize),
-                ticker: boost_deposits.token_a.ticker.clone(),
+                amount: format!("{:.1$}", token_amount_f64, token_decimals as usize),
+                ticker: token_ticker.clone(),
                 small_units: small_units,
             }
         }

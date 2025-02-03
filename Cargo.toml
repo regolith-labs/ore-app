@@ -69,7 +69,8 @@ kliquidity-sdk = "0.0.1"
 keyring = { version = "3.6.1", features = ["apple-native", "windows-native"] }
 lazy_static = "1.4"
 log = "0.4.20"
-meteora-pools-sdk = "0.1.0"
+meteora-pools-sdk = "0.1"
+meteora-vault-sdk = "0.1"
 num-format = "0.4.4"
 once_cell = "1.18"
 ore-api = "3.0"
@@ -126,6 +127,7 @@ features = [
 
 [patch.crates-io]
 # ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool" }
+meteora-pools-sdk = { path = "../meteora-pools-sdk" }
 solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 

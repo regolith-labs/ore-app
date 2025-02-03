@@ -23,9 +23,9 @@ pub fn PairDepositForm(
     let class = class.unwrap_or_default();
     let mut input_amount_a = use_signal::<String>(|| "".to_owned());
     let mut input_amount_b = use_signal::<String>(|| "".to_owned());
-    let input_stream_a = use_signal::<String>(|| "".to_owned());
-    let input_stream_b = use_signal::<String>(|| "".to_owned());
-    let err = use_signal::<Option<TokenInputError>>(|| None);
+    let mut input_stream_a = use_signal::<String>(|| "".to_owned());
+    let mut input_stream_b = use_signal::<String>(|| "".to_owned());
+    let mut err = use_signal::<Option<TokenInputError>>(|| None);
  
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
@@ -34,8 +34,8 @@ pub fn PairDepositForm(
         token_b_balance.restart();
         lp_balance.restart();
         stake.restart();
-        input_amount_a.set("".to_owned());
-        input_amount_b.set("".to_owned());
+        input_stream_a.set("".to_owned());
+        input_stream_b.set("".to_owned());
     });
 
     // Build pair deposit transaction
@@ -62,6 +62,7 @@ pub fn PairDepositForm(
     let mut process_input_stream = move |val: String, flag: bool| {
         // Parse event value
         if val.len().eq(&0) {
+            err.set(None);
             input_amount_a.set(val.clone());
             input_amount_b.set(val.clone());
             return;
@@ -102,6 +103,7 @@ pub fn PairDepositForm(
                     );
                 }
             } else {
+                err.set(None);
                 input_amount_a.set("0".to_string());
                 input_amount_b.set("0".to_string());
             }
