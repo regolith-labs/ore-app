@@ -5,7 +5,7 @@ use crate::{
     components::{Col, PairDepositForm, PairWithdrawForm, StakeTab, StakeTabs}, 
     config::BoostMeta, 
     gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::BoostDeposits
+    hooks::{on_transaction_done, LiquidityPair}
 };
 
 
@@ -13,7 +13,7 @@ use crate::{
 pub fn PairStakeForm(
     class: Option<String>,
     boost_meta: BoostMeta,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
@@ -21,6 +21,16 @@ pub fn PairStakeForm(
 ) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);
+
+    // Refresh data, if transaction success
+    on_transaction_done(move |_sig| {
+        liquidity_pair.restart();
+        stake.restart();
+        token_a_balance.restart();
+        token_b_balance.restart();
+        lp_balance.restart();
+    });
+
     rsx! {
         Col {
             class: "{class}",
@@ -31,7 +41,7 @@ pub fn PairStakeForm(
                 StakeTab::Deposit => rsx! {
                     PairDepositForm {
                         boost_meta: boost_meta,
-                        boost_deposits: boost_deposits,
+                        liquidity_pair: liquidity_pair,
                         lp_balance: lp_balance,
                         stake: stake,
                         token_a_balance: token_a_balance,
@@ -41,7 +51,7 @@ pub fn PairStakeForm(
                 StakeTab::Withdraw => rsx! {
                     PairWithdrawForm {
                         boost_meta: boost_meta,
-                        boost_deposits: boost_deposits,
+                        liquidity_pair: liquidity_pair,
                         lp_balance: lp_balance,
                         stake: stake,
                         token_a_balance: token_a_balance,

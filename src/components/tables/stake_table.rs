@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::{Col, NullValue, OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_boost_deposits, use_stake, BoostDeposits}, route::Route
+    components::{Col, NullValue, OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_liquidity_pair, use_stake, LiquidityPair}, route::Route
 };
 
 pub fn StakeTable() -> Element {
@@ -35,7 +35,7 @@ pub fn StakeTable() -> Element {
 fn StakeTableRow(boost_meta: BoostMeta) -> Element {
     let boost = use_boost(boost_meta.lp_mint);
     let stake = use_stake(boost_meta.lp_mint);
-    let boost_deposits = use_boost_deposits(boost_meta.clone());
+    let liquidity_pair = use_liquidity_pair(boost_meta.clone());
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -52,7 +52,7 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
             },
             right_2: rsx! {
                 StakeTableRowTVL {
-                    boost_deposits
+                    liquidity_pair
                 }
             },
             right_3: rsx! {
@@ -109,13 +109,13 @@ fn StakeTableRowMultiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-fn StakeTableRowTVL(boost_deposits: Resource<GatewayResult<BoostDeposits>>) -> Element {
+fn StakeTableRowTVL(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
     rsx! {
-        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
             Col {
                 gap: 2,
                 UsdValueSmall {
-                    amount: boost_deposits.total_value_usd.to_string(),
+                    amount: liquidity_pair.total_value_usd.to_string(),
                 }
             }
         } else {
@@ -125,23 +125,23 @@ fn StakeTableRowTVL(boost_deposits: Resource<GatewayResult<BoostDeposits>>) -> E
 }
 
 #[component]
-fn StakeTableRowBasis(boost_deposits: Resource<GatewayResult<BoostDeposits>>) -> Element {
+fn StakeTableRowBasis(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
     rsx! {
-        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
             Col {
                 gap: 2,
                 // TokenValueSmall {
                 //     class: "ml-auto",
-                //     amount: boost_deposits.balance_a.to_string(),
-                //     ticker: boost_deposits.token_a.clone(),
+                //     amount: liquidity_pair.balance_a.to_string(),
+                //     ticker: liquidity_pair.token_a.clone(),
                 // }
                 OreValueSmall {
-                    ui_amount_string: boost_deposits.balance_b_f64.to_string(),
+                    ui_amount_string: liquidity_pair.balance_b_f64.to_string(),
                 }
                 // TokenValueSmall {
                 //     class: "ml-auto",
-                //     amount: boost_deposits.balance_b.to_string(),
-                //     ticker: boost_deposits.token_b.clone(),
+                //     amount: liquidity_pair.balance_b.to_string(),
+                //     ticker: liquidity_pair.token_b.clone(),
                 // }
             }
         } else {
@@ -151,20 +151,20 @@ fn StakeTableRowBasis(boost_deposits: Resource<GatewayResult<BoostDeposits>>) ->
 }
 
 #[component]
-fn StakeTableRowLiquidity(boost_deposits: Resource<GatewayResult<BoostDeposits>>) -> Element {
+fn StakeTableRowLiquidity(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
     rsx! {
-        if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
             Col {
                 gap: 2,
                 TokenValueSmall {
                     class: "ml-auto",
-                    amount: boost_deposits.balance_a_f64.to_string(),
-                    ticker: boost_deposits.token_a.ticker.clone(),
+                    amount: liquidity_pair.balance_a_f64.to_string(),
+                    ticker: liquidity_pair.token_a.ticker.clone(),
                 }
                 // TokenValueSmall {
                 //     class: "ml-auto",
-                //     amount: boost_deposits.balance_b.to_string(),
-                //     ticker: boost_deposits.token_b.clone(),
+                //     amount: liquidity_pair.balance_b.to_string(),
+                //     ticker: liquidity_pair.token_b.clone(),
                 // }
             }
         } else {

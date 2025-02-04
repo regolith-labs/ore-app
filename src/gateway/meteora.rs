@@ -17,7 +17,7 @@ pub trait MeteoraGateway {
 
     // Instruction builders
     async fn build_meteora_deposit_instruction(&self, pool_address: Pubkey, max_amount_a: u64, max_amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction>;
-    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction>;
+    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, amount_a: u64, amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction>;
 }
 
 impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
@@ -145,8 +145,50 @@ impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
         Ok(accounts.instruction(args))
     }
 
-    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, owner: Pubkey) -> GatewayResult<Instruction> {
-        todo!("Not implemented")
+    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, amount_a: u64, amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction> {
+        // Get pool and vault data
+        let pool = self.get_meteora_pool(pool_address).await?;
+        let vault_a = self.get_meteora_vault(pool.a_vault).await?;
+        let vault_b = self.get_meteora_vault(pool.b_vault).await?;
+
+        // Get min amounts
+        let pool_token_amount = shares_amount;
+        let min_amount_a = (amount_b as u128)
+            .checked_mul((1000 - slippage_rate) as u128)
+            .unwrap()
+            .checked_div(1000)
+            .unwrap() as u64;
+        let min_amount_b = (amount_b as u128)
+            .checked_mul((1000 - slippage_rate) as u128)
+            .unwrap()
+            .checked_div(1000)
+            .unwrap() as u64;
+
+        // Build instruction
+        let args = meteora_pools_sdk::instructions::RemoveBalanceLiquidityInstructionArgs {
+            pool_token_amount,
+            minimum_a_token_out: min_amount_a,
+            minimum_b_token_out: min_amount_b,
+        };
+        let accounts = meteora_pools_sdk::instructions::RemoveBalanceLiquidity {
+            pool: pool_address,
+            lp_mint: pool.lp_mint,
+            user_pool_lp: get_associated_token_address(&owner, &pool.lp_mint),
+            a_vault_lp: pool.a_vault_lp,
+            b_vault_lp: pool.b_vault_lp,
+            a_vault: pool.a_vault,
+            b_vault: pool.b_vault,
+            a_vault_lp_mint: vault_a.lp_mint,
+            b_vault_lp_mint: vault_b.lp_mint,
+            a_token_vault: vault_a.token_vault,
+            b_token_vault: vault_b.token_vault,
+            user_a_token: get_associated_token_address(&owner, &pool.token_a_mint),
+            user_b_token: get_associated_token_address(&owner, &pool.token_b_mint),
+            user: owner,
+            vault_program: meteora_vault_sdk::programs::VAULT_ID,
+            token_program: spl_token::ID,
+        };
+        Ok(accounts.instruction(args))
     }
 }
 

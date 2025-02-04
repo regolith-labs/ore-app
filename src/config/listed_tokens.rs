@@ -66,4 +66,12 @@ impl Token {
     pub fn sol() -> Self {
         LISTED_TOKENS_BY_TICKER.get("SOL").cloned().unwrap()
     }
+
+    pub fn is_sol(&self) -> bool {
+        self.ticker == "SOL"
+    }
+
+    pub fn _is_ore(&self) -> bool {
+        self.ticker == "ORE"
+    }
 }

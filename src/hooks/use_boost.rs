@@ -12,19 +12,16 @@ pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
     })
 }
 
-pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<BoostDeposits>> {
+pub fn use_liquidity_pair(boost_meta: BoostMeta) -> Resource<GatewayResult<LiquidityPair>> {
     let lp_type: LpType = boost_meta.lp_type;
     use_resource(move || async move {
-        // Get lp mint supply
         let lp_mint_supply = use_gateway().rpc.get_token_supply(&boost_meta.lp_mint).await?;
-
-        // Get strategy metrics
         match lp_type {
             LpType::Kamino => {
                 let strategy_metrics = use_gateway().get_kamino_strategy_metrics(boost_meta.lp_id).await?;
                 let token_a = LISTED_TOKENS_BY_TICKER.get(&strategy_metrics.token_a).unwrap();
                 let token_b = LISTED_TOKENS_BY_TICKER.get(&strategy_metrics.token_b).unwrap();
-                return Ok(BoostDeposits {
+                return Ok(LiquidityPair {
                     token_a: token_a.clone(),
                     token_b: token_b.clone(),
                     balance_a_f64: strategy_metrics.vault_balances.token_a.total,
@@ -39,7 +36,7 @@ pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<Boost
                 let token_b = LISTED_TOKENS.get(&pool_metrics.pool_token_mints[1]).unwrap();
                 let balance_a = pool_metrics.pool_token_amounts[0];
                 let balance_b = pool_metrics.pool_token_amounts[1];
-                return Ok(BoostDeposits {
+                return Ok(LiquidityPair {
                     token_a: token_a.clone(),
                     token_b: token_b.clone(),
                     balance_a_f64: balance_a,
@@ -53,7 +50,7 @@ pub fn use_boost_deposits(boost_meta: BoostMeta) -> Resource<GatewayResult<Boost
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct BoostDeposits {
+pub struct LiquidityPair {
     pub token_a: Token,
     pub token_b: Token,
     pub balance_a_f64: f64,

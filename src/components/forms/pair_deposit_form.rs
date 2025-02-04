@@ -5,7 +5,7 @@ use crate::{
     components::{Col, SubmitButton, TokenInputError}, 
     config::BoostMeta, 
     gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_pair_deposit_transaction, BoostDeposits}
+    hooks::{on_transaction_done, use_pair_deposit_transaction, LiquidityPair}
 };
 use super::token_input_form::*;
 
@@ -14,7 +14,7 @@ use super::token_input_form::*;
 pub fn PairDepositForm(
     class: Option<String>,
     boost_meta: BoostMeta,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
@@ -24,24 +24,18 @@ pub fn PairDepositForm(
     let mut input_amount_a = use_signal::<String>(|| "".to_owned());
     let mut input_amount_b = use_signal::<String>(|| "".to_owned());
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
-    let mut input_stream_b = use_signal::<String>(|| "".to_owned());
+    let input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
  
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
-        boost_deposits.restart();
-        token_a_balance.restart();
-        token_b_balance.restart();
-        lp_balance.restart();
-        stake.restart();
         input_stream_a.set("".to_owned());
-        input_stream_b.set("".to_owned());
     });
 
     // Build pair deposit transaction
     let tx = use_pair_deposit_transaction(
         boost_meta, 
-        boost_deposits, 
+        liquidity_pair, 
         lp_balance, 
         stake, 
         token_a_balance, 
@@ -52,8 +46,8 @@ pub fn PairDepositForm(
     );
     
     // Get tokens
-    let (token_a, token_b) = if let Some(Ok(boost_deposits)) = boost_deposits.cloned() {
-        (Some(boost_deposits.token_a), Some(boost_deposits.token_b))
+    let (token_a, token_b) = if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+        (Some(liquidity_pair.token_a), Some(liquidity_pair.token_b))
     } else {
         (None, None)
     };
@@ -69,7 +63,7 @@ pub fn PairDepositForm(
         }
 
         // Get resources
-        let Some(Ok(deposits)) = boost_deposits.cloned() else {
+        let Some(Ok(deposits)) = liquidity_pair.cloned() else {
             return;
         };
         let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {

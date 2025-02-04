@@ -9,39 +9,19 @@ use steel::Pubkey;
 use crate::{
     components::*, 
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, 
-    gateway::{GatewayError, GatewayResult, UiTokenAmount}, 
-    hooks::{get_token_balance, on_transaction_done, use_boost, use_boost_claim_transaction, use_boost_deposits, use_lp_deposit_transaction, use_ore_balance, use_stake, use_token_balance, use_wallet, BoostDeposits, Wallet}
+    gateway::{GatewayResult, UiTokenAmount}, 
+    hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_token_balances, LiquidityPair}
 };
 
 #[component]
 pub fn Pair(lp_mint: String) -> Element {
-    let wallet = use_wallet();
     let lp_mint = Pubkey::from_str(&lp_mint).unwrap();
     let boost_meta = LISTED_BOOSTS_BY_MINT.get(&lp_mint).unwrap();
     let boost = use_boost(lp_mint);
-    let boost_deposits = use_boost_deposits(boost_meta.clone());
+    let liquidity_pair = use_liquidity_pair(boost_meta.clone());
     let stake = use_stake(lp_mint);
     let lp_balance = use_token_balance(lp_mint);
-    let token_a_balance = use_resource(move || async move {
-        if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
-            match *wallet.read() {
-                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
-                Wallet::Connected(pubkey) => get_token_balance(pubkey, boost_deposits.token_a.mint).await,
-            }
-        } else {
-            Err(GatewayError::Unknown)
-        }
-    });
-    let token_b_balance = use_resource(move || async move {
-        if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
-            match *wallet.read() {
-                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
-                Wallet::Connected(pubkey) => get_token_balance(pubkey, boost_deposits.token_b.mint).await,
-            }
-        } else {
-            Err(GatewayError::Unknown)
-        }
-    });
+    let (token_a_balance, token_b_balance) = use_token_balances(liquidity_pair);
     
     rsx! {
         Col {
@@ -57,7 +37,7 @@ pub fn Pair(lp_mint: String) -> Element {
                 PairStakeForm {
                     class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                     boost_meta: boost_meta.clone(),
-                    boost_deposits: boost_deposits,
+                    liquidity_pair: liquidity_pair,
                     lp_balance: lp_balance,
                     stake: stake,
                     token_a_balance: token_a_balance,
@@ -65,7 +45,7 @@ pub fn Pair(lp_mint: String) -> Element {
                 }
                 AccountMetrics {
                     boost_meta: boost_meta.clone(),
-                    boost_deposits: boost_deposits,
+                    liquidity_pair: liquidity_pair,
                     lp_balance: lp_balance,
                     token_a_balance: token_a_balance,
                     token_b_balance: token_b_balance,
@@ -74,7 +54,7 @@ pub fn Pair(lp_mint: String) -> Element {
                 }
                 SummaryMetrics {
                     boost,
-                    boost_deposits,
+                    liquidity_pair,
                     boost_meta: boost_meta.clone()
                 }
             }
@@ -85,7 +65,7 @@ pub fn Pair(lp_mint: String) -> Element {
 #[component]
 fn AccountMetrics(
     boost_meta: BoostMeta,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
     token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
@@ -119,13 +99,13 @@ fn AccountMetrics(
                     class: "text-elements-lowEmphasis font-medium",
                     "Deposits"
                 }
-                if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+                if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
                     if let Some(stake) = stake.read().as_ref() {
                         if let Ok(stake) = stake {
                             if stake.balance > 0 {
-                                PairStakeValue {
+                                LiquidityPairStakeValue {
                                     shares: stake.balance,
-                                    boost_deposits: boost_deposits.clone(),
+                                    liquidity_pair: liquidity_pair.clone(),
                                     small_units: Some(true),
                                 }
                             } else {
@@ -141,7 +121,7 @@ fn AccountMetrics(
                     LoadingValue {}
                 }
             }
-            if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+            if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
                 if let Some(Ok(stake)) = stake.read().as_ref() {
                     if stake.balance_pending > 0 {
                         Row {
@@ -150,16 +130,16 @@ fn AccountMetrics(
                                 class: "text-elements-lowEmphasis font-medium",
                                 "Deposits (pending)"
                             }
-                            PairStakeValue {
+                            LiquidityPairStakeValue {
                                 shares: stake.balance_pending,
-                                boost_deposits: boost_deposits.clone(),
+                                liquidity_pair: liquidity_pair.clone(),
                                 small_units: Some(true),
                             }
                         }
                     }
                 }
             }
-            if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+            if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
                 if let Some(Ok(lp_balance)) = lp_balance.read().as_ref() {
                     if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
                         Row {
@@ -168,9 +148,9 @@ fn AccountMetrics(
                                 class: "text-elements-lowEmphasis font-medium",
                                 "Unstaked"
                             }
-                            PairStakeValue {
+                            LiquidityPairStakeValue {
                                 shares: lp_balance.amount.parse::<u64>().unwrap_or(0),
-                                boost_deposits: boost_deposits.clone(),
+                                liquidity_pair: liquidity_pair.clone(),
                                 small_units: Some(true),
                             }
                         }
@@ -218,7 +198,7 @@ fn AccountMetrics(
 fn SummaryMetrics(
     boost: Resource<GatewayResult<Boost>>,
     boost_meta: BoostMeta,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>
 ) -> Element {
     rsx! {
         Col {
@@ -265,9 +245,9 @@ fn SummaryMetrics(
                     class: "text-elements-lowEmphasis font-medium",
                     "Total deposits"
                 }
-                if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
-                    PairValue {
-                        boost_deposits: boost_deposits.clone(),
+                if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
+                    LiquidityPairValue {
+                        liquidity_pair: liquidity_pair.clone(),
                         small_units: true,
                     }
                 } else {
@@ -295,9 +275,9 @@ fn SummaryMetrics(
                     class: "text-elements-lowEmphasis font-medium",
                     "TVL"
                 }
-                if let Some(Ok(boost_deposits)) = boost_deposits.read().as_ref() {
+                if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
                     UsdValueSmall {
-                        amount: boost_deposits.total_value_usd.to_string(),
+                        amount: liquidity_pair.total_value_usd.to_string(),
                     }
                 } else {
                     LoadingValue {}

@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::Stake;
 
-use crate::{components::{Col, OreIcon, Row}, config::{LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, hooks::BoostDeposits};
+use crate::{components::{Col, OreIcon, Row}, config::{LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, hooks::LiquidityPair};
 
 #[component]
 pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
@@ -284,12 +284,12 @@ pub fn UsdValueSmall(class: Option<String>, amount: String, small_units: Option<
 }
 
 #[component]
-pub fn PairValue(class: Option<String>, boost_deposits: BoostDeposits, small_units: Option<bool>) -> Element {
+pub fn LiquidityPairValue(class: Option<String>, liquidity_pair: LiquidityPair, small_units: Option<bool>) -> Element {
     let class = class.unwrap_or("".to_string());
-    let (ore_amount_f64, token_amount_f64, token_ticker) = if boost_deposits.token_a.ticker == "ORE" {
-        (boost_deposits.balance_a_f64, boost_deposits.balance_b_f64, boost_deposits.token_b.ticker.clone())
+    let (ore_amount_f64, token_amount_f64, token_ticker) = if liquidity_pair.token_a.ticker == "ORE" {
+        (liquidity_pair.balance_a_f64, liquidity_pair.balance_b_f64, liquidity_pair.token_b.ticker.clone())
     } else {
-        (boost_deposits.balance_b_f64, boost_deposits.balance_a_f64, boost_deposits.token_a.ticker.clone())
+        (liquidity_pair.balance_b_f64, liquidity_pair.balance_a_f64, liquidity_pair.token_a.ticker.clone())
     };
     rsx! {
         Col {
@@ -311,22 +311,22 @@ pub fn PairValue(class: Option<String>, boost_deposits: BoostDeposits, small_uni
 
 
 #[component]
-pub fn PairStakeValue(
+pub fn LiquidityPairStakeValue(
     class: Option<String>, 
     shares: u64, 
-    boost_deposits: BoostDeposits, 
+    liquidity_pair: LiquidityPair, 
     small_units: Option<bool>
 ) -> Element {
     let class = class.unwrap_or("".to_string());
 
-    let lp_share = shares as f64 / boost_deposits.shares as f64;
-    let stake_amount_a = boost_deposits.balance_a_f64 * lp_share;
-    let stake_amount_b = boost_deposits.balance_b_f64 * lp_share;
+    let lp_share = shares as f64 / liquidity_pair.shares as f64;
+    let stake_amount_a = liquidity_pair.balance_a_f64 * lp_share;
+    let stake_amount_b = liquidity_pair.balance_b_f64 * lp_share;
     
-    let (ore_amount_f64, token_amount_f64, token_ticker, token_decimals) = if boost_deposits.token_a.ticker == "ORE" {
-        (stake_amount_a, stake_amount_b, boost_deposits.token_b.ticker.clone(), boost_deposits.token_b.decimals)
+    let (ore_amount_f64, token_amount_f64, token_ticker, token_decimals) = if liquidity_pair.token_a.ticker == "ORE" {
+        (stake_amount_a, stake_amount_b, liquidity_pair.token_b.ticker.clone(), liquidity_pair.token_b.decimals)
     } else {
-        (stake_amount_b, stake_amount_a, boost_deposits.token_a.ticker.clone(), boost_deposits.token_a.decimals)
+        (stake_amount_b, stake_amount_a, liquidity_pair.token_a.ticker.clone(), liquidity_pair.token_a.decimals)
     };
 
     rsx! {

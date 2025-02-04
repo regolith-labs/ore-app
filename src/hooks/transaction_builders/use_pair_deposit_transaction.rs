@@ -4,13 +4,13 @@ use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_t
 use solana_sdk::{native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, BoostDeposits, Wallet}
+    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, LiquidityPair, Wallet}
 };
 
 // Build pair deposit transaction
 pub fn use_pair_deposit_transaction(
     boost_meta: BoostMeta,
-    boost_deposits: Resource<GatewayResult<BoostDeposits>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
@@ -21,6 +21,9 @@ pub fn use_pair_deposit_transaction(
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
+        // Reset error
+        err.set(None);
+
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
             err.set(None);
@@ -28,7 +31,7 @@ pub fn use_pair_deposit_transaction(
         };
     
         // Get resources
-        let Some(Ok(boost_deposits)) = boost_deposits.cloned() else {
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             err.set(None);
             return Err(GatewayError::Unknown);
         };
@@ -57,11 +60,11 @@ pub fn use_pair_deposit_transaction(
     
         // Check if wallet balances are sufficient
         if amount_a_f64 > token_a_balance.ui_amount.unwrap_or(0.0) {
-            err.set(Some(TokenInputError::InsufficientBalance(boost_deposits.token_a.clone())));
+            err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_a.clone())));
             return Err(GatewayError::Unknown);
         }
         if amount_b_f64 > token_b_balance.ui_amount.unwrap_or(0.0) {
-            err.set(Some(TokenInputError::InsufficientBalance(boost_deposits.token_b.clone())));
+            err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_b.clone())));
             return Err(GatewayError::Unknown);
         }
     
@@ -79,9 +82,9 @@ pub fn use_pair_deposit_transaction(
 
         // Wrap SOL, if needed 
         let sol_mint = Token::sol().mint;
-        let wsol_amount = if boost_deposits.token_a.ticker == "SOL" {
+        let wsol_amount = if liquidity_pair.token_a.ticker == "SOL" {
             amount_a_f64
-        } else if boost_deposits.token_b.ticker == "SOL" {
+        } else if liquidity_pair.token_b.ticker == "SOL" {
             amount_b_f64
         } else {
             0f64
@@ -114,8 +117,6 @@ pub fn use_pair_deposit_transaction(
                 ix
             }
             LpType::Meteora => {
-                // let amount_a_u64 = ui_amount_to_amount(amount_a_f64, token_a_balance.decimals) as u64;
-                // let amount_b_u64 = ui_amount_to_amount(amount_b_f64, token_b_balance.decimals) as u64;
                 let amount_a_u64 = token_a_balance.amount.parse::<u64>().unwrap();
                 let amount_b_u64 = token_b_balance.amount.parse::<u64>().unwrap();
                 let Ok(ix) = use_gateway().build_meteora_deposit_instruction(
