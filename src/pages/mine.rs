@@ -13,7 +13,7 @@ pub fn Mine() -> Element {
     let wallet = use_wallet();
 
     // on off button
-    let is_active = use_miner_is_active();
+    let is_active: Signal<IsActiveMiner> = use_miner_is_active();
 
     // register with first pool
     let pool = FIRST_POOL;
@@ -23,7 +23,7 @@ pub fn Mine() -> Element {
     // TODO: rendering lash-hash-at here
     // to demonstrate that we can read messages from the miner
     let (from_miner, _to_miner) = use_miner();
-    let mut last_hash_at = use_signal(|| 0);
+    let mut last_hash_at: Signal<i64> = use_signal(|| 0);
     use_effect(move || {
         let _pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
@@ -43,7 +43,7 @@ pub fn Mine() -> Element {
             }
             StopStartButton { is_active }
             MinerStatus { member_db: member, pool: pool.clone() }
-            div { "{last_hash_at}" }
+            div { "{last_hash_at}" }   
         }
     }
 }
@@ -65,6 +65,15 @@ fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
                     span {
                         class: "my-auto",
                         "Start mining"
+                    }
+                }
+            } else {
+                span {
+                    class: "flex flex-row gap-2 my-auto mx-auto bg-gray-300 px-4 h-12 text-white rounded-full font-semibold z-10 group-hover:scale-105 transition-transform border border-white",
+                    StopIcon { class: "my-auto h-5"  },
+                    span {
+                        class: "my-auto",
+                        "Stop mining"
                     }
                 }
             }

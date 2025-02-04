@@ -159,6 +159,21 @@ pub fn PlayIcon(class: Option<String>) -> Element {
 }
 
 #[component]
+pub fn StopIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                d: "M6 6h12v12H6z"
+            }
+        }
+    }
+}
+
+#[component]
 pub fn PlusIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {
