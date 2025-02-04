@@ -127,7 +127,7 @@ features = [
 
 [patch.crates-io]
 # ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool" }
-meteora-pools-sdk = { path = "../meteora-pools-sdk" }
+# meteora-pools-sdk = { path = "../meteora-pools-sdk" }
 solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 

@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::*;
+use crate::{components::*, route::Route};
 
 pub fn Stake() -> Element {
     rsx! {
@@ -27,7 +27,7 @@ fn AccountSummary() -> Element {
                 "Account"
             }
             Row {
-                class: "w-full justify-between px-0 sm:px-2",
+                class: "hidden sm:flex w-full justify-between px-0 sm:px-2",
                 Col {
                     gap: 4,
                     span {
@@ -65,9 +65,37 @@ fn AccountSummary() -> Element {
                     }
                 }
             }
+            ActionButtons {}
         }
     }
 }
+
+fn ActionButtons() -> Element {
+    rsx! {
+        Row {
+            class: "mx-auto w-full mt-8 justify-end",
+            ClaimButton {}
+        }
+    }
+}
+
+
+fn ClaimButton() -> Element {
+    rsx! {
+        Link {
+            to: Route::Landing {},
+            class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
+            // CircleStackIcon {
+            //     class: "h-5 w-5 mx-auto my-auto"
+            // }
+            span {
+                class: "my-auto text-nowrap",
+                "Claim"
+            }
+        }
+    }
+}
+
 
 fn _YieldOverview() -> Element {
     // TODO Get all stake accounts

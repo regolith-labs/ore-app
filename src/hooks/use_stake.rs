@@ -71,3 +71,17 @@ pub fn use_stake_balances(
     (stake_a_balance, stake_b_balance)
 }
 
+pub fn use_net_deposits() -> Resource<GatewayResult<UiTokenAmount>> {
+    
+    // TODO get all stake accounts
+    // TODO convert stake accounts into ore liquidity pair balances
+
+    use_resource(move || async move {
+        Ok(UiTokenAmount {
+            ui_amount: Some(0.0),
+            ui_amount_string: "0.0".to_string(),
+            amount: "0".to_string(),
+            decimals: 8,
+        })
+    })
+}

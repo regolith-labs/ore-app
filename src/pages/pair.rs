@@ -29,8 +29,8 @@ pub fn Pair(lp_mint: String) -> Element {
             gap: 8,
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: boost_meta.name.clone(),
-                subtitle: "Manage your liquidity pair position."
+                title: format!("Stake {}", boost_meta.ticker.clone()),
+                subtitle: format!("Manage your {} position.", boost_meta.name.clone())
             }
             Col {
                 class: "w-full h-full gap-16",

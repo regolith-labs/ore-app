@@ -4711,6 +4711,8 @@ dependencies = [
 [[package]]
 name = "meteora-pools-sdk"
 version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e78901982a157db4702fb3797c7f6f91fd04443cf822a77a6cf2c7b176570b89"
 dependencies = [
  "borsh 0.10.4",
  "num-derive 0.4.2",

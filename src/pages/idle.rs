@@ -16,7 +16,7 @@ pub fn Idle() -> Element {
             gap: 8,
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: "Idle yield",
+                title: "Stake ORE",
                 subtitle: "Stake unpaired ORE and earn the idle yield rate."
             }
             Col {
