@@ -193,14 +193,54 @@ pub fn OreValueSmallAbbreviated(class: Option<String>, ui_amount_string: String)
 }
 
 #[component]
-pub fn OreValueSmall(class: Option<String>, ui_amount_string: String, small_units: Option<bool>) -> Element {
+pub fn OreValueSmall(
+    class: Option<String>, 
+    ui_amount_string: String, 
+    small_units: Option<bool>,
+    abbreviated: Option<bool>
+) -> Element {
     let class: String = class.unwrap_or("".to_string());
     let display_small_units = small_units.unwrap_or(false);
+    let abbreviated = abbreviated.unwrap_or(false);
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
     let small_units = units[1];
-    let big_units_display = format_with_commas(big_units);
-    let small_units_display = small_units.trim_end_matches('0');
+    // let big_units_display = format_with_commas(big_units);
+    // let small_units_display = small_units.trim_end_matches('0');
+
+    // Abbreviate the value if the abbreviated flag is true
+    let (big_units_display, small_units_display) = if abbreviated {
+        if big_units == "0" {
+            // For values < 1, show 3 significant digits total
+            let mut significant_digits = String::new();
+            let mut non_zero_digits = 0;
+            for c in small_units.chars() {
+                significant_digits.push(c);
+                if c != '0' {
+                    non_zero_digits += 1;
+                    if non_zero_digits >= 3 {
+                        break;
+                    }
+                }
+            }
+            (
+                "0".to_string(),
+                significant_digits
+            )
+        } else {
+            // For values >= 1, show all big units and first 3 small units
+            (
+                format_with_commas(big_units),
+                small_units.chars().take(3).collect()
+            )
+        }
+    } else {
+        (
+            format_with_commas(big_units),
+            small_units.trim_end_matches('0').to_string()
+        )
+    };
+
     rsx! {
         Row {
             class: "gap-1.5 w-min {class}",

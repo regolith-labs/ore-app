@@ -290,6 +290,7 @@ fn StakeTableRowYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<Gat
                         class: "text-elements-gold",
                         ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
                         small_units: true,
+                        abbreviated: true,
                     }
                 } else {
                     NullValue {}
