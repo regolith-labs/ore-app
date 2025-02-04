@@ -205,8 +205,6 @@ pub fn OreValueSmall(
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
     let small_units = units[1];
-    // let big_units_display = format_with_commas(big_units);
-    // let small_units_display = small_units.trim_end_matches('0');
 
     // Abbreviate the value if the abbreviated flag is true
     let (big_units_display, small_units_display) = if abbreviated {
@@ -313,6 +311,29 @@ pub fn UsdValueSmall(class: Option<String>, amount: String, small_units: Option<
             class: "gap-1.5 {class}",
             span {
                 class: "my-auto font-medium", 
+                if display_small_units {
+                    "${big_units}.{small_units[..2].to_string()}"
+                } else {
+                    "${big_units}"
+                }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn UsdValue(class: Option<String>, amount: String, small_units: Option<bool>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    let display_small_units = small_units.unwrap_or(false);
+    let units: Vec<_> = amount.split('.').collect();
+    let big_units = units[0];
+    let big_units = format_with_commas(big_units);
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
+    rsx! {
+        Row {
+            class: "gap-1.5 {class}",
+            span {
+                class: "my-auto font-semibold text-2xl sm:text-3xl", 
                 if display_small_units {
                     "${big_units}.{small_units[..2].to_string()}"
                 } else {

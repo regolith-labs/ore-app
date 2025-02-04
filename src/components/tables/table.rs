@@ -19,15 +19,17 @@ pub fn Table(header: Element, rows: Element, class: Option<String>) -> Element {
 
 #[component]
 pub fn TableHeader(
+    class: Option<String>,
     left: String,
     right_1: String,
     right_2: Option<String>,
     right_3: Option<String>,
     right_4: Option<String>,
 ) -> Element {
+    let class = class.unwrap_or("".to_string());
     rsx! {
         Row {
-            class: "h-8 sm:h-10 w-full min-w-max px-5 sm:px-3 justify-between font-medium text-sm text-elements-lowEmphasis",
+            class: "h-8 sm:h-10 w-full min-w-max px-5 sm:px-3 justify-between font-medium text-elements-lowEmphasis text-nowrap {class}",
             span {
                 class: "flex w-screen sm:w-full sm:min-w-96 -ml-5 sm:ml-0 px-5 sm:px-0",
                 Row {

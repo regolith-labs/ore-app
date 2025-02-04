@@ -11,7 +11,11 @@ use crate::{
 pub fn StakeTable() -> Element {
     rsx! {
         Col {
-            IdleTable {},
+            span {
+                class: "text-elements-highEmphasis font-semibold text-2xl px-5 sm:px-8 mb-4",
+                "Boosts"
+            }
+            // IdleTable {},
             PairsTable {},
         }
     }
@@ -42,13 +46,21 @@ fn PairsTable() -> Element {
             class: "mx-0 sm:mx-8",
             header: rsx! {
                 TableHeader {
-                    left: "Pairs",
+                    left: "Idle",
+                    right_1: "Multiplier",
+                    right_2: "TVL",
+                    right_3: "Yield",
+                }
+            },
+            rows: rsx! {
+                IdleTableRow {}
+                TableHeader {
+                    class: "mt-4",
+                    left: "Liquidity pairs",
                     right_1: "",
                     right_2: "",
                     right_3: "",
                 }
-            },
-            rows: rsx! {
                 for boost_meta in LISTED_BOOSTS.iter() {
                     StakeTableRow {
                         boost_meta: boost_meta.clone(),
