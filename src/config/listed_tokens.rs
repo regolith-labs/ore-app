@@ -67,11 +67,19 @@ impl Token {
         LISTED_TOKENS_BY_TICKER.get("SOL").cloned().unwrap()
     }
 
-    pub fn is_sol(&self) -> bool {
-        self.ticker == "SOL"
+    pub fn usdc() -> Self {
+        LISTED_TOKENS_BY_TICKER.get("USDC").cloned().unwrap()
     }
 
     pub fn _is_ore(&self) -> bool {
         self.ticker == "ORE"
+    }
+
+    pub fn is_sol(&self) -> bool {
+        self.ticker == "SOL"
+    }
+
+    pub fn _is_usdc(&self) -> bool {
+        self.ticker == "USDC"
     }
 }

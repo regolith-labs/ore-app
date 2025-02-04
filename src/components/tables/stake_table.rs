@@ -1,23 +1,51 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
+use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 use steel::Pubkey;
 
 use crate::{
-    components::{Col, NullValue, OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_liquidity_pair, use_stake, LiquidityPair}, route::Route
+    components::{Col, NullValue, OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_liquidity_pair, use_ore_quote, use_stake, LiquidityPair}, route::Route
 };
 
 pub fn StakeTable() -> Element {
+    rsx! {
+        Col {
+            IdleTable {},
+            PairsTable {},
+        }
+    }
+}
+
+fn IdleTable() -> Element {
     rsx! {
         Table {
             class: "mx-0 sm:mx-8",
             header: rsx! {
                 TableHeader {
-                    left: "Pair",
+                    left: "Idle",
                     right_1: "Multiplier",
                     right_2: "TVL",
                     right_3: "Yield",
+                }
+            },
+            rows: rsx! {
+                IdleTableRow {}
+            }
+        }
+    }
+}
+
+fn PairsTable() -> Element {
+    rsx! {
+        Table {
+            class: "mx-0 sm:mx-8",
+            header: rsx! {
+                TableHeader {
+                    left: "Pairs",
+                    right_1: "",
+                    right_2: "",
+                    right_3: "",
                 }
             },
             rows: rsx! {
@@ -27,6 +55,38 @@ pub fn StakeTable() -> Element {
                     }
                 }
             }
+        }
+    }
+}
+
+fn IdleTableRow() -> Element {
+    let token = Token::ore();
+    let boost = use_boost(token.mint);
+    let stake = use_stake(token.mint);
+    rsx! {
+        TableRowLink {
+            to: Route::Idle {},
+            left: rsx! {
+                IdleTableRowTitle {
+                    token
+                }
+            },
+            right_1: rsx! {
+                StakeTableRowMultiplier {
+                    boost
+                }
+            },
+            right_2: rsx! {
+                IdleTableRowTVL {
+                    boost
+                }
+            },
+            right_3: rsx! {
+                StakeTableRowYield {
+                    boost,
+                    stake,
+                }
+            },
         }
     }
 }
@@ -66,6 +126,24 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
 }
 
 #[component]
+fn IdleTableRowTitle(token: Token) -> Element {
+    rsx! {
+        Row {
+            class: "gap-4 my-auto",
+            img {
+                class: "w-8 h-8 rounded-full shrink-0",
+                src: "{token.image}",
+            }
+            span {
+                class: "font-semibold my-auto",
+                "{token.ticker}"
+            }
+        }
+    }
+}
+
+
+#[component]
 fn StakeTableRowTitle(ticker: String, pair_mint: Pubkey) -> Element {
     let token = LISTED_TOKENS.get(&pair_mint).cloned();
     rsx! {
@@ -101,6 +179,35 @@ fn StakeTableRowMultiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
             span {
                 class: "text-right my-auto font-medium",
                 "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+            }
+        } else {
+            TableCellLoading {}
+        }
+    }
+}
+
+#[component]
+fn IdleTableRowTVL(boost: Resource<GatewayResult<Boost>>) -> Element {
+    let usdc = Token::usdc();
+    let quote = use_ore_quote(usdc.mint);
+    let tvl = use_resource(move || async move {
+        let Some(Ok(boost)) = *boost.read() else {
+            return None;
+        };
+        let Some(Ok(quote)) = quote.cloned() else {
+            return None;
+        };
+        let usdc_quote_f64 = amount_to_ui_amount(quote.out_amount, usdc.decimals);
+        let total_deposits_f64 = amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS);
+        Some(usdc_quote_f64 * total_deposits_f64)
+    });
+    rsx! {
+        if let Some(Some(tvl)) = tvl.cloned() {
+            Col {
+                gap: 2,
+                UsdValueSmall {
+                    amount: tvl.to_string(),
+                }
             }
         } else {
             TableCellLoading {}

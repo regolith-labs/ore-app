@@ -50,13 +50,11 @@ pub fn TokenInputForm(
                     "{title}"
                 }
                 if let Some(token) = token.clone() {
-                    if let Some(Ok(balance)) = balance.cloned() {
-                        Toolbar {
-                            balance: balance.clone(),
-                            token: token.clone(),
-                            update: update.clone(),
-                            toolbar_shortcuts,
-                        }
+                    Toolbar {
+                        balance: balance.clone(),
+                        token: token.clone(),
+                        update: update.clone(),
+                        toolbar_shortcuts,
                     }
                 }
             }
@@ -93,16 +91,22 @@ pub fn TokenInputForm(
 
 #[component]
 fn Toolbar(
-    balance: UiTokenAmount,
+    balance: Resource<GatewayResult<UiTokenAmount>>,
     token: Token,
     update: Signal<String>,
     toolbar_shortcuts: Option<bool>,
 ) -> Element {
-    let (half_value, max_value) = if let Some(ui_amount) = balance.ui_amount {
-        (
-            format!("{:.1$}", (ui_amount / 2.0), balance.decimals as usize),
-            balance.ui_amount_string.clone()
-        )
+
+    // Get half and max values
+    let (half_value, max_value) = if let Some(Ok(balance)) = balance.cloned() {
+        if let Some(ui_amount) = balance.ui_amount {
+            (
+                format!("{:.1$}", (ui_amount / 2.0), balance.decimals as usize),
+                balance.ui_amount_string.clone()
+            )
+        } else {
+            ("0".to_string(), "0".to_string())
+        }
     } else {
         ("0".to_string(), "0".to_string())
     };
@@ -110,9 +114,20 @@ fn Toolbar(
     rsx! {
         Row {
             gap: 2,
-            ToolbarBalance {
-                balance: balance.clone(),
-                token: token.clone(),
+            if let Some(balance) = balance.cloned() {
+                if let Ok(balance) = balance {
+                    ToolbarBalance {
+                        ui_amount_string: balance.ui_amount_string.clone(),
+                        token: token.clone(),
+                    }
+                } else {
+                    ToolbarBalance {
+                        ui_amount_string: "0".to_string(),
+                        token: token.clone(),
+                    }
+                }
+            } else {
+                LoadingValue {}
             }
             if toolbar_shortcuts.unwrap_or(false) {
                 ToolbarButton {
@@ -132,17 +147,13 @@ fn Toolbar(
 
 #[component]
 fn ToolbarBalance(
-    balance: UiTokenAmount,
+    ui_amount_string: String,
     token: Token,
 ) -> Element {
     rsx! {
-        Row {
-            class: "py-1 px-1 font-medium text-elements-lowEmphasis my-auto",
-            gap: 2,
-            span { 
-                class: "my-auto text-xs font-medium", 
-                "{balance.ui_amount_string} {token.ticker}" 
-            }
+        span { 
+            class: "my-auto text-xs font-medium py-1 px-1 font-medium text-elements-lowEmphasis", 
+            "{ui_amount_string} {token.ticker}" 
         }
     }
 }

@@ -2,8 +2,8 @@ use dioxus::prelude::*;
 use ore_boost_api::state::{boost_pda, Boost};
 use steel::Pubkey;
 
-use crate::{config::{BoostMeta, LpType, Token, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, ore::OreGateway, GatewayError, GatewayResult, Rpc}};
-use super::use_gateway;
+use crate::{config::{BoostMeta, LpType, Token, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, ore::OreGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount}};
+use super::{get_token_balance, use_gateway, use_wallet, Wallet};
 
 pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
     use_resource(move || async move {
@@ -11,6 +11,17 @@ pub fn use_boost(mint: Pubkey) -> Resource<GatewayResult<Boost>> {
         use_gateway().rpc.get_boost(boost_address).await.map_err(GatewayError::from)
     })
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct LiquidityPair {
+    pub token_a: Token,
+    pub token_b: Token,
+    pub balance_a_f64: f64,
+    pub balance_b_f64: f64,
+    pub total_value_usd: f64,
+    pub shares: u64,
+}
+
 
 pub fn use_liquidity_pair(boost_meta: BoostMeta) -> Resource<GatewayResult<LiquidityPair>> {
     let lp_type: LpType = boost_meta.lp_type;
@@ -49,12 +60,30 @@ pub fn use_liquidity_pair(boost_meta: BoostMeta) -> Resource<GatewayResult<Liqui
     })
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct LiquidityPair {
-    pub token_a: Token,
-    pub token_b: Token,
-    pub balance_a_f64: f64,
-    pub balance_b_f64: f64,
-    pub total_value_usd: f64,
-    pub shares: u64,
+pub fn use_liquidity_pair_balances(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> (Resource<GatewayResult<UiTokenAmount>>, Resource<GatewayResult<UiTokenAmount>>) {
+    let wallet = use_wallet();
+
+    let token_a_balance = use_resource(move || async move {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
+            match *wallet.read() {
+                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+                Wallet::Connected(authority) => get_token_balance(authority, liquidity_pair.token_a.mint).await,
+            }
+        } else {
+            Err(GatewayError::Unknown)
+        }
+    });
+
+    let token_b_balance = use_resource(move || async move {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
+            match *wallet.read() {
+                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+                Wallet::Connected(authority) => get_token_balance(authority, liquidity_pair.token_b.mint).await,
+            }
+        } else {
+            Err(GatewayError::Unknown)
+        }
+    });
+
+    (token_a_balance, token_b_balance)
 }

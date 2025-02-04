@@ -50,7 +50,7 @@ fn Hero() -> Element {
     }
 }
 
-fn MarqeeSection() -> Element {
+fn _MarqeeSection() -> Element {
     let wbtc_mint = Pubkey::from_str("3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh").unwrap();
     let sol_mint = Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap();
     let usdc_mint = Pubkey::from_str("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v").unwrap();

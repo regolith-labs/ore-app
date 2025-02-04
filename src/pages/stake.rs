@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{components::*, route::Route};
+use crate::components::*;
 
 pub fn Stake() -> Element {
     rsx! {
@@ -12,43 +12,18 @@ pub fn Stake() -> Element {
                 title: "Stake",
                 subtitle: "Provide liquidity for traders and earn yield."
             }
-            IdlePreview {}
             StakeTable {}
         }
     }
 }
 
-fn IdlePreview() -> Element {
+fn AccountSummary() -> Element {
     rsx! {
-        div {
-            class: "flex mx-auto w-full px-5 sm:px-8",
-            Link {
-                class: "flex flex-col w-full sm:flex-row gap-4 sm:justify-between rounded px-8 py-8 transition bg-surface-elevated border border-gray-800",
-                to: Route::Idle {},
-                Col {
-                    gap: 2,
-                    span {
-                        class: "font-semibold text-2xl",
-                        "Idle yield"
-                    }
-                    span {
-                        class: "text-elements-midEmphasis",
-                        "Stake unpaired ORE and earn the idle yield rate."
-                    }
-                }
-                div {
-                    class: "flex bg-white my-auto px-4 py-2 rounded-full transition hover:scale-105",
-                    span {
-                        class: "mx-auto my-auto font-semibold text-black",
-                        "Stake now"
-                    }
-                }
-            }
-        }
+
     }
 }
 
-fn YieldOverview() -> Element {
+fn _YieldOverview() -> Element {
     // TODO Get all stake accounts
     // TODO Calculate total claimable yield
     // TODO Provide claim button
