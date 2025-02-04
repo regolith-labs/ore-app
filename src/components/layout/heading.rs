@@ -15,7 +15,7 @@ pub fn Heading(class: Option<String>, title: String, subtitle: Option<String>) -
             }
             if let Some(subtitle) = subtitle {
                 span {
-                    class: "text-elements-lowEmphasis text-base",
+                    class: "text-elements-lowEmphasis font-medium",
                     "{subtitle}"
                 }
             }

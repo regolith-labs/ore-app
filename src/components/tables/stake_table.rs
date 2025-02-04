@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 use dioxus::prelude::*;
-use ore_api::consts::TOKEN_DECIMALS;
+use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::{Boost, Stake};
 use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 use steel::Pubkey;
@@ -8,62 +10,50 @@ use crate::{
     components::{Col, NullValue, OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_liquidity_pair, use_ore_quote, use_stake, LiquidityPair}, route::Route
 };
 
-pub fn StakeTable() -> Element {
+#[component]
+pub fn StakeTable(
+    stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>,
+    liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>>
+) -> Element {
     rsx! {
         Col {
             span {
                 class: "text-elements-highEmphasis font-semibold text-2xl px-5 sm:px-8 mb-4",
                 "Boosts"
             }
-            // IdleTable {},
-            PairsTable {},
-        }
-    }
-}
-
-fn IdleTable() -> Element {
-    rsx! {
-        Table {
-            class: "mx-0 sm:mx-8",
-            header: rsx! {
-                TableHeader {
-                    left: "Idle",
-                    right_1: "Multiplier",
-                    right_2: "TVL",
-                    right_3: "Yield",
-                }
-            },
-            rows: rsx! {
-                IdleTableRow {}
-            }
-        }
-    }
-}
-
-fn PairsTable() -> Element {
-    rsx! {
-        Table {
-            class: "mx-0 sm:mx-8",
-            header: rsx! {
-                TableHeader {
-                    left: "Idle",
-                    right_1: "Multiplier",
-                    right_2: "TVL",
-                    right_3: "Yield",
-                }
-            },
-            rows: rsx! {
-                IdleTableRow {}
-                TableHeader {
-                    class: "mt-4",
-                    left: "Liquidity pairs",
-                    right_1: "",
-                    right_2: "",
-                    right_3: "",
-                }
-                for boost_meta in LISTED_BOOSTS.iter() {
-                    StakeTableRow {
-                        boost_meta: boost_meta.clone(),
+            Table {
+                class: "mx-0 sm:mx-8",
+                header: rsx! {
+                    TableHeader {
+                        left: "Idle",
+                        right_1: "Multiplier",
+                        right_2: "TVL",
+                        right_3: "Yield",
+                    }
+                },
+                rows: rsx! {
+                    if let Some(stake) = stake_accounts.get(&MINT_ADDRESS) {
+                        IdleTableRow {
+                            stake: *stake
+                        }
+                    }
+                    TableHeader {
+                        class: "mt-4",
+                        left: "Pairs",
+                        right_1: "",
+                        right_2: "",
+                        right_3: "",
+                    }
+                    for boost_meta in LISTED_BOOSTS.iter() {
+                        if let Some(stake) = stake_accounts.get(&boost_meta.lp_mint) {
+                            if let Some(liquidity_pair) = liquidity_pairs.get(&boost_meta.lp_mint) {
+                                StakeTableRow {
+                                    boost_meta: boost_meta.clone(),
+                                    stake: *stake,
+                                    liquidity_pair: *liquidity_pair
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -71,16 +61,19 @@ fn PairsTable() -> Element {
     }
 }
 
-fn IdleTableRow() -> Element {
+#[component]
+fn IdleTableRow(
+    stake: Resource<GatewayResult<Stake>>
+) -> Element {
     let token = Token::ore();
     let boost = use_boost(token.mint);
-    let stake = use_stake(token.mint);
     rsx! {
         TableRowLink {
             to: Route::Idle {},
             left: rsx! {
                 IdleTableRowTitle {
-                    token
+                    token,
+                    stake
                 }
             },
             right_1: rsx! {
@@ -104,10 +97,12 @@ fn IdleTableRow() -> Element {
 }
 
 #[component]
-fn StakeTableRow(boost_meta: BoostMeta) -> Element {
+fn StakeTableRow(
+    boost_meta: BoostMeta,
+    stake: Resource<GatewayResult<Stake>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>
+) -> Element {
     let boost = use_boost(boost_meta.lp_mint);
-    let stake = use_stake(boost_meta.lp_mint);
-    let liquidity_pair = use_liquidity_pair(boost_meta.clone());
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -115,6 +110,8 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
                 StakeTableRowTitle {
                     ticker: boost_meta.ticker.clone(),
                     pair_mint: boost_meta.pair_mint,
+                    stake: stake.clone(),
+                    liquidity_pair: liquidity_pair.clone(),
                 }
             },
             right_1: rsx! {
@@ -138,17 +135,35 @@ fn StakeTableRow(boost_meta: BoostMeta) -> Element {
 }
 
 #[component]
-fn IdleTableRowTitle(token: Token) -> Element {
+fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Element {
+    let balance = if let Some(Ok(stake)) = stake.cloned() {
+        Some(
+            amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS)
+                .trim_end_matches("0")
+                .trim_end_matches(".")
+                .to_string()
+        )
+    } else {
+        None
+    };
     rsx! {
         Row {
             class: "gap-4 my-auto",
             img {
-                class: "w-8 h-8 rounded-full shrink-0",
+                class: "w-8 h-8 rounded-full shrink-0 my-auto",
                 src: "{token.image}",
             }
-            span {
-                class: "font-semibold my-auto",
-                "{token.ticker}"
+            Col {
+                span {
+                    class: "font-semibold my-auto",
+                    "{token.ticker}"
+                }
+                if let Some(balance) = balance {
+                    span {
+                        class: "font-medium text-xs text-elements-lowEmphasis",
+                        "{balance}"
+                    }
+                }
             }
         }
     }
@@ -156,29 +171,61 @@ fn IdleTableRowTitle(token: Token) -> Element {
 
 
 #[component]
-fn StakeTableRowTitle(ticker: String, pair_mint: Pubkey) -> Element {
+fn StakeTableRowTitle(
+    ticker: String, 
+    pair_mint: Pubkey, 
+    stake: Resource<GatewayResult<Stake>>, 
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>
+) -> Element {
     let token = LISTED_TOKENS.get(&pair_mint).cloned();
+    let ore_balance = if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+        if let Some(Ok(stake)) = stake.cloned() {
+            if stake.balance > 0 {
+                let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) = liquidity_pair.get_stake_amounts(stake.balance);
+                Some(
+                    format!("{:.1$}", ore_amount_f64, TOKEN_DECIMALS as usize)
+                        .trim_end_matches("0")
+                        .trim_end_matches(".")
+                        .to_string()
+                )
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    } else {
+        None
+    };
     rsx! {
         Row {
             class: "gap-4 my-auto",
             if let Some(token) = token {
                 img {
-                    class: "w-8 h-8 rounded-full shrink-0",
+                    class: "w-8 h-8 rounded-full shrink-0 my-auto",
                     src: "{token.image}",
                 }
             } else {
                 img {
-                    class: "w-8 h-8 rounded-full shrink-0",
+                    class: "w-8 h-8 rounded-full shrink-0 my-auto",
                     src: "", // TODO Unknown token icon
                 }
             }
             img {
-                class: "w-8 h-8 rounded-full shrink-0 -ml-6",
+                class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-6",
                 src: asset!("/public/icon.png"),
             }
-            span {
-                class: "font-semibold my-auto",
-                "{ticker}"
+            Col {
+                span {
+                    class: "font-semibold my-auto",
+                    "{ticker}"
+                }
+                if let Some(ore_balance) = ore_balance {
+                    span {
+                        class: "font-medium text-xs text-elements-lowEmphasis",
+                        "{ore_balance}"
+                    }
+                }
             }
         }
     }

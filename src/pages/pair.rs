@@ -104,7 +104,7 @@ fn AccountMetrics(
                         if let Ok(stake) = stake {
                             if stake.balance > 0 {
                                 LiquidityPairStakeValue {
-                                    shares: stake.balance,
+                                    stake_balance: stake.balance,
                                     liquidity_pair: liquidity_pair.clone(),
                                     small_units: Some(true),
                                 }
@@ -131,7 +131,7 @@ fn AccountMetrics(
                                 "Deposits (pending)"
                             }
                             LiquidityPairStakeValue {
-                                shares: stake.balance_pending,
+                                stake_balance: stake.balance_pending,
                                 liquidity_pair: liquidity_pair.clone(),
                                 small_units: Some(true),
                             }
@@ -149,7 +149,7 @@ fn AccountMetrics(
                                 "Unstaked"
                             }
                             LiquidityPairStakeValue {
-                                shares: lp_balance.amount.parse::<u64>().unwrap_or(0),
+                                stake_balance: lp_balance.amount.parse::<u64>().unwrap_or(0),
                                 liquidity_pair: liquidity_pair.clone(),
                                 small_units: Some(true),
                             }

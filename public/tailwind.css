@@ -714,9 +714,6 @@
   .-ml-2 {
     margin-left: calc(var(--spacing) * -2);
   }
-  .-ml-3 {
-    margin-left: calc(var(--spacing) * -3);
-  }
   .-ml-5 {
     margin-left: calc(var(--spacing) * -5);
   }
@@ -1374,24 +1371,10 @@
       }
     }
   }
-  .hover\:bg-elements-gold {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-elements-gold);
-      }
-    }
-  }
   .hover\:bg-gray-800 {
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-gray-800);
-      }
-    }
-  }
-  .hover\:text-black {
-    &:hover {
-      @media (hover: hover) {
-        color: var(--color-black);
       }
     }
   }

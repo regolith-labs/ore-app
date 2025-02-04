@@ -1,15 +1,14 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
-use ore_boost_api::state::Stake;
 
-use crate::{components::{Col, OreIcon, Row}, config::{LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, hooks::LiquidityPair};
+use crate::{components::{Col, OreIcon, Row}, config::LISTED_TOKENS_BY_TICKER, hooks::LiquidityPair};
 
 #[component]
 pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
-    let small_units = units[1];
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
 
     // let is_thousands = big_units.len() > 3;
     // let k = if is_thousands { "k" } else { "" };
@@ -54,7 +53,7 @@ pub fn OreValueGold(ui_amount_string: String, class: Option<String>) -> Element 
     let class = class.unwrap_or("".to_string());
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
-    let small_units = units[1];
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
     rsx! {
         Row {
             class: "sm:gap-3 h-10 w-min {class}",
@@ -105,7 +104,7 @@ pub fn OreValueWhole(ui_amount_string: String, class: Option<String>) -> Element
 pub fn OrePrice(ui_amount_string: String, change: Option<f64>) -> Element {
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
-    let small_units = units[1];
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
     rsx! {
         Row {
             class: "gap-2 w-min",
@@ -157,7 +156,7 @@ pub fn OreValueSmallAbbreviated(class: Option<String>, ui_amount_string: String)
     let class: String = class.unwrap_or("".to_string());
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
-    let small_units = units[1];
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
 
     let is_thousands = big_units.len() > 3;
     let k = if is_thousands { "k" } else { "" };
@@ -204,7 +203,7 @@ pub fn OreValueSmall(
     let abbreviated = abbreviated.unwrap_or(false);
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let big_units = units[0];
-    let small_units = units[1];
+    let small_units = if units.len() > 1 { units[1] } else { "00" };
 
     // Abbreviate the value if the abbreviated flag is true
     let (big_units_display, small_units_display) = if abbreviated {
@@ -214,7 +213,7 @@ pub fn OreValueSmall(
             let mut non_zero_digits = 0;
             for c in small_units.chars() {
                 significant_digits.push(c);
-                if c != '0' {
+                if c != '0' || non_zero_digits > 0 {
                     non_zero_digits += 1;
                     if non_zero_digits >= 3 {
                         break;
@@ -374,22 +373,12 @@ pub fn LiquidityPairValue(class: Option<String>, liquidity_pair: LiquidityPair, 
 #[component]
 pub fn LiquidityPairStakeValue(
     class: Option<String>, 
-    shares: u64, 
+    stake_balance: u64, 
     liquidity_pair: LiquidityPair, 
     small_units: Option<bool>
 ) -> Element {
     let class = class.unwrap_or("".to_string());
-
-    let lp_share = shares as f64 / liquidity_pair.shares as f64;
-    let stake_amount_a = liquidity_pair.balance_a_f64 * lp_share;
-    let stake_amount_b = liquidity_pair.balance_b_f64 * lp_share;
-    
-    let (ore_amount_f64, token_amount_f64, token_ticker, token_decimals) = if liquidity_pair.token_a.ticker == "ORE" {
-        (stake_amount_a, stake_amount_b, liquidity_pair.token_b.ticker.clone(), liquidity_pair.token_b.decimals)
-    } else {
-        (stake_amount_b, stake_amount_a, liquidity_pair.token_a.ticker.clone(), liquidity_pair.token_a.decimals)
-    };
-
+    let (ore_amount_f64, token_amount_f64, token_ticker, token_decimals) = liquidity_pair.get_stake_amounts(stake_balance);
     rsx! {
         Col {
             class: "gap-2 {class}",

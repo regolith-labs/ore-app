@@ -1,8 +1,14 @@
-use dioxus::prelude::*;
+use std::collections::HashMap;
 
-use crate::{components::*, route::Route};
+use dioxus::prelude::*;
+use steel::Pubkey;
+use ore_boost_api::state::Stake;
+
+use crate::{components::*, gateway::GatewayResult, hooks::{use_liquidity_pairs, use_net_deposits, use_net_yield, use_stake_accounts, LiquidityPair}, route::Route};
 
 pub fn Stake() -> Element {
+    let stake_accounts = use_stake_accounts();
+    let liquidity_pairs = use_liquidity_pairs();
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
@@ -12,13 +18,25 @@ pub fn Stake() -> Element {
                 title: "Stake",
                 subtitle: "Provide liquidity for traders and earn yield."
             }
-            AccountSummary {}
-            StakeTable {}
+            AccountSummary {
+                stake_accounts: stake_accounts.clone(),
+                liquidity_pairs: liquidity_pairs.clone()
+            }
+            StakeTable {
+                stake_accounts: stake_accounts,
+                liquidity_pairs: liquidity_pairs
+            }
         }
     }
 }
 
-fn AccountSummary() -> Element {
+#[component]
+fn AccountSummary(
+    stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>,
+    liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>>
+) -> Element {
+    let net_deposits = use_net_deposits(stake_accounts.clone(), liquidity_pairs);
+    let net_yield = use_net_yield(stake_accounts);
     rsx! {
         Col {
             class: "mx-auto w-full px-5 sm:px-8 justify-between",
@@ -34,34 +52,28 @@ fn AccountSummary() -> Element {
                         class: "text-elements-lowEmphasis font-medium",
                         "Net deposits"
                     }
-                    OreValue {
-                        ui_amount_string: "2.324330".to_string(),
+                    if let Some(Ok(net_deposits)) = net_deposits.cloned() {
+                        OreValue {
+                            ui_amount_string: net_deposits.ui_amount_string,
+                        }
+                    } else {
+                        LoadingValue {}
                     }
                 }
-                Row {
-                    Col {
-                        class: "min-w-56",
-                        gap: 4,
-                        span {
-                            class: "text-elements-lowEmphasis font-medium text-right",
-                            "Net liquidity"
-                        }
-                        UsdValue {
-                            class: "ml-auto",
-                            amount: "1230.12".to_string(),
-                        }
+                Col {
+                    class: "min-w-56",
+                    gap: 4,
+                    span {
+                        class: "text-elements-lowEmphasis font-medium text-right",
+                        "Net yield"
                     }
-                    Col {
-                        class: "min-w-56",
-                        gap: 4,
-                        span {
-                            class: "text-elements-lowEmphasis font-medium text-right",
-                            "Net yield"
-                        }
+                    if let Some(Ok(net_yield)) = net_yield.cloned() {
                         OreValue {
                             class: "text-elements-gold ml-auto",
-                            ui_amount_string: "1.213".to_string(),
+                            ui_amount_string: net_yield.ui_amount_string,
                         }
+                    } else {
+                        LoadingValue {}
                     }
                 }
             }
@@ -73,12 +85,11 @@ fn AccountSummary() -> Element {
 fn ActionButtons() -> Element {
     rsx! {
         Row {
-            class: "mx-auto w-full mt-8 justify-end",
+            class: "mx-auto w-full mt-4 justify-end",
             ClaimButton {}
         }
     }
 }
-
 
 fn ClaimButton() -> Element {
     rsx! {

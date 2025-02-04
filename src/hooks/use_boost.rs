@@ -22,6 +22,18 @@ pub struct LiquidityPair {
     pub shares: u64,
 }
 
+impl LiquidityPair {
+    pub fn get_stake_amounts(&self, stake_balance: u64) -> (f64, f64, String, u8) {
+        let stake_share = stake_balance as f64 / self.shares as f64;
+        let stake_amount_a = self.balance_a_f64 * stake_share;
+        let stake_amount_b = self.balance_b_f64 * stake_share;
+        if self.token_a.ticker == "ORE" {
+            (stake_amount_a, stake_amount_b, self.token_b.ticker.clone(), self.token_b.decimals)
+        } else {
+            (stake_amount_b, stake_amount_a, self.token_a.ticker.clone(), self.token_a.decimals)
+        }
+    }
+}
 
 pub fn use_liquidity_pair(boost_meta: BoostMeta) -> Resource<GatewayResult<LiquidityPair>> {
     let lp_type: LpType = boost_meta.lp_type;
