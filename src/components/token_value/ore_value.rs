@@ -32,7 +32,7 @@ pub fn OreValue(
 
     let (icon_gap, icon_size, whole_units_size, decimal_units_size, font_weight) = match size.unwrap_or(TokenValueSize::Small) {
         TokenValueSize::Small => ("gap-1.5", "h-4 w-4", "text-base", "text-base", "font-medium"),
-        TokenValueSize::Large => ("gap-3 h-10", "h-6 w-6 sm:h-8 sm:w-8", "text-2xl sm:text-3xl", "text-xl sm:text-2xl", "font-semibold"),
+        TokenValueSize::Large => ("gap-3 h-10", "h-6 w-6 sm:h-8 sm:w-8", "text-3xl", "text-2xl", "font-semibold"),
     };
 
     rsx! {
