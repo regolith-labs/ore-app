@@ -61,7 +61,6 @@ pub struct UiTokenAmount {
 pub type StringAmount = String;
 pub type StringDecimals = String;
 
-
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SimulateTransactionResponse {

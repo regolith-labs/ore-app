@@ -15,28 +15,26 @@ pub fn use_idle_withdraw_transaction(
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
+        err.set(None);
+
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
-            err.set(None);
             return Err(GatewayError::WalletDisconnected);
         };
 
          // If empty, disable
          let amount_str = input_amount.cloned();
          if amount_str.is_empty() {
-            err.set(None);
             return Err(GatewayError::Unknown);
         }
 
         // If input isn't a number, disable
         let Ok(amount_f64) = amount_str.parse::<f64>() else {
-            err.set(None);
             return Err(GatewayError::Unknown);
         };
 
         // If amount is 0, disable
         if amount_f64 == 0f64 {
-            err.set(None);
             return Err(GatewayError::Unknown);
         }
 

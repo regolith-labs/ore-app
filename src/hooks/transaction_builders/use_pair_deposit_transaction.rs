@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::{create_associated_token_account, create_associated_token_account_idempotent}}, spl_token::{self, instruction::{close_account, sync_native}}};
+use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::{create_associated_token_account, create_associated_token_account_idempotent}}, spl_token::{self, instruction::{close_account, sync_native}, ui_amount_to_amount}};
 use solana_sdk::{native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
@@ -26,37 +26,36 @@ pub fn use_pair_deposit_transaction(
 
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
-            err.set(None);
             return Err(GatewayError::WalletDisconnected);
         };
-    
-        // Get resources
-        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-    
+
         // Parse input amounts
         let Ok(amount_a_f64) = input_amount_a.cloned().parse::<f64>() else {
-            err.set(None);
             return Err(GatewayError::Unknown);
         };
         let Ok(amount_b_f64) = input_amount_b.cloned().parse::<f64>() else {
-            err.set(None);
             return Err(GatewayError::Unknown);
         };
         if amount_a_f64 == 0f64 || amount_b_f64 == 0f64 {
-            err.set(None);
             return Err(GatewayError::Unknown);
         }
+    
+        // Get resources
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
+            if amount_a_f64 > 0f64 {
+                err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_a.clone())));
+            }
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
+            if amount_b_f64 > 0f64 {
+                err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_b.clone())));
+            }
+            return Err(GatewayError::Unknown);
+        };
     
         // Check if wallet balances are sufficient
         if amount_a_f64 > token_a_balance.ui_amount.unwrap_or(0.0) {
@@ -82,9 +81,9 @@ pub fn use_pair_deposit_transaction(
 
         // Wrap SOL, if needed 
         let sol_mint = Token::sol().mint;
-        let wsol_amount = if liquidity_pair.token_a.ticker == "SOL" {
+        let wsol_amount = if liquidity_pair.token_a.is_sol() {
             amount_a_f64
-        } else if liquidity_pair.token_b.ticker == "SOL" {
+        } else if liquidity_pair.token_b.is_sol() {
             amount_b_f64
         } else {
             0f64
@@ -117,8 +116,8 @@ pub fn use_pair_deposit_transaction(
                 ix
             }
             LpType::Meteora => {
-                let amount_a_u64 = token_a_balance.amount.parse::<u64>().unwrap();
-                let amount_b_u64 = token_b_balance.amount.parse::<u64>().unwrap();
+                let amount_a_u64 = ui_amount_to_amount(amount_a_f64, liquidity_pair.token_a.decimals);
+                let amount_b_u64 = ui_amount_to_amount(amount_b_f64, liquidity_pair.token_b.decimals);
                 let Ok(ix) = use_gateway().build_meteora_deposit_instruction(
                     boost_meta.lp_id,
                     amount_a_u64,

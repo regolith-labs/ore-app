@@ -24,12 +24,13 @@ pub fn PairDepositForm(
     let mut input_amount_a = use_signal::<String>(|| "".to_owned());
     let mut input_amount_b = use_signal::<String>(|| "".to_owned());
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
-    let input_stream_b = use_signal::<String>(|| "".to_owned());
+    let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
  
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
         input_stream_a.set("".to_owned());
+        input_stream_b.set("".to_owned());
     });
 
     // Build pair deposit transaction
@@ -63,53 +64,52 @@ pub fn PairDepositForm(
         }
 
         // Get resources
-        let Some(Ok(deposits)) = liquidity_pair.cloned() else {
-            return;
-        };
-        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
-            return;
-        };
-        let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return;
         };
 
         // Calculate deposit ratio
-        let ratio = deposits.balance_a_f64 / deposits.balance_b_f64;
+        let ratio = liquidity_pair.balance_a_f64 / liquidity_pair.balance_b_f64;
+
+        // Parse input value
+        let val_f64 = val.parse::<f64>().unwrap_or(0.0);
+        if val_f64 == 0.0 {
+            if flag {
+                input_amount_a.set(val.clone());
+                input_amount_b.set("0".to_string());
+            } else {
+                input_amount_b.set(val.clone());
+                input_amount_a.set("0".to_string());
+            }
+            return;
+        }
 
         // Update input values
-        if let Ok(val_f64) = val.parse::<f64>() {
-            if val_f64 >= 0f64 {
-                if flag {
-                    input_amount_a.set(val.clone());
-                    input_amount_b.set(
-                        format!("{:.1$}", (val_f64 / ratio), token_b_balance.decimals as usize)
-                            .trim_end_matches('0')
-                            .trim_end_matches('.')
-                            .to_string()
-                    );
-                } else {
-                    input_amount_b.set(val.clone());
-                    input_amount_a.set(
-                        format!("{:.1$}", (val_f64 * ratio), token_a_balance.decimals as usize)
-                            .trim_end_matches('0')
-                            .trim_end_matches('.')
-                            .to_string()
-                    );
-                }
-            } else {
-                err.set(None);
-                input_amount_a.set("0".to_string());
-                input_amount_b.set("0".to_string());
-            }
+        if flag {
+            input_amount_a.set(val.clone());
+            input_amount_b.set(
+                format!("{:.1$}", (val_f64 / ratio), liquidity_pair.token_b.decimals as usize)
+                    .trim_end_matches('0')
+                    .trim_end_matches('.')
+                    .to_string()
+            );
+        } else {
+            input_amount_b.set(val.clone());
+            input_amount_a.set(
+                format!("{:.1$}", (val_f64 * ratio), liquidity_pair.token_a.decimals as usize)
+                    .trim_end_matches('0')
+                    .trim_end_matches('.')
+                    .to_string()
+            );
         }
     };
 
     // Process input streams
     use_effect(move || {
-        process_input_stream(input_stream_a.read().clone(), true);
+        process_input_stream(input_stream_a.cloned(), true);
     });
     use_effect(move || {
-        process_input_stream(input_stream_b.read().clone(), false);
+        process_input_stream(input_stream_b.cloned(), false);
     });
 
     rsx! {

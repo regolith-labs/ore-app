@@ -25,41 +25,33 @@ pub fn use_pair_withdraw_transaction(
 
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
-            err.set(None);
             return Err(GatewayError::WalletDisconnected);
-        };
-
-        // Get resources
-        let Some(Ok(stake)) = stake.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(stake_a_balance)) = stake_a_balance.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(_stake_b_balance)) = stake_b_balance.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
         };
 
         // Parse input amounts
         let Ok(amount_a_f64) = input_amount_a.cloned().parse::<f64>() else {
-            err.set(None);
             return Err(GatewayError::Unknown);
         };
         let Ok(amount_b_f64) = input_amount_b.cloned().parse::<f64>() else {
-            err.set(None);
             return Err(GatewayError::Unknown);
         };
         if amount_a_f64 == 0f64 || amount_b_f64 == 0f64 {
-            err.set(None);
             return Err(GatewayError::Unknown);
         }
+
+        // Get resources
+        let Some(Ok(stake)) = stake.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(stake_a_balance)) = stake_a_balance.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(_stake_b_balance)) = stake_b_balance.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
 
         // Get amount u64
         let amount_a_u64 = ui_amount_to_amount(amount_a_f64, liquidity_pair.token_a.decimals);

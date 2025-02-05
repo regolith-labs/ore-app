@@ -25,7 +25,7 @@ pub fn PairWithdrawForm(
     let mut input_amount_a = use_signal::<String>(|| "".to_owned());
     let mut input_amount_b = use_signal::<String>(|| "".to_owned());
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
-    let input_stream_b = use_signal::<String>(|| "".to_owned());
+    let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let err = use_signal::<Option<TokenInputError>>(|| None);
 
     // Get tokens
@@ -53,6 +53,7 @@ pub fn PairWithdrawForm(
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
         input_stream_a.set("".to_owned());
+        input_stream_b.set("".to_owned());
     });
 
     // Update input values based on updates from the form
@@ -64,21 +65,26 @@ pub fn PairWithdrawForm(
             return;
         }
 
-        // Get resources
-        let Some(Ok(stake)) = stake.cloned() else {
-            return;
-        };
-        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
-            return;
-        };
-
         // Parse input value
         let val_f64 = val.parse::<f64>().unwrap_or(0.0);
         if val_f64 == 0.0 {
-            input_amount_a.set("0".to_string());
-            input_amount_b.set("0".to_string());
+            if flag {
+                input_amount_a.set(val.clone());
+                input_amount_b.set("0".to_string());
+            } else {
+                input_amount_b.set(val.clone());
+                input_amount_a.set("0".to_string());
+            }
             return;
         }
+
+        // Get resources
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+            return;
+        };
+        let Some(Ok(stake)) = stake.cloned() else {
+            return;
+        };
 
         // Calculate percentage shares
         let percentage_shares = stake.balance as f64 / liquidity_pair.shares as f64;
@@ -109,10 +115,10 @@ pub fn PairWithdrawForm(
 
     // Process input streams
     use_effect(move || {
-        process_input_stream(input_stream_a.read().clone(),  true);
+        process_input_stream(input_stream_a.cloned(),  true);
     });
     use_effect(move || {
-        process_input_stream(input_stream_b.read().clone(), false);
+        process_input_stream(input_stream_b.cloned(), false);
     });
 
     rsx! {
