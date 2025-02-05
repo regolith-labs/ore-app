@@ -9,6 +9,8 @@ use crate::{
     route::Route,
 };
 
+
+
 pub fn Mine() -> Element {
     let wallet = use_wallet();
 
@@ -25,6 +27,7 @@ pub fn Mine() -> Element {
     let (from_miner, _to_miner) = use_miner();
     let mut last_hash_at: Signal<i64> = use_signal(|| 0);
     use_effect(move || {
+        // TODO: fetch current miner state (claim amount, etc)
         let _pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
         if let ore_miner_types::OutputMessage::Expired(lha) = from_miner_read {
@@ -43,7 +46,69 @@ pub fn Mine() -> Element {
             }
             StopStartButton { is_active }
             MinerStatus { member_db: member, pool: pool.clone() }
+            MinerData {}
+            // TODO: Add activity table
             div { "{last_hash_at}" }   
+        }
+    }
+}
+
+fn MinerData() -> Element {
+    rsx! {
+        Row {
+            class: "w-full flex-wrap sm:flex-col rounded-xl mx-auto justify-between py-5",
+            gap: 2,            
+            Col {
+                // class: "min-w-56",
+                gap: 4,
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Hash Power"
+                }
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl",
+                    "1230.12"
+                }
+            }
+            Col {
+                // class: "min-w-56",
+                gap: 4,
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Claimable Yield"
+                }
+                OreValue {
+                    ui_amount_string: "2.324330".to_string(),
+                }
+            }
+            Col {
+                // class: "min-w-56",
+                ActionButtons {}                
+            }
+        }
+    }
+}
+
+fn ActionButtons() -> Element {
+    rsx! {
+        Row {
+            class: "mx-auto w-full mt-8",
+            ClaimButton {}
+        }
+    }
+}
+
+// TODO: button on click must claim yield (if it exists)
+fn ClaimButton() -> Element {
+    rsx! {
+        // replace link with claim logic
+        Link {
+            to: Route::Landing {},
+            class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
+            span {
+                class: "my-auto text-nowrap",
+                "Claim Yield"
+            }
         }
     }
 }
@@ -58,6 +123,7 @@ fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
                 class: "absolute top-0 left-0 z-0",
                 gold: is_active.read().0
             }
+            // cloning to get the value
             if !is_active.cloned().0 {
                 span {
                     class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
