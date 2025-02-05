@@ -204,14 +204,7 @@ fn StakeTableRowTitle(
             return None;
         };
         let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) = liquidity_pair.get_stake_amounts(stake.balance);
-        Some(
-            format_token_amount(ore_amount_f64.to_string(), Some(true), Some(true))
-            // // TODO Significant digits
-            // format!("{:.1$}", ore_amount_f64, 2)
-            //     .trim_end_matches("0")
-            //     .trim_end_matches(".")
-            //     .to_string()
-        )
+        Some(format_token_amount(ore_amount_f64.to_string(), Some(true), Some(true)))
     });
 
     rsx! {
@@ -223,12 +216,12 @@ fn StakeTableRowTitle(
             }
             if let Some(token) = token {
                 img {
-                    class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-6",
+                    class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-5",
                     src: "{token.image}",
                 }
             } else {
                 img {
-                    class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-6",
+                    class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-5",
                     src: "", // TODO Unknown token icon
                 }
             }

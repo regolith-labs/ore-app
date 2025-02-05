@@ -705,6 +705,9 @@
   .-ml-2 {
     margin-left: calc(var(--spacing) * -2);
   }
+  .-ml-4 {
+    margin-left: calc(var(--spacing) * -4);
+  }
   .-ml-5 {
     margin-left: calc(var(--spacing) * -5);
   }
@@ -964,9 +967,6 @@
   }
   .overflow-x-auto {
     overflow-x: auto;
-  }
-  .overflow-y-auto {
-    overflow-y: auto;
   }
   .rounded {
     border-radius: 0.25rem;
