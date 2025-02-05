@@ -39,7 +39,8 @@ pub fn format_token_amount(
             }
             decimal_units_significant
         } else {
-            decimal_units.trim_end_matches('0').to_string()
+            decimal_units.to_string()
+            // decimal_units.trim_end_matches('0').to_string()
         }
     } else {
         "".to_string()

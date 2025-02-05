@@ -279,7 +279,6 @@ fn SummaryMetrics(
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
                     UsdValue {
                         ui_amount_string: liquidity_pair.total_value_usd.to_string(),
-                        with_decimal_units: true,
                     }
                 } else {
                     LoadingValue {}

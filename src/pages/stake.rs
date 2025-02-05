@@ -87,6 +87,7 @@ fn AccountSummary(
                     }
                     if let Some(Ok(net_yield)) = net_yield.cloned() {
                         OreValue {
+                            class: "text-right ml-auto",
                             ui_amount_string: net_yield.ui_amount_string,
                             with_decimal_units: true,
                             size: TokenValueSize::Large,

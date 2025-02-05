@@ -4,9 +4,9 @@ use crate::components::{format_token_amount, Row};
 
 
 #[component]
-pub fn UsdValue(class: Option<String>, ui_amount_string: String, with_decimal_units: Option<bool>) -> Element {
+pub fn UsdValue(class: Option<String>, ui_amount_string: String, with_decimal_units: Option<bool>, abbreviated: Option<bool>) -> Element {
     let class = class.unwrap_or("".to_string());
-    let formatted_amount = format_token_amount(ui_amount_string, with_decimal_units, Some(false));
+    let formatted_amount = format_token_amount(ui_amount_string, with_decimal_units, abbreviated);
     let units: Vec<_> = formatted_amount.split('.').collect();
 
     rsx! {
