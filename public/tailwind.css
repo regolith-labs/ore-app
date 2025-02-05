@@ -1029,6 +1029,9 @@
   .bg-controls-secondary {
     background-color: var(--color-controls-secondary);
   }
+  .bg-elements-lowEmphasis\/40 {
+    background-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 40%, transparent);
+  }
   .bg-gray-300 {
     background-color: var(--color-gray-300);
   }
@@ -1092,6 +1095,9 @@
   .px-1 {
     padding-inline: calc(var(--spacing) * 1);
   }
+  .px-1\.5 {
+    padding-inline: calc(var(--spacing) * 1.5);
+  }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
@@ -1109,6 +1115,9 @@
   }
   .px-8 {
     padding-inline: calc(var(--spacing) * 8);
+  }
+  .py-0 {
+    padding-block: calc(var(--spacing) * 0);
   }
   .py-1 {
     padding-block: calc(var(--spacing) * 1);
@@ -1216,6 +1225,9 @@
   }
   .text-elements-midEmphasis {
     color: var(--color-elements-midEmphasis);
+  }
+  .text-elements-midEmphasis\/50 {
+    color: color-mix(in oklab, var(--color-elements-midEmphasis) 50%, transparent);
   }
   .text-gray-700 {
     color: var(--color-gray-700);
@@ -1433,6 +1445,11 @@
       display: none;
     }
   }
+  .sm\:h-8 {
+    @media (width >= 40rem) {
+      height: calc(var(--spacing) * 8);
+    }
+  }
   .sm\:h-10 {
     @media (width >= 40rem) {
       height: calc(var(--spacing) * 10);
@@ -1441,6 +1458,11 @@
   .sm\:h-20 {
     @media (width >= 40rem) {
       height: calc(var(--spacing) * 20);
+    }
+  }
+  .sm\:w-8 {
+    @media (width >= 40rem) {
+      width: calc(var(--spacing) * 8);
     }
   }
   .sm\:w-56 {

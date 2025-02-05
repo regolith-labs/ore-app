@@ -30,7 +30,7 @@ pub fn StakeTable(
                 class: "mx-0 sm:mx-8",
                 header: rsx! {
                     TableHeader {
-                        left: "Idle",
+                        left: "Stake",
                         right_1: "Multiplier",
                         right_2: "TVL",
                         right_3: "Yield",
@@ -41,13 +41,6 @@ pub fn StakeTable(
                         IdleTableRow {
                             stake: *stake
                         }
-                    }
-                    TableHeader {
-                        class: "mt-4",
-                        left: "Pairs",
-                        right_1: "",
-                        right_2: "",
-                        right_3: "",
                     }
                     for boost_meta in LISTED_BOOSTS.iter() {
                         if let Some(stake) = stake_accounts.get(&boost_meta.lp_mint) {
@@ -151,24 +144,33 @@ fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Ele
             return None;
         };
         Some(
-            amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS)
-                .trim_end_matches("0")
-                .trim_end_matches(".")
-                .to_string()
+            format_token_amount(
+                amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
+                Some(true),
+                Some(true)
+            )
         )
     });
 
     rsx! {
         Row {
-            class: "gap-4 my-auto",
+            class: "my-auto",
+            gap: 4,
             img {
                 class: "w-8 h-8 rounded-full shrink-0 my-auto",
                 src: "{token.image}",
             }
             Col {
-                span {
-                    class: "font-semibold my-auto",
-                    "{token.ticker}"
+                Row {
+                    gap: 2,
+                    span {
+                        class: "font-semibold my-auto",
+                        "{token.ticker}"
+                    }
+                    span {
+                        class: "font-medium my-auto text-xs text-elements-midEmphasis/50 px-1.5 py-0 rounded bg-elements-lowEmphasis/40",
+                        "Idle"
+                    }
                 }
                 if let Some(Some(balance)) = balance.cloned() {
                     span {
@@ -203,12 +205,12 @@ fn StakeTableRowTitle(
         };
         let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) = liquidity_pair.get_stake_amounts(stake.balance);
         Some(
-
-            // TODO Significant digits
-            format!("{:.1$}", ore_amount_f64, 2)
-                .trim_end_matches("0")
-                .trim_end_matches(".")
-                .to_string()
+            format_token_amount(ore_amount_f64.to_string(), Some(true), Some(true))
+            // // TODO Significant digits
+            // format!("{:.1$}", ore_amount_f64, 2)
+            //     .trim_end_matches("0")
+            //     .trim_end_matches(".")
+            //     .to_string()
         )
     });
 

@@ -32,7 +32,7 @@ pub fn format_token_amount(
                 decimal_units_significant.push(c);
                 if c != '0' || non_zero_digits > 0 {
                     non_zero_digits += 1;
-                    if non_zero_digits >= 3 || decimal_units_significant.len() >= 3 {
+                    if non_zero_digits >= 2 || decimal_units_significant.len() >= 2 {
                         break;
                     }
                 }
