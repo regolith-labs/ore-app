@@ -262,7 +262,7 @@ fn StakeTableRowMultiplier(
             return None;
         }
         let pct = stake.balance as f64 / boost.total_deposits as f64 * 100.0;
-        let pct = if pct < 0.01 {
+        let pct = if pct < 1.0 {
             // Find first non-zero decimal place
             let mut decimals = 0;
             let mut val = pct;
