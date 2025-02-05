@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use dioxus::prelude::*;
+use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::{Boost, Stake};
 use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
@@ -78,12 +79,14 @@ fn IdleTableRow(
             },
             right_1: rsx! {
                 StakeTableRowMultiplier {
-                    boost
+                    boost,
+                    stake
                 }
             },
             right_2: rsx! {
                 IdleTableRowTVL {
-                    boost
+                    boost,
+                    stake
                 }
             },
             right_3: rsx! {
@@ -116,12 +119,15 @@ fn StakeTableRow(
             },
             right_1: rsx! {
                 StakeTableRowMultiplier {
-                    boost
+                    boost,
+                    stake
                 }
             },
             right_2: rsx! {
                 StakeTableRowTVL {
-                    liquidity_pair
+                    liquidity_pair,
+                    boost,
+                    stake
                 }
             },
             right_3: rsx! {
@@ -232,12 +238,53 @@ fn StakeTableRowTitle(
 }
 
 #[component]
-fn StakeTableRowMultiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
+fn StakeTableRowMultiplier(
+    boost: Resource<GatewayResult<Boost>>,
+    stake: Resource<GatewayResult<Stake>>
+) -> Element {
+    // Get user's percentage of total deposits
+    let user_percentage = use_resource(move || async move {
+        let Some(Ok(boost)) = boost.cloned() else {
+            return None;
+        };
+        let Some(Ok(stake)) = stake.cloned() else {
+            return None;
+        };
+        if stake.balance == 0 {
+            return None;
+        }
+        if boost.total_deposits == 0 {
+            return None;
+        }
+        let pct = stake.balance as f64 / boost.total_deposits as f64 * 100.0;
+        let pct = if pct < 0.01 {
+            // Find first non-zero decimal place
+            let mut decimals = 0;
+            let mut val = pct;
+            while val < 1.0 {
+                val *= 10.0;
+                decimals += 1;
+            }
+            (pct * 10f64.powi(decimals)).floor() / 10f64.powi(decimals)
+        } else {
+            (pct * 10.0).floor() / 10.0 // One decimal place
+        };
+        Some(pct)
+    });
+
     rsx! {
         if let Some(Ok(boost)) = boost.cloned() {
-            span {
-                class: "text-right my-auto font-medium",
-                "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+            Col {
+                span {
+                    class: "text-right my-auto font-medium",
+                    "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+                }
+                if let Some(Some(percentage)) = user_percentage.cloned() {
+                    span {
+                        class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
+                        "{percentage}%"
+                    }
+                }
             }
         } else {
             TableCellLoading {}
@@ -246,7 +293,10 @@ fn StakeTableRowMultiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-fn IdleTableRowTVL(boost: Resource<GatewayResult<Boost>>) -> Element {
+fn IdleTableRowTVL(
+    boost: Resource<GatewayResult<Boost>>,
+    stake: Resource<GatewayResult<Stake>>
+) -> Element {
     let usdc = Token::usdc();
     let quote = use_ore_quote(usdc.mint);
     let tvl = use_resource(move || async move {
@@ -260,12 +310,36 @@ fn IdleTableRowTVL(boost: Resource<GatewayResult<Boost>>) -> Element {
         let total_deposits_f64 = amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS);
         Some(usdc_quote_f64 * total_deposits_f64)
     });
+
+    let user_tvl = use_resource(move || async move {
+        let Some(Some(tvl)) = tvl.cloned() else {
+            return None;
+        };
+        let Some(Ok(boost)) = boost.cloned() else {
+            return None;
+        };
+        let Some(Ok(stake)) = stake.cloned() else {
+            return None;
+        };
+        if stake.balance > 0 {
+            let user_tvl = (tvl * (stake.balance as f64 / boost.total_deposits as f64)).floor() as u64;
+            Some(user_tvl.to_formatted_string(&Locale::en))
+        } else {
+            None
+        }
+    });
+
     rsx! {
         if let Some(Some(tvl)) = tvl.cloned() {
             Col {
-                gap: 2,
                 UsdValueSmall {
                     amount: tvl.to_string(),
+                }
+                if let Some(Some(user_tvl)) = user_tvl.cloned() {
+                    span {
+                        class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
+                        "${user_tvl}"
+                    }
                 }
             }
         } else {
@@ -275,13 +349,40 @@ fn IdleTableRowTVL(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-fn StakeTableRowTVL(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
+fn StakeTableRowTVL(
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
+    boost: Resource<GatewayResult<Boost>>,
+    stake: Resource<GatewayResult<Stake>>
+) -> Element {
+    let user_tvl = use_resource(move || async move {
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+            return None;
+        };
+        let Some(Ok(boost)) = boost.cloned() else {
+            return None;
+        };
+        let Some(Ok(stake)) = stake.cloned() else {
+            return None;
+        };
+        if stake.balance > 0 {
+            let user_tvl = (liquidity_pair.total_value_usd * (stake.balance as f64 / boost.total_deposits as f64)).floor() as u64;
+            Some(user_tvl.to_formatted_string(&Locale::en))
+        } else {
+            None
+        }
+    });
+
     rsx! {
         if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
             Col {
-                gap: 2,
                 UsdValueSmall {
                     amount: liquidity_pair.total_value_usd.to_string(),
+                }
+                if let Some(Some(user_tvl)) = user_tvl.cloned() {
+                    span {
+                        class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
+                        "${user_tvl}"
+                    }
                 }
             }
         } else {
