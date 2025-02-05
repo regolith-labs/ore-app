@@ -1,4 +1,4 @@
-mod balance;
+
 mod common;
 mod miner;
 mod layout;
@@ -11,7 +11,6 @@ mod submit_transaction;
 mod wallet;
 
 
-pub use balance::*;
 pub use common::*;
 pub use miner::*;
 pub use layout::*;

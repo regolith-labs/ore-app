@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use jupiter_swap_api_client::quote::QuoteResponse;
 use steel::Pubkey;
 
-use crate::{components::*, gateway::GatewayResult, hooks::{use_ore_quote, use_ore_supply}, route::Route};
+use crate::{components::*, gateway::GatewayResult, hooks::use_ore_quote, route::Route};
 
 pub fn Landing() -> Element {
     rsx! {
@@ -273,69 +273,6 @@ fn _YieldSection() -> Element {
         }
     }
 }
-
-fn _SupplySection() -> Element {
-    let circulating_supply = use_ore_supply();
-    rsx! {
-        Col {   
-            class: "w-full py-16 gap-12",
-            Col {
-                class: "px-3 sm:px-8",
-                gap: 4,
-                span {
-                    class: "font-wide font-semibold mx-auto text-2xl sm:text-3xl text-elements-highEmphasis",
-                    "Supply is limited."
-                }
-                span {
-                    class: "max-w-xl text-center sm:text-lg text-elements-lowEmphasis mx-auto my-auto",
-                    "ORE follows a fixed supply curve and deflationary emissions schedule."
-                }
-            }
-            Row {
-                class: "mx-auto gap-16 sm:gap-32",
-                if let Some(Ok(circulating_supply)) = circulating_supply.cloned() {
-                SupplyValue {
-                    title: "CURRENT",
-                    value: circulating_supply.ui_amount_string,
-                    }
-                } else {
-                    SupplyValue {
-                        title: "CURRENT",
-                        value: None,
-                    }
-                }
-                SupplyValue {
-                    title: "TOTAL",
-                    value: Some("5000000".to_string()),
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn SupplyValue(title: String, value: Option<String>) -> Element {
-    rsx! {
-        Col {
-            gap: 2,
-            if let Some(value) = value {
-                OreValueWhole {
-                    class: "mx-auto",
-                    ui_amount_string: value,
-                }
-            } else {
-                div {
-                    class: "h-10 w-32 mx-auto loading rounded"
-                }
-            }
-            span {
-                class: "font-wide font-semibold text-xs sm:text-sm text-center text-nowrap text-elements-lowEmphasis mx-auto my-auto",
-                "{title}"
-            }
-        }
-    }
-}
-
 
 fn _MiningSection() -> Element {
     rsx! {

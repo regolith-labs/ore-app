@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BeakerIcon, BoltIcon, Col, GlobeIcon, OreWordmarkIcon, Row, ToastDisplay, WalletAdapter},
+    components::{BoltIcon, CircleStackIcon, Col, GlobeIcon, OreWordmarkIcon, Row, ToastDisplay, WalletAdapter},
     route::Route,
 };
 
@@ -162,7 +162,7 @@ fn MobileTab(title: String, route: Route) -> Element {
                         }
                     },
                     Route::Stake {  } => rsx!{
-                        BeakerIcon {
+                        CircleStackIcon {
                             class: "h-5 w-5 mx-auto"
                         }
                     },

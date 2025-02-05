@@ -145,7 +145,7 @@ impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
         Ok(accounts.instruction(args))
     }
 
-    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, amount_a: u64, amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction> {
+    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, _amount_a: u64, amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction> {
         // Get pool and vault data
         let pool = self.get_meteora_pool(pool_address).await?;
         let vault_a = self.get_meteora_vault(pool.a_vault).await?;

@@ -4,27 +4,43 @@ use dioxus::prelude::*;
 use steel::Pubkey;
 use ore_boost_api::state::Stake;
 
-use crate::{components::*, gateway::GatewayResult, hooks::{use_liquidity_pairs, use_net_deposits, use_net_yield, use_stake_accounts, LiquidityPair}, route::Route};
+use crate::{
+    components::*, 
+    gateway::GatewayResult, 
+    hooks::{on_transaction_done, use_boost_claim_all_transaction, use_liquidity_pairs, use_net_deposits, use_net_yield, use_stake_accounts, LiquidityPair}
+};
 
 pub fn Stake() -> Element {
     let stake_accounts = use_stake_accounts();
     let liquidity_pairs = use_liquidity_pairs();
+
+    // Refresh stake accounts after transaction
+    let mut stake_accounts_mut = stake_accounts.clone();
+    on_transaction_done(move |_sig| {
+        for (_mint, stake_account) in stake_accounts_mut.iter_mut() {
+            stake_account.restart();
+        }
+    });
+
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
-            gap: 16,
+            gap: 8,
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake",
                 subtitle: "Provide liquidity for traders and earn yield."
             }
-            AccountSummary {
-                stake_accounts: stake_accounts.clone(),
-                liquidity_pairs: liquidity_pairs.clone()
-            }
-            StakeTable {
-                stake_accounts: stake_accounts,
-                liquidity_pairs: liquidity_pairs
+            Col {
+                gap: 16,
+                AccountSummary {
+                    stake_accounts: stake_accounts.clone(),
+                    liquidity_pairs: liquidity_pairs.clone()
+                }
+                StakeTable {
+                    stake_accounts: stake_accounts,
+                    liquidity_pairs: liquidity_pairs
+                }
             }
         }
     }
@@ -35,8 +51,8 @@ fn AccountSummary(
     stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>,
     liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>>
 ) -> Element {
-    let net_deposits = use_net_deposits(stake_accounts.clone(), liquidity_pairs);
-    let net_yield = use_net_yield(stake_accounts);
+    let net_deposits = use_net_deposits(stake_accounts.clone(), liquidity_pairs.clone());
+    let net_yield = use_net_yield(stake_accounts.clone());
     rsx! {
         Col {
             class: "mx-auto w-full px-5 sm:px-8 justify-between",
@@ -77,64 +93,36 @@ fn AccountSummary(
                     }
                 }
             }
-            ActionButtons {}
+            Row {
+                class: "mx-auto w-full mt-4 justify-end",
+                ClaimButton {
+                    stake_accounts: stake_accounts.clone()
+                }
+            }
         }
     }
 }
 
-fn ActionButtons() -> Element {
+#[component]
+fn ClaimButton(stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>) -> Element {
+    let tx = use_boost_claim_all_transaction(stake_accounts);
+    let is_enabled = if let Some(Ok(_)) = *tx.read() {
+        true
+    } else {
+        false
+    };
     rsx! {
-        Row {
-            class: "mx-auto w-full mt-4 justify-end",
-            ClaimButton {}
-        }
-    }
-}
-
-fn ClaimButton() -> Element {
-    rsx! {
-        Link {
-            to: Route::Landing {},
+        button {
+            disabled: !is_enabled,
+            onclick: move |_| {
+                if let Some(Ok(tx)) = tx.cloned() {
+                    submit_transaction(tx);
+                }
+            },
             class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
-            // CircleStackIcon {
-            //     class: "h-5 w-5 mx-auto my-auto"
-            // }
             span {
                 class: "my-auto text-nowrap",
                 "Claim"
-            }
-        }
-    }
-}
-
-
-fn _YieldOverview() -> Element {
-    // TODO Get all stake accounts
-    // TODO Calculate total claimable yield
-    // TODO Provide claim button
-    rsx! {
-        Row {
-            class: "mx-5 sm:mx-8 py-8 justify-between",
-            // div {
-            //     class: "flex w-full",
-            //     OreValue {
-            //         class: "mx-auto my-auto",
-            //         ui_amount_string: "2.324330".to_string(),
-            //     }
-            // }
-            div {
-                class: "flex w-full",
-                span {
-                    class: "text-elements-midEmphasis font-bold text-2xl sm:text-3xl my-auto mx-auto",
-                    "0.04%"
-                }   
-            }
-            div {
-                class: "flex w-full",
-                OreValueGold {
-                    class: "mx-auto my-auto",
-                    ui_amount_string: "2.324330".to_string(),
-                }   
             }
         }
     }

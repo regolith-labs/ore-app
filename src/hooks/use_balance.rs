@@ -31,7 +31,7 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     })
 }
 
-pub fn use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
+pub fn _use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
     use_resource(move || async move {
         use_gateway()
             .rpc
