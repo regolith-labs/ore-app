@@ -162,9 +162,10 @@ fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Ele
             }
             Col {
                 Row {
+                    class: "my-auto",
                     gap: 2,
                     span {
-                        class: "font-semibold my-auto",
+                        class: "font-semibold my-auto h-min",
                         "{token.ticker}"
                     }
                     span {
