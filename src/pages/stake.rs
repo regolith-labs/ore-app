@@ -71,6 +71,8 @@ fn AccountSummary(
                     if let Some(Ok(net_deposits)) = net_deposits.cloned() {
                         OreValue {
                             ui_amount_string: net_deposits.ui_amount_string,
+                            with_decimal_units: true,
+                            size: TokenValueSize::Large,
                         }
                     } else {
                         LoadingValue {}
@@ -85,8 +87,10 @@ fn AccountSummary(
                     }
                     if let Some(Ok(net_yield)) = net_yield.cloned() {
                         OreValue {
-                            class: "text-elements-gold ml-auto",
                             ui_amount_string: net_yield.ui_amount_string,
+                            with_decimal_units: true,
+                            size: TokenValueSize::Large,
+                            gold: true,
                         }
                     } else {
                         LoadingValue {}

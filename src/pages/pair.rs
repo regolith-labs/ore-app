@@ -99,14 +99,14 @@ fn AccountMetrics(
                     class: "text-elements-lowEmphasis font-medium",
                     "Deposits"
                 }
-                if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-                    if let Some(stake) = stake.read().as_ref() {
+                if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+                    if let Some(stake) = stake.cloned() {
                         if let Ok(stake) = stake {
                             if stake.balance > 0 {
                                 LiquidityPairStakeValue {
                                     stake_balance: stake.balance,
                                     liquidity_pair: liquidity_pair.clone(),
-                                    small_units: Some(true),
+                                    with_decimal_units: true,
                                 }
                             } else {
                                 NullValue {}
@@ -121,8 +121,8 @@ fn AccountMetrics(
                     LoadingValue {}
                 }
             }
-            if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-                if let Some(Ok(stake)) = stake.read().as_ref() {
+            if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+                if let Some(Ok(stake)) = stake.cloned() {
                     if stake.balance_pending > 0 {
                         Row {
                             class: "w-full justify-between px-4",
@@ -133,14 +133,14 @@ fn AccountMetrics(
                             LiquidityPairStakeValue {
                                 stake_balance: stake.balance_pending,
                                 liquidity_pair: liquidity_pair.clone(),
-                                small_units: Some(true),
+                                with_decimal_units: true,
                             }
                         }
                     }
                 }
             }
-            if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-                if let Some(Ok(lp_balance)) = lp_balance.read().as_ref() {
+            if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+                if let Some(Ok(lp_balance)) = lp_balance.cloned() {
                     if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
                         Row {
                             class: "w-full justify-between px-4",
@@ -151,7 +151,7 @@ fn AccountMetrics(
                             LiquidityPairStakeValue {
                                 stake_balance: lp_balance.amount.parse::<u64>().unwrap_or(0),
                                 liquidity_pair: liquidity_pair.clone(),
-                                small_units: Some(true),
+                                with_decimal_units: true,
                             }
                         }
                         SubmitButton {
@@ -169,13 +169,14 @@ fn AccountMetrics(
                     class: "text-elements-lowEmphasis font-medium",
                     "Yield"
                 }
-                if let Some(stake) = stake.read().as_ref() {
+                if let Some(stake) = stake.cloned() {
                     if let Ok(stake) = stake {
                         if stake.rewards > 0 {
-                            OreValueSmall {
-                                class: "text-elements-gold",
+                            OreValue {
                                 ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                                small_units: true,
+                                with_decimal_units: true,
+                                size: TokenValueSize::Small,
+                                gold: true,
                             }
                         } else {
                             NullValue {}
@@ -248,7 +249,7 @@ fn SummaryMetrics(
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
                     LiquidityPairValue {
                         liquidity_pair: liquidity_pair.clone(),
-                        small_units: true,
+                        with_decimal_units: true,
                     }
                 } else {
                     LoadingValue {}
@@ -276,8 +277,9 @@ fn SummaryMetrics(
                     "TVL"
                 }
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-                    UsdValueSmall {
-                        amount: liquidity_pair.total_value_usd.to_string(),
+                    UsdValue {
+                        ui_amount_string: liquidity_pair.total_value_usd.to_string(),
+                        with_decimal_units: true,
                     }
                 } else {
                     LoadingValue {}

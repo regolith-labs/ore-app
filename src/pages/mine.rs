@@ -123,8 +123,11 @@ fn PoolRow(pool: Pool) -> Element {
                 span { "2.4x" }
             },
             right_3: rsx! {
-                span { class: "text-elements-gold",
-                    OreValueSmallAbbreviated { ui_amount_string: "2.054" }
+                OreValue {
+                    ui_amount_string: "2.054".to_string(),
+                    with_decimal_units: true,
+                    size: TokenValueSize::Small,
+                    gold: true,
                 }
             }
         }

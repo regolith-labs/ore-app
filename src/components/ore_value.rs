@@ -1,265 +1,72 @@
+use std::str::FromStr;
+
 use dioxus::prelude::*;
+use num_format::{Locale, ToFormattedString};
 use ore_api::consts::TOKEN_DECIMALS;
 
 use crate::{components::{Col, OreIcon, Row}, config::LISTED_TOKENS_BY_TICKER, hooks::LiquidityPair};
 
-#[component]
-pub fn OreValue(ui_amount_string: String, class: Option<String>) -> Element {
-    let class = class.unwrap_or("".to_string());
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let small_units = if units.len() > 1 { units[1] } else { "00" };
-
-    // let is_thousands = big_units.len() > 3;
-    // let k = if is_thousands { "k" } else { "" };
-    // let big_units_display = if is_thousands {
-    //     match big_units.char_indices().rev().nth(2) {
-    //         Some((i, _)) => &big_units[..i],
-    //         None => "",
-    //     }
-    // } else {
-    //     big_units
-    // };
-    // let small_units_display: String = if is_thousands {
-    //     big_units.chars().rev().take(3).collect()
-    // } else {
-    //     small_units.chars().take(2).collect()
-    // };
-
-    rsx! {
-        Row {
-            class: "sm:gap-3 h-10 w-min {class}",
-            gap: 2,
-            OreIcon {
-                class: "h-6 w-6 sm:h-8 sm:w-8 my-auto"
-            }
-            Row {
-                class: "my-auto",
-                span {
-                    class: "mt-auto font-semibold text-2xl sm:text-3xl",
-                    "{big_units}"
-                }
-                span {
-                    class: "mt-auto font-semibold text-xl sm:text-2xl text-elements-lowEmphasis",
-                    ".{small_units}"
-                }
-            }
-        }
-    }
+#[derive(Clone, Copy, PartialEq)]
+pub enum TokenValueSize {
+    Small,
+    Large,
 }
 
 #[component]
-pub fn OreValueGold(ui_amount_string: String, class: Option<String>) -> Element {
-    let class = class.unwrap_or("".to_string());
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let small_units = if units.len() > 1 { units[1] } else { "00" };
-    rsx! {
-        Row {
-            class: "sm:gap-3 h-10 w-min {class}",
-            gap: 2,
-            OreIcon {
-                class: "h-6 w-6 sm:h-8 sm:w-8 my-auto text-elements-gold"
-            }
-            Row {
-                class: "my-auto",
-                span {
-                    class: "mt-auto font-bold text-2xl sm:text-3xl text-elements-gold",
-                    "{big_units}"
-                }
-                span {
-                    class: "mt-auto font-bold text-xl sm:text-2xl text-elements-gold opacity-50",
-                    ".{small_units}"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn OreValueWhole(ui_amount_string: String, class: Option<String>) -> Element {
-    let class = class.unwrap_or("".to_string());
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let big_units = format_with_commas(big_units);
-    rsx! {
-        Row {
-            class: "sm:gap-3 h-10 w-min {class}",
-            gap: 2,
-            OreIcon {
-                class: "h-5 w-5 sm:h-8 sm:w-8 my-auto"
-            }
-            Row {
-                class: "my-auto",
-                span {
-                    class: "mt-auto font-semibold text-2xl sm:text-3xl",
-                    "{big_units}"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn OrePrice(ui_amount_string: String, change: Option<f64>) -> Element {
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let small_units = if units.len() > 1 { units[1] } else { "00" };
-    rsx! {
-        Row {
-            class: "gap-2 w-min",
-            OreIcon {
-                class: "h-4 w-4 sm:h-6 sm:w-6 my-auto"
-            }
-            Row {
-                class: "my-auto",
-                span {
-                    class: "mt-auto font-semibold text-lg sm:text-xl",
-                    "{big_units}.{small_units}"
-                }
-            }
-            if let Some(change) = change {
-                span {
-                    class: "font-medium text-green-500 text-sm mt-auto mb-2 sm:mb-[7px]",
-                    "{change:.2}%"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn OreValueSmallWhole(class: Option<String>, ui_amount_string: String) -> Element {
-    let class: String = class.unwrap_or("".to_string());
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let big_units = format_with_commas(big_units);
-    rsx! {
-        Row {
-            class: "gap-1.5 w-min {class}",
-            OreIcon {
-                class: "h-4 w-4 my-auto"
-            }
-            Row {
-                class: "font-medium my-auto",
-                span {
-                    class: "mt-auto",
-                    "{big_units}"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn OreValueSmallAbbreviated(class: Option<String>, ui_amount_string: String) -> Element {
-    let class: String = class.unwrap_or("".to_string());
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let small_units = if units.len() > 1 { units[1] } else { "00" };
-
-    let is_thousands = big_units.len() > 3;
-    let k = if is_thousands { "k" } else { "" };
-    let big_units_display = if is_thousands {
-        match big_units.char_indices().rev().nth(2) {
-            Some((i, _)) => &big_units[..i],
-            None => "",
-        }
-    } else {
-        big_units
-    };
-    let small_units_display: String = if is_thousands {
-        big_units.chars().rev().take(3).into_iter().collect()
-    } else {
-        small_units.chars().take(3).collect()
-    };
-
-    rsx! {
-        Row {
-            class: "gap-1.5 w-min {class}",
-            OreIcon {
-                class: "h-4 w-4 my-auto"
-            }
-            Row {
-                class: "font-medium my-auto",
-                span {
-                    class: "mt-auto",
-                    "{big_units_display}.{small_units_display}{k}"
-                }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn OreValueSmall(
+pub fn OreValue(
     class: Option<String>, 
-    ui_amount_string: String, 
-    small_units: Option<bool>,
-    abbreviated: Option<bool>
+    ui_amount_string: String,
+    with_decimal_units: Option<bool>,
+    abbreviated: Option<bool>,
+    gold: Option<bool>,
+    size: Option<TokenValueSize>
 ) -> Element {
-    let class: String = class.unwrap_or("".to_string());
-    let display_small_units = small_units.unwrap_or(false);
-    let abbreviated = abbreviated.unwrap_or(false);
-    let units: Vec<_> = ui_amount_string.split('.').collect();
-    let big_units = units[0];
-    let small_units = if units.len() > 1 { units[1] } else { "00" };
+    let class = class.unwrap_or("".to_string());
+    let formatted_amount = format_token_amount(ui_amount_string, with_decimal_units, abbreviated);
+    let units: Vec<_> = formatted_amount.split('.').collect();
 
-    // Abbreviate the value if the abbreviated flag is true
-    let (big_units_display, small_units_display) = if abbreviated {
-        if big_units == "0" {
-            // For values < 1, show 3 significant digits total
-            let mut significant_digits = String::new();
-            let mut non_zero_digits = 0;
-            for c in small_units.chars() {
-                significant_digits.push(c);
-                if c != '0' || non_zero_digits > 0 {
-                    non_zero_digits += 1;
-                    if non_zero_digits >= 3 {
-                        break;
-                    }
-                }
-            }
-            (
-                "0".to_string(),
-                significant_digits
-            )
+    let (whole_units_color, decimal_units_color) = if gold.unwrap_or(false) {
+        if abbreviated.unwrap_or(false) {
+            ("text-elements-gold", "text-elements-gold")
         } else {
-            // For values >= 1, show all big units and first 3 small units
-            (
-                format_with_commas(big_units),
-                small_units.chars().take(3).collect()
-            )
+            ("text-elements-gold", "text-elements-gold opacity-50")
         }
     } else {
-        (
-            format_with_commas(big_units),
-            small_units.trim_end_matches('0').to_string()
-        )
+        if abbreviated.unwrap_or(false) {
+            ("text-elements-highEmphasis", "text-elements-highEmphasis")
+        } else {
+            ("text-elements-highEmphasis", "text-elements-lowEmphasis")
+        }
+    };
+
+    let (icon_gap, icon_size, whole_units_size, decimal_units_size, font_weight) = match size.unwrap_or(TokenValueSize::Small) {
+        TokenValueSize::Small => ("gap-1.5", "h-4 w-4", "text-base", "text-base", "font-medium"),
+        TokenValueSize::Large => ("gap-3 h-10", "h-6 w-6 sm:h-8 sm:w-8", "text-2xl sm:text-3xl", "text-xl sm:text-2xl", "font-semibold"),
     };
 
     rsx! {
         Row {
-            class: "gap-1.5 w-min {class}",
+            class: "w-min {class} {icon_gap}",
             OreIcon {
-                class: "h-4 w-4 my-auto"
+                class: "my-auto {icon_size} {whole_units_color}"
             }
             Row {
-                class: "font-medium my-auto",
+                class: "my-auto",
                 span {
-                    class: "mt-auto",
-                    "{big_units_display}"
+                    class: "mt-auto {whole_units_size} {whole_units_color} {font_weight}",
+                    "{units[0]}"
                 }
-                if display_small_units {
+                if units.len() > 1 {
                     span {
-                        class: "mt-auto font-medium opacity-50",
-                        ".{small_units_display}"
+                        class: "mt-auto {decimal_units_size} {decimal_units_color} {font_weight}",
+                        ".{units[1]}"
                     }
                 }
             }
         }
     }
 }
+
 
 #[component]
 pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, small_units: Option<bool>) -> Element {
@@ -354,10 +161,11 @@ pub fn LiquidityPairValue(class: Option<String>, liquidity_pair: LiquidityPair, 
     rsx! {
         Col {
             class: "gap-2 {class}",
-            OreValueSmall {
+            OreValue {
                 class: "ml-auto",
                 ui_amount_string: ore_amount_f64.to_string(),
-                small_units: small_units,
+                with_decimal_units: true,
+                size: TokenValueSize::Small,
             }
             TokenValueSmall {
                 class: "ml-auto",
@@ -382,10 +190,11 @@ pub fn LiquidityPairStakeValue(
     rsx! {
         Col {
             class: "gap-2 {class}",
-            OreValueSmall {
+            OreValue {
                 class: "ml-auto",
                 ui_amount_string: format!("{:.1$}", ore_amount_f64, TOKEN_DECIMALS as usize),
-                small_units: small_units,
+                with_decimal_units: true,
+                size: TokenValueSize::Small,
             }
             TokenValueSmall {
                 class: "ml-auto",
@@ -398,24 +207,6 @@ pub fn LiquidityPairStakeValue(
 }
 
 
-pub fn NullValue() -> Element {
-    rsx! {
-        span {
-            class: "text-elements-midEmphasis font-medium",
-            "–"
-        }
-    }
-}
-
-
-pub fn LoadingValue() -> Element {
-    rsx! {
-        span {
-            class: "w-10 h-4 rounded my-auto loading",
-            ""
-        }
-    }
-}
 
 fn format_with_commas(number: &str) -> String {
     if number.len() <= 3 {
@@ -432,4 +223,46 @@ fn format_with_commas(number: &str) -> String {
         count += 1;
     }
     result.chars().rev().collect::<String>()
+}
+
+fn format_token_amount(
+    ui_amount_string: String,
+    with_decimal_units: Option<bool>,
+    abbreviated: Option<bool>,
+) -> String {
+    // Split the amount into big and small units
+    let units: Vec<_> = ui_amount_string.split('.').collect();
+    let whole_units = units[0];
+    let decimal_units = if units.len() > 1 { units[1] } else { "00" };
+
+    // Format big units
+    let whole_units_u64 = u64::from_str(whole_units).unwrap();
+    let whole_units = whole_units_u64.to_formatted_string(&Locale::en);
+
+    // Format small units
+    let decimal_units = if with_decimal_units.unwrap_or(false) {
+        if abbreviated.unwrap_or(false) {
+            let mut decimal_units_significant = String::new();
+            let mut non_zero_digits = 0;
+            for c in decimal_units.chars() {
+                decimal_units_significant.push(c);
+                if c != '0' || non_zero_digits > 0 {
+                    non_zero_digits += 1;
+                    if non_zero_digits >= 3 || decimal_units_significant.len() >= 3 {
+                        break;
+                    }
+                }
+            }
+            decimal_units_significant
+        } else {
+            decimal_units.trim_end_matches('0').to_string()
+        }
+    } else {
+        "".to_string()
+    };
+    
+    // Return formatted string
+    format!("{}.{}", whole_units, decimal_units)
+        .trim_end_matches(".")
+        .to_string()
 }
