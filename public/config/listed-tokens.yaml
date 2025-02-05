@@ -89,11 +89,11 @@ tokens:
     homepage: https://www.helium.com
     decimals: 8
   
-  - mint: 4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy
-    name: Honey
-    ticker: HONEY
-    description: "HONEY is the native token of Hivemapper, a decentralized mapping network that rewards contributors for capturing and validating map data. By using dashcams and the Hivemapper mobile app, community members earn HONEY tokens for collecting fresh street-level imagery that keeps the map current. This innovative approach to mapping combines blockchain incentives with real-world utility, creating a constantly-updated, community-driven alternative to traditional mapping services. The HONEY token serves as both a reward mechanism and governance tool within the Hivemapper ecosystem."
-    image: https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png
-    twitter: https://twitter.com/hivemapper
-    homepage: https://hivemapper.com
-    decimals: 9
+  # - mint: 4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy
+  #   name: Honey
+  #   ticker: HONEY
+  #   description: "HONEY is the native token of Hivemapper, a decentralized mapping network that rewards contributors for capturing and validating map data. By using dashcams and the Hivemapper mobile app, community members earn HONEY tokens for collecting fresh street-level imagery that keeps the map current. This innovative approach to mapping combines blockchain incentives with real-world utility, creating a constantly-updated, community-driven alternative to traditional mapping services. The HONEY token serves as both a reward mechanism and governance tool within the Hivemapper ecosystem."
+  #   image: https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png
+  #   twitter: https://twitter.com/hivemapper
+  #   homepage: https://hivemapper.com
+  #   decimals: 9
