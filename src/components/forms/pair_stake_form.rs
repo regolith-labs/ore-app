@@ -5,7 +5,8 @@ use crate::{
     components::{Col, PairDepositForm, PairWithdrawForm, StakeTab, StakeTabs}, 
     config::BoostMeta, 
     gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, LiquidityPair}
+    hooks::on_transaction_done,
+    utils::LiquidityPair
 };
 
 

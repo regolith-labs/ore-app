@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
-use ore_boost_api::state::{Boost, Stake};
+use ore_boost_api::state::{boost_pda, Boost, Stake};
 use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 use steel::Pubkey;
 
@@ -11,8 +11,9 @@ use crate::{
     components::*, 
     config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, 
     gateway::GatewayResult, 
-    hooks::{use_boost, use_ore_quote, LiquidityPair}, 
-    route::Route
+    hooks::{use_boost, use_ore_quote}, 
+    route::Route,
+    utils::LiquidityPair
 };
 
 #[component]

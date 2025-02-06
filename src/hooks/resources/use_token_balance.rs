@@ -3,9 +3,9 @@ use solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
 
 use crate::{config::Token, gateway::{
     spl::SplGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount
-}};
+}, utils::LiquidityPair};
 
-use super::{use_gateway, use_wallet, Wallet};
+use crate::hooks::{use_gateway, use_wallet, Wallet};
 
 pub fn _use_sol_balance() -> Resource<GatewayResult<u64>> {
     let wallet = use_wallet();
@@ -51,7 +51,7 @@ pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>>
     })
 }
 
-pub async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiTokenAmount> {
+async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiTokenAmount> {
     if mint == Token::sol().mint {
         use_gateway()
             .rpc
@@ -74,4 +74,33 @@ pub async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<Ui
             .await
             .map_err(GatewayError::from)
     }
+}
+
+
+pub fn use_token_balances_for_liquidity_pair(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> (Resource<GatewayResult<UiTokenAmount>>, Resource<GatewayResult<UiTokenAmount>>) {
+    let wallet = use_wallet();
+
+    let token_a_balance = use_resource(move || async move {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
+            match *wallet.read() {
+                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+                Wallet::Connected(authority) => get_token_balance(authority, liquidity_pair.token_a.mint).await,
+            }
+        } else {
+            Err(GatewayError::Unknown)
+        }
+    });
+
+    let token_b_balance = use_resource(move || async move {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
+            match *wallet.read() {
+                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
+                Wallet::Connected(authority) => get_token_balance(authority, liquidity_pair.token_b.mint).await,
+            }
+        } else {
+            Err(GatewayError::Unknown)
+        }
+    });
+
+    (token_a_balance, token_b_balance)
 }
