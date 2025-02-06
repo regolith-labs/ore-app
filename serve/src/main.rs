@@ -11,9 +11,9 @@ async fn main() {
         .map(|reply, path: warp::path::FullPath| {
             let path_str = path.as_str();
             let reply = if should_cache(path_str) {
-                warp::reply::with_header(reply, CACHE_CONTROL, "no-cache, must-revalidate")
-            } else {
                 warp::reply::with_header(reply, CACHE_CONTROL, "public, max-age=31536000, immutable")
+            } else {
+                warp::reply::with_header(reply, CACHE_CONTROL, "no-cache, must-revalidate")
             };
             warp::reply::with_header(reply, ACCESS_CONTROL, "*")
         });
@@ -22,7 +22,7 @@ async fn main() {
     let index = warp::path::end()
         .and(warp::fs::file("../target/dx/ore-app/release/web/public/index.html"))
         .map(|reply| {
-            let reply = warp::reply::with_header(reply, CACHE_CONTROL, "public, max-age=31536000, immutable");
+            let reply = warp::reply::with_header(reply, CACHE_CONTROL, "no-cache, must-revalidate");
             warp::reply::with_header(reply, ACCESS_CONTROL, "*")
         });
 
@@ -30,7 +30,7 @@ async fn main() {
     let fallback = warp::any()
         .map(|| warp::reply::html(include_str!("../../target/dx/ore-app/release/web/public/index.html")))
         .map(|reply| {
-            let reply = warp::reply::with_header(reply, CACHE_CONTROL, "public, max-age=31536000, immutable");
+            let reply = warp::reply::with_header(reply, CACHE_CONTROL, "no-cache, must-revalidate");
             warp::reply::with_header(reply, ACCESS_CONTROL, "*")
         });
 
