@@ -10,7 +10,8 @@ use crate::{
     components::*, 
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, 
     gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_liquidity_pair_balances, LiquidityPair}
+    hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_token_balances_for_liquidity_pair},
+    utils::LiquidityPair
 };
 
 #[component]
@@ -21,7 +22,7 @@ pub fn Pair(lp_mint: String) -> Element {
     let liquidity_pair = use_liquidity_pair(boost_meta.clone());
     let stake = use_stake(lp_mint);
     let lp_balance = use_token_balance(lp_mint);
-    let (token_a_balance, token_b_balance) = use_liquidity_pair_balances(liquidity_pair);
+    let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
     
     rsx! {
         Col {

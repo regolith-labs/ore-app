@@ -7,12 +7,13 @@ use ore_boost_api::state::Stake;
 use crate::{
     components::*, 
     gateway::GatewayResult, 
-    hooks::{on_transaction_done, use_boost_claim_all_transaction, use_liquidity_pairs, use_net_deposits, use_net_yield, use_stake_accounts, LiquidityPair}
+    hooks::{on_transaction_done, use_boost_claim_all_transaction, use_all_liquidity_pairs, use_net_deposits, use_net_yield, use_all_stakes},
+    utils::LiquidityPair
 };
 
 pub fn Stake() -> Element {
-    let stake_accounts = use_stake_accounts();
-    let liquidity_pairs = use_liquidity_pairs();
+    let stake_accounts = use_all_stakes();
+    let liquidity_pairs = use_all_liquidity_pairs();
 
     // Refresh stake accounts after transaction
     let mut stake_accounts_mut = stake_accounts.clone();
@@ -69,7 +70,7 @@ fn AccountSummary(
                         class: "text-elements-lowEmphasis font-medium",
                         "Net deposits"
                     }
-                    if let Some(Ok(net_deposits)) = net_deposits.cloned() {
+                    if let Ok(net_deposits) = net_deposits.cloned() {
                         OreValue {
                             ui_amount_string: net_deposits.ui_amount_string,
                             with_decimal_units: true,
@@ -86,7 +87,7 @@ fn AccountSummary(
                         class: "text-elements-lowEmphasis font-medium md:text-right",
                         "Net yield"
                     }
-                    if let Some(Ok(net_yield)) = net_yield.cloned() {
+                    if let Ok(net_yield) = net_yield.cloned() {
                         OreValue {
                             class: "md:text-right md:ml-auto",
                             ui_amount_string: net_yield.ui_amount_string,

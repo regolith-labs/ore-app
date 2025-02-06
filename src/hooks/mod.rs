@@ -1,22 +1,20 @@
 mod miner;
+mod memos;
 mod transaction_status;
 mod transaction_builders;
+mod resources;
 mod wallet;
-mod use_boost;
 mod use_gateway;
-mod use_balance;
 // #[cfg(feature = "web")]
 // mod use_persistent;
 mod use_pools;
-mod use_stake;
 
 
 pub use miner::*;
+pub use memos::*;
 pub use transaction_status::*;
 pub use transaction_builders::*;
+pub use resources::*;
 pub use wallet::*;
-pub use use_boost::*;
 pub use use_gateway::*;
-pub use use_balance::*;
 pub use use_pools::*;
-pub use use_stake::*;

@@ -5,7 +5,8 @@ use crate::{
     components::{Col, SubmitButton, TokenInputError}, 
     config::BoostMeta, 
     gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_pair_withdraw_transaction, use_stake_balances, LiquidityPair}
+    hooks::{on_transaction_done, use_pair_withdraw_transaction, use_stake_balances},
+    utils::LiquidityPair
 };
 use super::token_input_form::*;
 

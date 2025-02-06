@@ -11,7 +11,7 @@ use crate::{
     config::{Token, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        get_token_balance, use_quote, use_swap_transaction, use_transaction_status, use_wallet, GetPubkey
+        use_quote, use_swap_transaction, use_token_balance, use_transaction_status, use_wallet, GetPubkey
     },
 };
 
@@ -53,16 +53,8 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let error_msg = use_signal(|| None);
 
     // token balances
-    let mut buy_token_balance = use_resource(move || async move {
-        let wallet = wallet.get_pubkey()?;
-        let buy_token = buy_token.read();
-        get_token_balance(wallet, buy_token.mint).await
-    });
-    let mut sell_token_balance = use_resource(move || async move {
-        let wallet = wallet.get_pubkey()?;
-        let sell_token = sell_token.read();
-        get_token_balance(wallet, sell_token.mint).await
-    });
+    let mut buy_token_balance = use_token_balance(buy_token.read().mint);
+    let mut sell_token_balance = use_token_balance(sell_token.read().mint);
 
     // reset signature
     use_effect(move || {

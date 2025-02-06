@@ -13,7 +13,7 @@ use tracing::Level;
 
 use crate::{
     components::MinerController,
-    hooks::{use_miner_is_active_provider, use_transaction_status_provider, use_miner_provider, use_wallet_provider},
+    hooks::{use_cache_provider, use_miner_is_active_provider, use_transaction_status_provider, use_miner_provider, use_wallet_provider},
     route::Route,
 };
 
@@ -31,6 +31,7 @@ pub fn App() -> Element {
     use_miner_is_active_provider();
     use_transaction_status_provider();
     use_wallet_provider();
+    use_cache_provider();
     rsx! {
         document::Link { rel: "stylesheet", href: asset!("/public/tailwind.css"), blocking: "render" }
         document::Link { rel: "icon", href: asset!("/public/favicon.png") }
