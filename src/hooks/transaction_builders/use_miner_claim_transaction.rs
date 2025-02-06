@@ -58,7 +58,8 @@ pub fn use_miner_claim_transaction(
             ixs.push(create_ata_ix); 
         }
 
-        let beneficiary = ata_address; // Use the ata_address directly since it should now exist
+        // Use the ata_address directly since it should now exist
+        let beneficiary = ata_address; 
 
         // Add claim transaction
         ixs.push(ore_pool_api::sdk::claim(authority, beneficiary, member_data.pool, member_data.balance));
