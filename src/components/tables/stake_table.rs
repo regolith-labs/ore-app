@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
-use ore_boost_api::state::{boost_pda, Boost, Stake};
+use ore_boost_api::state::{Boost, Stake};
 use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 use steel::Pubkey;
 

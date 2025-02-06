@@ -11,7 +11,7 @@ use crate::{
     config::{Token, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        use_quote, use_swap_transaction, use_token_balance, use_transaction_status, use_wallet, GetPubkey
+        use_quote, use_swap_transaction, use_token_balance, use_transaction_status
     },
 };
 
@@ -31,7 +31,6 @@ impl ToString for SwapError {
 #[component]
 pub fn SwapForm(class: Option<String>) -> Element {
     let class = class.unwrap_or_default();
-    let wallet = use_wallet();
 
     // input amounts
     let sell_input_amount = use_signal::<Option<String>>(|| Some("".to_owned()));
