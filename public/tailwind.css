@@ -672,6 +672,9 @@
   .-mt-64 {
     margin-top: calc(var(--spacing) * -64);
   }
+  .mt-6 {
+    margin-top: calc(var(--spacing) * 6);
+  }
   .mt-8 {
     margin-top: calc(var(--spacing) * 8);
   }
@@ -692,9 +695,6 @@
   }
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
-  }
-  .mb-6 {
-    margin-bottom: calc(var(--spacing) * 6);
   }
   .-ml-1 {
     margin-left: calc(var(--spacing) * -1);
@@ -1601,9 +1601,9 @@
       margin-top: calc(var(--spacing) * 0);
     }
   }
-  .md\:mt-4 {
+  .md\:mt-2 {
     @media (width >= 48rem) {
-      margin-top: calc(var(--spacing) * 4);
+      margin-top: calc(var(--spacing) * 2);
     }
   }
   .md\:ml-auto {

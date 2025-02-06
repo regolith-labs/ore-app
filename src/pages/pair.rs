@@ -1,16 +1,14 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
     components::*, 
-    config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, 
-    gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_token_balances_for_liquidity_pair},
+    config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, gateway::{GatewayResult, UiTokenAmount}, 
+    hooks::{on_transaction_done, use_boost, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_token_balances_for_liquidity_pair}, 
+    pages::{Multiplier, StakeYield, TotalStakers},
     utils::LiquidityPair
 };
 
@@ -34,7 +32,7 @@ pub fn Pair(lp_mint: String) -> Element {
                 subtitle: format!("Manage your {} position.", boost_meta.name.clone())
             }
             Col {
-                class: "w-full h-full gap-16",
+                gap: 16,
                 PairStakeForm {
                     class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                     boost_meta: boost_meta.clone(),
@@ -53,7 +51,7 @@ pub fn Pair(lp_mint: String) -> Element {
                     boost,
                     stake
                 }
-                SummaryMetrics {
+                BoostMetrics {
                     boost,
                     liquidity_pair,
                     boost_meta: boost_meta.clone()
@@ -73,8 +71,6 @@ fn AccountMetrics(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
-    let err = use_signal(|| None);
-
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
         token_a_balance.restart();
@@ -83,30 +79,48 @@ fn AccountMetrics(
         boost.restart();
     });
 
-    // Build transactions
-    let claim_tx = use_boost_claim_transaction(boost, stake);
-    let lp_deposit_tx = use_lp_deposit_transaction(boost, stake);
-
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8 gap-8",
-            span {
-                class: "text-elements-highEmphasis font-semibold text-2xl",
-                "Account"
+            Subheading {
+                title: "Account"
             }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Deposits"
-                }
+            Deposits {
+                liquidity_pair,
+                stake,
+            }
+            PendingDeposits {
+                liquidity_pair,
+                stake,
+            }
+            UnstakedLp {
+                boost_meta,
+                boost,
+                lp_balance,
+                liquidity_pair,
+                stake,
+            }
+            StakeYield {
+                boost,
+                stake,
+            }
+        }
+    }
+}
+
+#[component]
+fn Deposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+    rsx! {
+        TitledRow {
+            title: "Deposits",
+            value: rsx! {
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
                     if let Some(stake) = stake.cloned() {
                         if let Ok(stake) = stake {
                             if stake.balance > 0 {
                                 LiquidityPairStakeValue {
                                     stake_balance: stake.balance,
-                                    liquidity_pair: liquidity_pair.clone(),
+                                    liquidity_pair: liquidity_pair,
                                     with_decimal_units: true,
                                 }
                             } else {
@@ -122,82 +136,71 @@ fn AccountMetrics(
                     LoadingValue {}
                 }
             }
-            if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-                if let Some(Ok(stake)) = stake.cloned() {
-                    if stake.balance_pending > 0 {
-                        Row {
-                            class: "w-full justify-between px-4",
-                            span {
-                                class: "text-elements-lowEmphasis font-medium",
-                                "Deposits (pending)"
-                            }
+        }
+    }
+}
+
+#[component]
+fn PendingDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+    rsx! {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+            if let Some(Ok(stake)) = stake.cloned() {
+                if stake.balance_pending > 0 {
+                    TitledRow {
+                        title: "Deposits (pending)",
+                        value: rsx! {
                             LiquidityPairStakeValue {
                                 stake_balance: stake.balance_pending,
-                                liquidity_pair: liquidity_pair.clone(),
+                                liquidity_pair: liquidity_pair,
                                 with_decimal_units: true,
                             }
                         }
                     }
                 }
-            }
-            if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-                if let Some(Ok(lp_balance)) = lp_balance.cloned() {
-                    if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
-                        Row {
-                            class: "w-full justify-between px-4",
-                            span {
-                                class: "text-elements-lowEmphasis font-medium",
-                                "Unstaked"
-                            }
-                            LiquidityPairStakeValue {
-                                stake_balance: lp_balance.amount.parse::<u64>().unwrap_or(0),
-                                liquidity_pair: liquidity_pair.clone(),
-                                with_decimal_units: true,
-                            }
-                        }
-                        SubmitButton {
-                            class: "controls-tertiary",
-                            title: "Deposit {boost_meta.ticker}",
-                            transaction: lp_deposit_tx.clone(),
-                            err: err.clone(),
-                        }
-                    }
-                }
-            }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Yield"
-                }
-                if let Some(stake) = stake.cloned() {
-                    if let Ok(stake) = stake {
-                        if stake.rewards > 0 {
-                            OreValue {
-                                ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                                with_decimal_units: true,
-                                size: TokenValueSize::Small,
-                                gold: true,
-                            }
-                        } else {
-                            NullValue {}
-                        }
-                    } else {
-                        NullValue {}
-                    }
-                } else {
-                    LoadingValue {}
-                }
-            }
-            ClaimButton {
-                transaction: claim_tx.clone(),
             }
         }
     }
 }
 
 #[component]
-fn SummaryMetrics(
+fn UnstakedLp(
+    boost_meta: BoostMeta,
+    boost: Resource<GatewayResult<Boost>>,
+    lp_balance: Resource<GatewayResult<UiTokenAmount>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
+    stake: Resource<GatewayResult<Stake>>
+) -> Element {
+    let err = use_signal(|| None);
+    let lp_deposit_tx = use_lp_deposit_transaction(boost, stake);
+
+    rsx! {
+        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+            if let Some(Ok(lp_balance)) = lp_balance.cloned() {
+                if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
+                    TitledRow {
+                        title: "Unstaked",
+                        value: rsx! {
+                            LiquidityPairStakeValue {
+                                stake_balance: lp_balance.amount.parse::<u64>().unwrap_or(0),
+                                liquidity_pair: liquidity_pair,
+                                with_decimal_units: true,
+                            }
+                        }
+                    }
+                    SubmitButton {
+                        class: "controls-tertiary",
+                        title: "Deposit {boost_meta.ticker}",
+                        transaction: lp_deposit_tx,
+                        err: err,
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn BoostMetrics(
     boost: Resource<GatewayResult<Boost>>,
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>
@@ -206,31 +209,34 @@ fn SummaryMetrics(
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
             gap: 8,
-            span {
-                class: "text-elements-highEmphasis font-semibold text-2xl",
-                "Boost"
+            Subheading {
+                title: "Boost"
             }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Multiplier"
-                }
-                if let Some(Ok(boost)) = boost.read().as_ref() {
-                    span {
-                        class: "text-elements-highEmphasis font-medium",
-                        "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
-                    }
-                } else {
-                    LoadingValue {}
-                }   
+            Multiplier {
+                boost,
             }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Protocol"
-                }
+            Protocol {
+                boost_meta,
+            }
+            TotalDeposits {
+                liquidity_pair,
+            }
+            TotalStakers {
+                boost,
+            }
+            Tvl {
+                liquidity_pair,
+            }
+        }
+    }
+}
+
+#[component]
+fn Protocol(boost_meta: BoostMeta) -> Element {
+    rsx! {
+        TitledRow {
+            title: "Protocol",
+            value: rsx! {
                 a {
                     class: "text-elements-highEmphasis font-medium hover:underline",
                     href: match boost_meta.lp_type {
@@ -241,49 +247,36 @@ fn SummaryMetrics(
                     "{boost_meta.lp_type}"
                 }
             }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Total deposits"
+        }
+    }
+}
+
+#[component]
+fn TotalDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
+    rsx! {
+        TitledResourceRow {
+            title: "Total deposits",
+            resource: liquidity_pair,
+            com: |liquidity_pair| rsx! {
+                LiquidityPairValue {
+                    liquidity_pair: liquidity_pair.clone(),
+                    with_decimal_units: true,
                 }
-                if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-                    LiquidityPairValue {
-                        liquidity_pair: liquidity_pair.clone(),
-                        with_decimal_units: true,
-                    }
-                } else {
-                    LoadingValue {}
-                }   
             }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Total stakers"
+        }  
+    }
+}
+
+#[component]
+fn Tvl(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
+    rsx! {
+        TitledResourceRow {
+            title: "TVL",
+            resource: liquidity_pair,
+            com: |liquidity_pair| rsx! {
+                UsdValue {
+                    ui_amount_string: liquidity_pair.total_value_usd.to_string(),
                 }
-                if let Some(Ok(boost)) = boost.read().as_ref() {
-                    span {
-                        class: "text-elements-highEmphasis font-medium",
-                        "{boost.total_stakers}"
-                    }
-                } else {
-                    LoadingValue {}
-                }   
-            }
-            Row {
-                class: "w-full justify-between px-4",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "TVL"
-                }
-                if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-                    UsdValue {
-                        ui_amount_string: liquidity_pair.total_value_usd.to_string(),
-                    }
-                } else {
-                    LoadingValue {}
-                }   
             }
         }
     }

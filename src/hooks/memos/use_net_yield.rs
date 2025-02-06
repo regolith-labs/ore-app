@@ -1,14 +1,12 @@
-use std::collections::HashMap;
-
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
-use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
-use steel::Pubkey;
 
-use crate::gateway::{GatewayResult, UiTokenAmount};
+use crate::{gateway::{GatewayResult, UiTokenAmount}, hooks::use_all_stakes};
 
-pub fn use_net_yield(stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>) -> Memo<GatewayResult<UiTokenAmount>> {
+pub fn use_net_yield() -> Memo<GatewayResult<UiTokenAmount>> {
+    let stake_accounts = use_all_stakes();
+    
     use_memo(move || {
         // Iterate through all stake accounts and sum the rewards
         let mut net_yield = 0;

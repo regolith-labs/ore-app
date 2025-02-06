@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
@@ -11,21 +9,20 @@ use crate::{
     components::*, 
     config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, 
     gateway::GatewayResult, 
-    hooks::{use_boost, use_ore_price, OrePrice}, 
+    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_ore_price, OrePrice}, 
     route::Route,
     utils::LiquidityPair
 };
 
-#[component]
-pub fn StakeTable(
-    stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>,
-    liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>>
-) -> Element {
+pub fn StakeTable() -> Element {
+    let stake_accounts = use_all_stakes();
+    let liquidity_pairs = use_all_liquidity_pairs();
     rsx! {
         Col {
-            span {
-                class: "text-elements-highEmphasis font-semibold text-2xl px-5 sm:px-8 mb-4",
-                "Boosts"
+            gap: 8,
+            Subheading {
+                class: "px-5 sm:px-8",
+                title: "Boosts"
             }
             Table {
                 class: "mx-0 sm:mx-8",

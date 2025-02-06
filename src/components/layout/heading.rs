@@ -22,3 +22,14 @@ pub fn Heading(class: Option<String>, title: String, subtitle: Option<String>) -
         }
     }
 }
+
+#[component]
+pub fn Subheading(class: Option<String>, title: String) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        span {
+            class: "text-elements-highEmphasis font-semibold text-2xl {class}",
+            "{title}"
+        }
+    }
+}

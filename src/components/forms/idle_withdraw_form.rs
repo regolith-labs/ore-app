@@ -10,15 +10,15 @@ use crate::gateway::{UiTokenAmount, GatewayResult};
 
 #[component]
 pub fn IdleWithdrawForm(
-    ore_balance: Resource<GatewayResult<UiTokenAmount>>,
-    ore_stake: Resource<GatewayResult<Stake>>,
+    balance: Resource<GatewayResult<UiTokenAmount>>,
+    stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let mut input_amount = use_signal::<String>(|| "".to_owned());
     let err = use_signal::<Option<TokenInputError>>(|| None);
     
     // Get the stake balance
     let stake_balance = use_resource(move || async move {
-        let Some(Ok(stake)) = ore_stake.cloned() else {
+        let Some(Ok(stake)) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
         let amount_u64 = stake.balance + stake.balance_pending;
@@ -32,12 +32,12 @@ pub fn IdleWithdrawForm(
     });
 
     // Build the withdraw transaction
-    let tx = use_idle_withdraw_transaction(ore_stake, input_amount, err);
+    let tx = use_idle_withdraw_transaction(stake, input_amount, err);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
-        ore_balance.restart();
-        ore_stake.restart();
+        balance.restart();
+        stake.restart();
         input_amount.set("".to_owned());
     });
 

@@ -1,17 +1,13 @@
-use std::collections::HashMap;
-
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
-use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, ui_amount_to_amount};
-use steel::Pubkey;
 
-use crate::{gateway::{GatewayResult, UiTokenAmount}, utils::LiquidityPair};
+use crate::{gateway::{GatewayResult, UiTokenAmount}, hooks::{use_all_liquidity_pairs, use_all_stakes}};
 
-pub fn use_net_deposits(
-    stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>, 
-    liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>>
-) -> Memo<GatewayResult<UiTokenAmount>> {
+pub fn use_net_deposits() -> Memo<GatewayResult<UiTokenAmount>> {
+    let stake_accounts = use_all_stakes();
+    let liquidity_pairs = use_all_liquidity_pairs();
+
     use_memo(move || {
         // Iterate through all stake accounts and sum the deposits
         let mut net_deposits = 0;
