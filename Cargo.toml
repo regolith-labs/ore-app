@@ -65,8 +65,8 @@ gloo-utils = { version = "0.2.0", optional = true }
 is-url = { version = "1.0.4" }
 js-sys = { version = "0.3.67", optional = true }
 jupiter-swap-api-client = { git = "https://github.com/regolith-labs/jupiter-swap-api-client", package = "jupiter-swap-api-client", branch = "main" }
-kliquidity-sdk = "0.0.1"
 keyring = { version = "3.6.1", features = ["apple-native", "windows-native"] }
+kliquidity-sdk = "0.0.1"
 lazy_static = "1.4"
 log = "0.4.20"
 meteora-pools-sdk = "0.1"
@@ -82,6 +82,7 @@ ore-pool-types = "1.2"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
 reqwest = "0.11.24"
+rust_decimal = "1.36.0"
 serde = { version = "1.0", features = ["derive"] }
 serde-wasm-bindgen = { version = "0.6.3", optional = true }
 serde_json = "1.0"
@@ -100,7 +101,6 @@ wasm-bindgen = { version = "0.2.99", optional = true }
 wasm-bindgen-futures = { version = "0.4.41", optional = true }
 wasm-logger = { version = "0.2.0", optional = true }
 web-time = { version = "1.0.0", optional = true }
-rust_decimal = "1.36.0"
 
 [dependencies.web-sys]
 version = "0.3"
@@ -126,8 +126,6 @@ features = [
 ]
 
 [patch.crates-io]
-# ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool" }
-# meteora-pools-sdk = { path = "../meteora-pools-sdk" }
 solana-client-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "1.18", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 
@@ -142,5 +140,3 @@ inherits = "dev"
 
 [profile.android-dev]
 inherits = "dev"
-# solana-client-wasm = { version = "1.18", path = "../solana-playground/wasm/solana-client" }
-# solana-extra-wasm = { version = "1.18", path = "../solana-playground/wasm/utils/solana-extra" }

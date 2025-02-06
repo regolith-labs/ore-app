@@ -7,41 +7,28 @@ async fn main() {
         .and(warp::path::full())
         .map(|reply, path: warp::path::FullPath| {
             let path_str = path.as_str();
-            if should_cache(path_str) {
-                warp::reply::with_header(
-                    reply,
-                    "Cache-Control",
-                    "public, max-age=31536000, immutable"
-                )
+            let reply = if should_cache(path_str) {
+                cache_headers(reply)
             } else {
-                warp::reply::with_header(
-                    reply,
-                    "Cache-Control",
-                    "no-cache, must-revalidate"
-                )
-            }
+                cache_headers_must_revalidate(reply)
+            };
+            cors_headers(reply)
         });
 
     // Route to handle unknown paths
     let index = warp::path::end()
         .and(warp::fs::file("../target/dx/ore-app/release/web/public/index.html"))
         .map(|reply| {
-            warp::reply::with_header(
-                reply,
-                "Cache-Control",
-                "no-cache, must-revalidate"
-            )
+            let reply = cache_headers_must_revalidate(reply);
+            cors_headers(reply)
         });
 
     // Route to handle any other paths (fallback to index.html)
     let fallback = warp::any()
         .map(|| warp::reply::html(include_str!("../../target/dx/ore-app/release/web/public/index.html")))
         .map(|reply| {
-            warp::reply::with_header(
-                reply,
-                "Cache-Control",
-                "no-cache, must-revalidate"
-            )
+            let reply = cache_headers_must_revalidate(reply);
+            cors_headers(reply)
         });
 
     // Combine routes
@@ -49,6 +36,18 @@ async fn main() {
 
     // Start the warp server
     warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
+}
+
+fn cache_headers_must_revalidate(reply: warp::reply::Response) -> warp::reply::Response {
+    warp::reply::with_header(reply, "Cache-Control", "no-cache, must-revalidate")
+}
+
+fn cache_headers(reply: warp::reply::Response) -> warp::reply::Response {
+    warp::reply::with_header(reply, "Cache-Control", "public, max-age=31536000, immutable")
+}
+
+fn cors_headers(reply: warp::reply::Response) -> warp::reply::Response {
+    warp::reply::with_header(reply, "Access-Control-Allow-Origin", "*")
 }
 
 fn should_cache(path: &str) -> bool {
@@ -63,5 +62,6 @@ fn should_cache(path: &str) -> bool {
     path.ends_with(".jpg") ||
     path.ends_with(".jpeg") ||
     path.ends_with(".gif") ||
-    path.ends_with(".webp")
+    path.ends_with(".webp") ||
+    path.ends_with(".otf")
 }
