@@ -7,20 +7,14 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    font-family: 'Geist', 'ui-sans-serif', 'system-ui';
-    font-size: 14px;
+    font-family: 'Pilat', 'ui-sans-serif', 'system-ui';
+    font-size: 16px;
     font-weight: 600;
-    height: 32px;
-    line-height: 32px;
-    padding: 0 16px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 20px;
     border-radius: 9999px;
-    margin: auto 0px;
-    @media (min-width: 640px) {
-        font-size: 16px;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 20px;
-    }
+    margin: auto auto;
 }
 
 .wallet-adapter-button-trigger {
@@ -94,7 +88,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
-    font-family: 'Geist', 'ui-sans-serif', 'system-ui';
+    font-family: 'Pilat', 'ui-sans-serif', 'system-ui';
 }
 
 .wallet-adapter-dropdown-list-active {
@@ -217,7 +211,7 @@
     background: #10141f;
     box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
     /* font-family: 'DM Sans', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif; */
-    font-family: 'Geist', 'ui-sans-serif', 'system-ui';
+    font-family: 'Pilat', 'ui-sans-serif', 'system-ui';
     flex: 1;
 }
 
@@ -252,6 +246,8 @@
     font-weight: 400;
     border-radius: 0;
     font-size: 18px;
+    line-height: 24px;
+    height: 48px;
 }
 
 .wallet-adapter-modal-list .wallet-adapter-button-end-icon,

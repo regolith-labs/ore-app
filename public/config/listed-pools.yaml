@@ -1,0 +1,13 @@
+pools:
+  - address: 9RrEyMNFhFcrqVikWby5rVn1eXeKHr2SwGRbPhZ7wDCK
+    url: https://official.ec1ipse.me
+    name: Ec1ipse
+    description: ""
+    image: https://pbs.twimg.com/profile_images/1736827532312211456/V0bvyS_2_400x400.jpg
+  
+  # - address: DrSS5RM7zUd9qjUEdDaf31vnDUSbCrMto6mjqTrHFifN
+  #   url: ""
+  #   name: Rush
+  #   description: ""
+  #   image: https://pbs.twimg.com/profile_images/1825694276929368064/GJcGr3rR_400x400.jpg
+  

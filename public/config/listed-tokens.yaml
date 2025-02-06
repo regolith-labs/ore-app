@@ -1,0 +1,99 @@
+tokens:
+  - mint: So11111111111111111111111111111111111111112
+    name: Solana
+    ticker: SOL
+    description: "Solana is a high-performance blockchain platform known for its ultra-fast transactions, low fees, and powerful smart contract capabilities. With its innovative Proof of History consensus mechanism and ability to process up to 65,000 transactions per second, Solana has established itself as a leading ecosystem for DeFi, NFTs, and Web3 applications."
+    image: https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png
+    twitter: https://twitter.com/solana
+    homepage: https://solana.com
+    decimals: 9
+
+  - mint: oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp
+    name: ORE
+    ticker: ORE
+    description: "ORE is digital gold on Solana."
+    image: https://ore.supply/assets/icon.png
+    twitter: https://twitter.com/OREsupply
+    homepage: https://ore.supply
+    decimals: 11
+  
+  - mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    name: USDC
+    ticker: USDC
+    description: "USDC (USD Coin) is a fully-reserved digital dollar stablecoin, backed 1:1 by cash and short-duration US Treasury bonds. As one of the world's most trusted and widely-used stablecoins, USDC provides a reliable bridge between traditional finance and digital markets, enabling fast, low-cost transactions while maintaining a stable value pegged to the US dollar."
+    image: https://cdn.prod.website-files.com/66327d2c71b7019a2a9a1b62/667454fd94c7f58e94f4a009_USDC-webclip-256x256.png
+    twitter: https://twitter.com/circle
+    homepage: https://www.circle.com/en/usdc
+    decimals: 6
+
+  - mint: Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
+    name: USDT
+    ticker: USDT
+    description: "USDT (Tether) is a stablecoin that is fully collateralized by cash and short-duration US Treasury bonds. It is one of the most widely used stablecoins in the crypto ecosystem, providing a secure and stable digital representation of the US dollar."
+    image: https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg
+    twitter: https://twitter.com/tether_to
+    homepage: https://tether.to
+    decimals: 6
+  
+  - mint: jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL
+    name: Jito
+    ticker: JITO
+    description: "Jito builds and operates Solana MEV infrastructure."
+    image: https://metadata.jito.network/token/jto/image
+    twitter: https://twitter.com/jito_sol
+    homepage: https://jito.network
+    decimals: 9
+
+  - mint: JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN
+    name: Jupiter
+    ticker: JUP
+    description: "Jupiter is a decentralized exchange protocol that allows users to trade cryptocurrencies on the Solana blockchain. It provides a fast and secure platform for trading tokens, with low fees and high liquidity. Jupiter is built on the Jupiter protocol, which is a decentralized exchange protocol that allows users to trade cryptocurrencies on the Solana blockchain."
+    image: https://static.jup.ag/jup/icon.png
+    twitter: https://twitter.com/JupiterExchange
+    homepage: https://jup.ag
+    decimals: 6
+
+  - mint: KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS
+    name: Kamino
+    ticker: KMNO
+    description: "KMNO is the native token of Kamino Finance."
+    image: https://cdn.kamino.finance/kamino.svg
+    twitter: https://twitter.com/KaminoFinance
+    homepage: https://www.kamino.finance/
+    decimals: 6
+  
+  - mint: TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6
+    name: Tensor
+    ticker: TNSR
+    description: "TNSR is the official governance token for the Tensor Protocol Foundation."
+    image: https://arweave.net/beGAyeIzjV_UkyjFtxbkZyi_YqfOBWayiQ0B6wqWygY
+    twitter: https://twitter.com/TensorFdn
+    homepage: https://tensor.foundation
+    decimals: 9
+
+  - mint: orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE
+    name: Orca
+    ticker: ORCA
+    description: ".."
+    image: https://statics.solscan.io/cdn/imgs/s60?ref=68747470733a2f2f7261772e67697468756275736572636f6e74656e742e636f6d2f736f6c616e612d6c6162732f746f6b656e2d6c6973742f6d61696e2f6173736574732f6d61696e6e65742f6f726361454b54644b374c4b7a353776614159723951654e735645506669753651654d55316b656b745a452f6c6f676f2e706e67
+    twitter: https://twitter.com/orca_so
+    homepage: https://orca.so
+    decimals: 6
+
+  - mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux
+    name: Helium
+    ticker: HNT
+    description: "Helium is a decentralized wireless network protocol that incentivizes individuals to provide and validate wireless coverage. Originally focused on IoT connectivity through its LongFi network, Helium has expanded to include 5G cellular coverage. Network participants earn HNT tokens by operating hotspots that provide coverage or validating network transactions. This innovative 'proof-of-coverage' model has created one of the fastest-growing decentralized networks, transforming traditional telecom infrastructure into a community-powered system."
+    image: https://shdw-drive.genesysgo.net/6tcnBSybPG7piEDShBcrVtYJDPSvGrDbVvXmXKpzBvWP/hnt.png
+    twitter: https://twitter.com/helium
+    homepage: https://www.helium.com
+    decimals: 8
+  
+  # - mint: 4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy
+  #   name: Honey
+  #   ticker: HONEY
+  #   description: "HONEY is the native token of Hivemapper, a decentralized mapping network that rewards contributors for capturing and validating map data. By using dashcams and the Hivemapper mobile app, community members earn HONEY tokens for collecting fresh street-level imagery that keeps the map current. This innovative approach to mapping combines blockchain incentives with real-world utility, creating a constantly-updated, community-driven alternative to traditional mapping services. The HONEY token serves as both a reward mechanism and governance tool within the Hivemapper ecosystem."
+  #   image: https://hivemapper-marketing-public.s3.us-west-2.amazonaws.com/Hivemapper_HONEY_token.png
+  #   twitter: https://twitter.com/hivemapper
+  #   homepage: https://hivemapper.com
+  #   decimals: 9

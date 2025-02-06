@@ -1,21 +1,22 @@
-# ORE app
+# ORE App
 
-Web app for ORE cryptocurrency mining.
+Digital gold on Solana. 
 
-## Running locally
+## Get Started
 
-This app is built with [Dioxus](https://github.com/DioxusLabs/dioxus/).
-
-To run locally, you will need [Rust](https://www.rust-lang.org/tools/install).
-Once installed, you can run:
-```bash
-./script/build.sh
+Install:
+```
+cargo install dioxus-cli
 ```
 
-This builds the web artifacts. You can host them locally with the following command:
-```bash
-(cd serve && cargo run)
+Build:
+```
+dx build
 ```
 
-This hosts the website on `localhost:8080`.
+Serve:
+```
+dx serve --hot-reload
+```
 
+Visit http://localhost:8080/ to view the app.

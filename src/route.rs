@@ -1,58 +1,35 @@
 use dioxus::prelude::*;
 
-use crate::components::{
-    Claim, ClaimV1, Download, Home, Landing, Mine, MinerToolbarLayout, Navbar, OreTokenomics,
-    PageNotFound, Pay, Send, Settings, SimpleNavbar, Tx, Upgrade, User, WhatIsMining,
-};
+use crate::components::{AppNavigation, VisitorNavigation};
+use crate::pages::*;
 
 #[rustfmt::skip]
-#[derive(Routable, Clone)]
+#[derive(Routable, Clone, PartialEq, Eq)]
 pub enum Route {
-    #[route("/")]
-    Landing {},
+    #[layout(AppNavigation)]
+        #[route("/mine")]
+        Mine {},
+        #[route("/pay")]
+        Pay {},
+        #[route("/pool/:pool")]
+        Pool { pool: String },
+        #[route("/stake")]
+        Stake {},
+        #[route("/stake/idle")]
+        Idle {},
+        #[route("/stake/:lp_mint")]
+        Pair { lp_mint: String },
+        #[route("/trade")]
+        Trade {},
+    #[end_layout]
 
-    #[layout(SimpleNavbar)]
-        #[route("/what-is-mining")]
-        WhatIsMining {},
-        #[route("/ore-tokenomics")]
-        OreTokenomics {},
+    #[layout(VisitorNavigation)]
+        #[route("/")]
+        Landing {},
         #[route("/download")]
         Download {},
     #[end_layout]
 
-    #[layout(Navbar)]
-        #[layout(MinerToolbarLayout)]
-            #[route("/home")]
-            Home {},
-            #[route("/claim")]
-            Claim {},
-            #[route("/claim-v1")]
-            ClaimV1 {},
-            #[route("/mine")]
-            Mine {},
-            // #[route("/stake")]
-            // Stake {},
-            #[route("/settings")]
-            Settings {},
-            #[route("/send/:to")]
-            Send {
-                to: String
-            },
-            #[route("/pay")]
-            Pay {},
-            #[route("/tx/:sig")]
-            Tx {
-                sig: String,
-            },
-            #[route("/u/:id")]
-            User {
-                id: String,
-            },
-            #[route("/upgrade")]
-            Upgrade {}, 
-        #[end_layout]
-    #[end_layout]
-
     #[route("/:.._route")]
-    PageNotFound { _route: Vec<String> }
+    NotFound { _route: Vec<String> }
 }

@@ -1,7 +1,17 @@
 use std::rc::Rc;
 
-use crate::gateway::{Gateway, API_URL, RPC_URL};
+#[cfg(not(feature = "web"))]
+use crate::gateway::NativeRpc;
+#[cfg(feature = "web")]
+use crate::gateway::WebRpc;
+use crate::gateway::{Gateway, RPC_URL};
 
-pub fn use_gateway() -> Rc<Gateway> {
-    Rc::new(Gateway::new(API_URL.to_string(), RPC_URL.to_string()))
+#[cfg(feature = "web")]
+pub fn use_gateway() -> Rc<Gateway<WebRpc>> {
+    Rc::new(Gateway::new(RPC_URL.to_string()))
+}
+
+#[cfg(not(feature = "web"))]
+pub fn use_gateway() -> Rc<Gateway<NativeRpc>> {
+    Rc::new(Gateway::new(RPC_URL.to_string()))
 }

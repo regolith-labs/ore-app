@@ -5,7 +5,7 @@ import {
   BaseWalletMultiButton,
   WalletModalProvider,
 } from '@solana/wallet-adapter-react-ui';
-import { Transaction } from '@solana/web3.js';
+import { Transaction, VersionedTransaction } from '@solana/web3.js';
 import * as buffer from "buffer";
 window.Buffer = buffer.Buffer;
 
@@ -13,13 +13,13 @@ window.Buffer = buffer.Buffer;
 require('../src/styles.css');
 
 const LABELS = {
-    'change-wallet': 'Change wallet',
-    connecting: 'Connecting ...',
-    'copy-address': 'Copy address',
-    copied: 'Copied',
-    disconnect: 'Disconnect',
-    'has-wallet': 'Connect',
-    'no-wallet': 'Connect',
+  'change-wallet': 'Change wallet',
+  connecting: 'Connecting ...',
+  'copy-address': 'Copy address',
+  copied: 'Copied',
+  disconnect: 'Disconnect',
+  'has-wallet': 'Connect',
+  'no-wallet': 'Connect',
 };
 
 export const Wallet = () => {
@@ -32,11 +32,12 @@ export const Wallet = () => {
   );
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect={true}>
         <WalletModalProvider>
           <BaseWalletMultiButton labels={LABELS} />
           { /* Your app's components go here, nested within the context providers. */}
           <Dispatcher />
+          <Disconnect />
           <SignTransaction />
         </WalletModalProvider>
       </WalletProvider>
@@ -79,11 +80,24 @@ function Dispatcher() {
   }, [publicKey]);
 }
 
+function Disconnect() {
+  const { publicKey, disconnect } = useWallet();
+  const callback = useCallback(async (_) => {
+    try {
+      await disconnect();
+    } catch (err) {
+      console.log(err);
+    }
+  }, [publicKey]);
+  window.OreWalletDisconnecter = callback;
+  return
+}
+
 function SignTransaction() {
   const { publicKey, signTransaction } = useWallet();
   const callback = useCallback(async (msg) => {
     try {
-      const tx = Transaction.from(
+      const tx = VersionedTransaction.deserialize(
         Buffer.from(
           msg.b64,
           "base64"
@@ -92,9 +106,10 @@ function SignTransaction() {
       const signed = await signTransaction(
         tx
       );
-      return signed
-        .serialize()
-        .toString("base64");
+      const b64 = Buffer.from(
+        signed.serialize()
+      ).toString("base64");
+      return b64
     } catch (err) {
       console.log(err);
     }

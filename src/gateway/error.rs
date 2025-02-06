@@ -1,39 +1,78 @@
 use async_std::future::TimeoutError;
-use solana_client_wasm::{solana_sdk::program_error::ProgramError, ClientError};
-
-pub type GatewayResult<T> = Result<T, GatewayError>;
+use steel::ProgramError;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GatewayError {
     FailedDeserialization,
-    FailedAta,
     TransactionTimeout,
     NetworkUnavailable,
     AccountNotFound,
     RetryFailed,
     TimeoutError,
-    SignatureDenied,
-    // SimulationFailed,
+    SignatureFailed,
     RequestFailed,
     ProgramBuilderFailed,
-    WalletAdapterDisconnected,
+    WalletDisconnected,
+    JupSwapError,
+    ParseTokenStringAmmount,
+    Keyring,
+    BincodeSerialize,
+    BincodeDeserialize,
     Unknown,
 }
 
+impl From<solana_sdk::signer::SignerError> for GatewayError {
+    fn from(value: solana_sdk::signer::SignerError) -> Self {
+        log::error!("{:?}", value);
+        Self::SignatureFailed
+    }
+}
+
+impl From<keyring::Error> for GatewayError {
+    fn from(value: keyring::Error) -> Self {
+        log::error!("{:?}", value);
+        Self::Keyring
+    }
+}
+
+impl From<std::io::Error> for GatewayError {
+    fn from(value: std::io::Error) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::FailedDeserialization
+    }
+}
+
+impl From<std::num::ParseFloatError> for GatewayError {
+    fn from(value: std::num::ParseFloatError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::ParseTokenStringAmmount
+    }
+}
+
+impl From<jupiter_swap_api_client::ClientError> for GatewayError {
+    fn from(value: jupiter_swap_api_client::ClientError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::JupSwapError
+    }
+}
+
 impl From<reqwest::Error> for GatewayError {
-    fn from(_value: reqwest::Error) -> Self {
+    fn from(value: reqwest::Error) -> Self {
+        log::error!("{:?}", value);
         GatewayError::RequestFailed
     }
 }
 
 impl From<TimeoutError> for GatewayError {
-    fn from(_value: TimeoutError) -> Self {
+    fn from(value: TimeoutError) -> Self {
+        log::error!("{:?}", value);
         GatewayError::TimeoutError
     }
 }
 
-impl From<ClientError> for GatewayError {
-    fn from(value: ClientError) -> Self {
+#[cfg(feature = "web")]
+impl From<solana_client_wasm::ClientError> for GatewayError {
+    fn from(value: solana_client_wasm::ClientError) -> Self {
         let msg = value.to_string();
         if msg.starts_with("Client error: Invalid param: could not find account")
             || msg.starts_with("Client error: AccountNotFound: ")
@@ -46,6 +85,14 @@ impl From<ClientError> for GatewayError {
             log::info!("Err: {:?}", msg);
             GatewayError::Unknown
         }
+    }
+}
+
+#[cfg(feature = "desktop")]
+impl From<solana_client::client_error::ClientError> for GatewayError {
+    fn from(value: solana_client::client_error::ClientError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::RequestFailed
     }
 }
 
