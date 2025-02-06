@@ -1,7 +1,5 @@
 use crate::config::Token;
 
-
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct LiquidityPair {
     pub token_a: Token,
