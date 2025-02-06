@@ -69,12 +69,16 @@ fn AccountDetails(
                     class: "text-elements-lowEmphasis font-medium",
                     "Deposits"
                 }
-                if let Some(Ok(stake)) = ore_stake.read().as_ref() {
-                    if stake.balance > 0 {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
+                if let Some(stake) = ore_stake.read().as_ref() {
+                    if let Ok(stake) = stake {
+                        if stake.balance > 0 {
+                            OreValue {
+                                ui_amount_string: amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
+                                with_decimal_units: true,
+                                size: TokenValueSize::Small,
+                            }
+                        } else {
+                            NullValue {}
                         }
                     } else {
                         NullValue {}
@@ -105,13 +109,17 @@ fn AccountDetails(
                     class: "text-elements-lowEmphasis font-medium",
                     "Yield"
                 }
-                if let Some(Ok(stake)) = ore_stake.read().as_ref() {
-                    if stake.rewards > 0 {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                            gold: true,
+                if let Some(stake) = ore_stake.read().as_ref() {
+                    if let Ok(stake) = stake {
+                        if stake.rewards > 0 {
+                            OreValue {
+                                ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                                with_decimal_units: true,
+                                size: TokenValueSize::Small,
+                                gold: true,
+                            }
+                        } else {
+                            NullValue {}
                         }
                     } else {
                         NullValue {}

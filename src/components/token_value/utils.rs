@@ -17,7 +17,7 @@ pub fn format_token_amount(
     // Split the amount into big and small units
     let units: Vec<_> = ui_amount_string.split('.').collect();
     let whole_units = units[0];
-    let decimal_units = if units.len() > 1 { units[1] } else { "00" };
+    let decimal_units = if units.len() > 1 { units[1] } else { "000" };
 
     // Format big units
     let whole_units_u64 = u64::from_str(whole_units).unwrap();
@@ -32,7 +32,7 @@ pub fn format_token_amount(
                 decimal_units_significant.push(c);
                 if c != '0' || non_zero_digits > 0 {
                     non_zero_digits += 1;
-                    if non_zero_digits >= 2 || decimal_units_significant.len() >= 2 {
+                    if non_zero_digits >= 3 || decimal_units_significant.len() >= 3 {
                         break;
                     }
                 }
