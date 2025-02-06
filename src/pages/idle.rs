@@ -71,10 +71,10 @@ fn AccountDetails(
                 }
                 if let Some(Ok(stake)) = ore_stake.read().as_ref() {
                     if stake.balance > 0 {
-                        OreValueSmall {
-                            class: "text-elements-highEmphasis",
+                        OreValue {
                             ui_amount_string: amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
-                            small_units: true,
+                            with_decimal_units: true,
+                            size: TokenValueSize::Small,
                         }
                     } else {
                         NullValue {}
@@ -91,10 +91,10 @@ fn AccountDetails(
                             class: "text-elements-lowEmphasis font-medium",
                             "Deposits (pending)"
                         }
-                        OreValueSmall {
-                            class: "text-elements-highEmphasis",
+                        OreValue {
                             ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
-                            small_units: true,
+                            with_decimal_units: true,
+                            size: TokenValueSize::Small,
                         }
                     }
                 }
@@ -107,10 +107,11 @@ fn AccountDetails(
                 }
                 if let Some(Ok(stake)) = ore_stake.read().as_ref() {
                     if stake.rewards > 0 {
-                        OreValueSmall {
-                            class: "text-elements-gold",
+                        OreValue {
                             ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                            small_units: true,
+                            with_decimal_units: true,
+                            size: TokenValueSize::Small,
+                            gold: true,
                         }
                     } else {
                         NullValue {}
@@ -145,10 +146,10 @@ fn BoostDetails(
                     "Total deposits"
                 }
                 if let Some(Ok(boost)) = ore_boost.read().as_ref() {
-                    OreValueSmall {
-                        class: "text-elements-highEmphasis",
+                    OreValue {
                         ui_amount_string: amount_to_ui_amount_string(boost.total_deposits, TOKEN_DECIMALS),
-                        small_units: true,
+                        with_decimal_units: true,
+                        size: TokenValueSize::Small,
                     }
                 } else {
                     LoadingValue {}

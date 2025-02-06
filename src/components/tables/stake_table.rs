@@ -8,7 +8,11 @@ use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_am
 use steel::Pubkey;
 
 use crate::{
-    components::{Col, NullValue, OreValueSmall, Row, Table, TableCellLoading, TableHeader, TableRowLink, TokenValueSmall, UsdValueSmall}, config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, gateway::GatewayResult, hooks::{use_boost, use_ore_quote, LiquidityPair}, route::Route
+    components::*, 
+    config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, 
+    gateway::GatewayResult, 
+    hooks::{use_boost, use_ore_quote, LiquidityPair}, 
+    route::Route
 };
 
 #[component]
@@ -26,7 +30,7 @@ pub fn StakeTable(
                 class: "mx-0 sm:mx-8",
                 header: rsx! {
                     TableHeader {
-                        left: "Idle",
+                        left: "Stake",
                         right_1: "Multiplier",
                         right_2: "TVL",
                         right_3: "Yield",
@@ -37,13 +41,6 @@ pub fn StakeTable(
                         IdleTableRow {
                             stake: *stake
                         }
-                    }
-                    TableHeader {
-                        class: "mt-4",
-                        left: "Pairs",
-                        right_1: "",
-                        right_2: "",
-                        right_3: "",
                     }
                     for boost_meta in LISTED_BOOSTS.iter() {
                         if let Some(stake) = stake_accounts.get(&boost_meta.lp_mint) {
@@ -142,32 +139,44 @@ fn StakeTableRow(
 
 #[component]
 fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Element {
-    let balance = if let Some(Ok(stake)) = stake.cloned() {
+    let balance = use_resource(move || async move {
+        let Some(Ok(stake)) = stake.cloned() else {
+            return None;
+        };
         Some(
-            amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS)
-                .trim_end_matches("0")
-                .trim_end_matches(".")
-                .to_string()
+            format_token_amount(
+                amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
+                Some(true),
+                Some(true)
+            )
         )
-    } else {
-        None
-    };
+    });
+
     rsx! {
         Row {
-            class: "gap-4 my-auto",
+            class: "my-auto",
+            gap: 4,
             img {
                 class: "w-8 h-8 rounded-full shrink-0 my-auto",
                 src: "{token.image}",
             }
             Col {
-                span {
-                    class: "font-semibold my-auto",
-                    "{token.ticker}"
+                Row {
+                    class: "my-auto",
+                    gap: 2,
+                    span {
+                        class: "font-semibold my-auto h-min",
+                        "{token.ticker}"
+                    }
+                    span {
+                        class: "font-medium my-auto text-xs text-elements-midEmphasis/50 px-1.5 py-0 rounded bg-elements-lowEmphasis/40",
+                        "Idle"
+                    }
                 }
-                if let Some(balance) = balance {
+                if let Some(Some(balance)) = balance.cloned() {
                     span {
                         class: "font-medium text-xs text-elements-lowEmphasis",
-                        "{balance}"
+                        "{balance} ORE"
                     }
                 }
             }
@@ -184,52 +193,48 @@ fn StakeTableRowTitle(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>
 ) -> Element {
     let token = LISTED_TOKENS.get(&pair_mint).cloned();
-    let ore_balance = if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-        if let Some(Ok(stake)) = stake.cloned() {
-            if stake.balance > 0 {
-                let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) = liquidity_pair.get_stake_amounts(stake.balance);
-                Some(
-                    format!("{:.1$}", ore_amount_f64, TOKEN_DECIMALS as usize)
-                        .trim_end_matches("0")
-                        .trim_end_matches(".")
-                        .to_string()
-                )
-            } else {
-                None
-            }
-        } else {
-            None
-        }
-    } else {
-        None
-    };
+
+    let ore_balance = use_resource(move || async move {
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+            return None;
+        };
+        let Some(Ok(stake)) = stake.cloned() else {
+            return None;
+        };
+        if stake.balance == 0 {
+            return None;
+        };
+        let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) = liquidity_pair.get_stake_amounts(stake.balance);
+        Some(format_token_amount(ore_amount_f64.to_string(), Some(true), Some(true)))
+    });
+
     rsx! {
         Row {
             class: "gap-4 my-auto",
+            img {
+                class: "w-8 h-8 rounded-full shrink-0 my-auto",
+                src: asset!("/public/icon.png"),
+            }
             if let Some(token) = token {
                 img {
-                    class: "w-8 h-8 rounded-full shrink-0 my-auto",
+                    class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-5",
                     src: "{token.image}",
                 }
             } else {
                 img {
-                    class: "w-8 h-8 rounded-full shrink-0 my-auto",
+                    class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-5",
                     src: "", // TODO Unknown token icon
                 }
-            }
-            img {
-                class: "w-8 h-8 rounded-full shrink-0 my-auto -ml-6",
-                src: asset!("/public/icon.png"),
             }
             Col {
                 span {
                     class: "font-semibold my-auto",
                     "{ticker}"
                 }
-                if let Some(ore_balance) = ore_balance {
+                if let Some(Some(ore_balance)) = ore_balance.cloned() {
                     span {
                         class: "font-medium text-xs text-elements-lowEmphasis",
-                        "{ore_balance}"
+                        "{ore_balance} ORE"
                     }
                 }
             }
@@ -257,7 +262,7 @@ fn StakeTableRowMultiplier(
             return None;
         }
         let pct = stake.balance as f64 / boost.total_deposits as f64 * 100.0;
-        let pct = if pct < 0.01 {
+        let pct = if pct < 1.0 {
             // Find first non-zero decimal place
             let mut decimals = 0;
             let mut val = pct;
@@ -332,8 +337,8 @@ fn IdleTableRowTVL(
     rsx! {
         if let Some(Some(tvl)) = tvl.cloned() {
             Col {
-                UsdValueSmall {
-                    amount: tvl.to_string(),
+                UsdValue {
+                    ui_amount_string: tvl.to_string(),
                 }
                 if let Some(Some(user_tvl)) = user_tvl.cloned() {
                     span {
@@ -375,8 +380,8 @@ fn StakeTableRowTVL(
     rsx! {
         if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
             Col {
-                UsdValueSmall {
-                    amount: liquidity_pair.total_value_usd.to_string(),
+                UsdValue {
+                    ui_amount_string: liquidity_pair.total_value_usd.to_string(),
                 }
                 if let Some(Some(user_tvl)) = user_tvl.cloned() {
                     span {
@@ -392,64 +397,16 @@ fn StakeTableRowTVL(
 }
 
 #[component]
-fn StakeTableRowBasis(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
-    rsx! {
-        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-            Col {
-                gap: 2,
-                // TokenValueSmall {
-                //     class: "ml-auto",
-                //     amount: liquidity_pair.balance_a.to_string(),
-                //     ticker: liquidity_pair.token_a.clone(),
-                // }
-                OreValueSmall {
-                    ui_amount_string: liquidity_pair.balance_b_f64.to_string(),
-                }
-                // TokenValueSmall {
-                //     class: "ml-auto",
-                //     amount: liquidity_pair.balance_b.to_string(),
-                //     ticker: liquidity_pair.token_b.clone(),
-                // }
-            }
-        } else {
-            TableCellLoading {}
-        }
-    }
-}
-
-#[component]
-fn StakeTableRowLiquidity(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
-    rsx! {
-        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-            Col {
-                gap: 2,
-                TokenValueSmall {
-                    class: "ml-auto",
-                    amount: liquidity_pair.balance_a_f64.to_string(),
-                    ticker: liquidity_pair.token_a.ticker.clone(),
-                }
-                // TokenValueSmall {
-                //     class: "ml-auto",
-                //     amount: liquidity_pair.balance_b.to_string(),
-                //     ticker: liquidity_pair.token_b.clone(),
-                // }
-            }
-        } else {
-            TableCellLoading {}
-        }
-    }
-}
-
-#[component]
 fn StakeTableRowYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<GatewayResult<Stake>>) -> Element {
     rsx! {
         if let Some(stake) = stake.cloned() {
             if let Ok(stake) = stake {
                 if stake.rewards > 0 {
-                    OreValueSmall {
-                        class: "text-elements-gold",
+                    OreValue {
                         ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                        small_units: true,
+                        with_decimal_units: true,
+                        size: TokenValueSize::Small,
+                        gold: true,
                         abbreviated: true,
                     }
                 } else {

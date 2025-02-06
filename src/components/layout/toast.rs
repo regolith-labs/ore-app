@@ -78,7 +78,7 @@ pub fn ToastDisplay() -> Element {
                             }
                             span {
                                 class: "{detail_class}",
-                                "Transaction was submitted but could not be confirmed. Please try again."
+                                "Please try again."
                             }
                         }
                     }

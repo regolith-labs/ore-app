@@ -11,6 +11,14 @@ where
     Pubkey::from_str(&s).map_err(serde::de::Error::custom)
 }
 
+pub fn deserialize_pubkey_option<'de, D>(deserializer: D) -> Result<Option<Pubkey>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+    Ok(if s.is_empty() { None } else { Some(Pubkey::from_str(&s).unwrap()) })
+}
+
 pub fn deserialize_pubkey_vec<'de, D>(deserializer: D) -> Result<Vec<Pubkey>, D::Error>
 where
     D: Deserializer<'de>,

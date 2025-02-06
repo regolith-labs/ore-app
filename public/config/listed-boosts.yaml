@@ -6,6 +6,7 @@ boosts:
     lp_type: kamino 
     name: SOL-ORE Kamino LP
     ticker: kSOL-ORE
+    lut: RtzNY3VVuJHteXtF22v3ctLiksttnMSTLfgPFzyFDz2
 
   - address: D4qtrWeNpJnZpmT9Fe2kx5oJf3E4ovorZgE6K6ux7Lqt
     pair_mint: So11111111111111111111111111111111111111112
@@ -14,6 +15,7 @@ boosts:
     lp_type: meteora
     name: SOL-ORE Meteora LP
     ticker: SOL-ORE MLP
+    lut:
 
   - address: EExSorxnhxVKqnhNT4dNPNa8zvRBNBgju6n91F9cnKKy
     lp_mint: 7G3dfZkSk1HpDGnyL37LMBbPEgT4Ca6vZmZPUyi2syWt
@@ -22,3 +24,4 @@ boosts:
     lp_type: kamino
     name: HNT-ORE Kamino LP
     ticker: kHNT-ORE
+    lut: G9aqZtDcXYYzocyVMcsd4j2m3ootcb1kKNvTXciwJLQN

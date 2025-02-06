@@ -29,7 +29,7 @@ pub fn Stake() -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake",
-                subtitle: "Provide liquidity for traders and earn yield."
+                subtitle: "Provide market liquidity and earn yield."
             }
             Col {
                 gap: 16,
@@ -60,8 +60,9 @@ fn AccountSummary(
                 class: "text-elements-highEmphasis font-semibold text-2xl mb-6",
                 "Account"
             }
-            Row {
-                class: "hidden sm:flex w-full justify-between px-0 sm:px-2",
+            Col {
+                class: "md:flex-row w-full justify-between px-0 sm:px-2",
+                gap: 8,
                 Col {
                     gap: 4,
                     span {
@@ -71,6 +72,8 @@ fn AccountSummary(
                     if let Some(Ok(net_deposits)) = net_deposits.cloned() {
                         OreValue {
                             ui_amount_string: net_deposits.ui_amount_string,
+                            with_decimal_units: true,
+                            size: TokenValueSize::Large,
                         }
                     } else {
                         LoadingValue {}
@@ -80,13 +83,16 @@ fn AccountSummary(
                     class: "min-w-56",
                     gap: 4,
                     span {
-                        class: "text-elements-lowEmphasis font-medium text-right",
+                        class: "text-elements-lowEmphasis font-medium md:text-right",
                         "Net yield"
                     }
                     if let Some(Ok(net_yield)) = net_yield.cloned() {
                         OreValue {
-                            class: "text-elements-gold ml-auto",
+                            class: "md:text-right md:ml-auto",
                             ui_amount_string: net_yield.ui_amount_string,
+                            with_decimal_units: true,
+                            size: TokenValueSize::Large,
+                            gold: true,
                         }
                     } else {
                         LoadingValue {}
@@ -94,7 +100,7 @@ fn AccountSummary(
                 }
             }
             Row {
-                class: "mx-auto w-full mt-4 justify-end",
+                class: "mx-auto w-full mt-8 md:mt-4 md:justify-end",
                 ClaimButton {
                     stake_accounts: stake_accounts.clone()
                 }
@@ -119,9 +125,9 @@ fn ClaimButton(stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>) 
                     submit_transaction(tx);
                 }
             },
-            class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
+            class: "flex flex-row h-12 w-full md:w-min controls-gold rounded-full px-8",
             span {
-                class: "my-auto text-nowrap",
+                class: "my-auto mx-auto text-nowrap",
                 "Claim"
             }
         }

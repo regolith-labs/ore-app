@@ -1,10 +1,10 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::create_associated_token_account_idempotent}, spl_token::{self, instruction::{close_account, sync_native}, ui_amount_to_amount}};
-use solana_sdk::transaction::{Transaction, VersionedTransaction};
+use solana_sdk::{address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount}, hash::Hash, message::{v0::Message, VersionedMessage}, signature::Signature, transaction::VersionedTransaction};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, LiquidityPair, Wallet}
+    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount}, hooks::{use_gateway, use_wallet, LiquidityPair, Wallet}
 };
 
 // Build pair deposit transaction
@@ -25,41 +25,33 @@ pub fn use_pair_withdraw_transaction(
 
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
-            err.set(None);
             return Err(GatewayError::WalletDisconnected);
-        };
-
-        // Get resources
-        let Some(Ok(stake)) = stake.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(stake_a_balance)) = stake_a_balance.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
-        };
-        let Some(Ok(_stake_b_balance)) = stake_b_balance.cloned() else {
-            err.set(None);
-            return Err(GatewayError::Unknown);
         };
 
         // Parse input amounts
         let Ok(amount_a_f64) = input_amount_a.cloned().parse::<f64>() else {
-            err.set(None);
             return Err(GatewayError::Unknown);
         };
         let Ok(amount_b_f64) = input_amount_b.cloned().parse::<f64>() else {
-            err.set(None);
             return Err(GatewayError::Unknown);
         };
         if amount_a_f64 == 0f64 || amount_b_f64 == 0f64 {
-            err.set(None);
             return Err(GatewayError::Unknown);
         }
+
+        // Get resources
+        let Some(Ok(stake)) = stake.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(stake_a_balance)) = stake_a_balance.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(Ok(_stake_b_balance)) = stake_b_balance.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
 
         // Get amount u64
         let amount_a_u64 = ui_amount_to_amount(amount_a_f64, liquidity_pair.token_a.decimals);
@@ -141,21 +133,34 @@ pub fn use_pair_withdraw_transaction(
             );
         }
 
-        // Send instructions
-        let tx_legacy = Transaction::new_with_payer(&ixs, Some(&authority)).into();
-        // let tx = VersionedTransaction {
-        //     signatures: vec![],
-        //     message: VersionedMessage::V0(
-        //         v0::Message::try_compile(
-        //             &authority,
-        //             &ixs,
-        //             &[], // TODO LUT
-        //             Hash::default(),
-        //         ).unwrap()
-        //     ),
-        // };
+        // Fetch lookup tables
+        let mut luts = vec![];
+        if let Some(lut) = boost_meta.lut {
+            if let Ok(account_data) = use_gateway().rpc.get_account_data(&lut).await {
+                if let Ok(address_lookup_table) = AddressLookupTable::deserialize(&account_data) {
+                    let address_lookup_table_account = AddressLookupTableAccount {
+                        key: lut,
+                        addresses: address_lookup_table.addresses.to_vec(),
+                    };
+                    luts.push(address_lookup_table_account);
+                }
+            }
+        }
         
-        Ok(tx_legacy)
+        // Build the transaction
+        let tx = VersionedTransaction {
+            signatures: vec![Signature::default()],
+            message: VersionedMessage::V0(
+                Message::try_compile(
+                    &authority,
+                    &ixs,
+                    &luts,
+                    Hash::default(),
+                ).unwrap()
+            ),
+        };
+        
+        Ok(tx)
     })
         
 }
