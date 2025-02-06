@@ -106,6 +106,8 @@ impl<R: Rpc> KaminoGateway for Gateway<R> {
             return Err(GatewayError::Unknown);
         }
 
+        log::info!("Strategy address: {}", strategy_address);
+
         // Get strategy state
         let strategy = self.get_kamino_whirlpool_strategy(strategy_address).await?;
 
