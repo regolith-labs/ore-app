@@ -4,12 +4,10 @@ use crate::{
     components::*,
     config::{Pool, FIRST_POOL, LISTED_POOLS},
     hooks::{
-        use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
+        use_miner_claim_transaction, use_member_onchain, use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
     },
     route::Route,
 };
-
-
 
 pub fn Mine() -> Element {
     let wallet = use_wallet();
@@ -21,6 +19,18 @@ pub fn Mine() -> Element {
     let pool = FIRST_POOL;
     let pool_url = &pool.url;
     let member = use_member_db(pool_url.clone());
+    // log the member data for debugging
+    // log::info!("Member data: {:?}", member);
+
+
+
+    let member_on_chain = use_member_onchain(pool.address);
+    // log member_on_chain datafor debugging
+    log::info!("Member on chain data: {:?}", member_on_chain);
+    let mine_claim_tx = use_miner_claim_transaction(member_on_chain.clone());
+
+    // can get current yield from ec1iplse
+    // build claim to geet member rewardds on chain (what will be displayed)
 
     // TODO: rendering lash-hash-at here
     // to demonstrate that we can read messages from the miner
