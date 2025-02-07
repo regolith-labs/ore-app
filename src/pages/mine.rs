@@ -7,7 +7,6 @@ use crate::{
     route::Route
 };
 
-
 pub fn Mine() -> Element {
     let wallet = use_wallet();
 
@@ -57,13 +56,13 @@ pub fn Mine() -> Element {
 #[component]
 fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransaction, crate::gateway::GatewayError>>, member: Resource<GatewayResult<ore_pool_api::state::Member>> ) -> Element {    
     on_transaction_done(move |_sig| {
-        claim_tx.restart();        
+        member_on_chain.restart();        
     });
     
     rsx! {
-        Row {
-            class: "w-full flex-wrap sm:flex-col rounded-xl mx-auto justify-between py-5",
-            gap: 2,            
+        Col {
+            class: "w-full md:flex-row flex-wrap rounded-xl mx-auto justify-between py-5",
+            gap: 8,            
             Col {
                 // class: "min-w-56",
                 gap: 4,
@@ -83,14 +82,14 @@ fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransac
                     class: "text-elements-lowEmphasis font-medium",
                     "Claimable Yield"
                 }
-                OreValue {
-                    size: TokenValueSize::Large,
-                    ui_amount_string: if let Some(Ok(member)) = member.cloned() {
-                        member.balance.to_string()
-                    } else {
-                        "0".to_string()
-                    },
-                }
+                if let Some(Ok(member)) = member.cloned() {
+                    OreValue {
+                        size: TokenValueSize::Large,
+                        ui_amount_string: member.balance.to_string(),
+                    }
+                } else {
+                        LoadingValue {}
+                }             
             }
             Col {
                 class: "justify-end min-w-56",
@@ -101,32 +100,6 @@ fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransac
         }
     }
 }
-
-
-// TODO: remove 
-// fn ActionButtons() -> Element {
-//     rsx! {1
-//         Row {
-//             class: "mx-auto w-full mt-8",
-//             ClaimButton {}
-//         }
-//     }
-// }
-
-// TODO: remove 
-// fn ClaimButton() -> Element {
-//     rsx! {
-//         // replace link with claim logic
-//         Link {
-//             to: Route::Landing {},
-//             class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
-//             span {
-//                 class: "my-auto text-nowrap",
-//                 "Claim Yield"
-//             }
-//         }
-//     }
-// }
 
 #[component]
 fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
@@ -150,7 +123,7 @@ fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
                 }
             } else {
                 span {
-                    class: "flex flex-row gap-2 my-auto mx-auto bg-gray-300 px-4 h-12 text-white rounded-full font-semibold z-10 group-hover:scale-105 transition-transform border border-white",
+                    class: "flex flex-row gap-2 my-auto mx-auto bg-gray-300 px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
                     StopIcon { class: "my-auto h-5"  },
                     span {
                         class: "my-auto",
