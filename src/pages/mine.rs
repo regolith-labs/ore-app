@@ -46,9 +46,11 @@ pub fn Mine() -> Element {
             // if let Some(Ok(member)) = member_onchain.cloned() {
             //     // use member
             // }
-            MinerData {claim_tx: claim_tx.clone(), member: member.clone() }
-            // TODO: Add activity table
-            // div { "{last_hash_at}" }   
+            MinerData {claim_tx: claim_tx.clone(), member: member.clone() }                           
+        }
+        Col {
+            class: "w-full max-w-3xl mx-auto",
+            MineTable {}
         }
     }
 }
