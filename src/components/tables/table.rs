@@ -69,6 +69,56 @@ pub fn TableHeader(
 }
 
 #[component]
+pub fn TableRow(
+    left: Element,
+    right_1: Element,
+    right_2: Option<Element>,
+    right_3: Option<Element>,
+    right_4: Option<Element>,
+) -> Element {
+    rsx! {
+        Row {
+            class: "flex flex-row w-full min-w-max px-5 sm:px-3 h-20 sm:rounded-md transition hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
+            span {
+                class: "w-screen sm:w-full sm:min-w-96 my-auto -ml-5 sm:ml-0 px-5 sm:px-0",
+                Row {
+                    class: "w-full sm:min-w-96 my-auto grow-0 shrink-0 sm:grow justify-between",
+                    span {
+                        class: "w-min sm:w-56 text-nowrap",
+                        {left}
+                    }
+                    span {
+                        class: "flex text-right w-56 my-auto justify-end",
+                        {right_1}
+                    }
+                }
+            }
+            Row {
+                if let Some(right_2) = right_2 {
+                    span {
+                        class: "flex text-right w-56 my-auto justify-end",
+                        {right_2}
+                    }
+                }
+                if let Some(right_3) = right_3 {
+                    span {
+                        class: "flex text-right w-56 my-auto justify-end",
+                        {right_3}
+                    }
+                }
+                if let Some(right_4) = right_4 {
+                    span {
+                        class: "flex text-right w-56 my-auto justify-end",
+                        {right_4}
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+#[component]
 pub fn TableRowLink(
     to: Route,
     left: Element,
