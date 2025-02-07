@@ -3,7 +3,7 @@ use ore_pool_types::Member;
 
 use crate::{
     config::Pool, gateway::GatewayResult, hooks::{
-        use_member_onchain, use_miner_is_active, use_register_db, use_register_onchain, use_transaction_status, use_wallet, Wallet
+        use_member, use_miner_is_active, use_pool_register_transaction, use_register_db, use_transaction_status, use_wallet, Wallet
     }
 };
 
@@ -13,10 +13,12 @@ use crate::components::{submit_transaction, TransactionStatus};
 pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> Element {
     let wallet = use_wallet();
     let is_active = use_miner_is_active();
-    let mut member_onchain = use_member_onchain(pool.address);
+    let mut member = use_member(pool.address);
     let mut register_db = use_register_db(pool.url.clone());
-    let register_onchain = use_register_onchain(pool.address);
+    let register_tx = use_pool_register_transaction(pool.address);
     let transaction_status = use_transaction_status();
+
+    
 
     let el = match *wallet.read() {
         Wallet::Disconnected => {
@@ -39,9 +41,9 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
                         Some(Err(err)) => {
                             log::error!("{:?}", err);
                             // check for member on chain
-                            match &*member_onchain.read_unchecked() {
-                                Some(Ok(member_onchain)) => {
-                                    log::info!("{:?}", member_onchain);
+                            match &*member.read_unchecked() {
+                                Some(Ok(member)) => {
+                                    log::info!("{:?}", member);
                                     // register member with the pool
                                     match &*register_db.read() {
                                         Some(Ok(_)) => {
@@ -67,7 +69,7 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
                                     log::error!("{:?}", err);
 
                                     // register member on chain first
-                                    match &*register_onchain.read() {
+                                    match &*register_tx.read() {
                                         Some(Ok(tx)) => {
                                             let tx = tx.clone();
                                             let el = if let Some(transaction_status) = transaction_status.cloned() {
@@ -96,7 +98,7 @@ pub fn MinerStatus(member_db: Resource<GatewayResult<Member>>, pool: Pool) -> El
                                                         }
                                                     }
                                                     TransactionStatus::Done(_sig) => {
-                                                        member_onchain.restart();
+                                                        member.restart();
                                                         register_db.restart();
                                                         rsx! {
                                                             div { "restarting register db" }

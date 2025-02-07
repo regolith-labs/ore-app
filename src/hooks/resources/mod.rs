@@ -3,12 +3,14 @@ mod use_liquidity_pair;
 mod use_stake;
 mod use_token_balance;
 mod use_ore_price;
+mod use_member;
 
 pub use use_boost::*;
 pub use use_liquidity_pair::*;
 pub use use_stake::*;
 pub use use_token_balance::*;
 pub use use_ore_price::*;
+pub use use_member::*;
 
 pub fn use_cache_provider() {
     use_boosts_provider();

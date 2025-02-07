@@ -59,9 +59,7 @@ pub fn MinerController() -> Element {
         let challenge = *challenge.read();
         if let (Some(Ok(member)), Some(Ok(challenge)), true) = (member, challenge, is_active) {
             spawn(async move {
-                let gateway = use_gateway();
-                let cutoff_time =
-                    get_cutoff(&gateway.rpc, challenge.challenge.lash_hash_at, 5).await;
+                let cutoff_time = get_cutoff(challenge.challenge.lash_hash_at, 5).await;
                 match cutoff_time {
                     Ok(cutoff_time) => {
                         to_miner.send(ore_miner_types::InputMessage {
@@ -80,7 +78,7 @@ pub fn MinerController() -> Element {
 
     // solutions receiver
     use_effect(move || {
-        let pubkey = wallet.get_pubkey();
+        let pubkey = wallet.pubkey();
         let pool_url = pool.url.clone();
         let from_miner_read = &*from_miner.read();
         if let ore_miner_types::OutputMessage::Solution(solution) = from_miner_read {

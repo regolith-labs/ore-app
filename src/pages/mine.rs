@@ -5,7 +5,7 @@ use crate::{
     gateway::{GatewayError, GatewayResult}, 
     config::{Pool, FIRST_POOL, LISTED_POOLS},
     hooks::{
-       on_transaction_done, use_miner_claim_transaction, use_member_onchain, use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
+       on_transaction_done, use_miner_claim_transaction, use_member, use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
     },
     route::Route,
 };
@@ -20,9 +20,9 @@ pub fn Mine() -> Element {
     // register with first pool
     let pool = FIRST_POOL;
     let pool_url = &pool.url;
-    let member = use_member_db(pool_url.clone());    
-    let member_on_chain = use_member_onchain(pool.address);
-    let claim_tx = use_miner_claim_transaction(member_on_chain.clone());
+    let member_db = use_member_db(pool_url.clone());    
+    let member = use_member(pool.address);
+    let claim_tx = use_miner_claim_transaction(member.clone());
         
     // TODO: rendering lash-hash-at here
     // to demonstrate that we can read messages from the miner
@@ -30,7 +30,6 @@ pub fn Mine() -> Element {
     let mut last_hash_at: Signal<i64> = use_signal(|| 0);
     use_effect(move || {
         // TODO: fetch current miner state (claim amount, etc)
-        let _pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
         if let ore_miner_types::OutputMessage::Expired(lha) = from_miner_read {
             last_hash_at.set(*lha);
@@ -47,11 +46,11 @@ pub fn Mine() -> Element {
                 subtitle: "Utilize spare hashpower to harvest ORE."
             }
             StopStartButton { is_active }
-            // MinerStatus { member_db: member, pool: pool.clone() }
+            // MinerStatus { member_db: member_db, pool: pool.clone() }
             // if let Some(Ok(member)) = member_onchain.cloned() {
             //     // use member
             // }
-            MinerData {claim_tx: claim_tx.clone(), member_on_chain: member_on_chain.clone() }
+            MinerData {claim_tx: claim_tx.clone(), member: member.clone() }
             // TODO: Add activity table
             // div { "{last_hash_at}" }   
         }
@@ -59,7 +58,7 @@ pub fn Mine() -> Element {
 }
 
 #[component]
-fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransaction, crate::gateway::GatewayError>>, member_on_chain: Resource<GatewayResult<ore_pool_api::state::Member>> ) -> Element {    
+fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransaction, crate::gateway::GatewayError>>, member: Resource<GatewayResult<ore_pool_api::state::Member>> ) -> Element {    
     on_transaction_done(move |_sig| {
         claim_tx.restart();        
     });
@@ -89,7 +88,7 @@ fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransac
                 }
                 OreValue {
                     size: TokenValueSize::Large,
-                    ui_amount_string: if let Some(Ok(member)) = member_on_chain.cloned() {
+                    ui_amount_string: if let Some(Ok(member)) = member.cloned() {
                         member.balance.to_string()
                     } else {
                         "0".to_string()

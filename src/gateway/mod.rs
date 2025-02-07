@@ -2,6 +2,7 @@ mod error;
 pub mod kamino;
 pub mod meteora;
 pub mod ore;
+pub mod pool;
 pub mod solana;
 pub mod spl;
 mod utils;
