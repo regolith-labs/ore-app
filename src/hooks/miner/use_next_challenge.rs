@@ -18,16 +18,18 @@ pub fn use_next_challenge(
     use_resource(move || {
         let last_hash_at = *last_hash_at.read();
         async move {
-            if let (Some(Ok(member_record)), Some(pool)) = (member_record.cloned(), pool.cloned()) {
-                use_gateway().poll_new_challenge(
-                    Pubkey::from_str(member_record.authority.as_str()).unwrap(),
-                    pool.url,
-                    last_hash_at,
-                )
-                .await
-            } else {
-                Err(crate::gateway::GatewayError::AccountNotFound)
-            }
+            let Some(Ok(member_record)) = member_record.cloned() else {
+                return Err(crate::gateway::GatewayError::AccountNotFound);
+            };
+            let Some(pool) = pool.cloned() else {
+                return Err(crate::gateway::GatewayError::AccountNotFound);
+            };
+            use_gateway().poll_new_challenge(
+                Pubkey::from_str(member_record.authority.as_str()).unwrap(),
+                pool.url,
+                last_hash_at,
+            )
+            .await
         }
     })
 }
