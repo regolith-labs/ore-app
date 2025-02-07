@@ -16,10 +16,11 @@ pub fn MinerController() -> Element {
     // TODO: round robin select
     let pool = FIRST_POOL.clone();
     let pool_url = pool.url.clone();
-    let member = use_member_db(pool_url.clone());
+    let member = use_member_db(pool_url.clone());     
 
     // build miner
     let (from_miner, mut to_miner) = use_miner();
+
     let mut last_hash_at = use_signal(|| 0);
 
     // restart miner
@@ -32,7 +33,7 @@ pub fn MinerController() -> Element {
     // next challenge
     let challenge = use_resource(move || {
         let gateway = use_gateway();
-        let pool_url = pool_url.clone();
+        let pool_url: String = pool_url.clone();
         let member = &*member.read();
         let member = member.clone();
         let last_hash_at = *last_hash_at.read();
