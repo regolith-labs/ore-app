@@ -7,7 +7,6 @@ mod wallet;
 mod use_gateway;
 // #[cfg(feature = "web")]
 // mod use_persistent;
-mod use_pools;
 
 
 pub use miner::*;
@@ -17,4 +16,3 @@ pub use transaction_builders::*;
 pub use resources::*;
 pub use wallet::*;
 pub use use_gateway::*;
-pub use use_pools::*;

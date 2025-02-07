@@ -1,13 +1,10 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::*,
-    gateway::{GatewayError, GatewayResult}, 
-    config::{Pool, FIRST_POOL, LISTED_POOLS},
-    hooks::{
-       on_transaction_done, use_miner_claim_transaction, use_member, use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
-    },
-    route::Route,
+    components::*, config::{Pool, LISTED_POOLS}, 
+    gateway::GatewayResult, 
+    hooks::{on_transaction_done, use_member, use_member_record, use_miner, use_miner_claim_transaction, use_miner_is_active, use_pool, use_wallet, IsActiveMiner}, 
+    route::Route
 };
 
 
@@ -18,10 +15,10 @@ pub fn Mine() -> Element {
     let is_active: Signal<IsActiveMiner> = use_miner_is_active();
 
     // register with first pool
-    let pool = FIRST_POOL;
-    let pool_url = &pool.url;
-    let member_db = use_member_db(pool_url.clone());    
-    let member = use_member(pool.address);
+    // let pool = FIRST_POOL;
+    let pool = use_pool();
+    let member_record = use_member_record(pool);    
+    let member = use_member(pool);
     let claim_tx = use_miner_claim_transaction(member.clone());
         
     // TODO: rendering lash-hash-at here
@@ -46,7 +43,7 @@ pub fn Mine() -> Element {
                 subtitle: "Utilize spare hashpower to harvest ORE."
             }
             StopStartButton { is_active }
-            // MinerStatus { member_db: member_db, pool: pool.clone() }
+            // MinerStatus { member_record: member_record, pool: pool.clone() }
             // if let Some(Ok(member)) = member_onchain.cloned() {
             //     // use member
             // }

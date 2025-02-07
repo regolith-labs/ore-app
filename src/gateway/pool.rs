@@ -4,16 +4,16 @@ use solana_sdk::pubkey::Pubkey;
 use super::{Gateway, GatewayError, GatewayResult, Rpc, solana::SolanaGateway};
 
 pub trait PoolGateway {
-    async fn get_challenge(&self, authority: Pubkey, pool_url: &str) -> GatewayResult<MemberChallenge>;
+    async fn get_challenge(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberChallenge>;
     async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64>;
-    async fn get_member_record(&self, authority: Pubkey, pool_url: &str) -> GatewayResult<MemberRecord>;
-    async fn poll_new_challenge(&self, authority: Pubkey, pool_url: &str, last_hash_at: i64) -> GatewayResult<MemberChallenge>;
-    async fn post_solution(&self, authority: Pubkey, pool_url: &str, solution: &drillx::Solution) -> GatewayResult<()>;
+    async fn get_member_record(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord>;
+    async fn poll_new_challenge(&self, authority: Pubkey, pool_url: String, last_hash_at: i64) -> GatewayResult<MemberChallenge>;
+    async fn post_solution(&self, authority: Pubkey, pool_url: String, solution: &drillx::Solution) -> GatewayResult<()>;
     async fn register(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord>;
 }
 
 impl<R: Rpc> PoolGateway for Gateway<R> {
-    async fn get_challenge(&self, authority: Pubkey, pool_url: &str) -> GatewayResult<MemberChallenge> {
+    async fn get_challenge(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberChallenge> {
         let get_url = format!("{}/challenge/{}", pool_url, authority);
         let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
         let challenge = resp.json::<MemberChallenge>().await.map_err(GatewayError::from)?;
@@ -30,16 +30,16 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         Ok(cutoff)
     }
 
-    async fn get_member_record(&self, authority: Pubkey, pool_url: &str) -> GatewayResult<MemberRecord> {
+    async fn get_member_record(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord> {
         let get_url = format!("{}/member/{}", pool_url, authority);
         let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
         let member_record = resp.json::<MemberRecord>().await.map_err(GatewayError::from)?;
         Ok(member_record)
     }
 
-    async fn poll_new_challenge(&self, authority: Pubkey, pool_url: &str, last_hash_at: i64) -> GatewayResult<MemberChallenge> {
+    async fn poll_new_challenge(&self, authority: Pubkey, pool_url: String, last_hash_at: i64) -> GatewayResult<MemberChallenge> {
         loop {
-            let challenge = self.get_challenge(authority, pool_url).await?;
+            let challenge = self.get_challenge(authority, pool_url.clone()).await?;
             if challenge.challenge.lash_hash_at == last_hash_at {
                 async_std::task::sleep(std::time::Duration::from_secs(1)).await;
             } else {
@@ -48,7 +48,7 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         }
     }
 
-    async fn post_solution(&self, authority: Pubkey, pool_url: &str, solution: &drillx::Solution) -> GatewayResult<()> {
+    async fn post_solution(&self, authority: Pubkey, pool_url: String, solution: &drillx::Solution) -> GatewayResult<()> {
         let post_url = format!("{}/contribute", pool_url);
         let payload = ContributePayloadV2 {
             authority,
