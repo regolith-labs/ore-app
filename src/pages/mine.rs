@@ -2,12 +2,14 @@ use dioxus::prelude::*;
 
 use crate::{
     components::*,
+    gateway::{GatewayError, GatewayResult}, 
     config::{Pool, FIRST_POOL, LISTED_POOLS},
     hooks::{
-        use_miner_claim_transaction, use_member_onchain, use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
+       on_transaction_done, use_miner_claim_transaction, use_member_onchain, use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
     },
     route::Route,
 };
+
 
 pub fn Mine() -> Element {
     let wallet = use_wallet();
@@ -18,20 +20,10 @@ pub fn Mine() -> Element {
     // register with first pool
     let pool = FIRST_POOL;
     let pool_url = &pool.url;
-    let member = use_member_db(pool_url.clone());
-    // log the member data for debugging
-    // log::info!("Member data: {:?}", member);
-
-
-
+    let member = use_member_db(pool_url.clone());    
     let member_on_chain = use_member_onchain(pool.address);
-    // log member_on_chain datafor debugging
-    log::info!("Member on chain data: {:?}", member_on_chain);
-    let mine_claim_tx = use_miner_claim_transaction(member_on_chain.clone());
-
-    // can get current yield from ec1iplse
-    // build claim to geet member rewardds on chain (what will be displayed)
-
+    let claim_tx = use_miner_claim_transaction(member_on_chain.clone());
+        
     // TODO: rendering lash-hash-at here
     // to demonstrate that we can read messages from the miner
     let (from_miner, _to_miner) = use_miner();
@@ -55,15 +47,23 @@ pub fn Mine() -> Element {
                 subtitle: "Utilize local hashpower to harvest ORE."
             }
             StopStartButton { is_active }
-            MinerStatus { member_db: member, pool: pool.clone() }
-            MinerData {}
+            // MinerStatus { member_db: member, pool: pool.clone() }
+            // if let Some(Ok(member)) = member_onchain.cloned() {
+            //     // use member
+            // }
+            MinerData {claim_tx: claim_tx.clone(), member_on_chain: member_on_chain.clone() }
             // TODO: Add activity table
-            div { "{last_hash_at}" }   
+            // div { "{last_hash_at}" }   
         }
     }
 }
 
-fn MinerData() -> Element {
+#[component]
+fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransaction, crate::gateway::GatewayError>>, member_on_chain: Resource<GatewayResult<ore_pool_api::state::Member>> ) -> Element {    
+    on_transaction_done(move |_sig| {
+        claim_tx.restart();        
+    });
+    
     rsx! {
         Row {
             class: "w-full flex-wrap sm:flex-col rounded-xl mx-auto justify-between py-5",
@@ -88,40 +88,49 @@ fn MinerData() -> Element {
                     "Claimable Yield"
                 }
                 OreValue {
-                    ui_amount_string: "2.324330".to_string(),
+                    size: TokenValueSize::Large,
+                    ui_amount_string: if let Some(Ok(member)) = member_on_chain.cloned() {
+                        member.balance.to_string()
+                    } else {
+                        "0".to_string()
+                    },
                 }
             }
             Col {
-                // class: "min-w-56",
-                ActionButtons {}                
+                class: "justify-end min-w-56",
+                ClaimButton {
+                    transaction: claim_tx.clone(),
+                }                
             }
         }
     }
 }
 
-fn ActionButtons() -> Element {
-    rsx! {
-        Row {
-            class: "mx-auto w-full mt-8",
-            ClaimButton {}
-        }
-    }
-}
 
-// TODO: button on click must claim yield (if it exists)
-fn ClaimButton() -> Element {
-    rsx! {
-        // replace link with claim logic
-        Link {
-            to: Route::Landing {},
-            class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
-            span {
-                class: "my-auto text-nowrap",
-                "Claim Yield"
-            }
-        }
-    }
-}
+// TODO: remove 
+// fn ActionButtons() -> Element {
+//     rsx! {1
+//         Row {
+//             class: "mx-auto w-full mt-8",
+//             ClaimButton {}
+//         }
+//     }
+// }
+
+// TODO: remove 
+// fn ClaimButton() -> Element {
+//     rsx! {
+//         // replace link with claim logic
+//         Link {
+//             to: Route::Landing {},
+//             class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
+//             span {
+//                 class: "my-auto text-nowrap",
+//                 "Claim Yield"
+//             }
+//         }
+//     }
+// }
 
 #[component]
 fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
