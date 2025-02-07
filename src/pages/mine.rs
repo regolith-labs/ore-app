@@ -1,37 +1,25 @@
 use dioxus::prelude::*;
+use ore_api::consts::TOKEN_DECIMALS;
+use ore_pool_api::state::Member;
+use ore_pool_types::Member as MemberRecord;
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 
 use crate::{
     components::*, config::{Pool, LISTED_POOLS}, 
     gateway::GatewayResult, 
-    hooks::{on_transaction_done, use_member, use_member_record, use_miner, use_miner_claim_transaction, use_miner_is_active, use_pool, use_wallet, IsActiveMiner}, 
+    hooks::{on_transaction_done, use_member, use_member_record, use_miner_claim_transaction, use_miner_is_active, use_pool, IsActiveMiner}, 
     route::Route
 };
 
 pub fn Mine() -> Element {
-    let wallet = use_wallet();
-
-    // on off button
+    // On/off button
     let is_active: Signal<IsActiveMiner> = use_miner_is_active();
 
-    // register with first pool
-    // let pool = FIRST_POOL;
+    // TODO Register with first pool
     let pool = use_pool();
-    let member_record = use_member_record(pool);    
     let member = use_member(pool);
-    let claim_tx = use_miner_claim_transaction(member.clone());
-        
-    // TODO: rendering lash-hash-at here
-    // to demonstrate that we can read messages from the miner
-    let (from_miner, _to_miner) = use_miner();
-    let mut last_hash_at: Signal<i64> = use_signal(|| 0);
-    use_effect(move || {
-        // TODO: fetch current miner state (claim amount, etc)
-        let from_miner_read = &*from_miner.read();
-        if let ore_miner_types::OutputMessage::Expired(lha) = from_miner_read {
-            last_hash_at.set(*lha);
-        }
-    });
-
+    let member_record = use_member_record(pool);    
+    
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16 max-w-2xl mx-auto px-5 sm:px-8",
@@ -41,12 +29,13 @@ pub fn Mine() -> Element {
                 title: "Mine",
                 subtitle: "Utilize spare hashpower to harvest ORE."
             }
-            StopStartButton { is_active }
-            // MinerStatus { member_record: member_record, pool: pool.clone() }
-            // if let Some(Ok(member)) = member_onchain.cloned() {
-            //     // use member
-            // }
-            MinerData {claim_tx: claim_tx.clone(), member: member.clone() }                           
+            StopStartButton { 
+                is_active 
+            }
+            MinerData { 
+                member,
+                member_record
+            }
         }
         Col {
             class: "w-full max-w-3xl mx-auto",
@@ -56,45 +45,80 @@ pub fn Mine() -> Element {
 }
 
 #[component]
-fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransaction, crate::gateway::GatewayError>>, member: Resource<GatewayResult<ore_pool_api::state::Member>> ) -> Element {    
+fn MinerData(
+    member: Resource<GatewayResult<Member>>,
+    member_record: Resource<GatewayResult<MemberRecord>>
+) -> Element {    
+
+    // Build the claim transaction
+    let claim_tx = use_miner_claim_transaction(member);
+    
+    // Refresh member account
     on_transaction_done(move |_sig| {
         member.restart();        
     });
     
     rsx! {
         Col {
-            class: "w-full md:flex-row flex-wrap rounded-xl mx-auto justify-between py-5",
+            class: "w-full flex-wrap mx-auto justify-between py-5",
             gap: 8,            
             Col {
                 // class: "min-w-56",
                 gap: 4,
                 span {
                     class: "text-elements-lowEmphasis font-medium",
-                    "Hash Power"
+                    "Hashpower"
                 }
                 span {
                     class: "font-semibold text-2xl sm:text-3xl",
-                    "1230.12"
+                    "1230 H/s"
+                }
+            }
+            if let Some(Ok(member_record)) = member_record.cloned() {
+                Col {
+                    gap: 4,
+                    span {
+                        class: "text-elements-lowEmphasis font-medium",
+                        "Rewards (pending)"
+                    }
+                    if let Some(member) = member.cloned() {
+                        if let Ok(member) = member {
+                            OreValue {
+                                size: TokenValueSize::Large,
+                                ui_amount_string: amount_to_ui_amount_string(member_record.total_balance as u64 - member.total_balance, TOKEN_DECIMALS),
+                                with_decimal_units: true,
+                            }
+                        } else {
+                            NullValue {}
+                        }
+                    } else {
+                        LoadingValue {}
+                    }
                 }
             }
             Col {
-                // class: "min-w-56",
                 gap: 4,
                 span {
                     class: "text-elements-lowEmphasis font-medium",
-                    "Claimable Yield"
+                    "Rewards"
                 }
-                if let Some(Ok(member)) = member.cloned() {
-                    OreValue {
-                        size: TokenValueSize::Large,
-                        ui_amount_string: member.balance.to_string(),
+                if let Some(member) = member.cloned() {
+                    if let Ok(member) = member {
+                        OreValue {
+                            size: TokenValueSize::Large,
+                            ui_amount_string: amount_to_ui_amount_string(member.balance, TOKEN_DECIMALS),
+                            with_decimal_units: true,
+                            gold: true,
+                        }
+                    } else {
+                        NullValue {}
                     }
                 } else {
-                        LoadingValue {}
+                    LoadingValue {}
                 }             
             }
             Col {
-                class: "justify-end min-w-56",
+                class: "justify-end",
                 ClaimButton {
                     transaction: claim_tx.clone(),
                 }                

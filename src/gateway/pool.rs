@@ -1,11 +1,14 @@
+use ore_pool_api::state::Member;
 use ore_pool_types::{ContributePayloadV2, Member as MemberRecord, MemberChallenge, RegisterPayload};
 use solana_sdk::pubkey::Pubkey;
+use steel::AccountDeserialize;
 
 use super::{Gateway, GatewayError, GatewayResult, Rpc, solana::SolanaGateway};
 
 pub trait PoolGateway {
     async fn get_challenge(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberChallenge>;
     async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64>;
+    async fn get_member(&self, address: Pubkey) -> GatewayResult<Member>;
     async fn get_member_record(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord>;
     async fn poll_new_challenge(&self, authority: Pubkey, pool_url: String, last_hash_at: i64) -> GatewayResult<MemberChallenge>;
     async fn post_solution(&self, authority: Pubkey, pool_url: String, solution: &drillx::Solution) -> GatewayResult<()>;
@@ -30,6 +33,15 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         Ok(cutoff)
     }
 
+    async fn get_member(&self, address: Pubkey) -> GatewayResult<Member> {
+        let data = self
+            .rpc
+            .get_account_data(&address)
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(*Member::try_from_bytes(&data)?)
+    }
+
     async fn get_member_record(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord> {
         let get_url = format!("{}/member/{}", pool_url, authority);
         let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
@@ -39,6 +51,7 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
 
     async fn poll_new_challenge(&self, authority: Pubkey, pool_url: String, last_hash_at: i64) -> GatewayResult<MemberChallenge> {
         loop {
+            log::info!("Polling...");
             let challenge = self.get_challenge(authority, pool_url.clone()).await?;
             if challenge.challenge.lash_hash_at == last_hash_at {
                 async_std::task::sleep(std::time::Duration::from_secs(1)).await;

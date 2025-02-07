@@ -3,7 +3,7 @@ use ore_pool_api::state::Member;
 use ore_pool_types::Member as MemberRecord;
 
 use crate::{
-    config::Pool, gateway::{ore::OreGateway, pool::PoolGateway, GatewayError, GatewayResult}, hooks::{use_gateway, use_wallet, GetPubkey}
+    config::Pool, gateway::{pool::PoolGateway, GatewayError, GatewayResult}, hooks::{use_gateway, use_wallet, GetPubkey}
 };
 
 pub fn use_member(pool: Resource<Pool>) -> Resource<GatewayResult<Member>> {
@@ -14,7 +14,7 @@ pub fn use_member(pool: Resource<Pool>) -> Resource<GatewayResult<Member>> {
             return Err(GatewayError::AccountNotFound);
         };
         let member_pda = ore_pool_api::state::member_pda(pubkey, pool.address);
-        use_gateway().rpc.get_member(member_pda.0).await
+        use_gateway().get_member(member_pda.0).await
     })
 }
 
