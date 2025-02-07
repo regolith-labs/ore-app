@@ -1,25 +1,14 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
-use ore_pool_api::state::Member;
-use ore_pool_types::Member as MemberRecord;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 
 use crate::{
-    components::*, config::{Pool, LISTED_POOLS}, 
-    gateway::GatewayResult, 
-    hooks::{on_transaction_done, use_member, use_member_record, use_miner_claim_transaction, use_miner_is_active, use_pool, IsActiveMiner}, 
-    route::Route
+    components::*, 
+    gateway::pool::PoolGateway,
+    hooks::{on_transaction_done, use_gateway, use_member, use_member_record, use_miner_claim_transaction, use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus, Wallet}, 
 };
 
-pub fn Mine() -> Element {
-    // On/off button
-    let is_active: Signal<IsActiveMiner> = use_miner_is_active();
-
-    // TODO Register with first pool
-    let pool = use_pool();
-    let member = use_member(pool);
-    let member_record = use_member_record(pool);    
-    
+pub fn Mine() -> Element {    
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16 max-w-2xl mx-auto px-5 sm:px-8",
@@ -29,113 +18,99 @@ pub fn Mine() -> Element {
                 title: "Mine",
                 subtitle: "Utilize spare hashpower to harvest ORE."
             }
-            StopStartButton { 
-                is_active 
-            }
-            MinerData { 
-                member,
-                member_record
-            }
+            StopStartButton {}
+            MinerData {}
             // TODO: Add activity table
         }
     }
 }
 
-#[component]
-fn MinerData(
-    member: Resource<GatewayResult<Member>>,
-    member_record: Resource<GatewayResult<MemberRecord>>
-) -> Element {    
+fn MinerData() -> Element {
+    // Get resources
+    let mut member = use_member();
+    let mut member_record = use_member_record();    
 
     // Build the claim transaction
     let claim_tx = use_miner_claim_transaction(member);
     
     // Refresh member account
     on_transaction_done(move |_sig| {
-        member.restart();        
+        member.restart();
+        member_record.restart();
     });
     
     rsx! {
         Col {
             class: "w-full flex-wrap mx-auto justify-between py-5",
             gap: 8,            
-            Col {
-                // class: "min-w-56",
-                gap: 4,
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Hashpower"
-                }
-                span {
-                    class: "font-semibold text-2xl sm:text-3xl",
-                    "1230 H/s"
-                }
-            }
-            if let Some(Ok(member_record)) = member_record.cloned() {
-                Col {
-                    gap: 4,
-                    span {
-                        class: "text-elements-lowEmphasis font-medium",
-                        "Rewards (pending)"
-                    }
-                    if let Some(member) = member.cloned() {
-                        if let Ok(member) = member {
-                            OreValue {
-                                size: TokenValueSize::Large,
-                                ui_amount_string: amount_to_ui_amount_string(member_record.total_balance as u64 - member.total_balance, TOKEN_DECIMALS),
-                                with_decimal_units: true,
-                            }
-                        } else {
-                            NullValue {}
-                        }
-                    } else {
-                        LoadingValue {}
-                    }
-                }
-            }
-            Col {
-                gap: 4,
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Rewards"
-                }
-                if let Some(member) = member.cloned() {
-                    if let Ok(member) = member {
-                        OreValue {
-                            size: TokenValueSize::Large,
-                            ui_amount_string: amount_to_ui_amount_string(member.balance, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            gold: true,
-                        }
-                    } else {
-                        NullValue {}
-                    }
-                } else {
-                    LoadingValue {}
-                }             
-            }
-            Col {
-                class: "justify-end",
-                ClaimButton {
-                    transaction: claim_tx.clone(),
-                }                
+            MinerStatus {}
+            MinerHashpower {}
+            MinerPendingRewards {}
+            MinerRewards {}
+            ClaimButton {
+                transaction: claim_tx,
             }
         }
     }
 }
 
-#[component]
-fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
+fn StopStartButton() -> Element {
+    let wallet = use_wallet();
+    let pool_url = use_pool_url();
+    let mut miner_status = use_miner_status();
+    let mut member = use_member();
+    let mut member_record = use_member_record();
+    let register_tx = use_pool_register_transaction();
+
+    let is_active = use_miner_is_active();
+
+    let mut f = use_future(move || async move {
+        log::info!("Registering...");
+        let Wallet::Connected(authority) = *wallet.read() else {
+            return;
+        };
+        log::info!("Registering (A)...");
+        let Some(pool_url) = pool_url.cloned() else {
+            return;
+        };
+        log::info!("Registering (B)...");
+        if let Ok(_member_record) = use_gateway().register(authority, pool_url).await {
+            log::info!("Registering (C)...");
+            member.restart();
+            member_record.restart();
+            miner_status.set(MinerStatus::FetchingChallenge);
+        }
+    });
+
+    on_transaction_done(move |_sig| {
+        if miner_status.cloned() == MinerStatus::Registering {
+            log::info!("Restarting future...");
+            f.restart();
+        }
+    });
+
     rsx! {
         button {
             class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16 group",
-            onclick: move |_| is_active.set(IsActiveMiner(!is_active.cloned().0)),
+            onclick: move |_| {
+                if *is_active.read() {
+                    miner_status.set(MinerStatus::Stopped);
+                } else {
+                    if let Some(Ok(_member)) = member.cloned() {
+                        miner_status.set(MinerStatus::FetchingChallenge);
+                    } else if let Some(Ok(tx)) = register_tx.cloned() {
+                        log::info!("Submitting transaction...");
+                        miner_status.set(MinerStatus::Registering);
+                        submit_transaction(tx);
+                    }
+                }
+            },
             OrbMiner {
                 class: "absolute top-0 left-0 z-0",
-                gold: is_active.read().0
+                gold: *is_active.read()
             }
             // cloning to get the value
-            if !is_active.cloned().0 {
+            if !*is_active.read() {
                 span {
                     class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
                     PlayIcon { class: "my-auto h-5" }
@@ -158,53 +133,101 @@ fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
     }
 }
 
-fn _PoolTable() -> Element {
+fn MinerStatus() -> Element {
+    let miner_status = use_miner_status();
+    let status = use_memo(move || {
+        match miner_status.cloned() {
+            MinerStatus::Registering => "Registering",
+            MinerStatus::FetchingChallenge => "Fetching",
+            MinerStatus::Hashing => "Hashing",
+            MinerStatus::SubmittingSolution => "Submitting",
+            MinerStatus::Stopped => "Stopped",
+        }
+    });
     rsx! {
-        Col { gap: 2,
-            Table {
-                header: rsx! {
-                    TableHeader { left: "Pool", right_1: "Hashpower", right_2: "Multiplier", right_3: "Yield" }
-                },
-                rows: rsx! {
-                    for pool in LISTED_POOLS.iter() {
-                        PoolRow { pool: pool.clone() }
+        Col {
+            // class: "min-w-56",
+            gap: 4,
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Status"
+            }
+            span {
+                class: "font-semibold text-2xl sm:text-3xl",
+                "{status}"
+            }
+        }
+    }
+}
+
+fn MinerHashpower() -> Element {
+    rsx! {
+        Col {
+            gap: 4,
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Hashpower"
+            }
+            span {
+                class: "font-semibold text-2xl sm:text-3xl",
+                "1230 H/s"
+            }
+        }
+    }
+}
+
+fn MinerPendingRewards() -> Element {
+    let member = use_member();
+    let member_record = use_member_record();
+    rsx! {
+        if let Some(Ok(member_record)) = member_record.cloned() {
+            Col {
+                gap: 4,
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Rewards (pending)"
+                }
+                if let Some(member) = member.cloned() {
+                    if let Ok(member) = member {
+                        OreValue {
+                            size: TokenValueSize::Large,
+                            ui_amount_string: amount_to_ui_amount_string(member_record.total_balance as u64 - member.total_balance, TOKEN_DECIMALS),
+                            with_decimal_units: true,
+                        }
+                    } else {
+                        NullValue {}
                     }
+                } else {
+                    LoadingValue {}
                 }
             }
         }
     }
 }
 
-#[component]
-fn PoolRow(pool: Pool) -> Element {
+fn MinerRewards() -> Element {
+    let member = use_member();
     rsx! {
-        TableRowLink {
-            to: Route::Landing {},
-            left: rsx! {
-                Row { gap: 4,
-                    img {
-                        class: "w-10 h-10 my-auto bg-gray-900 rounded",
-                        src: "{pool.image}"
-                    }
-                    Col { class: "my-auto",
-                        span { class: "font-medium", "{pool.name}" }
-                    }
-                }
-            },
-            right_1: rsx! {
-                span { "64480" }
-            },
-            right_2: rsx! {
-                span { "2.4x" }
-            },
-            right_3: rsx! {
-                OreValue {
-                    ui_amount_string: "2.054".to_string(),
-                    with_decimal_units: true,
-                    size: TokenValueSize::Small,
-                    gold: true,
-                }
+        Col {
+            gap: 4,
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Rewards"
             }
+            if let Some(member) = member.cloned() {
+                if let Ok(member) = member {
+                    OreValue {
+                        size: TokenValueSize::Large,
+                        ui_amount_string: amount_to_ui_amount_string(member.balance, TOKEN_DECIMALS),
+                        with_decimal_units: true,
+                        gold: true,
+                    }
+                } else {
+                    NullValue {}
+                }
+            } else {
+                LoadingValue {}
+            }             
         }
     }
 }
