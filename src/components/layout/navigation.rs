@@ -192,7 +192,7 @@ fn is_navbar_hidden(current_route: &Route) -> bool {
 fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
     match route {
         Route::Mine {} => match current_route {
-            Route::Mine {} | Route::Pool { pool: _ } => true,
+            Route::Mine {} => true,
             _ => false,
         },
         Route::Stake {} => match current_route {

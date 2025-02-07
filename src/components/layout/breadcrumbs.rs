@@ -5,7 +5,7 @@ use crate::{
     route::Route,
 };
 
-pub fn Breadcrumbs() -> Element {
+pub fn _Breadcrumbs() -> Element {
     let route: Route = use_route();
     rsx! {
         Row {
@@ -23,17 +23,17 @@ pub fn Breadcrumbs() -> Element {
                 //         }
                 //     }
                 // }
-                Route::Pool { pool } => {
-                    rsx! {
-                        Path {
-                            title: "Mine",
-                            route: Route::Mine {},
-                        }
-                        Active {
-                            title: "{pool}"
-                        }
-                    }
-                }
+                // Route::Pool { pool } => {
+                //     rsx! {
+                //         Path {
+                //             title: "Mine",
+                //             route: Route::Mine {},
+                //         }
+                //         Active {
+                //             title: "{pool}"
+                //         }
+                //     }
+                // }
                 // Route::Market { market } => {
                 //     rsx! {
                 //         Path {

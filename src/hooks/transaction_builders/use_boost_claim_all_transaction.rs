@@ -1,19 +1,14 @@
-use std::collections::HashMap;
-
 use dioxus::prelude::*;
-use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::spl_associated_token_account;
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
-use steel::Pubkey;
 
 use crate::{
-    gateway::{GatewayError, GatewayResult}, hooks::{use_wallet, Wallet}
+    gateway::{GatewayError, GatewayResult}, hooks::{use_all_stakes, use_wallet, Wallet}
 };
 
-pub fn use_boost_claim_all_transaction(
-    stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>,
-) -> Resource<GatewayResult<VersionedTransaction>> {
+pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let stake_accounts = use_all_stakes();
     use_resource(move || {
         let stake_accounts = stake_accounts.clone();
         async move {

@@ -11,11 +11,9 @@ pub enum Route {
         Mine {},
         #[route("/pay")]
         Pay {},
-        #[route("/pool/:pool")]
-        Pool { pool: String },
         #[route("/stake")]
         Stake {},
-        #[route("/stake/idle")]
+        #[route("/stake/ore")]
         Idle {},
         #[route("/stake/:lp_mint")]
         Pair { lp_mint: String },

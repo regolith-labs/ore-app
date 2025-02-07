@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
@@ -11,20 +9,20 @@ use crate::{
     components::*, 
     config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, 
     gateway::GatewayResult, 
-    hooks::{use_boost, use_ore_quote, LiquidityPair}, 
-    route::Route
+    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_ore_price, OrePrice}, 
+    route::Route,
+    utils::LiquidityPair
 };
 
-#[component]
-pub fn StakeTable(
-    stake_accounts: HashMap<Pubkey, Resource<GatewayResult<Stake>>>,
-    liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>>
-) -> Element {
+pub fn StakeTable() -> Element {
+    let stake_accounts = use_all_stakes();
+    let liquidity_pairs = use_all_liquidity_pairs();
     rsx! {
         Col {
-            span {
-                class: "text-elements-highEmphasis font-semibold text-2xl px-5 sm:px-8 mb-4",
-                "Boosts"
+            gap: 8,
+            Subheading {
+                class: "px-5 sm:px-8",
+                title: "Boosts"
             }
             Table {
                 class: "mx-0 sm:mx-8",
@@ -302,22 +300,20 @@ fn IdleTableRowTVL(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>
 ) -> Element {
-    let usdc = Token::usdc();
-    let quote = use_ore_quote(usdc.mint);
-    let tvl = use_resource(move || async move {
+    let ore_price = use_ore_price();
+    let tvl = use_memo(move || {
         let Some(Ok(boost)) = *boost.read() else {
             return None;
         };
-        let Some(Ok(quote)) = quote.cloned() else {
+        let Some(OrePrice(ore_price_f64)) = ore_price.cloned() else {
             return None;
         };
-        let usdc_quote_f64 = amount_to_ui_amount(quote.out_amount, usdc.decimals);
         let total_deposits_f64 = amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS);
-        Some(usdc_quote_f64 * total_deposits_f64)
+        Some(ore_price_f64 * total_deposits_f64)
     });
 
-    let user_tvl = use_resource(move || async move {
-        let Some(Some(tvl)) = tvl.cloned() else {
+    let user_tvl = use_memo(move || {
+        let Some(tvl) = tvl.cloned() else {
             return None;
         };
         let Some(Ok(boost)) = boost.cloned() else {
@@ -335,12 +331,12 @@ fn IdleTableRowTVL(
     });
 
     rsx! {
-        if let Some(Some(tvl)) = tvl.cloned() {
+        if let Some(tvl) = tvl.cloned() {
             Col {
                 UsdValue {
                     ui_amount_string: tvl.to_string(),
                 }
-                if let Some(Some(user_tvl)) = user_tvl.cloned() {
+                if let Some(user_tvl) = user_tvl.cloned() {
                     span {
                         class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
                         "${user_tvl}"

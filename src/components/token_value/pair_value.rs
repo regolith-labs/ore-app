@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 
-use crate::{components::{token_value::{utils::TokenValueSize, OreValue, TokenValueSmall}, Col}, hooks::LiquidityPair};
+use crate::{components::{token_value::{utils::TokenValueSize, OreValue, TokenValueSmall}, Col}, utils::LiquidityPair};
 
 #[component]
 pub fn LiquidityPairValue(class: Option<String>, liquidity_pair: LiquidityPair, with_decimal_units: Option<bool>) -> Element {

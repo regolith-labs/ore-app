@@ -43,7 +43,7 @@ pub fn Mine() -> Element {
             Heading {
                 class: "w-full",
                 title: "Mine",
-                subtitle: "Utilize local hashpower to harvest ORE."
+                subtitle: "Utilize spare hashpower to harvest ORE."
             }
             StopStartButton { is_active }
             // MinerStatus { member_db: member, pool: pool.clone() }
@@ -160,9 +160,7 @@ fn _PoolTable() -> Element {
 fn PoolRow(pool: Pool) -> Element {
     rsx! {
         TableRowLink {
-            to: Route::Pool {
-                pool: pool.name.clone(),
-            },
+            to: Route::Landing {},
             left: rsx! {
                 Row { gap: 4,
                     img {

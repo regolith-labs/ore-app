@@ -4,7 +4,7 @@ use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_t
 use solana_sdk::{address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount}, hash::Hash, message::{v0::Message, VersionedMessage}, signature::Signature, transaction::VersionedTransaction};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount}, hooks::{use_gateway, use_wallet, LiquidityPair, Wallet}
+    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet}, utils::LiquidityPair
 };
 
 // Build pair deposit transaction
