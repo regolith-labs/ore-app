@@ -1,9 +1,9 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
+use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 
-use crate::{components::*, gateway::{GatewayResult, UiTokenAmount}, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_stake}};
+use crate::{components::*, gateway::{GatewayResult, UiTokenAmount}, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_ore_price, use_stake}};
 
 pub fn Idle() -> Element {
     let balance = use_ore_balance();
@@ -100,13 +100,15 @@ fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
 fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
     rsx! {
         if let Some(Ok(stake)) = stake.cloned() {
-            TitledRow {
-                title: "Deposits (pending)",
-                value: rsx! {
-                    OreValue {
-                        ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
-                        with_decimal_units: true,
-                        size: TokenValueSize::Small,
+            if stake.balance_pending > 0 {
+                TitledRow {
+                    title: "Deposits (pending)",
+                    value: rsx! {           
+                        OreValue {
+                            ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
+                            with_decimal_units: true,
+                            size: TokenValueSize::Small,
+                        }
                     }
                 }
             }
@@ -164,6 +166,9 @@ fn BoostMetrics(
             TotalStakers {
                 boost,
             }
+            Tvl {
+                boost,
+            }
         }
     }
 }
@@ -216,6 +221,29 @@ pub fn TotalStakers(boost: Resource<GatewayResult<Boost>>) -> Element {
                         class: "text-elements-highEmphasis font-medium",
                         "{boost.total_stakers}"
                     }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
+    let ore_price = use_ore_price();
+    rsx! {
+        TitledRow {
+            title: "TVL",
+            value: rsx! {
+                if let Some(ore_price) = ore_price.cloned() {
+                    if let Some(Ok(boost)) = boost.cloned() {
+                        UsdValue {
+                            ui_amount_string: (amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS) * ore_price.0).to_string(),
+                        }
+                    } else {
+                        LoadingValue {}
+                    }
+                } else {
+                    LoadingValue {}
                 }
             }
         }
