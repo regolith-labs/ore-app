@@ -56,7 +56,7 @@ pub fn Mine() -> Element {
 #[component]
 fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransaction, crate::gateway::GatewayError>>, member: Resource<GatewayResult<ore_pool_api::state::Member>> ) -> Element {    
     on_transaction_done(move |_sig| {
-        member_on_chain.restart();        
+        member.restart();        
     });
     
     rsx! {
