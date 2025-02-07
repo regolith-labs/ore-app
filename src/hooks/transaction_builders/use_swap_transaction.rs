@@ -23,7 +23,7 @@ pub fn use_swap_transaction(
         let client = JupiterSwapApiClient::new(API_URL.to_string());
         async move {
             let quote = &*quote.read();
-            let pubkey = wallet.get_pubkey()?;
+            let pubkey = wallet.pubkey()?;
             match quote {
                 Some(quote) => {
                     let request = SwapRequest {

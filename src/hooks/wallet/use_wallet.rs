@@ -14,11 +14,11 @@ pub enum Wallet {
 }
 
 pub trait GetPubkey {
-    fn get_pubkey(&self) -> GatewayResult<Pubkey>;
+    fn pubkey(&self) -> GatewayResult<Pubkey>;
 }
 
 impl GetPubkey for Signal<Wallet> {
-    fn get_pubkey(&self) -> GatewayResult<Pubkey> {
+    fn pubkey(&self) -> GatewayResult<Pubkey> {
         match *self.read() {
             Wallet::Connected(pubkey) => Ok(pubkey),
             Wallet::Disconnected => Err(GatewayError::WalletDisconnected),

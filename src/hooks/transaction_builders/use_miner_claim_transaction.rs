@@ -1,6 +1,4 @@
 use dioxus::prelude::*;
-use ore_boost_api::state::{Boost, Stake};
-use ore_pool_types::Member;
 use solana_extra_wasm::program::spl_associated_token_account::{self, get_associated_token_address};
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
 use solana_extra_wasm::program::spl_token;
@@ -31,7 +29,7 @@ pub fn use_miner_claim_transaction(
         // Get member data from Member
         let member_data = match data {
             Some(Ok(member)) => member, // Extract the Member if successful
-            Some(Err(err)) => return Err(GatewayError::Unknown), // Handle the Err case
+            Some(Err(_err)) => return Err(GatewayError::Unknown), // Handle the Err case
             None => return Err(GatewayError::Unknown), // Handle the None case
         };  
 
