@@ -17,4 +17,5 @@ pub fn use_cache_provider() {
     use_liquidity_pairs_provider();
     use_stakes_provider();
     use_ore_price_provider();
+    use_members_provider();
 }

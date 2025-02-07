@@ -34,7 +34,7 @@ impl<R: Rpc> Gateway<R> {
         }
     }
     
-    pub async fn get_recent_priority_fee_estimate(&self, treasury: bool) -> u64 {
+    pub async fn _get_recent_priority_fee_estimate(&self, treasury: bool) -> u64 {
         let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
         if treasury {
             ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string());
