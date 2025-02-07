@@ -16,12 +16,20 @@ use crate::{
 pub fn Pair(lp_mint: String) -> Element {
     let lp_mint = Pubkey::from_str(&lp_mint).unwrap();
     let boost_meta = LISTED_BOOSTS_BY_MINT.get(&lp_mint).unwrap();
-    let boost = use_boost(lp_mint);
     let liquidity_pair = use_liquidity_pair(boost_meta.clone());
-    let stake = use_stake(lp_mint);
     let lp_balance = use_token_balance(lp_mint);
-    let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
+    let mut boost = use_boost(lp_mint);
+    let mut stake = use_stake(lp_mint);
+    let (mut token_a_balance, mut token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
     
+    // Refresh data if successful transaction
+    on_transaction_done(move |_sig| {
+        token_a_balance.restart();
+        token_b_balance.restart();
+        stake.restart();
+        boost.restart();
+    });
+
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
@@ -46,8 +54,6 @@ pub fn Pair(lp_mint: String) -> Element {
                     boost_meta: boost_meta.clone(),
                     liquidity_pair: liquidity_pair,
                     lp_balance: lp_balance,
-                    token_a_balance: token_a_balance,
-                    token_b_balance: token_b_balance,
                     boost,
                     stake
                 }
@@ -66,19 +72,9 @@ fn AccountMetrics(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
-    // Refresh data if successful transaction
-    on_transaction_done(move |_sig| {
-        token_a_balance.restart();
-        token_b_balance.restart();
-        stake.restart();
-        boost.restart();
-    });
-
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8 gap-8",

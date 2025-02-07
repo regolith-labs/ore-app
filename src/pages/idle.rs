@@ -3,12 +3,19 @@ use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
 use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 
-use crate::{components::*, gateway::{GatewayResult, UiTokenAmount}, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_ore_price, use_stake}};
+use crate::{components::*, gateway::GatewayResult, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_ore_price, use_stake}};
 
 pub fn Idle() -> Element {
-    let balance = use_ore_balance();
-    let boost = use_boost(ore_api::consts::MINT_ADDRESS);
-    let stake = use_stake(ore_api::consts::MINT_ADDRESS);
+    let mut balance = use_ore_balance();
+    let mut boost = use_boost(ore_api::consts::MINT_ADDRESS);
+    let mut stake = use_stake(ore_api::consts::MINT_ADDRESS);
+
+    // Refresh data if successful transaction
+    on_transaction_done(move |_sig| {
+        balance.restart();
+        stake.restart();
+        boost.restart();
+    });
 
     rsx! {
         Col {
@@ -29,7 +36,6 @@ pub fn Idle() -> Element {
                 AccountMetrics {
                     boost,
                     stake,
-                    balance,
                 }
                 BoostMetrics {
                     boost,
@@ -43,15 +49,7 @@ pub fn Idle() -> Element {
 fn AccountMetrics(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
-    balance: Resource<GatewayResult<UiTokenAmount>>,
 ) -> Element {
-    // Refresh data if successful transaction
-    on_transaction_done(move |_sig| {
-        balance.restart();
-        stake.restart();
-        boost.restart();
-    });
-
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",

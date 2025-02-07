@@ -102,9 +102,7 @@ fn _PoolTable() -> Element {
 fn PoolRow(pool: Pool) -> Element {
     rsx! {
         TableRowLink {
-            to: Route::Pool {
-                pool: pool.name.clone(),
-            },
+            to: Route::Landing {},
             left: rsx! {
                 Row { gap: 4,
                     img {
