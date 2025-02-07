@@ -2,12 +2,14 @@ use dioxus::prelude::*;
 
 use crate::{
     components::*,
+    gateway::{GatewayError, GatewayResult}, 
     config::{Pool, FIRST_POOL, LISTED_POOLS},
     hooks::{
-        use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
+       on_transaction_done, use_miner_claim_transaction, use_member_onchain, use_member_db, use_miner, use_miner_is_active, use_wallet, GetPubkey, IsActiveMiner, 
     },
     route::Route,
 };
+
 
 pub fn Mine() -> Element {
     let wallet = use_wallet();
@@ -18,13 +20,16 @@ pub fn Mine() -> Element {
     // register with first pool
     let pool = FIRST_POOL;
     let pool_url = &pool.url;
-    let member = use_member_db(pool_url.clone());
-
+    let member = use_member_db(pool_url.clone());    
+    let member_on_chain = use_member_onchain(pool.address);
+    let claim_tx = use_miner_claim_transaction(member_on_chain.clone());
+        
     // TODO: rendering lash-hash-at here
     // to demonstrate that we can read messages from the miner
     let (from_miner, _to_miner) = use_miner();
     let mut last_hash_at: Signal<i64> = use_signal(|| 0);
     use_effect(move || {
+        // TODO: fetch current miner state (claim amount, etc)
         let _pubkey = wallet.get_pubkey();
         let from_miner_read = &*from_miner.read();
         if let ore_miner_types::OutputMessage::Expired(lha) = from_miner_read {
@@ -42,11 +47,90 @@ pub fn Mine() -> Element {
                 subtitle: "Utilize spare hashpower to harvest ORE."
             }
             StopStartButton { is_active }
-            MinerStatus { member_db: member, pool: pool.clone() }
-            div { "{last_hash_at}" }   
+            // MinerStatus { member_db: member, pool: pool.clone() }
+            // if let Some(Ok(member)) = member_onchain.cloned() {
+            //     // use member
+            // }
+            MinerData {claim_tx: claim_tx.clone(), member_on_chain: member_on_chain.clone() }
+            // TODO: Add activity table
+            // div { "{last_hash_at}" }   
         }
     }
 }
+
+#[component]
+fn MinerData(claim_tx: Resource<Result<solana_sdk::transaction::VersionedTransaction, crate::gateway::GatewayError>>, member_on_chain: Resource<GatewayResult<ore_pool_api::state::Member>> ) -> Element {    
+    on_transaction_done(move |_sig| {
+        claim_tx.restart();        
+    });
+    
+    rsx! {
+        Row {
+            class: "w-full flex-wrap sm:flex-col rounded-xl mx-auto justify-between py-5",
+            gap: 2,            
+            Col {
+                // class: "min-w-56",
+                gap: 4,
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Hash Power"
+                }
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl",
+                    "1230.12"
+                }
+            }
+            Col {
+                // class: "min-w-56",
+                gap: 4,
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Claimable Yield"
+                }
+                OreValue {
+                    size: TokenValueSize::Large,
+                    ui_amount_string: if let Some(Ok(member)) = member_on_chain.cloned() {
+                        member.balance.to_string()
+                    } else {
+                        "0".to_string()
+                    },
+                }
+            }
+            Col {
+                class: "justify-end min-w-56",
+                ClaimButton {
+                    transaction: claim_tx.clone(),
+                }                
+            }
+        }
+    }
+}
+
+
+// TODO: remove 
+// fn ActionButtons() -> Element {
+//     rsx! {1
+//         Row {
+//             class: "mx-auto w-full mt-8",
+//             ClaimButton {}
+//         }
+//     }
+// }
+
+// TODO: remove 
+// fn ClaimButton() -> Element {
+//     rsx! {
+//         // replace link with claim logic
+//         Link {
+//             to: Route::Landing {},
+//             class: "flex flex-row h-10 w-min controls-gold rounded-full px-4 gap-2",
+//             span {
+//                 class: "my-auto text-nowrap",
+//                 "Claim Yield"
+//             }
+//         }
+//     }
+// }
 
 #[component]
 fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
@@ -58,6 +142,7 @@ fn StopStartButton(is_active: Signal<IsActiveMiner>) -> Element {
                 class: "absolute top-0 left-0 z-0",
                 gold: is_active.read().0
             }
+            // cloning to get the value
             if !is_active.cloned().0 {
                 span {
                     class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
