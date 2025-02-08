@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BoltIcon, CircleStackIcon, Col, GlobeIcon, OreWordmarkIcon, Row, ToastDisplay, WalletAdapter},
+    components::{BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon, OreWordmarkIcon, Row, ToastDisplay, WalletAdapter, XIcon},
     route::Route,
 };
 
@@ -55,8 +55,9 @@ fn VisitorNavBar() -> Element {
         Row {
             class: "w-screen shrink-0 h-16 sm:h-20 px-2 sm:px-6",
             Row {
-                class: "w-full my-auto",
+                class: "w-full my-auto justify-between",
                 Logo {}
+                SocialLinks {}
             }
         }
     }
@@ -65,7 +66,7 @@ fn VisitorNavBar() -> Element {
 fn Logo() -> Element {
     rsx! {
         Link {
-            class: "p-1 my-auto rounded hover:bg-gray-800",
+            class: "p-1 my-auto rounded hover:bg-controls-secondaryHover",
             to: Route::Landing {},
             OreWordmarkIcon {
                 class: "h-5"
@@ -204,5 +205,46 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
             _ => false,
         },
         _ => false,
+    }
+}
+
+fn SocialLinks() -> Element {
+    let button_color = "text-white";
+    rsx! {
+        div {
+            class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
+            Link {
+                to: "https://dexscreener.com/solana/ggadtfbqdgjozz3fp7zrtofgwnrs4e6mczmmd5ni1mxj",
+                class: "flex h-8 sm:h-10 w-8 sm:w-10 rounded-full {button_color} hover:bg-controls-secondaryHover my-auto",
+                new_tab: true,
+                DexscreenIcon {
+                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                }
+            }
+            Link {
+                to: "https://discord.gg/4TQfshAAsT",
+                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                new_tab: true,
+                DiscordIcon {
+                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                }
+            }
+            Link {
+                to: "https://github.com/regolith-labs/ore",
+                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                new_tab: true,
+                GithubIcon {
+                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                }
+            }
+            Link {
+                to: "https://x.com/oresupply",
+                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                new_tab: true,
+                XIcon {
+                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                }
+            }
+        }
     }
 }
