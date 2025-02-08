@@ -588,6 +588,9 @@
   .bottom-4 {
     bottom: calc(var(--spacing) * 4);
   }
+  .left-0 {
+    left: calc(var(--spacing) * 0);
+  }
   .left-1\/2 {
     left: calc(1/2 * 100%);
   }
@@ -596,6 +599,9 @@
   }
   .z-0 {
     z-index: 0;
+  }
+  .z-10 {
+    z-index: 10;
   }
   .z-50 {
     z-index: 50;
@@ -686,6 +692,9 @@
   }
   .mr-16 {
     margin-right: calc(var(--spacing) * 16);
+  }
+  .mr-auto {
+    margin-right: auto;
   }
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
@@ -779,6 +788,9 @@
   }
   .w-3 {
     width: calc(var(--spacing) * 3);
+  }
+  .w-3\/5 {
+    width: calc(3/5 * 100%);
   }
   .w-4 {
     width: calc(var(--spacing) * 4);
@@ -1101,6 +1113,9 @@
   .px-8 {
     padding-inline: calc(var(--spacing) * 8);
   }
+  .px-48 {
+    padding-inline: calc(var(--spacing) * 48);
+  }
   .py-0 {
     padding-block: calc(var(--spacing) * 0);
   }
@@ -1140,6 +1155,9 @@
   .text-right {
     text-align: right;
   }
+  .font-extended {
+    font-family: var(--font-extended);
+  }
   .font-sans {
     font-family: var(--font-sans);
   }
@@ -1157,6 +1175,10 @@
   .text-4xl {
     font-size: var(--text-4xl);
     line-height: var(--tw-leading, var(--text-4xl--line-height));
+  }
+  .text-9xl {
+    font-size: var(--text-9xl);
+    line-height: var(--tw-leading, var(--text-9xl--line-height));
   }
   .text-base {
     font-size: var(--text-base);

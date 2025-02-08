@@ -19,15 +19,24 @@ use dioxus::prelude::*;
 #[component]
 pub fn OrbHero() -> Element {
     rsx! {
+        // div {
+        //     class: "bg-transparent mx-auto",
+        //     dangerous_inner_html: r#"
+        //         <spline-viewer
+        //             style="height: 12rem; width: 12rem;" 
+        //             url="https://prod.spline.design/zyaww3tr0AUmyWMP/scene.splinecode"
+        //         />
+        //     "#
+        // }
         div {
-            class: "bg-transparent mx-auto",
+            class: "absolute top-0 right-0 bottom-0 w-3/5",
             dangerous_inner_html: r#"
                 <spline-viewer
-                    style="height: 12rem; width: 12rem;" 
-                    url="https://prod.spline.design/zyaww3tr0AUmyWMP/scene.splinecode"
+                    style="height: 100%; width: 100%;" 
+                    url="https://prod.spline.design/lIB-o0ilow1By5Yr/scene.splinecode"
                 />
             "#
-        }
+        }   
     }
 }
 

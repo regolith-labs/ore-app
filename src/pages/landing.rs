@@ -21,31 +21,45 @@ fn Hero() -> Element {
         Col {
             class: "mx-auto my-auto pt-0 px-5 gap-16",
             gap: 16,
-            OrbHero {}
             Col {
-                class: "mx-auto",
-                gap: 2,
-                span {
-                    class: "mx-auto font-wide font-bold text-4xl sm:text-5xl text-elements-highEmphasis",
-                    "Digital gold."
-                }
-                span {
-                    class: "mx-auto font-wide font-bold text-4xl sm:text-5xl text-elements-lowEmphasis",
-                    "On Solana."
-                }
-                span {  
-                    class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
-                    "Hard money crypto with defi native yield."
-                }
-            }
-            Link {
-                class: "flex mx-auto h-16 w-full sm:max-w-xs px-4 rounded-full controls-primary transition-transform hover:scale-105",
-                to: Route::Mine {},
-                span {
-                    class: "font-semibold text-lg sm:text-xl mx-auto my-auto",
-                    "Start mining →"
+                class: "absolute flex top-0 left-0 right-0 bottom-0 px-48",
+                Col {
+                    class: "my-auto",
+                    span {
+                        class: "mr-auto font-extended font-bold text-9xl text-elements-highEmphasis",
+                        "Liquid"
+                    }
+                    span {
+                        class: "mr-auto font-extended font-bold text-9xl text-elements-highEmphasis",
+                        "Digital"
+                    }
+                    span {
+                        class: "mr-auto font-extended font-bold text-9xl text-elements-highEmphasis",
+                        "Gold"
+                    }
                 }
             }
+            OrbHero {}
+            // Col {
+            //     class: "mx-auto z-10",
+            //     gap: 2,
+            //     span {
+            //         class: "mx-auto font-wide font-bold text-4xl sm:text-5xl text-elements-highEmphasis",
+            //         "Liquid digital gold."
+            //     }
+            //     span {  
+            //         class: "mx-auto mt-8 font-wide text-xl sm:text-2xl text-center text-elements-midEmphasis",
+            //         "Hard money crypto with defi native yield."
+            //     }
+            // }
+            // Link {
+            //     class: "flex mx-auto h-16 w-full sm:max-w-xs px-4 rounded-full controls-primary transition-transform hover:scale-105 z-10",
+            //     to: Route::Mine {},
+            //     span {
+            //         class: "font-semibold text-lg sm:text-xl mx-auto my-auto",
+            //         "Start mining →"
+            //     }
+            // }
         }
     }
 }
