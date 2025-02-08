@@ -61,21 +61,19 @@ fn StopStartButton() -> Element {
     let mut member = use_member();
     let mut member_record = use_member_record();
     let register_tx = use_pool_register_transaction();
-
     let is_active = use_miner_is_active();
 
     let mut f = use_future(move || async move {
-        log::info!("Registering...");
         let Wallet::Connected(authority) = *wallet.read() else {
             return;
         };
-        log::info!("Registering (A)...");
         let Some(pool_url) = pool_url.cloned() else {
             return;
         };
-        log::info!("Registering (B)...");
+        if miner_status.cloned() != MinerStatus::Registering {
+            return;
+        }
         if let Ok(_member_record) = use_gateway().register(authority, pool_url).await {
-            log::info!("Registering (C)...");
             member.restart();
             member_record.restart();
             miner_status.set(MinerStatus::FetchingChallenge);
@@ -84,7 +82,6 @@ fn StopStartButton() -> Element {
 
     on_transaction_done(move |_sig| {
         if miner_status.cloned() == MinerStatus::Registering {
-            log::info!("Restarting future...");
             f.restart();
         }
     });
@@ -99,7 +96,6 @@ fn StopStartButton() -> Element {
                     if let Some(Ok(_member)) = member.cloned() {
                         miner_status.set(MinerStatus::FetchingChallenge);
                     } else if let Some(Ok(tx)) = register_tx.cloned() {
-                        log::info!("Submitting transaction...");
                         miner_status.set(MinerStatus::Registering);
                         submit_transaction(tx);
                     }
