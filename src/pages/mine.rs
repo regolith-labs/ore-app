@@ -18,7 +18,10 @@ pub fn Mine() -> Element {
                 title: "Mine",
                 subtitle: "Utilize spare hashpower to harvest ORE."
             }
-            StopStartButton {}
+            OrbMiner {
+                class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
+                gold: *use_miner_is_active().read()
+            }
             MinerData {}
             // TODO: Add activity table
         }
@@ -41,7 +44,7 @@ fn MinerData() -> Element {
     
     rsx! {
         Col {
-            class: "w-full flex-wrap mx-auto justify-between py-5",
+            class: "w-full flex-wrap mx-auto justify-between",
             gap: 8,            
             MinerStatus {}
             MinerHashpower {}
@@ -86,9 +89,14 @@ fn StopStartButton() -> Element {
         }
     });
 
+    let controls_class = if *is_active.read() {
+        "controls-secondary"
+    } else {
+        "controls-primary"
+    };
     rsx! {
         button {
-            class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16 group",
+            class: "flex flex-row gap-2 my-auto px-8 h-12 rounded-full {controls_class}",
             onclick: move |_| {
                 if *is_active.read() {
                     miner_status.set(MinerStatus::Stopped);
@@ -101,28 +109,17 @@ fn StopStartButton() -> Element {
                     }
                 }
             },
-            OrbMiner {
-                class: "absolute top-0 left-0 z-0",
-                gold: *is_active.read()
-            }
-            // cloning to get the value
             if !*is_active.read() {
+                PlayIcon { class: "my-auto h-5" }
                 span {
-                    class: "flex flex-row gap-2 my-auto mx-auto bg-white px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
-                    PlayIcon { class: "my-auto h-5" }
-                    span {
-                        class: "my-auto",
-                        "Start mining"
-                    }
+                    class: "my-auto",
+                    "Start"
                 }
             } else {
+                StopIcon { class: "my-auto h-5"  }
                 span {
-                    class: "flex flex-row gap-2 my-auto mx-auto bg-gray-300 px-4 h-12 text-black rounded-full font-semibold z-10 group-hover:scale-105 transition-transform",
-                    StopIcon { class: "my-auto h-5"  },
-                    span {
-                        class: "my-auto",
-                        "Stop mining"
-                    }
+                    class: "my-auto",
+                    "Stop"
                 }
             }
         }
@@ -142,15 +139,18 @@ fn MinerStatus() -> Element {
     });
     rsx! {
         Col {
-            // class: "min-w-56",
             gap: 4,
             span {
                 class: "text-elements-lowEmphasis font-medium",
                 "Status"
             }
-            span {
-                class: "font-semibold text-2xl sm:text-3xl",
-                "{status}"
+            Row {
+                class: "justify-between",
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl",
+                    "{status}"
+                }
+                StopStartButton {}
             }
         }
     }
