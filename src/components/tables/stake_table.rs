@@ -120,9 +120,9 @@ fn StakeTableRow(
             },
             right_2: rsx! {
                 StakeTableRowTVL {
-                    liquidity_pair,
                     boost,
-                    stake
+                    stake,
+                    liquidity_pair
                 }
             },
             right_3: rsx! {
@@ -299,7 +299,7 @@ fn StakeTableRowMultiplier(
 #[component]
 fn IdleTableRowTVL(
     boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>
+    stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let ore_price = use_ore_price();
     let tvl = use_memo(move || {
@@ -354,15 +354,12 @@ fn IdleTableRowTVL(
 
 #[component]
 fn StakeTableRowTVL(
-    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>
+    stake: Resource<GatewayResult<Stake>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let user_tvl = use_memo(move || {
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
-            return None;
-        };
-        let Some(Ok(boost)) = boost.cloned() else {
             return None;
         };
         let Some(Ok(stake)) = stake.cloned() else {
@@ -370,8 +367,8 @@ fn StakeTableRowTVL(
         };
         if stake.balance > 0 || stake.balance_pending > 0 {
             let total_balance = stake.balance + stake.balance_pending;
-            let total_deposits = boost.total_deposits + stake.balance_pending;
-            let user_tvl = (liquidity_pair.total_value_usd * (total_balance as f64 / total_deposits as f64)).floor() as u64;
+            // let total_deposits = boost.total_deposits + stake.balance_pending;
+            let user_tvl = (liquidity_pair.total_value_usd * (total_balance as f64 / liquidity_pair.shares as f64)).floor() as u64;
             Some(user_tvl.to_formatted_string(&Locale::en))
         } else {
             None
