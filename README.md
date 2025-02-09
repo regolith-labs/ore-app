@@ -1,6 +1,6 @@
 # ORE App
 
-Digital gold on Solana. 
+Liquid digital gold. 
 
 ## Get Started
 
