@@ -245,8 +245,7 @@ fn StakeTableRowMultiplier(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>
 ) -> Element {
-    // Get user's percentage of total deposits
-    let user_percentage = use_resource(move || async move {
+    let user_percentage = use_memo(move || {
         let Some(Ok(boost)) = boost.cloned() else {
             return None;
         };
@@ -259,7 +258,9 @@ fn StakeTableRowMultiplier(
         if boost.total_deposits == 0 {
             return None;
         }
-        let pct = stake.balance as f64 / boost.total_deposits as f64 * 100.0;
+        let pct = (stake.balance + stake.balance_pending) as f64 / 
+            (boost.total_deposits + stake.balance_pending) as f64 *
+            100.0;
         let pct = if pct < 1.0 {
             // Find first non-zero decimal place
             let mut decimals = 0;
@@ -282,7 +283,7 @@ fn StakeTableRowMultiplier(
                     class: "text-right my-auto font-medium",
                     "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
                 }
-                if let Some(Some(percentage)) = user_percentage.cloned() {
+                if let Some(percentage) = user_percentage.cloned() {
                     span {
                         class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
                         "{percentage}%"
@@ -322,8 +323,10 @@ fn IdleTableRowTVL(
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
-        if stake.balance > 0 {
-            let user_tvl = (tvl * (stake.balance as f64 / boost.total_deposits as f64)).floor() as u64;
+        if stake.balance > 0 || stake.balance_pending > 0 {
+            let total_balance = stake.balance + stake.balance_pending;
+            let total_deposits = boost.total_deposits + stake.balance_pending;
+            let user_tvl = (tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
             Some(user_tvl.to_formatted_string(&Locale::en))
         } else {
             None
@@ -355,7 +358,7 @@ fn StakeTableRowTVL(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>
 ) -> Element {
-    let user_tvl = use_resource(move || async move {
+    let user_tvl = use_memo(move || {
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return None;
         };
@@ -365,8 +368,10 @@ fn StakeTableRowTVL(
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
-        if stake.balance > 0 {
-            let user_tvl = (liquidity_pair.total_value_usd * (stake.balance as f64 / boost.total_deposits as f64)).floor() as u64;
+        if stake.balance > 0 || stake.balance_pending > 0 {
+            let total_balance = stake.balance + stake.balance_pending;
+            let total_deposits = boost.total_deposits + stake.balance_pending;
+            let user_tvl = (liquidity_pair.total_value_usd * (total_balance as f64 / total_deposits as f64)).floor() as u64;
             Some(user_tvl.to_formatted_string(&Locale::en))
         } else {
             None
@@ -379,7 +384,7 @@ fn StakeTableRowTVL(
                 UsdValue {
                     ui_amount_string: liquidity_pair.total_value_usd.to_string(),
                 }
-                if let Some(Some(user_tvl)) = user_tvl.cloned() {
+                if let Some(user_tvl) = user_tvl.cloned() {
                     span {
                         class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
                         "${user_tvl}"
