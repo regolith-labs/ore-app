@@ -212,11 +212,11 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
 fn LaunchButton() -> Element {
     rsx! {
         Link {
-            class: "flex px-6 h-12 my-auto rounded controls-primary rounded-full z-100",
+            class: "flex px-8 h-12 my-auto rounded controls-primary rounded-full z-100",
             to: Route::Mine {},
             span {
                 class: "my-auto",
-                "Start mining →"
+                "Launch app →"
             }
         }
     }
