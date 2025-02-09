@@ -40,7 +40,7 @@ pub fn Pair(lp_mint: String) -> Element {
                 subtitle: format!("Manage your {} position.", boost_meta.name.clone())
             }
             Col {
-                gap: 16,
+                class: "gap-16",
                 PairStakeForm {
                     class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                     boost_meta: boost_meta.clone(),
