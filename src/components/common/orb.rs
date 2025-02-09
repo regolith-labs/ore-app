@@ -24,7 +24,7 @@ pub fn OrbHero() -> Element {
             dangerous_inner_html: r#"
                 <spline-viewer
                     style="height: 100%; overflow: visible;" 
-                    url="https://prod.spline.design/Y2igVlaEL2MBaBOY/scene.splinecode"
+                    url="https://prod.spline.design/2XKuRwA88rO-PcmC/scene.splinecode"
                 />
             "#
         }
