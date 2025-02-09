@@ -25,15 +25,18 @@ fn Hero() -> Element {
 fn LiquidDigitalGold() -> Element {
     rsx! {
         Col {
-            class: "absolute left-0 right-0 bottom-32 sm:left-8 sm:right-8 md:bottom-0 md:top-0 font-extended font-bold text-7xl md:text-8xl lg:text-9xl text-center md:text-left text-elements-highEmphasis",
+            class: "absolute left-0 right-0 bottom-32 sm:left-8 sm:right-8 md:bottom-0 md:top-0 font-extended font-bold text-7xl md:text-8xl lg:text-9xl text-center md:text-left text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black",
             gap: 2,
             span {
-                class: "md:mt-auto",
+                class: "md:mt-auto z-30",
                 "Liquid"
             }
-            span { "Digital" }
+            span { 
+                class: "z-20",
+                "Digital" 
+            }
             span {
-                class: "md:mb-auto",
+                class: "md:mb-auto z-10",
                 "Gold" 
             }
         }
