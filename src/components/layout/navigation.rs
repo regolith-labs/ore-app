@@ -57,7 +57,8 @@ fn VisitorNavBar() -> Element {
             Row {
                 class: "w-full my-auto justify-between",
                 Logo {}
-                SocialLinks {}
+                // SocialLinks {}
+                LaunchButton {}
             }
         }
     }
@@ -208,7 +209,20 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
     }
 }
 
-fn SocialLinks() -> Element {
+fn LaunchButton() -> Element {
+    rsx! {
+        Link {
+            class: "flex px-6 h-12 my-auto rounded controls-primary rounded-full z-100",
+            to: Route::Mine {},
+            span {
+                class: "my-auto",
+                "Start mining →"
+            }
+        }
+    }
+}
+
+fn _SocialLinks() -> Element {
     let button_color = "text-white";
     rsx! {
         div {

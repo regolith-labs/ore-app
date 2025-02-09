@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{components::*, route::Route};
+use crate::components::*;
 
 pub fn Landing() -> Element {
     rsx! {
