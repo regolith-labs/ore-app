@@ -1,5 +1,5 @@
 use ore_pool_api::state::Member;
-use ore_pool_types::{ContributePayloadV2, Member as MemberRecord, MemberChallenge, RegisterPayload};
+use ore_pool_types::{ContributePayloadV2, Member as MemberRecord, MemberChallenge, RegisterPayload, PoolMemberMiningEvent};
 use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
@@ -13,6 +13,7 @@ pub trait PoolGateway {
     async fn poll_new_challenge(&self, authority: Pubkey, pool_url: String, last_hash_at: i64) -> GatewayResult<MemberChallenge>;
     async fn post_solution(&self, authority: Pubkey, pool_url: String, solution: &drillx::Solution) -> GatewayResult<()>;
     async fn register(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord>;
+    async fn get_latest_event(&self, authority: Pubkey, pool_url: String) -> GatewayResult<PoolMemberMiningEvent>;
 }
 
 impl<R: Rpc> PoolGateway for Gateway<R> {
@@ -21,6 +22,14 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
         let challenge = resp.json::<MemberChallenge>().await.map_err(GatewayError::from)?;
         Ok(challenge)
+    }
+
+    async fn get_latest_event(&self, authority: Pubkey, pool_url: String) -> GatewayResult<PoolMemberMiningEvent> {
+        let get_url = format!("{}/event/latest/{}", pool_url, authority);
+        let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
+        let latest_event = resp.json::<PoolMemberMiningEvent>().await.map_err(GatewayError::from)?;
+        log::info!("Latest event in get_latest_event: {:?}", latest_event);
+        Ok(latest_event)
     }
 
     async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64> {

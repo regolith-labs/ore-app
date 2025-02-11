@@ -7,7 +7,7 @@ use steel::Pubkey;
 
 use crate::{
     gateway::{pool::PoolGateway, GatewayResult}, 
-    hooks::{use_gateway, use_member_record, use_miner, use_miner_is_active, use_miner_status, use_pool_url, use_wallet, GetPubkey, MinerStatus}
+    hooks::{use_gateway, use_member_record, use_miner, use_miner_events, use_miner_is_active, use_miner_status, use_pool_url, use_wallet, GetPubkey, MinerStatus}
 };
 
 pub fn use_mining_loop() {
@@ -103,6 +103,7 @@ fn use_solution_contribute(
     let pool_url = use_pool_url();
     let mut member_record = use_member_record();
     let mut miner_status = use_miner_status();
+    let mut miner_events = use_miner_events();
     let is_active = use_miner_is_active();
     use_effect(move || {
         // Check status
@@ -115,17 +116,24 @@ fn use_solution_contribute(
         if !*is_active.read() {
             return;
         }
-
         // Process messsage from miner
         match *from_miner.read() {
             OutputMessage::Solution(solution) => {
                 // Submit solution
                 spawn(async move {
                     miner_status.set(MinerStatus::SubmittingSolution);
-                    if let Err(err) = use_gateway().post_solution(pubkey, pool_url, &solution).await {
+                    if let Err(err) = use_gateway().post_solution(pubkey, pool_url.clone(), &solution).await {
                         log::error!("Error posting solution: {:?}", err);
                     }
                     member_record.restart();
+                    match use_gateway().get_latest_event(pubkey, pool_url.clone()).await {
+                        Ok(latest_event) => {
+                            miner_events.write().push(latest_event);                            
+                        }
+                        Err(err) => {
+                            log::error!("Error getting latest event: {:?}", err);
+                        }
+                    }                    
                 });
             }
             OutputMessage::Expired(lha) => {
