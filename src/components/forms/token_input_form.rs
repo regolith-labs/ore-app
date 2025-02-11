@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{components::{Col, LoadingValue, Row}, config::Token, gateway::{GatewayResult, UiTokenAmount}};
+use crate::{components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Row, TokenPicker}, config::Token, gateway::{GatewayResult, UiTokenAmount}};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum TokenInputError {
@@ -19,16 +19,22 @@ impl ToString for TokenInputError {
 pub fn TokenInputForm(
     class: Option<String>,
     title: String,
-    token: Option<Token>,
+    token: Signal<Option<Token>>,
     balance: Resource<GatewayResult<UiTokenAmount>>,
     value: Signal<String>,
     mut update: Signal<String>,
     err: Signal<Option<TokenInputError>>,
     toolbar_shortcuts: Option<bool>,
+    with_picker: Option<bool>,
+    loading: Option<bool>,
+    disabled: Option<bool>,
 ) -> Element {
     let class = class.unwrap_or("".to_string());
-
-    let color = if let Some(token) = token.clone() {
+    let disabled = disabled.unwrap_or(false);
+    let loading = loading.unwrap_or(false);
+    let with_picker = with_picker.unwrap_or(false);
+    let display_picker = use_signal(|| false);
+    let color = if let Some(token) = token.cloned() {
         match err.cloned() {
             Some(TokenInputError::InsufficientBalance(err_token)) if err_token.ticker == token.ticker => {
                 "text-red-500"
@@ -39,17 +45,29 @@ pub fn TokenInputForm(
         "text-elements-primary"
     };
 
+    let placeholder = if disabled {
+        "".to_string()
+    } else {
+        "0".to_string()
+    };
+
+    let disabled_class = if disabled {
+        "hover:cursor-not-allowed"
+    } else {
+        ""
+    };
+
     rsx! {
         Col {
             class: "{class}",
-            gap: 4,
+            gap: 2,
             Row {
                 class: "justify-between",
                 span {
                     class: "text-elements-lowEmphasis my-auto pl-1",
                     "{title}"
                 }
-                if let Some(token) = token.clone() {
+                if let Some(token) = token.cloned() {
                     Toolbar {
                         balance: balance.clone(),
                         token: token.clone(),
@@ -59,30 +77,77 @@ pub fn TokenInputForm(
                 }
             }
             Row {
-                gap: 4,
-                if let Some(token) = token.clone() {
-                    Row {
-                        class: "my-auto",
-                        gap: 2,
-                        img {
-                            class: "w-8 h-8 rounded-full",
-                            src: "{token.image}",
-                        }
-                        span {
-                            class: "font-semibold my-auto",
-                            "{token.ticker}"
-                        }
+                class: "justify-between",
+                if let Some(token) = token.cloned() {
+                    TokenDisplay { 
+                        token,
+                        with_picker,
+                        display_picker,
                     }
-                    input {
-                        class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-10 pr-1 w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none {color}",
-                        placeholder: "0",
-                        r#type: "number",
-                        inputmode: "decimal",
-                        value: value.read().clone(),
-                        oninput: move |e: FormEvent| update.set(e.value()),
+                    if loading {
+                        LoadingValue {
+                            size: LoadingValueSize::Large,
+                        }
+                    } else {
+                        input {
+                            class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-12 pr-1 my-auto w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none {color} {disabled_class}",
+                            placeholder: placeholder.clone(),
+                            r#type: "number",
+                            step: "any",
+                            inputmode: "decimal",
+                            disabled: disabled,
+                            value: value.read().clone(),
+                            oninput: move |e: FormEvent| update.set(e.value()),
+                        }
                     }
                 } else {
-                    LoadingValue {}
+                    LoadingValue {
+                        size: LoadingValueSize::Large,
+                    }
+                }
+            }
+        }
+
+        // Token picker
+        if display_picker.cloned() {
+            TokenPicker {
+                show: display_picker,
+                token,
+            }
+        }
+    }
+}
+
+#[component]
+fn TokenDisplay(token: Token, with_picker: bool, display_picker: Signal<bool>) -> Element {
+    rsx! {
+        if with_picker {
+            button {
+                class: "flex flex-row gap-2 items-center gap-2 p-2 -ml-2 hover:bg-controls-secondaryHover rounded cursor-pointer shrink-0",
+                onclick: move |_| display_picker.set(true),
+                img {
+                    class: "w-8 h-8 rounded-full",
+                    src: "{token.image}",
+                }
+                span {
+                    class: "font-semibold my-auto",
+                    "{token.ticker}"
+                }
+                CarrotDownIcon {
+                    class: "w-4 my-auto opacity-50" 
+                }
+            }
+        } else {
+            Row {
+                class: "my-auto h-12",
+                gap: 2,
+                img {
+                    class: "w-8 h-8 rounded-full my-auto",
+                    src: "{token.image}",
+                }
+                span {
+                    class: "font-semibold my-auto",
+                    "{token.ticker}"
                 }
             }
         }

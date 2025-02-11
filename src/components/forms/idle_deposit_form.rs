@@ -12,6 +12,7 @@ pub fn IdleDepositForm(
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let mut input_amount = use_signal::<String>(|| "".to_owned());
+    let token = use_signal(|| Some(Token::ore()));
     let err = use_signal::<Option<TokenInputError>>(|| None);
 
     // Build the transaction
@@ -32,7 +33,7 @@ pub fn IdleDepositForm(
                 class: "lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0 p-4",
                 title: "Deposit".to_string(),
                 balance,
-                token: Token::ore(),
+                token,
                 value: input_amount,
                 update: input_amount,
                 toolbar_shortcuts: true,
