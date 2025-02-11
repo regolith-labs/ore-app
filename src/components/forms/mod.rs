@@ -7,6 +7,7 @@ mod token_input_form;
 mod idle_stake_form;
 mod idle_deposit_form;
 mod idle_withdraw_form;
+mod token_picker;
 
 pub use pair_deposit_form::*;
 pub use pair_stake_form::*;
@@ -17,3 +18,4 @@ pub use token_input_form::*;
 pub use idle_stake_form::*;
 pub use idle_deposit_form::*;
 pub use idle_withdraw_form::*;
+pub use token_picker::*;

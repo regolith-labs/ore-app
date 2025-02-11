@@ -14,6 +14,7 @@ pub fn IdleWithdrawForm(
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let mut input_amount = use_signal::<String>(|| "".to_owned());
+    let token = use_signal(|| Some(Token::ore()));
     let err = use_signal::<Option<TokenInputError>>(|| None);
     
     // Get the stake balance
@@ -49,7 +50,7 @@ pub fn IdleWithdrawForm(
                 class: "lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0 p-4",
                 title: "Withdraw".to_string(),
                 balance: stake_balance,
-                token: Token::ore(),
+                token,
                 value: input_amount,
                 update: input_amount,
                 toolbar_shortcuts: true,

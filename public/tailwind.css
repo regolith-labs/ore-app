@@ -1005,6 +1005,9 @@
   .bg-black\/50 {
     background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
   }
+  .bg-blue-500 {
+    background-color: var(--color-blue-500);
+  }
   .bg-controls-secondary {
     background-color: var(--color-controls-secondary);
   }
@@ -1013,6 +1016,12 @@
   }
   .bg-gray-900 {
     background-color: var(--color-gray-900);
+  }
+  .bg-green-500 {
+    background-color: var(--color-green-500);
+  }
+  .bg-red-500 {
+    background-color: var(--color-red-500);
   }
   .bg-surface-elevated {
     background-color: var(--color-surface-elevated);
@@ -1283,6 +1292,13 @@
   .placeholder\:text-gray-700 {
     &::placeholder {
       color: var(--color-gray-700);
+    }
+  }
+  .hover\:cursor-not-allowed {
+    &:hover {
+      @media (hover: hover) {
+        cursor: not-allowed;
+      }
     }
   }
   .hover\:cursor-pointer {

@@ -22,6 +22,8 @@ pub fn PairDepositForm(
     token_b_balance: Resource<GatewayResult<UiTokenAmount>>
 ) -> Element {
     let class = class.unwrap_or_default();
+    let mut token_a = use_signal(|| None);
+    let mut token_b = use_signal(|| None);
     let mut input_amount_a = use_signal::<String>(|| "".to_owned());
     let mut input_amount_b = use_signal::<String>(|| "".to_owned());
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
@@ -48,11 +50,15 @@ pub fn PairDepositForm(
     );
     
     // Get tokens
-    let (token_a, token_b) = if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-        (Some(liquidity_pair.token_a), Some(liquidity_pair.token_b))
-    } else {
-        (None, None)
-    };
+    use_effect(move || {
+        let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+            token_a.set(None);
+            token_b.set(None);
+            return;
+        };
+        token_a.set(Some(liquidity_pair.token_a));
+        token_b.set(Some(liquidity_pair.token_b));
+    });
 
     // Update input values based on updates from the form
     let mut process_input_stream = move |val: String, flag: bool| {
