@@ -11,7 +11,7 @@ pub fn WalletAdapter() -> Element {
 
     let mut wallet_mount = use_future(move || async move {
         if Wallet::Disconnected == wallet.cloned() {
-            async_std::task::sleep(Duration::from_millis(100)).await;
+            async_std::task::sleep(Duration::from_millis(1000)).await;
             let eval = eval(
                 r#"
                     window.MountWalletAdapter();

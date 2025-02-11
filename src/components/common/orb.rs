@@ -20,11 +20,11 @@ use dioxus::prelude::*;
 pub fn OrbHero() -> Element {
     rsx! {
         div {
-            class: "bg-transparent mx-auto",
+            class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible",
             dangerous_inner_html: r#"
                 <spline-viewer
-                    style="height: 12rem; width: 12rem;" 
-                    url="https://prod.spline.design/zyaww3tr0AUmyWMP/scene.splinecode"
+                    style="height: 100%; overflow: visible;" 
+                    url="https://prod.spline.design/2XKuRwA88rO-PcmC/scene.splinecode"
                 />
             "#
         }

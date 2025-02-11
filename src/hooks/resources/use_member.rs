@@ -3,10 +3,18 @@ use ore_pool_api::state::Member;
 use ore_pool_types::Member as MemberRecord;
 
 use crate::{
-    config::Pool, gateway::{pool::PoolGateway, GatewayError, GatewayResult}, hooks::{use_gateway, use_wallet, GetPubkey}
+    gateway::{pool::PoolGateway, GatewayError, GatewayResult}, hooks::{use_gateway, use_pool, use_wallet, GetPubkey}
 };
 
-pub fn use_member(pool: Resource<Pool>) -> Resource<GatewayResult<Member>> {
+pub(crate) fn use_members_provider() {
+    let r = use_member_resource();
+    use_context_provider::<Resource<GatewayResult<Member>>>(|| r);
+    let r = use_member_record_resource();
+    use_context_provider::<Resource<GatewayResult<MemberRecord>>>(|| r);
+}
+
+fn use_member_resource() -> Resource<GatewayResult<Member>> {
+    let pool = use_pool();
     let wallet = use_wallet();
     use_resource(move || async move {
         let pubkey = wallet.pubkey()?;
@@ -18,7 +26,12 @@ pub fn use_member(pool: Resource<Pool>) -> Resource<GatewayResult<Member>> {
     })
 }
 
-pub fn use_member_record(pool: Resource<Pool>) -> Resource<GatewayResult<MemberRecord>> {
+pub fn use_member() -> Resource<GatewayResult<Member>> {
+    use_context()
+}
+
+fn use_member_record_resource() -> Resource<GatewayResult<MemberRecord>> {
+    let pool = use_pool();
     let wallet = use_wallet();
     use_resource(move || async move {
         let pubkey = wallet.pubkey()?;
@@ -27,4 +40,8 @@ pub fn use_member_record(pool: Resource<Pool>) -> Resource<GatewayResult<MemberR
         };
         use_gateway().get_member_record(pubkey, pool.url).await
     })
+}
+
+pub fn use_member_record() -> Resource<GatewayResult<MemberRecord>> {
+    use_context()
 }

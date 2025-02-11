@@ -1,6 +1,7 @@
 use async_std::future::TimeoutError;
 use steel::ProgramError;
 
+#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GatewayError {
     FailedDeserialization,

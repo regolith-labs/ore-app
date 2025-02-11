@@ -8,7 +8,7 @@ use super::GatewayError;
 
 pub type GatewayResult<T> = Result<T, GatewayError>;
 
-pub async fn retry<F, Fut, T>(f: F) -> GatewayResult<T>
+pub async fn _retry<F, Fut, T>(f: F) -> GatewayResult<T>
 where
     F: Fn() -> Fut,
     Fut: Future<Output = GatewayResult<T>>,
