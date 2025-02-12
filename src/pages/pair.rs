@@ -16,18 +16,18 @@ use crate::{
 pub fn Pair(lp_mint: String) -> Element {
     let lp_mint = Pubkey::from_str(&lp_mint).unwrap();
     let boost_meta = LISTED_BOOSTS_BY_MINT.get(&lp_mint).unwrap();
-    let liquidity_pair = use_liquidity_pair(boost_meta.clone());
-    let lp_balance = use_token_balance(lp_mint);
+    let mut liquidity_pair = use_liquidity_pair(boost_meta.clone());
+    let mut lp_balance = use_token_balance(lp_mint);
     let mut boost = use_boost(lp_mint);
     let mut stake = use_stake(lp_mint);
-    let (mut token_a_balance, mut token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
+    let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
     
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
-        token_a_balance.restart();
-        token_b_balance.restart();
         stake.restart();
         boost.restart();
+        liquidity_pair.restart();
+        lp_balance.restart();
     });
 
     rsx! {
