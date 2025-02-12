@@ -25,11 +25,11 @@ pub fn PairStakeForm(
 
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
-        liquidity_pair.restart();
-        stake.restart();
-        token_a_balance.restart();
-        token_b_balance.restart();
-        lp_balance.restart();
+        // liquidity_pair.restart();
+        // stake.restart();
+        // token_a_balance.restart();
+        // token_b_balance.restart();
+        // lp_balance.restart();
     });
 
     rsx! {
