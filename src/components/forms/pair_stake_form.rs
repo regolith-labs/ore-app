@@ -23,15 +23,6 @@ pub fn PairStakeForm(
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);
 
-    // Refresh data, if transaction success
-    on_transaction_done(move |_sig| {
-        // liquidity_pair.restart();
-        // stake.restart();
-        // token_a_balance.restart();
-        // token_b_balance.restart();
-        // lp_balance.restart();
-    });
-
     rsx! {
         Col {
             class: "{class}",
