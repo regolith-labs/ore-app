@@ -65,12 +65,6 @@ pub fn use_pair_withdraw_transaction(
             .checked_div(stake_a_balance_u64 as u128)
             .unwrap() as u64;
 
-        log::info!("shares_amount: {}", shares_amount);
-        log::info!("stake.balance: {}", stake.balance);
-        log::info!("stake.balance_pending: {}", stake.balance_pending);
-        log::info!("amount_a_u64: {}", amount_a_u64);
-        log::info!("stake_a_balance_u64: {}", stake_a_balance_u64);
-
         // Check if shares amount is sufficient
         if shares_amount > stake.balance + stake.balance_pending {
             err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_a.clone())));

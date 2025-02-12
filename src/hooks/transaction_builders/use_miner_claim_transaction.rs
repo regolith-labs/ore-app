@@ -19,12 +19,8 @@ pub fn use_miner_claim_transaction(
             return Err(GatewayError::WalletDisconnected);
         };        
     
-        // Destructure member_on_chain from Resouce<Result<Member>>
-        // let data = &*member_on_chain.value().read_unchecked();
+        // Destructure member_on_chain 
         let data = &*member_on_chain.value().read_unchecked();
-        // let Some(Ok (data)) = member_on_chain.cloned() else {return Err(GatewayError::Unknown)};
-        
-        // log::info!("user_miner data: {:?}", data);
         
         // Get member data from Member
         let member_data = match data {
@@ -33,8 +29,6 @@ pub fn use_miner_claim_transaction(
             None => return Err(GatewayError::Unknown), // Handle the None case
         };  
 
-        log::info!("Miner data: {:?}", member_data);
-
         // Check if miner has no balance to claim
         if member_data.balance <= 0 {
             return Err(GatewayError::Unknown);
@@ -42,12 +36,10 @@ pub fn use_miner_claim_transaction(
         
         // Aggregate instructions
         let mut ixs = vec![];
-
         let gateway = use_gateway();
 
         // Get the associated token address for miner
         let ata_address = get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
-        // log::info!("Associated token address: {:?}", ata_address);
 
         // Check if the associated token account exists
         if gateway.rpc.get_token_account(&ata_address).await.is_err() {            
@@ -64,16 +56,12 @@ pub fn use_miner_claim_transaction(
 
         // Use the ata_address directly since it should now exist
         let beneficiary = ata_address; 
-        // log::info!("Beneficiary address: {:?}", beneficiary);
 
         // Add claim transaction
         ixs.push(ore_pool_api::sdk::claim(authority, beneficiary, member_data.pool, member_data.balance));
-        // log instructions vector
-        // log::info!("Instructions: {:?}", ixs);
        
         // Build transaction
         let tx: VersionedTransaction = Transaction::new_with_payer(&ixs, Some(&authority)).into();
-        // log::info!("Transaction: {:?}", tx);
         Ok(tx)
     })
 }
