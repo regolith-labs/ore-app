@@ -4,6 +4,7 @@ use num_format::{Locale, ToFormattedString};
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum TokenValueSize {
+    XSmall,
     Small,
     Large,
 }

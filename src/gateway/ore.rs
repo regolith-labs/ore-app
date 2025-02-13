@@ -2,16 +2,23 @@ use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
-use super::{GatewayError, GatewayResult, Rpc};
+use super::{Gateway, GatewayError, GatewayResult, Rpc};
+
+const ORE_API_URL: &str = "https://api.ore.supply";
 
 pub trait OreGateway {
+    // Accounts
     async fn get_boost(&self, address: Pubkey) -> GatewayResult<Boost>;
     async fn get_stake(&self, address: Pubkey) -> GatewayResult<Stake>;
+
+    // API
+    async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64>;
 }
 
-impl<R: Rpc> OreGateway for R {
+impl<R: Rpc> OreGateway for Gateway<R> {
     async fn get_boost(&self, address: Pubkey) -> GatewayResult<Boost> {
         let data = self
+            .rpc
             .get_account_data(&address)
             .await
             .map_err(GatewayError::from)?;
@@ -20,9 +27,17 @@ impl<R: Rpc> OreGateway for R {
 
     async fn get_stake(&self, address: Pubkey) -> GatewayResult<Stake> {
         let data = self
+            .rpc
             .get_account_data(&address)
             .await
             .map_err(GatewayError::from)?;
         Ok(*Stake::try_from_bytes(&data)?)
+    }
+
+    async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64> {
+        let get_url = format!("{}/boosts/{}/yield", ORE_API_URL, boost_address);
+        let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
+        let yield_7d = resp.json::<f64>().await.map_err(GatewayError::from)?;
+        Ok(yield_7d)
     }
 }

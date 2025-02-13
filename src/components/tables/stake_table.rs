@@ -2,14 +2,14 @@ use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
+use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
     components::*, 
     config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, 
     gateway::GatewayResult, 
-    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_ore_price, OrePrice}, 
+    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl}, 
     route::Route,
     utils::LiquidityPair
 };
@@ -86,6 +86,7 @@ fn IdleTableRow(
             },
             right_3: rsx! {
                 StakeTableRowYield {
+                    mint_address: MINT_ADDRESS,
                     boost,
                     stake,
                 }
@@ -120,6 +121,7 @@ fn StakeTableRow(
             },
             right_2: rsx! {
                 StakeTableRowTVL {
+                    boost_meta: boost_meta.clone(),
                     boost,
                     stake,
                     liquidity_pair
@@ -127,6 +129,7 @@ fn StakeTableRow(
             },
             right_3: rsx! {
                 StakeTableRowYield {
+                    mint_address: boost_meta.lp_mint,
                     boost,
                     stake,
                 }
@@ -301,20 +304,10 @@ fn IdleTableRowTVL(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
-    let ore_price = use_ore_price();
-    let tvl = use_memo(move || {
-        let Some(Ok(boost)) = *boost.read() else {
-            return None;
-        };
-        let Some(OrePrice(ore_price_f64)) = ore_price.cloned() else {
-            return None;
-        };
-        let total_deposits_f64 = amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS);
-        Some(ore_price_f64 * total_deposits_f64)
-    });
+    let boost_tvl = use_boost_tvl(MINT_ADDRESS);
 
     let user_tvl = use_memo(move || {
-        let Some(tvl) = tvl.cloned() else {
+        let Ok(boost_tvl) = boost_tvl.cloned() else {
             return None;
         };
         let Some(Ok(boost)) = boost.cloned() else {
@@ -326,7 +319,7 @@ fn IdleTableRowTVL(
         if stake.balance > 0 || stake.balance_pending > 0 {
             let total_balance = stake.balance + stake.balance_pending;
             let total_deposits = boost.total_deposits + stake.balance_pending;
-            let user_tvl = (tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
+            let user_tvl = (boost_tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
             Some(user_tvl.to_formatted_string(&Locale::en))
         } else {
             None
@@ -334,10 +327,10 @@ fn IdleTableRowTVL(
     });
 
     rsx! {
-        if let Some(tvl) = tvl.cloned() {
+        if let Ok(boost_tvl) = boost_tvl.cloned() {
             Col {
                 UsdValue {
-                    ui_amount_string: tvl.to_string(),
+                    ui_amount_string: boost_tvl.to_string(),
                 }
                 if let Some(user_tvl) = user_tvl.cloned() {
                     span {
@@ -354,10 +347,13 @@ fn IdleTableRowTVL(
 
 #[component]
 fn StakeTableRowTVL(
+    boost_meta: BoostMeta,
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
+    let boost_tvl = use_boost_tvl(boost_meta.lp_mint);
+
     let user_tvl = use_memo(move || {
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return None;
@@ -376,10 +372,10 @@ fn StakeTableRowTVL(
     });
 
     rsx! {
-        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
+        if let Ok(boost_tvl) = boost_tvl.cloned() {
             Col {
                 UsdValue {
-                    ui_amount_string: liquidity_pair.total_value_usd.to_string(),
+                    ui_amount_string: boost_tvl.to_string(),
                 }
                 if let Some(user_tvl) = user_tvl.cloned() {
                     span {
@@ -395,23 +391,27 @@ fn StakeTableRowTVL(
 }
 
 #[component]
-fn StakeTableRowYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+fn StakeTableRowYield(mint_address: Pubkey, boost: Resource<GatewayResult<Boost>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+    let apy = use_boost_apy(mint_address);
     rsx! {
-        if let Some(stake) = stake.cloned() {
-            if let Ok(stake) = stake {
-                if stake.rewards > 0 {
-                    OreValue {
-                        ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                        with_decimal_units: true,
-                        size: TokenValueSize::Small,
-                        gold: true,
-                        abbreviated: true,
-                    }
-                } else {
-                    NullValue {}
+        if let Ok(apy) = apy.cloned() {
+            Col {
+                span {
+                    class: "text-right my-auto font-medium",
+                    "{apy:.0}%"
                 }
-            } else {
-                NullValue {}
+                if let Some(Ok(stake)) = stake.cloned() {
+                    if stake.rewards > 0 {
+                        OreValue {
+                            class: "text-right ml-auto",
+                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                            with_decimal_units: true,
+                            size: TokenValueSize::XSmall,
+                            gold: true,
+                            abbreviated: true,
+                        }
+                    }
+                }
             }
         } else {
             TableCellLoading {}
