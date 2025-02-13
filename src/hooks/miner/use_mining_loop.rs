@@ -128,7 +128,7 @@ fn use_solution_contribute(
                     member_record.restart();
                     match use_gateway().get_latest_event(pubkey, pool_url.clone()).await {
                         Ok(latest_event) => {
-                            miner_events.write().push(latest_event);                            
+                            miner_events.write().push(latest_event);    
                         }
                         Err(err) => {
                             log::error!("Error getting latest event: {:?}", err);
