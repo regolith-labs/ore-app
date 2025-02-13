@@ -69,7 +69,8 @@ pub fn TableHeader(
 }
 
 #[component]
-pub fn TableRow(
+pub fn TableRowExternalLink(
+    to: String,
     left: Element,
     right_1: Element,
     right_2: Option<Element>,
@@ -77,7 +78,9 @@ pub fn TableRow(
     right_4: Option<Element>,
 ) -> Element {
     rsx! {
-        Row {
+        Link {
+            to: to,
+            new_tab: true,
             class: "flex flex-row w-full min-w-max px-5 sm:px-3 h-20 sm:rounded-md transition hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
             span {
                 class: "w-screen sm:w-full sm:min-w-96 my-auto -ml-5 sm:ml-0 px-5 sm:px-0",

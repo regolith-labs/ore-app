@@ -36,7 +36,7 @@ pub fn MineTable() -> Element {
                                 tr {
                                     td {
                                         colspan: "4",
-                                        class: "flex flex-row items-center justify-start pt-16 text-elements-lowEmphasis px-5 sm:px-3",
+                                        class: "flex flex-row justify-start pt-16 text-elements-lowEmphasis px-5 sm:px-3",
                                         "No activity yet"
                                     }
                                 }
@@ -64,7 +64,8 @@ fn MineTableRow(
     event: MiningEvent
 ) -> Element {
     rsx! {
-        TableRow {
+        TableRowExternalLink {
+            to: format!("https://solscan.io/tx/{}", event.signature),
             left: rsx! {
                 MineTableRowTitle {
                     timestamp: event.timestamp
@@ -102,13 +103,12 @@ fn MineTableRowTitle(
     let time = datetime.format("%I:%M %p");
     rsx! {
         Col {
-            class: "gap-4 my-auto",
             span {
-                class: "font-semibold my-auto",
+                class: "font-medium my-auto",
                 "{date}"
             }            
             span {
-                class: "font-medium text-xs text-elements-lowEmphasis",
+                class: "text-xs text-elements-lowEmphasis",
                 "{time}"
             }                        
         }
@@ -139,13 +139,12 @@ fn MineTableRowScore(
 ) -> Element {    
     rsx! {
         Col {
-            class: "gap-4 my-auto",
             span {
-                class: "font-semibold my-auto",
+                class: "font-medium my-auto",
                 "{pool_score}"
             }            
             span {
-                class: "font-medium text-xs text-elements-lowEmphasis",
+                class: "text-xs text-elements-lowEmphasis",
                 "{member_score}"
             }                        
         }
@@ -159,19 +158,20 @@ fn MineTableRowYield(
 ) -> Element {
     rsx! {
         Col {
-            class: "gap-4 my-auto justify-end",
             OreValue {
+                class: "text-right ml-auto font-medium",
                 ui_amount_string: amount_to_ui_amount_string(net_reward, TOKEN_DECIMALS),
                 with_decimal_units: true,
                 size: TokenValueSize::Small,
-                gold: true,
+                gold: false,
                 abbreviated: true,
             }
             OreValue {
+                class: "text-right ml-auto",
                 ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
                 with_decimal_units: true,
-                size: TokenValueSize::Small,
-                gold: false,
+                size: TokenValueSize::XSmall,
+                gold: true,
                 abbreviated: true,
             }
         }
