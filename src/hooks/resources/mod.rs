@@ -1,4 +1,7 @@
+
 mod use_boost;
+mod use_boost_apy;
+mod use_boost_tvl;
 mod use_liquidity_pair;
 mod use_stake;
 mod use_token_balance;
@@ -6,6 +9,8 @@ mod use_ore_price;
 mod use_member;
 
 pub use use_boost::*;
+pub use use_boost_apy::*;
+pub use use_boost_tvl::*;
 pub use use_liquidity_pair::*;
 pub use use_stake::*;
 pub use use_token_balance::*;
@@ -18,4 +23,5 @@ pub fn use_cache_provider() {
     use_stakes_provider();
     use_ore_price_provider();
     use_members_provider();
+    use_boost_yield_provider();
 }

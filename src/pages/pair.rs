@@ -16,7 +16,7 @@ use crate::{
 pub fn Pair(lp_mint: String) -> Element {
     let lp_mint = Pubkey::from_str(&lp_mint).unwrap();
     let boost_meta = LISTED_BOOSTS_BY_MINT.get(&lp_mint).unwrap();
-    let mut liquidity_pair = use_liquidity_pair(boost_meta.clone());
+    let mut liquidity_pair = use_liquidity_pair(lp_mint);
     let mut lp_balance = use_token_balance(lp_mint);
     let mut boost = use_boost(lp_mint);
     let mut stake = use_stake(lp_mint);

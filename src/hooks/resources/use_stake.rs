@@ -34,7 +34,7 @@ fn use_stake_resource(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
             Wallet::Connected(authority) => {
                 let boost_address = boost_pda(mint_address).0;
                 let stake_address = stake_pda(authority, boost_address).0;
-                use_gateway().rpc.get_stake(stake_address).await.map_err(GatewayError::from)
+                use_gateway().get_stake(stake_address).await.map_err(GatewayError::from)
             }
         }
     })

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use dioxus::prelude::*;
 use steel::Pubkey;
 
-use crate::{config::{BoostMeta, LpType, LISTED_BOOSTS, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayResult, Rpc}, hooks::use_gateway, utils::LiquidityPair};
+use crate::{config::{LpType, LISTED_BOOSTS, LISTED_BOOSTS_BY_MINT, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc}, hooks::use_gateway, utils::LiquidityPair};
 
 
 
@@ -13,16 +13,19 @@ pub(crate) fn use_liquidity_pairs_provider() {
 
     // Listed liquidity pairs
     for boost_meta in LISTED_BOOSTS.iter() {
-        liquidity_pairs.insert(boost_meta.lp_mint, use_liquidity_pair_resource(boost_meta.clone()));
+        liquidity_pairs.insert(boost_meta.lp_mint, use_liquidity_pair_resource(boost_meta.lp_mint));
     }
 
     // Setup context provider
     use_context_provider(|| liquidity_pairs);
 }
 
-fn use_liquidity_pair_resource(boost_meta: BoostMeta) -> Resource<GatewayResult<LiquidityPair>> {
-    let lp_type: LpType = boost_meta.lp_type;
+fn use_liquidity_pair_resource(lp_mint_address: Pubkey) -> Resource<GatewayResult<LiquidityPair>> {
     use_resource(move || async move {
+        let Some(boost_meta) = LISTED_BOOSTS_BY_MINT.get(&lp_mint_address) else {
+            return Err(GatewayError::Unknown);
+        };
+        let lp_type: LpType = boost_meta.lp_type;
         let lp_mint_supply = use_gateway().rpc.get_token_supply(&boost_meta.lp_mint).await?;
         match lp_type {
             LpType::Kamino => {
@@ -58,12 +61,12 @@ fn use_liquidity_pair_resource(boost_meta: BoostMeta) -> Resource<GatewayResult<
 }
 
 
-pub fn use_liquidity_pair(boost_meta: BoostMeta) -> Resource<GatewayResult<LiquidityPair>> {
+pub fn use_liquidity_pair(lp_mint_address: Pubkey) -> Resource<GatewayResult<LiquidityPair>> {
     let liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>> = use_context();
-    if let Some(liquidity_pair) = liquidity_pairs.get(&boost_meta.lp_mint) {
+    if let Some(liquidity_pair) = liquidity_pairs.get(&lp_mint_address) {
         *liquidity_pair
     } else {
-        use_liquidity_pair_resource(boost_meta.clone())
+        use_liquidity_pair_resource(lp_mint_address)
     }
 }
 

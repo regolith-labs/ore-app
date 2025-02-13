@@ -28,7 +28,7 @@ pub(crate) fn use_boosts_provider() {
 
 fn use_boost_resource(address: Pubkey) -> Resource<GatewayResult<Boost>> {
     use_resource(move || async move {
-        use_gateway().rpc.get_boost(address).await.map_err(GatewayError::from)
+        use_gateway().get_boost(address).await.map_err(GatewayError::from)
     })
 }
 
