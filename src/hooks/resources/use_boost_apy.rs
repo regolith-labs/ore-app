@@ -7,7 +7,7 @@ use steel::Pubkey;
 
 use crate::{config::LISTED_BOOSTS, gateway::{ore::OreGateway, GatewayError, GatewayResult}, hooks::use_gateway};
 
-use super::{use_boost_tvl, use_ore_price, OrePrice};
+use super::{use_boost, use_boost_tvl, use_liquidity_pair, use_ore_price, OrePrice};
 
 pub type BoostYield = f64;
 
@@ -48,6 +48,8 @@ pub fn use_boost_yield(mint_address: Pubkey) -> Resource<GatewayResult<BoostYiel
 pub fn use_boost_apy(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
     let boost_yield = use_boost_yield(mint_address);
     let boost_tvl = use_boost_tvl(mint_address);
+    let boost = use_boost(mint_address);
+    let liquidity_pair = use_liquidity_pair(mint_address);
     let ore_price = use_ore_price();
     use_memo(move || {
         let Some(Ok(boost_yield)) = boost_yield.cloned() else {
@@ -56,9 +58,24 @@ pub fn use_boost_apy(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
         let Ok(boost_tvl) = boost_tvl.cloned() else {
             return Err(GatewayError::Unknown);
         };
+        let Some(Ok(boost)) = boost.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
         let Some(OrePrice(ore_price_f64)) = ore_price.cloned() else {
             return Err(GatewayError::Unknown);
         };
+
+        // Adjust TVL for boost deposits
+        let boost_tvl = if mint_address == MINT_ADDRESS {
+            boost_tvl
+        } else {
+            let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
+                return Err(GatewayError::Unknown);
+            };
+            let deposited_shares_pct = boost.total_deposits as f64 / liquidity_pair.shares as f64;
+            boost_tvl * deposited_shares_pct   
+        };
+        
         let apy = ((boost_yield * ore_price_f64) / boost_tvl) * 52.0 * 100.0;
         Ok(apy)
     })
