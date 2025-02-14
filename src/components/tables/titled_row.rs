@@ -5,12 +5,11 @@ use crate::{components::{Col, InfoIcon, LoadingValue, NullValue, Row}, gateway::
 #[component]
 pub fn TitledRow(title: String, description: String, value: Element) -> Element {
     let mut open = use_signal(|| false);
-    let color = if *open.read() { "" } else { "" };
     let max_height = if *open.read() { "max-h-96" } else { "max-h-0" };
     let opacity = if *open.read() { "opacity-100" } else { "opacity-0" };
     rsx! {
         button {
-            class: "flex flex-col gap-4 px-0 sm:px-3 transition-all rounded duration-300 ease-in-out group hover:cursor-pointer {color}",
+            class: "flex flex-col gap-4 py-4 px-0 sm:px-3 transition-all duration-300 ease-in-out group hover:cursor-pointer",
             onclick: move |_| open.set(!open.cloned()),
             Row {
                 class: "w-full justify-between gap-4 sm:gap-16",
