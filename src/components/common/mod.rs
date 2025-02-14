@@ -8,4 +8,4 @@ pub use flex::*;
 pub use icons::*;
 pub use orb::*;
 pub use spinner::*;
-pub use tooltip::*;
+// pub use tooltip::*;

@@ -179,7 +179,7 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Multiplier",
-            description: "The multiplier indicates a boost's relative priority for receiving native yield. The higher the multiplier, the more ORE will be allocated for stakers in the boost.",
+            description: "The multiplier measures the boost's relative priority for receiving native yield. The higher the multiplier, the more ORE will be allocated for stakers in the boost.",
             resource: boost,
             com: |boost| rsx! {
                 span {
