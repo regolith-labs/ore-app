@@ -21,7 +21,7 @@ impl MiningEvent {
         }
 
         new_events.push_front(event);
-        if new_events.len() > 3 {
+        if new_events.len() > 15 {
             new_events.pop_back();
         }
         *events.write() = new_events;
