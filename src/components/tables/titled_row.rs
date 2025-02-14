@@ -35,7 +35,10 @@ pub fn TitledRow(title: String, description: String, value: Element) -> Element 
                         }
                     }
                 }
-                {value}
+                span {
+                    class: "mb-auto",
+                    {value}
+                }
             }
             div {
                 class: "sm:hidden overflow-hidden transition-all duration-300 ease-in-out h-min {max_height}",
