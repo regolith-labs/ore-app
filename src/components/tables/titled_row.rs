@@ -13,18 +13,18 @@ pub fn TitledRow(title: String, description: String, value: Element) -> Element 
             class: "flex flex-col gap-4 px-0 sm:px-3 transition-all rounded duration-300 ease-in-out group hover:cursor-pointer {color}",
             onclick: move |_| open.set(!open.cloned()),
             Row {
-                class: "w-full justify-between gap-4",
+                class: "w-full justify-between gap-4 sm:gap-16",
                 Col {
                     gap: 4,
                     Row {
                         class: "text-elements-lowEmphasis h-min",
                         gap: 2,
                         div {
-                            class: "font-medium",
+                            class: "font-medium text-left",
                             "{title}"
                         }
                         InfoIcon {
-                            class: "h-4 w-4 my-auto transition-opacity duration-300 ease-in-out group-hover:opacity-100 opacity-0",
+                            class: "h-4 w-4 shrink-0 my-auto transition-opacity duration-300 ease-in-out group-hover:opacity-100 opacity-0",
                         }
                     }
                     div {
