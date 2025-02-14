@@ -3,7 +3,7 @@ use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
 use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 
-use crate::{components::*, gateway::GatewayResult, hooks::{on_transaction_done, use_boost, use_boost_claim_transaction, use_ore_balance, use_ore_price, use_stake}};
+use crate::{components::*, gateway::GatewayResult, hooks::{on_transaction_done, use_boost, use_boost_apy, use_boost_claim_transaction, use_ore_balance, use_ore_price, use_stake}};
 
 pub fn Idle() -> Element {
     let mut balance = use_ore_balance();
@@ -53,8 +53,9 @@ fn AccountMetrics(
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
-            gap: 8,
+            gap: 0,
             Subheading {
+                class: "mb-4",
                 title: "Account"
             }
             Deposits {
@@ -154,10 +155,12 @@ fn BoostMetrics(
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
-            gap: 8,
+            gap: 0,
             Subheading {
+                class: "mb-4",
                 title: "Boost"
             }
+            Apy {}
             Multiplier {
                 boost,
             }
@@ -169,6 +172,27 @@ fn BoostMetrics(
             }
             Tvl {
                 boost,
+            }
+        }
+    }
+}
+
+#[component]
+pub fn Apy() -> Element {
+    let apy = use_boost_apy(ore_api::consts::MINT_ADDRESS);
+    rsx! {
+        TitledRow {
+            title: "APY",
+            description: "The estimated annualized percentage yield of participating in the boost. Calculation is derived from the last 7 days of distributed yield divided by the total deposits currently in the boost. This estimate in no way guarantees future returns.",
+            value: rsx! {
+                if let Ok(apy) = apy.cloned() {
+                    span {
+                        class: "text-elements-highEmphasis font-medium",
+                        "{apy:.0}%"
+                    }
+                } else {
+                    LoadingValue {}
+                }
             }
         }
     }
@@ -190,7 +214,6 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
         }
     }
 }
-
 
 #[component]
 fn TotalDeposits(boost: Resource<GatewayResult<Boost>>) -> Element {

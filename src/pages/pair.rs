@@ -7,7 +7,7 @@ use steel::Pubkey;
 use crate::{
     components::*, 
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_boost, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_token_balances_for_liquidity_pair}, 
+    hooks::{on_transaction_done, use_boost, use_boost_apy, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_token_balances_for_liquidity_pair}, 
     pages::{Multiplier, StakeYield, TotalStakers},
     utils::LiquidityPair
 };
@@ -78,8 +78,9 @@ fn AccountMetrics(
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
-            gap: 8,
+            gap: 0,
             Subheading {
+                class: "mb-4",
                 title: "Account"
             }
             Deposits {
@@ -110,7 +111,7 @@ fn Deposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resou
     rsx! {
         TitledRow {
             title: "Deposits",
-            description: "The amount of liquidity you have deposited in the boost. This liquidity is \"productive\" and automatically earns trading fees from market activity.",
+            description: "The amount of liquidity you have deposited in the boost. These assets are \"productive\" and earn trading fees from market activity.",
             value: rsx! {
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
                     if let Some(stake) = stake.cloned() {
@@ -208,9 +209,13 @@ fn BoostMetrics(
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
-            gap: 8,
+            gap: 0,
             Subheading {
+                class: "mb-4",
                 title: "Boost"
+            }
+            Apy {
+                boost_meta: boost_meta.clone(),
             }
             Multiplier {
                 boost,
@@ -232,11 +237,32 @@ fn BoostMetrics(
 }
 
 #[component]
+pub fn Apy(boost_meta: BoostMeta) -> Element {
+    let apy = use_boost_apy(boost_meta.lp_mint);
+    rsx! {
+        TitledRow {
+            title: "APY",
+            description: "The estimated annualized percentage yield of participating in the boost. Calculation is derived from the last 7 days of distributed yield divided by the total deposits currently in the boost. This estimate in no way guarantees future returns.",
+            value: rsx! {
+                if let Ok(apy) = apy.cloned() {
+                    span {
+                        class: "text-elements-highEmphasis font-medium",
+                        "{apy:.0}%"
+                    }
+                } else {
+                    LoadingValue {}
+                }
+            }
+        }
+    }
+}
+
+#[component]
 fn Protocol(boost_meta: BoostMeta) -> Element {
     rsx! {
         TitledRow {
             title: "Protocol",
-            description: "The underlying protocol managing all liquidity deposited in the boost. This protocol deploys available liquidity into a strategy to earn trading fees from market activity.",
+            description: "The underlying protocol managing all liquidity deposited in the boost. This protocol deploys provided assets into a strategy to earn trading fees from market activity.",
             value: rsx! {
                 a {
                     class: "text-elements-highEmphasis font-medium hover:underline",
