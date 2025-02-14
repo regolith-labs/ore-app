@@ -24,7 +24,7 @@ pub fn TitledRow(title: String, description: String, value: Element) -> Element 
                             "{title}"
                         }
                         InfoIcon {
-                            class: "h-4 w-4 shrink-0 my-auto transition-opacity duration-300 ease-in-out group-hover:opacity-100 opacity-0",
+                            class: "h-4 w-4 shrink-0 my-auto transition-opacity group-hover:opacity-100 opacity-0",
                         }
                     }
                     div {
