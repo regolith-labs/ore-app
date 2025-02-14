@@ -118,6 +118,7 @@ fn Deposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resou
                         if let Ok(stake) = stake {
                             if stake.balance > 0 {
                                 LiquidityPairStakeValue {
+                                    class: "pb-0 sm:pb-4",
                                     stake_balance: stake.balance,
                                     liquidity_pair: liquidity_pair,
                                     with_decimal_units: true,
@@ -150,6 +151,7 @@ fn PendingDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake
                         description: "The amount of liquidity you have deposited in the boost that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
                         value: rsx! {
                             LiquidityPairStakeValue {
+                                class: "pb-0 sm:pb-4",
                                 stake_balance: stake.balance_pending,
                                 liquidity_pair: liquidity_pair,
                                 with_decimal_units: true,
@@ -287,6 +289,7 @@ fn TotalDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Elem
             resource: liquidity_pair,
             com: |liquidity_pair| rsx! {
                 LiquidityPairValue {
+                    class: "pb-0 sm:pb-4",
                     liquidity_pair: liquidity_pair.clone(),
                     with_decimal_units: true,
                 }
