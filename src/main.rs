@@ -13,7 +13,7 @@ use hooks::{use_miner_status_provider, use_mining_loop};
 use tracing::Level;
 
 use crate::{
-    hooks::{use_cache_provider, use_transaction_status_provider, use_miner_provider, use_wallet_provider},
+    hooks::{use_cache_provider, use_transaction_status_provider, use_miner_provider, use_wallet_provider, use_miner_events_provider},
     route::Route,
 };
 
@@ -29,6 +29,7 @@ fn main() {
 pub fn App() -> Element {
     use_miner_provider();
     use_miner_status_provider();
+    use_miner_events_provider();
     use_transaction_status_provider();
     use_wallet_provider();
     use_cache_provider();

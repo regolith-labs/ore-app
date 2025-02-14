@@ -11,20 +11,26 @@ use crate::{
 pub fn Mine() -> Element {    
     rsx! {
         Col {
-            class: "w-full h-full pb-20 sm:pb-16 max-w-2xl mx-auto px-5 sm:px-8",
-            gap: 4,
-            Heading {
-                class: "w-full",
-                title: "Mine",
-                subtitle: "Utilize spare hashpower to harvest ORE."
+            class: "w-full h-full pb-20 sm:pb-16 mx-auto px-5 sm:px-8",
+            gap: 16,
+            Col {
+                class: "w-full max-w-2xl mx-auto px-5 sm:px-8",
+                Heading {
+                    class: "w-full",
+                    title: "Mine",
+                    subtitle: "Utilize spare hashpower to harvest ORE."
+                }
+                OrbMiner {
+                    class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
+                    gold: *use_miner_is_active().read()
+                }
+                MinerData {}
             }
-            OrbMiner {
-                class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
-                gold: *use_miner_is_active().read()
-            }
-            MinerData {}
-            // TODO: Add activity table
-        }
+            Col {
+                class: "w-full max-w-3xl justify-center",
+                MineTable {}
+            }            
+        }                
     }
 }
 

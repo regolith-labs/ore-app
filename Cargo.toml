@@ -101,6 +101,7 @@ wasm-bindgen = { version = "0.2.99", optional = true }
 wasm-bindgen-futures = { version = "0.4.41", optional = true }
 wasm-logger = { version = "0.2.0", optional = true }
 web-time = { version = "1.0.0", optional = true }
+chrono = { version = "0.4", features = ["wasmbind"] }
 
 [dependencies.web-sys]
 version = "0.3"

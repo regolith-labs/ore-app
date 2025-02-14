@@ -3,6 +3,8 @@ use ore_pool_types::{ContributePayloadV2, Member as MemberRecord, MemberChalleng
 use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
+use crate::hooks::MiningEvent;
+
 use super::{Gateway, GatewayError, GatewayResult, Rpc, solana::SolanaGateway};
 
 pub trait PoolGateway {
@@ -13,6 +15,7 @@ pub trait PoolGateway {
     async fn poll_new_challenge(&self, authority: Pubkey, pool_url: String, last_hash_at: i64) -> GatewayResult<MemberChallenge>;
     async fn post_solution(&self, authority: Pubkey, pool_url: String, solution: &drillx::Solution) -> GatewayResult<()>;
     async fn register(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord>;
+    async fn get_latest_event(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MiningEvent>;
 }
 
 impl<R: Rpc> PoolGateway for Gateway<R> {
@@ -21,6 +24,14 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
         let challenge = resp.json::<MemberChallenge>().await.map_err(GatewayError::from)?;
         Ok(challenge)
+    }
+
+    async fn get_latest_event(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MiningEvent> {        
+        async_std::task::sleep(std::time::Duration::from_secs(1)).await;
+        let get_url = format!("{}/event/latest/{}", pool_url, authority);
+        let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
+        let latest_event = resp.json::<MiningEvent>().await.map_err(GatewayError::from)?;
+        Ok(latest_event)
     }
 
     async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64> {
