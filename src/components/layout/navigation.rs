@@ -128,7 +128,7 @@ fn MobileTabBar() -> Element {
     };
     rsx! {
         Row {
-            class: "{hidden} sm:hidden fixed bottom-0 w-full elevated",
+            class: "{hidden} sm:hidden fixed bottom-0 w-full elevated z-50",
             MobileTab {
                 title: "Mine",
                 route: Route::Mine {}
