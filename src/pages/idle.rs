@@ -76,6 +76,7 @@ fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Deposits",
+            description: "The amount of ORE you have deposited in this boost.",
             resource: stake,
             com: |stake| {
                 rsx! {
@@ -101,6 +102,7 @@ fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
             if stake.balance_pending > 0 {
                 TitledRow {
                     title: "Deposits (pending)",
+                    description: "Pending deposits are automatically committed approximately every hour.",
                     value: rsx! {           
                         OreValue {
                             ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
@@ -122,6 +124,7 @@ pub fn StakeYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<Gateway
     rsx! {
         TitledResourceRow {
             title: "Yield",
+            description: "The amount of yield you have earned and may claim from this boost.",
             resource: stake,
             com: |stake| {
                 rsx! {
@@ -176,6 +179,7 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Multiplier",
+            description: "A multiplier indicating this boost's relative priority for receiving native yield.",
             resource: boost,
             com: |boost| rsx! {
                 span {
@@ -193,6 +197,7 @@ fn TotalDeposits(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Total deposits",
+            description: "The total amount of ORE deposited into this boost.",
             resource: boost,
             com: |boost| {
                 rsx! {
@@ -212,6 +217,7 @@ pub fn TotalStakers(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Total stakers",
+            description: "The total number of unique stakers participating in this boost.",
             resource: boost,
             com: |boost| {
                 rsx! {
@@ -231,6 +237,7 @@ fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledRow {
             title: "TVL",
+            description: "The total value (USD) of all ORE deposited in this boost.",
             value: rsx! {
                 if let Some(ore_price) = ore_price.cloned() {
                     if let Some(Ok(boost)) = boost.cloned() {

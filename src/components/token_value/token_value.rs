@@ -27,7 +27,7 @@ pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, wi
                 "{units[0]}"
                 if with_decimal_units.unwrap_or(false) {
                     span {
-                        class: "mt-auto font-medium opacity-50",
+                        class: "mt-auto font-medium text-elements-lowEmphasis",
                         ".{units[1]}"
                     }
                 }

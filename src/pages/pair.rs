@@ -77,7 +77,8 @@ fn AccountMetrics(
 ) -> Element {
     rsx! {
         Col {
-            class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8 gap-8",
+            class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
+            gap: 8,
             Subheading {
                 title: "Account"
             }
@@ -109,6 +110,7 @@ fn Deposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resou
     rsx! {
         TitledRow {
             title: "Deposits",
+            description: "The amount of liquidity you have deposited in this boost.",
             value: rsx! {
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
                     if let Some(stake) = stake.cloned() {
@@ -144,6 +146,7 @@ fn PendingDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake
                 if stake.balance_pending > 0 {
                     TitledRow {
                         title: "Deposits (pending)",
+                        description: "Pending deposits are automatically committed approximately every hour.",
                         value: rsx! {
                             LiquidityPairStakeValue {
                                 stake_balance: stake.balance_pending,
@@ -175,6 +178,7 @@ fn UnstakedLp(
                 if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
                     TitledRow {
                         title: "Unstaked",
+                        description: format!("You have {} LP tokens that are not staked in this boost.", lp_balance.amount),
                         value: rsx! {
                             LiquidityPairStakeValue {
                                 stake_balance: lp_balance.amount.parse::<u64>().unwrap_or(0),
@@ -232,6 +236,7 @@ fn Protocol(boost_meta: BoostMeta) -> Element {
     rsx! {
         TitledRow {
             title: "Protocol",
+            description: "The underlying protocol managing deposits in this boost.",
             value: rsx! {
                 a {
                     class: "text-elements-highEmphasis font-medium hover:underline",
@@ -252,6 +257,7 @@ fn TotalDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Elem
     rsx! {
         TitledResourceRow {
             title: "Total deposits",
+            description: "The total amount of liquidity deposited into this boost.",
             resource: liquidity_pair,
             com: |liquidity_pair| rsx! {
                 LiquidityPairValue {
@@ -268,6 +274,7 @@ fn Tvl(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "TVL",
+            description: "The total value (USD) of all liquidity deposited in this boost.",
             resource: liquidity_pair,
             com: |liquidity_pair| rsx! {
                 UsdValue {
