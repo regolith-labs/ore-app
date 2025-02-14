@@ -7,7 +7,7 @@ use steel::Pubkey;
 
 use crate::{
     gateway::{pool::PoolGateway, GatewayResult}, 
-    hooks::{use_gateway, use_member_record, use_miner, use_miner_events, use_miner_is_active, use_miner_status, use_pool_url, use_wallet, GetPubkey, MinerStatus}
+    hooks::{use_gateway, use_member_record, use_miner, use_miner_is_active, use_miner_status, use_pool_url, use_wallet, GetPubkey, MinerStatus, MiningEvent}
 };
 
 pub fn use_mining_loop() {
@@ -103,7 +103,6 @@ fn use_solution_contribute(
     let pool_url = use_pool_url();
     let mut member_record = use_member_record();
     let mut miner_status = use_miner_status();
-    let mut miner_events = use_miner_events();
     let is_active = use_miner_is_active();
     use_effect(move || {
         // Check status
@@ -128,7 +127,7 @@ fn use_solution_contribute(
                     member_record.restart();
                     match use_gateway().get_latest_event(pubkey, pool_url.clone()).await {
                         Ok(latest_event) => {
-                            miner_events.write().push(latest_event);    
+                            MiningEvent::add_to_signal(latest_event);
                         }
                         Err(err) => {
                             log::error!("Error getting latest event: {:?}", err);

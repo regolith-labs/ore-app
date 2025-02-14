@@ -5,7 +5,6 @@ use crate::{
 };
 use chrono::{DateTime, Local};
 use solana_sdk::signature::Signature;
-use std::cmp::Ord;
 use ore_api::consts::TOKEN_DECIMALS;
 use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 
@@ -30,7 +29,8 @@ pub fn MineTable() -> Element {
                 },
                 rows: rsx! {
                     {
-                        let mut events = miner_events.iter().collect::<Vec<_>>();
+                        let events_guard = miner_events.read();
+                        let events = events_guard.iter().collect::<Vec<_>>();
                         if events.is_empty() {
                             rsx! {
                                 tr {
@@ -42,8 +42,6 @@ pub fn MineTable() -> Element {
                                 }
                             }
                         } else {
-                            events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-                            events.dedup_by(|a, b| a.signature == b.signature);
                             rsx! {
                                 for event in events {
                                     MineTableRow {
