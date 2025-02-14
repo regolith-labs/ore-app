@@ -12,17 +12,18 @@ pub fn MineTable() -> Element {
     let miner_events = use_miner_events();    
     rsx! {
         Col {
+            class: "w-full",
             gap: 8,
             Subheading {
                 class: "px-5 sm:px-8",
-                title: "Mining Log"
+                title: "Activity"
             }
             Table {
                 class: "mx-0 sm:mx-8",
                 header: rsx! {
                     TableHeader {
-                        left: "Time",
-                        right_1: "Transaction",
+                        left: "Transaction",
+                        right_1: "Date",
                         right_2: "Score",
                         right_3: "Reward",
                     }
@@ -33,12 +34,9 @@ pub fn MineTable() -> Element {
                         let events = events_guard.iter().collect::<Vec<_>>();
                         if events.is_empty() {
                             rsx! {
-                                tr {
-                                    td {
-                                        colspan: "4",
-                                        class: "flex flex-row justify-start pt-16 text-elements-lowEmphasis px-5 sm:px-3",
-                                        "No activity yet"
-                                    }
+                                span {
+                                    class: "my-4 text-elements-lowEmphasis font-medium px-5 sm:px-3",
+                                    "No activity yet"
                                 }
                             }
                         } else {
@@ -65,13 +63,13 @@ fn MineTableRow(
         TableRowExternalLink {
             to: format!("https://solscan.io/tx/{}", event.signature),
             left: rsx! {
-                MineTableRowTitle {
-                    timestamp: event.timestamp
+                MineTableRowTx {
+                    signature: event.signature
                 }
             },
             right_1: rsx! {
-                MineTableRowTx {
-                    signature: event.signature
+                MineTableRowDate {
+                    timestamp: event.timestamp
                 }
             },
             right_2: rsx! {
@@ -81,7 +79,7 @@ fn MineTableRow(
                 }
             },
             right_3: rsx! {
-                MineTableRowYield {
+                MineTableRowReward {
                     net_reward: event.net_reward,
                     member_reward: event.member_reward
                 }
@@ -91,7 +89,7 @@ fn MineTableRow(
 }
 
 #[component]
-fn MineTableRowTitle(
+fn MineTableRowDate(
     timestamp: u64
 ) -> Element {    
     let datetime = DateTime::from_timestamp(timestamp as i64, 0)
@@ -106,7 +104,7 @@ fn MineTableRowTitle(
                 "{date}"
             }            
             span {
-                class: "text-xs text-elements-lowEmphasis",
+                class: "text-xs font-medium text-elements-lowEmphasis",
                 "{time}"
             }                        
         }
@@ -121,11 +119,9 @@ fn MineTableRowTx(
     let first_four = &signature.to_string()[0..4];
     let last_four = &signature.to_string()[len - 4..len];
     rsx! {
-        Col {
-            span {
-                class: "text-right my-auto font-medium",
-                "{first_four}...{last_four}"
-            }                
+        span {
+            class: "font-medium my-auto",
+            "{first_four}...{last_four}"
         }
     }
 }
@@ -142,7 +138,7 @@ fn MineTableRowScore(
                 "{pool_score}"
             }            
             span {
-                class: "text-xs text-elements-lowEmphasis",
+                class: "font-medium text-xs text-elements-lowEmphasis",
                 "{member_score}"
             }                        
         }
@@ -150,29 +146,26 @@ fn MineTableRowScore(
 }
 
 #[component]
-fn MineTableRowYield(
+fn MineTableRowReward(
     net_reward: u64,
     member_reward: u64
 ) -> Element {
     rsx! {
         Col {
             OreValue {
-                class: "text-right ml-auto font-medium",
+                class: "text-right ml-auto",
                 ui_amount_string: amount_to_ui_amount_string(net_reward, TOKEN_DECIMALS),
                 with_decimal_units: true,
                 size: TokenValueSize::Small,
-                gold: false,
-                abbreviated: true,
+                color_override: "text-elements-highEmphasis",
             }
             OreValue {
                 class: "text-right ml-auto",
                 ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
                 with_decimal_units: true,
                 size: TokenValueSize::XSmall,
-                gold: true,
-                abbreviated: true,
+                color_override: "text-elements-lowEmphasis",
             }
-        }
-        
+        }       
     }
 }

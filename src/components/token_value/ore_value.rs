@@ -10,7 +10,8 @@ pub fn OreValue(
     with_decimal_units: Option<bool>,
     abbreviated: Option<bool>,
     gold: Option<bool>,
-    size: Option<TokenValueSize>
+    size: Option<TokenValueSize>,
+    color_override: Option<String>
 ) -> Element {
     let class = class.unwrap_or("".to_string());
     let formatted_amount = format_token_amount(ui_amount_string, with_decimal_units, abbreviated);
@@ -29,6 +30,8 @@ pub fn OreValue(
             ("text-elements-highEmphasis", "text-elements-lowEmphasis")
         }
     };
+    let whole_units_color = color_override.clone().unwrap_or(whole_units_color.to_string());
+    let decimal_units_color = color_override.clone().unwrap_or(decimal_units_color.to_string());
 
     let (icon_gap, icon_size, whole_units_size, decimal_units_size, font_weight) = match size.unwrap_or(TokenValueSize::Small) {
         TokenValueSize::XSmall => ("gap-1", "h-3 w-3", "text-xs", "text-xs", "font-medium"),

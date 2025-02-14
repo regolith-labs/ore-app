@@ -11,7 +11,8 @@ use crate::{
 pub fn Mine() -> Element {    
     rsx! {
         Col {
-            class: "w-full h-full pb-20 sm:pb-16 mx-auto px-5 sm:px-8",
+            // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
+            class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
             Col {
                 class: "w-full max-w-2xl mx-auto px-5 sm:px-8",
@@ -25,11 +26,8 @@ pub fn Mine() -> Element {
                     gold: *use_miner_is_active().read()
                 }
                 MinerData {}
-            }
-            Col {
-                class: "w-full max-w-3xl justify-center",
-                MineTable {}
-            }            
+            }   
+            MineTable {}         
         }                
     }
 }
