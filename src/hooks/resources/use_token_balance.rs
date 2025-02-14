@@ -41,6 +41,8 @@ pub fn _use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
     })
 }
 
+//TODO: START HERE
+// get resoruce from hahsmap conteext, return the resource if it exisstss
 pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
     let wallet_status = use_wallet();
     use_resource(move || async move {
@@ -50,7 +52,7 @@ pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>>
         }
     })
 }
-
+// IGNOORE THIS FOR NOW
 pub fn use_token_balance_for_token(token: Signal<Option<Token>>) -> Resource<GatewayResult<UiTokenAmount>> {
     let wallet_status = use_wallet();
     use_resource(move || async move {
@@ -64,8 +66,17 @@ pub fn use_token_balance_for_token(token: Signal<Option<Token>>) -> Resource<Gat
     })
 }
 
+/*
+use_resoource() {
+
+
+}
+*/
 async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiTokenAmount> {
-    if mint == Token::sol().mint {
+    // todo: this is what we want to cache this whole block (if else()
+    // mint -> key
+    // value -> GatewayResult<UiTokenAmount>
+    if mint == Token::sol().mint {        
         use_gateway()
             .rpc
             .get_balance(&pubkey)
