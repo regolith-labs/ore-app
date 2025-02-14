@@ -33,7 +33,7 @@ pub struct MiningEvent {
     pub timestamp: u64,
     pub difficulty: u64,
     pub net_reward: u64,
-pub net_base_reward: u64,
+    pub net_base_reward: u64,
     pub net_miner_boost_reward: u64,
     pub member_difficulty: u64,
     pub member_reward: u64
