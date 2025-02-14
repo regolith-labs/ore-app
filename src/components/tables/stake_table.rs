@@ -410,6 +410,11 @@ fn StakeTableRowYield(mint_address: Pubkey, boost: Resource<GatewayResult<Boost>
                             gold: true,
                             abbreviated: true,
                         }
+                    } else {
+                        span {
+                            class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
+                            "–"
+                        }
                     }
                 }
             }
