@@ -8,15 +8,14 @@ use crate::{config::{Token, LISTED_TOKENS}, gateway::{
 
 use crate::hooks::{use_gateway, use_wallet, Wallet};
 
-// Create token balances resource
 pub(crate) fn use_token_balance_provider() {
     let mut token_balances = HashMap::new();
 
     for pubkey in LISTED_TOKENS.keys() {
-        let token_mint = *pubkey;
+        let token_mint = *pubkey;        
         token_balances.insert(token_mint, use_token_balance_resource(token_mint));
-    }
-
+    }    
+    
     use_context_provider(|| token_balances);
 }
 
@@ -30,9 +29,6 @@ fn use_token_balance_resource(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmo
     })
 }
 
-
-//TODO: START HERE
-// get resource from hahsmap conteext, return the resource if it exisstss
 pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>> {
     let token_balances: HashMap<Pubkey, Resource<GatewayResult<UiTokenAmount>>> = use_context();
     if let Some(balance) = token_balances.get(&mint) {
@@ -40,17 +36,8 @@ pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>>
     } else {
         use_token_balance_resource(mint)
     }
-    
-    // BEFORE
-    // let wallet_status = use_wallet();
-    // use_resource(move || async move {
-    //     match *wallet_status.read() {
-    //         Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
-    //         Wallet::Connected(pubkey) => get_token_balance(pubkey, mint).await,
-    //     }
-    // })
 }
-// IGNOORE THIS FOR NOW
+
 pub fn use_token_balance_for_token(token: Signal<Option<Token>>) -> Resource<GatewayResult<UiTokenAmount>> {
     let wallet_status = use_wallet();
     use_resource(move || async move {
@@ -80,7 +67,6 @@ async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiToke
                 }
             })
             .map_err(GatewayError::from)
-    // All other token balances
     } else {
         use_gateway()
             .rpc
