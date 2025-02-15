@@ -1,26 +1,11 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon, OreWordmarkIcon, Row, ToastDisplay, WalletAdapter, XIcon},
+    components::{BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon, OreWordmarkIcon, Row, WalletAdapter, XIcon},
     route::Route,
 };
 
-pub fn AppNavigation() -> Element {
-    rsx! {
-        Col {
-            class: "w-screen min-h-dvh",
-            AppNavBar {}
-            MobileTabBar {}
-            span {
-                class: "py-5 sm:py-8 w-full max-w-[80rem] mx-auto",
-                Outlet::<Route> {}
-            }
-            ToastDisplay {}
-        }
-    }
-}
-
-fn AppNavBar() -> Element {
+pub(crate) fn AppNavBar() -> Element {
     rsx! {
         Row {
             class: "w-screen h-20 px-3 sm:px-6 sm:sticky sm:top-0 bg-black z-50",
@@ -40,17 +25,7 @@ fn AppNavBar() -> Element {
     }
 }
 
-pub fn VisitorNavigation() -> Element {
-    rsx! {
-        Col {
-            class: "w-screen h-screen",
-            VisitorNavBar {}
-            Outlet::<Route> {}
-        }
-    }
-}
-
-fn VisitorNavBar() -> Element {
+pub(crate) fn VisitorNavBar() -> Element {
     rsx! {
         Row {
             class: "w-screen shrink-0 h-16 sm:h-20 px-2 sm:px-6",
@@ -64,10 +39,10 @@ fn VisitorNavBar() -> Element {
     }
 }
 
-fn Logo() -> Element {
+pub fn Logo() -> Element {
     rsx! {
         Link {
-            class: "p-1 my-auto rounded hover:bg-controls-secondaryHover",
+            class: "p-1 my-auto w-min h-min rounded hover:bg-controls-secondaryHover",
             to: Route::Landing {},
             OreWordmarkIcon {
                 class: "h-5"
@@ -119,7 +94,7 @@ fn Tab(title: String, route: Route) -> Element {
     }
 }
 
-fn MobileTabBar() -> Element {
+pub(crate) fn MobileTabBar() -> Element {
     let current_route: Route = use_route();
     let hidden = if is_navbar_hidden(&current_route) {
         "hidden"

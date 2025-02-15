@@ -1,12 +1,12 @@
 use dioxus::prelude::*;
 
-use crate::components::{AppNavigation, VisitorNavigation};
+use crate::components::*;
 use crate::pages::*;
 
 #[rustfmt::skip]
 #[derive(Routable, Clone, PartialEq, Eq)]
 pub enum Route {
-    #[layout(AppNavigation)]
+    #[layout(AppLayout)]
         #[route("/mine")]
         Mine {},
         #[route("/pay")]
@@ -21,9 +21,12 @@ pub enum Route {
         Trade {},
     #[end_layout]
 
-    #[layout(VisitorNavigation)]
+    #[layout(LandingLayout)]
         #[route("/")]
         Landing {},
+    #[end_layout]
+
+    #[layout(VisitorLayout)]
         #[route("/download")]
         Download {},
     #[end_layout]

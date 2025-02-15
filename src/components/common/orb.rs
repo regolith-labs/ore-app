@@ -17,14 +17,66 @@ use dioxus::prelude::*;
 // }
 
 #[component]
-pub fn OrbHero() -> Element {
+pub fn HeroOrb() -> Element {
     rsx! {
         div {
-            class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible",
+            class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             dangerous_inner_html: r#"
                 <spline-viewer
                     style="height: 100%; overflow: visible;" 
-                    url="https://prod.spline.design/2XKuRwA88rO-PcmC/scene.splinecode"
+                    url="https://prod.spline.design/Y2igVlaEL2MBaBOY/scene.splinecode"
+                />
+            "#
+        }
+    }
+}
+
+#[component]
+pub fn LandingMiner() -> Element {
+    rsx! {
+        div {
+            class: "absolute top-0 left-0 w-full h-full overflow-clipped pointer-events-none",
+            // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            dangerous_inner_html: r#"
+                <spline-viewer
+                    style="height: 100%; width: 100%;" 
+                    url="https://prod.spline.design/uJNJJEEp0yCY0MvG/scene.splinecode"
+                />
+            "#
+        }
+    }
+}
+
+#[component]
+pub fn LandingWave() -> Element {
+    rsx! {
+        div {
+            class: "absolute top-0 left-0 w-full h-full overflow-clipped pointer-events-none",
+            // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            dangerous_inner_html: r#"
+                <spline-viewer
+                    style="height: 100%; width: 100%;" 
+                    url="https://prod.spline.design/AUe5QgM7p99M8Cm1/scene.splinecode"
+                />
+            "#
+        }
+    }
+}
+
+#[component]
+pub fn LandingOrbit() -> Element {
+    rsx! {
+        div {
+            class: "w-full h-full overflow-clipped pointer-events-none",
+            // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            dangerous_inner_html: r#"
+                <spline-viewer
+                    style="height: 100%; width: 100%;" 
+                    url="https://prod.spline.design/RGffAqOACmF8v29S/scene.splinecode"
                 />
             "#
         }
