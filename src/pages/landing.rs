@@ -87,7 +87,7 @@ fn Section3() -> Element {
                 SectionCopy {
                     title: "Deep liquidity.",
                     subtitle: "Native yield.",
-                    detail: "Stake your crypto and earn yield."
+                    detail: "Stake and earn productive yield on your crypto."
                 }
                 // LandingOrbit {}
                 LandingWave {}
@@ -102,7 +102,7 @@ fn Section4() -> Element {
             class: "relative w-full h-full mx-auto max-w-7xl min-h-screen",
             SectionCopy {
                 title: "Join the community.",
-                detail: "Thousands around the world love ORE."
+                detail: "Discover why people around the world love ORE."
             }
         }
     }
