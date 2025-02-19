@@ -23,7 +23,7 @@ pub fn Alert() -> Element {
     if *show_alert.read() {
         rsx! {
             Row {
-                class: "h-10 w-full rounded-lg p-4 bg-amber-950 flex items-center justify-start",
+                class: "h-10 w-full rounded-xl p-4 bg-amber-950 flex items-center justify-start",
                 gap: 2,
                 AlertInfoIcon {
                     class: "h-4 w-4 shrink-0 color-black",

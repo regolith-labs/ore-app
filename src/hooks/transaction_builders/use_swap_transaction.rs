@@ -6,14 +6,12 @@ use jupiter_swap_api_client::{
     transaction_config::TransactionConfig,
     JupiterSwapApiClient,
 };
-use solana_sdk::{native_token::sol_to_lamports, pubkey::Pubkey, transaction::VersionedTransaction};
+use solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
 use crate::{components::TokenInputError, gateway::{GatewayError, GatewayResult, UiTokenAmount}};
 use crate::config::Token;
 
-use crate::hooks::{use_wallet, GetPubkey, use_token_balance};
-
-use solana_extra_wasm::program::spl_token::ui_amount_to_amount;
+use crate::hooks::{use_wallet, GetPubkey, use_sol_balance, MIN_SOL_BALANCE};
 
 const API_URL: &str = "https://quote-api.jup.ag/v6";
 
@@ -24,7 +22,7 @@ pub fn use_swap_transaction(
     mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let sol_balance = use_token_balance(Token::sol().mint);
+    let sol_balance = use_sol_balance();
     use_resource(move || {
         let client = JupiterSwapApiClient::new(API_URL.to_string());
         async move {
@@ -41,10 +39,9 @@ pub fn use_swap_transaction(
                 return Err(GatewayError::Unknown);
             };
 
-            // Check if user has enough Sol to begin with
-            if let Some(Ok(token_amount)) = sol_balance.cloned() {
-                let sol_amount = ui_amount_to_amount(token_amount.ui_amount.unwrap(), token_amount.decimals);
-                if sol_amount < sol_to_lamports(0.1) {
+            // Check if user has enough SOL
+            if let Some(Ok(sol_amount)) = sol_balance.cloned() {
+                if sol_amount.ui_amount.unwrap() < MIN_SOL_BALANCE {
                     err.set(Some(TokenInputError::InsufficientSol));
                     return Err(GatewayError::Unknown);
                 }

@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Row, TokenPicker}, config::Token, gateway::{GatewayResult, UiTokenAmount}};
+use crate::{components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Row, TokenPicker}, config::Token, gateway::{GatewayResult, UiTokenAmount}, hooks::MIN_SOL_BALANCE};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum TokenInputError {
@@ -12,7 +12,7 @@ impl ToString for TokenInputError {
     fn to_string(&self) -> String {
         match self {
             TokenInputError::InsufficientBalance(token) => format!("Not enough {}", token.ticker),
-            TokenInputError::InsufficientSol => "Not enough SOL (Minimum 0.1 SOL)".to_string(),
+            TokenInputError::InsufficientSol => format!("Not enough SOL (Minimum {:.1} SOL)", MIN_SOL_BALANCE)
         }
     }
 }

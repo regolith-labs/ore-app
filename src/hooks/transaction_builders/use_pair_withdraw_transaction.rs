@@ -1,10 +1,10 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::create_associated_token_account_idempotent}, spl_token::{self, instruction::{close_account, sync_native}, ui_amount_to_amount}};
-use solana_sdk::{address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount}, hash::Hash, message::{v0::Message, VersionedMessage}, signature::Signature, transaction::VersionedTransaction, native_token::sol_to_lamports};
+use solana_sdk::{address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount}, hash::Hash, message::{v0::Message, VersionedMessage}, signature::Signature, transaction::VersionedTransaction};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet, use_token_balance}, utils::LiquidityPair 
+    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet, use_sol_balance, MIN_SOL_BALANCE}, utils::LiquidityPair 
 };
 
 // Build pair deposit transaction
@@ -19,7 +19,7 @@ pub fn use_pair_withdraw_transaction(
     mut err: Signal<Option<TokenInputError>>
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let sol_balance = use_token_balance(Token::sol().mint);
+    let sol_balance = use_sol_balance();
     use_resource(move || async move {
         // Reset error
         err.set(None);
@@ -40,10 +40,9 @@ pub fn use_pair_withdraw_transaction(
             return Err(GatewayError::Unknown);
         }
 
-        // Check if user has enough Sol to begin with
-        if let Some(Ok(token_amount)) = sol_balance.cloned() {
-            let sol_amount = ui_amount_to_amount(token_amount.ui_amount.unwrap(), token_amount.decimals);
-            if sol_amount < sol_to_lamports(0.1) {
+        // Check if user has enough SOL
+        if let Some(Ok(sol_balance)) = sol_balance.cloned() {
+            if sol_balance.ui_amount.unwrap() < MIN_SOL_BALANCE {
                 err.set(Some(TokenInputError::InsufficientSol));
                 return Err(GatewayError::Unknown);
             }

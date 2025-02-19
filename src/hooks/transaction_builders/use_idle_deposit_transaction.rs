@@ -2,10 +2,10 @@ use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
 use solana_extra_wasm::program::spl_token::ui_amount_to_amount;
-use solana_sdk::{native_token::sol_to_lamports, transaction::{Transaction, VersionedTransaction}};
+use solana_sdk::transaction::{Transaction, VersionedTransaction};
 
 use crate::{
-    components::TokenInputError, config::Token, gateway::{GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_wallet, Wallet, use_token_balance}
+    components::TokenInputError, config::Token, gateway::{GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_wallet, Wallet, use_sol_balance, MIN_SOL_BALANCE}
 };
 
 pub fn use_idle_deposit_transaction(
@@ -15,7 +15,7 @@ pub fn use_idle_deposit_transaction(
     mut err: Signal<Option<TokenInputError>>
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let sol_balance = use_token_balance(Token::sol().mint);
+    let sol_balance = use_sol_balance();
     use_resource(move || async move {
         err.set(None);
 
@@ -41,9 +41,8 @@ pub fn use_idle_deposit_transaction(
         }
 
         // Check if user has enough Sol to begin with
-        if let Some(Ok(token_amount)) = sol_balance.cloned() {
-            let sol_amount = ui_amount_to_amount(token_amount.ui_amount.unwrap(), token_amount.decimals);
-            if sol_amount < sol_to_lamports(0.1) {
+        if let Some(Ok(sol_balance)) = sol_balance.cloned() {
+            if sol_balance.ui_amount.unwrap() < MIN_SOL_BALANCE {
                 err.set(Some(TokenInputError::InsufficientSol));
                 return Err(GatewayError::Unknown);
             }
