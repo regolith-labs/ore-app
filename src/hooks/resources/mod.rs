@@ -16,6 +16,8 @@ pub use use_stake::*;
 pub use use_token_balance::*;
 pub use use_ore_price::*;
 pub use use_member::*;
+
+pub const MIN_SOL_BALANCE: f64 = 0.2;
 pub fn use_cache_provider() {
     use_boosts_provider();
     use_liquidity_pairs_provider();

@@ -104,18 +104,8 @@ pub fn use_token_balances_for_liquidity_pair(liquidity_pair: Resource<GatewayRes
     (token_a_balance, token_b_balance)
 }
 
-pub fn _use_sol_balance() -> Resource<GatewayResult<u64>> {
-    let wallet = use_wallet();
-    use_resource(move || async move {
-        match *wallet.read() {
-            Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
-            Wallet::Connected(pubkey) => use_gateway()
-                .rpc
-                .get_balance(&pubkey)
-                .await
-                .map_err(GatewayError::from),
-        }
-    })
+pub fn use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
+    return use_token_balance(Token::sol().mint);
 }
 
 pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {

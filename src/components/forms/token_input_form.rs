@@ -1,16 +1,18 @@
 use dioxus::prelude::*;
 
-use crate::{components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Row, TokenPicker}, config::Token, gateway::{GatewayResult, UiTokenAmount}};
+use crate::{components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Row, TokenPicker}, config::Token, gateway::{GatewayResult, UiTokenAmount}, hooks::MIN_SOL_BALANCE};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum TokenInputError {
     InsufficientBalance(Token),
+    InsufficientSol,
 }
 
 impl ToString for TokenInputError {
     fn to_string(&self) -> String {
         match self {
             TokenInputError::InsufficientBalance(token) => format!("Not enough {}", token.ticker),
+            TokenInputError::InsufficientSol => format!("Not enough SOL (Minimum {:.1} SOL)", MIN_SOL_BALANCE)
         }
     }
 }
@@ -37,6 +39,9 @@ pub fn TokenInputForm(
     let color = if let Some(token) = token.cloned() {
         match err.cloned() {
             Some(TokenInputError::InsufficientBalance(err_token)) if err_token.ticker == token.ticker => {
+                "text-red-500"
+            }
+            Some(TokenInputError::InsufficientSol) => {
                 "text-red-500"
             }
             _ => "text-elements-primary"

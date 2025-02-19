@@ -182,27 +182,32 @@ fn SwapButton(
     let is_disabled = quote_response.is_none() || !is_tx_ready.cloned() || err.read().is_some();
 
     rsx! {
-        button {
-            class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
-            disabled: is_disabled,
-            onclick: move |_| {
-                let swap_tx = &*swap_tx.read();
-                if let Some(Ok(tx)) = swap_tx {
-                    submit_transaction(tx.clone());
-                }
-            },
-            if let Some(err) = err.cloned() {
-                span { 
-                    class: "mx-auto my-auto font-semibold", 
-                    "{err.to_string()}" 
-                }
-            } else {
-                span { 
-                    class: "mx-auto my-auto font-semibold", 
-                    "Swap" 
-                }
-            }   
-        }
+        Col {
+            class: "w-full",
+            gap: 4,
+            button {
+                class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
+                disabled: is_disabled,
+                onclick: move |_| {
+                    let swap_tx = &*swap_tx.read();
+                    if let Some(Ok(tx)) = swap_tx {
+                        submit_transaction(tx.clone());
+                    }
+                },
+                if let Some(err) = err.cloned() {
+                    span { 
+                        class: "mx-auto my-auto font-semibold", 
+                        "{err.to_string()}" 
+                    }
+                } else {
+                    span { 
+                        class: "mx-auto my-auto font-semibold", 
+                        "Swap" 
+                    }
+                }   
+            }
+            Alert {}
+        }        
     }
 }
 
