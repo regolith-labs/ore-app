@@ -5,12 +5,14 @@ use crate::{components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Ro
 #[derive(Clone, PartialEq, Eq)]
 pub enum TokenInputError {
     InsufficientBalance(Token),
+    InsufficientSol,
 }
 
 impl ToString for TokenInputError {
     fn to_string(&self) -> String {
         match self {
             TokenInputError::InsufficientBalance(token) => format!("Not enough {}", token.ticker),
+            TokenInputError::InsufficientSol => "Not enough SOL (Minimum 0.1 SOL)".to_string(),
         }
     }
 }
@@ -37,6 +39,9 @@ pub fn TokenInputForm(
     let color = if let Some(token) = token.cloned() {
         match err.cloned() {
             Some(TokenInputError::InsufficientBalance(err_token)) if err_token.ticker == token.ticker => {
+                "text-red-500"
+            }
+            Some(TokenInputError::InsufficientSol) => {
                 "text-red-500"
             }
             _ => "text-elements-primary"

@@ -1049,6 +1049,9 @@
   .bg-gray-900 {
     background-color: var(--color-gray-900);
   }
+  .bg-amber-950 {
+    background-color: var(--color-amber-950);
+  }
   .bg-surface-elevated {
     background-color: var(--color-surface-elevated);
   }
@@ -1223,6 +1226,9 @@
   }
   .text-red-500 {
     color: var(--color-red-500);
+  }
+  .text-orange-300 {
+    color: var(--color-orange-300);
   }
   .text-white {
     color: var(--color-white);

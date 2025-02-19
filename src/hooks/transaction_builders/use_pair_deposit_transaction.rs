@@ -4,7 +4,7 @@ use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_t
 use solana_sdk::{native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet}, utils::LiquidityPair
+    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet, use_token_balance}, utils::LiquidityPair
 };
 
 // Build pair deposit transaction
@@ -20,6 +20,7 @@ pub fn use_pair_deposit_transaction(
     mut err: Signal<Option<TokenInputError>>
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let sol_balance = use_token_balance(Token::sol().mint);
     use_resource(move || async move {
         // Reset error
         err.set(None);
@@ -39,6 +40,15 @@ pub fn use_pair_deposit_transaction(
         if amount_a_f64 == 0f64 || amount_b_f64 == 0f64 {
             return Err(GatewayError::Unknown);
         }
+
+        // Check if user has enough Sol to begin with
+        if let Some(Ok(token_amount)) = sol_balance.cloned() {
+            let sol_amount = ui_amount_to_amount(token_amount.ui_amount.unwrap(), token_amount.decimals);
+            if sol_amount < sol_to_lamports(0.1) {
+                err.set(Some(TokenInputError::InsufficientSol));
+                return Err(GatewayError::Unknown);
+            }
+        }
     
         // Get resources
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
@@ -46,7 +56,7 @@ pub fn use_pair_deposit_transaction(
         };
         let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
             if amount_a_f64 > 0f64 {
-                err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_a.clone())));
+                err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_a.clone()))); // 
             }
             return Err(GatewayError::Unknown);
         };
@@ -65,8 +75,8 @@ pub fn use_pair_deposit_transaction(
         if amount_b_f64 > token_b_balance.ui_amount.unwrap_or(0.0) {
             err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_b.clone())));
             return Err(GatewayError::Unknown);
-        }
-    
+        }        
+
         // Aggregate instructions
         let mut ixs: Vec<steel::Instruction> = vec![];
 

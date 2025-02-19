@@ -50,6 +50,7 @@ fn MinerData() -> Element {
         Col {
             class: "w-full flex-wrap mx-auto justify-between",
             gap: 8,            
+            Alert {}
             MinerStatus {}
             MinerHashpower {}
             MinerPendingRewards {}
@@ -98,9 +99,11 @@ fn StopStartButton() -> Element {
     } else {
         "controls-primary"
     };
+
     rsx! {
         button {
             class: "flex flex-row gap-2 my-auto px-8 h-12 rounded-full {controls_class}",
+            disabled: matches!(*wallet.read(), Wallet::Disconnected),
             onclick: move |_| {
                 if *is_active.read() {
                     miner_status.set(MinerStatus::Stopped);
