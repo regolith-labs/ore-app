@@ -1,12 +1,15 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 
-use crate::{gateway::{GatewayResult, UiTokenAmount}, hooks::use_all_stakes};
+use crate::{
+    gateway::{GatewayResult, UiTokenAmount},
+    hooks::use_all_stakes,
+    solana::spl_token::amount_to_ui_amount,
+};
 
 pub fn use_net_yield() -> Memo<GatewayResult<UiTokenAmount>> {
     let stake_accounts = use_all_stakes();
-    
+
     use_memo(move || {
         // Iterate through all stake accounts and sum the rewards
         let mut net_yield = 0;

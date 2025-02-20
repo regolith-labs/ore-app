@@ -9,7 +9,7 @@ mod utils;
 
 pub use error::*;
 use serde_json::{json, Value};
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 use solana_client::nonblocking::rpc_client::RpcClient;
 #[cfg(feature = "web")]
 use solana_client_wasm::WasmClient;
@@ -33,7 +33,7 @@ impl<R: Rpc> Gateway<R> {
             http: reqwest::Client::new(),
         }
     }
-    
+
     pub async fn _get_recent_priority_fee_estimate(&self, treasury: bool) -> u64 {
         let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
         if treasury {
@@ -79,10 +79,10 @@ pub trait Rpc {
     ) -> GatewayResult<Signature>;
 }
 
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 pub struct NativeRpc(RpcClient);
 
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 impl Rpc for NativeRpc {
     fn new(rpc_url: String) -> Self {
         NativeRpc(RpcClient::new(rpc_url))

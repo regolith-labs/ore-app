@@ -1,10 +1,11 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::spl_associated_token_account;
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
 
 use crate::{
-    gateway::{GatewayError, GatewayResult}, hooks::{use_wallet, Wallet}
+    gateway::{GatewayError, GatewayResult},
+    hooks::{use_wallet, Wallet},
+    solana::spl_associated_token_account,
 };
 
 pub fn use_boost_claim_transaction(
@@ -30,12 +31,20 @@ pub fn use_boost_claim_transaction(
         if stake.rewards == 0 {
             return Err(GatewayError::Unknown);
         }
-        
+
         // Aggregate instructions
         let mut ixs = vec![];
-        let beneficiary = spl_associated_token_account::get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
-        ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, boost.mint, stake.rewards));
-       
+        let beneficiary = spl_associated_token_account::get_associated_token_address(
+            &authority,
+            &ore_api::consts::MINT_ADDRESS,
+        );
+        ixs.push(ore_boost_api::sdk::claim(
+            authority,
+            beneficiary,
+            boost.mint,
+            stake.rewards,
+        ));
+
         // Build transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
         Ok(tx)

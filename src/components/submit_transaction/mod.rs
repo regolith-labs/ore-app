@@ -1,4 +1,4 @@
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 mod submit_transaction_native;
 #[cfg(feature = "web")]
 mod submit_transaction_web;

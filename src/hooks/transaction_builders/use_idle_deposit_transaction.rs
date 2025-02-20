@@ -1,18 +1,21 @@
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::spl_token::ui_amount_to_amount;
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
 
 use crate::{
-    components::TokenInputError, config::Token, gateway::{GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_wallet, Wallet, use_sol_balance, MIN_SOL_BALANCE}
+    components::TokenInputError,
+    config::Token,
+    gateway::{GatewayError, GatewayResult, UiTokenAmount},
+    hooks::{use_sol_balance, use_wallet, Wallet, MIN_SOL_BALANCE},
+    solana::spl_token::ui_amount_to_amount,
 };
 
 pub fn use_idle_deposit_transaction(
     stake: Resource<GatewayResult<Stake>>,
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<String>,
-    mut err: Signal<Option<TokenInputError>>
+    mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     let sol_balance = use_sol_balance();
@@ -24,9 +27,9 @@ pub fn use_idle_deposit_transaction(
             return Err(GatewayError::WalletDisconnected);
         };
 
-         // If empty, disable
-         let amount_str = input_amount.cloned();
-         if amount_str.is_empty() {
+        // If empty, disable
+        let amount_str = input_amount.cloned();
+        if amount_str.is_empty() {
             return Err(GatewayError::Unknown);
         }
 
@@ -71,11 +74,14 @@ pub fn use_idle_deposit_transaction(
 
         // Build deposit instruction
         let amount_u64 = ui_amount_to_amount(amount_f64, TOKEN_DECIMALS);
-        ixs.push(ore_boost_api::sdk::deposit(authority, MINT_ADDRESS, amount_u64));
-    
+        ixs.push(ore_boost_api::sdk::deposit(
+            authority,
+            MINT_ADDRESS,
+            amount_u64,
+        ));
+
         // Build transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
         Ok(tx)
     })
-        
 }

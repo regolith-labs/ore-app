@@ -3,11 +3,15 @@ use std::collections::HashMap;
 use dioxus::prelude::*;
 use ore_api::consts::MINT_ADDRESS;
 use ore_boost_api::state::{boost_pda, stake_pda, Stake};
-use solana_extra_wasm::program::spl_token::ui_amount_to_amount;
 use steel::Pubkey;
 
-use crate::{config::LISTED_BOOSTS, gateway::{ore::OreGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet}, utils::LiquidityPair};
-
+use crate::{
+    config::LISTED_BOOSTS,
+    gateway::{ore::OreGateway, GatewayError, GatewayResult, UiTokenAmount},
+    hooks::{use_gateway, use_wallet, Wallet},
+    solana::spl_token::ui_amount_to_amount,
+    utils::LiquidityPair,
+};
 
 pub(crate) fn use_stakes_provider() {
     // Hashmap to cache resources
@@ -25,7 +29,6 @@ pub(crate) fn use_stakes_provider() {
     use_context_provider(|| stakes);
 }
 
-
 fn use_stake_resource(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -34,7 +37,10 @@ fn use_stake_resource(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
             Wallet::Connected(authority) => {
                 let boost_address = boost_pda(mint_address).0;
                 let stake_address = stake_pda(authority, boost_address).0;
-                use_gateway().get_stake(stake_address).await.map_err(GatewayError::from)
+                use_gateway()
+                    .get_stake(stake_address)
+                    .await
+                    .map_err(GatewayError::from)
             }
         }
     })
@@ -54,9 +60,12 @@ pub fn use_all_stakes() -> HashMap<Pubkey, Resource<GatewayResult<Stake>>> {
 }
 
 pub fn use_withdrawable_balances(
-    liquidity_pair: Resource<GatewayResult<LiquidityPair>>, 
-    stake: Resource<GatewayResult<Stake>>
-) -> (Resource<GatewayResult<UiTokenAmount>>, Resource<GatewayResult<UiTokenAmount>>) {
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
+    stake: Resource<GatewayResult<Stake>>,
+) -> (
+    Resource<GatewayResult<UiTokenAmount>>,
+    Resource<GatewayResult<UiTokenAmount>>,
+) {
     let stake_a_balance = use_resource(move || async move {
         let Some(Ok(stake)) = stake.cloned() else {
             return Err(GatewayError::Unknown);
@@ -64,7 +73,8 @@ pub fn use_withdrawable_balances(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let percentage_shares = (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares =
+            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
         let amount_f64 = liquidity_pair.balance_a_f64 * percentage_shares;
         let token_a_decimals = liquidity_pair.token_a.decimals;
         let amount_u64 = ui_amount_to_amount(amount_f64, token_a_decimals);
@@ -78,7 +88,7 @@ pub fn use_withdrawable_balances(
             decimals: token_a_decimals as u8,
         })
     });
-    
+
     let stake_b_balance = use_resource(move || async move {
         let Some(Ok(stake)) = stake.cloned() else {
             return Err(GatewayError::Unknown);
@@ -86,7 +96,8 @@ pub fn use_withdrawable_balances(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let percentage_shares = (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares =
+            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
         let amount_f64 = liquidity_pair.balance_b_f64 * percentage_shares;
         let token_b_decimals = liquidity_pair.token_b.decimals;
         let amount_u64 = ui_amount_to_amount(amount_f64, token_b_decimals);

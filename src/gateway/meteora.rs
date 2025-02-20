@@ -1,23 +1,49 @@
 use meteora_pools_sdk::accounts::Pool as MeteoraPool;
 use meteora_vault_sdk::accounts::Vault as MeteoraVault;
 use meteora_vault_sdk::types::LockedProfitTracker;
-use solana_extra_wasm::program::{spl_associated_token_account::get_associated_token_address, spl_token};
-use steel::{Instruction, Pubkey};
 use serde::Deserialize;
+use steel::{Instruction, Pubkey};
 
-use super::{spl::SplGateway, solana::SolanaGateway, Gateway, GatewayResult, Rpc};
-use crate::{gateway::GatewayError, utils::{deserialize_pubkey_vec, deserialize_string_to_f64, deserialize_string_to_f64_vec}};
+use super::{solana::SolanaGateway, spl::SplGateway, Gateway, GatewayResult, Rpc};
+use crate::{
+    gateway::GatewayError,
+    solana::{spl_associated_token_account::get_associated_token_address, spl_token},
+    utils::{deserialize_pubkey_vec, deserialize_string_to_f64, deserialize_string_to_f64_vec},
+};
 
 pub trait MeteoraGateway {
     // Fetch data
-    async fn get_meteora_pool_metrics(&self, address: Pubkey) -> GatewayResult<MeteoraPoolMetrics>;   
+    async fn get_meteora_pool_metrics(&self, address: Pubkey) -> GatewayResult<MeteoraPoolMetrics>;
     async fn get_meteora_pool(&self, address: Pubkey) -> GatewayResult<MeteoraPool>;
     async fn get_meteora_vault(&self, address: Pubkey) -> GatewayResult<MeteoraVault>;
-    async fn get_meteora_pool_token_amount(&self, pool: MeteoraPool, vault_a: MeteoraVault, vault_b: MeteoraVault, max_amount_a: u64, max_amount_b: u64, slippage_rate: u64) -> GatewayResult<u64>;
+    async fn get_meteora_pool_token_amount(
+        &self,
+        pool: MeteoraPool,
+        vault_a: MeteoraVault,
+        vault_b: MeteoraVault,
+        max_amount_a: u64,
+        max_amount_b: u64,
+        slippage_rate: u64,
+    ) -> GatewayResult<u64>;
 
     // Instruction builders
-    async fn build_meteora_deposit_instruction(&self, pool_address: Pubkey, max_amount_a: u64, max_amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction>;
-    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, amount_a: u64, amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction>;
+    async fn build_meteora_deposit_instruction(
+        &self,
+        pool_address: Pubkey,
+        max_amount_a: u64,
+        max_amount_b: u64,
+        slippage_rate: u64,
+        owner: Pubkey,
+    ) -> GatewayResult<Instruction>;
+    async fn build_meteora_withdraw_instruction(
+        &self,
+        pool_address: Pubkey,
+        shares_amount: u64,
+        amount_a: u64,
+        amount_b: u64,
+        slippage_rate: u64,
+        owner: Pubkey,
+    ) -> GatewayResult<Instruction>;
 }
 
 impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
@@ -40,12 +66,22 @@ impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
         Ok(vault)
     }
 
-    async fn get_meteora_pool_token_amount(&self, pool: MeteoraPool, vault_a: MeteoraVault, vault_b: MeteoraVault, max_amount_a: u64, max_amount_b: u64, slippage_rate: u64) -> GatewayResult<u64> {
+    async fn get_meteora_pool_token_amount(
+        &self,
+        pool: MeteoraPool,
+        vault_a: MeteoraVault,
+        vault_b: MeteoraVault,
+        max_amount_a: u64,
+        max_amount_b: u64,
+        slippage_rate: u64,
+    ) -> GatewayResult<u64> {
         // Get token accounts
-        let Some(pool_vault_a_lp_token) = self.rpc.get_token_account(&pool.a_vault_lp).await? else {
+        let Some(pool_vault_a_lp_token) = self.rpc.get_token_account(&pool.a_vault_lp).await?
+        else {
             return Err(GatewayError::Unknown);
         };
-        let Some(pool_vault_b_lp_token) = self.rpc.get_token_account(&pool.b_vault_lp).await? else {
+        let Some(pool_vault_b_lp_token) = self.rpc.get_token_account(&pool.b_vault_lp).await?
+        else {
             return Err(GatewayError::Unknown);
         };
 
@@ -64,16 +100,16 @@ impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
 
         // Get vault token amount
         let Some(pool_token_a_amount) = vault_a.get_amount_by_share(
-            current_time as u64, 
-            pool_vault_a_lp_token_amount_u64, 
-            vault_a_lp_mint.supply
+            current_time as u64,
+            pool_vault_a_lp_token_amount_u64,
+            vault_a_lp_mint.supply,
         ) else {
             return Err(GatewayError::Unknown);
         };
         let Some(pool_token_b_amount) = vault_b.get_amount_by_share(
-            current_time as u64, 
-            pool_vault_b_lp_token_amount_u64, 
-            vault_b_lp_mint.supply
+            current_time as u64,
+            pool_vault_b_lp_token_amount_u64,
+            vault_b_lp_mint.supply,
         ) else {
             return Err(GatewayError::Unknown);
         };
@@ -99,31 +135,41 @@ impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
         Ok(pool_token_amount as u64)
     }
 
-    async fn build_meteora_deposit_instruction(&self, pool_address: Pubkey, max_amount_a: u64, max_amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction> {
+    async fn build_meteora_deposit_instruction(
+        &self,
+        pool_address: Pubkey,
+        max_amount_a: u64,
+        max_amount_b: u64,
+        slippage_rate: u64,
+        owner: Pubkey,
+    ) -> GatewayResult<Instruction> {
         // Get pool and vault data
-        let pool = self.get_meteora_pool(pool_address).await?;      
+        let pool = self.get_meteora_pool(pool_address).await?;
         let vault_a = self.get_meteora_vault(pool.a_vault).await?;
         let vault_b = self.get_meteora_vault(pool.b_vault).await?;
 
         // Get token amount
-        let pool_token_amount = self.get_meteora_pool_token_amount(
-            pool.clone(),
-            vault_a.clone(),
-            vault_b.clone(),
-            max_amount_a,
-            max_amount_b,
-            slippage_rate
-        ).await?;
+        let pool_token_amount = self
+            .get_meteora_pool_token_amount(
+                pool.clone(),
+                vault_a.clone(),
+                vault_b.clone(),
+                max_amount_a,
+                max_amount_b,
+                slippage_rate,
+            )
+            .await?;
 
         // Derive token addresses
         let user_pool_lp = get_associated_token_address(&owner, &pool.lp_mint);
-        
+
         // Build instruction
-        let args: meteora_pools_sdk::instructions::AddBalanceLiquidityInstructionArgs = meteora_pools_sdk::instructions::AddBalanceLiquidityInstructionArgs {
-            pool_token_amount,
-            maximum_token_a_amount: max_amount_a,
-            maximum_token_b_amount: max_amount_b,
-        };
+        let args: meteora_pools_sdk::instructions::AddBalanceLiquidityInstructionArgs =
+            meteora_pools_sdk::instructions::AddBalanceLiquidityInstructionArgs {
+                pool_token_amount,
+                maximum_token_a_amount: max_amount_a,
+                maximum_token_b_amount: max_amount_b,
+            };
         let accounts = meteora_pools_sdk::instructions::AddBalanceLiquidity {
             pool: pool_address,
             lp_mint: pool.lp_mint,
@@ -145,7 +191,15 @@ impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
         Ok(accounts.instruction(args))
     }
 
-    async fn build_meteora_withdraw_instruction(&self, pool_address: Pubkey, shares_amount: u64, _amount_a: u64, amount_b: u64, slippage_rate: u64, owner: Pubkey) -> GatewayResult<Instruction> {
+    async fn build_meteora_withdraw_instruction(
+        &self,
+        pool_address: Pubkey,
+        shares_amount: u64,
+        _amount_a: u64,
+        amount_b: u64,
+        slippage_rate: u64,
+        owner: Pubkey,
+    ) -> GatewayResult<Instruction> {
         // Get pool and vault data
         let pool = self.get_meteora_pool(pool_address).await?;
         let vault_a = self.get_meteora_vault(pool.a_vault).await?;
@@ -208,7 +262,6 @@ pub struct MeteoraPoolMetrics {
     // pub lp_mint: Pubkey,
     #[serde(deserialize_with = "deserialize_string_to_f64")]
     pub pool_tvl: f64,
-
     // TODO Rest of the fields
 }
 
@@ -219,12 +272,7 @@ trait MeteoraVaultExt {
 
 impl MeteoraVaultExt for MeteoraVault {
     /// Get amount by share
-    fn get_amount_by_share(
-        &self,
-        current_time: u64,
-        share: u64,
-        total_supply: u64,
-    ) -> Option<u64> {
+    fn get_amount_by_share(&self, current_time: u64, share: u64, total_supply: u64) -> Option<u64> {
         let total_amount = self.get_unlocked_amount(current_time)?;
         u64::try_from(
             u128::from(share)

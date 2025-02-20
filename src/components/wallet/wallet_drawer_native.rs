@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::hooks::{use_wallet, Wallet};
 
-use super::{Col, LiquidityTable, TokenTable, WalletTab, WalletTabs};
+use crate::components::*;
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {

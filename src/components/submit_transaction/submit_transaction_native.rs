@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
 use solana_sdk::{
-    message::VersionedMessage,
     signature::{Keypair, Signature},
     transaction::VersionedTransaction,
 };
@@ -8,32 +7,36 @@ use solana_sdk::{
 use crate::{
     components::*,
     gateway::{solana::SolanaGateway, GatewayResult, NativeRpc, Rpc},
-    hooks::{use_gateway, use_wallet},
+    hooks::{use_gateway, use_transaction_status},
 };
 
-pub fn submit_transaction(tx: VersionedTransaction, mut signal: Signal<InvokeSignatureStatus>) {
+pub fn submit_transaction(tx: VersionedTransaction) {
+    let mut transaction_status = use_transaction_status();
     spawn(async move {
-        signal.set(InvokeSignatureStatus::Waiting);
+        transaction_status.set(Some(TransactionStatus::Waiting));
         // get signer
         match crate::hooks::use_wallet_native::get() {
             Ok(signer) => {
                 let gateway = use_gateway();
+                transaction_status.set(Some(TransactionStatus::Sending(0)));
                 // sign
                 match sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
                     Ok(sig) => {
-                        signal.set(InvokeSignatureStatus::Done(sig));
+                        transaction_status.set(Some(TransactionStatus::Done(sig)));
                         return;
                     }
                     Err(err) => {
                         log::error!("{:?}", err);
+                        transaction_status.set(Some(TransactionStatus::Error));
                     }
                 }
             }
             Err(err) => {
                 log::error!("{:?}", err);
+                transaction_status.set(Some(TransactionStatus::Denied));
+                return;
             }
         }
-        signal.set(InvokeSignatureStatus::DoneWithError);
     });
 }
 

@@ -1,9 +1,16 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string};
 
-use crate::{components::*, gateway::GatewayResult, hooks::{on_transaction_done, use_boost, use_boost_apy, use_boost_claim_transaction, use_ore_balance, use_ore_price, use_stake}};
+use crate::{
+    components::*,
+    gateway::GatewayResult,
+    hooks::{
+        on_transaction_done, use_boost, use_boost_apy, use_boost_claim_transaction,
+        use_ore_balance, use_ore_price, use_stake,
+    },
+    solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
+};
 
 pub fn Idle() -> Element {
     let mut balance = use_ore_balance();
@@ -104,7 +111,7 @@ fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
                 TitledRow {
                     title: "Deposits (pending)",
                     description: "The amount of ORE you have deposited in the boost that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
-                    value: rsx! {           
+                    value: rsx! {
                         OreValue {
                             ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
                             with_decimal_units: true,
@@ -118,7 +125,10 @@ fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
 }
 
 #[component]
-pub fn StakeYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+pub fn StakeYield(
+    boost: Resource<GatewayResult<Boost>>,
+    stake: Resource<GatewayResult<Stake>>,
+) -> Element {
     // Build claim transaction
     let claim_tx = use_boost_claim_transaction(boost, stake);
 
@@ -149,9 +159,7 @@ pub fn StakeYield(boost: Resource<GatewayResult<Boost>>, stake: Resource<Gateway
 }
 
 #[component]
-fn BoostMetrics(
-    boost: Resource<GatewayResult<Boost>>
-) -> Element {
+fn BoostMetrics(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
@@ -277,3 +285,4 @@ fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
         }
     }
 }
+

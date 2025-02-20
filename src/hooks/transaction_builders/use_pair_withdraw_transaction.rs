@@ -1,10 +1,32 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
-use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_token_address, instruction::create_associated_token_account_idempotent}, spl_token::{self, instruction::{close_account, sync_native}, ui_amount_to_amount}};
-use solana_sdk::{address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount}, hash::Hash, message::{v0::Message, VersionedMessage}, signature::Signature, transaction::VersionedTransaction};
+use solana_sdk::{
+    address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount},
+    hash::Hash,
+    message::{v0::Message, VersionedMessage},
+    signature::Signature,
+    transaction::VersionedTransaction,
+};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet, use_sol_balance, MIN_SOL_BALANCE}, utils::LiquidityPair 
+    components::TokenInputError,
+    config::{BoostMeta, LpType, Token},
+    gateway::{
+        kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc,
+        UiTokenAmount,
+    },
+    hooks::{use_gateway, use_sol_balance, use_wallet, Wallet, MIN_SOL_BALANCE},
+    solana::{
+        spl_associated_token_account::{
+            get_associated_token_address, instruction::create_associated_token_account_idempotent,
+        },
+        spl_token::{
+            self,
+            instruction::{close_account, sync_native},
+            ui_amount_to_amount,
+        },
+    },
+    utils::LiquidityPair,
 };
 
 // Build pair deposit transaction
@@ -16,7 +38,7 @@ pub fn use_pair_withdraw_transaction(
     stake_b_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
-    mut err: Signal<Option<TokenInputError>>
+    mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     let sol_balance = use_sol_balance();
@@ -76,57 +98,60 @@ pub fn use_pair_withdraw_transaction(
 
         // Check if shares amount is sufficient
         if shares_amount > stake.balance + stake.balance_pending {
-            err.set(Some(TokenInputError::InsufficientBalance(liquidity_pair.token_a.clone())));
+            err.set(Some(TokenInputError::InsufficientBalance(
+                liquidity_pair.token_a.clone(),
+            )));
             return Err(GatewayError::Unknown);
         }
-       
+
         // Aggregate instructions
         let mut ixs = vec![];
 
         // Build ore boost withdraw instruction
-        ixs.push(
-            ore_boost_api::sdk::withdraw(
-                authority,
-                boost_meta.lp_mint,
-                shares_amount,
-            )
-        );
-    
+        ixs.push(ore_boost_api::sdk::withdraw(
+            authority,
+            boost_meta.lp_mint,
+            shares_amount,
+        ));
+
         // Build sol ata
         let sol_mint = Token::sol().mint;
         let wsol_ata = get_associated_token_address(&authority, &sol_mint);
         let is_sol = liquidity_pair.token_a.is_sol() || liquidity_pair.token_b.is_sol();
         if is_sol {
-            ixs.push(
-                create_associated_token_account_idempotent(&authority, &authority, &sol_mint, &spl_token::ID)
-            );
-            ixs.push(
-                sync_native(&spl_token::ID, &wsol_ata).unwrap()
-            );
+            ixs.push(create_associated_token_account_idempotent(
+                &authority,
+                &authority,
+                &sol_mint,
+                &spl_token::ID,
+            ));
+            ixs.push(sync_native(&spl_token::ID, &wsol_ata).unwrap());
         }
 
         // Append kamino withdraw instructions
         let withdraw_ix = match boost_meta.lp_type {
             LpType::Kamino => {
-                let Ok(ix) = use_gateway().build_kamino_withdraw_instruction(
-                    boost_meta.lp_id,
-                    shares_amount,
-                    authority,
-                ).await else {
+                let Ok(ix) = use_gateway()
+                    .build_kamino_withdraw_instruction(boost_meta.lp_id, shares_amount, authority)
+                    .await
+                else {
                     err.set(None);
                     return Err(GatewayError::Unknown);
                 };
                 ix
             }
             LpType::Meteora => {
-                let Ok(ix) = use_gateway().build_meteora_withdraw_instruction(
-                    boost_meta.lp_id,
-                    shares_amount,
-                    amount_a_u64,
-                    amount_b_u64,
-                    1,
-                    authority,
-                ).await else {
+                let Ok(ix) = use_gateway()
+                    .build_meteora_withdraw_instruction(
+                        boost_meta.lp_id,
+                        shares_amount,
+                        amount_a_u64,
+                        amount_b_u64,
+                        1,
+                        authority,
+                    )
+                    .await
+                else {
                     err.set(None);
                     return Err(GatewayError::Unknown);
                 };
@@ -138,7 +163,14 @@ pub fn use_pair_withdraw_transaction(
         // Close the wSOL ata
         if is_sol {
             ixs.push(
-                close_account(&spl_token::ID, &wsol_ata, &authority, &authority, &[&authority]).unwrap()
+                close_account(
+                    &spl_token::ID,
+                    &wsol_ata,
+                    &authority,
+                    &authority,
+                    &[&authority],
+                )
+                .unwrap(),
             );
         }
 
@@ -155,21 +187,15 @@ pub fn use_pair_withdraw_transaction(
                 }
             }
         }
-        
+
         // Build the transaction
         let tx = VersionedTransaction {
             signatures: vec![Signature::default()],
             message: VersionedMessage::V0(
-                Message::try_compile(
-                    &authority,
-                    &ixs,
-                    &luts,
-                    Hash::default(),
-                ).unwrap()
+                Message::try_compile(&authority, &ixs, &luts, Hash::default()).unwrap(),
             ),
         };
-        
+
         Ok(tx)
     })
-        
 }

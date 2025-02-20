@@ -5,6 +5,7 @@ mod gateway;
 mod hooks;
 mod pages;
 mod route;
+mod solana;
 mod time;
 mod utils;
 
@@ -13,7 +14,10 @@ use hooks::{use_miner_status_provider, use_mining_loop};
 use tracing::Level;
 
 use crate::{
-    hooks::{use_cache_provider, use_transaction_status_provider, use_miner_provider, use_wallet_provider, use_miner_events_provider},
+    hooks::{
+        use_cache_provider, use_miner_events_provider, use_miner_provider,
+        use_transaction_status_provider, use_wallet_provider,
+    },
     route::Route,
 };
 
