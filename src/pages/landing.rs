@@ -5,7 +5,6 @@ use crate::{components::*, hooks::{use_ore_holders, use_ore_market_cap}, route::
 pub fn Landing() -> Element {
     rsx! {
         Hero {}
-        // Marqee {}
         Mining {}
         Liquidity {}
         Stats {}
@@ -18,7 +17,7 @@ pub fn Landing() -> Element {
 fn Hero() -> Element {
     rsx! {
         Col {
-            class: "relative w-full h-full max-w-screen min-h-192",
+            class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-192",
             LandingNavbar {}
             Col {
                 class: "absolute w-full h-full mx-auto max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
@@ -78,7 +77,7 @@ fn HeroTitle() -> Element {
 fn Mining() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen md:min-h-224 px-4 mt-16",
+            class: "relative w-screen h-full min-h-screen md:min-h-224 px-4 mt-16 pt-16 sm:pt-32 md:pt-0",
             HashAnimation {}
             Col {
                 // class: "relative w-full h-min mx-auto max-w-7xl justify-start",
@@ -155,103 +154,162 @@ fn Community() -> Element {
             SectionCopy {
                 tip: "Social",
                 title: "Join the community.",
-                detail: "Discover why people around the world love ORE."
+                detail: "Discover why thousands of people around the world love ORE."
             }
             Testimonials {}
         }
     }
 }
+
+#[derive(Clone, PartialEq)]
+struct TestimonialData {
+    image: String,
+    name: String,
+    quote: String,
+    link: String,
+}
+
 fn Testimonials() -> Element {
+    let data = vec![
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1651271535800336406/vR1FxvDs_400x400.jpg".into(),
+            name: "Matty Tay".into(),
+            quote: "BTC walked so ORE could run.".into(),
+            link: "https://x.com/mattytay/status/1870887900663169059".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1857467519042232321/GLvZxG-T_400x400.jpg".into(),
+            name: "network state enjoyooor".into(),
+            quote: "ORE becoming more gamified with every new update . This is what mining evolution looks like.".into(),
+            link: "https://x.com/lowercaseben/status/1878117108287943112".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1830469870200193024/7xI_DeCq_400x400.jpg".into(),
+            name: "Brewtoshi".into(),
+            quote: "Ore Boosts are its killer feature and are super underrated atm".into(),
+            link: "https://x.com/Brewtoshi/status/1875560756332392708".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1876410450767925248/J-l8lpL6_400x400.jpg".into(),
+            name: "Ore Historian".into(),
+            quote: "Its not crazy and it will work. $ORE will be running the defi ecosystem".into(),
+            link: "https://x.com/oreHistorian/status/1877146737673981959".into()        
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1892613729700691968/cG64Yc06_400x400.jpg".into(),
+            name: "Anatoly Yakovenko".into(),
+            quote: ".OREsupply is cool".into(),
+            link: "https://x.com/aeyakovenko/status/1891891612235727093".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1815598662006792192/ShUElYCu_400x400.jpg".into(),
+            name: "kel".into(),
+            quote: "using proof of work for distribution atop a performant proof of stake chain has the potential to be the next such faded mechanism".into(),
+            link: "https://x.com/kelxyz_/status/1819423305096425812".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1828429925428158464/DgmDex35_400x400.jpg".into(),
+            name: "Vidiu".into(),
+            quote: "The answer is simple @OREsupply".into(),
+            link: "https://x.com/0xVidiu/status/1892670871984062474".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1848549429717975040/JpZUMEAW_400x400.jpg".into(),
+            name: "Elias".into(),
+            quote: "ore is actually here to help us. it can only make the network stronger".into(),
+            link: "https://x.com/Eliascm17/status/1776341784118890765".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1798717628099469312/TiVu101s_400x400.jpg".into(),
+            name: "Farhaj Mayan".into(),
+            quote: "Upgraded my ORE. LFG 🫡 @OREsupply".into(),
+            link: "https://x.com/farhajmayan/status/1820073386107720121".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1873772860566638592/cTfnGR67_400x400.jpg".into(),
+            name: "SOL Big Brain".into(),
+            quote: "Been in heavy accumulation mode of $ORE (@OREsupply) lately.".into(),
+            link: "https://x.com/SOLBigBrain/status/1870124964088533248".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1510345561731330063/mRH8nY7D_400x400.jpg".into(),
+            name: "Madhatt3r".into(),
+            quote: "Memecoins will come and go but ORE is forever. It is hard money in a sea of inflationary credit. Believe in something.".into(),
+            link: "https://x.com/".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1853830577872347136/7fDP-JKR_400x400.jpg".into(),
+            name: "Solana Legend ".into(),
+            quote: "Born too late to own a house. Born too early to be a TikTok star. Born at the perfect time to mine ORE".into(),
+            link: "https://x.com/SolanaLegend/status/1820629234232000721".into()
+        },
+        TestimonialData {
+            image: "https://pbs.twimg.com/profile_images/1536022035435991046/Ih9CZm-r_400x400.jpg".into(),
+            name: "David Chapman".into(),
+            quote: "ORE is what Satoshi envisioned.".into(),
+            link: "https://x.com/DChapmanCrypto/status/1820710738308280432".into()
+        },
+    ];
+        
+        
     rsx! {
         Col {
             class: "w-full h-min mx-auto max-w-7xl justify-start mt-8",
-            Row {
-                class: "w-full gap-4",
-                Col {
-                    class: "flex-1 mt-16",
+            TestimonialWall {
+                class: "hidden sm:flex",
+                testimonial_data: data.clone()
+            }
+            TestimonialList {
+                class: "sm:hidden",
+                testimonial_data: data.clone()
+            }
+        }
+    }
+}
+
+#[component]
+fn TestimonialList(class: Option<String>, testimonial_data: Vec<TestimonialData>) -> Element {
+    let class = class.unwrap_or_default();
+    rsx! {
+        Row {
+            class: "w-full gap-4 overflow-x-auto {class}",
+            for data in testimonial_data {
+                Testimonial {
+                    class: "my-auto w-72",
+                    data: data.clone()
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>) -> Element {
+    let class = class.unwrap_or_default();
+    rsx! {
+        Row {
+            class: "w-full gap-4 {class}",
+            Col {
+                class: "flex-1 mt-16 gap-4",
+                for data in testimonial_data[0..4] {
                     Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1651271535800336406/vR1FxvDs_400x400.jpg",
-                        name: "Matty Tay",
-                        quote: "BTC walked so ORE could run.",
-                        link: "https://x.com/mattytay/status/1870887900663169059"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1857467519042232321/GLvZxG-T_400x400.jpg",
-                        name: "network state enjoyooor",
-                        quote: "ORE becoming more gamified with every new update . This is what mining evolution looks like.",
-                        link: "https://x.com/lowercaseben/status/1878117108287943112"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1830469870200193024/7xI_DeCq_400x400.jpg",
-                        name: "Brewtoshi",
-                        quote: "Ore Boosts are its killer feature and are super underrated atm",
-                        link: "https://x.com/Brewtoshi/status/1875560756332392708"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1876410450767925248/J-l8lpL6_400x400.jpg",
-                        name: "Ore Historian",
-                        quote: "Its not crazy and it will work. $ORE will be running the defi ecosystem",
-                        link: "https://x.com/oreHistorian/status/1877146737673981959"
+                        data: data.clone()
                     }
                 }
-                Col {
-                    class: "flex-1",
+            }
+            Col {
+                class: "flex-1 gap-4",
+                for data in testimonial_data[4..9] {
                     Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1892613729700691968/cG64Yc06_400x400.jpg",
-                        name: "Anatoly Yakovenko",
-                        quote: ".OREsupply is cool",
-                        link: "https://x.com/aeyakovenko/status/1891891612235727093"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1815598662006792192/ShUElYCu_400x400.jpg",
-                        name: "kel",
-                        quote: "using proof of work for distribution atop a performant proof of stake chain has the potential to be the next such faded mechanism",
-                        link: "https://x.com/kelxyz_/status/1819423305096425812"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1828429925428158464/DgmDex35_400x400.jpg",
-                        name: "Vidiu",
-                        quote: "The answer is simple @OREsupply",
-                        link: "https://x.com/0xVidiu/status/1892670871984062474"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1848549429717975040/JpZUMEAW_400x400.jpg",
-                        name: "Elias",
-                        quote: "ore is actually here to help us. it can only make the network stronger",
-                        link: "https://x.com/Eliascm17/status/1776341784118890765"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1798717628099469312/TiVu101s_400x400.jpg",
-                        name: "Farhaj Mayan",
-                        quote: "Upgraded my ORE. LFG 🫡 @OREsupply",
-                        link: "https://x.com/farhajmayan/status/1820073386107720121"
+                        data: data.clone()
                     }
                 }
-                Col {
-                    class: "flex-1 mt-16",
+            }
+            Col {
+                class: "flex-1 mt-16 gap-4",
+                for data in testimonial_data[9..13] {
                     Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1873772860566638592/cTfnGR67_400x400.jpg",
-                        name: "SOL Big Brain",
-                        quote: "Been in heavy accumulation mode of $ORE (@OREsupply) lately.",
-                        link: "https://x.com/SOLBigBrain/status/1870124964088533248"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1510345561731330063/mRH8nY7D_400x400.jpg",
-                        name: "Madhatt3r",
-                        quote: "Memecoins will come and go but ORE is forever. It is hard money in a sea of inflationary credit. Believe in something.",
-                        link: "https://x.com/"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1853830577872347136/7fDP-JKR_400x400.jpg",
-                        name: "Solana Legend ",
-                        quote: "Born too late to own a house. Born too early to be a TikTok star. Born at the perfect time to mine ORE",
-                        link: "https://x.com/SolanaLegend/status/1820629234232000721"
-                    }
-                    Testimonial {
-                        image: "https://pbs.twimg.com/profile_images/1536022035435991046/Ih9CZm-r_400x400.jpg",
-                        name: "David Chapman",
-                        quote: "ORE is what Satoshi envisioned.",
-                        link: "https://x.com/DChapmanCrypto/status/1820710738308280432"
+                        data: data.clone()
                     }
                 }
             }
@@ -260,27 +318,28 @@ fn Testimonials() -> Element {
 }
 
 #[component]
-fn Testimonial(image: String, name: String, quote: String, link: String) -> Element {
+fn Testimonial(class: Option<String>, data: TestimonialData) -> Element {
+    let class = class.unwrap_or_default();
     rsx! {
         a {
-            class: "flex flex-col bg-elements-midEmphasis/10 rounded-lg p-5 mb-4 border-2 border-transparent hover:border-elements-highEmphasis transition-all duration-300 ease-in-out",
-            href: "{link}",
+            class: "flex flex-col bg-elements-midEmphasis/10 rounded-md p-5 border-2 border-transparent hover:border-elements-highEmphasis transition-all duration-300 ease-in-out grow w-96 {class}",
+            href: "{data.link}",
             target: "_blank",
             Row {
                 class: "gap-3",
                 img {
                     class: "w-10 h-10 rounded-full",
-                    src: "{image}" // Placeholder avatar
+                    src: "{data.image}" // Placeholder avatar
                 }
                 Col {
                     class: "gap-1",
                     span {
                         class: "font-semibold text-elements-highEmphasis",
-                        "{name}"
+                        "{data.name}"
                     }
                     p {
                         class: "text-elements-midEmphasis",
-                        "{quote}"
+                        "{data.quote}"
                     }
                 }
             }
@@ -365,7 +424,7 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "Bitcoin defi is broken. L2s, bridges, and custodians are fragmented Bitcoin's liquidity across defi. ORE is an experiment to bring the best ideas of Bitcoin to the Solana defi ecosystem."
+                    answer: "Bitcoin defi is fundamentally broken. A variety of bridges and third-party custodians have fragmented Bitcoin's defi liquidity across a maze of wrapper tokens and L2s. ORE represents a new generation of digital gold native to the Solana ecosystem. It prioritizes performance, self-custody, and composability to finally bring digital gold and decentralized finance together."
                 }
                 FaqItem {
                     question: "How does mining work?",
@@ -389,7 +448,7 @@ fn FaqItem(question: String, answer: String) -> Element {
     let rotation = if is_open.cloned() { "rotate-45" } else { "rotate-0" };
     rsx! {
         button {
-            class: "flex flex-col py-8 px-8 cursor-pointer transition-all duration-300 ease-in-out rounded hover:bg-elements-midEmphasis/10",
+            class: "flex flex-col py-8 px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
             onclick: move |_| is_open.set(!is_open.cloned()),
             Row {
                 class: "justify-between font-wide text-left font-bold text-2xl text-elements-highEmphasis",
