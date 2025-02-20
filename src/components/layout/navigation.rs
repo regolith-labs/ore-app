@@ -33,7 +33,7 @@ pub(crate) fn VisitorNavBar() -> Element {
                 class: "w-full my-auto justify-between",
                 Logo {}
                 // SocialLinks {}
-                LaunchButton {}
+                // LaunchButton {}
             }
         }
     }
@@ -184,54 +184,41 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
     }
 }
 
-fn LaunchButton() -> Element {
-    rsx! {
-        Link {
-            class: "flex px-8 h-12 my-auto rounded controls-primary rounded-full z-100",
-            to: Route::Mine {},
-            span {
-                class: "my-auto",
-                "Launch app →"
-            }
-        }
-    }
-}
-
-fn _SocialLinks() -> Element {
+pub fn SocialLinks() -> Element {
     let button_color = "text-white";
     rsx! {
         div {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
             Link {
                 to: "https://dexscreener.com/solana/ggadtfbqdgjozz3fp7zrtofgwnrs4e6mczmmd5ni1mxj",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 rounded-full {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 rounded-full {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 DexscreenIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
             Link {
                 to: "https://discord.gg/4TQfshAAsT",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 DiscordIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
             Link {
                 to: "https://github.com/regolith-labs/ore",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 GithubIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
             Link {
                 to: "https://x.com/oresupply",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 XIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
         }
