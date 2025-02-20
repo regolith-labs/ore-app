@@ -1,0 +1,157 @@
+name: Build and Release (macOS)
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    env:
+      # Build constants
+      TARGET: macos
+      ARCH: x86_64
+      VERSION: ${{ github.ref_name }}
+      # AWS publish constants
+      AWS_REGION: us-east-1
+      S3_BUCKET_NAME: ore-app-xyz
+
+    steps:
+      # 1) Check out code
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # 2) Cache Cargo registry
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      # 3) Cache target directory
+      - name: Cache target directory
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-
+
+      # 4) Install Rust (stable)
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          profile: minimal
+          override: true
+
+      # 5) Add x86_64-apple-darwin target
+      - name: Add x86_64 Rust target
+        run: |
+          rustup target add x86_64-apple-darwin
+
+      # 6) Install CLI tools
+      - name: Install dioxus-cli and cargo-packager
+        run: |
+          cargo install cargo-packager@0.11.3 dioxus-cli@0.6.3
+
+      # 7) Build & Package for x86_64
+      - name: Build and Package
+        run: |
+          # Force Cargo to build for x86_64-apple-darwin
+          # so dx bundle will produce x86_64 artifacts
+          CARGO_BUILD_TARGET=x86_64-apple-darwin \
+            dx bundle --platform desktop --package-types macos --release
+
+        ## # 8) Import Developer ID Certificate
+        ## - name: Import Developer ID cert
+        ##   run: |
+        ##     # Decode the Base64-encoded P12
+        ##     echo "$DEVID_CERT_BASE64" | base64 --decode > developer_id.p12
+
+        ##     # Create & unlock a temporary keychain (no password)
+        ##     security create-keychain -p "" build.keychain
+        ##     security default-keychain -s build.keychain
+        ##     security unlock-keychain -p "" build.keychain
+
+        ##     # Import the p12 into the keychain
+        ##     security import developer_id.p12 -k ~/Library/Keychains/build.keychain -P "$DEVID_CERT_PASSWORD" -T /usr/bin/codesign
+
+        ##     # Allow codesign to use this key without prompting
+        ##     security set-key-partition-list -S apple-tool:,apple: -s -k "" ~/Library/Keychains/build.keychain
+        ##   env:
+        ##     DEVID_CERT_BASE64: ${{ secrets.DEVID_CERT_BASE64 }}
+        ##     DEVID_CERT_PASSWORD: ${{ secrets.DEVID_CERT_PASSWORD }}
+
+        ## # 9) Sign the .app
+        ## - name: Code-sign .app
+        ##   run: |
+        ##     APP_DIR="/Users/runner/work/wallet/wallet/target/dx/wallet/bundle/macos/bundle/macos/Wallet.app"
+        ##     codesign --deep --force --verify --verbose --options runtime \
+        ##       --sign "Developer ID Application: $DEVID_NAME ($DEVID_TEAM_ID)" \
+        ##       "$APP_DIR"
+        ##   env:
+        ##     DEVID_NAME: ${{ secrets.DEVID_NAME }}
+        ##     DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
+
+        ## # 10) Notarize the signed .app
+        ## - name: Notarize app
+        ##   run: |
+        ##     # Possibly redundant on GitHub macOS runners, but ensures availability
+        ##     brew install jq || true
+        ##     
+        ##     set -euxo pipefail
+        ## 
+        ##     APP_DIR="/Users/runner/work/wallet/wallet/target/dx/wallet/bundle/macos/bundle/macos/Wallet.app"
+        ##     ZIP_FILE="Wallet_${{ env.VERSION }}.app.zip"
+        ## 
+        ##     # Zip the .app for submission
+        ##     /usr/bin/zip -r "$ZIP_FILE" "$APP_DIR"
+        ## 
+        ##     echo "Submitting to Apple Notary Service..."
+        ##     xcrun notarytool submit "$ZIP_FILE" \
+        ##       --apple-id "$NOTARIZE_APPLE_ID" \
+        ##       --team-id "$DEVID_TEAM_ID" \
+        ##       --password "$NOTARIZE_APP_PASSWORD" \
+        ##       --verbose \
+        ##       --wait
+
+        ##     echo "Stapling the notarization ticket..."
+        ##     xcrun stapler staple "$APP_DIR"
+        ##   env:
+        ##     NOTARIZE_APPLE_ID: ${{ secrets.NOTARIZE_APPLE_ID }}
+        ##     NOTARIZE_APP_PASSWORD: ${{ secrets.NOTARIZE_APP_PASSWORD }}
+        ##     DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
+
+        ## # 11) Configure AWS credentials
+        ## - name: Configure AWS credentials
+        ##   uses: aws-actions/configure-aws-credentials@v3
+        ##   with:
+        ##     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        ##     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        ##     aws-region: ${{ env.AWS_REGION }}
+
+        ## # 12) Create tar.gz from the notarized .app folder & upload to S3
+        ## - name: Package and Upload
+        ##   run: |
+        ##     APP_DIR="/Users/runner/work/wallet/wallet/target/dx/wallet/bundle/macos/bundle/macos/Wallet.app"
+        ##     TAR_FILE="Wallet_${{ env.VERSION }}.app.tar.gz"
+
+        ##     tar -czf "$TAR_FILE" -C "$(dirname "$APP_DIR")" "$(basename "$APP_DIR")"
+
+        ##     # Upload to S3
+        ##     aws s3 cp \
+        ##       "$TAR_FILE" \
+        ##       "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/wallet_${{ env.VERSION }}_x64.app.tar.gz"
+
+        ## # 13) Print S3 download link
+        ## - name: Print S3 download link
+        ##   run: |
+        ##     echo "Download macOS artifact at:"
+        ##     echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/wallet_${{ env.VERSION }}_x64.app.tar.gz"
