@@ -18,7 +18,7 @@ pub fn Landing() -> Element {
 fn Hero() -> Element {
     rsx! {
         Col {
-            class: "relative w-full h-full max-w-screen min-h-screen",
+            class: "relative w-full h-full max-w-screen min-h-192",
             LandingNavbar {}
             Col {
                 class: "absolute w-full h-full mx-auto max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
@@ -78,19 +78,20 @@ fn HeroTitle() -> Element {
 fn Mining() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen px-4 mt-16",
+            class: "relative w-screen h-full min-h-screen md:min-h-224 px-4 mt-16",
             HashAnimation {}
             Col {
-                class: "relative w-full h-min mx-auto max-w-7xl justify-start",
+                // class: "relative w-full h-min mx-auto max-w-7xl justify-start",
+                class: "w-full h-min mx-auto max-w-7xl justify-start",
                 SectionCopy {
-                    class: "bg-linear-to-r from-transparent via-black to-transparent from-10% via-50% to-90%",
+                    class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                     tip: "Fair launch",
                     title: "Proof of work.",
                     subtitle: "On Solana.", 
                     detail: "Start mining crypto in just one click."
                 }
+                LandingMiner {}
             }
-            LandingMiner {}
         }
     }
 }
@@ -116,50 +117,13 @@ fn HashAnimation() -> Element {
 
     rsx! {
         Col {
-            class: "absolute bottom-0 left-0 right-0 w-full h-full overflow-hidden opacity-10 pointer-events-none",
+            class: "absolute bottom-0 left-1/2 -translate-x-1/2 w-min w-full h-full overflow-hidden opacity-10 pointer-events-none z-0",
             Col {
                 class: "w-full gap-4 mt-auto font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-pre-wrap",
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
-                }
-                span {
-                    "{hash_text}"
+                for _ in 0..32 {
+                    span {
+                        "{hash_text}"
+                    }
                 }
             }
         }
@@ -169,7 +133,7 @@ fn HashAnimation() -> Element {
 fn Liquidity() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen px-4 mt-16",
+            class: "relative w-screen h-full min-h-screen md:min-h-192 px-4 mt-16",
             Col {
                 class: "w-full h-min mx-auto max-w-7xl justify-start",
                 SectionCopy {
@@ -187,7 +151,7 @@ fn Liquidity() -> Element {
 fn Community() -> Element {
     rsx! {
         Col {
-            class: "relative w-full h-full mx-auto max-w-7xl min-h-screen pt-16 px-4",
+            class: "relative w-full h-full mx-auto max-w-7xl min-h-192 pt-16 px-4",
             SectionCopy {
                 tip: "Social",
                 title: "Join the community.",
@@ -299,7 +263,7 @@ fn Testimonials() -> Element {
 fn Testimonial(image: String, name: String, quote: String, link: String) -> Element {
     rsx! {
         a {
-            class: "flex flex-col bg-elements-midEmphasis/10 rounded-lg p-5 mb-4 border-2 border-transparent hover:border-elements-midEmphasis transition-all duration-300 ease-in-out",
+            class: "flex flex-col bg-elements-midEmphasis/10 rounded-lg p-5 mb-4 border-2 border-transparent hover:border-elements-highEmphasis transition-all duration-300 ease-in-out",
             href: "{link}",
             target: "_blank",
             Row {

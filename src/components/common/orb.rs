@@ -36,7 +36,8 @@ pub fn HeroOrb() -> Element {
 pub fn LandingMiner() -> Element {
     rsx! {
         div {
-            class: "absolute top-0 left-0 w-full h-full overflow-clipped pointer-events-none",
+            class: "absolute bottom-0 left-0 right-0 top-16 w-full h-full overflow-clipped pointer-events-none",
+            // class: "absolute bottom-0 max-w-7xl mx-auto w-full h-full overflow-clipped pointer-events-none",
             // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             dangerous_inner_html: r#"
@@ -53,7 +54,7 @@ pub fn LandingMiner() -> Element {
 pub fn LandingWave() -> Element {
     rsx! {
         div {
-            class: "absolute top-0 left-0 w-full h-full overflow-clipped pointer-events-none",
+            class: "absolute bottom-0 left-0 md:left-auto max-w-7xl max-h-160 mx-auto w-full h-full overflow-clipped pointer-events-none",
             // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             dangerous_inner_html: r#"

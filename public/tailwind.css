@@ -585,6 +585,9 @@
   .top-1\/2 {
     top: calc(1/2 * 100%);
   }
+  .top-32 {
+    top: calc(var(--spacing) * 32);
+  }
   .right-0 {
     right: calc(var(--spacing) * 0);
   }
@@ -809,6 +812,12 @@
   }
   .max-h-96 {
     max-height: calc(var(--spacing) * 96);
+  }
+  .max-h-160 {
+    max-height: calc(var(--spacing) * 160);
+  }
+  .min-h-192 {
+    min-height: calc(var(--spacing) * 192);
   }
   .min-h-dvh {
     min-height: 100dvh;
@@ -1078,6 +1087,9 @@
   .border-t-elements-highEmphasis {
     border-top-color: var(--color-elements-highEmphasis);
   }
+  .bg-amber-950 {
+    background-color: var(--color-amber-950);
+  }
   .bg-black {
     background-color: var(--color-black);
   }
@@ -1096,8 +1108,8 @@
   .bg-gray-900 {
     background-color: var(--color-gray-900);
   }
-  .bg-amber-950 {
-    background-color: var(--color-amber-950);
+  .bg-red-500 {
+    background-color: var(--color-red-500);
   }
   .bg-surface-elevated {
     background-color: var(--color-surface-elevated);
@@ -1111,7 +1123,7 @@
   .bg-white {
     background-color: var(--color-white);
   }
-  .bg-linear-to-r {
+  .bg-gradient-to-r {
     --tw-gradient-position: to right in oklab,;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
@@ -1332,11 +1344,11 @@
   .text-green-500 {
     color: var(--color-green-500);
   }
-  .text-red-500 {
-    color: var(--color-red-500);
-  }
   .text-orange-300 {
     color: var(--color-orange-300);
+  }
+  .text-red-500 {
+    color: var(--color-red-500);
   }
   .text-white {
     color: var(--color-white);
@@ -1488,10 +1500,10 @@
       }
     }
   }
-  .hover\:border-elements-midEmphasis {
+  .hover\:border-elements-highEmphasis {
     &:hover {
       @media (hover: hover) {
-        border-color: var(--color-elements-midEmphasis);
+        border-color: var(--color-elements-highEmphasis);
       }
     }
   }
@@ -1776,6 +1788,11 @@
       left: calc(var(--spacing) * 64);
     }
   }
+  .md\:left-auto {
+    @media (width >= 48rem) {
+      left: auto;
+    }
+  }
   .md\:mt-16 {
     @media (width >= 48rem) {
       margin-top: calc(var(--spacing) * 16);
@@ -1799,6 +1816,16 @@
   .md\:ml-auto {
     @media (width >= 48rem) {
       margin-left: auto;
+    }
+  }
+  .md\:min-h-192 {
+    @media (width >= 48rem) {
+      min-height: calc(var(--spacing) * 192);
+    }
+  }
+  .md\:min-h-224 {
+    @media (width >= 48rem) {
+      min-height: calc(var(--spacing) * 224);
     }
   }
   .md\:w-min {
