@@ -82,7 +82,7 @@ fn Mining() -> Element {
             Col {
                 class: "relative w-full h-min mx-auto max-w-7xl justify-start",
                 SectionCopy {
-                    class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90%",
+                    class: "bg-linear-to-r from-transparent via-black to-transparent from-10% via-50% to-90%",
                     tip: "Hard money",
                     title: "Proof of work.",
                     subtitle: "On Solana.", 
@@ -172,7 +172,7 @@ fn Liquidity() -> Element {
             Col {
                 class: "w-full h-min mx-auto max-w-7xl justify-start",
                 SectionCopy {
-                    tip: "DeFi",
+                    tip: "Defi native",
                     title: "Deep liquidity.",
                     subtitle: "Native yield.",
                     detail: "Stake your crypto and earn yield."
@@ -188,7 +188,7 @@ fn Community() -> Element {
         Col {
             class: "relative w-full h-full mx-auto max-w-7xl min-h-screen pt-16 px-4",
             SectionCopy {
-                tip: "Social",
+                tip: "Social network",
                 title: "Join the community.",
                 detail: "Discover why people around the world love ORE."
             }

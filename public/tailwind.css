@@ -1099,7 +1099,7 @@
   .bg-white {
     background-color: var(--color-white);
   }
-  .bg-gradient-to-r {
+  .bg-linear-to-r {
     --tw-gradient-position: to right in oklab,;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
