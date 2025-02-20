@@ -74,16 +74,18 @@ fn HeroTitle() -> Element {
         }
     }
 }
-
 fn Mining() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen px-4",
+            class: "relative w-screen h-full min-h-screen px-4 mt-16",
+            HashAnimation {}
             Col {
-                class: "w-full h-min mx-auto max-w-7xl justify-start",
+                class: "relative w-full h-min mx-auto max-w-7xl justify-start",
                 SectionCopy {
+                    class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90%",
+                    tip: "Hard money",
                     title: "Proof of work.",
-                    subtitle: "On Solana.",
+                    subtitle: "On Solana.", 
                     detail: "Start mining crypto in just one click."
                 }
             }
@@ -92,13 +94,85 @@ fn Mining() -> Element {
     }
 }
 
+fn HashAnimation() -> Element {
+    let mut hash_text = use_signal(|| "".to_string());
+    let chars = "0123456789abcdef";
+    
+    use_effect(move || {
+        spawn(async move {
+            loop {
+                // Generate 64 character random hex string
+                let mut new_hash = String::with_capacity(64);
+                for _ in 0..64 {
+                    let idx = fastrand::usize(..chars.len());
+                    new_hash.push(chars.chars().nth(idx).unwrap());
+                }
+                hash_text.set(new_hash);
+                async_std::task::sleep(std::time::Duration::from_millis(1000)).await;
+            }
+        });
+    });
+
+    rsx! {
+        Col {
+            class: "absolute bottom-0 left-0 right-0 w-full h-full overflow-hidden opacity-10 pointer-events-none",
+            Col {
+                class: "w-full gap-4 mt-auto font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-pre-wrap",
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+                span {
+                    "{hash_text}"
+                }
+            }
+        }
+    }
+}
+
 fn Liquidity() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen px-4",
+            class: "relative w-screen h-full min-h-screen px-4 mt-16",
             Col {
                 class: "w-full h-min mx-auto max-w-7xl justify-start",
                 SectionCopy {
+                    tip: "DeFi",
                     title: "Deep liquidity.",
                     subtitle: "Native yield.",
                     detail: "Stake your crypto and earn yield."
@@ -114,6 +188,7 @@ fn Community() -> Element {
         Col {
             class: "relative w-full h-full mx-auto max-w-7xl min-h-screen pt-16 px-4",
             SectionCopy {
+                tip: "Social",
                 title: "Join the community.",
                 detail: "Discover why people around the world love ORE."
             }
@@ -126,79 +201,92 @@ fn Testimonials() -> Element {
         Col {
             class: "w-full h-min mx-auto max-w-7xl justify-start",
             Row {
-                class: "w-full gap-8",
+                class: "w-full gap-4",
                 Col {
                     class: "flex-1 mt-16",
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        image: "https://pbs.twimg.com/profile_images/1651271535800336406/vR1FxvDs_400x400.jpg",
+                        name: "Matty Tay",
+                        quote: "BTC walked so ORE could run.",
+                        link: "https://x.com/mattytay/status/1870887900663169059"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                 }
                 Col {
                     class: "flex-1",
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        image: "https://pbs.twimg.com/profile_images/1892613729700691968/cG64Yc06_400x400.jpg",
+                        name: "Anatoly Yakovenko",
+                        quote: ".OREsupply is cool",
+                        link: "https://x.com/aeyakovenko/status/1891891612235727093"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                 }
                 Col {
                     class: "flex-1 mt-16",
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        image: "https://pbs.twimg.com/profile_images/1873772860566638592/cTfnGR67_400x400.jpg",
+                        name: "SOL Big Brain",
+                        quote: "Been in heavy accumulation mode of $ORE (@OREsupply) lately.",
+                        link: "https://x.com/SOLBigBrain/status/1870124964088533248"
+                    }
+                    Testimonial {
+                        image: "https://pbs.twimg.com/profile_images/1510345561731330063/mRH8nY7D_400x400.jpg",
+                        name: "Madhatt3r",
+                        quote: "Memecoins will come and go but ORE is forever. It is hard money in a sea of inflationary credit. Believe in something.",
+                        link: "https://x.com/"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                     Testimonial {
                         image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                         name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
-                    }
-                    Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes."
+                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
+                        link: "https://x.com/"
                     }
                 }
             }
@@ -207,10 +295,10 @@ fn Testimonials() -> Element {
 }
 
 #[component]
-fn Testimonial(image: String, name: String, quote: String) -> Element {
+fn Testimonial(image: String, name: String, quote: String, link: String) -> Element {
     rsx! {
         Col {
-            class: "bg-elements-midEmphasis/10 rounded-lg p-6 mb-8",
+            class: "bg-elements-midEmphasis/10 rounded-lg p-6 mb-4",
             Row {
                 class: "gap-3",
                 img {
@@ -293,11 +381,18 @@ fn Stats() -> Element {
 }
 
 #[component]
-fn SectionCopy(title: String, subtitle: Option<String>, detail: Option<String>) -> Element {
+fn SectionCopy(class: Option<String>, tip: Option<String>, title: String, subtitle: Option<String>, detail: Option<String>) -> Element {
+    let class = class.unwrap_or_default();
     rsx! {
         Col {
-            class: "py-16 font-wide font-bold text-4xl md:text-5xl lg:text-6xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black px-4",
+            class: "py-8 font-wide font-bold text-4xl md:text-5xl lg:text-6xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black px-4 {class}",
             gap: 2,
+            if let Some(tip) = tip {
+                span {
+                    class: "z-30 border-2 border-elements-gold text-elements-gold rounded-full px-4 py-2 text-xs font-semibold mx-auto mb-4",
+                    "{tip}"
+                }
+            }
             span {
                 class: "z-30",
                 "{title}"
