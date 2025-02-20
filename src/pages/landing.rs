@@ -218,16 +218,16 @@ fn Testimonials() -> Element {
                         link: "https://x.com/lowercaseben/status/1878117108287943112"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1830469870200193024/7xI_DeCq_400x400.jpg",
+                        name: "Brewtoshi",
+                        quote: "Ore Boosts are its killer feature and are super underrated atm",
+                        link: "https://x.com/Brewtoshi/status/1875560756332392708"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1876410450767925248/J-l8lpL6_400x400.jpg",
+                        name: "Ore Historian",
+                        quote: "Its not crazy and it will work. $ORE will be running the defi ecosystem",
+                        link: "https://x.com/oreHistorian/status/1877146737673981959"
                     }
                 }
                 Col {
@@ -239,28 +239,28 @@ fn Testimonials() -> Element {
                         link: "https://x.com/aeyakovenko/status/1891891612235727093"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1815598662006792192/ShUElYCu_400x400.jpg",
+                        name: "kel",
+                        quote: "using proof of work for distribution atop a performant proof of stake chain has the potential to be the next such faded mechanism",
+                        link: "https://x.com/kelxyz_/status/1819423305096425812"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1828429925428158464/DgmDex35_400x400.jpg",
+                        name: "Vidiu",
+                        quote: "The answer is simple @OREsupply",
+                        link: "https://x.com/0xVidiu/status/1892670871984062474"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1848549429717975040/JpZUMEAW_400x400.jpg",
+                        name: "Elias",
+                        quote: "ore is actually here to help us. it can only make the network stronger",
+                        link: "https://x.com/Eliascm17/status/1776341784118890765"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1798717628099469312/TiVu101s_400x400.jpg",
+                        name: "Farhaj Mayan",
+                        quote: "Upgraded my ORE. LFG 🫡 @OREsupply",
+                        link: "https://x.com/farhajmayan/status/1820073386107720121"
                     }
                 }
                 Col {
@@ -278,16 +278,16 @@ fn Testimonials() -> Element {
                         link: "https://x.com/"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1853830577872347136/7fDP-JKR_400x400.jpg",
+                        name: "Solana Legend ",
+                        quote: "Born too late to own a house. Born too early to be a TikTok star. Born at the perfect time to mine ORE",
+                        link: "https://x.com/SolanaLegend/status/1820629234232000721"
                     }
                     Testimonial {
-                        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                        name: "John Doe",
-                        quote: "This is an amazing project! The technology behind it is truly revolutionary and I'm excited to see where it goes.",
-                        link: "https://x.com/"
+                        image: "https://pbs.twimg.com/profile_images/1536022035435991046/Ih9CZm-r_400x400.jpg",
+                        name: "David Chapman",
+                        quote: "ORE is what Satoshi envisioned.",
+                        link: "https://x.com/DChapmanCrypto/status/1820710738308280432"
                     }
                 }
             }
@@ -298,8 +298,10 @@ fn Testimonials() -> Element {
 #[component]
 fn Testimonial(image: String, name: String, quote: String, link: String) -> Element {
     rsx! {
-        Col {
-            class: "bg-elements-midEmphasis/10 rounded-lg p-6 mb-4",
+        a {
+            class: "flex flex-col bg-elements-midEmphasis/10 rounded-lg p-5 mb-4 border-2 border-transparent hover:border-elements-midEmphasis transition-all duration-300 ease-in-out",
+            href: "{link}",
+            target: "_blank",
             Row {
                 class: "gap-3",
                 img {
@@ -309,11 +311,11 @@ fn Testimonial(image: String, name: String, quote: String, link: String) -> Elem
                 Col {
                     class: "gap-1",
                     span {
-                        class: "font-semibold",
+                        class: "font-semibold text-elements-highEmphasis",
                         "{name}"
                     }
                     p {
-                        class: "text-elements-lowEmphasis",
+                        class: "text-elements-midEmphasis",
                         "{quote}"
                     }
                 }
@@ -399,19 +401,19 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "ORE is a hard money token on the Solana blockchain."
+                    answer: "Bitcoin defi is broken. L2s, bridges, and custodians are fragmented Bitcoin's liquidity across defi. ORE is an experiment to bring the best ideas of Bitcoin to the Solana defi ecosystem."
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "ORE is a hard money token on the Solana blockchain."
+                    answer: "TODO."
                 }
                 FaqItem {
                     question: "How does staking work?",
-                    answer: "ORE is a hard money token on the Solana blockchain."
+                    answer: "TODO."
                 }
                 FaqItem {
                     question: "Where does the yield come from?",
-                    answer: "ORE is a hard money token on the Solana blockchain."
+                    answer: "TODO."
                 }
             }
         }

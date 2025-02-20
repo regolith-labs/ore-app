@@ -1072,6 +1072,9 @@
   .border-red-500 {
     border-color: var(--color-red-500);
   }
+  .border-transparent {
+    border-color: transparent;
+  }
   .border-t-elements-highEmphasis {
     border-top-color: var(--color-elements-highEmphasis);
   }
@@ -1154,9 +1157,6 @@
   }
   .p-5 {
     padding: calc(var(--spacing) * 5);
-  }
-  .p-6 {
-    padding: calc(var(--spacing) * 6);
   }
   .px-0 {
     padding-inline: calc(var(--spacing) * 0);
@@ -1485,6 +1485,13 @@
     &:hover {
       @media (hover: hover) {
         cursor: pointer;
+      }
+    }
+  }
+  .hover\:border-elements-midEmphasis {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-elements-midEmphasis);
       }
     }
   }
