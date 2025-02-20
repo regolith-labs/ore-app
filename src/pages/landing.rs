@@ -428,7 +428,7 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "TODO."
+                    answer: "Mining ORE is easy. Anyone with a laptop or home computer can do it. Simply navigate to the Mine page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be added to a mining pool and do not need to pay transaction fees while you mine."
                 }
                 FaqItem {
                     question: "How does staking work?",
@@ -436,7 +436,7 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Where does the yield come from?",
-                    answer: "TODO."
+                    answer: "Staking yield is generated in two ways. First, stakers earn fees whenever a trader executes a swap in a liquidity pair they are providing. Secondly, stakers can earn native yield from the ORE protocol via Boosts. This yield is generated automatically by the protocol which allocates a portion of all newly mined ORE to liquidity provider incentives."
                 }
             }
         }
