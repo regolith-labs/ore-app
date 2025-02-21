@@ -109,7 +109,7 @@ jobs:
           
           set -euxo pipefail
       
-          ZIP_FILE="Wallet_${{ env.VERSION }}.app.zip"
+          ZIP_FILE="ORE_${{ env.VERSION }}.app.zip"
       
           # Zip the .app for submission
           /usr/bin/zip -r "$ZIP_FILE" "${{ env.APP_DIR }}"
@@ -140,17 +140,17 @@ jobs:
       # 12) Create tar.gz from the notarized .app folder & upload to S3
       - name: Package and Upload
         run: |
-          TAR_FILE="Wallet_${{ env.VERSION }}.app.tar.gz"
+          TAR_FILE="ORE_${{ env.VERSION }}.app.tar.gz"
 
           tar -czf "$TAR_FILE" -C "$(dirname "${{ env.APP_DIR }}")" "$(basename "${{ env.APP_DIR }}")"
 
           # Upload to S3
           aws s3 cp \
             "$TAR_FILE" \
-            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/wallet_${{ env.VERSION }}_x64.app.tar.gz"
+            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64.app.tar.gz"
 
       # 13) Print S3 download link
       - name: Print S3 download link
         run: |
           echo "Download macOS artifact at:"
-          echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/wallet_${{ env.VERSION }}_x64.app.tar.gz"
+          echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64.app.tar.gz"
