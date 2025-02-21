@@ -5,7 +5,7 @@ use solana_extra_wasm::program::spl_token::ui_amount_to_amount;
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
 
 use crate::{
-    components::TokenInputError, config::Token, gateway::{GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_wallet, Wallet, use_sol_balance, MIN_SOL_BALANCE}
+    components::TokenInputError, config::Token, gateway::{GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_wallet, Wallet}
 };
 
 pub fn use_idle_deposit_transaction(
@@ -15,7 +15,6 @@ pub fn use_idle_deposit_transaction(
     mut err: Signal<Option<TokenInputError>>
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let sol_balance = use_sol_balance();
     use_resource(move || async move {
         err.set(None);
 
@@ -38,14 +37,6 @@ pub fn use_idle_deposit_transaction(
         // If amount is 0, disable
         if amount_f64 == 0f64 {
             return Err(GatewayError::Unknown);
-        }
-
-        // Check if user has enough Sol to begin with
-        if let Some(Ok(sol_balance)) = sol_balance.cloned() {
-            if sol_balance.ui_amount.unwrap() < MIN_SOL_BALANCE {
-                err.set(Some(TokenInputError::InsufficientSol));
-                return Err(GatewayError::Unknown);
-            }
         }
 
         // If amount is greater than ore balance, disable
