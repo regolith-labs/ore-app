@@ -12,10 +12,18 @@ jobs:
   build-macos:
     runs-on: macos-latest
 
+    # 1) Add a matrix strategy for x86_64 and aarch64
+    strategy:
+      matrix:
+        arch: [ x86_64, aarch64 ]
+
     env:
       # Build constants
       TARGET: macos
-      ARCH: x86_64
+      
+      # 2) Instead of hard-coding ARCH=x86_64, use matrix.arch
+      ARCH: ${{ matrix.arch }}
+
       VERSION: ${{ github.ref_name }}
       # Build dir
       APP_DIR: /Users/runner/work/ore-app/ore-app/dist/OreApp.app
@@ -53,39 +61,34 @@ jobs:
           profile: minimal
           override: true
 
-      # 5) Add x86_64-apple-darwin target
-      - name: Add x86_64 Rust target
+      # 5) Add Rust target based on matrix.arch
+      - name: Add Rust target
         run: |
-          rustup target add x86_64-apple-darwin
+          rustup target add ${{ matrix.arch }}-apple-darwin
 
       # 6) Install CLI tools
       - name: Install dioxus-cli and cargo-packager
         run: |
           cargo install cargo-packager@0.11.3 dioxus-cli@0.6.3
 
-      # 7) Build & Package for x86_64
+      # 7) Build & Package for whichever arch is active
       - name: Build and Package
         run: |
-          # Force Cargo to build for x86_64-apple-darwin
-          # so dx bundle will produce x86_64 artifacts
-          CARGO_BUILD_TARGET=x86_64-apple-darwin \
+          # Use the matrix.arch in CARGO_BUILD_TARGET
+          CARGO_BUILD_TARGET=${{ matrix.arch }}-apple-darwin \
             dx bundle --platform desktop --package-types macos --release
 
       # 8) Import Developer ID Certificate
       - name: Import Developer ID cert
         run: |
-          # Decode the Base64-encoded P12
           echo "$DEVID_CERT_BASE64" | base64 --decode > developer_id.p12
 
-          # Create & unlock a temporary keychain (no password)
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
 
-          # Import the p12 into the keychain
           security import developer_id.p12 -k ~/Library/Keychains/build.keychain -P "$DEVID_CERT_PASSWORD" -T /usr/bin/codesign
 
-          # Allow codesign to use this key without prompting
           security set-key-partition-list -S apple-tool:,apple: -s -k "" ~/Library/Keychains/build.keychain
         env:
           DEVID_CERT_BASE64: ${{ secrets.DEVID_CERT_BASE64 }}
@@ -104,17 +107,12 @@ jobs:
       # 10) Notarize the signed .app
       - name: Notarize app
         run: |
-          # Possibly redundant on GitHub macOS runners, but ensures availability
           brew install jq || true
-          
           set -euxo pipefail
-      
+
           ZIP_FILE="ORE_${{ env.VERSION }}.app.zip"
-      
-          # Zip the .app for submission
           /usr/bin/zip -r "$ZIP_FILE" "${{ env.APP_DIR }}"
-      
-          echo "Submitting to Apple Notary Service..."
+
           xcrun notarytool submit "$ZIP_FILE" \
             --apple-id "$NOTARIZE_APPLE_ID" \
             --team-id "$DEVID_TEAM_ID" \
@@ -122,7 +120,6 @@ jobs:
             --verbose \
             --wait
 
-          echo "Stapling the notarization ticket..."
           xcrun stapler staple "${{ env.APP_DIR }}"
         env:
           NOTARIZE_APPLE_ID: ${{ secrets.NOTARIZE_APPLE_ID }}
@@ -137,20 +134,31 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 12) Create tar.gz from the notarized .app folder & upload to S3
+      # 12) Use arch in S3 path & filename so each build is unique
       - name: Package and Upload
         run: |
           TAR_FILE="ORE_${{ env.VERSION }}.app.tar.gz"
 
           tar -czf "$TAR_FILE" -C "$(dirname "${{ env.APP_DIR }}")" "$(basename "${{ env.APP_DIR }}")"
 
-          # Upload to S3
-          aws s3 cp \
-            "$TAR_FILE" \
-            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64.app.tar.gz"
+          # Distinguish x86_64 vs aarch64 in final name (and path)
+          if [ "${{ env.ARCH }}" = "x86_64" ]; then
+            OUT_ARCH="x64"
+          else
+            OUT_ARCH="aarch64"
+          fi
 
-      # 13) Print S3 download link
+          aws s3 cp "$TAR_FILE" \
+            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
+
+      # 13) Print link for each arch
       - name: Print S3 download link
         run: |
-          echo "Download macOS artifact at:"
-          echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64.app.tar.gz"
+          if [ "${{ env.ARCH }}" = "x86_64" ]; then
+            OUT_ARCH="x64"
+          else
+            OUT_ARCH="aarch64"
+          fi
+
+          echo "Download macOS artifact for $OUT_ARCH at:"
+          echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
