@@ -13,7 +13,7 @@ app = []             # App-specific logic
 
 [dependencies]
 anyhow = "1.0"
-drillx = "2.0.0"
+drillx = "2.2"
 gloo-worker = "0.5.0"
 log = "0.4.20"
 ore-miner-types = { path = "../miner-types" }
