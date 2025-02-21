@@ -4,7 +4,7 @@ use solana_extra_wasm::program::{spl_associated_token_account::{get_associated_t
 use solana_sdk::{native_token::sol_to_lamports, system_instruction::transfer, transaction::{Transaction, VersionedTransaction}};
 
 use crate::{
-    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet, use_sol_balance, MIN_SOL_BALANCE}, utils::LiquidityPair
+    components::TokenInputError, config::{BoostMeta, LpType, Token}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount}, hooks::{use_gateway, use_wallet, Wallet}, utils::LiquidityPair
 };
 
 // Build pair deposit transaction
@@ -20,7 +20,6 @@ pub fn use_pair_deposit_transaction(
     mut err: Signal<Option<TokenInputError>>
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let sol_balance = use_sol_balance();
     use_resource(move || async move {
         // Reset error
         err.set(None);
@@ -41,14 +40,6 @@ pub fn use_pair_deposit_transaction(
             return Err(GatewayError::Unknown);
         }
 
-        // Check if user has enough SOL
-        if let Some(Ok(sol_balance)) = sol_balance.cloned() {
-            if sol_balance.ui_amount.unwrap() < MIN_SOL_BALANCE {
-                err.set(Some(TokenInputError::InsufficientSol));
-                return Err(GatewayError::Unknown);
-            }
-        }
-    
         // Get resources
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
