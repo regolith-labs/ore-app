@@ -12,7 +12,7 @@ use crate::{
     gateway::{
         kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount,
     },
-    hooks::{use_gateway, use_sol_balance, use_wallet, Wallet, MIN_SOL_BALANCE},
+    hooks::{use_gateway, use_wallet, Wallet},
     solana::{
         spl_associated_token_account::{
             get_associated_token_address,
@@ -42,7 +42,6 @@ pub fn use_pair_deposit_transaction(
     mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let sol_balance = use_sol_balance();
     use_resource(move || async move {
         // Reset error
         err.set(None);
@@ -61,14 +60,6 @@ pub fn use_pair_deposit_transaction(
         };
         if amount_a_f64 == 0f64 || amount_b_f64 == 0f64 {
             return Err(GatewayError::Unknown);
-        }
-
-        // Check if user has enough SOL
-        if let Some(Ok(sol_balance)) = sol_balance.cloned() {
-            if sol_balance.ui_amount.unwrap() < MIN_SOL_BALANCE {
-                err.set(Some(TokenInputError::InsufficientSol));
-                return Err(GatewayError::Unknown);
-            }
         }
 
         // Get resources

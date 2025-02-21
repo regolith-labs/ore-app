@@ -104,7 +104,7 @@ pub fn use_token_balances_for_liquidity_pair(liquidity_pair: Resource<GatewayRes
     (token_a_balance, token_b_balance)
 }
 
-pub fn use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
+pub fn _use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     return use_token_balance(Token::sol().mint);
 }
 
