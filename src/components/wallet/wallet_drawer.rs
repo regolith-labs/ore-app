@@ -1,10 +1,10 @@
 use dioxus::prelude::*;
 
 use crate::components::*;
-use crate::gateway::UiTokenAmount;
-use crate::gateway::GatewayResult;
-use crate::hooks::use_token_balance;
 use crate::config::{Token, LISTED_TOKENS};
+use crate::gateway::GatewayResult;
+use crate::gateway::UiTokenAmount;
+use crate::hooks::use_token_balance;
 use crate::route::Route;
 
 #[component]

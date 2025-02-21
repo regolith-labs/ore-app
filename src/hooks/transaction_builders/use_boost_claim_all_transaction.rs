@@ -1,9 +1,10 @@
 use dioxus::prelude::*;
-use solana_extra_wasm::program::spl_associated_token_account;
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
 
 use crate::{
-    gateway::{GatewayError, GatewayResult}, hooks::{use_all_stakes, use_wallet, Wallet}
+    gateway::{GatewayError, GatewayResult},
+    hooks::{use_all_stakes, use_wallet, Wallet},
+    solana::spl_associated_token_account,
 };
 
 pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
@@ -16,24 +17,32 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
             let Wallet::Connected(authority) = *wallet.read() else {
                 return Err(GatewayError::WalletDisconnected);
             };
-        
+
             // Derive beneficiary
-            let beneficiary = spl_associated_token_account::get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
-        
+            let beneficiary = spl_associated_token_account::get_associated_token_address(
+                &authority,
+                &ore_api::consts::MINT_ADDRESS,
+            );
+
             // Get resources
             let mut ixs = vec![];
             for (pubkey, stake) in stake_accounts.iter() {
                 if let Some(Ok(stake)) = stake.cloned() {
                     if stake.rewards > 0 {
-                        ixs.push(ore_boost_api::sdk::claim(authority, beneficiary, *pubkey, stake.rewards));
+                        ixs.push(ore_boost_api::sdk::claim(
+                            authority,
+                            beneficiary,
+                            *pubkey,
+                            stake.rewards,
+                        ));
                     }
                 }
             }
-        
+
             if ixs.is_empty() {
                 return Err(GatewayError::Unknown);
             }
-        
+
             // Build transaction
             let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
             Ok(tx)

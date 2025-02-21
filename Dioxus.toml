@@ -27,3 +27,7 @@ watch_path = ["src", "public"]
 
 # resolves a hot reloading issue
 index_on_404 = true
+
+[bundle]
+publisher = "regolith labs"
+identifier = "ore.supply"

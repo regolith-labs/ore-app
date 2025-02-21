@@ -1,14 +1,18 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 
 use crate::{
-    components::*, 
+    components::*,
     gateway::pool::PoolGateway,
-    hooks::{on_transaction_done, use_gateway, use_member, use_member_record, use_miner_claim_transaction, use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus, Wallet}, 
+    hooks::{
+        on_transaction_done, use_gateway, use_member, use_member_record,
+        use_miner_claim_transaction, use_miner_is_active, use_miner_status,
+        use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus, Wallet,
+    },
+    solana::spl_token::amount_to_ui_amount_string,
 };
 
-pub fn Mine() -> Element {    
+pub fn Mine() -> Element {
     rsx! {
         Col {
             // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
@@ -26,30 +30,30 @@ pub fn Mine() -> Element {
                     gold: *use_miner_is_active().read()
                 }
                 MinerData {}
-            }   
-            MineTable {}         
-        }                
+            }
+            MineTable {}
+        }
     }
 }
 
 fn MinerData() -> Element {
     // Get resources
     let mut member = use_member();
-    let mut member_record = use_member_record();    
+    let mut member_record = use_member_record();
 
     // Build the claim transaction
     let claim_tx = use_miner_claim_transaction(member);
-    
+
     // Refresh member account
     on_transaction_done(move |_sig| {
         member.restart();
         member_record.restart();
     });
-    
+
     rsx! {
         Col {
             class: "w-full flex-wrap mx-auto justify-between",
-            gap: 8,            
+            gap: 8,
             Alert {}
             MinerStatus {}
             MinerHashpower {}
@@ -135,14 +139,12 @@ fn StopStartButton() -> Element {
 
 fn MinerStatus() -> Element {
     let miner_status = use_miner_status();
-    let status = use_memo(move || {
-        match miner_status.cloned() {
-            MinerStatus::Registering => "Registering",
-            MinerStatus::FetchingChallenge => "Fetching",
-            MinerStatus::Hashing => "Hashing",
-            MinerStatus::SubmittingSolution => "Submitting",
-            MinerStatus::Stopped => "Stopped",
-        }
+    let status = use_memo(move || match miner_status.cloned() {
+        MinerStatus::Registering => "Registering",
+        MinerStatus::FetchingChallenge => "Fetching",
+        MinerStatus::Hashing => "Hashing",
+        MinerStatus::SubmittingSolution => "Submitting",
+        MinerStatus::Stopped => "Stopped",
     });
     rsx! {
         Col {
@@ -230,7 +232,7 @@ fn MinerRewards() -> Element {
                 }
             } else {
                 LoadingValue {}
-            }             
+            }
         }
     }
 }

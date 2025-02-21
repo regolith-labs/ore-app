@@ -2,16 +2,16 @@ use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::{Boost, Stake};
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
 use steel::Pubkey;
 
 use crate::{
-    components::*, 
-    config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS}, 
-    gateway::GatewayResult, 
-    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl}, 
+    components::*,
+    config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS},
+    gateway::GatewayResult,
+    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl},
     route::Route,
-    utils::LiquidityPair
+    solana::spl_token::amount_to_ui_amount_string,
+    utils::LiquidityPair,
 };
 
 pub fn StakeTable() -> Element {
@@ -58,9 +58,7 @@ pub fn StakeTable() -> Element {
 }
 
 #[component]
-fn IdleTableRow(
-    stake: Resource<GatewayResult<Stake>>
-) -> Element {
+fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
     let token = Token::ore();
     let boost = use_boost(token.mint);
     rsx! {
@@ -99,7 +97,7 @@ fn IdleTableRow(
 fn StakeTableRow(
     boost_meta: BoostMeta,
     stake: Resource<GatewayResult<Stake>>,
-    liquidity_pair: Resource<GatewayResult<LiquidityPair>>
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let boost = use_boost(boost_meta.lp_mint);
     rsx! {
@@ -144,13 +142,11 @@ fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Ele
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
-        Some(
-            format_token_amount(
-                amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
-                Some(true),
-                Some(true)
-            )
-        )
+        Some(format_token_amount(
+            amount_to_ui_amount_string(stake.balance, TOKEN_DECIMALS),
+            Some(true),
+            Some(true),
+        ))
     });
 
     rsx! {
@@ -185,13 +181,12 @@ fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Ele
     }
 }
 
-
 #[component]
 fn StakeTableRowTitle(
-    ticker: String, 
-    pair_mint: Pubkey, 
-    stake: Resource<GatewayResult<Stake>>, 
-    liquidity_pair: Resource<GatewayResult<LiquidityPair>>
+    ticker: String,
+    pair_mint: Pubkey,
+    stake: Resource<GatewayResult<Stake>>,
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let token = LISTED_TOKENS.get(&pair_mint).cloned();
 
@@ -205,8 +200,13 @@ fn StakeTableRowTitle(
         if stake.balance == 0 {
             return None;
         };
-        let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) = liquidity_pair.get_stake_amounts(stake.balance);
-        Some(format_token_amount(ore_amount_f64.to_string(), Some(true), Some(true)))
+        let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) =
+            liquidity_pair.get_stake_amounts(stake.balance);
+        Some(format_token_amount(
+            ore_amount_f64.to_string(),
+            Some(true),
+            Some(true),
+        ))
     });
 
     rsx! {
@@ -246,7 +246,7 @@ fn StakeTableRowTitle(
 #[component]
 fn StakeTableRowMultiplier(
     boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>
+    stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let user_percentage = use_memo(move || {
         let Some(Ok(boost)) = boost.cloned() else {
@@ -261,9 +261,9 @@ fn StakeTableRowMultiplier(
         if boost.total_deposits == 0 {
             return None;
         }
-        let pct = (stake.balance + stake.balance_pending) as f64 / 
-            (boost.total_deposits + stake.balance_pending) as f64 *
-            100.0;
+        let pct = (stake.balance + stake.balance_pending) as f64
+            / (boost.total_deposits + stake.balance_pending) as f64
+            * 100.0;
         let pct = if pct < 1.0 {
             // Find first non-zero decimal place
             let mut decimals = 0;
@@ -319,7 +319,8 @@ fn IdleTableRowTVL(
         if stake.balance > 0 || stake.balance_pending > 0 {
             let total_balance = stake.balance + stake.balance_pending;
             let total_deposits = boost.total_deposits + stake.balance_pending;
-            let user_tvl = (boost_tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
+            let user_tvl =
+                (boost_tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
             Some(user_tvl.to_formatted_string(&Locale::en))
         } else {
             None
@@ -364,7 +365,9 @@ fn StakeTableRowTVL(
         if stake.balance > 0 || stake.balance_pending > 0 {
             let total_balance = stake.balance + stake.balance_pending;
             // let total_deposits = boost.total_deposits + stake.balance_pending;
-            let user_tvl = (liquidity_pair.total_value_usd * (total_balance as f64 / liquidity_pair.shares as f64)).floor() as u64;
+            let user_tvl = (liquidity_pair.total_value_usd
+                * (total_balance as f64 / liquidity_pair.shares as f64))
+                .floor() as u64;
             Some(user_tvl.to_formatted_string(&Locale::en))
         } else {
             None
@@ -391,7 +394,11 @@ fn StakeTableRowTVL(
 }
 
 #[component]
-fn StakeTableRowYield(mint_address: Pubkey, boost: Resource<GatewayResult<Boost>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+fn StakeTableRowYield(
+    mint_address: Pubkey,
+    boost: Resource<GatewayResult<Boost>>,
+    stake: Resource<GatewayResult<Stake>>,
+) -> Element {
     let apy = use_boost_apy(mint_address);
     rsx! {
         if let Ok(apy) = apy.cloned() {

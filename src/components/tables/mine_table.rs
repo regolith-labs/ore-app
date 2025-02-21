@@ -1,15 +1,16 @@
-use dioxus::prelude::*;
 use crate::{
-    components::*,         
-    hooks::{use_miner_events, MiningEvent}
+    components::*,
+    hooks::{use_miner_events, MiningEvent},
 };
 use chrono::{DateTime, Local};
-use solana_sdk::signature::Signature;
+use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount_string;
+use solana_sdk::signature::Signature;
+
+use crate::solana::spl_token::amount_to_ui_amount_string;
 
 pub fn MineTable() -> Element {
-    let miner_events = use_miner_events();    
+    let miner_events = use_miner_events();
     rsx! {
         Col {
             class: "w-full",
@@ -56,9 +57,7 @@ pub fn MineTable() -> Element {
 }
 
 #[component]
-fn MineTableRow(
-    event: MiningEvent
-) -> Element {
+fn MineTableRow(event: MiningEvent) -> Element {
     rsx! {
         TableRowExternalLink {
             to: format!("https://solscan.io/tx/{}", event.signature),
@@ -89,12 +88,10 @@ fn MineTableRow(
 }
 
 #[component]
-fn MineTableRowDate(
-    timestamp: u64
-) -> Element {    
+fn MineTableRowDate(timestamp: u64) -> Element {
     let datetime = DateTime::from_timestamp(timestamp as i64, 0)
         .unwrap()
-        .with_timezone(&Local);    
+        .with_timezone(&Local);
     let date = datetime.format("%b %d");
     let time = datetime.format("%I:%M %p");
     rsx! {
@@ -102,19 +99,17 @@ fn MineTableRowDate(
             span {
                 class: "font-medium my-auto",
                 "{date}"
-            }            
+            }
             span {
                 class: "text-xs font-medium text-elements-lowEmphasis",
                 "{time}"
-            }                        
+            }
         }
     }
 }
 
 #[component]
-fn MineTableRowTx(
-    signature: Signature
-) -> Element {
+fn MineTableRowTx(signature: Signature) -> Element {
     let len = signature.to_string().len();
     let first_four = &signature.to_string()[0..4];
     let last_four = &signature.to_string()[len - 4..len];
@@ -127,29 +122,23 @@ fn MineTableRowTx(
 }
 
 #[component]
-fn MineTableRowScore(    
-    pool_score: u64,
-    member_score: u64
-) -> Element {    
+fn MineTableRowScore(pool_score: u64, member_score: u64) -> Element {
     rsx! {
         Col {
             span {
                 class: "font-medium my-auto",
                 "{pool_score}"
-            }            
+            }
             span {
                 class: "font-medium text-xs text-elements-lowEmphasis",
                 "{member_score}"
-            }                        
+            }
         }
     }
 }
 
 #[component]
-fn MineTableRowReward(
-    net_reward: u64,
-    member_reward: u64
-) -> Element {
+fn MineTableRowReward(net_reward: u64, member_reward: u64) -> Element {
     rsx! {
         Col {
             OreValue {
@@ -166,6 +155,6 @@ fn MineTableRowReward(
                 size: TokenValueSize::XSmall,
                 color_override: "text-elements-lowEmphasis",
             }
-        }       
+        }
     }
 }

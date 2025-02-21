@@ -1,9 +1,9 @@
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
-use solana_extra_wasm::program::spl_token::amount_to_ui_amount;
 use steel::Pubkey;
 
 use crate::gateway::{GatewayError, GatewayResult};
+use crate::solana::spl_token::amount_to_ui_amount;
 
 use super::{use_boost, use_liquidity_pair, use_ore_price, OrePrice};
 

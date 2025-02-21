@@ -33,7 +33,7 @@ impl<R: Rpc> Gateway<R> {
             http: reqwest::Client::new(),
         }
     }
-    
+
     pub async fn _get_recent_priority_fee_estimate(&self, treasury: bool) -> u64 {
         let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
         if treasury {
