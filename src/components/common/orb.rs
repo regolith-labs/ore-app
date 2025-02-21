@@ -20,7 +20,7 @@ use dioxus::prelude::*;
 pub fn HeroOrb() -> Element {
     rsx! {
         div {
-            class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            class: "absolute z-40 -top-32 bottom-32 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             dangerous_inner_html: r#"
                 <spline-viewer
@@ -36,14 +36,19 @@ pub fn HeroOrb() -> Element {
 pub fn LandingMiner() -> Element {
     rsx! {
         div {
-            class: "absolute bottom-0 left-0 right-0 top-16 w-full h-full overflow-clipped pointer-events-none",
+            class: "h-160 w-screen md:w-lg lg:w-xl overflow-hidden shrink-0 pointer-events-none",
+            // class: "absolute md:static md:my-auto h-160 bottom-0 md:bottom-auto -translate-x-1/2 md:translate-x-0 left-1/2 md:left-auto w-5xl md:w-lg lg:w-xl overflow-hidden shrink-0 pointer-events-none",
+            // class: "absolute md:static h-160 w-5xl md:w-3xl -translate-x-1/2 bottom-0 md:bottom-auto md:translate-x-0 overflow-hidden shrink-0 pointer-events-none bg-red-500",
+            // class: "absolute h-160 w-7xl -translate-x-1/2 left-1/2 bottom-0 overflow-hidden pointer-events-none",
+            // class: "absolute bottom-0 left-0 right-0 top-16 w-full h-full overflow-clipped pointer-events-none",
             // class: "absolute bottom-0 max-w-7xl mx-auto w-full h-full overflow-clipped pointer-events-none",
             // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+            // https://prod.spline.design/uJNJJEEp0yCY0MvG/scene.splinecode
             dangerous_inner_html: r#"
                 <spline-viewer
                     style="height: 100%; width: 100%;" 
-                    url="https://prod.spline.design/uJNJJEEp0yCY0MvG/scene.splinecode"
+                    url="https://prod.spline.design/M54opX84FI0VNGE2/scene.splinecode"
                 />
             "#
         }

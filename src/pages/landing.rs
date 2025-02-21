@@ -44,7 +44,7 @@ fn LandingNavbar() -> Element {
 fn LaunchButton() -> Element {
     rsx! {
         Link {
-            class: "flex px-8 h-12 my-auto rounded controls-primary rounded-full z-100",
+            class: "flex px-4 sm:px-8 h-10 sm:h-12 my-auto rounded controls-primary rounded-full z-100",
             to: Route::Mine {},
             span {
                 class: "my-auto",
@@ -77,52 +77,146 @@ fn HeroTitle() -> Element {
 fn Mining() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen md:min-h-224 px-4 mt-16 pt-16 sm:pt-32 md:pt-0",
-            HashAnimation {}
+            class: "relative w-screen h-full min-h-screen md:min-h-224 mt-16",
+            // HashAnimation {}
             Col {
                 // class: "relative w-full h-min mx-auto max-w-7xl justify-start",
-                class: "w-full h-min mx-auto max-w-7xl justify-start",
-                SectionCopy {
-                    class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
-                    tip: "Fair launch",
-                    title: "Proof of work.",
-                    subtitle: "On Solana.", 
-                    detail: "Start mining crypto in just one click."
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between bg-blue-500",
+                Col {
+                    class: "bg-yellow-500",
+                    gap: 8,
+                    SectionCopy {
+                        class: "hidden md:flex w-full text-nowrap",
+                        align: Align::Left,
+                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
+                        tip: "Fair launch",
+                        title: "Proof of work.",
+                        subtitle: "On Solana.", 
+                        detail: "Start mining crypto today."
+                    }
+                    SectionCopy {
+                        class: "md:hidden",
+                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
+                        tip: "Fair launch",
+                        title: "Proof of work.",
+                        subtitle: "On Solana.", 
+                        detail: "Start mining crypto in just one click."
+                    }
+                    Col {
+                        class: "w-2xl h-min mx-auto md:mr-auto md:ml-0 px-4 bg-green-500",
+                        gap: 8, 
+                        WalkthroughStep {
+                            step: "1",
+                            title: "Connect wallet",
+                            detail: "Authenticate with any Solana wallet."
+                        }
+                        WalkthroughStep {
+                            step: "2",
+                            title: "Join a pool",
+                            detail: "Hop into a mining pool to avoid transaction fees."
+                        }
+                        WalkthroughStep {
+                            step: "3",
+                            title: "Earn rewards",
+                            detail: "Start mining crypto and earning rewards."
+                        }
+                    }
                 }
-                LandingMiner {}
+                div {
+                    // class: "relative h-160 w-screen md:w-lg lg:w-xl overflow-hidden shrink-0 pointer-events-none bg-red-500",
+                    class: "h-160 w-screen md:w-full overflow-hidden shrink-0 pointer-events-none bg-red-500",
+                    HashAnimation {}
+                    // PhoneRock {}
+                }
+                // LandingMiner {}
             }
+        }
+    }
+}
+
+#[component]
+fn PhoneRock() -> Element {
+    rsx! {
+        div {
+            // class: "absolute top-0 left-0 right-0 bottom-0",
+            class: "w-full h-full bg-transparent",
+            dangerous_inner_html: r#"
+                <spline-viewer
+                    style="height: 100%; width: 100%;" 
+                    url="https://prod.spline.design/M54opX84FI0VNGE2/scene.splinecode"
+                />
+            "#
         }
     }
 }
 
 fn HashAnimation() -> Element {
     let mut hash_text = use_signal(|| "".to_string());
-    let chars = "0123456789abcdef";
+    let length = 512;
+    let batch_size = 32;
+    let update_interval = 200;
+    let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     
     use_effect(move || {
         spawn(async move {
+            // Initialize with random characters
+            let mut current_hash = String::with_capacity(length);
+            for _ in 0..length {
+                let idx = fastrand::usize(..chars.len());
+                current_hash.push(chars.chars().nth(idx).unwrap());
+            }
+            hash_text.set(current_hash.clone());
+
+            // Change 10 random positions
             loop {
-                // Generate 64 character random hex string
-                let mut new_hash = String::with_capacity(64);
-                for _ in 0..64 {
+                let mut new_hash = current_hash.clone();
+                for _ in 0..batch_size {
+                    let pos = fastrand::usize(..length);
                     let idx = fastrand::usize(..chars.len());
-                    new_hash.push(chars.chars().nth(idx).unwrap());
+                    new_hash.replace_range(pos..pos+1, &chars.chars().nth(idx).unwrap().to_string());
                 }
-                hash_text.set(new_hash);
-                async_std::task::sleep(std::time::Duration::from_millis(1000)).await;
+                current_hash = new_hash;
+                hash_text.set(current_hash.clone());
+                async_std::task::sleep(std::time::Duration::from_millis(update_interval)).await;
             }
         });
     });
 
     rsx! {
         Col {
-            class: "absolute bottom-0 left-1/2 -translate-x-1/2 w-min w-full h-full overflow-hidden opacity-10 pointer-events-none z-0",
+            // class: "absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full overflow-hidden opacity-10 pointer-events-none z-0 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words",
+            class: "absolute opacity-10 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words top-0 left-0 right-0 bottom-0",
+            "{hash_text}"
+        }
+    }
+}
+
+
+#[component]
+fn WalkthroughStep(step: String, title: String, detail: String) -> Element {
+    rsx! {
+        Row {
+            class: "w-full h-min",
+            gap: 4, 
+            div {
+                class: "flex text-sm h-8 w-8 font-semibold border border-elements-lowEmphasis shrink-0 rounded",
+                span {
+                    class: "mx-auto my-auto w-min h-min text-center",
+                    "{step}"
+                }
+            }
             Col {
-                class: "w-full gap-4 mt-auto font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-pre-wrap",
-                for _ in 0..32 {
+                class: "w-full h-min",
+                div {
+                    class: "flex text-xl font-semibold text-elements-highEmphasis h-8",
                     span {
-                        "{hash_text}"
+                        class: "my-auto",
+                        "{title}"
                     }
+                }
+                span {
+                    class: "text-lg text-elements-midEmphasis",
+                    "{detail}"
                 }
             }
         }
@@ -150,7 +244,7 @@ fn Liquidity() -> Element {
 fn Community() -> Element {
     rsx! {
         Col {
-            class: "relative w-full h-full mx-auto max-w-7xl min-h-192 pt-16 px-4",
+            class: "relative w-full h-full mx-auto max-w-7xl min-h-192 pt-16",
             SectionCopy {
                 tip: "Social",
                 title: "Join the community.",
@@ -272,7 +366,7 @@ fn TestimonialList(class: Option<String>, testimonial_data: Vec<TestimonialData>
     let class = class.unwrap_or_default();
     rsx! {
         Row {
-            class: "w-full gap-4 overflow-x-auto {class}",
+            class: "w-full gap-4 overflow-x-auto px-4 {class}",
             for data in testimonial_data {
                 Testimonial {
                     class: "my-auto w-72",
@@ -288,9 +382,9 @@ fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>
     let class = class.unwrap_or_default();
     rsx! {
         Row {
-            class: "w-full gap-4 {class}",
+            class: "w-full gap-4 px-4 {class}",
             Col {
-                class: "flex-1 mt-16 gap-4",
+                class: "mt-8 gap-4",
                 for data in testimonial_data[0..4] {
                     Testimonial {
                         data: data.clone()
@@ -298,7 +392,7 @@ fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>
                 }
             }
             Col {
-                class: "flex-1 gap-4",
+                class: "gap-4",
                 for data in testimonial_data[4..9] {
                     Testimonial {
                         data: data.clone()
@@ -306,7 +400,7 @@ fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>
                 }
             }
             Col {
-                class: "flex-1 mt-16 gap-4",
+                class: "mt-8 gap-4",
                 for data in testimonial_data[9..13] {
                     Testimonial {
                         data: data.clone()
@@ -408,7 +502,7 @@ fn Stats() -> Element {
 fn Faq() -> Element {
     rsx! {
         Col {
-            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start mt-16 px-4",
+            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start mt-16 px-0 sm:px-4",
             SectionCopy {
                 class: "text-left md:min-w-sm lg:min-w-md",
                 align: Align::Left,
@@ -420,7 +514,7 @@ fn Faq() -> Element {
                 class: "w-full h-min justify-start md:mt-16",
                 FaqItem {
                     question: "What is ORE?",
-                    answer: "ORE is a new \"digital gold\" primitive for decentralized finance. It is a crypto commodity mineable via proof-of-work on the Solana blockchain."
+                    answer: "ORE is a \"digital gold\" primitive for decentralized finance. It is a crypto commodity mineable via proof-of-work on the Solana blockchain."
                 }
                 FaqItem {
                     question: "Why should I care?",
@@ -428,7 +522,7 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "Mining ORE is easy. Anyone with a laptop or home computer can do it. Simply navigate to the Mine page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be added to a mining pool and do not need to pay transaction fees while you mine."
+                    answer: "Anyone with a laptop or home computer can mine ORE. Simply navigate to the Mine page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be registered with a mining pool and do not need to pay transaction fees while you mine."
                 }
                 FaqItem {
                     question: "How does staking work?",
@@ -442,25 +536,26 @@ fn Faq() -> Element {
         }
     }
 }
+
 #[component]
 fn FaqItem(question: String, answer: String) -> Element {
     let mut is_open = use_signal(|| false);
     let rotation = if is_open.cloned() { "rotate-45" } else { "rotate-0" };
+    let answer_class = if is_open.cloned() { "max-h-96 opacity-100" } else { "max-h-0 opacity-0" };
     rsx! {
         button {
-            class: "flex flex-col py-8 px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
+            class: "flex flex-col py-8 px-4 sm:px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
             onclick: move |_| is_open.set(!is_open.cloned()),
             Row {
                 class: "justify-between font-wide text-left font-bold text-2xl text-elements-highEmphasis",
                 gap: 8,
                 "{question}"
                 PlusIcon {
-                    class: "w-4 h-4 my-auto transition-transform duration-300 ease-in-out text-elements-lowEmphasis {rotation}"
+                    class: "w-4 h-4 my-auto shrink-0 transition-transform duration-300 ease-in-out text-elements-lowEmphasis {rotation}"
                 }
             }
             div {
-                class: "overflow-hidden transition-all duration-300 ease-in-out",
-                style: if is_open.cloned() { "max-height: 200px; opacity: 1;" } else { "max-height: 0px; opacity: 0;" },
+                class: "overflow-hidden transition-all duration-300 ease-in-out {answer_class}",
                 p {
                     class: "text-elements-midEmphasis mt-4 text-lg text-left",
                     "{answer}"
