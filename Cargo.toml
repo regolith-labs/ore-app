@@ -92,12 +92,12 @@ serde = { version = "1.0", features = ["derive"] }
 serde-wasm-bindgen = { version = "0.6.3", optional = true }
 serde_json = "1.0"
 serde_yaml = "0.9"
-solana-client-wasm = { version = "2.1.9", optional = true }
-solana-extra-wasm = { version = "2.1.9", optional = true }
-solana-sdk = "2.1.14"
-solana-client = { version = "2.1.14", optional = true }
-solana-account-decoder = { version = "2.1.14", optional = true }
-solana-transaction-status = { version = "2.1.9", optional = true }
+solana-client-wasm = { version = "2.1", optional = true }
+solana-extra-wasm = { version = "2.1", optional = true }
+solana-sdk = "2.1"
+solana-client = { version = "2.1", optional = true }
+solana-account-decoder = { version = "2.1", optional = true }
+solana-transaction-status = { version = "2.1", optional = true }
 spl-associated-token-account = { version = "^6", optional = true, features = [
   "no-entrypoint",
 ] }
@@ -136,8 +136,8 @@ features = [
 ]
 
 [patch.crates-io]
-solana-client-wasm = { version = "2.1.9", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
-solana-extra-wasm = { version = "2.1.9", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
+solana-client-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
+solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }
 meteora-pools-sdk = { git = "https://github.com/regolith-labs/meteora-pools-sdk", branch = "master" }
 meteora-vault-sdk = { git = "https://github.com/regolith-labs/meteora-vault-sdk", branch = "master" }
