@@ -77,13 +77,12 @@ fn HeroTitle() -> Element {
 fn Mining() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen md:min-h-224 mt-16",
+            class: "w-screen h-full min-h-screen md:min-h-224 mt-16",
             // HashAnimation {}
             Col {
                 // class: "relative w-full h-min mx-auto max-w-7xl justify-start",
-                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between bg-blue-500",
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between",
                 Col {
-                    class: "bg-yellow-500",
                     gap: 8,
                     SectionCopy {
                         class: "hidden md:flex w-full text-nowrap",
@@ -103,7 +102,7 @@ fn Mining() -> Element {
                         detail: "Start mining crypto in just one click."
                     }
                     Col {
-                        class: "w-2xl h-min mx-auto md:mr-auto md:ml-0 px-4 bg-green-500",
+                        class: "w-2xl md:w-md h-min mx-auto md:mr-auto md:ml-0 px-4",
                         gap: 8, 
                         WalkthroughStep {
                             step: "1",
@@ -113,7 +112,7 @@ fn Mining() -> Element {
                         WalkthroughStep {
                             step: "2",
                             title: "Join a pool",
-                            detail: "Hop into a mining pool to avoid transaction fees."
+                            detail: "Hop into a mining pool to avoid unnecessary transaction fees."
                         }
                         WalkthroughStep {
                             step: "3",
@@ -124,9 +123,9 @@ fn Mining() -> Element {
                 }
                 div {
                     // class: "relative h-160 w-screen md:w-lg lg:w-xl overflow-hidden shrink-0 pointer-events-none bg-red-500",
-                    class: "h-160 w-screen md:w-full overflow-hidden shrink-0 pointer-events-none bg-red-500",
+                    class: "relative h-160 w-screen md:w-auto overflow-hidden shrink-0 pointer-events-none",
                     HashAnimation {}
-                    // PhoneRock {}
+                    PhoneRock {}
                 }
                 // LandingMiner {}
             }
@@ -153,8 +152,8 @@ fn PhoneRock() -> Element {
 fn HashAnimation() -> Element {
     let mut hash_text = use_signal(|| "".to_string());
     let length = 512;
-    let batch_size = 32;
-    let update_interval = 200;
+    let batch_size = 64;
+    let update_interval = 500;
     let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     
     use_effect(move || {
@@ -185,8 +184,14 @@ fn HashAnimation() -> Element {
     rsx! {
         Col {
             // class: "absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full overflow-hidden opacity-10 pointer-events-none z-0 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words",
-            class: "absolute opacity-10 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words top-0 left-0 right-0 bottom-0",
-            "{hash_text}"
+            class: "absolute opacity-20 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words top-0 left-0 right-0 bottom-0",
+            span {
+                class: "bottom-0",
+                "{hash_text}"
+            }
+        }
+        Col {
+            class: "absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b md:bg-gradient-to-r from-black to-transparent",
         }
     }
 }
