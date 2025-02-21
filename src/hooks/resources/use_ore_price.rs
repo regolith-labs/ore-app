@@ -47,4 +47,3 @@ pub fn use_ore_quote(output_token: Pubkey) -> Resource<GatewayResult<QuoteRespon
         Ok(response)
     })
 }
-
