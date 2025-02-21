@@ -1,26 +1,11 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon, OreWordmarkIcon, Row, ToastDisplay, WalletAdapter, XIcon},
+    components::{BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon, OreWordmarkIcon, Row, WalletAdapter, XIcon},
     route::Route,
 };
 
-pub fn AppNavigation() -> Element {
-    rsx! {
-        Col {
-            class: "w-screen min-h-dvh",
-            AppNavBar {}
-            MobileTabBar {}
-            span {
-                class: "py-5 sm:py-8 w-full max-w-[80rem] mx-auto",
-                Outlet::<Route> {}
-            }
-            ToastDisplay {}
-        }
-    }
-}
-
-fn AppNavBar() -> Element {
+pub(crate) fn AppNavBar() -> Element {
     rsx! {
         Row {
             class: "w-screen h-20 px-3 sm:px-6 sm:sticky sm:top-0 bg-black z-50",
@@ -40,17 +25,7 @@ fn AppNavBar() -> Element {
     }
 }
 
-pub fn VisitorNavigation() -> Element {
-    rsx! {
-        Col {
-            class: "w-screen h-screen",
-            VisitorNavBar {}
-            Outlet::<Route> {}
-        }
-    }
-}
-
-fn VisitorNavBar() -> Element {
+pub(crate) fn VisitorNavBar() -> Element {
     rsx! {
         Row {
             class: "w-screen shrink-0 h-16 sm:h-20 px-2 sm:px-6",
@@ -58,16 +33,16 @@ fn VisitorNavBar() -> Element {
                 class: "w-full my-auto justify-between",
                 Logo {}
                 // SocialLinks {}
-                LaunchButton {}
+                // LaunchButton {}
             }
         }
     }
 }
 
-fn Logo() -> Element {
+pub fn Logo() -> Element {
     rsx! {
         Link {
-            class: "p-1 my-auto rounded hover:bg-controls-secondaryHover",
+            class: "p-1 my-auto w-min h-min rounded hover:bg-controls-secondaryHover",
             to: Route::Landing {},
             OreWordmarkIcon {
                 class: "h-5"
@@ -119,7 +94,7 @@ fn Tab(title: String, route: Route) -> Element {
     }
 }
 
-fn MobileTabBar() -> Element {
+pub(crate) fn MobileTabBar() -> Element {
     let current_route: Route = use_route();
     let hidden = if is_navbar_hidden(&current_route) {
         "hidden"
@@ -209,54 +184,41 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
     }
 }
 
-fn LaunchButton() -> Element {
-    rsx! {
-        Link {
-            class: "flex px-8 h-12 my-auto rounded controls-primary rounded-full z-100",
-            to: Route::Mine {},
-            span {
-                class: "my-auto",
-                "Launch app →"
-            }
-        }
-    }
-}
-
-fn _SocialLinks() -> Element {
+pub fn SocialLinks() -> Element {
     let button_color = "text-white";
     rsx! {
         div {
             class: "flex flex-row sm:text-sm md:text-base lg:text-lg my-auto gap-4 md:gap-8",
             Link {
                 to: "https://dexscreener.com/solana/ggadtfbqdgjozz3fp7zrtofgwnrs4e6mczmmd5ni1mxj",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 rounded-full {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 rounded-full {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 DexscreenIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
             Link {
                 to: "https://discord.gg/4TQfshAAsT",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 DiscordIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
             Link {
                 to: "https://github.com/regolith-labs/ore",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 GithubIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
             Link {
                 to: "https://x.com/oresupply",
-                class: "flex h-8 sm:h-10 w-8 sm:w-10 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
+                class: "flex h-10 sm:h-12 w-10 sm:w-12 transition-colors rounded-full transition-colors {button_color} hover:bg-controls-secondaryHover my-auto",
                 new_tab: true,
                 XIcon {
-                    class: "w-5 sm:w-6 h-5 sm:h-6 m-auto"
+                    class: "w-6 sm:w-8 h-6 sm:h-8 m-auto"
                 }
             }
         }

@@ -8,6 +8,8 @@ use crate::{config::{Token, LISTED_TOKENS}, gateway::{
 
 use crate::hooks::{use_gateway, use_wallet, Wallet};
 
+use super::{use_ore_price, OrePrice};
+
 pub(crate) fn use_token_balance_provider() {
     let mut token_balances = HashMap::new();
 
@@ -118,12 +120,31 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     })
 }
 
-pub fn _use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
+pub fn use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
     use_resource(move || async move {
         use_gateway()
             .rpc
             .get_token_supply(&ore_api::consts::MINT_ADDRESS)
             .await
             .map_err(GatewayError::from)
+    })
+}
+
+pub fn use_ore_market_cap() -> Resource<GatewayResult<f64>> {
+    let supply = use_ore_supply();
+    let price = use_ore_price();
+
+    use_resource(move || async move {
+        let Some(Ok(supply)) = supply.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(OrePrice(price)) = price.cloned() else {
+            return Err(GatewayError::Unknown);
+        };
+        let Some(supply) = supply.ui_amount else {
+            return Err(GatewayError::Unknown);
+        };
+        let market_cap = supply * price;
+        Ok(market_cap)
     })
 }
