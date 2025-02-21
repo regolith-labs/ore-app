@@ -285,4 +285,3 @@ fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
         }
     }
 }
-
