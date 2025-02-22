@@ -77,19 +77,19 @@ body {
     }
 
     .controls-primary {
-        @apply flex font-semibold transition bg-controls-primary text-black hover:bg-controls-primaryHover hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled;
+        @apply flex font-semibold transition duration-300 ease-in-out bg-controls-primary text-black hover:bg-controls-primaryHover hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled;
     }
 
     .controls-secondary {
-        @apply flex font-semibold text-center transition bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover hover:not-disabled:cursor-pointer;
+        @apply flex font-semibold text-center transition duration-300 ease-in-out bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover hover:not-disabled:cursor-pointer;
     }
 
     .controls-tertiary {
-        @apply flex font-semibold transition bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis hover:not-disabled:cursor-pointer;
+        @apply flex font-semibold transition duration-300 ease-in-out bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis hover:not-disabled:cursor-pointer;
     }
 
     .controls-gold {
-        @apply flex font-semibold transition font-medium border-2 border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
+        @apply flex font-semibold transition duration-300 ease-in-out font-medium border-2 border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
     }
 }
 

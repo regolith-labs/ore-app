@@ -89,7 +89,7 @@ fn Mining() -> Element {
                         tip: "Fair launch",
                         title: "Proof of work.",
                         subtitle: "On Solana.", 
-                        detail: "Start mining crypto today."
+                        // detail: "Start mining digital gold today."
                     }
                     SectionCopy {
                         class: "md:hidden",
@@ -97,10 +97,10 @@ fn Mining() -> Element {
                         tip: "Fair launch",
                         title: "Proof of work.",
                         subtitle: "On Solana.", 
-                        detail: "Start mining crypto in just one click."
+                        // detail: "Start mining digital gold today."
                     }
                     Col {
-                        class: "w-full md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
+                        class: "md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
                         gap: 8, 
                         WalkthroughStep {
                             step: "1",
@@ -114,9 +114,15 @@ fn Mining() -> Element {
                         }
                         WalkthroughStep {
                             step: "3",
-                            title: "Earn rewards",
-                            detail: "Start mining crypto and claiming rewards."
+                            title: "Claim rewards",
+                            detail: "Mine crypto and claim rewards."
                         }
+                    }
+                    SectionCtas {
+                        primary_title: "Start mining →",
+                        primary_route: Route::Mine {},
+                        secondary_title: "Learn more",
+                        secondary_route: Route::Mine {}
                     }
                 }
                 div {
@@ -126,7 +132,7 @@ fn Mining() -> Element {
                         HashAnimation {}
                     }
                     img {
-                        class: "relative w-full h-full pb-8 pt-16 object-cover z-10",
+                        class: "relative w-full h-full pb-8 pt-8 object-cover z-10",
                         src: asset!("/public/rock-phone.png")
                     }
                 }
@@ -136,21 +142,27 @@ fn Mining() -> Element {
 }
 
 #[component]
-fn PhoneRock() -> Element {
+fn SectionCtas(primary_title: String, primary_route: Route, secondary_title: String, secondary_route: Route) -> Element {
     rsx! {
-        // div {
-        //     // class: "absolute top-0 left-0 right-0 bottom-0",
-        //     class: "w-full h-full bg-transparent",
-        //     dangerous_inner_html: r#"
-        //         <spline-viewer
-        //             style="height: 100%; width: 100%;" 
-        //             url="https://prod.spline.design/M54opX84FI0VNGE2/scene.splinecode"
-        //         />
-        //     "#
-        // }
-        img {
-            class: "w-full h-full z-50",
-            src: asset!("/public/rock-phone.png")
+        Col {
+            class: "sm:flex-row mx-auto md:ml-0 h-min mt-8 px-4",
+            gap: 4,
+            Link {
+                to: primary_route,
+                class: "flex h-12 w-full sm:w-min px-8 rounded-full controls-primary",
+                span {
+                    class: "my-auto mx-auto text-nowrap font-semibold",
+                    "{primary_title}"
+                }
+            }
+            Link {
+                to: secondary_route,
+                class: "flex h-12 w-full sm:w-min px-8 rounded-full text-elements-lowEmphasis hover:text-elements-highEmphasis transition-colors hover:bg-controls-tertiaryHover duration-300 ease-in-out",
+                span {
+                    class: "my-auto mx-auto text-nowrap font-semibold",
+                    "{secondary_title}"
+                }
+            }
         }
     }
 }
@@ -236,16 +248,70 @@ fn WalkthroughStep(step: String, title: String, detail: String) -> Element {
 fn Liquidity() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen md:min-h-192 px-4",
+            class: "relative w-screen h-full min-h-screen md:min-h-192 px-4 mt-16",
             Col {
-                class: "w-full h-min mx-auto max-w-7xl justify-start",
-                SectionCopy {
-                    tip: "Defi",
-                    title: "Deep liquidity.",
-                    subtitle: "Native yield.",
-                    detail: "Stake your crypto and earn yield."
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between",
+                Col {
+                    class: "w-full h-min mx-auto max-w-7xl justify-start",
+                    gap: 8,
+                    // SectionCopy {
+                    //     tip: "Defi",
+                    //     title: "Deep liquidity.",
+                    //     subtitle: "Native yield.",
+                    //     detail: "Stake your crypto and earn yield."
+                    // }
+                    SectionCopy {
+                        class: "hidden md:flex w-full text-nowrap",
+                        align: Align::Left,
+                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
+                        tip: "Defi",
+                        title: "Deep liquidity.",
+                        subtitle: "Native yield.", 
+                        // detail: "Stake your crypto and earn yield."
+                    }
+                    SectionCopy {
+                        class: "md:hidden",
+                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
+                        tip: "Defi",
+                        title: "Deep liquidity.",
+                        subtitle: "Native yield.", 
+                        // detail: "Stake your crypto and earn yield."
+                    }
+                    span {
+                        class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        "ORE is unifying liquidity across Solana around a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the network."
+                    }
+                    SectionCtas {
+                        primary_title: "Explore opportunities →",
+                        primary_route: Route::Stake {},
+                        secondary_title: "Learn more",
+                        secondary_route: Route::Stake {}
+                    }
+                    // LandingWave {}
                 }
-                // LandingWave {}
+                div {
+                    class: "relative h-160 w-screen md:w-auto overflow-hidden shrink-0 pointer-events-none",
+                    // div {
+                    //     class: "absolute inset-0 z-0",
+                    //     HashAnimation {}
+                    // }
+                    // img {
+                    //     class: "relative w-full h-full pb-8 pt-8 object-cover z-10",
+                    //     src: asset!("/public/rock-phone.png")
+                    // }
+                    div {
+                        class: "relative w-full h-full pb-8 pt-8 object-cover z-10",
+                        // class: "absolute bottom-0 left-0 md:left-auto max-w-7xl max-h-160 mx-auto w-full h-full overflow-clipped pointer-events-none",
+                        // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+                        // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
+                        dangerous_inner_html: r#"
+                            <spline-viewer
+                                style="height: 100%; width: 100%;" 
+                                url="https://prod.spline.design/63ZFyDX-IkLeeBln/scene.splinecode"
+                            />
+                        "#
+                    }
+                }
             }
         }
     }
@@ -394,7 +460,7 @@ fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>
         Row {
             class: "w-full gap-4 px-4 {class}",
             Col {
-                class: "mt-8 gap-4",
+                class: "my-auto gap-4",
                 for data in testimonial_data[0..4] {
                     Testimonial {
                         data: data.clone()
@@ -410,7 +476,7 @@ fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>
                 }
             }
             Col {
-                class: "mt-8 gap-4",
+                class: "my-auto gap-4",
                 for data in testimonial_data[9..13] {
                     Testimonial {
                         data: data.clone()
@@ -459,7 +525,7 @@ fn Stats() -> Element {
         Col {
             class: "w-full h-min text-elements-highEmphasis px-4",
             Col {
-                class: "md:flex-row md:gap-24 relative w-full py-16 md:py-32 px-4 mx-auto max-w-7xl border-t border-b border-elements-midEmphasis",
+                class: "md:flex-row md:gap-24 relative w-full py-16 md:py-32 px-4 mx-auto max-w-7xl border-t border-b border-elements-midEmphasis selection:bg-elements-highEmphasis selection:text-black",
                 gap: 16,
                 Col {
                     class: "md:ml-auto",
@@ -512,7 +578,7 @@ fn Stats() -> Element {
 fn Faq() -> Element {
     rsx! {
         Col {
-            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start mt-16 px-0 sm:px-4",
+            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start mt-32 px-0 sm:px-4",
             SectionCopy {
                 class: "text-left md:min-w-sm lg:min-w-md",
                 align: Align::Left,
@@ -629,10 +695,9 @@ fn Footer() -> Element {
             }
             Col {
                 class: "w-full h-min mx-auto max-w-7xl justify-between border-t border-elements-midEmphasis pt-4",
-                // class: "w-full h-min mx-auto max-w-7xl justify-between pt-4",
                 gap: 16,
                 span {
-                    class: "text-elements-lowEmphasis text-sm font-medium ml-auto mr-4",
+                    class: "text-elements-lowEmphasis text-sm font-medium ml-auto mr-2",
                     "© Regolith Labs 2025"
                 }
                 OreWordmarkIcon {
