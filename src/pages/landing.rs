@@ -78,9 +78,7 @@ fn Mining() -> Element {
     rsx! {
         Col {
             class: "w-screen h-full min-h-screen md:min-h-224 mt-16",
-            // HashAnimation {}
             Col {
-                // class: "relative w-full h-min mx-auto max-w-7xl justify-start",
                 class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between",
                 Col {
                     gap: 8,
@@ -102,7 +100,7 @@ fn Mining() -> Element {
                         detail: "Start mining crypto in just one click."
                     }
                     Col {
-                        class: "w-2xl md:w-md h-min mx-auto md:mr-auto md:ml-0 px-4",
+                        class: "w-full md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
                         gap: 8, 
                         WalkthroughStep {
                             step: "1",
@@ -112,22 +110,26 @@ fn Mining() -> Element {
                         WalkthroughStep {
                             step: "2",
                             title: "Join a pool",
-                            detail: "Hop into a mining pool to avoid unnecessary transaction fees."
+                            detail: "Hop into a mining pool to avoid transaction fees."
                         }
                         WalkthroughStep {
                             step: "3",
                             title: "Earn rewards",
-                            detail: "Start mining crypto and earning rewards."
+                            detail: "Start mining crypto and claiming rewards."
                         }
                     }
                 }
                 div {
-                    // class: "relative h-160 w-screen md:w-lg lg:w-xl overflow-hidden shrink-0 pointer-events-none bg-red-500",
                     class: "relative h-160 w-screen md:w-auto overflow-hidden shrink-0 pointer-events-none",
-                    HashAnimation {}
-                    PhoneRock {}
+                    div {
+                        class: "absolute inset-0 z-0",
+                        HashAnimation {}
+                    }
+                    img {
+                        class: "relative w-full h-full pb-8 pt-16 object-cover z-10",
+                        src: asset!("/public/rock-phone.png")
+                    }
                 }
-                // LandingMiner {}
             }
         }
     }
@@ -136,15 +138,19 @@ fn Mining() -> Element {
 #[component]
 fn PhoneRock() -> Element {
     rsx! {
-        div {
-            // class: "absolute top-0 left-0 right-0 bottom-0",
-            class: "w-full h-full bg-transparent",
-            dangerous_inner_html: r#"
-                <spline-viewer
-                    style="height: 100%; width: 100%;" 
-                    url="https://prod.spline.design/M54opX84FI0VNGE2/scene.splinecode"
-                />
-            "#
+        // div {
+        //     // class: "absolute top-0 left-0 right-0 bottom-0",
+        //     class: "w-full h-full bg-transparent",
+        //     dangerous_inner_html: r#"
+        //         <spline-viewer
+        //             style="height: 100%; width: 100%;" 
+        //             url="https://prod.spline.design/M54opX84FI0VNGE2/scene.splinecode"
+        //         />
+        //     "#
+        // }
+        img {
+            class: "w-full h-full z-50",
+            src: asset!("/public/rock-phone.png")
         }
     }
 }
@@ -157,41 +163,40 @@ fn HashAnimation() -> Element {
     let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     
     use_effect(move || {
-        spawn(async move {
-            // Initialize with random characters
-            let mut current_hash = String::with_capacity(length);
-            for _ in 0..length {
-                let idx = fastrand::usize(..chars.len());
-                current_hash.push(chars.chars().nth(idx).unwrap());
-            }
-            hash_text.set(current_hash.clone());
+        // Initialize with random characters
+        let mut current_hash = String::with_capacity(length);
+        for _ in 0..length {
+            let idx = fastrand::usize(..chars.len());
+            current_hash.push(chars.chars().nth(idx).unwrap());
+        }
+        hash_text.set(current_hash.clone());
 
+        // spawn(async move {
             // Change 10 random positions
-            loop {
-                let mut new_hash = current_hash.clone();
-                for _ in 0..batch_size {
-                    let pos = fastrand::usize(..length);
-                    let idx = fastrand::usize(..chars.len());
-                    new_hash.replace_range(pos..pos+1, &chars.chars().nth(idx).unwrap().to_string());
-                }
-                current_hash = new_hash;
-                hash_text.set(current_hash.clone());
-                async_std::task::sleep(std::time::Duration::from_millis(update_interval)).await;
-            }
-        });
+            // loop {
+            //     let mut new_hash = current_hash.clone();
+            //     for _ in 0..batch_size {
+            //         let pos = fastrand::usize(..length);
+            //         let idx = fastrand::usize(..chars.len());
+            //         new_hash.replace_range(pos..pos+1, &chars.chars().nth(idx).unwrap().to_string());
+            //     }
+            //     current_hash = new_hash;
+            //     hash_text.set(current_hash.clone());
+            //     async_std::task::sleep(std::time::Duration::from_millis(update_interval)).await;
+            // }
+        // });
     });
 
     rsx! {
         Col {
-            // class: "absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full overflow-hidden opacity-10 pointer-events-none z-0 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words",
-            class: "absolute opacity-20 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words top-0 left-0 right-0 bottom-0",
+            class: "absolute opacity-20 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words top-0 left-0 md:right-0 -right-16 bottom-0 z-10",
             span {
                 class: "bottom-0",
                 "{hash_text}"
             }
         }
         Col {
-            class: "absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b md:bg-gradient-to-r from-black to-transparent",
+            class: "absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b md:bg-gradient-to-r from-black to-transparent z-20",
         }
     }
 }
@@ -231,7 +236,7 @@ fn WalkthroughStep(step: String, title: String, detail: String) -> Element {
 fn Liquidity() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen md:min-h-192 px-4 mt-16",
+            class: "relative w-screen h-full min-h-screen md:min-h-192 px-4",
             Col {
                 class: "w-full h-min mx-auto max-w-7xl justify-start",
                 SectionCopy {
@@ -240,7 +245,7 @@ fn Liquidity() -> Element {
                     subtitle: "Native yield.",
                     detail: "Stake your crypto and earn yield."
                 }
-                LandingWave {}
+                // LandingWave {}
             }
         }
     }
@@ -249,7 +254,7 @@ fn Liquidity() -> Element {
 fn Community() -> Element {
     rsx! {
         Col {
-            class: "relative w-full h-full mx-auto max-w-7xl min-h-192 pt-16",
+            class: "relative w-full h-full mx-auto max-w-7xl pt-16",
             SectionCopy {
                 tip: "Social",
                 title: "Join the community.",
@@ -374,7 +379,7 @@ fn TestimonialList(class: Option<String>, testimonial_data: Vec<TestimonialData>
             class: "w-full gap-4 overflow-x-auto px-4 {class}",
             for data in testimonial_data {
                 Testimonial {
-                    class: "my-auto w-72",
+                    class: "my-auto min-w-64",
                     data: data.clone()
                 }
             }
@@ -421,7 +426,7 @@ fn Testimonial(class: Option<String>, data: TestimonialData) -> Element {
     let class = class.unwrap_or_default();
     rsx! {
         a {
-            class: "flex flex-col bg-elements-midEmphasis/10 rounded-md p-5 border-2 border-transparent hover:border-elements-highEmphasis transition-all duration-300 ease-in-out grow w-96 {class}",
+            class: "flex flex-col bg-elements-midEmphasis/10 rounded-md p-5 border-2 border-transparent hover:border-elements-highEmphasis transition-all duration-300 ease-in-out grow {class}",
             href: "{data.link}",
             target: "_blank",
             Row {
@@ -589,7 +594,8 @@ fn SectionCopy(class: Option<String>, align: Option<Align>, tip: Option<String>,
             gap: 2,
             if let Some(tip) = tip {
                 span {
-                    class: "z-30 border-2 border-elements-gold text-elements-gold rounded-full w-min px-4 py-2 text-xs font-semibold mb-4 text-nowrap {text_margin}",
+                    // class: "z-30 text-elements-gold rounded-full w-min text-sm font-semibold mb-4 text-nowrap {text_margin}",
+                    class: "z-30 border-2 border-elements-gold text-elements-gold rounded-full w-min px-3 py-1 text-xs font-semibold mb-4 text-nowrap {text_margin}",
                     "{tip}"
                 }
             }
