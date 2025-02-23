@@ -115,8 +115,8 @@ fn Mining() -> Element {
                         }
                         WalkthroughStep {
                             step: "3",
-                            title: "Start mining",
-                            detail: "Utilize your spare hashpower to mine crypto and earn rewards."
+                            title: "Mine crypto",
+                            detail: "Utilize spare hashpower and earn rewards."
                         }
                     }
                     SectionCtas {
@@ -281,7 +281,7 @@ fn Liquidity() -> Element {
                         "ORE unifies liquidity across Solana on a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the network."
                     }
                     SectionCtas {
-                        primary_title: "Explore opportunities →",
+                        primary_title: "Earn yield →",
                         primary_route: Route::Stake {},
                         secondary_title: "Learn more",
                         secondary_route: Route::Stake {}
@@ -569,7 +569,7 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "ORE represents a new generation of digital gold, built for the new generation of crypto users. It takes the basic properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new token native to Solana defi. "
+                    answer: "ORE represents a new generation of digital gold, built for the new generation of crypto users. It takes the core properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new token native to Solana. "
                 }
                 FaqItem {
                     question: "How does mining work?",
