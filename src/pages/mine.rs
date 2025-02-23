@@ -23,7 +23,7 @@ pub fn Mine() -> Element {
                 Heading {
                     class: "w-full",
                     title: "Mine",
-                    subtitle: "Utilize spare hashpower to harvest ORE."
+                    subtitle: "Utilize spare hashpower to earn rewards."
                 }
                 OrbMiner {
                     class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
