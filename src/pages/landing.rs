@@ -90,19 +90,15 @@ fn Mining() -> Element {
                     SectionCopy {
                         class: "hidden md:flex w-full text-nowrap",
                         align: Align::Left,
-                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Fair launch",
                         title: "Proof of work.",
                         subtitle: "On Solana.",
-                        // detail: "Start mining digital gold today."
                     }
                     SectionCopy {
                         class: "md:hidden",
-                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Fair launch",
                         title: "Proof of work.",
                         subtitle: "On Solana.",
-                        // detail: "Start mining digital gold today."
                     }
                     Col {
                         class: "md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
@@ -119,8 +115,8 @@ fn Mining() -> Element {
                         }
                         WalkthroughStep {
                             step: "3",
-                            title: "Claim rewards",
-                            detail: "Mine crypto and claim rewards."
+                            title: "Start mining",
+                            detail: "Utilize your spare hashpower to mine crypto and earn rewards."
                         }
                     }
                     SectionCtas {
@@ -267,28 +263,18 @@ fn Liquidity() -> Element {
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 8,
-                    // SectionCopy {
-                    //     tip: "Defi",
-                    //     title: "Deep liquidity.",
-                    //     subtitle: "Native yield.",
-                    //     detail: "Stake your crypto and earn yield."
-                    // }
                     SectionCopy {
                         class: "hidden md:flex w-full text-nowrap",
                         align: Align::Left,
-                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Defi",
                         title: "Deep liquidity.",
                         subtitle: "Native yield.",
-                        // detail: "Stake your crypto and earn yield."
                     }
                     SectionCopy {
                         class: "md:hidden",
-                        // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Defi",
                         title: "Deep liquidity.",
                         subtitle: "Native yield.",
-                        // detail: "Stake your crypto and earn yield."
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
@@ -583,20 +569,19 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "ORE represents a new generation of digital gold, built for a new generation of crypto users. It takes the basic properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new Solana native token. "
+                    answer: "ORE represents a new generation of digital gold, built for the new generation of crypto users. It takes the basic properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new token native to Solana defi. "
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "ORE can be mined by anyone with a laptop or home computer. Simply navigate to the mining page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be enrolled with a mining pool and do not need to pay any transaction fees while you mine."
+                    answer: "ORE can be mined by anyone with a laptop or home computer. Simply navigate to the mining page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be enrolled in a mining pool and do not need to pay any transaction fees while you mine."
                 }
                 FaqItem {
                     question: "How does staking work?",
-                    answer: "ORE automatically allocates a portion of all newly mined tokens to liquidity providers as yield. These incentives help bootstrap liquidity and maintain deep markets with a network of strategic assets in the Solana ecosystem. By providing liquidity for boosted pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE native yield."
+                    answer: "ORE automatically allocates a portion of all newly mined tokens to liquidity providers as yield. These incentives help bootstrap liquidity and maintain deep markets with a network of strategic assets in the Solana ecosystem. By providing liquidity for boosted pairs, stakers can earn fees from traders as well as receive additional rewards in the form of native ORE yield."
                 }
                 FaqItem {
                     question: "Is it secure?",
                     answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team has committed to freezing the protocol in the coming months to ensure longterm security."
-                    // answer: "Staking yield is generated in two ways. First, stakers earn fees whenever a trader executes a swap in a liquidity pair they are providing. Secondly, stakers can earn native yield from the ORE protocol via Boosts. This yield is generated automatically by the protocol which allocates a portion of all newly mined ORE to liquidity provider incentives."
                 }
             }
         }
@@ -618,7 +603,7 @@ fn FaqItem(question: String, answer: String) -> Element {
     };
     rsx! {
         button {
-            class: "flex flex-col py-8 px-4 sm:px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
+            class: "flex flex-col w-full py-8 px-4 sm:px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
             onclick: move |_| is_open.set(!is_open.cloned()),
             Row {
                 class: "justify-between font-wide text-left font-bold text-2xl text-elements-highEmphasis",
