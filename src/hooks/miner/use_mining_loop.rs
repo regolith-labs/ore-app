@@ -129,7 +129,18 @@ fn use_solution_contribute(
                     {
                         log::error!("Error posting solution: {:?}", err);
                     }
-                    member_record.restart();
+                    miner_status.set(MinerStatus::Hashing);
+                    // TODO:
+                    // this is a bug --
+                    // restarting the member record (probably to fetch rewards balance?)
+                    // will trigger the dispatch challenge resource.
+                    // what happens is that the previous challenge is still sitting there
+                    // but the dispatcher "thinks" it received a new chalenge
+                    // when really only the member record was restarted,
+                    // so the miner ends up with a stale (previous) challenge.
+                    // this causes a chain reaction where the miner is perpetually stale.
+                    //
+                    // member_record.restart(); <-- bug
                     match use_gateway()
                         .get_latest_event(pubkey, pool_url.clone())
                         .await
