@@ -1,7 +1,10 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon, OreWordmarkIcon, Row, WalletAdapter, XIcon},
+    components::{
+        BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon,
+        OreWordmarkIcon, Row, WalletAdapter, XIcon,
+    },
     route::Route,
 };
 
@@ -81,7 +84,11 @@ fn TabBar() -> Element {
 fn Tab(title: String, route: Route) -> Element {
     let current_route = use_route();
     let selected = is_tab_selected(&route, &current_route);
-    let color = if !selected { "text-elements-lowEmphasis hover:text-elements-midEmphasis" } else { "" };
+    let color = if !selected {
+        "text-elements-lowEmphasis hover:text-elements-midEmphasis"
+    } else {
+        ""
+    };
     rsx! {
         Link {
             class: "flex px-8 h-12 elevated-control transition-colors {color}",
@@ -124,7 +131,11 @@ pub(crate) fn MobileTabBar() -> Element {
 fn MobileTab(title: String, route: Route) -> Element {
     let current_route: Route = use_route();
     let selected = is_tab_selected(&route, &current_route);
-    let color = if !selected { "text-elements-lowEmphasis hover:text-elements-midEmphasis" } else { "" };
+    let color = if !selected {
+        "text-elements-lowEmphasis hover:text-elements-midEmphasis"
+    } else {
+        ""
+    };
     rsx! {
         Link {
             class: "flex h-16 w-full",
@@ -173,7 +184,7 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
             _ => false,
         },
         Route::Stake {} => match current_route {
-            Route::Stake {} | Route::Idle {} | Route::Pair { lp_mint: _ }  => true,
+            Route::Stake {} | Route::Idle {} | Route::Pair { lp_mint: _ } => true,
             _ => false,
         },
         Route::Trade {} => match current_route {

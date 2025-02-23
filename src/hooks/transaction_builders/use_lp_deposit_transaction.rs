@@ -3,7 +3,8 @@ use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::transaction::{Transaction, VersionedTransaction};
 
 use crate::{
-    gateway::{GatewayError, GatewayResult}, hooks::{use_wallet, Wallet}
+    gateway::{GatewayError, GatewayResult},
+    hooks::{use_wallet, Wallet},
 };
 
 pub fn use_lp_deposit_transaction(
@@ -34,7 +35,7 @@ pub fn use_lp_deposit_transaction(
 
         // Deposit LP tokens
         ixs.push(ore_boost_api::sdk::deposit(authority, boost.mint, u64::MAX));
-       
+
         // Build transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
         Ok(tx)

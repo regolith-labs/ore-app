@@ -3,9 +3,14 @@ use std::collections::HashMap;
 use dioxus::prelude::*;
 use steel::Pubkey;
 
-use crate::{config::{LpType, LISTED_BOOSTS, LISTED_BOOSTS_BY_MINT, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER}, gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc}, hooks::use_gateway, utils::LiquidityPair};
-
-
+use crate::{
+    config::{
+        LpType, LISTED_BOOSTS, LISTED_BOOSTS_BY_MINT, LISTED_TOKENS, LISTED_TOKENS_BY_TICKER,
+    },
+    gateway::{kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc},
+    hooks::use_gateway,
+    utils::LiquidityPair,
+};
 
 pub(crate) fn use_liquidity_pairs_provider() {
     // Hashmap to cache resources
@@ -13,7 +18,10 @@ pub(crate) fn use_liquidity_pairs_provider() {
 
     // Listed liquidity pairs
     for boost_meta in LISTED_BOOSTS.iter() {
-        liquidity_pairs.insert(boost_meta.lp_mint, use_liquidity_pair_resource(boost_meta.lp_mint));
+        liquidity_pairs.insert(
+            boost_meta.lp_mint,
+            use_liquidity_pair_resource(boost_meta.lp_mint),
+        );
     }
 
     // Setup context provider
@@ -26,12 +34,21 @@ fn use_liquidity_pair_resource(lp_mint_address: Pubkey) -> Resource<GatewayResul
             return Err(GatewayError::Unknown);
         };
         let lp_type: LpType = boost_meta.lp_type;
-        let lp_mint_supply = use_gateway().rpc.get_token_supply(&boost_meta.lp_mint).await?;
+        let lp_mint_supply = use_gateway()
+            .rpc
+            .get_token_supply(&boost_meta.lp_mint)
+            .await?;
         match lp_type {
             LpType::Kamino => {
-                let strategy_metrics = use_gateway().get_kamino_strategy_metrics(boost_meta.lp_id).await?;
-                let token_a = LISTED_TOKENS_BY_TICKER.get(&strategy_metrics.token_a).unwrap();
-                let token_b = LISTED_TOKENS_BY_TICKER.get(&strategy_metrics.token_b).unwrap();
+                let strategy_metrics = use_gateway()
+                    .get_kamino_strategy_metrics(boost_meta.lp_id)
+                    .await?;
+                let token_a = LISTED_TOKENS_BY_TICKER
+                    .get(&strategy_metrics.token_a)
+                    .unwrap();
+                let token_b = LISTED_TOKENS_BY_TICKER
+                    .get(&strategy_metrics.token_b)
+                    .unwrap();
                 return Ok(LiquidityPair {
                     token_a: token_a.clone(),
                     token_b: token_b.clone(),
@@ -42,9 +59,15 @@ fn use_liquidity_pair_resource(lp_mint_address: Pubkey) -> Resource<GatewayResul
                 });
             }
             LpType::Meteora => {
-                let pool_metrics = use_gateway().get_meteora_pool_metrics(boost_meta.lp_id).await?;
-                let token_a = LISTED_TOKENS.get(&pool_metrics.pool_token_mints[0]).unwrap();
-                let token_b = LISTED_TOKENS.get(&pool_metrics.pool_token_mints[1]).unwrap();
+                let pool_metrics = use_gateway()
+                    .get_meteora_pool_metrics(boost_meta.lp_id)
+                    .await?;
+                let token_a = LISTED_TOKENS
+                    .get(&pool_metrics.pool_token_mints[0])
+                    .unwrap();
+                let token_b = LISTED_TOKENS
+                    .get(&pool_metrics.pool_token_mints[1])
+                    .unwrap();
                 let balance_a = pool_metrics.pool_token_amounts[0];
                 let balance_b = pool_metrics.pool_token_amounts[1];
                 return Ok(LiquidityPair {
@@ -59,7 +82,6 @@ fn use_liquidity_pair_resource(lp_mint_address: Pubkey) -> Resource<GatewayResul
         }
     })
 }
-
 
 pub fn use_liquidity_pair(lp_mint_address: Pubkey) -> Resource<GatewayResult<LiquidityPair>> {
     let liquidity_pairs: HashMap<Pubkey, Resource<GatewayResult<LiquidityPair>>> = use_context();

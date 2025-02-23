@@ -16,9 +16,19 @@ impl LiquidityPair {
         let stake_amount_a = self.balance_a_f64 * stake_share;
         let stake_amount_b = self.balance_b_f64 * stake_share;
         if self.token_a.ticker == "ORE" {
-            (stake_amount_a, stake_amount_b, self.token_b.ticker.clone(), self.token_b.decimals)
+            (
+                stake_amount_a,
+                stake_amount_b,
+                self.token_b.ticker.clone(),
+                self.token_b.decimals,
+            )
         } else {
-            (stake_amount_b, stake_amount_a, self.token_a.ticker.clone(), self.token_a.decimals)
+            (
+                stake_amount_b,
+                stake_amount_a,
+                self.token_a.ticker.clone(),
+                self.token_a.decimals,
+            )
         }
     }
 }

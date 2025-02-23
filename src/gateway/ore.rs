@@ -37,14 +37,24 @@ impl<R: Rpc> OreGateway for Gateway<R> {
 
     async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64> {
         let get_url = format!("{}/boosts/{}/yield", ORE_API_URL, boost_address);
-        let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
+        let resp = self
+            .http
+            .get(get_url)
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
         let yield_7d = resp.json::<f64>().await.map_err(GatewayError::from)?;
         Ok(yield_7d)
     }
 
     async fn get_ore_holders(&self) -> GatewayResult<u64> {
         let get_url = format!("{}/holders", ORE_API_URL);
-        let resp = self.http.get(get_url).send().await.map_err(GatewayError::from)?;
+        let resp = self
+            .http
+            .get(get_url)
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
         let holders = resp.json::<u64>().await.map_err(GatewayError::from)?;
         Ok(holders)
     }

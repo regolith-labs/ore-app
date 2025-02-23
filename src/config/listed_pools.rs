@@ -9,8 +9,7 @@ pub static LISTED_POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
     let yaml_str = include_str!("../../public/config/listed-pools.yaml");
 
     // Parse the config
-    let config: Config =
-        serde_yaml::from_str(yaml_str).expect("Failed to parse listed-pools.yaml");
+    let config: Config = serde_yaml::from_str(yaml_str).expect("Failed to parse listed-pools.yaml");
 
     config.pools
 });

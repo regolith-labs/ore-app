@@ -1,6 +1,11 @@
 use dioxus::prelude::*;
 
-use crate::{components::*, hooks::{use_ore_holders, use_ore_market_cap}, route::Route, utils::format_abbreviated_number};
+use crate::{
+    components::*,
+    hooks::{use_ore_holders, use_ore_market_cap},
+    route::Route,
+    utils::format_abbreviated_number,
+};
 
 pub fn Landing() -> Element {
     rsx! {
@@ -63,13 +68,13 @@ fn HeroTitle() -> Element {
                 class: "md:mt-auto z-30",
                 "Liquid"
             }
-            span { 
+            span {
                 class: "z-20",
-                "Digital" 
+                "Digital"
             }
             span {
                 class: "md:mb-auto z-10",
-                "Gold" 
+                "Gold"
             }
         }
     }
@@ -88,7 +93,7 @@ fn Mining() -> Element {
                         // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Fair launch",
                         title: "Proof of work.",
-                        subtitle: "On Solana.", 
+                        subtitle: "On Solana.",
                         // detail: "Start mining digital gold today."
                     }
                     SectionCopy {
@@ -96,12 +101,12 @@ fn Mining() -> Element {
                         // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Fair launch",
                         title: "Proof of work.",
-                        subtitle: "On Solana.", 
+                        subtitle: "On Solana.",
                         // detail: "Start mining digital gold today."
                     }
                     Col {
                         class: "md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
-                        gap: 8, 
+                        gap: 8,
                         WalkthroughStep {
                             step: "1",
                             title: "Connect wallet",
@@ -142,7 +147,12 @@ fn Mining() -> Element {
 }
 
 #[component]
-fn SectionCtas(primary_title: String, primary_route: Route, secondary_title: String, secondary_route: Route) -> Element {
+fn SectionCtas(
+    primary_title: String,
+    primary_route: Route,
+    secondary_title: String,
+    secondary_route: Route,
+) -> Element {
     rsx! {
         Col {
             class: "sm:flex-row mx-auto md:ml-0 h-min mt-8 px-4",
@@ -173,7 +183,7 @@ fn HashAnimation() -> Element {
     let batch_size = 64;
     let update_interval = 500;
     let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    
+
     use_effect(move || {
         // Initialize with random characters
         let mut current_hash = String::with_capacity(length);
@@ -184,18 +194,18 @@ fn HashAnimation() -> Element {
         hash_text.set(current_hash.clone());
 
         // spawn(async move {
-            // Change 10 random positions
-            // loop {
-            //     let mut new_hash = current_hash.clone();
-            //     for _ in 0..batch_size {
-            //         let pos = fastrand::usize(..length);
-            //         let idx = fastrand::usize(..chars.len());
-            //         new_hash.replace_range(pos..pos+1, &chars.chars().nth(idx).unwrap().to_string());
-            //     }
-            //     current_hash = new_hash;
-            //     hash_text.set(current_hash.clone());
-            //     async_std::task::sleep(std::time::Duration::from_millis(update_interval)).await;
-            // }
+        // Change 10 random positions
+        // loop {
+        //     let mut new_hash = current_hash.clone();
+        //     for _ in 0..batch_size {
+        //         let pos = fastrand::usize(..length);
+        //         let idx = fastrand::usize(..chars.len());
+        //         new_hash.replace_range(pos..pos+1, &chars.chars().nth(idx).unwrap().to_string());
+        //     }
+        //     current_hash = new_hash;
+        //     hash_text.set(current_hash.clone());
+        //     async_std::task::sleep(std::time::Duration::from_millis(update_interval)).await;
+        // }
         // });
     });
 
@@ -213,13 +223,12 @@ fn HashAnimation() -> Element {
     }
 }
 
-
 #[component]
 fn WalkthroughStep(step: String, title: String, detail: String) -> Element {
     rsx! {
         Row {
             class: "w-full h-min",
-            gap: 4, 
+            gap: 4,
             div {
                 class: "flex text-sm h-8 w-8 font-semibold border border-elements-lowEmphasis shrink-0 rounded",
                 span {
@@ -270,7 +279,7 @@ fn Liquidity() -> Element {
                         // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Defi",
                         title: "Deep liquidity.",
-                        subtitle: "Native yield.", 
+                        subtitle: "Native yield.",
                         // detail: "Stake your crypto and earn yield."
                     }
                     SectionCopy {
@@ -278,7 +287,7 @@ fn Liquidity() -> Element {
                         // class: "bg-gradient-to-r from-transparent via-black to-transparent from-10% via-50% to-90% z-10",
                         tip: "Defi",
                         title: "Deep liquidity.",
-                        subtitle: "Native yield.", 
+                        subtitle: "Native yield.",
                         // detail: "Stake your crypto and earn yield."
                     }
                     span {
@@ -401,8 +410,7 @@ fn Testimonials() -> Element {
             link: "https://x.com/DChapmanCrypto/status/1820710738308280432".into()
         },
     ];
-        
-        
+
     rsx! {
         Col {
             class: "w-full h-min mx-auto max-w-7xl justify-start mt-8",
@@ -499,7 +507,7 @@ fn Testimonial(class: Option<String>, data: TestimonialData) -> Element {
 }
 
 fn Stats() -> Element {
-    // TODO 
+    // TODO
     let holders = use_ore_holders();
     let market_cap = use_ore_market_cap();
     rsx! {
@@ -598,8 +606,16 @@ fn Faq() -> Element {
 #[component]
 fn FaqItem(question: String, answer: String) -> Element {
     let mut is_open = use_signal(|| false);
-    let rotation = if is_open.cloned() { "rotate-45" } else { "rotate-0" };
-    let answer_class = if is_open.cloned() { "max-h-96 opacity-100" } else { "max-h-0 opacity-0" };
+    let rotation = if is_open.cloned() {
+        "rotate-45"
+    } else {
+        "rotate-0"
+    };
+    let answer_class = if is_open.cloned() {
+        "max-h-96 opacity-100"
+    } else {
+        "max-h-0 opacity-0"
+    };
     rsx! {
         button {
             class: "flex flex-col py-8 px-4 sm:px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
@@ -630,7 +646,14 @@ enum Align {
 }
 
 #[component]
-fn SectionCopy(class: Option<String>, align: Option<Align>, tip: Option<String>, title: String, subtitle: Option<String>, detail: Option<String>) -> Element {
+fn SectionCopy(
+    class: Option<String>,
+    align: Option<Align>,
+    tip: Option<String>,
+    title: String,
+    subtitle: Option<String>,
+    detail: Option<String>,
+) -> Element {
     let class = class.unwrap_or_default();
     let (text_align, text_margin) = match align.unwrap_or(Align::Center) {
         Align::Left => ("text-left", "mr-auto"),
@@ -652,9 +675,9 @@ fn SectionCopy(class: Option<String>, align: Option<Align>, tip: Option<String>,
                 "{title}"
             }
             if let Some(subtitle) = subtitle {
-                span { 
+                span {
                     class: "z-20 text-elements-lowEmphasis",
-                    "{subtitle}" 
+                    "{subtitle}"
                 }
             }
             if let Some(detail) = detail {

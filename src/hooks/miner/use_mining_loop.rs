@@ -6,8 +6,11 @@ use ore_pool_types::MemberChallenge;
 use steel::Pubkey;
 
 use crate::{
-    gateway::{pool::PoolGateway, GatewayResult}, 
-    hooks::{use_gateway, use_member_record, use_miner, use_miner_is_active, use_miner_status, use_pool_url, use_wallet, GetPubkey, MinerStatus, MiningEvent}
+    gateway::{pool::PoolGateway, GatewayResult},
+    hooks::{
+        use_gateway, use_member_record, use_miner, use_miner_is_active, use_miner_status,
+        use_pool_url, use_wallet, GetPubkey, MinerStatus, MiningEvent,
+    },
 };
 
 pub fn use_mining_loop() {
@@ -54,19 +57,15 @@ fn use_next_challenge(last_hash_at: Signal<i64>) -> Resource<GatewayResult<Membe
         if !*is_active.read() {
             return Err(crate::gateway::GatewayError::Unknown);
         }
-        
+
         let last_hash_at = *last_hash_at.read();
-        
+
         miner_status.set(MinerStatus::FetchingChallenge);
-        use_gateway().poll_new_challenge(
-            member_authority,
-            pool_url,
-            last_hash_at,
-        )
-        .await
+        use_gateway()
+            .poll_new_challenge(member_authority, pool_url, last_hash_at)
+            .await
     })
 }
-
 
 fn use_challenge_dispatch(
     challenge: Resource<GatewayResult<MemberChallenge>>,
@@ -80,7 +79,10 @@ fn use_challenge_dispatch(
             if let Some(Ok(member_record)) = member_record.cloned() {
                 if let Some(Ok(challenge)) = challenge.cloned() {
                     spawn(async move {
-                        if let Ok(cutoff_time) = use_gateway().get_cutoff(challenge.challenge.lash_hash_at, 5).await {
+                        if let Ok(cutoff_time) = use_gateway()
+                            .get_cutoff(challenge.challenge.lash_hash_at, 5)
+                            .await
+                        {
                             miner_status.set(MinerStatus::Hashing);
                             to_miner.send(ore_miner_types::InputMessage {
                                 member: member_record,
@@ -121,24 +123,32 @@ fn use_solution_contribute(
                 // Submit solution
                 spawn(async move {
                     miner_status.set(MinerStatus::SubmittingSolution);
-                    if let Err(err) = use_gateway().post_solution(pubkey, pool_url.clone(), &solution).await {
+                    if let Err(err) = use_gateway()
+                        .post_solution(pubkey, pool_url.clone(), &solution)
+                        .await
+                    {
                         log::error!("Error posting solution: {:?}", err);
                     }
                     member_record.restart();
-                    match use_gateway().get_latest_event(pubkey, pool_url.clone()).await {
+                    match use_gateway()
+                        .get_latest_event(pubkey, pool_url.clone())
+                        .await
+                    {
                         Ok(latest_event) => {
                             MiningEvent::add_to_signal(latest_event);
                         }
                         Err(err) => {
                             log::error!("Error getting latest event: {:?}", err);
                         }
-                    }                    
+                    }
                 });
             }
             OutputMessage::Expired(lha) => {
                 // Update last hash at
                 let peek = *last_hash_at.peek();
-                if lha > peek { last_hash_at.set(lha); }
+                if lha > peek {
+                    last_hash_at.set(lha);
+                }
             }
             _ => {}
         }

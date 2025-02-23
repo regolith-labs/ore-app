@@ -16,9 +16,9 @@ use super::TokenInputError;
 pub fn SwapForm(class: Option<String>) -> Element {
     let class = class.unwrap_or_default();
 
-   // Selected tokens
-   let buy_token = use_signal(|| Some(Token::ore()));
-   let sell_token = use_signal(|| Some(Token::sol()));
+    // Selected tokens
+    let buy_token = use_signal(|| Some(Token::ore()));
+    let sell_token = use_signal(|| Some(Token::sol()));
 
     // Input amounts
     let mut sell_input_amount = use_signal::<String>(|| "".to_string());
@@ -53,12 +53,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
     });
 
     // Build swap transaction
-    let swap_tx = use_swap_transaction(
-        quote_response,
-        sell_token,
-        sell_token_balance,
-        err,
-    );
+    let swap_tx = use_swap_transaction(quote_response, sell_token, sell_token_balance, err);
 
     // On successful transaction, reset input amounts
     on_transaction_done(move |_sig| {
@@ -104,11 +99,11 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     }
                 }
             }
-            SwapDetails { 
+            SwapDetails {
                 quote_response,
             }
-            SwapButton { 
-                quote_response, 
+            SwapButton {
+                quote_response,
                 swap_tx,
                 err,
             }
@@ -195,19 +190,19 @@ fn SwapButton(
                     }
                 },
                 if let Some(err) = err.cloned() {
-                    span { 
-                        class: "mx-auto my-auto font-semibold", 
-                        "{err.to_string()}" 
+                    span {
+                        class: "mx-auto my-auto font-semibold",
+                        "{err.to_string()}"
                     }
                 } else {
-                    span { 
-                        class: "mx-auto my-auto font-semibold", 
-                        "Swap" 
+                    span {
+                        class: "mx-auto my-auto font-semibold",
+                        "Swap"
                     }
-                }   
+                }
             }
             Alert {}
-        }        
+        }
     }
 }
 
@@ -233,8 +228,8 @@ fn SwitchButton(
                 sell_input_amount.set(buy_input_peek.clone());
                 buy_input_amount.set("".to_string());
             },
-            SwitchIcon { 
-                class: "h-4 mx-auto my-auto" 
+            SwitchIcon {
+                class: "h-4 mx-auto my-auto"
             }
         }
     }

@@ -10,7 +10,7 @@ pub fn SubmitButton(
     class: Option<String>,
     title: String,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
-    err: Signal<Option<TokenInputError>>
+    err: Signal<Option<TokenInputError>>,
 ) -> Element {
     let class = class.unwrap_or("controls-primary".to_string());
 

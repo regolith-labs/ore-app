@@ -1,10 +1,17 @@
 use dioxus::prelude::*;
 
-use crate::{components::{format_token_amount, Row}, config::LISTED_TOKENS_BY_TICKER};
-
+use crate::{
+    components::{format_token_amount, Row},
+    config::LISTED_TOKENS_BY_TICKER,
+};
 
 #[component]
-pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, with_decimal_units: Option<bool>) -> Element {
+pub fn TokenValueSmall(
+    class: Option<String>,
+    amount: String,
+    ticker: String,
+    with_decimal_units: Option<bool>,
+) -> Element {
     let class = class.unwrap_or("".to_string());
     let image = if let Some(token) = LISTED_TOKENS_BY_TICKER.get(&ticker) {
         token.image.clone()
@@ -23,7 +30,7 @@ pub fn TokenValueSmall(class: Option<String>, amount: String, ticker: String, wi
                 src: "{image}"
             }
             span {
-                class: "my-auto font-medium", 
+                class: "my-auto font-medium",
                 "{units[0]}"
                 if with_decimal_units.unwrap_or(false) {
                     span {

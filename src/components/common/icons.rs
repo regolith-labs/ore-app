@@ -354,7 +354,7 @@ pub fn DrawerIcon(class: Option<String>) -> Element {
     rsx! {
         svg {
             view_box: "0 0 29 38",
-            fill: "currentColor", 
+            fill: "currentColor",
             class: "{class}",
             path {
                 fill_rule: "evenodd",
@@ -364,7 +364,6 @@ pub fn DrawerIcon(class: Option<String>) -> Element {
         }
     }
 }
-
 
 #[component]
 pub fn UserGroupIcon(class: Option<String>) -> Element {
@@ -567,7 +566,6 @@ pub fn WalletIcon(class: Option<String>) -> Element {
         }
     }
 }
-
 
 #[component]
 pub fn SwapIcon(class: Option<String>) -> Element {

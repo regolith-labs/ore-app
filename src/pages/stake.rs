@@ -1,8 +1,11 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::*, 
-    hooks::{on_transaction_done, use_boost_claim_all_transaction, use_net_deposits, use_net_yield, use_all_stakes}
+    components::*,
+    hooks::{
+        on_transaction_done, use_all_stakes, use_boost_claim_all_transaction, use_net_deposits,
+        use_net_yield,
+    },
 };
 
 pub fn Stake() -> Element {
