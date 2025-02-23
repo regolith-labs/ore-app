@@ -42,16 +42,13 @@ pub fn submit_transaction(mut tx: VersionedTransaction) {
                 let res = eval.send(serde_json::Value::String(b64));
                 match res {
                     Ok(()) => {
-
                         // Execute eval command
                         let res = eval.recv().await;
 
                         // Process eval result
                         match res {
-
                             // Process valid signing result
                             Ok(serde_json::Value::String(string)) => {
-
                                 // Decode signed transaction
                                 let gateway = use_gateway();
                                 let decode_res = base64::engine::general_purpose::STANDARD
@@ -72,14 +69,16 @@ pub fn submit_transaction(mut tx: VersionedTransaction) {
                                 };
 
                                 // Confirm transaction
-                                match rpc_res { 
+                                match rpc_res {
                                     Some(sig) => {
                                         log::info!("sig: {}", sig);
                                         let confirmed = gateway.rpc.confirm_signature(sig).await;
                                         if confirmed.is_ok() {
-                                            transaction_status.set(Some(TransactionStatus::Done(sig)));
+                                            transaction_status
+                                                .set(Some(TransactionStatus::Done(sig)));
                                         } else {
-                                            transaction_status.set(Some(TransactionStatus::Timeout));
+                                            transaction_status
+                                                .set(Some(TransactionStatus::Timeout));
                                         }
                                     }
                                     None => {

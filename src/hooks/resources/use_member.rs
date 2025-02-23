@@ -3,7 +3,8 @@ use ore_pool_api::state::Member;
 use ore_pool_types::Member as MemberRecord;
 
 use crate::{
-    gateway::{pool::PoolGateway, GatewayError, GatewayResult}, hooks::{use_gateway, use_pool, use_wallet, GetPubkey}
+    gateway::{pool::PoolGateway, GatewayError, GatewayResult},
+    hooks::{use_gateway, use_pool, use_wallet, GetPubkey},
 };
 
 pub(crate) fn use_members_provider() {

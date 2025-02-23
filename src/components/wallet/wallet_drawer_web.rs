@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<bool>) -> Element {
     // let tab = use_signal(|| WalletTab::Tokens);
-    
+
     rsx! {
         div {
             class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",

@@ -33,9 +33,10 @@ pub fn use_miner_is_active() -> Memo<bool> {
     use_memo(move || {
         log::info!("Miner status: {:?}", miner_status.cloned());
         match miner_status.cloned() {
-            MinerStatus::FetchingChallenge | MinerStatus::Hashing | MinerStatus::SubmittingSolution => true,
+            MinerStatus::FetchingChallenge
+            | MinerStatus::Hashing
+            | MinerStatus::SubmittingSolution => true,
             _ => false,
         }
     })
 }
-

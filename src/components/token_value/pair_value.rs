@@ -1,15 +1,34 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 
-use crate::{components::{token_value::{utils::TokenValueSize, OreValue, TokenValueSmall}, Col}, utils::LiquidityPair};
+use crate::{
+    components::{
+        token_value::{utils::TokenValueSize, OreValue, TokenValueSmall},
+        Col,
+    },
+    utils::LiquidityPair,
+};
 
 #[component]
-pub fn LiquidityPairValue(class: Option<String>, liquidity_pair: LiquidityPair, with_decimal_units: Option<bool>) -> Element {
+pub fn LiquidityPairValue(
+    class: Option<String>,
+    liquidity_pair: LiquidityPair,
+    with_decimal_units: Option<bool>,
+) -> Element {
     let class = class.unwrap_or("".to_string());
-    let (ore_amount_f64, token_amount_f64, token_ticker) = if liquidity_pair.token_a.ticker == "ORE" {
-        (liquidity_pair.balance_a_f64, liquidity_pair.balance_b_f64, liquidity_pair.token_b.ticker.clone())
+    let (ore_amount_f64, token_amount_f64, token_ticker) = if liquidity_pair.token_a.ticker == "ORE"
+    {
+        (
+            liquidity_pair.balance_a_f64,
+            liquidity_pair.balance_b_f64,
+            liquidity_pair.token_b.ticker.clone(),
+        )
     } else {
-        (liquidity_pair.balance_b_f64, liquidity_pair.balance_a_f64, liquidity_pair.token_a.ticker.clone())
+        (
+            liquidity_pair.balance_b_f64,
+            liquidity_pair.balance_a_f64,
+            liquidity_pair.token_a.ticker.clone(),
+        )
     };
     rsx! {
         Col {
@@ -30,16 +49,16 @@ pub fn LiquidityPairValue(class: Option<String>, liquidity_pair: LiquidityPair, 
     }
 }
 
-
 #[component]
 pub fn LiquidityPairStakeValue(
-    class: Option<String>, 
-    stake_balance: u64, 
-    liquidity_pair: LiquidityPair, 
-    with_decimal_units: Option<bool>
+    class: Option<String>,
+    stake_balance: u64,
+    liquidity_pair: LiquidityPair,
+    with_decimal_units: Option<bool>,
 ) -> Element {
     let class = class.unwrap_or("".to_string());
-    let (ore_amount_f64, token_amount_f64, token_ticker, token_decimals) = liquidity_pair.get_stake_amounts(stake_balance);
+    let (ore_amount_f64, token_amount_f64, token_ticker, token_decimals) =
+        liquidity_pair.get_stake_amounts(stake_balance);
     rsx! {
         Col {
             class: "gap-2 {class}",
@@ -58,4 +77,3 @@ pub fn LiquidityPairStakeValue(
         }
     }
 }
-

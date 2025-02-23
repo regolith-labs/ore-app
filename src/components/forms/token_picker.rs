@@ -1,6 +1,9 @@
 use dioxus::prelude::*;
 
-use crate::{components::*, config::{Token, LISTED_TOKENS}};
+use crate::{
+    components::*,
+    config::{Token, LISTED_TOKENS},
+};
 
 // TODO Close on ESC click
 #[component]
@@ -70,9 +73,9 @@ pub fn TokenPicker(
                                     class: "w-8 h-8 rounded-full",
                                     src: "{t.image}",
                                 }
-                                span { 
+                                span {
                                     class: "font-semibold",
-                                    "{t.ticker}" 
+                                    "{t.ticker}"
                                 }
                             }
                         }

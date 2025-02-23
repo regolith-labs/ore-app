@@ -5,11 +5,16 @@ use ore_boost_api::state::{Boost, Stake};
 use steel::Pubkey;
 
 use crate::{
-    components::*, 
-    config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT}, gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_boost, use_boost_apy, use_liquidity_pair, use_lp_deposit_transaction, use_stake, use_token_balance, use_token_balances_for_liquidity_pair}, 
+    components::*,
+    config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT},
+    gateway::{GatewayResult, UiTokenAmount},
+    hooks::{
+        on_transaction_done, use_boost, use_boost_apy, use_liquidity_pair,
+        use_lp_deposit_transaction, use_stake, use_token_balance,
+        use_token_balances_for_liquidity_pair,
+    },
     pages::{Multiplier, StakeYield, TotalStakers},
-    utils::LiquidityPair
+    utils::LiquidityPair,
 };
 
 #[component]
@@ -21,7 +26,7 @@ pub fn Pair(lp_mint: String) -> Element {
     let mut boost = use_boost(lp_mint);
     let mut stake = use_stake(lp_mint);
     let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
-    
+
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
         stake.restart();
@@ -107,7 +112,10 @@ fn AccountMetrics(
 }
 
 #[component]
-fn Deposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+fn Deposits(
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
+    stake: Resource<GatewayResult<Stake>>,
+) -> Element {
     rsx! {
         TitledRow {
             title: "Deposits",
@@ -141,7 +149,10 @@ fn Deposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resou
 }
 
 #[component]
-fn PendingDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>, stake: Resource<GatewayResult<Stake>>) -> Element {
+fn PendingDeposits(
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
+    stake: Resource<GatewayResult<Stake>>,
+) -> Element {
     rsx! {
         if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
             if let Some(Ok(stake)) = stake.cloned() {
@@ -170,7 +181,7 @@ fn UnstakedLp(
     boost: Resource<GatewayResult<Boost>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>
+    stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let err = use_signal(|| None);
     let lp_deposit_tx = use_lp_deposit_transaction(boost, stake);
@@ -206,7 +217,7 @@ fn UnstakedLp(
 fn BoostMetrics(
     boost: Resource<GatewayResult<Boost>>,
     boost_meta: BoostMeta,
-    liquidity_pair: Resource<GatewayResult<LiquidityPair>>
+    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     rsx! {
         Col {
@@ -294,7 +305,7 @@ fn TotalDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Elem
                     with_decimal_units: true,
                 }
             }
-        }  
+        }
     }
 }
 

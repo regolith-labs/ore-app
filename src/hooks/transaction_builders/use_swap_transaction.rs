@@ -8,8 +8,11 @@ use jupiter_swap_api_client::{
 };
 use solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
-use crate::{components::TokenInputError, gateway::{GatewayError, GatewayResult, UiTokenAmount}};
 use crate::config::Token;
+use crate::{
+    components::TokenInputError,
+    gateway::{GatewayError, GatewayResult, UiTokenAmount},
+};
 
 use crate::hooks::{use_wallet, GetPubkey};
 
@@ -39,22 +42,25 @@ pub fn use_swap_transaction(
             };
 
             // Check if balance is sufficient
-            let sell_token_balance_u64 = sell_token_balance.amount.parse::<u64>().map_err(|_| GatewayError::Unknown)?;
+            let sell_token_balance_u64 = sell_token_balance
+                .amount
+                .parse::<u64>()
+                .map_err(|_| GatewayError::Unknown)?;
             let sell_token_amount_u64 = quote.in_amount;
             if sell_token_balance_u64 < sell_token_amount_u64 {
                 err.set(Some(TokenInputError::InsufficientBalance(sell_token)));
                 return Err(GatewayError::Unknown);
             }
 
-            // Build transaction from jupiter quote 
+            // Build transaction from jupiter quote
             let request = SwapRequest {
                 user_public_key: pubkey,
                 quote_response: quote.clone(),
                 config: TransactionConfig::default(),
             };
             let response = client.swap(&request, None).await?;
-            let vtx: VersionedTransaction = bincode::deserialize(response.swap_transaction.as_slice())
-                .map_err(|err| {
+            let vtx: VersionedTransaction =
+                bincode::deserialize(response.swap_transaction.as_slice()).map_err(|err| {
                     log::error!("{:?}", err);
                     GatewayError::FailedDeserialization
                 })?;
@@ -78,7 +84,7 @@ pub fn use_quote(
                     clear = true;
                 } else {
                     let Some(input_token) = input_token.read().clone() else {
-                        return
+                        return;
                     };
                     let Some(output_token) = output_token.read().clone() else {
                         return;
