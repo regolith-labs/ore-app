@@ -103,9 +103,6 @@ fn StopStartButton() -> Element {
     // this is the recovery path,
     // where the onchain registration landed
     // but the server registration failed or hasn't been submitted yet
-    //
-    // in most cases, this will get invoked *before* the onchain registration lands
-    // and will fail (expected)
     use_memo(move || {
         if miner_status.cloned() == MinerStatus::Registering {
             register_with_pool_server.restart();
@@ -136,6 +133,7 @@ fn StopStartButton() -> Element {
                             // registered with the pool server too, fetch challenge
                             miner_status.set(MinerStatus::FetchingChallenge);
                         } else {
+                            // only registered onchain, submit registration to pool server
                             miner_status.set(MinerStatus::Registering);
                         }
                     } else if let Some(Ok(tx)) = register_tx.cloned() {
