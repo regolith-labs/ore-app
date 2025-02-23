@@ -49,7 +49,7 @@ fn LandingNavbar() -> Element {
 fn LaunchButton() -> Element {
     rsx! {
         Link {
-            class: "flex px-4 sm:px-8 h-10 sm:h-12 my-auto rounded controls-primary rounded-full z-100",
+            class: "flex px-8 h-12 my-auto rounded controls-primary rounded-full z-100",
             to: Route::Mine {},
             span {
                 class: "my-auto",

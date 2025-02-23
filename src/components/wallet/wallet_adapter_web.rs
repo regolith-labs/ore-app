@@ -11,7 +11,7 @@ pub fn WalletAdapter() -> Element {
 
     let mut wallet_mount = use_future(move || async move {
         if Wallet::Disconnected == wallet.cloned() {
-            async_std::task::sleep(Duration::from_millis(1000)).await;
+            async_std::task::sleep(Duration::from_millis(500)).await;
             let eval = eval(
                 r#"
                     window.MountWalletAdapter();
@@ -40,7 +40,7 @@ pub fn WalletAdapter() -> Element {
             }
             rsx! {
                 div {
-                    class: "rounded-full transition-colors my-auto h-10 text-black bg-white",
+                    class: "rounded-full transition my-auto h-12 text-black bg-white hover:cursor-pointer hover:scale-105 duration-300 ease-in-out bg-controls-primary",
                     nav {
                         id: "ore-wallet-adapter"
                     }
