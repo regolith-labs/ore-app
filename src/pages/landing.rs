@@ -132,7 +132,7 @@ fn Mining() -> Element {
                         HashAnimation {}
                     }
                     img {
-                        class: "relative w-full h-full pb-8 pt-8 object-cover z-10",
+                        class: "relative w-full h-full pb-8 pt-8 object-contain z-10",
                         src: asset!("/public/rock-phone.png")
                     }
                 }
