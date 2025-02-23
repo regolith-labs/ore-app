@@ -249,8 +249,12 @@ fn Liquidity() -> Element {
     rsx! {
         Col {
             class: "relative w-screen h-full min-h-screen md:min-h-192 px-4 mt-16",
+            img {
+                class: "absolute left-0 right-0 bottom-0 mx-auto max-w-7xl w-full object-contain z-0",
+                src: asset!("/public/ribbon.png")
+            }
             Col {
-                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between",
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 8,
@@ -279,7 +283,7 @@ fn Liquidity() -> Element {
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is unifying liquidity across Solana around a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the network."
+                        "ORE unifies liquidity across Solana on a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the network."
                     }
                     SectionCtas {
                         primary_title: "Explore opportunities →",
@@ -288,29 +292,6 @@ fn Liquidity() -> Element {
                         secondary_route: Route::Stake {}
                     }
                     // LandingWave {}
-                }
-                div {
-                    class: "relative h-160 w-screen md:w-auto overflow-hidden shrink-0 pointer-events-none",
-                    // div {
-                    //     class: "absolute inset-0 z-0",
-                    //     HashAnimation {}
-                    // }
-                    // img {
-                    //     class: "relative w-full h-full pb-8 pt-8 object-cover z-10",
-                    //     src: asset!("/public/rock-phone.png")
-                    // }
-                    div {
-                        class: "relative w-full h-full pb-8 pt-8 object-cover z-10",
-                        // class: "absolute bottom-0 left-0 md:left-auto max-w-7xl max-h-160 mx-auto w-full h-full overflow-clipped pointer-events-none",
-                        // class: "absolute z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
-                        // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
-                        dangerous_inner_html: r#"
-                            <spline-viewer
-                                style="height: 100%; width: 100%;" 
-                                url="https://prod.spline.design/63ZFyDX-IkLeeBln/scene.splinecode"
-                            />
-                        "#
-                    }
                 }
             }
         }
