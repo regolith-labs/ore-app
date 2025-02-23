@@ -571,23 +571,24 @@ fn Faq() -> Element {
                 class: "w-full h-min justify-start md:mt-16",
                 FaqItem {
                     question: "What is ORE?",
-                    answer: "ORE is a \"digital gold\" primitive for decentralized finance. It is a crypto commodity mineable via proof-of-work on the Solana blockchain."
+                    answer: "ORE is a new \"digital gold\" primitive for decentralized finance. It is a crypto commodity mineable via proof-of-work on the Solana blockchain."
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "Bitcoin defi is fundamentally broken. A variety of bridges and third-party custodians have fragmented Bitcoin's defi liquidity across a maze of wrapper tokens and L2s. ORE represents a new generation of digital gold native to the Solana ecosystem. It prioritizes performance, self-custody, and composability to finally bring digital gold and decentralized finance together."
+                    answer: "ORE represents a new generation of digital gold, built for a new generation of crypto users. It takes the basic properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new Solana native token. "
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "Anyone with a laptop or home computer can mine ORE. Simply navigate to the Mine page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be registered with a mining pool and do not need to pay transaction fees while you mine."
+                    answer: "ORE can be mined by anyone with a laptop or home computer. Simply navigate to the mining page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be enrolled with a mining pool and do not need to pay any transaction fees while you mine."
                 }
                 FaqItem {
                     question: "How does staking work?",
-                    answer: "TODO."
+                    answer: "ORE automatically allocates a portion of all newly mined tokens to liquidity providers as yield. These incentives help bootstrap liquidity and maintain deep markets with a network of strategic assets in the Solana ecosystem. By providing liquidity for boosted pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE native yield."
                 }
                 FaqItem {
-                    question: "Where does the yield come from?",
-                    answer: "Staking yield is generated in two ways. First, stakers earn fees whenever a trader executes a swap in a liquidity pair they are providing. Secondly, stakers can earn native yield from the ORE protocol via Boosts. This yield is generated automatically by the protocol which allocates a portion of all newly mined ORE to liquidity provider incentives."
+                    question: "Is it secure?",
+                    answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team has committed to freezing the protocol in the coming months to ensure longterm security."
+                    // answer: "Staking yield is generated in two ways. First, stakers earn fees whenever a trader executes a swap in a liquidity pair they are providing. Secondly, stakers can earn native yield from the ORE protocol via Boosts. This yield is generated automatically by the protocol which allocates a portion of all newly mined ORE to liquidity provider incentives."
                 }
             }
         }
