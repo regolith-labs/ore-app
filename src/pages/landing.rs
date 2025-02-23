@@ -36,7 +36,7 @@ fn Hero() -> Element {
 fn LandingNavbar() -> Element {
     rsx! {
         Row {
-            class: "w-screen shrink-0 h-16 sm:h-24 px-2 sm:px-6 z-100",
+            class: "w-screen shrink-0 h-20 sm:h-24 px-2 sm:px-6 z-100",
             Row {
                 class: "w-full my-auto justify-between",
                 Logo {}
@@ -87,38 +87,12 @@ fn Mining() -> Element {
                 class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between",
                 Col {
                     gap: 8,
-                    SectionCopy {
-                        class: "hidden md:flex w-full text-nowrap",
-                        align: Align::Left,
+                    SectionCopyResponsive {
                         tip: "Fair launch",
                         title: "Proof of work.",
                         subtitle: "On Solana.",
                     }
-                    SectionCopy {
-                        class: "md:hidden",
-                        tip: "Fair launch",
-                        title: "Proof of work.",
-                        subtitle: "On Solana.",
-                    }
-                    Col {
-                        class: "md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
-                        gap: 8,
-                        WalkthroughStep {
-                            step: "1",
-                            title: "Connect wallet",
-                            detail: "Authenticate with any Solana wallet."
-                        }
-                        WalkthroughStep {
-                            step: "2",
-                            title: "Join a pool",
-                            detail: "Hop into a mining pool to avoid transaction fees."
-                        }
-                        WalkthroughStep {
-                            step: "3",
-                            title: "Mine crypto",
-                            detail: "Utilize spare hashpower and earn rewards."
-                        }
-                    }
+                    MiningGuide {}
                     SectionCtas {
                         primary_title: "Start mining →",
                         primary_route: Route::Mine {},
@@ -126,17 +100,7 @@ fn Mining() -> Element {
                         secondary_route: Route::Mine {}
                     }
                 }
-                div {
-                    class: "relative h-160 w-screen md:w-auto overflow-hidden shrink-0 pointer-events-none",
-                    div {
-                        class: "absolute inset-0 z-0",
-                        HashAnimation {}
-                    }
-                    img {
-                        class: "relative w-full h-full pb-8 pt-8 object-contain z-10",
-                        src: asset!("/public/rock-phone.png")
-                    }
-                }
+                MiningIllustration {}
             }
         }
     }
@@ -168,6 +132,22 @@ fn SectionCtas(
                     class: "my-auto mx-auto text-nowrap font-semibold",
                     "{secondary_title}"
                 }
+            }
+        }
+    }
+}
+
+fn MiningIllustration() -> Element {
+    rsx! {
+        div {
+            class: "relative h-160 w-screen md:w-auto overflow-hidden shrink-0 pointer-events-none",
+            div {
+                class: "absolute inset-0 z-0",
+                HashAnimation {}
+            }
+            img {
+                class: "relative w-full h-full pb-8 pt-8 object-contain z-10",
+                src: asset!("/public/rock-phone.png")
             }
         }
     }
@@ -219,8 +199,32 @@ fn HashAnimation() -> Element {
     }
 }
 
+fn MiningGuide() -> Element {
+    rsx! {
+        Col {
+            class: "md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
+            gap: 8,
+            GuideStep {
+                step: "1",
+                title: "Connect wallet",
+                detail: "Authenticate with any Solana wallet."
+            }
+            GuideStep {
+                step: "2",
+                title: "Join a pool",
+                detail: "Hop into a mining pool to avoid transaction fees."
+            }
+            GuideStep {
+                step: "3",
+                title: "Mine crypto",
+                detail: "Utilize spare hashpower and earn rewards."
+            }
+        }
+    }
+}
+
 #[component]
-fn WalkthroughStep(step: String, title: String, detail: String) -> Element {
+fn GuideStep(step: String, title: String, detail: String) -> Element {
     rsx! {
         Row {
             class: "w-full h-min",
@@ -263,15 +267,7 @@ fn Liquidity() -> Element {
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 8,
-                    SectionCopy {
-                        class: "hidden md:flex w-full text-nowrap",
-                        align: Align::Left,
-                        tip: "Defi",
-                        title: "Deep liquidity.",
-                        subtitle: "Native yield.",
-                    }
-                    SectionCopy {
-                        class: "md:hidden",
+                    SectionCopyResponsive {
                         tip: "Defi",
                         title: "Deep liquidity.",
                         subtitle: "Native yield.",
@@ -671,6 +667,29 @@ fn SectionCopy(
                     "{detail}"
                 }
             }
+        }
+    }
+}
+
+#[component]
+fn SectionCopyResponsive(
+    tip: Option<String>,
+    title: String,
+    subtitle: Option<String>,
+) -> Element {
+    rsx! {
+        SectionCopy {
+            class: "hidden md:flex w-full text-nowrap",
+            align: Align::Left,
+            tip: tip.clone(),
+            title: title.clone(),
+            subtitle: subtitle.clone(),
+        }
+        SectionCopy {
+            class: "md:hidden",
+            tip: tip.clone(),
+            title: title.clone(),
+            subtitle: subtitle.clone(),
         }
     }
 }
