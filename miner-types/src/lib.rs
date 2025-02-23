@@ -7,7 +7,7 @@ pub struct InputMessage {
     pub cutoff_time: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum OutputMessage {
     Init,
     Solution(drillx::Solution),

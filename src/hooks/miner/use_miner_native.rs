@@ -47,6 +47,10 @@ pub fn use_miner_provider() {
                 // listen for solutions from miner
                 while let Some(msg) = receiver.recv().await {
                     from_miner.set(msg);
+                    if let OutputMessage::Expired(_) = msg {
+                        log::info!("expired");
+                        break;
+                    }
                 }
             }
         },
@@ -67,8 +71,10 @@ async fn find_hash_par(
     let core_ids = core_ids.into_iter().filter(|id| id.id < (cores as usize));
     // distribute
     for core_id in core_ids {
+        log::info!("core: {:?}", core_id);
         let challenge = *challenge;
         std::thread::spawn({
+            log::info!("spawning core: {:?}", core_id);
             // init drillx solver
             let mut memory = drillx::equix::SolverMemory::new();
             let solutions_channel = solutions_channel.clone();
@@ -108,18 +114,19 @@ async fn find_hash_par(
                     if nonce % 10 == 0 {
                         if timer.elapsed().as_secs().ge(&cutoff_time) {
                             // send expiration message
-                            let expired = OutputMessage::Expired(last_hash_at);
-                            if let Err(err) = solutions_channel.send(expired) {
-                                log::error!("{:?}", err);
+                            if core_id.id == 0 {
+                                let expired = OutputMessage::Expired(last_hash_at);
+                                if let Err(err) = solutions_channel.send(expired) {
+                                    log::error!("{:?}", err);
+                                }
                             }
                             break;
                         } else if core_id.id == 0 {
                             log::info!(
-                                "Mining... Time remaining: {} {}",
+                                "Mining... Time remaining: {}",
                                 format_duration(
-                                    cutoff_time.saturating_add(timer.elapsed().as_secs()) as u32
+                                    cutoff_time.saturating_sub(timer.elapsed().as_secs()) as u32
                                 ),
-                                nonce
                             );
                         }
                     }

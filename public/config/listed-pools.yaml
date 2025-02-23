@@ -1,7 +1,7 @@
 pools:
-  - address: 9RrEyMNFhFcrqVikWby5rVn1eXeKHr2SwGRbPhZ7wDCK
-    url: https://official.ec1ipse.me
-    name: Ec1ipse
+  - address: BtHnX9BGnYr5Kjomrn5NMVg68tYGrcVpav225P6zPsQz
+    url: http://localhost:3000
+    name: Bigtime
     description: ""
     image: https://pbs.twimg.com/profile_images/1736827532312211456/V0bvyS_2_400x400.jpg
   

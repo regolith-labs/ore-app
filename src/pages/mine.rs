@@ -18,16 +18,15 @@ pub fn Mine() -> Element {
             // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
-            Col {
-                class: "w-full max-w-2xl mx-auto px-5 sm:px-8",
+            Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8",
                 Heading {
                     class: "w-full",
                     title: "Mine",
-                    subtitle: "Utilize spare hashpower to harvest ORE."
+                    subtitle: "Utilize spare hashpower to harvest ORE.",
                 }
                 OrbMiner {
                     class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
-                    gold: *use_miner_is_active().read()
+                    gold: *use_miner_is_active().read(),
                 }
                 MinerData {}
             }
@@ -51,17 +50,13 @@ fn MinerData() -> Element {
     });
 
     rsx! {
-        Col {
-            class: "w-full flex-wrap mx-auto justify-between",
-            gap: 8,
+        Col { class: "w-full flex-wrap mx-auto justify-between", gap: 8,
             Alert {}
             MinerStatus {}
             MinerHashpower {}
             MinerPendingRewards {}
             MinerRewards {}
-            ClaimButton {
-                transaction: claim_tx,
-            }
+            ClaimButton { transaction: claim_tx }
         }
     }
 }
@@ -75,7 +70,7 @@ fn StopStartButton() -> Element {
     let register_tx = use_pool_register_transaction();
     let is_active = use_miner_is_active();
 
-    let mut f = use_future(move || async move {
+    let mut register_with_pool_server = use_future(move || async move {
         let Wallet::Connected(authority) = *wallet.read() else {
             return;
         };
@@ -92,9 +87,28 @@ fn StopStartButton() -> Element {
         }
     });
 
+    // on successful registration signature (onchain),
+    // restart the pool server registration
+    //
+    // this is the happy path,
+    // first the onchain registration signature lands
+    // and then we submit for registration with the offchain pool server
     on_transaction_done(move |_sig| {
         if miner_status.cloned() == MinerStatus::Registering {
-            f.restart();
+            register_with_pool_server.restart();
+        }
+    });
+    // submit pool server registration
+    //
+    // this is the recovery path,
+    // where the onchain registration landed
+    // but the server registration failed or hasn't been submitted yet
+    //
+    // in most cases, this will get invoked *before* the onchain registration lands
+    // and will fail (expected)
+    use_memo(move || {
+        if miner_status.cloned() == MinerStatus::Registering {
+            register_with_pool_server.restart();
         }
     });
 
@@ -109,12 +123,23 @@ fn StopStartButton() -> Element {
             class: "flex flex-row gap-2 my-auto px-8 h-12 rounded-full {controls_class}",
             disabled: matches!(*wallet.read(), Wallet::Disconnected),
             onclick: move |_| {
+                // set to stopped (miner is active)
                 if *is_active.read() {
                     miner_status.set(MinerStatus::Stopped);
                 } else {
+                    // stopped
+                    // if already registered in pool fetch next challenge
+                    // or else try registering (both onchain and then with the pool server)
                     if let Some(Ok(_member)) = member.cloned() {
-                        miner_status.set(MinerStatus::FetchingChallenge);
+                        // already registered on chain, check if registered with pool server
+                        if let Some(Ok(_member_db)) = member_record.cloned() {
+                            // registered with the pool server too, fetch challenge
+                            miner_status.set(MinerStatus::FetchingChallenge);
+                        } else {
+                            miner_status.set(MinerStatus::Registering);
+                        }
                     } else if let Some(Ok(tx)) = register_tx.cloned() {
+                        // not registered onchain, submit registration transaction
                         miner_status.set(MinerStatus::Registering);
                         submit_transaction(tx);
                     }
@@ -122,16 +147,10 @@ fn StopStartButton() -> Element {
             },
             if !*is_active.read() {
                 PlayIcon { class: "my-auto h-5" }
-                span {
-                    class: "my-auto",
-                    "Start"
-                }
+                span { class: "my-auto", "Start" }
             } else {
-                StopIcon { class: "my-auto h-5"  }
-                span {
-                    class: "my-auto",
-                    "Stop"
-                }
+                StopIcon { class: "my-auto h-5" }
+                span { class: "my-auto", "Stop" }
             }
         }
     }
@@ -147,18 +166,10 @@ fn MinerStatus() -> Element {
         MinerStatus::Stopped => "Stopped",
     });
     rsx! {
-        Col {
-            gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Status"
-            }
-            Row {
-                class: "justify-between",
-                span {
-                    class: "font-semibold text-2xl sm:text-3xl",
-                    "{status}"
-                }
+        Col { gap: 4,
+            span { class: "text-elements-lowEmphasis font-medium", "Status" }
+            Row { class: "justify-between",
+                span { class: "font-semibold text-2xl sm:text-3xl", "{status}" }
                 StopStartButton {}
             }
         }
@@ -167,16 +178,9 @@ fn MinerStatus() -> Element {
 
 fn MinerHashpower() -> Element {
     rsx! {
-        Col {
-            gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Hashpower"
-            }
-            span {
-                class: "font-semibold text-2xl sm:text-3xl",
-                "1230 H/s"
-            }
+        Col { gap: 4,
+            span { class: "text-elements-lowEmphasis font-medium", "Hashpower" }
+            span { class: "font-semibold text-2xl sm:text-3xl", "1230 H/s" }
         }
     }
 }
@@ -186,17 +190,16 @@ fn MinerPendingRewards() -> Element {
     let member_record = use_member_record();
     rsx! {
         if let Some(Ok(member_record)) = member_record.cloned() {
-            Col {
-                gap: 4,
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Rewards (pending)"
-                }
+            Col { gap: 4,
+                span { class: "text-elements-lowEmphasis font-medium", "Rewards (pending)" }
                 if let Some(member) = member.cloned() {
                     if let Ok(member) = member {
                         OreValue {
                             size: TokenValueSize::Large,
-                            ui_amount_string: amount_to_ui_amount_string(member_record.total_balance as u64 - member.total_balance, TOKEN_DECIMALS),
+                            ui_amount_string: amount_to_ui_amount_string(
+                                member_record.total_balance as u64 - member.total_balance,
+                                TOKEN_DECIMALS,
+                            ),
                             with_decimal_units: true,
                         }
                     } else {
@@ -213,12 +216,8 @@ fn MinerPendingRewards() -> Element {
 fn MinerRewards() -> Element {
     let member = use_member();
     rsx! {
-        Col {
-            gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Rewards"
-            }
+        Col { gap: 4,
+            span { class: "text-elements-lowEmphasis font-medium", "Rewards" }
             if let Some(member) = member.cloned() {
                 if let Ok(member) = member {
                     OreValue {
