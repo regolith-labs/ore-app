@@ -4,7 +4,6 @@ use crate::components::{Col, Row, Spinner, TransactionStatus};
 use crate::hooks::use_transaction_status;
 use crate::time::Duration;
 
-
 pub fn ToastDisplay() -> Element {
     let transaction_status = use_transaction_status();
 
@@ -13,7 +12,10 @@ pub fn ToastDisplay() -> Element {
         let mut transaction_status_signal = transaction_status.clone();
         if let Some(transaction_status) = transaction_status.cloned() {
             match transaction_status {
-                TransactionStatus::Denied | TransactionStatus::Error | TransactionStatus::Timeout | TransactionStatus::Done(_) => {
+                TransactionStatus::Denied
+                | TransactionStatus::Error
+                | TransactionStatus::Timeout
+                | TransactionStatus::Done(_) => {
                     spawn(async move {
                         async_std::task::sleep(Duration::from_secs(8)).await;
                         transaction_status_signal.set(None);
@@ -35,7 +37,7 @@ pub fn ToastDisplay() -> Element {
                     rsx! {
                         Row {
                             class: "{toast_class} border-l-4 border-elements-lowEmphasis",
-                            gap: 2, 
+                            gap: 2,
                             Spinner {
                                 class: "my-auto",
                             }
@@ -96,7 +98,7 @@ pub fn ToastDisplay() -> Element {
                                     class: "{title_class} my-auto",
                                     "Submitting transaction"
                                 }
-                            }   
+                            }
                             span {
                                 class: "{detail_class} ml-8",
                                 "Waiting for confirmation..."

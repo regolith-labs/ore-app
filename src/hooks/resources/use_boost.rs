@@ -5,7 +5,11 @@ use ore_api::consts::MINT_ADDRESS;
 use ore_boost_api::state::{boost_pda, Boost};
 use steel::Pubkey;
 
-use crate::{config::LISTED_BOOSTS, gateway::{ore::OreGateway, GatewayError, GatewayResult}, hooks::use_gateway};
+use crate::{
+    config::LISTED_BOOSTS,
+    gateway::{ore::OreGateway, GatewayError, GatewayResult},
+    hooks::use_gateway,
+};
 
 // TODO: REFerence resoourcee
 // we can call restart on the resource
@@ -19,7 +23,7 @@ pub(crate) fn use_boosts_provider() {
 
     // TODO: for the listed, go thrugh the list of tokens and fetch the atas ffr tthe current wallet
     // in the cases waallet changes, then we would reset the reseurrce and refetch the new atas
-    
+
     // Listed boosts
     for boost_meta in LISTED_BOOSTS.iter() {
         let boost_address = boost_pda(boost_meta.lp_mint).0;
@@ -32,14 +36,16 @@ pub(crate) fn use_boosts_provider() {
 
 fn use_boost_resource(address: Pubkey) -> Resource<GatewayResult<Boost>> {
     use_resource(move || async move {
-        use_gateway().get_boost(address).await.map_err(GatewayError::from)
+        use_gateway()
+            .get_boost(address)
+            .await
+            .map_err(GatewayError::from)
     })
 }
 
-
 /*
 use the tokens resurce
-fetch the 
+fetch the
 
 
 esseentilly the use_bosot but use token accounts instead
@@ -53,4 +59,3 @@ pub fn use_boost(mint_address: Pubkey) -> Resource<GatewayResult<Boost>> {
         use_boost_resource(boost_address)
     }
 }
-

@@ -1,16 +1,14 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 
-use crate::{
-    components::{Col, SubmitButton, TokenInputError}, 
-    config::BoostMeta, 
-    gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_pair_withdraw_transaction, use_withdrawable_balances},
-    utils::LiquidityPair
-};
 use super::token_input_form::*;
-
-
+use crate::{
+    components::{Col, SubmitButton, TokenInputError},
+    config::BoostMeta,
+    gateway::{GatewayResult, UiTokenAmount},
+    hooks::{on_transaction_done, use_pair_withdraw_transaction, use_withdrawable_balances},
+    utils::LiquidityPair,
+};
 
 #[component]
 pub fn PairWithdrawForm(
@@ -20,7 +18,7 @@ pub fn PairWithdrawForm(
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
 ) -> Element {
     let class = class.unwrap_or_default();
     let mut token_a = use_signal(|| None);
@@ -47,14 +45,14 @@ pub fn PairWithdrawForm(
 
     // Build pair deposit transaction
     let tx = use_pair_withdraw_transaction(
-        boost_meta, 
-        liquidity_pair, 
+        boost_meta,
+        liquidity_pair,
         stake,
         stake_a_balance,
         stake_b_balance,
-        input_amount_a, 
-        input_amount_b, 
-        err
+        input_amount_a,
+        input_amount_b,
+        err,
     );
 
     // Refresh data, if transaction success
@@ -94,7 +92,8 @@ pub fn PairWithdrawForm(
         };
 
         // Calculate percentage shares
-        let percentage_shares = (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares =
+            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
         let token_a_shares = liquidity_pair.balance_a_f64 * percentage_shares;
         let token_b_shares = liquidity_pair.balance_b_f64 * percentage_shares;
 
@@ -103,26 +102,34 @@ pub fn PairWithdrawForm(
             let percent_to_withdraw = val_f64 / token_a_shares;
             input_amount_a.set(val.clone());
             input_amount_b.set(
-                format!("{:.1$}", token_b_shares * percent_to_withdraw, liquidity_pair.token_b.decimals as usize)
-                    .trim_end_matches('0')
-                    .trim_end_matches('.')
-                    .to_string()
+                format!(
+                    "{:.1$}",
+                    token_b_shares * percent_to_withdraw,
+                    liquidity_pair.token_b.decimals as usize
+                )
+                .trim_end_matches('0')
+                .trim_end_matches('.')
+                .to_string(),
             );
         } else {
             let percent_to_withdraw = val_f64 / token_b_shares;
             input_amount_b.set(val.clone());
             input_amount_a.set(
-                format!("{:.1$}", token_a_shares * percent_to_withdraw, liquidity_pair.token_a.decimals as usize)
-                    .trim_end_matches('0')
-                    .trim_end_matches('.')
-                    .to_string()
+                format!(
+                    "{:.1$}",
+                    token_a_shares * percent_to_withdraw,
+                    liquidity_pair.token_a.decimals as usize
+                )
+                .trim_end_matches('0')
+                .trim_end_matches('.')
+                .to_string(),
             );
         }
     };
 
     // Process input streams
     use_effect(move || {
-        process_input_stream(input_stream_a.cloned(),  true);
+        process_input_stream(input_stream_a.cloned(), true);
     });
     use_effect(move || {
         process_input_stream(input_stream_b.cloned(), false);

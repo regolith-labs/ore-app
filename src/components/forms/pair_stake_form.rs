@@ -2,12 +2,11 @@ use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 
 use crate::{
-    components::{Col, PairDepositForm, PairWithdrawForm, StakeTab, StakeTabs}, 
-    config::BoostMeta, 
-    gateway::{GatewayResult, UiTokenAmount}, 
-    utils::LiquidityPair
+    components::{Col, PairDepositForm, PairWithdrawForm, StakeTab, StakeTabs},
+    config::BoostMeta,
+    gateway::{GatewayResult, UiTokenAmount},
+    utils::LiquidityPair,
 };
-
 
 #[component]
 pub fn PairStakeForm(
@@ -17,7 +16,7 @@ pub fn PairStakeForm(
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
 ) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);
@@ -53,4 +52,3 @@ pub fn PairStakeForm(
         }
     }
 }
-

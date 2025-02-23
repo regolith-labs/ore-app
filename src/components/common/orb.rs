@@ -92,7 +92,11 @@ pub fn LandingOrbit() -> Element {
 #[component]
 pub fn OrbMiner(class: Option<String>, gold: bool) -> Element {
     let class = class.unwrap_or_default();
-    let asset_id = if gold { "Ow2sG0dhJar0f3VM" } else { "KM4FufZYWJA5RJ1a" };
+    let asset_id = if gold {
+        "Ow2sG0dhJar0f3VM"
+    } else {
+        "KM4FufZYWJA5RJ1a"
+    };
     rsx! {
         div {
             class: "bg-transparent {class}",

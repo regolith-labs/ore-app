@@ -1,10 +1,12 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 
+use crate::gateway::{GatewayResult, UiTokenAmount};
 use crate::{
-    components::{Col, SubmitButton, TokenInputError, TokenInputForm}, config::Token, hooks::{on_transaction_done, use_idle_deposit_transaction}
+    components::{Col, SubmitButton, TokenInputError, TokenInputForm},
+    config::Token,
+    hooks::{on_transaction_done, use_idle_deposit_transaction},
 };
-use crate::gateway::{UiTokenAmount, GatewayResult};
 
 #[component]
 pub fn IdleDepositForm(
@@ -24,7 +26,7 @@ pub fn IdleDepositForm(
         stake.restart();
         input_amount.set("".to_owned());
     });
-   
+
     rsx! {
         Col {
             class: "w-full",

@@ -10,7 +10,8 @@ pub(crate) enum StakeTab {
 
 #[component]
 pub(crate) fn StakeTabs(tab: Signal<StakeTab>) -> Element {
-    let common_class = "flex-1 h-12 transition-colors rounded-full font-semibold hover:cursor-pointer";
+    let common_class =
+        "flex-1 h-12 transition-colors rounded-full font-semibold hover:cursor-pointer";
 
     let deposit_class = if *tab.read() == StakeTab::Deposit {
         "text-elements-highEmphasis bg-controls-secondary"

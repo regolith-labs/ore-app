@@ -1,14 +1,14 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 
-use crate::components::{Col, StakeTab, StakeTabs, IdleDepositForm, IdleWithdrawForm};
-use crate::gateway::{UiTokenAmount, GatewayResult};
+use crate::components::{Col, IdleDepositForm, IdleWithdrawForm, StakeTab, StakeTabs};
+use crate::gateway::{GatewayResult, UiTokenAmount};
 
 #[component]
 pub fn IdleStakeForm(
     class: Option<String>,
     balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>
+    stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);

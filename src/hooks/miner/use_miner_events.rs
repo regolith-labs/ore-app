@@ -15,7 +15,7 @@ impl MiningEvent {
     pub fn add_to_signal(event: MiningEvent) {
         let mut events = use_miner_events();
         let mut new_events = events.read().clone();
-        
+
         if new_events.contains(&event) {
             return;
         }
@@ -28,7 +28,7 @@ impl MiningEvent {
     }
 }
 #[derive(Debug, Clone, Deserialize, PartialEq)]
-pub struct MiningEvent {   
+pub struct MiningEvent {
     pub signature: Signature,
     pub timestamp: u64,
     pub difficulty: u64,
@@ -36,5 +36,5 @@ pub struct MiningEvent {
     pub net_base_reward: u64,
     pub net_miner_boost_reward: u64,
     pub member_difficulty: u64,
-    pub member_reward: u64
+    pub member_reward: u64,
 }

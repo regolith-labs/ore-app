@@ -1,15 +1,14 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 
-use crate::{
-    components::{Col, SubmitButton, TokenInputError}, 
-    config::BoostMeta, 
-    gateway::{GatewayResult, UiTokenAmount}, 
-    hooks::{on_transaction_done, use_pair_deposit_transaction},
-    utils::LiquidityPair
-};
 use super::token_input_form::*;
-
+use crate::{
+    components::{Col, SubmitButton, TokenInputError},
+    config::BoostMeta,
+    gateway::{GatewayResult, UiTokenAmount},
+    hooks::{on_transaction_done, use_pair_deposit_transaction},
+    utils::LiquidityPair,
+};
 
 #[component]
 pub fn PairDepositForm(
@@ -19,7 +18,7 @@ pub fn PairDepositForm(
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake: Resource<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
 ) -> Element {
     let class = class.unwrap_or_default();
     let mut token_a = use_signal(|| None);
@@ -29,7 +28,7 @@ pub fn PairDepositForm(
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
     let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
- 
+
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
         input_stream_a.set("".to_owned());
@@ -38,17 +37,17 @@ pub fn PairDepositForm(
 
     // Build pair deposit transaction
     let tx = use_pair_deposit_transaction(
-        boost_meta, 
-        liquidity_pair, 
-        lp_balance, 
-        stake, 
-        token_a_balance, 
-        token_b_balance, 
-        input_amount_a, 
-        input_amount_b, 
-        err
+        boost_meta,
+        liquidity_pair,
+        lp_balance,
+        stake,
+        token_a_balance,
+        token_b_balance,
+        input_amount_a,
+        input_amount_b,
+        err,
     );
-    
+
     // Get tokens
     use_effect(move || {
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
@@ -95,18 +94,26 @@ pub fn PairDepositForm(
         if flag {
             input_amount_a.set(val.clone());
             input_amount_b.set(
-                format!("{:.1$}", (val_f64 / ratio), liquidity_pair.token_b.decimals as usize)
-                    .trim_end_matches('0')
-                    .trim_end_matches('.')
-                    .to_string()
+                format!(
+                    "{:.1$}",
+                    (val_f64 / ratio),
+                    liquidity_pair.token_b.decimals as usize
+                )
+                .trim_end_matches('0')
+                .trim_end_matches('.')
+                .to_string(),
             );
         } else {
             input_amount_b.set(val.clone());
             input_amount_a.set(
-                format!("{:.1$}", (val_f64 * ratio), liquidity_pair.token_a.decimals as usize)
-                    .trim_end_matches('0')
-                    .trim_end_matches('.')
-                    .to_string()
+                format!(
+                    "{:.1$}",
+                    (val_f64 * ratio),
+                    liquidity_pair.token_a.decimals as usize
+                )
+                .trim_end_matches('0')
+                .trim_end_matches('.')
+                .to_string(),
             );
         }
     };
@@ -152,4 +159,3 @@ pub fn PairDepositForm(
         }
     }
 }
-

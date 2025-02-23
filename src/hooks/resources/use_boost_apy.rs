@@ -5,7 +5,11 @@ use ore_api::consts::MINT_ADDRESS;
 use ore_boost_api::state::boost_pda;
 use steel::Pubkey;
 
-use crate::{config::LISTED_BOOSTS, gateway::{ore::OreGateway, GatewayError, GatewayResult}, hooks::use_gateway};
+use crate::{
+    config::LISTED_BOOSTS,
+    gateway::{ore::OreGateway, GatewayError, GatewayResult},
+    hooks::use_gateway,
+};
 
 use super::{use_boost, use_boost_tvl, use_liquidity_pair, use_ore_price, OrePrice};
 
@@ -31,7 +35,10 @@ pub(crate) fn use_boost_yield_provider() {
 
 fn use_boost_yield_resource(address: Pubkey) -> Resource<GatewayResult<BoostYield>> {
     use_resource(move || async move {
-        use_gateway().get_boost_yield_7d(address).await.map_err(GatewayError::from)
+        use_gateway()
+            .get_boost_yield_7d(address)
+            .await
+            .map_err(GatewayError::from)
     })
 }
 
@@ -73,11 +80,10 @@ pub fn use_boost_apy(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
                 return Err(GatewayError::Unknown);
             };
             let deposited_shares_pct = boost.total_deposits as f64 / liquidity_pair.shares as f64;
-            boost_tvl * deposited_shares_pct   
+            boost_tvl * deposited_shares_pct
         };
-        
+
         let apy = ((boost_yield * ore_price_f64) / boost_tvl) * 52.0 * 100.0;
         Ok(apy)
     })
-    
 }

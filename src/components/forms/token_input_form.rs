@@ -1,6 +1,11 @@
 use dioxus::prelude::*;
 
-use crate::{components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Row, TokenPicker}, config::Token, gateway::{GatewayResult, UiTokenAmount}, hooks::MIN_SOL_BALANCE};
+use crate::{
+    components::{CarrotDownIcon, Col, LoadingValue, LoadingValueSize, Row, TokenPicker},
+    config::Token,
+    gateway::{GatewayResult, UiTokenAmount},
+    hooks::MIN_SOL_BALANCE,
+};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum TokenInputError {
@@ -12,7 +17,9 @@ impl ToString for TokenInputError {
     fn to_string(&self) -> String {
         match self {
             TokenInputError::InsufficientBalance(token) => format!("Not enough {}", token.ticker),
-            TokenInputError::_InsufficientSol => format!("Not enough SOL (Minimum {:.1} SOL)", MIN_SOL_BALANCE)
+            TokenInputError::_InsufficientSol => {
+                format!("Not enough SOL (Minimum {:.1} SOL)", MIN_SOL_BALANCE)
+            }
         }
     }
 }
@@ -38,13 +45,13 @@ pub fn TokenInputForm(
     let display_picker = use_signal(|| false);
     let color = if let Some(token) = token.cloned() {
         match err.cloned() {
-            Some(TokenInputError::InsufficientBalance(err_token)) if err_token.ticker == token.ticker => {
+            Some(TokenInputError::InsufficientBalance(err_token))
+                if err_token.ticker == token.ticker =>
+            {
                 "text-red-500"
             }
-            Some(TokenInputError::_InsufficientSol) => {
-                "text-red-500"
-            }
-            _ => "text-elements-primary"
+            Some(TokenInputError::_InsufficientSol) => "text-red-500",
+            _ => "text-elements-primary",
         }
     } else {
         "text-elements-primary"
@@ -84,7 +91,7 @@ pub fn TokenInputForm(
             Row {
                 class: "justify-between",
                 if let Some(token) = token.cloned() {
-                    TokenDisplay { 
+                    TokenDisplay {
                         token,
                         with_picker,
                         display_picker,
@@ -139,7 +146,7 @@ fn TokenDisplay(token: Token, with_picker: bool, display_picker: Signal<bool>) -
                     "{token.ticker}"
                 }
                 CarrotDownIcon {
-                    class: "w-4 my-auto opacity-50" 
+                    class: "w-4 my-auto opacity-50"
                 }
             }
         } else {
@@ -166,13 +173,12 @@ fn Toolbar(
     update: Signal<String>,
     toolbar_shortcuts: Option<bool>,
 ) -> Element {
-
     // Get half and max values
     let (half_value, max_value) = if let Some(Ok(balance)) = balance.cloned() {
         if let Some(ui_amount) = balance.ui_amount {
             (
                 format!("{:.1$}", (ui_amount / 2.0), balance.decimals as usize),
-                balance.ui_amount_string.clone()
+                balance.ui_amount_string.clone(),
             )
         } else {
             ("0".to_string(), "0".to_string())
@@ -216,23 +222,16 @@ fn Toolbar(
 }
 
 #[component]
-fn ToolbarBalance(
-    ui_amount_string: String,
-    token: Token,
-) -> Element {
+fn ToolbarBalance(ui_amount_string: String, token: Token) -> Element {
     rsx! {
-        span { 
-            class: "my-auto text-xs font-medium py-1 px-1 font-medium text-elements-lowEmphasis", 
-            "{ui_amount_string} {token.ticker}" 
+        span {
+            class: "my-auto text-xs font-medium py-1 px-1 font-medium text-elements-lowEmphasis",
+            "{ui_amount_string} {token.ticker}"
         }
     }
 }
 #[component]
-fn ToolbarButton(
-    title: String,
-    shortcut_value: String,
-    update: Signal<String>,
-) -> Element {
+fn ToolbarButton(title: String, shortcut_value: String, update: Signal<String>) -> Element {
     rsx! {
         button {
             class: "flex flex-row gap-2 py-1 px-2 rounded controls-tertiary my-auto text-xs font-semibold font-sans",

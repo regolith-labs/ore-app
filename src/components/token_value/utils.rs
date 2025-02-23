@@ -9,7 +9,6 @@ pub enum TokenValueSize {
     Large,
 }
 
-
 pub fn format_token_amount(
     ui_amount_string: String,
     with_decimal_units: Option<bool>,
@@ -46,7 +45,7 @@ pub fn format_token_amount(
     } else {
         "".to_string()
     };
-    
+
     // Return formatted string
     format!("{}.{}", whole_units, decimal_units)
         .trim_end_matches(".")
