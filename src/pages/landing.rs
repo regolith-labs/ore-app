@@ -176,8 +176,8 @@ fn SectionCtas(
 fn HashAnimation() -> Element {
     let mut hash_text = use_signal(|| "".to_string());
     let length = 512;
-    let batch_size = 64;
-    let update_interval = 500;
+    let _batch_size = 64;
+    let _update_interval = 500;
     let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     use_effect(move || {
