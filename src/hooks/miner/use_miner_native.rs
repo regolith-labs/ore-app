@@ -99,6 +99,8 @@ async fn find_hash_par(
                             if difficulty.ge(&min_difficulty) {
                                 let diggest = hx.d;
                                 let nonce = nonce.to_le_bytes();
+                                log::info!("/////////////////////////////////////");
+                                log::info!("difficulty: {}", difficulty);
                                 let solution = Solution {
                                     d: diggest,
                                     n: nonce,
@@ -123,10 +125,11 @@ async fn find_hash_par(
                             break;
                         } else if core_id.id == 0 {
                             log::info!(
-                                "Mining... Time remaining: {}",
+                                "Mining... Time remaining: {} {}",
                                 format_duration(
                                     cutoff_time.saturating_sub(timer.elapsed().as_secs()) as u32
                                 ),
+                                nonce,
                             );
                         }
                     }
@@ -158,6 +161,7 @@ fn nonce_indices(
     // calculate bounds on nonce space
     let left_bound = member_search_space_size.saturating_mul(member.id as u64)
         + (device_id as u64).saturating_mul(device_search_space_size);
+    log::info!("left bound: {}", left_bound);
     // split nonce-device space for muliple cores
     let range_per_core = device_search_space_size.saturating_div(cores);
     let mut nonce_indices = Vec::with_capacity(cores as usize);
@@ -165,6 +169,7 @@ fn nonce_indices(
         let index = left_bound + n * range_per_core;
         nonce_indices.push(index);
     }
+    log::info!("nonces: {:?}", nonce_indices);
     Ok(nonce_indices)
 }
 
