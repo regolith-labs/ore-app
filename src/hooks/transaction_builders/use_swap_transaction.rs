@@ -1,11 +1,13 @@
 use dioxus::prelude::*;
 use dioxus_sdk::utils::timing::{use_debounce, UseDebounce};
 use jupiter_swap_api_client::{
-    quote::{QuoteRequest, QuoteResponse},
+    quote::{QuoteRequest, QuoteResponse, SwapMode},
+    route_plan_with_metadata::RoutePlanWithMetadata,
     swap::SwapRequest,
     transaction_config::TransactionConfig,
     JupiterSwapApiClient,
 };
+use rust_decimal::Decimal;
 use solana_sdk::{pubkey::Pubkey, transaction::VersionedTransaction};
 
 use crate::config::Token;
@@ -69,9 +71,27 @@ pub fn use_swap_transaction(
     })
 }
 
+fn zero_quote(input_mint: Pubkey, output_mint: Pubkey) -> QuoteResponse {
+    QuoteResponse {
+        input_mint,
+        in_amount: 0,
+        output_mint,
+        out_amount: 0,
+        other_amount_threshold: 0,
+        swap_mode: SwapMode::ExactIn,
+        slippage_bps: 0,
+        computed_auto_slippage: None,
+        uses_quote_minimizing_slippage: None,
+        platform_fee: None,
+        price_impact_pct: Decimal::from(0),
+        route_plan: RoutePlanWithMetadata::default(),
+        context_slot: 0,
+        time_taken: 0.0,
+    }
+}
+
 pub fn use_quote(
     input_token: Signal<Option<Token>>,
-    mut input_token_amount: Signal<String>,
     output_token: Signal<Option<Token>>,
     mut output_token_amount: Signal<String>,
     mut quote_response: Signal<Option<QuoteResponse>>,
@@ -79,16 +99,22 @@ pub fn use_quote(
     use_debounce::<String>(std::time::Duration::from_millis(750), move |input_str| {
         spawn(async move {
             let mut clear = false;
+
+            // Get tokens
+            let Some(input_token) = input_token.read().clone() else {
+                return;
+            };
+            let Some(output_token) = output_token.read().clone() else {
+                return;
+            };
+
+            // Parse input amount
             if let Ok(float) = input_str.parse::<f64>() {
                 if float == 0f64 {
-                    clear = true;
+                    output_token_amount.set("0".to_string());
+                    quote_response.set(Some(zero_quote(input_token.mint, output_token.mint)));
+                    return;
                 } else {
-                    let Some(input_token) = input_token.read().clone() else {
-                        return;
-                    };
-                    let Some(output_token) = output_token.read().clone() else {
-                        return;
-                    };
                     match quote(
                         float,
                         &input_token.decimals,
@@ -125,7 +151,6 @@ pub fn use_quote(
             }
 
             if clear {
-                input_token_amount.set("".to_string());
                 output_token_amount.set("".to_string());
                 quote_response.set(None);
             }

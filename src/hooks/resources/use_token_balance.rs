@@ -45,16 +45,16 @@ pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>>
 pub fn use_token_balance_for_token(
     token: Signal<Option<Token>>,
 ) -> Resource<GatewayResult<UiTokenAmount>> {
-    let wallet_status = use_wallet();
-    use_resource(move || async move {
-        let Some(token) = token.read().clone() else {
-            return Err(GatewayError::Unknown.into());
-        };
-        match *wallet_status.read() {
-            Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
-            Wallet::Connected(pubkey) => get_token_balance(pubkey, token.mint).await,
+    let token_balances: HashMap<Pubkey, Resource<GatewayResult<UiTokenAmount>>> = use_context();
+    if let Some(token) = token.cloned() {
+        if let Some(balance) = token_balances.get(&token.mint) {
+            *balance
+        } else {
+            use_token_balance_resource(token.mint)
         }
-    })
+    } else {
+        use_resource(move || async move { Err(GatewayError::Unknown.into()) })
+    }
 }
 
 async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiTokenAmount> {

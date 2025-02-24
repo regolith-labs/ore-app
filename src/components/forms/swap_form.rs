@@ -25,21 +25,15 @@ pub fn SwapForm(class: Option<String>) -> Element {
     let mut buy_input_amount = use_signal::<String>(|| "".to_string());
 
     // Fetch token balances
-    let sell_token_balance = use_token_balance_for_token(sell_token);
-    let buy_token_balance = use_token_balance_for_token(buy_token);
+    let mut sell_token_balance = use_token_balance_for_token(sell_token);
+    let mut buy_token_balance = use_token_balance_for_token(buy_token);
 
     // Quote response
     let mut quote_response = use_signal::<Option<QuoteResponse>>(|| None);
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
 
     // Quote fetcher with debounce
-    let mut quote_fetcher = use_quote(
-        sell_token,
-        sell_input_amount,
-        buy_token,
-        buy_input_amount,
-        quote_response,
-    );
+    let mut quote_fetcher = use_quote(sell_token, buy_token, buy_input_amount, quote_response);
 
     // When sell input amount changes, fetch a new quote
     use_effect(move || {
@@ -59,6 +53,8 @@ pub fn SwapForm(class: Option<String>) -> Element {
     on_transaction_done(move |_sig| {
         sell_input_amount.set("".to_string());
         buy_input_amount.set("".to_string());
+        sell_token_balance.restart();
+        buy_token_balance.restart();
     });
 
     rsx! {
