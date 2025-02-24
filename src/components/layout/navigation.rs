@@ -11,7 +11,7 @@ use crate::{
 pub(crate) fn AppNavBar() -> Element {
     rsx! {
         Row {
-            class: "w-screen h-20 px-3 sm:px-6 sm:sticky sm:top-0 bg-black z-50",
+            class: "w-screen h-20 sm:h-24 px-2 sm:px-6 sm:sticky sm:top-0 bg-black z-50 shrink-0",
             Row {
                 class: "relative justify-center sm:justify-between w-full my-auto",
                 span {
@@ -19,7 +19,7 @@ pub(crate) fn AppNavBar() -> Element {
                     Logo {}
                 }
                 div {
-                    class: "absolute left-1/2 -translate-x-1/2",
+                    class: "absolute left-1/2 -translate-x-1/2 my-auto",
                     TabBar {}
                 }
                 WalletAdapter {}
@@ -31,7 +31,7 @@ pub(crate) fn AppNavBar() -> Element {
 pub(crate) fn VisitorNavBar() -> Element {
     rsx! {
         Row {
-            class: "w-screen shrink-0 h-16 sm:h-20 px-2 sm:px-6",
+            class: "w-screen shrink-0 h-20 sm:h-24 px-2 sm:px-6",
             Row {
                 class: "w-full my-auto justify-between",
                 Logo {}

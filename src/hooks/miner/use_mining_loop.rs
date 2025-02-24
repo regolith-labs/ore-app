@@ -102,7 +102,6 @@ fn use_solution_contribute(
 ) -> Effect {
     let wallet = use_wallet();
     let pool_url = use_pool_url();
-    let mut member_record = use_member_record();
     let mut member_record_balance = use_member_record_balance();
     let mut miner_status = use_miner_status();
     let is_active = use_miner_is_active();

@@ -24,7 +24,6 @@ pub fn LandingLayout() -> Element {
     rsx! {
         Col {
             class: "w-screen",
-            // LandingNavBar {}
             Outlet::<Route> {}
         }
     }
