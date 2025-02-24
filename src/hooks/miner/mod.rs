@@ -1,6 +1,6 @@
 mod use_miner;
 mod use_miner_events;
-// #[cfg(not(feature = "web"))]
+#[cfg(not(feature = "web"))]
 mod use_miner_native;
 #[cfg(feature = "web")]
 mod use_miner_web;
