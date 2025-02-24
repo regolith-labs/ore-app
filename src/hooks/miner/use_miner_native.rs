@@ -45,10 +45,22 @@ pub fn use_miner_provider() {
                     }
                 });
                 // listen for solutions from miner
+                let mut best_difficulty = 0;
                 while let Some(msg) = receiver.recv().await {
-                    from_miner.set(msg);
+                    // submit best solutions
+                    if let OutputMessage::Solution(solution) = msg {
+                        let difficulty = solution.to_hash().difficulty();
+                        // submit
+                        if difficulty.gt(&best_difficulty) {
+                            from_miner.set(msg);
+                            best_difficulty = difficulty;
+                            log::info!("found new best difficulty: {}", best_difficulty);
+                        }
+                    }
+                    // exit if expired
                     if let OutputMessage::Expired(_) = msg {
                         log::info!("expired");
+                        from_miner.set(msg);
                         break;
                     }
                 }
