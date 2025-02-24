@@ -20,7 +20,7 @@ pub fn use_miner_provider() {
                 // spawn miner
                 let sender = sender.clone();
                 tokio::spawn(async move {
-                    let cores = 10;
+                    let cores = 15;
                     let device_id = 0;
                     let challenge = msg.challenge.challenge;
                     match nonce_indices(&msg.member, &msg.challenge, cores, device_id) {
@@ -83,10 +83,8 @@ async fn find_hash_par(
     let core_ids = core_ids.into_iter().filter(|id| id.id < (cores as usize));
     // distribute
     for core_id in core_ids {
-        log::info!("core: {:?}", core_id);
         let challenge = *challenge;
         std::thread::spawn({
-            log::info!("spawning core: {:?}", core_id);
             // init drillx solver
             let mut memory = drillx::equix::SolverMemory::new();
             let solutions_channel = solutions_channel.clone();

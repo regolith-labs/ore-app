@@ -18,7 +18,8 @@ pub fn Mine() -> Element {
             // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
-            Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8",
+            Col {
+                class: "w-full max-w-2xl mx-auto px-5 sm:px-8",
                 Heading {
                     class: "w-full",
                     title: "Mine",
@@ -26,7 +27,7 @@ pub fn Mine() -> Element {
                 }
                 OrbMiner {
                     class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
-                    gold: *use_miner_is_active().read(),
+                    gold: *use_miner_is_active().read()
                 }
                 MinerData {}
             }
@@ -50,13 +51,17 @@ fn MinerData() -> Element {
     });
 
     rsx! {
-        Col { class: "w-full flex-wrap mx-auto justify-between", gap: 8,
+        Col {
+            class: "w-full flex-wrap mx-auto justify-between",
+            gap: 8,
             Alert {}
             MinerStatus {}
             MinerHashpower {}
             MinerPendingRewards {}
             MinerRewards {}
-            ClaimButton { transaction: claim_tx }
+            ClaimButton {
+                transaction: claim_tx,
+            }
         }
     }
 }
@@ -145,10 +150,16 @@ fn StopStartButton() -> Element {
             },
             if !*is_active.read() {
                 PlayIcon { class: "my-auto h-5" }
-                span { class: "my-auto", "Start" }
+                span {
+                    class: "my-auto",
+                    "Start"
+                }
             } else {
-                StopIcon { class: "my-auto h-5" }
-                span { class: "my-auto", "Stop" }
+                StopIcon { class: "my-auto h-5"  }
+                span {
+                    class: "my-auto",
+                    "Stop"
+                }
             }
         }
     }
@@ -164,10 +175,18 @@ fn MinerStatus() -> Element {
         MinerStatus::Stopped => "Stopped",
     });
     rsx! {
-        Col { gap: 4,
-            span { class: "text-elements-lowEmphasis font-medium", "Status" }
-            Row { class: "justify-between",
-                span { class: "font-semibold text-2xl sm:text-3xl", "{status}" }
+        Col {
+            gap: 4,
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Status"
+            }
+            Row {
+                class: "justify-between",
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl",
+                    "{status}"
+                }
                 StopStartButton {}
             }
         }
@@ -176,9 +195,16 @@ fn MinerStatus() -> Element {
 
 fn MinerHashpower() -> Element {
     rsx! {
-        Col { gap: 4,
-            span { class: "text-elements-lowEmphasis font-medium", "Hashpower" }
-            span { class: "font-semibold text-2xl sm:text-3xl", "1230 H/s" }
+        Col {
+            gap: 4,
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Hashpower"
+            }
+            span {
+                class: "font-semibold text-2xl sm:text-3xl",
+                "1230 H/s"
+            }
         }
     }
 }
@@ -188,16 +214,17 @@ fn MinerPendingRewards() -> Element {
     let member_record_balance = use_member_record_balance();
     rsx! {
         if let Some(Ok(member_record_balance)) = member_record_balance.cloned() {
-            Col { gap: 4,
-                span { class: "text-elements-lowEmphasis font-medium", "Rewards (pending)" }
+            Col {
+                gap: 4,
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Rewards (pending)"
+                }
                 if let Some(member) = member.cloned() {
                     if let Ok(member) = member {
                         OreValue {
                             size: TokenValueSize::Large,
-                            ui_amount_string: amount_to_ui_amount_string(
-                                member_record_balance - member.total_balance,
-                                TOKEN_DECIMALS,
-                            ),
+                            ui_amount_string: amount_to_ui_amount_string(member_record_balance - member.total_balance, TOKEN_DECIMALS),
                             with_decimal_units: true,
                         }
                     } else {
@@ -214,8 +241,12 @@ fn MinerPendingRewards() -> Element {
 fn MinerRewards() -> Element {
     let member = use_member();
     rsx! {
-        Col { gap: 4,
-            span { class: "text-elements-lowEmphasis font-medium", "Rewards" }
+        Col {
+            gap: 4,
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Rewards"
+            }
             if let Some(member) = member.cloned() {
                 if let Ok(member) = member {
                     OreValue {
@@ -233,3 +264,4 @@ fn MinerRewards() -> Element {
         }
     }
 }
+
