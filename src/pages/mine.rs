@@ -264,4 +264,3 @@ fn MinerRewards() -> Element {
         }
     }
 }
-
