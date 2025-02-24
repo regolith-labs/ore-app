@@ -1,0 +1,33 @@
+ORE-19
+Introduce a TransactionType enum to the app (done)
+
+Swap -> @swap.rs & @use_swap_transaction.rs [done]
+
+BoostDeposit (Idle) -> @use_pair_deposit_transaction.rs in @pair_deposit_form.rs 
+
+BoostWithdraw (Idle) -> @use_pair_withdraw_transaction.rs in @pair_withdraw_form.rs in 
+
+BoostClaim (Pass to both)-> @use_boost_claim_transaction.rs vs @use_boost_claim_all_transaction.rs ? in @stake.rs
+
+PoolClaim -> ? @use_miner_claim_transaction.rs in @mine.rs -> MinerData
+
+PoolJoin -> @use_pool_register_transaction.rs in @mine.rs -> StartStopButton
+------
+
+== Pending ==
+Swap (done)
+BoostDeposit,
+BoostWithdraw,
+BoostClaim,
+PoolClaim,
+PoolJoin,
+
+Remove logs
+
+== Notes ==
+Add an endpoint into the API to log transaction signatures with a transaction type.
+Log the transaction signature and type into a database.
+Create a background job to periodically look up transaction statuses and add this data to our database.
+Export this data to a warehouse where it can be queried for business insights.
+We want to be able to breakdown app activity and revenue by feature and by user.
+In submit_transaction, send the transaction signature and type to our API.

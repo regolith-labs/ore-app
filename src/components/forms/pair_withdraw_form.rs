@@ -1,14 +1,13 @@
-use dioxus::prelude::*;
-use ore_boost_api::state::Stake;
-
-use super::token_input_form::*;
 use crate::{
-    components::{Col, SubmitButton, TokenInputError},
+    components::{Col, SubmitButton, TokenInputError, TokenInputForm},
     config::BoostMeta,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_pair_withdraw_transaction, use_withdrawable_balances},
     utils::LiquidityPair,
 };
+use dioxus::prelude::*;
+use ore_boost_api::state::Stake;
+use ore_types::request::TransactionType;
 
 #[component]
 pub fn PairWithdrawForm(
@@ -162,7 +161,8 @@ pub fn PairWithdrawForm(
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
-                err: err
+                err: err,
+                tx_type: TransactionType::BoostWithdraw
             }
         }
     }

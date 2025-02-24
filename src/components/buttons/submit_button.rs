@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use solana_sdk::transaction::VersionedTransaction;
+use ore_types::request::TransactionType;
 
 use crate::{components::submit_transaction, gateway::GatewayResult};
 
@@ -11,6 +12,7 @@ pub fn SubmitButton(
     title: String,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
     err: Signal<Option<TokenInputError>>,
+    tx_type: TransactionType
 ) -> Element {
     let class = class.unwrap_or("controls-primary".to_string());
 
@@ -33,7 +35,7 @@ pub fn SubmitButton(
                 disabled: !enabled,
                 onclick: move |_| {
                     if let Some(Ok(transaction)) = transaction.cloned() {
-                        submit_transaction(transaction);
+                        submit_transaction(transaction, tx_type.clone());
                     }
                 },
                 if let UseResourceState::Pending = *transaction.state().read() {
