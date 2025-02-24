@@ -5,7 +5,7 @@ use crate::{
     components::*,
     gateway::pool::PoolGateway,
     hooks::{
-        on_transaction_done, use_gateway, use_member, use_member_record,
+        on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
         use_miner_claim_transaction, use_miner_is_active, use_miner_status,
         use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus, Wallet,
     },
@@ -185,9 +185,9 @@ fn MinerHashpower() -> Element {
 
 fn MinerPendingRewards() -> Element {
     let member = use_member();
-    let member_record = use_member_record();
+    let member_record_balance = use_member_record_balance();
     rsx! {
-        if let Some(Ok(member_record)) = member_record.cloned() {
+        if let Some(Ok(member_record_balance)) = member_record_balance.cloned() {
             Col { gap: 4,
                 span { class: "text-elements-lowEmphasis font-medium", "Rewards (pending)" }
                 if let Some(member) = member.cloned() {
@@ -195,7 +195,7 @@ fn MinerPendingRewards() -> Element {
                         OreValue {
                             size: TokenValueSize::Large,
                             ui_amount_string: amount_to_ui_amount_string(
-                                member_record.total_balance as u64 - member.total_balance,
+                                member_record_balance - member.total_balance,
                                 TOKEN_DECIMALS,
                             ),
                             with_decimal_units: true,
