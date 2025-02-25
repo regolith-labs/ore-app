@@ -8,7 +8,6 @@ use steel::AccountDeserialize;
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
 const ORE_API_URL: &str = "https://api.ore.supply";
-const ORE_API_URL: &str = "https://api.ore.supply";
 
 pub trait OreGateway {
     // Accounts
