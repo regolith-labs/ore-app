@@ -79,7 +79,6 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .map_err(GatewayError::from)?;
         let body = resp.text().await.map_err(GatewayError::from)?;
         let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
-        log::info!("Transaction written to db: {}", sig);
         Ok(sig)
     }
 }
