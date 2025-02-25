@@ -17,7 +17,10 @@ pub trait OreGateway {
     // API
     async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64>;
     async fn get_ore_holders(&self) -> GatewayResult<u64>;
-    async fn log_transaction_db(&self, transaction: TransactionEvent) -> GatewayResult<Signature>;
+    async fn log_transaction_event(
+        &self,
+        transaction: TransactionEvent,
+    ) -> GatewayResult<Signature>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -63,7 +66,10 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         Ok(holders)
     }
 
-    async fn log_transaction_db(&self, transaction: TransactionEvent) -> GatewayResult<Signature> {
+    async fn log_transaction_event(
+        &self,
+        transaction: TransactionEvent,
+    ) -> GatewayResult<Signature> {
         let url = format!("{}/events/transaction", ORE_API_URL);
         let resp = self
             .http
