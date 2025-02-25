@@ -224,7 +224,7 @@ fn MinerHashpower() -> Element {
 
 fn MinerSelectCores() -> Element {
     let mut cores = use_signal(|| 0);
-    let max = 16;
+    let max = crate::cores::get();
     rsx! {
         Row {
             class: "justify-between",

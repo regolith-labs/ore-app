@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 mod components;
 mod config;
+mod cores;
 mod gateway;
 mod hooks;
 mod pages;
