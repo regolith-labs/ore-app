@@ -255,7 +255,7 @@ pub fn Apy(boost_meta: BoostMeta) -> Element {
     rsx! {
         TitledRow {
             title: "APY",
-            description: "The estimated annualized percentage yield of participating in the boost. Calculation is derived from the last 7 days of distributed yield divided by the total deposits currently in the boost. This estimate in no way guarantees future returns.",
+            description: "The estimated annualized percentage yield of participating in the boost. This calculation is derived from the last 7 days of distributed yield divided by the total deposits currently in the boost. This estimate in no way guarantees future returns.",
             value: rsx! {
                 if let Ok(apy) = apy.cloned() {
                     span {

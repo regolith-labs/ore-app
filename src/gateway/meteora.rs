@@ -35,6 +35,7 @@ pub trait MeteoraGateway {
         slippage_rate: u64,
         owner: Pubkey,
     ) -> GatewayResult<Instruction>;
+
     async fn build_meteora_withdraw_instruction(
         &self,
         pool_address: Pubkey,

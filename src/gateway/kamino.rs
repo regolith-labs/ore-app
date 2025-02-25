@@ -16,6 +16,7 @@ pub trait KaminoGateway {
         &self,
         strategy: Pubkey,
     ) -> GatewayResult<KaminoStrategyMetrics>;
+
     async fn get_kamino_whirlpool_strategy(
         &self,
         strategy: Pubkey,
@@ -30,6 +31,7 @@ pub trait KaminoGateway {
         amount_b: f64,
         owner: Pubkey,
     ) -> GatewayResult<Instruction>;
+
     async fn build_kamino_withdraw_instruction(
         &self,
         strategy_address: Pubkey,
