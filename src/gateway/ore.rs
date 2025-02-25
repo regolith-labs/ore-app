@@ -8,6 +8,7 @@ use steel::AccountDeserialize;
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
 const ORE_API_URL: &str = "https://api.ore.supply";
+const ORE_API_URL: &str = "https://api.ore.supply";
 
 pub trait OreGateway {
     // Accounts
@@ -78,6 +79,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .map_err(GatewayError::from)?;
         let body = resp.text().await.map_err(GatewayError::from)?;
         let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
+        log::info!("Transaction written to db: {}", sig);
         Ok(sig)
     }
 }
