@@ -1,12 +1,12 @@
-use dioxus::prelude::*;
-use ore_boost_api::state::Stake;
-
-use crate::gateway::{GatewayResult, UiTokenAmount};
 use crate::{
     components::{Col, SubmitButton, TokenInputError, TokenInputForm},
     config::Token,
+    gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_idle_deposit_transaction},
 };
+use dioxus::prelude::*;
+use ore_boost_api::state::Stake;
+use ore_types::request::TransactionType;
 
 #[component]
 pub fn IdleDepositForm(
@@ -44,7 +44,8 @@ pub fn IdleDepositForm(
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
-                err: err
+                err: err,
+                tx_type: TransactionType::BoostDeposit
             }
         }
     }

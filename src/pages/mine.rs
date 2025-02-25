@@ -11,6 +11,7 @@ use crate::{
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
+use ore_types::request::TransactionType;
 
 pub fn Mine() -> Element {
     rsx! {
@@ -144,7 +145,7 @@ fn StopStartButton() -> Element {
                     } else if let Some(Ok(tx)) = register_tx.cloned() {
                         // not registered onchain, submit registration transaction
                         miner_status.set(MinerStatus::Registering);
-                        submit_transaction(tx);
+                        submit_transaction(tx, TransactionType::PoolJoin);
                     }
                 }
             },

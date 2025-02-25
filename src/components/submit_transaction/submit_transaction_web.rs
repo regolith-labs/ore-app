@@ -1,19 +1,22 @@
 use base64::Engine;
 use dioxus::{document::eval, prelude::*};
+use js_sys::Date;
+use ore_types::request::{AppId, TransactionEvent, TransactionType};
 use solana_sdk::{message::VersionedMessage, transaction::VersionedTransaction};
 
 use crate::{
     components::*,
-    gateway::{solana::SolanaGateway, Rpc},
+    gateway::{ore::OreGateway, solana::SolanaGateway, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
-pub fn submit_transaction(mut tx: VersionedTransaction) {
+pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType) {
     let mut transaction_status = use_transaction_status();
-    log::info!("submitting transaction: {:?}", tx.message);
+
     spawn(async move {
         // Set blockhash
         let gateway = use_gateway();
+
         if let Ok(hash) = gateway.rpc.get_latest_blockhash().await {
             match &mut tx.message {
                 VersionedMessage::V0(message) => {
@@ -68,10 +71,32 @@ pub fn submit_transaction(mut tx: VersionedTransaction) {
                                     }
                                 };
 
+                                let signer = tx.message.static_account_keys()[0];
+                                let timestamp = (Date::now() / 1000.0) as i64;
+                                // Write transaction to db (API)
+                                if let Some(sig) = rpc_res {
+                                    match gateway
+                                        .log_transaction_db(TransactionEvent {
+                                            sig: sig,
+                                            signer: signer,
+                                            transaction_type: tx_type,
+                                            app: AppId::OreWeb,
+                                            ts: timestamp,
+                                            status: None,
+                                            fee: None,
+                                        })
+                                        .await
+                                    {
+                                        Ok(_sig) => {}
+                                        Err(e) => {
+                                            log::error!("Error writing transaction to db: {:?}", e);
+                                        }
+                                    }
+                                }
+
                                 // Confirm transaction
                                 match rpc_res {
                                     Some(sig) => {
-                                        log::info!("sig: {}", sig);
                                         let confirmed = gateway.rpc.confirm_signature(sig).await;
                                         if confirmed.is_ok() {
                                             transaction_status

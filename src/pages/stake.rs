@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use ore_types::request::TransactionType;
 
 use crate::{
     components::*,
@@ -118,7 +119,7 @@ fn ClaimButton() -> Element {
             disabled: !is_enabled,
             onclick: move |_| {
                 if let Some(Ok(tx)) = tx.cloned() {
-                    submit_transaction(tx);
+                    submit_transaction(tx, TransactionType::BoostClaim);
                 }
             },
             class: "flex flex-row h-12 w-full md:w-min controls-gold rounded-full px-8",

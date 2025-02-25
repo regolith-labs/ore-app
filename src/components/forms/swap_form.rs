@@ -1,14 +1,14 @@
-use dioxus::prelude::*;
-use jupiter_swap_api_client::quote::QuoteResponse;
-use rust_decimal::Decimal;
-use solana_sdk::transaction::VersionedTransaction;
-
 use crate::{
     components::*,
     config::Token,
     gateway::GatewayResult,
     hooks::{on_transaction_done, use_quote, use_swap_transaction, use_token_balance_for_token},
 };
+use dioxus::prelude::*;
+use jupiter_swap_api_client::quote::QuoteResponse;
+use ore_types::request::TransactionType;
+use rust_decimal::Decimal;
+use solana_sdk::transaction::VersionedTransaction;
 
 use super::TokenInputError;
 
@@ -182,7 +182,7 @@ fn SwapButton(
                 onclick: move |_| {
                     let swap_tx = &*swap_tx.read();
                     if let Some(Ok(tx)) = swap_tx {
-                        submit_transaction(tx.clone());
+                        submit_transaction(tx.clone(), TransactionType::Swap);
                     }
                 },
                 if let Some(err) = err.cloned() {

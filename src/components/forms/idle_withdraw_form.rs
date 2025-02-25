@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::Stake;
-
+use ore_types::request::TransactionType;
 use crate::{
     components::{Col, SubmitButton, TokenInputError, TokenInputForm},
     config::Token,
@@ -61,7 +61,8 @@ pub fn IdleWithdrawForm(
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
-                err: err
+                err: err,
+                tx_type: TransactionType::BoostWithdraw
             }
         }
     }
