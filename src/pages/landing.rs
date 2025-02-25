@@ -125,14 +125,14 @@ fn SectionCtas(
                     "{primary_title}"
                 }
             }
-            Link {
-                to: secondary_route,
-                class: "flex h-12 w-full sm:w-min px-8 rounded-full text-elements-lowEmphasis hover:text-elements-highEmphasis transition-colors hover:bg-controls-tertiaryHover duration-300 ease-in-out",
-                span {
-                    class: "my-auto mx-auto text-nowrap font-semibold",
-                    "{secondary_title}"
-                }
-            }
+            // Link {
+            //     to: secondary_route,
+            //     class: "flex h-12 w-full sm:w-min px-8 rounded-full text-elements-lowEmphasis hover:text-elements-highEmphasis transition-colors hover:bg-controls-tertiaryHover duration-300 ease-in-out",
+            //     span {
+            //         class: "my-auto mx-auto text-nowrap font-semibold",
+            //         "{secondary_title}"
+            //     }
+            // }
         }
     }
 }
@@ -211,8 +211,8 @@ fn MiningGuide() -> Element {
             }
             GuideStep {
                 step: "2",
-                title: "Join a pool",
-                detail: "Hop into a mining pool to avoid transaction fees."
+                title: "Hop in",
+                detail: "Join a mining pool to reduce transaction fees."
             }
             GuideStep {
                 step: "3",
@@ -274,7 +274,7 @@ fn Liquidity() -> Element {
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE unifies liquidity across Solana on a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the network."
+                        "ORE is unifying liquidity across Solana onto a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the depth of the network."
                     }
                     SectionCtas {
                         primary_title: "Earn yield →",
@@ -672,11 +672,7 @@ fn SectionCopy(
 }
 
 #[component]
-fn SectionCopyResponsive(
-    tip: Option<String>,
-    title: String,
-    subtitle: Option<String>,
-) -> Element {
+fn SectionCopyResponsive(tip: Option<String>, title: String, subtitle: Option<String>) -> Element {
     rsx! {
         SectionCopy {
             class: "hidden md:flex w-full text-nowrap",

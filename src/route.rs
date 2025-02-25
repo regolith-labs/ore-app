@@ -29,6 +29,8 @@ pub enum Route {
     #[layout(VisitorLayout)]
         #[route("/download")]
         Download {},
+        #[route("/blog")]
+        Blog {},
     #[end_layout]
 
     #[route("/:.._route")]

@@ -1,3 +1,4 @@
+mod blog;
 mod download;
 mod idle;
 mod landing;
@@ -8,6 +9,7 @@ mod pay;
 mod stake;
 mod trade;
 
+pub use blog::*;
 pub use download::*;
 pub use idle::*;
 pub use landing::*;
