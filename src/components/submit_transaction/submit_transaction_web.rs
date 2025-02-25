@@ -87,9 +87,7 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                         })
                                         .await
                                     {
-                                        Ok(sig) => {
-                                            log::info!("Transaction written to db: {}", sig);
-                                        }
+                                        Ok(_sig) => {}
                                         Err(e) => {
                                             log::error!("Error writing transaction to db: {:?}", e);
                                         }
@@ -99,7 +97,6 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                 // Confirm transaction
                                 match rpc_res {
                                     Some(sig) => {
-                                        log::info!("sig: {}", sig);
                                         let confirmed = gateway.rpc.confirm_signature(sig).await;
                                         if confirmed.is_ok() {
                                             transaction_status

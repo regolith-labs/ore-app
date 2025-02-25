@@ -89,7 +89,7 @@ ore-miner-web = { path = "./miner-web", features = [
 ], default-features = false, optional = true }
 ore-pool-api = "1.3"
 ore-pool-types = "1.2"
-ore-types = "0.0.11"
+ore-types = "0.0.12"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
 reqwest = "0.11.24"
@@ -151,7 +151,6 @@ solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/s
 kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }
 meteora-pools-sdk = { git = "https://github.com/regolith-labs/meteora-pools-sdk", branch = "master" }
 meteora-vault-sdk = { git = "https://github.com/regolith-labs/meteora-vault-sdk", branch = "master" }
-ore-types = {path = "../ore-infra/types"}
 
 [profile]
 
