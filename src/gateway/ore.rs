@@ -1,5 +1,8 @@
 use ore_boost_api::state::{Boost, Stake};
+use ore_types::request::TransactionEvent;
 use solana_sdk::pubkey::Pubkey;
+use solana_sdk::signature::Signature;
+use std::str::FromStr;
 use steel::AccountDeserialize;
 
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
@@ -14,6 +17,7 @@ pub trait OreGateway {
     // API
     async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64>;
     async fn get_ore_holders(&self) -> GatewayResult<u64>;
+    async fn log_transaction_db(&self, transaction: TransactionEvent) -> GatewayResult<Signature>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -57,5 +61,19 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .map_err(GatewayError::from)?;
         let holders = resp.json::<u64>().await.map_err(GatewayError::from)?;
         Ok(holders)
+    }
+
+    async fn log_transaction_db(&self, transaction: TransactionEvent) -> GatewayResult<Signature> {
+        let url = format!("{}/events/transaction", ORE_API_URL);
+        let resp = self
+            .http
+            .post(url)
+            .json(&transaction)
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
+        let body = resp.text().await.map_err(GatewayError::from)?;
+        let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
+        Ok(sig)
     }
 }

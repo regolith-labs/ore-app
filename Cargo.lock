@@ -5475,6 +5475,7 @@ dependencies = [
  "ore-miner-web",
  "ore-pool-api",
  "ore-pool-types",
+ "ore-types",
  "qrcode-generator",
  "rand 0.8.5",
  "reqwest 0.11.27",
@@ -5581,6 +5582,17 @@ checksum = "d373e1f25cfd8c073dde2c90aada62bff5818cb72404d76c796f278e14d18382"
 dependencies = [
  "drillx",
  "serde",
+ "solana-sdk",
+]
+
+[[package]]
+name = "ore-types"
+version = "0.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2dd74dda300a829f0a6db9fbb729d6454cab338a310d51ad6f20f8697eed8dd"
+dependencies = [
+ "serde",
+ "serde_json",
  "solana-sdk",
 ]
 

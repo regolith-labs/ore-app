@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use ore_types::request::TransactionType;
 use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{components::submit_transaction, gateway::GatewayResult};
@@ -17,7 +18,7 @@ pub fn ClaimButton(transaction: Resource<GatewayResult<VersionedTransaction>>) -
             disabled: !enabled,
             onclick: move |_| {
                 if let Some(Ok(transaction)) = transaction.cloned() {
-                    submit_transaction(transaction);
+                    submit_transaction(transaction, TransactionType::PoolClaim);
                 }
             },
             span {
