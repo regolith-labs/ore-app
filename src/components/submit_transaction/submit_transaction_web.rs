@@ -76,7 +76,7 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                 // Write transaction to db (API)
                                 if let Some(sig) = rpc_res {
                                     match gateway
-                                        .write_transaction_db(TransactionEvent {
+                                        .log_transaction_db(TransactionEvent {
                                             sig: sig,
                                             signer: signer,
                                             transaction_type: tx_type,
