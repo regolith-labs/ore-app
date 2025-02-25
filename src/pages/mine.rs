@@ -6,7 +6,7 @@ use crate::{
     gateway::pool::PoolGateway,
     hooks::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner_claim_transaction, use_miner_is_active, use_miner_status,
+        use_miner_claim_transaction, use_miner_cores, use_miner_is_active, use_miner_status,
         use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
@@ -223,7 +223,7 @@ fn MinerHashpower() -> Element {
 }
 
 fn MinerSelectCores() -> Element {
-    let mut cores = use_signal(|| 0);
+    let mut cores = use_miner_cores();
     let max = crate::cores::get();
     rsx! {
         Row {
