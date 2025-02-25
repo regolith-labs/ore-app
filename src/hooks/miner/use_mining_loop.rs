@@ -8,8 +8,8 @@ use steel::Pubkey;
 use crate::{
     gateway::{pool::PoolGateway, GatewayResult},
     hooks::{
-        use_gateway, use_member_record, use_miner, use_miner_is_active, use_miner_status,
-        use_pool_url, use_wallet, GetPubkey, MinerStatus, MiningEvent,
+        use_gateway, use_member_record, use_member_record_balance, use_miner, use_miner_is_active,
+        use_miner_status, use_pool_url, use_wallet, GetPubkey, MinerStatus, MiningEvent,
     },
 };
 
@@ -34,14 +34,13 @@ pub fn use_mining_loop() {
 
 fn use_next_challenge(last_hash_at: Signal<i64>) -> Resource<GatewayResult<MemberChallenge>> {
     let pool_url = use_pool_url();
-
     let member_record = use_member_record();
 
     let member_authority = use_memo(move || {
         let Some(Ok(member_record)) = member_record.cloned() else {
             return None;
         };
-        Some(Pubkey::from_str(member_record.authority.as_str()).unwrap())
+        Pubkey::from_str(member_record.authority.as_str()).ok()
     });
 
     let is_active = use_miner_is_active();
@@ -103,7 +102,7 @@ fn use_solution_contribute(
 ) -> Effect {
     let wallet = use_wallet();
     let pool_url = use_pool_url();
-    let mut member_record = use_member_record();
+    let mut member_record_balance = use_member_record_balance();
     let mut miner_status = use_miner_status();
     let is_active = use_miner_is_active();
     use_effect(move || {
@@ -122,6 +121,7 @@ fn use_solution_contribute(
             OutputMessage::Solution(solution) => {
                 // Submit solution
                 spawn(async move {
+                    // Submitting
                     miner_status.set(MinerStatus::SubmittingSolution);
                     if let Err(err) = use_gateway()
                         .post_solution(pubkey, pool_url.clone(), &solution)
@@ -129,7 +129,12 @@ fn use_solution_contribute(
                     {
                         log::error!("Error posting solution: {:?}", err);
                     }
-                    member_record.restart();
+                    // Set miner status back to hashing
+                    // continuous submissions ...
+                    miner_status.set(MinerStatus::Hashing);
+                    // Restart member balance for pending rewards
+                    member_record_balance.restart();
+                    // Get latest pool event
                     match use_gateway()
                         .get_latest_event(pubkey, pool_url.clone())
                         .await

@@ -1509,6 +1509,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "core_affinity"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "622892f5635ce1fc38c8f16dfc938553ed64af482edb5e150bf4caedbfcb2304"
+dependencies = [
+ "libc",
+ "num_cpus",
+ "winapi",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5433,6 +5444,7 @@ dependencies = [
  "bytemuck",
  "cached",
  "chrono",
+ "core_affinity",
  "dioxus",
  "dioxus-logger",
  "dioxus-sdk",
@@ -5463,6 +5475,7 @@ dependencies = [
  "ore-miner-web",
  "ore-pool-api",
  "ore-pool-types",
+ "ore-types",
  "qrcode-generator",
  "rand 0.8.5",
  "reqwest 0.11.27",
@@ -5480,7 +5493,9 @@ dependencies = [
  "spl-associated-token-account 6.0.0",
  "spl-memo 4.0.3",
  "spl-token 4.0.2",
+ "spl-token-2022 6.0.0",
  "steel",
+ "tokio",
  "tracing",
  "url",
  "wasm-bindgen",
@@ -5567,6 +5582,17 @@ checksum = "d373e1f25cfd8c073dde2c90aada62bff5818cb72404d76c796f278e14d18382"
 dependencies = [
  "drillx",
  "serde",
+ "solana-sdk",
+]
+
+[[package]]
+name = "ore-types"
+version = "0.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2dd74dda300a829f0a6db9fbb729d6454cab338a310d51ad6f20f8697eed8dd"
+dependencies = [
+ "serde",
+ "serde_json",
  "solana-sdk",
 ]
 

@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use dioxus::prelude::*;
 use ore_boost_api::state::{Boost, Stake};
+use ore_types::request::TransactionType;
 use steel::Pubkey;
 
 use crate::{
@@ -34,7 +35,7 @@ pub fn Pair(lp_mint: String) -> Element {
         liquidity_pair.restart();
         lp_balance.restart();
     });
-
+    
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
@@ -206,6 +207,7 @@ fn UnstakedLp(
                         title: "Deposit {boost_meta.ticker}",
                         transaction: lp_deposit_tx,
                         err: err,
+                        tx_type: TransactionType::BoostDeposit
                     }
                 }
             }
