@@ -197,13 +197,85 @@ fn MinerHashpower() -> Element {
     rsx! {
         Col {
             gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Hashpower"
+            Row {
+                class: "justify-between",
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Hashpower"
+                }
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Cores"
+                }
+            }
+            Row {
+                class: "justify-between",
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl",
+                    "1230 H/s"
+                }
+                span {
+                    MinerSelectCores {}
+                }
+            }
+        }
+    }
+}
+
+fn MinerSelectCores() -> Element {
+    let mut cores = use_signal(|| 0);
+    let max = 16;
+    rsx! {
+        Row {
+            class: "justify-between",
+            button {
+                class: "bg-white flex items-center justify-center w-12 h-12 bg-gray-200 border border-gray-300 text-black rounded-l hover:bg-gray-300 active:bg-gray-400",
+                onclick: move |_| {
+                    let current = cores.peek().clone() - 1;
+                    cores.set(current.max(1));
+                },
+                svg {
+                    class: "w-6 h-6",
+                    fill: "none",
+                    stroke: "currentColor",
+                    stroke_width: "2",
+                    stroke_linecap: "round",
+                    stroke_linejoin: "round",
+                    view_box: "0 0 24 24",
+                    path {
+                        d: "M20 12H4",
+                    }
+                }
+            }
+            button {
+                class: "bg-white flex items-center justify-center w-12 h-12 bg-gray-200 border border-gray-300 text-black rounded-l hover:bg-gray-300 active:bg-gray-400",
+                onclick: move |_| {
+                    let current = cores.peek().clone() + 1;
+                    cores.set(current.min(16));
+                },
+                svg {
+                    class: "w-6 h-6",
+                    fill: "none",
+                    stroke: "currentColor",
+                    stroke_width: "2",
+                    stroke_linecap: "round",
+                    stroke_linejoin: "round",
+                    view_box: "0 0 24 24",
+                    path {
+                        d: "M12 4v16M20 12H4",
+                    }
+                },
+            }
+            button {
+                class: "w-12 h-12 flex items-center justify-center border border-gray-300 mr-2",
+                onclick: move |_| {
+                    cores.set(max);
+                },
+                "Max"
             }
             span {
-                class: "font-semibold text-2xl sm:text-3xl",
-                "1230 H/s"
+                class: "w-12 h-12 flex items-center justify-center border border-gray-300",
+                "{cores}"
             }
         }
     }
