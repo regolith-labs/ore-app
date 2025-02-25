@@ -193,6 +193,24 @@ fn MinerStatus() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
+fn MinerHashpower() -> Element {
+    rsx! {
+        Col {
+            gap: 4,
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Hashpower"
+            }
+            span {
+                class: "font-semibold text-2xl sm:text-3xl",
+                "1230 H/s"
+            }
+        }
+    }
+}
+
+#[cfg(not(feature = "web"))]
 fn MinerHashpower() -> Element {
     rsx! {
         Col {
@@ -222,6 +240,7 @@ fn MinerHashpower() -> Element {
     }
 }
 
+#[cfg(not(feature = "web"))]
 fn MinerSelectCores() -> Element {
     let mut cores = use_miner_cores();
     let max = crate::cores::get();
