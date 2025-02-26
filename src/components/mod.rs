@@ -5,6 +5,7 @@ mod layout;
 mod submit_transaction;
 mod tables;
 mod token_value;
+mod updater;
 mod wallet;
 
 pub use buttons::*;
@@ -14,4 +15,5 @@ pub use layout::*;
 pub use submit_transaction::*;
 pub use tables::*;
 pub use token_value::*;
+pub use updater::*;
 pub use wallet::*;
