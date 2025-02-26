@@ -7,9 +7,9 @@ use cargo_packager_updater::{semver::Version, url::Url, Config, Update};
 const ENDPOINT: &str = "http://localhost:3000/app/update/{{target}}/{{arch}}/{{current_version}}";
 
 pub fn Updater() -> Element {
-    let update = use_resource(move || async move { updater() });
+    let state = use_resource(move || async move { updater() });
     rsx! {
-        match &*update.read() {
+        match &*state.read() {
             Some(Ok(state)) => {
                 match state {
                     State::AlreadyHaveLatest => {
@@ -45,6 +45,7 @@ pub fn Updater() -> Element {
     }
 }
 
+#[derive(Clone)]
 enum State {
     AlreadyHaveLatest,
     UpdateAvailable(Update, NewBinaryToInstall),
@@ -66,14 +67,23 @@ fn updater() -> Result<State> {
     let current_version = env!("CARGO_PKG_VERSION");
     let current_version = Version::parse(current_version)?;
     // check for update
-    let update = cargo_packager_updater::check_update(current_version, config)?;
-    if let Some(update) = update {
-        println!("update: {:?}", update);
-        // download
-        let bytes = update.download()?;
-        Ok(State::UpdateAvailable(update, bytes))
-    } else {
-        println!("no update available");
-        Ok(State::AlreadyHaveLatest)
+    let handle = std::thread::spawn(move || {
+        let update = cargo_packager_updater::check_update(current_version, config)?;
+        if let Some(update) = update {
+            println!("update: {:?}", update);
+            // download
+            let bytes = update.download()?;
+            Ok(State::UpdateAvailable(update, bytes))
+        } else {
+            println!("no update available");
+            Ok(State::AlreadyHaveLatest)
+        }
+    });
+    match handle.join() {
+        Ok(res) => res,
+        Err(err) => {
+            log::error!("{:?}", err);
+            Err(anyhow::anyhow!("failed"))
+        }
     }
 }
