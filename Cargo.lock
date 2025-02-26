@@ -5573,6 +5573,7 @@ dependencies = [
  "solana-client",
  "solana-client-wasm",
  "solana-extra-wasm",
+ "solana-program",
  "solana-sdk",
  "solana-transaction-status",
  "spl-associated-token-account 6.0.0",

@@ -21,6 +21,7 @@ desktop = [
   "env_logger",
   "solana-account-decoder",
   "solana-client",
+  "solana-program",
   "solana-transaction-status",
   "spl-associated-token-account",
   "spl-memo",
@@ -107,6 +108,7 @@ solana-sdk = "2.1"
 solana-client = { version = "2.1", optional = true }
 solana-account-decoder = { version = "2.1", optional = true }
 solana-transaction-status = { version = "2.1", optional = true }
+solana-program = { version = "2.1", optional = true }
 spl-associated-token-account = { version = "^6", optional = true, features = [
   "no-entrypoint",
 ] }
