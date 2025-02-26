@@ -270,7 +270,7 @@ fn MinerSelectCores() -> Element {
                 class: "bg-white flex items-center justify-center w-12 h-12 bg-gray-200 border border-gray-300 text-black rounded-l hover:bg-gray-300 active:bg-gray-400",
                 onclick: move |_| {
                     let current = cores.peek().clone() + 1;
-                    cores.set(current.min(16));
+                    cores.set(current.min(max));
                 },
                 svg {
                     class: "w-6 h-6",
