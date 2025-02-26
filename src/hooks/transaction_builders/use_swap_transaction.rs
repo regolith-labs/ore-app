@@ -24,6 +24,7 @@ pub fn use_swap_transaction(
     quote: Signal<Option<QuoteResponse>>,
     sell_token: Signal<Option<Token>>,
     sell_token_balance: Resource<GatewayResult<UiTokenAmount>>,
+    priority_fee: Signal<u64>,
     mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();

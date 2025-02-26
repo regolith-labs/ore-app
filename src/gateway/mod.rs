@@ -20,7 +20,8 @@ pub use utils::*;
 
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 // pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";
-
+pub const APP_FEE: u64 = 5_000;
+pub const SOLANA_BASE_FEE: u64 = 5_000;
 pub struct Gateway<R: Rpc> {
     pub rpc: R,
     pub http: reqwest::Client,
@@ -34,21 +35,29 @@ impl<R: Rpc> Gateway<R> {
         }
     }
 
-    pub async fn _get_recent_priority_fee_estimate(&self, treasury: bool) -> u64 {
+    // TODO LOOK at this for priority fee
+    pub async fn get_recent_priority_fee_estimate(&self, treasury: bool) -> u64 {
         let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
         if treasury {
-            ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string());
+            ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string()); // ORE-65
         }
+        // let req = json!({
+        //     "jsonrpc": "2.0",
+        //     "id": "priority-fee-estimate",
+        //     "method": "getRecentPrioritizationFees",
+        //     "params": [{
+        //         "accountKeys": ore_addresses,
+        //         "options": {
+        //             "recommended": true
+        //         }
+        //     }]
+        // });
+
         let req = json!({
             "jsonrpc": "2.0",
             "id": "priority-fee-estimate",
-            "method": "getPriorityFeeEstimate",
-            "params": [{
-                "accountKeys": ore_addresses,
-                "options": {
-                    "recommended": true
-                }
-            }]
+            "method": "getRecentPrioritizationFees",
+            "params": [ore_addresses]
         });
         if let Ok(res) = self.http.post(RPC_URL.to_string()).json(&req).send().await {
             if let Ok(res) = res.json::<Value>().await {

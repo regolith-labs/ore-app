@@ -133,7 +133,7 @@ pub fn use_pair_deposit_transaction(
                 &authority,
                 &wsol_ata,
                 sol_to_lamports(wsol_amount),
-            ));
+            )); // ORE-65 transfer
             ixs.push(sync_native(&spl_token::ID, &wsol_ata).unwrap());
         }
 
@@ -208,6 +208,10 @@ pub fn use_pair_deposit_transaction(
             boost_meta.lp_mint,
             u64::MAX,
         ));
+
+        // Include transsaction fee
+        let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
+        ixs.push(transfer(&authority, &treasury_token_address, 5000));
 
         // Build transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority));

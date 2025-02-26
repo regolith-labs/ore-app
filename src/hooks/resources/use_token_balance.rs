@@ -82,6 +82,7 @@ async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiToke
     }
 }
 
+// TODO: Shouldn't we be using use_token_balance instead of get_token_balance?
 pub fn use_token_balances_for_liquidity_pair(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> (
