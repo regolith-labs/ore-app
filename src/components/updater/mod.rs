@@ -5,6 +5,8 @@ use cargo_packager_updater::{semver::Version, url::Url, Config, Update};
 
 // releases endpoint
 const ENDPOINT: &str = "http://localhost:3000/app/update/{{target}}/{{arch}}/{{current_version}}";
+// releases signer pubkey
+const PUBKEY: &str = "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE1RkFDQUFCQ0M0NDhBRTQKUldUa2lrVE1xOHI2cGJSaXdCS0NVWGdBQTYzSGFNTXlBRlc5NThYVFhwUEVab29UaGpiSk1WWloK";
 
 pub fn Updater() -> Element {
     let state = use_resource(move || async move { updater() });
@@ -20,6 +22,7 @@ pub fn Updater() -> Element {
                         let binary = binary.clone();
                         rsx! {
                             button {
+                                class: "text-xl",
                                 onclick: move |_| {
                                     let update = update.clone();
                                     let binary = binary.clone();
@@ -35,10 +38,7 @@ pub fn Updater() -> Element {
                     }
                 }
             }
-            Some(Err(err)) => {
-                rsx! {}
-            }
-            None => {
+             _ => {
                 rsx! {}
             }
         }
@@ -56,7 +56,7 @@ fn updater() -> Result<State> {
     let endpoint = Url::parse(ENDPOINT)?;
     println!("{:?}", endpoint);
     // signer pubkey
-    let pubkey = String::from("dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE1RkFDQUFCQ0M0NDhBRTQKUldUa2lrVE1xOHI2cGJSaXdCS0NVWGdBQTYzSGFNTXlBRlc5NThYVFhwUEVab29UaGpiSk1WWloK");
+    let pubkey = String::from(PUBKEY);
     // config
     let config = Config {
         endpoints: vec![endpoint],
@@ -80,10 +80,16 @@ fn updater() -> Result<State> {
         }
     });
     match handle.join() {
-        Ok(res) => res,
+        Ok(res) => match res {
+            ok @ Ok(_) => ok,
+            Err(err) => {
+                log::error!("{:?}", err);
+                Err(err)
+            }
+        },
         Err(err) => {
             log::error!("{:?}", err);
-            Err(anyhow::anyhow!("failed"))
+            Err(anyhow::anyhow!("failed to join thread from updater"))
         }
     }
 }
