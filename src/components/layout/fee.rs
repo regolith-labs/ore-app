@@ -1,14 +1,16 @@
 use crate::components::*;
+use crate::hooks::{APP_FEE, SOLANA_BASE_FEE};
 use dioxus::prelude::*;
+use solana_sdk::native_token::lamports_to_sol;
 
 #[component]
-pub fn Fee(// base fee, priority fee, ore fee
-) -> Element {
+pub fn Fee(priority_fee: Signal<u64>) -> Element {
     let mut is_open = use_signal(|| false);
-    let base_fee = 0.00001; // Example values - replace with actual fee calculations
-    let priority_fee = 0.00002;
-    let ore_fee = 0.00002;
-    let total_fee = base_fee + priority_fee + ore_fee;
+    let base_fee = lamports_to_sol(SOLANA_BASE_FEE);
+    let app_fee = lamports_to_sol(APP_FEE);
+    let priority_fee = lamports_to_sol(priority_fee.cloned() / 1_000_000);
+
+    let total_fee = base_fee + priority_fee + app_fee;
 
     let max_height = if *is_open.read() {
         "max-h-32"
@@ -64,7 +66,7 @@ pub fn Fee(// base fee, priority fee, ore fee
                         Row {
                             class: "w-full justify-between",
                             span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana priority Fee" }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{ore_fee:.5} SOL" }
+                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{app_fee:.5} SOL" }
                         }
                     }
                 }
