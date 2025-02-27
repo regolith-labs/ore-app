@@ -5553,6 +5553,7 @@ dependencies = [
  "meteora-pools-sdk",
  "meteora-vault-sdk",
  "num-format",
+ "num_cpus",
  "once_cell",
  "ore-api",
  "ore-boost-api",

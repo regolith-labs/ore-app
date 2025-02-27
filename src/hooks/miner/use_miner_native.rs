@@ -20,8 +20,9 @@ pub fn use_miner_provider() {
                 // spawn miner
                 let sender = sender.clone();
                 tokio::spawn(async move {
-                    let cores = 1;
                     let device_id = 0;
+                    let cores = msg.cores as u8;
+                    log::info!("cores requested: {:?}", cores);
                     let challenge = msg.challenge.challenge;
                     match nonce_indices(&msg.member, &msg.challenge, cores, device_id) {
                         Ok(nonce_indices) => {

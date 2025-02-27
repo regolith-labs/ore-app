@@ -6,7 +6,7 @@ use crate::{
     gateway::pool::PoolGateway,
     hooks::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner_claim_transaction, use_miner_is_active, use_miner_status,
+        use_miner_claim_transaction, use_miner_cores, use_miner_is_active, use_miner_status,
         use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
@@ -195,6 +195,7 @@ fn MinerStatus() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn MinerHashpower() -> Element {
     rsx! {
         Col {
@@ -206,6 +207,96 @@ fn MinerHashpower() -> Element {
             span {
                 class: "font-semibold text-2xl sm:text-3xl",
                 "1230 H/s"
+            }
+        }
+    }
+}
+
+#[cfg(not(feature = "web"))]
+fn MinerHashpower() -> Element {
+    rsx! {
+        Col {
+            gap: 4,
+            Row {
+                class: "justify-between",
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Hashpower"
+                }
+                span {
+                    class: "text-elements-lowEmphasis font-medium",
+                    "Cores"
+                }
+            }
+            Row {
+                class: "justify-between",
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl",
+                    "1230 H/s"
+                }
+                span {
+                    MinerSelectCores {}
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(feature = "web"))]
+fn MinerSelectCores() -> Element {
+    let mut cores = use_miner_cores();
+    let max = crate::cores::get();
+    rsx! {
+        Row {
+            class: "justify-between",
+            button {
+                class: "bg-white flex items-center justify-center w-12 h-12 bg-gray-200 border border-gray-300 text-black rounded-l hover:bg-gray-300 active:bg-gray-400",
+                onclick: move |_| {
+                    let current = cores.peek().clone() - 1;
+                    cores.set(current.max(1));
+                },
+                svg {
+                    class: "w-6 h-6",
+                    fill: "none",
+                    stroke: "currentColor",
+                    stroke_width: "2",
+                    stroke_linecap: "round",
+                    stroke_linejoin: "round",
+                    view_box: "0 0 24 24",
+                    path {
+                        d: "M20 12H4",
+                    }
+                }
+            }
+            button {
+                class: "bg-white flex items-center justify-center w-12 h-12 bg-gray-200 border border-gray-300 text-black rounded-l hover:bg-gray-300 active:bg-gray-400",
+                onclick: move |_| {
+                    let current = cores.peek().clone() + 1;
+                    cores.set(current.min(max));
+                },
+                svg {
+                    class: "w-6 h-6",
+                    fill: "none",
+                    stroke: "currentColor",
+                    stroke_width: "2",
+                    stroke_linecap: "round",
+                    stroke_linejoin: "round",
+                    view_box: "0 0 24 24",
+                    path {
+                        d: "M12 4v16M20 12H4",
+                    }
+                },
+            }
+            button {
+                class: "w-12 h-12 flex items-center justify-center border border-gray-300 mr-2",
+                onclick: move |_| {
+                    cores.set(max);
+                },
+                "Max"
+            }
+            span {
+                class: "w-12 h-12 flex items-center justify-center border border-gray-300",
+                "{cores}"
             }
         }
     }
