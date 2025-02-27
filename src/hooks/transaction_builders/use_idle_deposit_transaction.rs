@@ -63,6 +63,8 @@ pub fn use_idle_deposit_transaction(
         // Aggregate instructions
         let mut ixs = vec![];
 
+        // SET COMPUTE BUDGET -> 500,000 for now
+
         // Open stake account, if necessary
         if let Some(Ok(_)) = *stake.read() {
             // Do nothing
@@ -83,7 +85,7 @@ pub fn use_idle_deposit_transaction(
         // Use the correct transfer function that returns an Instruction directly
         ixs.push(solana_program::system_instruction::transfer(
             &authority,
-            &ore_api::consts::TREASURY_ADDRESS,
+            &ore_api::consts::TREASURY_ADDRESS, // TODO CHABNGE TO REGOLITH LABS
             APP_FEE,
         ));
 
