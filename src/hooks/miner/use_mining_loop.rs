@@ -13,6 +13,8 @@ use crate::{
     },
 };
 
+use super::use_miner_cores;
+
 pub fn use_mining_loop() {
     // Miner pub/sub channels
     let (from_miner, mut to_miner) = use_miner();
@@ -71,6 +73,7 @@ fn use_challenge_dispatch(
     to_miner: Coroutine<InputMessage>,
 ) -> Effect {
     let mut miner_status = use_miner_status();
+    let miner_cores = use_miner_cores();
     let is_active = use_miner_is_active();
     let member_record = use_member_record();
     use_effect(move || {
@@ -87,6 +90,7 @@ fn use_challenge_dispatch(
                                 member: member_record,
                                 challenge,
                                 cutoff_time,
+                                cores: miner_cores.peek().clone(),
                             });
                         }
                     });

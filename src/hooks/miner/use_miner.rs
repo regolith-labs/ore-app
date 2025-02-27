@@ -40,3 +40,11 @@ pub fn use_miner_is_active() -> Memo<bool> {
         }
     })
 }
+
+pub fn use_miner_cores_provider() {
+    use_context_provider(|| Signal::new(1usize));
+}
+
+pub fn use_miner_cores() -> Signal<usize> {
+    use_context()
+}
