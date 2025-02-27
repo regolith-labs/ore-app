@@ -21,7 +21,7 @@ jobs:
       AWS_REGION: us-east-1
       S3_BUCKET_NAME: ore-app-xyz
       # where dx places the .app
-      APP_DIR: target\dx\ore-app\bundle\windows\bundle/nsis/OreApp_${{ env.VERSION }}_x64-setup.exe
+      APP_DIR: target\dx\ore-app\bundle\windows\bundle/nsis/OreApp_${{ github.ref_name }}_x64-setup.exe
 
     steps:
       - name: Check out code
