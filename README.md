@@ -11,13 +11,14 @@ cargo install dioxus-cli
 
 Build Tailwind:
 ```sh
-npx tailwindcss -i ./input.css \
-                -o ./public/tailwind.css \
-                --config tailwind.config.js \
-                --minify
+npx tailwindcss \
+    -i ./input.css \
+    -o ./public/tailwind.css \
+    --config tailwind.config.js \
+    --minify
 ```
 
-Build App:
+Build app:
 ```sh
 dx build
 ```
