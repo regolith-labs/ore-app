@@ -37,12 +37,12 @@ impl<R: Rpc> Gateway<R> {
 
     pub async fn get_recent_priority_fee_estimate(
         &self,
-        treasury: bool,
+        treasury: bool, // remove this
         tx: &VersionedTransaction,
     ) -> GatewayResult<u64> {
         let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
         if treasury {
-            ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string());
+            ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string()); // remove this
         }
         match bincode::serialize(&tx) {
             Ok(tx_bytes) => {
