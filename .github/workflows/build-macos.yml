@@ -12,7 +12,6 @@ jobs:
   build-macos:
     runs-on: macos-latest
 
-    # 1) Add a matrix strategy for x86_64 and aarch64
     strategy:
       matrix:
         arch: [ x86_64, aarch64 ]
@@ -20,13 +19,12 @@ jobs:
     env:
       # Build constants
       TARGET: macos
-      
-      # 2) Instead of hard-coding ARCH=x86_64, use matrix.arch
       ARCH: ${{ matrix.arch }}
-
       VERSION: ${{ github.ref_name }}
-      # Build dir
+
+      # Where dx places the .app
       APP_DIR: /Users/runner/work/ore-app/ore-app/dist/OreApp.app
+
       # AWS publish constants
       AWS_REGION: us-east-1
       S3_BUCKET_NAME: ore-app-xyz
@@ -74,11 +72,10 @@ jobs:
       # 7) Build & Package for whichever arch is active
       - name: Build and Package
         run: |
-          # Use the matrix.arch in CARGO_BUILD_TARGET
           CARGO_BUILD_TARGET=${{ matrix.arch }}-apple-darwin \
             dx bundle --platform desktop --package-types macos --release
 
-      # 8) Import Developer ID Certificate
+      # 8) Import Developer ID Certificate (Apple codesign)
       - name: Import Developer ID cert
         run: |
           echo "$DEVID_CERT_BASE64" | base64 --decode > developer_id.p12
@@ -94,7 +91,7 @@ jobs:
           DEVID_CERT_BASE64: ${{ secrets.DEVID_CERT_BASE64 }}
           DEVID_CERT_PASSWORD: ${{ secrets.DEVID_CERT_PASSWORD }}
 
-      # 9) Sign the .app
+      # 9) Code-sign .app (Apple)
       - name: Code-sign .app
         run: |
           codesign --deep --force --verify --verbose --options runtime \
@@ -120,13 +117,23 @@ jobs:
             --verbose \
             --wait
 
+          # Staple the app
           xcrun stapler staple "${{ env.APP_DIR }}"
         env:
           NOTARIZE_APPLE_ID: ${{ secrets.NOTARIZE_APPLE_ID }}
           NOTARIZE_APP_PASSWORD: ${{ secrets.NOTARIZE_APP_PASSWORD }}
           DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
 
-      # 11) Configure AWS credentials
+      # 11) Sign again with cargo-packager
+      - name: Cargo Packager Sign
+        env:
+          CARGO_PACKAGER_SIGN_PRIVATE_KEY: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY }}
+          CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD }}
+        run: |
+          # This creates a .sig file next to the .app (e.g., OreApp.app.sig).
+          cargo packager signer sign "${{ env.APP_DIR }}"
+
+      # 12) Configure AWS credentials (for both .sig and .tar.gz uploads)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -134,14 +141,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 12) Use arch in S3 path & filename so each build is unique
-      - name: Package and Upload
+      # 13) Upload the Cargo Packager .sig file
+      - name: Upload Cargo Packager Signature
+        run: |
+          if [ "${{ env.ARCH }}" = "x86_64" ]; then
+            OUT_ARCH="x64"
+          else
+            OUT_ARCH="aarch64"
+          fi
+
+          SIG_FILE="${{ env.APP_DIR }}.sig"
+          aws s3 cp "$SIG_FILE" \
+            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.sig"
+
+      # 14) Package final .app again & upload to S3
+      - name: Package and Upload .tar.gz
         run: |
           TAR_FILE="ORE_${{ env.VERSION }}.app.tar.gz"
 
           tar -czf "$TAR_FILE" -C "$(dirname "${{ env.APP_DIR }}")" "$(basename "${{ env.APP_DIR }}")"
 
-          # Distinguish x86_64 vs aarch64 in final name (and path)
           if [ "${{ env.ARCH }}" = "x86_64" ]; then
             OUT_ARCH="x64"
           else
@@ -151,7 +170,7 @@ jobs:
           aws s3 cp "$TAR_FILE" \
             "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
 
-      # 13) Print link for each arch
+      # 15) Print link for the app
       - name: Print S3 download link
         run: |
           if [ "${{ env.ARCH }}" = "x86_64" ]; then
