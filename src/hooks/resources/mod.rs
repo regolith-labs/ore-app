@@ -19,6 +19,8 @@ pub use use_stake::*;
 pub use use_token_balance::*;
 
 pub const MIN_SOL_BALANCE: f64 = 0.2;
+pub const APP_FEE: u64 = 5_000;
+pub const SOLANA_BASE_FEE: u64 = 5_000;
 
 pub fn use_cache_provider() {
     use_boosts_provider();

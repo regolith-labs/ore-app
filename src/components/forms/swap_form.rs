@@ -121,11 +121,13 @@ pub fn SwapForm(class: Option<String>) -> Element {
 
 #[component]
 fn SwapDetails(quote_response: Signal<Option<QuoteResponse>>) -> Element {
-    let priority_fee = use_resource(move || async move {
-        let gateway = use_gateway();
-        let priority_fee = gateway.get_recent_priority_fee_estimate(true).await;
-    });
-    log::info!("priority_fee: {:?}", priority_fee.value());
+    // let priority_fee = use_resource(move || async move {
+    //     let gateway = use_gateway();
+    //     // let priority_fee = gateway.get_recent_priority_fee_estimate(true).await;
+    //     // priority_fee
+    // });
+    // log::info!("priority_fee: {:?}", priority_fee.cloned());
+    // microlamports * price * 10^9
 
     let (price_impact_value, slippage, transaction_fee) = {
         let quote_response = &*quote_response.read();
