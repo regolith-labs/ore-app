@@ -78,14 +78,14 @@ jobs:
         run: |
           aws s3 cp `
             "${{ env.APP_DIR }}" `
-            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64-setup.exe"
+            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64.exe"
 
       - name: Upload Signature to S3
         run: |
           aws s3 cp `
             "${{ env.APP_DIR }}.sig" `
-            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64-setup.exe.sig"
+            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64.exe.sig"
 
       - name: Print S3 download link
         run: |
-           echo "Download EXE at: https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64-setup.exe"
+           echo "Download EXE at: https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_x64.exe"
