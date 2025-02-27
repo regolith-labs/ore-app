@@ -124,53 +124,31 @@ jobs:
           NOTARIZE_APP_PASSWORD: ${{ secrets.NOTARIZE_APP_PASSWORD }}
           DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
 
-      # 11) Sign again with cargo-packager
-      - name: Cargo Packager Sign
+      # 11) Package .app into a tar.gz, sign it with cargo-packager, and upload both tarball and signature to S3
+      - name: Package, Sign, and Upload .tar.gz
         env:
           CARGO_PACKAGER_SIGN_PRIVATE_KEY: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY }}
           CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD }}
         run: |
-          # This creates a .sig file next to the .app (e.g., OreApp.app.sig).
-          cargo packager signer sign "${{ env.APP_DIR }}"
-
-      # 12) Configure AWS credentials (for both .sig and .tar.gz uploads)
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      # 13) Upload the Cargo Packager .sig file
-      - name: Upload Cargo Packager Signature
-        run: |
-          if [ "${{ env.ARCH }}" = "x86_64" ]; then
-            OUT_ARCH="x64"
-          else
-            OUT_ARCH="aarch64"
-          fi
-
-          SIG_FILE="${{ env.APP_DIR }}.sig"
-          aws s3 cp "$SIG_FILE" \
-            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.sig"
-
-      # 14) Package final .app again & upload to S3
-      - name: Package and Upload .tar.gz
-        run: |
+          # Create the tarball from the .app folder
           TAR_FILE="ORE_${{ env.VERSION }}.app.tar.gz"
-
           tar -czf "$TAR_FILE" -C "$(dirname "${{ env.APP_DIR }}")" "$(basename "${{ env.APP_DIR }}")"
 
+          # Sign the tarball (cargo packager expects a file, not a folder)
+          cargo packager signer sign "$TAR_FILE"
+
+          # Determine output architecture naming
           if [ "${{ env.ARCH }}" = "x86_64" ]; then
             OUT_ARCH="x64"
           else
             OUT_ARCH="aarch64"
           fi
 
-          aws s3 cp "$TAR_FILE" \
-            "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
+          # Upload the tarball and its signature (.sig) file to S3
+          aws s3 cp "$TAR_FILE" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
+          aws s3 cp "$TAR_FILE.sig" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz.sig"
 
-      # 15) Print link for the app
+      # 12) Print link for the app
       - name: Print S3 download link
         run: |
           if [ "${{ env.ARCH }}" = "x86_64" ]; then
