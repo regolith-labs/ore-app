@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
 // use solana_program::system_instruction::transfer;
+use solana_program::system_instruction::transfer;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     transaction::{Transaction, VersionedTransaction},
@@ -13,7 +14,7 @@ use crate::{
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
     hooks::{use_gateway, use_transaction_status, use_wallet, Wallet, APP_FEE},
     solana::spl_associated_token_account::get_associated_token_address,
-    solana::spl_token::{self, instruction::transfer, ui_amount_to_amount},
+    solana::spl_token::{self, ui_amount_to_amount},
 };
 
 pub fn use_idle_deposit_transaction(
@@ -21,7 +22,7 @@ pub fn use_idle_deposit_transaction(
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
-    priority_fee: Signal<u64>,
+    mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -31,10 +32,6 @@ pub fn use_idle_deposit_transaction(
         let Wallet::Connected(authority) = *wallet.read() else {
             return Err(GatewayError::WalletDisconnected);
         };
-
-        let ata = get_associated_token_address(&authority, &Token::sol().mint);
-
-        log::info!("ata: {}", ata);
 
         // If empty, disable
         let amount_str = input_amount.cloned();
@@ -81,29 +78,14 @@ pub fn use_idle_deposit_transaction(
             amount_u64,
         ));
 
-        // Transfer tx from user -> Ore treasury
-        let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
-        // CHANGE THE DESNTATION TO BE MY SOL TOKEN ACCOUNT
-        ixs.push(
-            match transfer(
-                &spl_token::ID,
-                &authority,
-                // &treasury_token_address,
-                &ata,
-                &authority,
-                &[],
-                APP_FEE,
-            ) {
-                Ok(ix) => {
-                    log::info!("Transfer was successful: {:?}", ix);
-                    ix
-                }
-                Err(e) => {
-                    log::error!("error transferring tokens: {}", e);
-                    return Err(GatewayError::Unknown);
-                }
-            },
-        );
+        log::info!("treasury addresss: {:?}", ore_api::consts::TREASURY_ADDRESS);
+
+        // Use the correct transfer function that returns an Instruction directly
+        ixs.push(solana_program::system_instruction::transfer(
+            &authority,
+            &ore_api::consts::TREASURY_ADDRESS,
+            APP_FEE,
+        ));
 
         // Build initial transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
@@ -121,12 +103,16 @@ pub fn use_idle_deposit_transaction(
         log::info!("dynamic_priority_fee: {}", dynamic_priority_fee);
 
         // // Add priority fee instruction
-        // ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
-        //     dynamic_priority_fee,
-        // ));
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
+            dynamic_priority_fee,
+        ));
+
+        priority_fee.set(dynamic_priority_fee);
+
+        log::info!("ixs: {:?}", ixs);
 
         // Build final tx
-        // let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         Ok(tx)
     })

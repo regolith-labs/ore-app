@@ -62,21 +62,12 @@ impl<R: Rpc> Gateway<R> {
                 if let Ok(res) = self.http.post(RPC_URL.to_string()).json(&req).send().await {
                     if let Ok(res) = res.json::<Value>().await {
                         log::info!("res: {:?}", res);
+                        // Get dynamic fee estimate in microlamports
                         let dynamic_fee_estimate = res["result"]["priorityFeeEstimate"]
                             .as_f64()
                             .map(|fee| fee as u64)
                             .unwrap_or(0);
-                        log::info!(
-                            "dynamic_fee_estimate before covnersion: {}",
-                            dynamic_fee_estimate
-                        );
-                        let dynamic_fee_estimate_u64 = dynamic_fee_estimate * 10_u64.pow(9);
-                        // let dynamic_fee_estimate_u64 =
-                        //     (dynamic_fee_estimate * 10_f64.powf(9.0)) as u64;
-                        log::info!(
-                            "dynamic_fee_estimate after conversion: {}",
-                            dynamic_fee_estimate_u64
-                        );
+                        log::info!("dynamic_fee_estimate: {:?}", dynamic_fee_estimate);
                         return Ok(dynamic_fee_estimate);
                     } else {
                         return Err(GatewayError::Unknown);

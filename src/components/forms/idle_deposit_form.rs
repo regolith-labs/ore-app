@@ -48,7 +48,7 @@ pub fn IdleDepositForm(
                 err: err,
                 tx_type: TransactionType::BoostDeposit
             }
-            Fee {}
+            Fee { priority_fee: priority_fee.clone() }
         }
     }
 }
