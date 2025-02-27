@@ -22,6 +22,8 @@ use crate::{
     route::Route,
 };
 
+const CSS: &str = include_str!("../public/tailwind.css");
+
 fn main() {
     #[cfg(feature = "web")]
     wasm_logger::init(wasm_logger::Config::default());
@@ -41,7 +43,7 @@ pub fn App() -> Element {
     use_cache_provider();
     use_mining_loop();
     rsx! {
-        document::Link { rel: "stylesheet", href: asset!("/public/tailwind.css"), blocking: "render" }
+        style { "{CSS}" }
         document::Link { rel: "icon", href: asset!("/public/favicon.png") }
         document::Link { rel: "icon", href: asset!("/public/icon.png") }
         document::Script { src: asset!("/public/wallet.js") }
