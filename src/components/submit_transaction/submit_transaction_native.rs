@@ -8,7 +8,7 @@ use crate::{
     hooks::{use_gateway, use_transaction_status},
 };
 
-pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
+pub fn submit_transaction(tx: VersionedTransaction, tx_type: TransactionType) {
     let mut transaction_status = use_transaction_status();
     spawn(async move {
         transaction_status.set(Some(TransactionStatus::Waiting));
