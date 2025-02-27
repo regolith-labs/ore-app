@@ -1,14 +1,19 @@
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-use solana_sdk::transaction::{Transaction, VersionedTransaction};
+// use solana_program::system_instruction::transfer;
+use solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
+    transaction::{Transaction, VersionedTransaction},
+};
 
 use crate::{
     components::TokenInputError,
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
-    hooks::{use_wallet, Wallet},
-    solana::spl_token::ui_amount_to_amount,
+    hooks::{use_gateway, use_transaction_status, use_wallet, Wallet, APP_FEE},
+    solana::spl_associated_token_account::get_associated_token_address,
+    solana::spl_token::{self, instruction::transfer, ui_amount_to_amount},
 };
 
 pub fn use_idle_deposit_transaction(
@@ -16,6 +21,7 @@ pub fn use_idle_deposit_transaction(
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
+    priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -25,6 +31,10 @@ pub fn use_idle_deposit_transaction(
         let Wallet::Connected(authority) = *wallet.read() else {
             return Err(GatewayError::WalletDisconnected);
         };
+
+        let ata = get_associated_token_address(&authority, &Token::sol().mint);
+
+        log::info!("ata: {}", ata);
 
         // If empty, disable
         let amount_str = input_amount.cloned();
@@ -71,8 +81,53 @@ pub fn use_idle_deposit_transaction(
             amount_u64,
         ));
 
-        // Build transaction
+        // Transfer tx from user -> Ore treasury
+        let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
+        // CHANGE THE DESNTATION TO BE MY SOL TOKEN ACCOUNT
+        ixs.push(
+            match transfer(
+                &spl_token::ID,
+                &authority,
+                // &treasury_token_address,
+                &ata,
+                &authority,
+                &[],
+                APP_FEE,
+            ) {
+                Ok(ix) => {
+                    log::info!("Transfer was successful: {:?}", ix);
+                    ix
+                }
+                Err(e) => {
+                    log::error!("error transferring tokens: {}", e);
+                    return Err(GatewayError::Unknown);
+                }
+            },
+        );
+
+        // Build initial transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        // Get priority fee estimate
+        let gateway = use_gateway();
+
+        // Get dynamic priority fee
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(false, &tx).await
+        {
+            Ok(fee) => fee,
+            Err(_) => return Err(GatewayError::Unknown), // Early return on failure
+        };
+
+        log::info!("dynamic_priority_fee: {}", dynamic_priority_fee);
+
+        // // Add priority fee instruction
+        // ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
+        //     dynamic_priority_fee,
+        // ));
+
+        // Build final tx
+        // let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
         Ok(tx)
     })
 }

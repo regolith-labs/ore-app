@@ -1,5 +1,5 @@
 use crate::{
-    components::{Col, SubmitButton, TokenInputError, TokenInputForm},
+    components::{Col, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::Token,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_idle_deposit_transaction},
@@ -16,9 +16,10 @@ pub fn IdleDepositForm(
     let mut input_amount = use_signal::<String>(|| "".to_owned());
     let token = use_signal(|| Some(Token::ore()));
     let err = use_signal::<Option<TokenInputError>>(|| None);
+    let priority_fee = use_signal(|| 0);
 
     // Build the transaction
-    let tx = use_idle_deposit_transaction(stake, balance, input_amount, err);
+    let tx = use_idle_deposit_transaction(stake, balance, input_amount, err, priority_fee);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
@@ -47,6 +48,7 @@ pub fn IdleDepositForm(
                 err: err,
                 tx_type: TransactionType::BoostDeposit
             }
+            Fee {}
         }
     }
 }

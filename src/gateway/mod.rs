@@ -7,6 +7,8 @@ pub mod solana;
 pub mod spl;
 mod utils;
 
+use base64::Engine;
+use bs58::{decode, encode};
 pub use error::*;
 use serde_json::{json, Value};
 #[cfg(not(feature = "web"))]
@@ -20,8 +22,6 @@ pub use utils::*;
 
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 // pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";
-pub const APP_FEE: u64 = 5_000;
-pub const SOLANA_BASE_FEE: u64 = 5_000;
 pub struct Gateway<R: Rpc> {
     pub rpc: R,
     pub http: reqwest::Client,
@@ -35,39 +35,61 @@ impl<R: Rpc> Gateway<R> {
         }
     }
 
-    // TODO LOOK at this for priority fee
-    pub async fn get_recent_priority_fee_estimate(&self, treasury: bool) -> u64 {
+    pub async fn get_recent_priority_fee_estimate(
+        &self,
+        treasury: bool,
+        tx: &VersionedTransaction,
+    ) -> GatewayResult<u64> {
         let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
         if treasury {
-            ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string()); // ORE-65
+            ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string());
         }
-        // let req = json!({
-        //     "jsonrpc": "2.0",
-        //     "id": "priority-fee-estimate",
-        //     "method": "getRecentPrioritizationFees",
-        //     "params": [{
-        //         "accountKeys": ore_addresses,
-        //         "options": {
-        //             "recommended": true
-        //         }
-        //     }]
-        // });
-
-        let req = json!({
-            "jsonrpc": "2.0",
-            "id": "priority-fee-estimate",
-            "method": "getRecentPrioritizationFees",
-            "params": [ore_addresses]
-        });
-        if let Ok(res) = self.http.post(RPC_URL.to_string()).json(&req).send().await {
-            if let Ok(res) = res.json::<Value>().await {
-                return res["result"]["priorityFeeEstimate"]
-                    .as_f64()
-                    .map(|fee| fee as u64)
-                    .unwrap_or(0);
+        match bincode::serialize(&tx) {
+            Ok(tx_bytes) => {
+                // let tx_base64 = base64::en::general_purpose::STANDARD.encode(tx_bytes);
+                let tx_bs58 = bs58::encode(tx_bytes).into_string();
+                let req = json!({
+                    "jsonrpc": "2.0",
+                    "id": "priority-fee-estimate",
+                    "method": "getPriorityFeeEstimate",
+                    "params": [{
+                        "transaction": tx_bs58,
+                        "options": {
+                            "recommended": true
+                        }
+                    }]
+                });
+                if let Ok(res) = self.http.post(RPC_URL.to_string()).json(&req).send().await {
+                    if let Ok(res) = res.json::<Value>().await {
+                        log::info!("res: {:?}", res);
+                        let dynamic_fee_estimate = res["result"]["priorityFeeEstimate"]
+                            .as_f64()
+                            .map(|fee| fee as u64)
+                            .unwrap_or(0);
+                        log::info!(
+                            "dynamic_fee_estimate before covnersion: {}",
+                            dynamic_fee_estimate
+                        );
+                        let dynamic_fee_estimate_u64 = dynamic_fee_estimate * 10_u64.pow(9);
+                        // let dynamic_fee_estimate_u64 =
+                        //     (dynamic_fee_estimate * 10_f64.powf(9.0)) as u64;
+                        log::info!(
+                            "dynamic_fee_estimate after conversion: {}",
+                            dynamic_fee_estimate_u64
+                        );
+                        return Ok(dynamic_fee_estimate);
+                    } else {
+                        return Err(GatewayError::Unknown);
+                    }
+                } else {
+                    return Err(GatewayError::Unknown);
+                }
+            }
+            Err(e) => {
+                log::error!("err serializing tx: {}", e);
+                Err(GatewayError::Unknown)
             }
         }
-        0
     }
 }
 
