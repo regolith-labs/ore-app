@@ -602,7 +602,7 @@ fn FaqItem(question: String, answer: String) -> Element {
             class: "flex flex-col w-full py-8 px-4 sm:px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
             onclick: move |_| is_open.set(!is_open.cloned()),
             Row {
-                class: "justify-between font-wide text-left font-bold text-2xl text-elements-highEmphasis",
+                class: "justify-between font-wide text-left font-bold text-2xl w-full text-elements-highEmphasis",
                 gap: 8,
                 "{question}"
                 PlusIcon {
