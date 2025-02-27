@@ -4,7 +4,7 @@ use anyhow::Result;
 use cargo_packager_updater::{semver::Version, url::Url, Config, Update};
 
 // releases endpoint
-const ENDPOINT: &str = "http://localhost:3000/app/update/{{target}}/{{arch}}/{{current_version}}";
+const ENDPOINT: &str = "https://api.ore.supply/app/update/{{target}}/{{arch}}/{{current_version}}";
 // releases signer pubkey
 const PUBKEY: &str = "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE1RkFDQUFCQ0M0NDhBRTQKUldUa2lrVE1xOHI2cGJSaXdCS0NVWGdBQTYzSGFNTXlBRlc5NThYVFhwUEVab29UaGpiSk1WWloK";
 
