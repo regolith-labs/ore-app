@@ -46,7 +46,7 @@ async fn sign_submit_confirm(
     let sig = rpc.send_transaction(&signed).await?;
     // confirm
     let confirmed = rpc.confirm_signature(sig).await;
-    if !confirmed.is_ok() {
+    if confirmed.is_ok() {
         transaction_status.set(Some(TransactionStatus::Done(sig)));
     } else {
         transaction_status.set(Some(TransactionStatus::Timeout));
