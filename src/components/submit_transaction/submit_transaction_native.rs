@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use ore_types::request::TransactionType;
 use solana_sdk::{signature::Keypair, transaction::VersionedTransaction};
 
 use crate::{
@@ -7,7 +8,7 @@ use crate::{
     hooks::{use_gateway, use_transaction_status},
 };
 
-pub fn submit_transaction(tx: VersionedTransaction) {
+pub fn submit_transaction(tx: VersionedTransaction, tx_type: TransactionType) {
     let mut transaction_status = use_transaction_status();
     spawn(async move {
         transaction_status.set(Some(TransactionStatus::Waiting));

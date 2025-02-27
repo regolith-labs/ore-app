@@ -8,6 +8,7 @@ Install:
 ```sh
 cargo install dioxus-cli
 ```
+
 Build Tailwind:
 ```sh
 npx tailwindcss -i ./input.css \
@@ -21,9 +22,12 @@ Build App:
 dx build
 ```
 
-Serve:
+Serve web:
 ```sh
-dx serve --hot-reload
+dx serve
 ```
 
-Visit http://localhost:8080/ to view the app.
+Serve desktop:
+```
+dx serve --platform desktop
+```
