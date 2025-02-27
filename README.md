@@ -28,6 +28,6 @@ dx serve
 ```
 
 Serve desktop:
-```
+```sh
 dx serve --platform desktop
 ```
