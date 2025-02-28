@@ -33,6 +33,21 @@ pub fn Updater() -> Element {
                                         log::info!("installing");
                                         if let Err(_err) = update.install(binary.as_ref()) {
                                             log::error!("error installing binary");
+                                        } else {
+                                            log::info!("install complete");
+                                            match std::process::Command::new("open")
+                                                .arg("-n")
+                                                .arg(update.extract_path)
+                                                .spawn()
+                                            {
+                                                Ok(child) => {
+                                                    log::info!("new process started: {:?}", child);
+                                                    std::process::exit(0);
+                                                }
+                                                Err(err) => {
+                                                    log::error!("{:?}", err);
+                                                }
+                                            }
                                         }
                                     });
                                 },
