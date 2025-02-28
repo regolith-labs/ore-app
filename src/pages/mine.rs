@@ -33,7 +33,6 @@ pub fn Mine() -> Element {
                     }
                 }
                 MinerData {}
-                Updater {}
             }
             MineTable {}
         }
