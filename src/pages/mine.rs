@@ -26,9 +26,11 @@ pub fn Mine() -> Element {
                     title: "Mine",
                     subtitle: "Utilize spare hashpower to earn rewards."
                 }
-                OrbMiner {
-                    class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
-                    gold: *use_miner_is_active().read()
+                if cfg!(feature = "web") {
+                    OrbMiner {
+                        class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
+                        gold: *use_miner_is_active().read()
+                    }
                 }
                 MinerData {}
             }
