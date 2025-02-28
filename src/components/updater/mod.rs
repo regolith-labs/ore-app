@@ -31,8 +31,9 @@ pub fn Updater() -> Element {
                                     let binary = Arc::clone(&binary);
                                     spawn(async move {
                                         log::info!("installing");
-                                        if let Err(_err) = update.install(binary.as_ref()) {
+                                        if let Err(err) = update.install(binary.as_ref()) {
                                             log::error!("error installing binary");
+                                            log::error!("{:?}", err);
                                         } else {
                                             log::info!("install complete");
                                             match std::process::Command::new("open")
