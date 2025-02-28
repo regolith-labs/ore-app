@@ -2,10 +2,12 @@ use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_sdk::{
     address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount},
+    compute_budget::ComputeBudgetInstruction,
     hash::Hash,
     message::{v0::Message, VersionedMessage},
     signature::Signature,
-    transaction::VersionedTransaction,
+    system_instruction::transfer,
+    transaction::{Transaction, VersionedTransaction},
 };
 
 use crate::{
@@ -15,7 +17,7 @@ use crate::{
         kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc,
         UiTokenAmount,
     },
-    hooks::{use_gateway, use_wallet, Wallet},
+    hooks::{use_gateway, use_wallet, Wallet, COMPUTE_UNIT_BUFFER},
     solana::{
         spl_associated_token_account::{
             get_associated_token_address, instruction::create_associated_token_account_idempotent,
@@ -28,6 +30,8 @@ use crate::{
     },
     utils::LiquidityPair,
 };
+
+const ESTIMATED_PAIR_WITHDRAW_COMPUTE_UNITS: u32 = 323323;
 
 // Build pair deposit transaction
 pub fn use_pair_withdraw_transaction(
@@ -97,6 +101,20 @@ pub fn use_pair_withdraw_transaction(
 
         // Aggregate instructions
         let mut ixs = vec![];
+
+        // Adjust compute unit limit based on buffer -> 387,987
+        let adjusted_compute_unit_limit = ESTIMATED_PAIR_WITHDRAW_COMPUTE_UNITS
+            + (ESTIMATED_PAIR_WITHDRAW_COMPUTE_UNITS as f64 * COMPUTE_UNIT_BUFFER) as u32;
+
+        log::info!(
+            "adjusted_compute_unit_limit: {}",
+            adjusted_compute_unit_limit
+        );
+
+        // Set compute unit limit
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
+            adjusted_compute_unit_limit,
+        ));
 
         // Build ore boost withdraw instruction
         ixs.push(ore_boost_api::sdk::withdraw(
@@ -178,6 +196,30 @@ pub fn use_pair_withdraw_transaction(
                 }
             }
         }
+
+        // Include ORE app fee
+        let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
+        ixs.push(transfer(&authority, &authority, 5000));
+
+        // Build initial transaction to estimate priority fee
+        let tx = VersionedTransaction {
+            signatures: vec![Signature::default()],
+            message: VersionedMessage::V0(
+                Message::try_compile(&authority, &ixs, &luts, Hash::default()).unwrap(),
+            ),
+        };
+
+        // Get priority fee estimate
+        let gateway = use_gateway();
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
+            Ok(fee) => fee,
+            Err(_) => return Err(GatewayError::Unknown),
+        };
+
+        // Add priority fee instruction
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
+            dynamic_priority_fee,
+        ));
 
         // Build the transaction
         let tx = VersionedTransaction {

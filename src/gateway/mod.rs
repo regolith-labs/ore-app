@@ -37,13 +37,10 @@ impl<R: Rpc> Gateway<R> {
 
     pub async fn get_recent_priority_fee_estimate(
         &self,
-        treasury: bool, // remove this
         tx: &VersionedTransaction,
     ) -> GatewayResult<u64> {
-        let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
-        if treasury {
-            ore_addresses.push(ore_api::consts::TREASURY_ADDRESS.to_string()); // remove this
-        }
+        // let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
+
         match bincode::serialize(&tx) {
             Ok(tx_bytes) => {
                 // let tx_base64 = base64::en::general_purpose::STANDARD.encode(tx_bytes);
@@ -70,9 +67,11 @@ impl<R: Rpc> Gateway<R> {
                         log::info!("dynamic_fee_estimate: {:?}", dynamic_fee_estimate);
                         return Ok(dynamic_fee_estimate);
                     } else {
+                        log::error!("Failed to parse priority fee json");
                         return Err(GatewayError::Unknown);
                     }
                 } else {
+                    log::error!("Failed to send priority fee estimate request");
                     return Err(GatewayError::Unknown);
                 }
             }

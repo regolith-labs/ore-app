@@ -41,6 +41,13 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                 }
                 Row {
                     class: "items-center gap-2",
+                    // TokenValueSmall {
+                    //     class: "ml-auto",
+                    //     amount: format!("{:.1$}", total_fee, 9),
+                    //     ticker: "SOL".to_string(),
+                    //     with_decimal_units: true,
+
+                    // }
                     span {
                         class: "text-elements-lowEmphasis font-medium",
                         { format!("{:.5} SOL", total_fee) }
@@ -56,17 +63,38 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                         Row {
                             class: "w-full justify-between",
                             span { class: "font-medium text-xs text-elements-lowEmphasis", "App Fee" }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{base_fee:.5} SOL" }
+                            // TokenValueSmall {
+                            //     class: "ml-auto",
+                            //     amount: format!("{:.1$}", app_fee, 9),
+                            //     ticker: "SOL".to_string(),
+                            //     with_decimal_units: true,
+                            //     size: Some(TokenValueSize::XSmall),
+                            // }
+                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{app_fee:.5} SOL" }
                         }
                         Row {
                             class: "w-full justify-between",
                             span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana base Fee" }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{priority_fee:.5} SOL" }
+                            // TokenValueSmall {
+                            //     class: "ml-auto",
+                            //     amount: format!("{:.1$}", base_fee, 9),
+                            //     ticker: "SOL".to_string(),
+                            //     with_decimal_units: true,
+                            //     size: Some(TokenValueSize::XSmall),
+                            // }
+                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{base_fee:.5} SOL" }
                         }
                         Row {
                             class: "w-full justify-between",
                             span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana priority Fee" }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{app_fee:.5} SOL" }
+                            // TokenValueSmall {
+                            //     class: "ml-auto",
+                            //     amount: format!("{:.1$}", priority_fee, 9),
+                            //     ticker: "SOL".to_string(),
+                            //     with_decimal_units: true,
+                            //     size: Some(TokenValueSize::XSmall),
+                            // }
+                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{priority_fee:.5} SOL" }
                         }
                     }
                 }

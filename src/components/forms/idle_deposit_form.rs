@@ -42,13 +42,13 @@ pub fn IdleDepositForm(
                 toolbar_shortcuts: true,
                 err: err
             }
+            Fee { priority_fee: priority_fee.clone() }
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
                 err: err,
                 tx_type: TransactionType::BoostDeposit
             }
-            Fee { priority_fee: priority_fee.clone() }
         }
     }
 }

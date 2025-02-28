@@ -9,6 +9,8 @@ mod use_pair_withdraw_transaction;
 mod use_pool_register_transaction;
 mod use_swap_transaction;
 
+pub const COMPUTE_UNIT_BUFFER: f64 = 0.2;
+
 pub use use_boost_claim_all_transaction::*;
 pub use use_boost_claim_transaction::*;
 pub use use_idle_deposit_transaction::*;

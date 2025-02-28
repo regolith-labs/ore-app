@@ -5,7 +5,7 @@ use ore_types::request::{AppId, TransactionEvent, TransactionType};
 use solana_sdk::{message::VersionedMessage, transaction::VersionedTransaction};
 
 use crate::{
-        components::*,
+    components::*,
     gateway::{ore::OreGateway, solana::SolanaGateway, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
