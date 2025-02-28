@@ -46,7 +46,7 @@ pub fn Logo() -> Element {
     rsx! {
         Link {
             class: "p-1 my-auto w-min h-min rounded hover:bg-controls-secondaryHover",
-            to: Route::Landing {},
+            to: if cfg!(feature = "web") { Route::Landing {} } else { Route::Mine {} },
             OreWordmarkIcon {
                 class: "h-5"
             }
