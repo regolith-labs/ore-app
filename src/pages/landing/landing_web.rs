@@ -7,14 +7,6 @@ use crate::{
     utils::format_abbreviated_number,
 };
 
-#[cfg(not(feature = "web"))]
-pub fn Landing() -> Element {
-    let navigator = use_navigator();
-    navigator.replace(Route::Mine {});
-    rsx! {}
-}
-
-#[cfg(feature = "web")]
 pub fn Landing() -> Element {
     rsx! {
         Hero {}
