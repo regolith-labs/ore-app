@@ -1067,8 +1067,7 @@ dependencies = [
 [[package]]
 name = "cargo-packager-updater"
 version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b60a6cdf300a0f0ee62f3f435e23cc97ef7a0a3a489a3aee6b0ca0cd986d722b"
+source = "git+https://github.com/regolith-labs/cargo-packager.git?rev=6cedc87#6cedc87a56721f70e7c208bd5d194be01af098f3"
 dependencies = [
  "base64 0.22.1",
  "cargo-packager-utils",
@@ -1092,8 +1091,7 @@ dependencies = [
 [[package]]
 name = "cargo-packager-utils"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b43458dd2ee3cdab3f5b105acd80791383b730380c929018701313d7d299d4e8"
+source = "git+https://github.com/regolith-labs/cargo-packager.git?rev=6cedc87#6cedc87a56721f70e7c208bd5d194be01af098f3"
 dependencies = [
  "ctor",
 ]

@@ -28,7 +28,7 @@ pub fn Updater() -> Element {
                             let update = update.clone();
                             let binary = Arc::clone(&binary);
                             spawn(async move {
-                                if let Err(err) = update.install(binary) {
+                                if let Err(err) = update.install(binary.as_ref()) {
                                     log::error!("{:?}", err);
                                 }
                             });
