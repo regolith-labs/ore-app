@@ -1,7 +1,6 @@
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-// use solana_program::system_instruction::transfer;
 use solana_program::system_instruction::transfer;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
@@ -12,10 +11,11 @@ use crate::{
     components::TokenInputError,
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
-    hooks::{use_gateway, use_transaction_status, use_wallet, Wallet, APP_FEE},
-    solana::spl_associated_token_account::get_associated_token_address,
-    solana::spl_token::{self, ui_amount_to_amount},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE, COMPUTE_UNIT_BUFFER},
+    solana::spl_token::ui_amount_to_amount,
 };
+
+const ESTIMATED_IDLE_DEPOSIT_COMPUTE_UNITS: u32 = 20693;
 
 pub fn use_idle_deposit_transaction(
     stake: Resource<GatewayResult<Stake>>,
@@ -63,7 +63,19 @@ pub fn use_idle_deposit_transaction(
         // Aggregate instructions
         let mut ixs = vec![];
 
-        // SET COMPUTE BUDGET -> 500,000 for now
+        // Adjust compute unit limit based on buffer -> 24,831
+        let adjusted_compute_unit_limit = ESTIMATED_IDLE_DEPOSIT_COMPUTE_UNITS
+            + (ESTIMATED_IDLE_DEPOSIT_COMPUTE_UNITS as f64 * COMPUTE_UNIT_BUFFER) as u32;
+
+        log::info!(
+            "adjusted_compute_unit_limit: {}",
+            adjusted_compute_unit_limit
+        );
+
+        // Set compute unit limit
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
+            adjusted_compute_unit_limit,
+        ));
 
         // Open stake account, if necessary
         if let Some(Ok(_)) = *stake.read() {
@@ -80,12 +92,9 @@ pub fn use_idle_deposit_transaction(
             amount_u64,
         ));
 
-        log::info!("treasury addresss: {:?}", ore_api::consts::TREASURY_ADDRESS);
-
-        // Use the correct transfer function that returns an Instruction directly
-        ixs.push(solana_program::system_instruction::transfer(
-            &authority,
-            &ore_api::consts::TREASURY_ADDRESS, // TODO CHABNGE TO REGOLITH LABS
+        // Include ORE app fee
+        ixs.push(transfer(
+            &authority, &authority, // TODO CHABNGE TO REGOLITH LABS
             APP_FEE,
         ));
 
@@ -94,24 +103,20 @@ pub fn use_idle_deposit_transaction(
 
         // Get priority fee estimate
         let gateway = use_gateway();
-
-        // Get dynamic priority fee
-        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(false, &tx).await
-        {
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
             Ok(fee) => fee,
-            Err(_) => return Err(GatewayError::Unknown), // Early return on failure
+            Err(_) => return Err(GatewayError::Unknown),
         };
 
         log::info!("dynamic_priority_fee: {}", dynamic_priority_fee);
 
-        // // Add priority fee instruction
+        // Add priority fee instruction
         ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
             dynamic_priority_fee,
         ));
 
+        // Set priority fee for UI
         priority_fee.set(dynamic_priority_fee);
-
-        log::info!("ixs: {:?}", ixs);
 
         // Build final tx
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();

@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
     native_token::sol_to_lamports,
     system_instruction::transfer,
     transaction::{Transaction, VersionedTransaction},
@@ -12,7 +13,7 @@ use crate::{
     gateway::{
         kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount,
     },
-    hooks::{use_gateway, use_wallet, Wallet},
+    hooks::{use_gateway, use_wallet, Wallet, COMPUTE_UNIT_BUFFER},
     solana::{
         spl_associated_token_account::{
             get_associated_token_address,
@@ -28,6 +29,8 @@ use crate::{
     },
     utils::LiquidityPair,
 };
+
+const ESTIMATED_PAIR_DEPOSIT_COMPUTE_UNITS: u32 = 323218;
 
 // Build pair deposit transaction
 pub fn use_pair_deposit_transaction(
@@ -99,6 +102,20 @@ pub fn use_pair_deposit_transaction(
 
         // Aggregate instructions
         let mut ixs: Vec<steel::Instruction> = vec![];
+
+        // Adjust compute unit limit based on buffer -> 462,560
+        let adjusted_compute_unit_limit = ESTIMATED_PAIR_DEPOSIT_COMPUTE_UNITS
+            + (ESTIMATED_PAIR_DEPOSIT_COMPUTE_UNITS as f64 * COMPUTE_UNIT_BUFFER) as u32;
+
+        log::info!(
+            "adjusted_compute_unit_limit: {}",
+            adjusted_compute_unit_limit
+        );
+
+        // Set compute unit limit
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
+            adjusted_compute_unit_limit,
+        ));
 
         // Create ata for lp shares, if needed
         if let Some(Ok(_)) = lp_balance.cloned() {
@@ -209,12 +226,29 @@ pub fn use_pair_deposit_transaction(
             u64::MAX,
         ));
 
-        // Include transsaction fee
+        // Include ORE app fee
         let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
-        ixs.push(transfer(&authority, &treasury_token_address, 5000));
+        ixs.push(transfer(&authority, &authority, 5000));
 
-        // Build transaction
+        // Build initial transaction to estimate priority fee
+        // does this need to be a versioned tx or legacy?
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        // Get priority fee estimate
+        let gateway = use_gateway();
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
+            Ok(fee) => fee,
+            Err(_) => return Err(GatewayError::Unknown),
+        };
+
+        // Add priority fee instruction
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
+            dynamic_priority_fee,
+        ));
+
+        // Build final tx with priority fee
         let tx = Transaction::new_with_payer(&ixs, Some(&authority));
+
         Ok(tx.into())
     })
 }
