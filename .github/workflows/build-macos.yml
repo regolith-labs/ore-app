@@ -22,7 +22,7 @@ jobs:
       ARCH: ${{ matrix.arch }}
       VERSION: ${{ github.ref_name }}
 
-      # Where dx places the .app
+      # Where dioxus-cli places the .app
       APP_DIR: /Users/runner/work/ore-app/ore-app/dist/OreApp.app
 
       # AWS publish constants
@@ -64,7 +64,7 @@ jobs:
         run: |
           rustup target add ${{ matrix.arch }}-apple-darwin
 
-      # 6) Install CLI tools
+      # 6) Install CLI tools (dioxus, cargo-packager)
       - name: Install dioxus-cli and cargo-packager
         run: |
           cargo install cargo-packager@0.11.3 dioxus-cli@0.6.3
@@ -91,7 +91,7 @@ jobs:
           DEVID_CERT_BASE64: ${{ secrets.DEVID_CERT_BASE64 }}
           DEVID_CERT_PASSWORD: ${{ secrets.DEVID_CERT_PASSWORD }}
 
-      # 9) Code-sign .app (Apple)
+      # 9) Code-sign the .app (Apple)
       - name: Code-sign .app
         run: |
           codesign --deep --force --verify --verbose --options runtime \
@@ -124,7 +124,7 @@ jobs:
           NOTARIZE_APP_PASSWORD: ${{ secrets.NOTARIZE_APP_PASSWORD }}
           DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
 
-      # 11) Configure AWS credentials
+      # 11) Configure AWS credentials (for final uploads)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -132,68 +132,63 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 12) Package .app into a tar.gz, sign it with cargo-packager, and upload both tarball and signature to S3
+      # 12) Package .app into a tar.gz, sign it with cargo-packager, upload both tarball + signature
       - name: Package, Sign, and Upload .tar.gz
         env:
           CARGO_PACKAGER_SIGN_PRIVATE_KEY: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY }}
           CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD }}
         run: |
-          # Create the tarball from the .app folder
           TAR_FILE="ORE_${{ env.VERSION }}.app.tar.gz"
           tar -czf "$TAR_FILE" -C "$(dirname "${{ env.APP_DIR }}")" "$(basename "${{ env.APP_DIR }}")"
 
-          # Sign the tarball (cargo packager expects a file, not a folder)
+          # Sign the tarball for your self-updater
           cargo packager signer sign "$TAR_FILE"
 
-          # Determine output architecture naming
           if [ "${{ env.ARCH }}" = "x86_64" ]; then
             OUT_ARCH="x64"
           else
             OUT_ARCH="aarch64"
           fi
 
-          # Upload the tarball and its signature (.sig) file to S3
+          # Upload the tarball and signature to S3
           aws s3 cp "$TAR_FILE" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
           aws s3 cp "$TAR_FILE.sig" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz.sig"
 
-      # 13) Print link for the app
-      - name: Print S3 download link
-        run: |
-          if [ "${{ env.ARCH }}" = "x86_64" ]; then
-            OUT_ARCH="x64"
-          else
-            OUT_ARCH="aarch64"
-          fi
-
-          echo "Download macOS artifact for $OUT_ARCH at:"
-          echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
-
-      # 14) Create a DMG from the notarized .app
+      # 13) Create a DMG with Applications alias (Drag-and-Drop)
       - name: Create DMG
         run: |
           DMG_FILE="ORE_${{ env.VERSION }}.dmg"
-          
-          # Make a DMG containing the .app
-          # You might want to customize volume name, background, etc.
-          hdiutil create -volname "OreAppInstaller" \
-            -srcfolder "${{ env.APP_DIR }}" \
-            -ov "$DMG_FILE"
+          DMG_DIR="$(mktemp -d -t dmgbuild)"
 
-      # 15) (Optional) Code-sign the DMG itself
-      #     This step is recommended, but not strictly required if you plan to notarize it anyway.
-      - name: Code-sign DMG
+          echo "Staging in $DMG_DIR"
+          cp -R "${{ env.APP_DIR }}" "$DMG_DIR/"
+          ln -s /Applications "$DMG_DIR/Applications"
+
+          hdiutil create -volname "Install OreApp" \
+            -srcfolder "$DMG_DIR" \
+            -ov -format UDZO \
+            "$DMG_FILE"
+
+          rm -rf "$DMG_DIR"
+
+          echo "DMG created: $DMG_FILE"
+
+      # 14) Code-sign DMG (optional but recommended)
+      - name: Sign DMG
         run: |
+          DMG_FILE="ORE_${{ env.VERSION }}.dmg"
+
           codesign --force --sign "Developer ID Application: $DEVID_NAME ($DEVID_TEAM_ID)" --verbose \
-            "ORE_${{ env.VERSION }}.dmg"
+            "$DMG_FILE"
         env:
           DEVID_NAME: ${{ secrets.DEVID_NAME }}
           DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
 
-      # 16) Notarize the DMG
+      # 15) Notarize DMG
       - name: Notarize DMG
         run: |
           DMG_FILE="ORE_${{ env.VERSION }}.dmg"
-          
+
           xcrun notarytool submit "$DMG_FILE" \
             --apple-id "$NOTARIZE_APPLE_ID" \
             --team-id "$DEVID_TEAM_ID" \
@@ -201,17 +196,16 @@ jobs:
             --verbose \
             --wait
 
-          # Staple the DMG with the notarization ticket
+          # Staple the DMG
           xcrun stapler staple "$DMG_FILE"
         env:
           NOTARIZE_APPLE_ID: ${{ secrets.NOTARIZE_APPLE_ID }}
           NOTARIZE_APP_PASSWORD: ${{ secrets.NOTARIZE_APP_PASSWORD }}
           DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
 
-      # 17) Upload the DMG to S3 for new users
-      - name: Upload DMG to S3
+      # 16) Upload DMG to S3
+      - name: Upload DMG
         run: |
-          # e.g., rename or keep as-is
           DMG_FILE="ORE_${{ env.VERSION }}.dmg"
           if [ "${{ env.ARCH }}" = "x86_64" ]; then
             OUT_ARCH="x64"
@@ -220,6 +214,22 @@ jobs:
           fi
 
           aws s3 cp "$DMG_FILE" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.dmg"
-          
-          echo "DMG upload complete."
 
+          echo "DMG uploaded to S3."
+        env:
+          DEVID_TEAM_ID: ${{ secrets.DEVID_TEAM_ID }}
+
+      # 17) Print links for both .tar.gz (auto-updates) and .dmg (new users)
+      - name: Print Download Links
+        run: |
+          if [ "${{ env.ARCH }}" = "x86_64" ]; then
+            OUT_ARCH="x64"
+          else
+            OUT_ARCH="aarch64"
+          fi
+
+          echo "Download macOS DMG for $OUT_ARCH at:"
+          echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.dmg"
+
+          echo "Download macOS tarball for $OUT_ARCH (self-update) at:"
+          echo "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/${{ env.ARCH }}/${{ env.VERSION }}/ore_${{ env.VERSION }}_${OUT_ARCH}.app.tar.gz"
