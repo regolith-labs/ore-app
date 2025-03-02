@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::components::{Col, Row, Spinner, TransactionStatus};
+use crate::components::{Col, Row, Spinner, TransactionStatus, Updater};
 use crate::hooks::use_transaction_status;
 use crate::time::Duration;
 
@@ -31,97 +31,66 @@ pub fn ToastDisplay() -> Element {
     let detail_class = "text-elements-lowEmphasis";
 
     rsx! {
-        if let Some(transaction_status) = transaction_status.cloned() {
-            match transaction_status {
-                TransactionStatus::Waiting => {
-                    rsx! {
-                        Row {
-                            class: "{toast_class} border-l-4 border-elements-lowEmphasis",
-                            gap: 2,
-                            Spinner {
-                                class: "my-auto",
-                            }
-                            span {
-                                class: "{title_class} my-auto",
-                                "Waiting for signature..."
+        match transaction_status.cloned() {
+            Some(transaction_status) => {
+                match transaction_status {
+                    TransactionStatus::Waiting => {
+                        rsx! {
+                            Row { class: "{toast_class} border-l-4 border-elements-lowEmphasis", gap: 2,
+                                Spinner { class: "my-auto" }
+                                span { class: "{title_class} my-auto", "Waiting for signature..." }
                             }
                         }
                     }
-                }
-                TransactionStatus::Denied => {
-                    rsx! {
-                        Col {
-                            class: "{toast_class} border-l-4 border-red-500",
-                            span {
-                                class: "{title_class} my-auto",
-                                "Signature denied"
+                    TransactionStatus::Denied => {
+                        rsx! {
+                            Col { class: "{toast_class} border-l-4 border-red-500",
+                                span { class: "{title_class} my-auto", "Signature denied" }
                             }
                         }
                     }
-                }
-                TransactionStatus::Error => {
-                    rsx! {
-                        Col {
-                            class: "{toast_class} border-l-4 border-red-500",
-                            span {
-                                class: "{title_class} my-auto",
-                                "Transaction failed"
+                    TransactionStatus::Error => {
+                        rsx! {
+                            Col { class: "{toast_class} border-l-4 border-red-500",
+                                span { class: "{title_class} my-auto", "Transaction failed" }
                             }
                         }
                     }
-                }
-                TransactionStatus::Timeout => {
-                    rsx! {
-                        Col {
-                            class: "{toast_class} border-l-4 border-red-500",
-                            span {
-                                class: "{title_class} my-auto",
-                                "Transaction timed out"
-                            }
-                            span {
-                                class: "{detail_class}",
-                                "Please try again."
+                    TransactionStatus::Timeout => {
+                        rsx! {
+                            Col { class: "{toast_class} border-l-4 border-red-500",
+                                span { class: "{title_class} my-auto", "Transaction timed out" }
+                                span { class: "{detail_class}", "Please try again." }
                             }
                         }
                     }
-                }
-                TransactionStatus::Sending(_attempt) => {
-                    rsx! {
-                        Col {
-                            class: "{toast_class} border-l-4 border-blue-500",
-                            Row {
-                                gap: 2,
-                                Spinner {
-                                    class: "my-auto",
+                    TransactionStatus::Sending(_attempt) => {
+                        rsx! {
+                            Col { class: "{toast_class} border-l-4 border-blue-500",
+                                Row { gap: 2,
+                                    Spinner { class: "my-auto" }
+                                    span { class: "{title_class} my-auto", "Submitting transaction" }
                                 }
-                                span {
-                                    class: "{title_class} my-auto",
-                                    "Submitting transaction"
-                                }
+                                span { class: "{detail_class} ml-8", "Waiting for confirmation..." }
                             }
-                            span {
-                                class: "{detail_class} ml-8",
-                                "Waiting for confirmation..."
+                        }
+                    }
+                    TransactionStatus::Done(sig) => {
+                        rsx! {
+                            a {
+                                class: "flex flex-col {toast_class} border-l-4 border-green-500 hover:cursor-pointer",
+                                href: "https://solscan.io/tx/{sig}",
+                                target: "_blank",
+                                span { class: "{title_class}", "Transaction confirmed!" }
+                                span { class: "{detail_class}", "View on Solscan" }
                             }
                         }
                     }
                 }
-                TransactionStatus::Done(sig) => {
-                    rsx! {
-                        a {
-                            class: "flex flex-col {toast_class} border-l-4 border-green-500 hover:cursor-pointer",
-                            href: "https://solscan.io/tx/{sig}",
-                            target: "_blank",
-                            span {
-                                class: "{title_class}",
-                                "Transaction confirmed!"
-                            }
-                            span {
-                                class: "{detail_class}",
-                                "View on Solscan"
-                            }
-                        }
-                    }
+            }
+            None => {
+                rsx! {
+                    Updater {}
                 }
             }
         }

@@ -31,7 +31,6 @@ pub fn Mine() -> Element {
                     gold: *use_miner_is_active().read()
                 }
                 MinerData {}
-                Updater {}
             }
             MineTable {}
         }
