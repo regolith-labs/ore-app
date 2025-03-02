@@ -5,9 +5,11 @@ use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     hash::Hash,
     message::{v0::Message, VersionedMessage},
+    pubkey::Pubkey,
     signature::Signature,
     system_instruction::transfer,
-    transaction::{Transaction, VersionedTransaction},
+    transaction::VersionedTransaction,
+    
 };
 
 use crate::{
@@ -17,7 +19,7 @@ use crate::{
         kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc,
         UiTokenAmount,
     },
-    hooks::{use_gateway, use_wallet, Wallet, COMPUTE_UNIT_BUFFER},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     solana::{
         spl_associated_token_account::{
             get_associated_token_address, instruction::create_associated_token_account_idempotent,
@@ -31,8 +33,6 @@ use crate::{
     utils::LiquidityPair,
 };
 
-const ESTIMATED_PAIR_WITHDRAW_COMPUTE_UNITS: u32 = 323323;
-
 // Build pair deposit transaction
 pub fn use_pair_withdraw_transaction(
     boost_meta: BoostMeta,
@@ -43,6 +43,7 @@ pub fn use_pair_withdraw_transaction(
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
+    mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -102,18 +103,9 @@ pub fn use_pair_withdraw_transaction(
         // Aggregate instructions
         let mut ixs = vec![];
 
-        // Adjust compute unit limit based on buffer -> 387,987
-        let adjusted_compute_unit_limit = ESTIMATED_PAIR_WITHDRAW_COMPUTE_UNITS
-            + (ESTIMATED_PAIR_WITHDRAW_COMPUTE_UNITS as f64 * COMPUTE_UNIT_BUFFER) as u32;
-
-        log::info!(
-            "adjusted_compute_unit_limit: {}",
-            adjusted_compute_unit_limit
-        );
-
         // Set compute unit limit
         ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
-            adjusted_compute_unit_limit,
+            COMPUTE_UNIT_LIMIT,
         ));
 
         // Build ore boost withdraw instruction
@@ -198,8 +190,8 @@ pub fn use_pair_withdraw_transaction(
         }
 
         // Include ORE app fee
-        let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
-        ixs.push(transfer(&authority, &authority, 5000));
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, 5000));
 
         // Build initial transaction to estimate priority fee
         let tx = VersionedTransaction {
@@ -213,7 +205,10 @@ pub fn use_pair_withdraw_transaction(
         let gateway = use_gateway();
         let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
             Ok(fee) => fee,
-            Err(_) => return Err(GatewayError::Unknown),
+            Err(_) => {
+                log::error!("Failed to fetch priority fee estimate");
+                return Err(GatewayError::Unknown);
+            }
         };
 
         // Add priority fee instruction
@@ -221,7 +216,15 @@ pub fn use_pair_withdraw_transaction(
             dynamic_priority_fee,
         ));
 
-        // Build the transaction
+        // Calculate priority fee in lamports
+        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        let dynamic_priority_fee_in_lamports =
+            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
+
+        // Set priority fee for UI
+        priority_fee.set(dynamic_priority_fee_in_lamports);
+
+        // Build final tx with priority fee
         let tx = VersionedTransaction {
             signatures: vec![Signature::default()],
             message: VersionedMessage::V0(

@@ -3,6 +3,7 @@ use ore_boost_api::state::Stake;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     native_token::sol_to_lamports,
+    pubkey::Pubkey,
     system_instruction::transfer,
     transaction::{Transaction, VersionedTransaction},
 };
@@ -13,7 +14,7 @@ use crate::{
     gateway::{
         kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount,
     },
-    hooks::{use_gateway, use_wallet, Wallet, COMPUTE_UNIT_BUFFER},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     solana::{
         spl_associated_token_account::{
             get_associated_token_address,
@@ -30,8 +31,6 @@ use crate::{
     utils::LiquidityPair,
 };
 
-const ESTIMATED_PAIR_DEPOSIT_COMPUTE_UNITS: u32 = 323218;
-
 // Build pair deposit transaction
 pub fn use_pair_deposit_transaction(
     boost_meta: BoostMeta,
@@ -43,6 +42,7 @@ pub fn use_pair_deposit_transaction(
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
+    mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -103,18 +103,9 @@ pub fn use_pair_deposit_transaction(
         // Aggregate instructions
         let mut ixs: Vec<steel::Instruction> = vec![];
 
-        // Adjust compute unit limit based on buffer -> 462,560
-        let adjusted_compute_unit_limit = ESTIMATED_PAIR_DEPOSIT_COMPUTE_UNITS
-            + (ESTIMATED_PAIR_DEPOSIT_COMPUTE_UNITS as f64 * COMPUTE_UNIT_BUFFER) as u32;
-
-        log::info!(
-            "adjusted_compute_unit_limit: {}",
-            adjusted_compute_unit_limit
-        );
-
         // Set compute unit limit
         ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
-            adjusted_compute_unit_limit,
+            COMPUTE_UNIT_LIMIT,
         ));
 
         // Create ata for lp shares, if needed
@@ -154,7 +145,7 @@ pub fn use_pair_deposit_transaction(
             ixs.push(sync_native(&spl_token::ID, &wsol_ata).unwrap());
         }
 
-        // Build the instruction
+        // Build the deposit instruction
         let deposit_ix = match boost_meta.lp_type {
             LpType::Kamino => {
                 let Ok(ix) = use_gateway()
@@ -227,18 +218,20 @@ pub fn use_pair_deposit_transaction(
         ));
 
         // Include ORE app fee
-        let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
-        ixs.push(transfer(&authority, &authority, 5000));
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, 5000));
 
         // Build initial transaction to estimate priority fee
-        // does this need to be a versioned tx or legacy?
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         // Get priority fee estimate
         let gateway = use_gateway();
         let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
             Ok(fee) => fee,
-            Err(_) => return Err(GatewayError::Unknown),
+            Err(_) => {
+                log::error!("Failed to fetch priority fee estimate");
+                return Err(GatewayError::Unknown);
+            }
         };
 
         // Add priority fee instruction
@@ -246,9 +239,17 @@ pub fn use_pair_deposit_transaction(
             dynamic_priority_fee,
         ));
 
-        // Build final tx with priority fee
-        let tx = Transaction::new_with_payer(&ixs, Some(&authority));
+        // Calculate priority fee in lamports
+        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        let dynamic_priority_fee_in_lamports =
+            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
 
-        Ok(tx.into())
+        // Set priority fee for UI
+        priority_fee.set(dynamic_priority_fee_in_lamports);
+
+        // Build final tx with priority fee
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        Ok(tx)
     })
 }

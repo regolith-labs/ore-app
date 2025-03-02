@@ -2,17 +2,16 @@ use dioxus::prelude::*;
 use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
+    pubkey::Pubkey,
     system_instruction::transfer,
     transaction::{Transaction, VersionedTransaction},
 };
 
 use crate::{
     gateway::{GatewayError, GatewayResult},
-    hooks::{use_gateway, use_wallet, Wallet, COMPUTE_UNIT_BUFFER},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     solana::spl_associated_token_account,
 };
-
-const ESTIMATED_BOOST_CLAIM_COMPUTE_UNITS: u32 = 13778;
 
 pub fn use_boost_claim_transaction(
     boost: Resource<GatewayResult<Boost>>,
@@ -41,18 +40,9 @@ pub fn use_boost_claim_transaction(
         // Aggregate instructions
         let mut ixs = vec![];
 
-        // Adjust compute unit limit based on buffer -> 110,000
-        let adjusted_compute_unit_limit = ESTIMATED_BOOST_CLAIM_COMPUTE_UNITS
-            + (ESTIMATED_BOOST_CLAIM_COMPUTE_UNITS as f64 * COMPUTE_UNIT_BUFFER) as u32;
-
-        log::info!(
-            "adjusted_compute_unit_limit: {}",
-            adjusted_compute_unit_limit
-        );
-
         // Set compute unit limit
         ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
-            adjusted_compute_unit_limit,
+            COMPUTE_UNIT_LIMIT,
         ));
 
         // Derive beneficiary
@@ -70,8 +60,8 @@ pub fn use_boost_claim_transaction(
         ));
 
         // Include ORE app fee
-        let treasury_token_address = ore_api::consts::TREASURY_TOKENS_ADDRESS;
-        ixs.push(transfer(&authority, &authority, 5000));
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, 5000));
 
         // Build initial transaction to estimate priority fee
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
@@ -80,7 +70,10 @@ pub fn use_boost_claim_transaction(
         let gateway = use_gateway();
         let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
             Ok(fee) => fee,
-            Err(_) => return Err(GatewayError::Unknown),
+            Err(_) => {
+                log::error!("Failed to fetch priority fee estimate");
+                return Err(GatewayError::Unknown);
+            }
         };
 
         // Add priority fee instruction
@@ -88,7 +81,7 @@ pub fn use_boost_claim_transaction(
             dynamic_priority_fee,
         ));
 
-        // Build transaction with priority fee
+        // Build final tx with priority fee
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
         Ok(tx)
     })

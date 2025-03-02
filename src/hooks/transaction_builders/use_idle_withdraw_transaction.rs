@@ -2,19 +2,18 @@ use crate::{
     components::TokenInputError,
     config::Token,
     gateway::{GatewayError, GatewayResult},
-    hooks::{use_gateway, use_wallet, Wallet, APP_FEE, COMPUTE_UNIT_BUFFER},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     solana::spl_token::{amount_to_ui_amount, ui_amount_to_amount},
 };
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-use solana_program::system_instruction::transfer;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
+    pubkey::Pubkey,
+    system_instruction::transfer,
     transaction::{Transaction, VersionedTransaction},
 };
-
-const ESTIMATED_IDLE_WITHDRAW_COMPUTE_UNITS: u32 = 17195;
 
 pub fn use_idle_withdraw_transaction(
     stake: Resource<GatewayResult<Stake>>,
@@ -63,18 +62,9 @@ pub fn use_idle_withdraw_transaction(
         // Aggregate instructions
         let mut ixs = vec![];
 
-        // Adjust compute unit limit based on buffer -> 20,634
-        let adjusted_compute_unit_limit = ESTIMATED_IDLE_WITHDRAW_COMPUTE_UNITS
-            + (ESTIMATED_IDLE_WITHDRAW_COMPUTE_UNITS as f64 * COMPUTE_UNIT_BUFFER) as u32;
-
-        log::info!(
-            "adjusted_compute_unit_limit: {}",
-            adjusted_compute_unit_limit
-        );
-
         // Set compute unit limit
         ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
-            adjusted_compute_unit_limit,
+            COMPUTE_UNIT_LIMIT,
         ));
 
         // Build withdraw instruction
@@ -86,18 +76,16 @@ pub fn use_idle_withdraw_transaction(
         ));
 
         // Include ORE app fee
-        ixs.push(transfer(&authority, &authority, APP_FEE));
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
 
-        // Build initial transaction
+        // Build initial transaction to estimate priority fee
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         // Get priority fee estimate
         let gateway = use_gateway();
         let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
-            Ok(fee) => {
-                log::info!("Priority fee estimate fetched: {}", fee);
-                fee
-            }
+            Ok(fee) => fee,
             Err(_) => {
                 log::error!("Failed to fetch priority fee estimate");
                 return Err(GatewayError::Unknown);
@@ -109,12 +97,17 @@ pub fn use_idle_withdraw_transaction(
             dynamic_priority_fee,
         ));
 
+        // Calculate priority fee in lamports
+        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        let dynamic_priority_fee_in_lamports =
+            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
+
         // Set priority fee for UI
-        priority_fee.set(dynamic_priority_fee);
+        priority_fee.set(dynamic_priority_fee_in_lamports);
 
-        // Build final tx
-        let tx_with_fee = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+        // Build final tx with priority fee
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
-        Ok(tx_with_fee)
+        Ok(tx)
     })
 }

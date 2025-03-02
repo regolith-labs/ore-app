@@ -24,7 +24,7 @@ pub fn use_swap_transaction(
     quote: Signal<Option<QuoteResponse>>,
     sell_token: Signal<Option<Token>>,
     sell_token_balance: Resource<GatewayResult<UiTokenAmount>>,
-    priority_fee: Signal<u64>,
+    _priority_fee: Signal<u64>,
     mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
@@ -67,6 +67,17 @@ pub fn use_swap_transaction(
                     log::error!("{:?}", err);
                     GatewayError::FailedDeserialization
                 })?;
+
+            // Get priority fee estimate
+            // let gateway = use_gateway();
+            // let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&vtx).await {
+            //     Ok(fee) => fee,
+            //     Err(_) => {
+            //         log::error!("Failed to fetch priority fee estimate");
+            //         return Err(GatewayError::Unknown);
+            //     }
+            // };
+
             Ok(vtx)
         }
     })
