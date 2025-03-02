@@ -7,8 +7,6 @@ pub mod solana;
 pub mod spl;
 mod utils;
 
-use base64::Engine;
-use bs58::{decode, encode};
 pub use error::*;
 use serde_json::{json, Value};
 #[cfg(not(feature = "web"))]
@@ -39,11 +37,8 @@ impl<R: Rpc> Gateway<R> {
         &self,
         tx: &VersionedTransaction,
     ) -> GatewayResult<u64> {
-        // let mut ore_addresses: Vec<String> = vec![ore_api::id().to_string()];
-
         match bincode::serialize(&tx) {
             Ok(tx_bytes) => {
-                // let tx_base64 = base64::en::general_purpose::STANDARD.encode(tx_bytes);
                 let tx_bs58 = bs58::encode(tx_bytes).into_string();
                 let req = json!({
                     "jsonrpc": "2.0",
@@ -58,13 +53,11 @@ impl<R: Rpc> Gateway<R> {
                 });
                 if let Ok(res) = self.http.post(RPC_URL.to_string()).json(&req).send().await {
                     if let Ok(res) = res.json::<Value>().await {
-                        log::info!("res: {:?}", res);
                         // Get dynamic fee estimate in microlamports
                         let dynamic_fee_estimate = res["result"]["priorityFeeEstimate"]
                             .as_f64()
                             .map(|fee| fee as u64)
                             .unwrap_or(0);
-                        log::info!("dynamic_fee_estimate: {:?}", dynamic_fee_estimate);
                         return Ok(dynamic_fee_estimate);
                     } else {
                         log::error!("Failed to parse priority fee json");
