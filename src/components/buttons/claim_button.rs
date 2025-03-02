@@ -1,11 +1,13 @@
+use crate::{components::submit_transaction, gateway::GatewayResult};
 use dioxus::prelude::*;
 use ore_types::request::TransactionType;
 use solana_sdk::transaction::VersionedTransaction;
 
-use crate::{components::submit_transaction, gateway::GatewayResult};
-
 #[component]
-pub fn ClaimButton(transaction: Resource<GatewayResult<VersionedTransaction>>) -> Element {
+pub fn ClaimButton(
+    transaction: Resource<GatewayResult<VersionedTransaction>>,
+    tx_type: TransactionType,
+) -> Element {
     let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
         true
     } else {
@@ -18,7 +20,7 @@ pub fn ClaimButton(transaction: Resource<GatewayResult<VersionedTransaction>>) -
             disabled: !enabled,
             onclick: move |_| {
                 if let Some(Ok(transaction)) = transaction.cloned() {
-                    submit_transaction(transaction, TransactionType::PoolClaim);
+                    submit_transaction(transaction, tx_type.clone());
                 }
             },
             span {
