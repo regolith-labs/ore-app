@@ -35,7 +35,7 @@ pub fn Pair(lp_mint: String) -> Element {
         liquidity_pair.restart();
         lp_balance.restart();
     });
-    
+
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
@@ -202,12 +202,15 @@ fn UnstakedLp(
                             }
                         }
                     }
-                    SubmitButton {
-                        class: "controls-tertiary",
-                        title: "Deposit {boost_meta.ticker}",
-                        transaction: lp_deposit_tx,
-                        err: err,
-                        tx_type: TransactionType::BoostDeposit
+                    Col {
+                        class: "py-4 px-0 sm:px-3",
+                        SubmitButton {
+                            class: "controls-tertiary",
+                            title: "Deposit {boost_meta.ticker}",
+                            transaction: lp_deposit_tx,
+                            err: err,
+                            tx_type: TransactionType::BoostDeposit
+                        }
                     }
                 }
             }
