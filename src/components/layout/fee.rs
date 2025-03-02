@@ -3,12 +3,18 @@ use crate::hooks::{APP_FEE, SOLANA_BASE_FEE};
 use dioxus::prelude::*;
 use solana_sdk::native_token::lamports_to_sol;
 
+fn format_fee(amount: f64) -> String {
+    // Remove trailing zeros after decimal point
+    let s = format!("{:.9}", amount);
+    s.trim_end_matches('0').trim_end_matches('.').to_string()
+}
+
 #[component]
 pub fn Fee(priority_fee: Signal<u64>) -> Element {
     let mut is_open = use_signal(|| false);
     let base_fee = lamports_to_sol(SOLANA_BASE_FEE);
     let app_fee = lamports_to_sol(APP_FEE);
-    let priority_fee = lamports_to_sol(priority_fee.cloned() / 1_000_000);
+    let priority_fee = lamports_to_sol(priority_fee.cloned());
 
     let total_fee = base_fee + priority_fee + app_fee;
 
@@ -41,16 +47,9 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                 }
                 Row {
                     class: "items-center gap-2",
-                    // TokenValueSmall {
-                    //     class: "ml-auto",
-                    //     amount: format!("{:.1$}", total_fee, 9),
-                    //     ticker: "SOL".to_string(),
-                    //     with_decimal_units: true,
-
-                    // }
                     span {
                         class: "text-elements-lowEmphasis font-medium",
-                        { format!("{:.5} SOL", total_fee) }
+                        { format!("{} SOL", format_fee(total_fee)) }
                     }
                 }
             }
@@ -63,38 +62,17 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                         Row {
                             class: "w-full justify-between",
                             span { class: "font-medium text-xs text-elements-lowEmphasis", "App Fee" }
-                            // TokenValueSmall {
-                            //     class: "ml-auto",
-                            //     amount: format!("{:.1$}", app_fee, 9),
-                            //     ticker: "SOL".to_string(),
-                            //     with_decimal_units: true,
-                            //     size: Some(TokenValueSize::XSmall),
-                            // }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{app_fee:.5} SOL" }
+                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{format_fee(app_fee)}" }
                         }
                         Row {
                             class: "w-full justify-between",
                             span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana base Fee" }
-                            // TokenValueSmall {
-                            //     class: "ml-auto",
-                            //     amount: format!("{:.1$}", base_fee, 9),
-                            //     ticker: "SOL".to_string(),
-                            //     with_decimal_units: true,
-                            //     size: Some(TokenValueSize::XSmall),
-                            // }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{base_fee:.5} SOL" }
+                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{format_fee(base_fee)}" }
                         }
                         Row {
                             class: "w-full justify-between",
                             span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana priority Fee" }
-                            // TokenValueSmall {
-                            //     class: "ml-auto",
-                            //     amount: format!("{:.1$}", priority_fee, 9),
-                            //     ticker: "SOL".to_string(),
-                            //     with_decimal_units: true,
-                            //     size: Some(TokenValueSize::XSmall),
-                            // }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{priority_fee:.5} SOL" }
+                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{format_fee(priority_fee)}" }
                         }
                     }
                 }
