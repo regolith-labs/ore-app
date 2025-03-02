@@ -2,10 +2,7 @@ use crate::{
     components::*,
     config::Token,
     gateway::GatewayResult,
-    hooks::{
-        on_transaction_done, use_gateway, use_quote, use_swap_transaction,
-        use_token_balance_for_token,
-    },
+    hooks::{on_transaction_done, use_quote, use_swap_transaction, use_token_balance_for_token},
 };
 use dioxus::prelude::*;
 use jupiter_swap_api_client::quote::QuoteResponse;
@@ -61,6 +58,8 @@ pub fn SwapForm(class: Option<String>) -> Element {
         err,
     );
 
+    priority_fee.set(0000000000);
+
     // On successful transaction, reset input amounts
     on_transaction_done(move |_sig| {
         sell_input_amount.set("".to_string());
@@ -109,6 +108,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
             }
             SwapDetails {
                 quote_response,
+                priority_fee,
             }
             SwapButton {
                 quote_response,
@@ -120,16 +120,11 @@ pub fn SwapForm(class: Option<String>) -> Element {
 }
 
 #[component]
-fn SwapDetails(quote_response: Signal<Option<QuoteResponse>>) -> Element {
-    // let priority_fee = use_resource(move || async move {
-    //     let gateway = use_gateway();
-    //     // let priority_fee = gateway.get_recent_priority_fee_estimate(true).await;
-    //     // priority_fee
-    // });
-    // log::info!("priority_fee: {:?}", priority_fee.cloned());
-    // microlamports * price * 10^9
-
-    let (price_impact_value, slippage, transaction_fee) = {
+fn SwapDetails(
+    quote_response: Signal<Option<QuoteResponse>>,
+    priority_fee: Signal<u64>,
+) -> Element {
+    let (price_impact_value, _slippage, _transaction_fee) = {
         let quote_response = &*quote_response.read();
         match quote_response {
             Some(quote_response) => {
@@ -145,13 +140,7 @@ fn SwapDetails(quote_response: Signal<Option<QuoteResponse>>) -> Element {
                 let slippage = format!("{:.2}%", (quote_response.slippage_bps as f64) / 1000f64);
 
                 // transaction fee
-                let transaction_fee = "0.00005 SOL".to_string(); // TODO Get priority fee
-
-                // Priority fee
-
-                // Base fee
-
-                // Ore fee
+                let transaction_fee = "0.00005 SOL".to_string();
 
                 (price_impact_value, slippage, transaction_fee)
             }
@@ -159,87 +148,12 @@ fn SwapDetails(quote_response: Signal<Option<QuoteResponse>>) -> Element {
         }
     };
 
-    // let transaction_fee = "0.00005 SOL".to_string(); // TODO Get priority fee
-    // let slippage = "0.00005 SOL".to_string(); // TODO Get priority fee
-
     rsx! {
             Col {
                 class: "px-5",
                 gap: 3,
                 SwapDetailLabel { title: "Price impact", value: price_impact_value }
-                FeeDetailValue {}
-        }
-    }
-}
-
-#[component]
-pub fn FeeDetailValue(// base fee, priority fee, ore fee
-) -> Element {
-    let mut is_open = use_signal(|| false);
-    let base_fee = 0.00001; // Example values - replace with actual fee calculations
-    let priority_fee = 0.00002;
-    let ore_fee = 0.00002;
-    let total_fee = base_fee + priority_fee + ore_fee;
-
-    let max_height = if *is_open.read() {
-        "max-h-32"
-    } else {
-        "max-h-0"
-    };
-    let opacity = if *is_open.read() {
-        "opacity-100"
-    } else {
-        "opacity-0"
-    };
-
-    rsx! {
-        button {
-            class: "w-full flex flex-col transition-all duration-300 ease-in-out hover:cursor-pointer".to_string(),
-            onclick: move |_| is_open.set(!is_open.cloned()),
-            Row {
-                class: "w-full justify-between items-center",
-                Row {
-                    class: "text-elements-lowEmphasis gap-2 items-center",
-                    span {
-                        class: "font-medium",
-                        "Total Fee"
-                    }
-                    InfoIcon {
-                        class: "h-4 w-4 shrink-0",
-                    }
-                }
-                Row {
-                    class: "items-center gap-2",
-                    span {
-                        class: "text-elements-lowEmphasis font-medium",
-                        { format!("{:.5} SOL", total_fee) }
-                    }
-                }
-            }
-            Col {
-                gap: 3,
-                Col {
-                    class: "overflow-hidden transition-all duration-300 ease-in-out {max_height}",
-                    Col {
-                        class: "pt-4 gap-2 transition-opacity duration-300 {opacity}",
-                        Row {
-                            class: "w-full justify-between",
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "App Fee" }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{base_fee:.5} SOL" }
-                        }
-                        Row {
-                            class: "w-full justify-between",
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana base Fee" }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{priority_fee:.5} SOL" }
-                        }
-                        Row {
-                            class: "w-full justify-between",
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana priority Fee" }
-                            span { class: "font-medium text-xs text-elements-lowEmphasis", "{ore_fee:.5} SOL" }
-                        }
-                    }
-                }
-            }
+                Fee { priority_fee: priority_fee.clone() }
         }
     }
 }
