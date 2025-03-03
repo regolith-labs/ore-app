@@ -5,6 +5,13 @@ use dioxus::prelude::*;
 use crate::components::Row;
 use crate::hooks::{use_updater, UpdateState};
 
+/// no-op updater for web
+#[cfg(feature = "web")]
+pub fn Updater() -> Element {
+    rsx! {}
+}
+
+#[cfg(not(feature = "web"))]
 pub fn Updater() -> Element {
     let mut updater = use_updater();
     let toast_class = "fixed bottom-4 left-4 ml-auto z-100 bg-surface-floating p-4 rounded";
