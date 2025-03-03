@@ -35,6 +35,9 @@ pub fn SwapForm(class: Option<String>) -> Element {
     // Quote fetcher with debounce
     let mut quote_fetcher = use_quote(sell_token, buy_token, buy_input_amount, quote_response);
 
+    // Priority fee
+    let mut priority_fee = use_signal::<u64>(|| 0);
+
     // When sell input amount changes, fetch a new quote
     use_effect(move || {
         let sell_input_amount = sell_input_amount.read().clone();
@@ -47,7 +50,15 @@ pub fn SwapForm(class: Option<String>) -> Element {
     });
 
     // Build swap transaction
-    let swap_tx = use_swap_transaction(quote_response, sell_token, sell_token_balance, err);
+    let swap_tx = use_swap_transaction(
+        quote_response,
+        sell_token,
+        sell_token_balance,
+        priority_fee,
+        err,
+    );
+
+    priority_fee.set(0000000000);
 
     // On successful transaction, reset input amounts
     on_transaction_done(move |_sig| {
@@ -97,6 +108,7 @@ pub fn SwapForm(class: Option<String>) -> Element {
             }
             SwapDetails {
                 quote_response,
+                priority_fee,
             }
             SwapButton {
                 quote_response,
@@ -108,7 +120,10 @@ pub fn SwapForm(class: Option<String>) -> Element {
 }
 
 #[component]
-fn SwapDetails(quote_response: Signal<Option<QuoteResponse>>) -> Element {
+fn SwapDetails(
+    quote_response: Signal<Option<QuoteResponse>>,
+    priority_fee: Signal<u64>,
+) -> Element {
     let (price_impact_value, _slippage, _transaction_fee) = {
         let quote_response = &*quote_response.read();
         match quote_response {
@@ -125,7 +140,7 @@ fn SwapDetails(quote_response: Signal<Option<QuoteResponse>>) -> Element {
                 let slippage = format!("{:.2}%", (quote_response.slippage_bps as f64) / 1000f64);
 
                 // transaction fee
-                let transaction_fee = "0.00005 SOL".to_string(); // TODO Get priority fee
+                let transaction_fee = "0.00005 SOL".to_string();
 
                 (price_impact_value, slippage, transaction_fee)
             }
@@ -134,12 +149,11 @@ fn SwapDetails(quote_response: Signal<Option<QuoteResponse>>) -> Element {
     };
 
     rsx! {
-        Col {
-            class: "px-5",
-            gap: 3,
-            SwapDetailLabel { title: "Price impact", value: price_impact_value }
-            // SwapDetailLabel { title: "Slippage", value: slippage }
-            // SwapDetailLabel { title: "Transaction fee", value: transaction_fee }
+            Col {
+                class: "px-5",
+                gap: 3,
+                SwapDetailLabel { title: "Price impact", value: price_impact_value }
+                Fee { priority_fee: priority_fee.clone() }
         }
     }
 }

@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
     native_token::sol_to_lamports,
+    pubkey::Pubkey,
     system_instruction::transfer,
     transaction::{Transaction, VersionedTransaction},
 };
@@ -12,7 +14,7 @@ use crate::{
     gateway::{
         kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount,
     },
-    hooks::{use_gateway, use_wallet, Wallet},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     solana::{
         spl_associated_token_account::{
             get_associated_token_address,
@@ -40,6 +42,7 @@ pub fn use_pair_deposit_transaction(
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
+    mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -100,6 +103,11 @@ pub fn use_pair_deposit_transaction(
         // Aggregate instructions
         let mut ixs: Vec<steel::Instruction> = vec![];
 
+        // Set compute unit limit
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
+            COMPUTE_UNIT_LIMIT,
+        ));
+
         // Create ata for lp shares, if needed
         if let Some(Ok(_)) = lp_balance.cloned() {
             // Do nothing
@@ -133,11 +141,11 @@ pub fn use_pair_deposit_transaction(
                 &authority,
                 &wsol_ata,
                 sol_to_lamports(wsol_amount),
-            ));
+            )); // ORE-65 transfer
             ixs.push(sync_native(&spl_token::ID, &wsol_ata).unwrap());
         }
 
-        // Build the instruction
+        // Build the deposit instruction
         let deposit_ix = match boost_meta.lp_type {
             LpType::Kamino => {
                 let Ok(ix) = use_gateway()
@@ -209,8 +217,39 @@ pub fn use_pair_deposit_transaction(
             u64::MAX,
         ));
 
-        // Build transaction
-        let tx = Transaction::new_with_payer(&ixs, Some(&authority));
-        Ok(tx.into())
+        // Include ORE app fee
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, 5000));
+
+        // Build initial transaction to estimate priority fee
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        // Get priority fee estimate
+        let gateway = use_gateway();
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
+            Ok(fee) => fee,
+            Err(_) => {
+                log::error!("Failed to fetch priority fee estimate");
+                return Err(GatewayError::Unknown);
+            }
+        };
+
+        // Add priority fee instruction
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
+            dynamic_priority_fee,
+        ));
+
+        // Calculate priority fee in lamports
+        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        let dynamic_priority_fee_in_lamports =
+            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
+
+        // Set priority fee for UI
+        priority_fee.set(dynamic_priority_fee_in_lamports);
+
+        // Build final tx with priority fee
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        Ok(tx)
     })
 }

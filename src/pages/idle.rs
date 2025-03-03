@@ -1,7 +1,3 @@
-use dioxus::prelude::*;
-use ore_api::consts::TOKEN_DECIMALS;
-use ore_boost_api::state::{Boost, Stake};
-
 use crate::{
     components::*,
     gateway::GatewayResult,
@@ -11,6 +7,10 @@ use crate::{
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
 };
+use dioxus::prelude::*;
+use ore_api::consts::TOKEN_DECIMALS;
+use ore_boost_api::state::{Boost, Stake};
+use ore_types::request::TransactionType;
 
 pub fn Idle() -> Element {
     let mut balance = use_ore_balance();
@@ -154,6 +154,7 @@ pub fn StakeYield(
         }
         ClaimButton {
             transaction: claim_tx.clone(),
+            tx_type: TransactionType::BoostClaim,
         }
     }
 }

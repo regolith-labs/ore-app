@@ -64,6 +64,7 @@ fn MinerData() -> Element {
             MinerRewards {}
             ClaimButton {
                 transaction: claim_tx,
+                tx_type: TransactionType::PoolClaim,
             }
         }
     }
