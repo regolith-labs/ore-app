@@ -29,5 +29,5 @@ watch_path = ["src", "public"]
 index_on_404 = true
 
 [bundle]
-publisher = "regolith labs"
+publisher = "Regolith Labs Inc."
 identifier = "ore.supply"

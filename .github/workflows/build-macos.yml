@@ -23,7 +23,7 @@ jobs:
       VERSION: ${{ github.ref_name }}
 
       # Where dx places the .app
-      APP_DIR: /Users/runner/work/ore-app/ore-app/dist/OreApp.app
+      APP_DIR: /Users/runner/work/ore-app/ore-app/dist/ORE.app
 
       # AWS publish constants
       AWS_REGION: us-east-1

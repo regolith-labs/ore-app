@@ -8,8 +8,8 @@ use crate::gateway::GatewayError as Error;
 
 use super::Wallet;
 
-const SERVICE_MULTISIG: &str = "ore-app-zxyz-multisig";
-const USER: &str = "ore-user-zxyz";
+const SERVICE: &str = "ORE";
+const USER_DEVICE_KEY: &str = "user-device-key";
 
 pub fn use_wallet_provider() {
     let multisig_authority = get_or_set();
@@ -38,7 +38,7 @@ pub struct MultisigAuthority {
 }
 
 pub fn get() -> Result<MultisigAuthority, Error> {
-    let keyring = Entry::new(SERVICE_MULTISIG, USER)?;
+    let keyring = Entry::new(SERVICE, USER_DEVICE_KEY)?;
     let secret = keyring.get_secret()?;
     let multisig_authority = bincode::deserialize(secret.as_slice()).map_err(|err| {
         println!("{:?}", err);
@@ -48,7 +48,7 @@ pub fn get() -> Result<MultisigAuthority, Error> {
 }
 
 fn set(secret: &[u8]) -> Result<(), Error> {
-    let keyring = Entry::new(SERVICE_MULTISIG, USER)?;
+    let keyring = Entry::new(SERVICE, USER_DEVICE_KEY)?;
     keyring.set_secret(secret).map_err(From::from)
 }
 

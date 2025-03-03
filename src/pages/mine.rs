@@ -63,7 +63,7 @@ fn MinerData() -> Element {
             gap: 8,
             Alert {}
             MinerStatus {}
-            MinerHashpower {}
+            // MinerHashpower {}
             if cfg!(not(feature = "web")) {
                 MinerCores {}
             }
@@ -265,24 +265,20 @@ fn MinerPendingRewards() -> Element {
     let member_record_balance = use_member_record_balance();
     rsx! {
         if let Some(Ok(member_record_balance)) = member_record_balance.cloned() {
-            Col {
-                gap: 4,
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Rewards (pending)"
-                }
-                if let Some(member) = member.cloned() {
-                    if let Ok(member) = member {
+            if let Some(Ok(member)) = member.cloned() {
+                if member_record_balance > member.total_balance {
+                    Col {
+                        gap: 4,
+                        span {
+                            class: "text-elements-lowEmphasis font-medium",
+                            "Rewards (pending)"
+                        }
                         OreValue {
                             size: TokenValueSize::Large,
                             ui_amount_string: amount_to_ui_amount_string(member_record_balance - member.total_balance, TOKEN_DECIMALS),
                             with_decimal_units: true,
                         }
-                    } else {
-                        NullValue {}
                     }
-                } else {
-                    LoadingValue {}
                 }
             }
         }

@@ -38,7 +38,7 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                 Row {
                     class: "text-elements-lowEmphasis gap-2 items-center",
                     span {
-                        class: "font-medium",
+                        class: "font-medium text-left",
                         "Transaction fee"
                     }
                     InfoIcon {
@@ -46,7 +46,7 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                     }
                 }
                 span {
-                    class: "text-elements-lowEmphasis font-medium",
+                    class: "text-elements-lowEmphasis font-medium text-right",
                     {
                         format!("{} SOL", format_fee(total_fee))
                     }
@@ -58,18 +58,18 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                     class: "pt-4 gap-2 transition-opacity duration-300 ease-in-out w-full {opacity}",
                     Row {
                         class: "w-full justify-between",
-                        span { class: "font-medium text-xs text-elements-lowEmphasis", "App fee" }
-                        span { class: "font-medium text-xs text-elements-lowEmphasis", "{format_fee(app_fee)}" }
+                        span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "App fee" }
+                        span { class: "font-medium text-sm text-elements-lowEmphasis text-right", "{format_fee(app_fee)}" }
                     }
                     Row {
                         class: "w-full justify-between",
-                        span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana base fee" }
-                        span { class: "font-medium text-xs text-elements-lowEmphasis", "{format_fee(base_fee)}" }
+                        span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "Solana base fee" }
+                        span { class: "font-medium text-sm text-elements-lowEmphasis text-right", "{format_fee(base_fee)}" }
                     }
                     Row {
                         class: "w-full justify-between",
-                        span { class: "font-medium text-xs text-elements-lowEmphasis", "Solana priority fee" }
-                        span { class: "font-medium text-xs text-elements-lowEmphasis", "{format_fee(priority_fee)}" }
+                        span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "Solana priority fee" }
+                        span { class: "font-medium text-sm text-elements-lowEmphasis text-right", "{format_fee(priority_fee)}" }
                     }
                 }
             }
