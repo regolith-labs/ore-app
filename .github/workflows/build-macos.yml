@@ -164,7 +164,7 @@ jobs:
           cp -R "${{ env.APP_DIR }}" "$DMG_DIR/"
           ln -s /Applications "$DMG_DIR/Applications"
 
-          hdiutil create -volname "Install OreApp" \
+          hdiutil create -volname "Install ORE" \
             -srcfolder "$DMG_DIR" \
             -ov -format UDZO \
             "$DMG_FILE"
