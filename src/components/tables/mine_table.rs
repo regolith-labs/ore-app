@@ -1,6 +1,7 @@
 use crate::{
     components::*,
     hooks::{use_miner_events, MiningEvent},
+    utils::format_percentage,
 };
 use chrono::{DateTime, Local};
 use dioxus::prelude::*;
@@ -36,8 +37,8 @@ pub fn MineTable() -> Element {
                         if events.is_empty() {
                             rsx! {
                                 span {
-                                    class: "my-4 text-elements-lowEmphasis font-medium px-5 sm:px-3",
-                                    "No activity yet"
+                                    class: "my-4 text-elements-lowEmphasis text-sm font-medium px-5 sm:px-3",
+                                    "No session activity yet"
                                 }
                             }
                         } else {
@@ -139,6 +140,7 @@ fn MineTableRowScore(pool_score: u64, member_score: u64) -> Element {
 
 #[component]
 fn MineTableRowReward(net_reward: u64, member_reward: u64) -> Element {
+    // let percentage = format_percentage((member_reward as f64 / net_reward as f64) * 100.0);
     rsx! {
         Col {
             OreValue {
@@ -148,12 +150,16 @@ fn MineTableRowReward(net_reward: u64, member_reward: u64) -> Element {
                 size: TokenValueSize::Small,
                 color_override: "text-elements-highEmphasis",
             }
-            OreValue {
-                class: "text-right ml-auto",
-                ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
-                with_decimal_units: true,
-                size: TokenValueSize::XSmall,
-                color_override: "text-elements-lowEmphasis",
+            // OreValue {
+            //     class: "text-right ml-auto",
+            //     ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
+            //     with_decimal_units: true,
+            //     size: TokenValueSize::XSmall,
+            //     color_override: "text-elements-lowEmphasis",
+            // }
+            span {
+                class: "text-right ml-auto h-3 text-xs font-medium text-elements-lowEmphasis",
+                "{member_reward} grams"
             }
         }
     }

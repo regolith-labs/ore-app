@@ -13,5 +13,6 @@ pub enum OutputMessage {
     Init,
     Solution(drillx::Solution),
     Expired(LastHashAt),
+    TimeRemaining(i64),
 }
 type LastHashAt = i64;
