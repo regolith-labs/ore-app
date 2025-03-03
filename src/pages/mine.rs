@@ -194,12 +194,14 @@ fn MinerStatus() -> Element {
         }
         _ => false,
     });
+
     let mut time_remaining = use_signal(|| 60);
     use_effect(move || {
         if let OutputMessage::TimeRemaining(time) = out_msg.cloned() {
             time_remaining.set(time);
         }
     });
+
     rsx! {
         Col {
             gap: 4,

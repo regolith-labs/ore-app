@@ -64,6 +64,11 @@ pub fn use_miner_provider() {
                         from_miner.set(msg);
                         break;
                     }
+                    // time remaining
+                    if let OutputMessage::TimeRemaining(remaining) = msg {
+                        log::info!("time remaining: {}", remaining);
+                        from_miner.set(msg);
+                    }
                 }
             }
         },
@@ -135,7 +140,7 @@ async fn find_hash_par(
                             break;
                         } else if core_id.id == 0 {
                             let remaining = cutoff_time.saturating_sub(timer.elapsed().as_secs());
-                            solutions_channel.send(OutputMessage::TimeRemaining(remaining));
+                            solutions_channel.send(OutputMessage::TimeRemaining(remaining as i64));
                             log::info!(
                                 "Mining... Time remaining: {} {}",
                                 format_duration(remaining as u32),
