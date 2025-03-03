@@ -1,13 +1,18 @@
 use dioxus::prelude::*;
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::Stake;
-use solana_sdk::transaction::{Transaction, VersionedTransaction};
+use solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
+    pubkey::Pubkey,
+    system_instruction::transfer,
+    transaction::{Transaction, VersionedTransaction},
+};
 
 use crate::{
     components::TokenInputError,
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
-    hooks::{use_wallet, Wallet},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     solana::spl_token::ui_amount_to_amount,
 };
 
@@ -16,6 +21,7 @@ pub fn use_idle_deposit_transaction(
     ore_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
+    mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -56,6 +62,11 @@ pub fn use_idle_deposit_transaction(
         // Aggregate instructions
         let mut ixs = vec![];
 
+        // Set compute unit limit
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
+            COMPUTE_UNIT_LIMIT,
+        ));
+
         // Open stake account, if necessary
         if let Some(Ok(_)) = *stake.read() {
             // Do nothing
@@ -71,8 +82,39 @@ pub fn use_idle_deposit_transaction(
             amount_u64,
         ));
 
-        // Build transaction
+        // Include ORE app fee
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
+
+        // Build initial transaction to estimate priority fee
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        // Get priority fee estimate
+        let gateway = use_gateway();
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
+            Ok(fee) => fee,
+            Err(_) => {
+                log::error!("Failed to fetch priority fee estimate");
+                return Err(GatewayError::Unknown);
+            }
+        };
+
+        // Add priority fee instruction
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
+            dynamic_priority_fee,
+        ));
+
+        // Calculate priority fee in lamports
+        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        let dynamic_priority_fee_in_lamports =
+            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
+
+        // Set priority fee for UI
+        priority_fee.set(dynamic_priority_fee_in_lamports);
+
+        // Build final tx with priority fee
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
         Ok(tx)
     })
 }

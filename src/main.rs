@@ -45,6 +45,16 @@ pub fn App() -> Element {
         document::Link { rel: "icon", href: asset!("/public/favicon.png") }
         document::Link { rel: "icon", href: asset!("/public/icon.png") }
         document::Script { src: asset!("/public/wallet.js") }
+        if cfg!(feature = "web") {
+            document::Script { src: "https://unpkg.com/@splinetool/viewer/build/spline-viewer.js", r#type: "module" }
+            document::Script {
+                src: "https://cdn.usefathom.com/script.js",
+                r#type: "text/javascript",
+                defer: true,
+                "data-spa": "auto",
+                "data-site": "FCVSKOIN",
+            }
+        }
         Router::<Route> {}
     }
 }

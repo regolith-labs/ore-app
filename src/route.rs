@@ -19,6 +19,8 @@ pub enum Route {
         Pair { lp_mint: String },
         #[route("/trade")]
         Trade {},
+        #[route("/topup/:address")]
+        Topup { address: String },
     #[end_layout]
 
     #[layout(LandingLayout)]

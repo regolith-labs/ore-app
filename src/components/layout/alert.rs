@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{AlertInfoIcon, Row},
+    components::{AlertWarningIcon, Col, Row},
     config::Token,
     hooks::{use_token_balance, use_wallet, Wallet, MIN_SOL_BALANCE},
 };
@@ -10,7 +10,7 @@ pub fn Alert() -> Element {
     let wallet = use_wallet();
     let sol_balance = use_token_balance(Token::sol().mint);
     let message = format!(
-        "Warning: We suggest having at least {:.1} SOL in your wallet.",
+        "For best performance, top up with at least {:.1} SOL.",
         MIN_SOL_BALANCE
     );
     let mut show_alert = use_signal(|| false);
@@ -29,15 +29,22 @@ pub fn Alert() -> Element {
 
     if *show_alert.read() {
         rsx! {
-            Row {
-                class: "h-10 w-full rounded-xl p-4 bg-amber-950 flex items-center justify-start",
-                gap: 2,
-                AlertInfoIcon {
-                    class: "h-4 w-4 shrink-0 color-black",
-                }
-                span {
-                    class: "text-orange-300 text-elements-lowEmphasis",
-                    "{message}"
+            Col {
+                class: "h-min w-full rounded-xl px-4 py-2 bg-amber-950 flex justify-start text-left",
+                Row {
+                    gap: 2,
+                    AlertWarningIcon {
+                        class: "h-4 w-4 shrink-0 color-black mb-auto mt-1",
+                    }
+                    span {
+                        class: "text-orange-300 text-elements-lowEmphasis my-auto",
+                        span {
+                            class: "font-semibold",
+                            "Low balance: "
+                        }
+                        "{message}"
+                    }
+
                 }
             }
         }

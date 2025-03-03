@@ -1,5 +1,5 @@
 use crate::{
-    components::{Col, SubmitButton, TokenInputError, TokenInputForm},
+    components::{Col, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::BoostMeta,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_pair_withdraw_transaction, use_withdrawable_balances},
@@ -27,6 +27,7 @@ pub fn PairWithdrawForm(
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
     let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let err = use_signal::<Option<TokenInputError>>(|| None);
+    let priority_fee = use_signal::<u64>(|| 0);
 
     // Get tokens
     use_effect(move || {
@@ -52,6 +53,7 @@ pub fn PairWithdrawForm(
         input_amount_a,
         input_amount_b,
         err,
+        priority_fee,
     );
 
     // Refresh data, if transaction success
@@ -157,6 +159,10 @@ pub fn PairWithdrawForm(
                     update: input_stream_b,
                     err: err
                 }
+            }
+            Col {
+                class: "w-full px-4",
+                Fee { priority_fee: priority_fee.clone() }
             }
             SubmitButton {
                 title: "Submit".to_string(),

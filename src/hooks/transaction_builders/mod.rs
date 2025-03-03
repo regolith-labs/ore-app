@@ -19,3 +19,9 @@ pub use use_pair_deposit_transaction::*;
 pub use use_pair_withdraw_transaction::*;
 pub use use_pool_register_transaction::*;
 pub use use_swap_transaction::*;
+
+pub const APP_FEE: u64 = 5_000;
+pub const APP_FEE_ACCOUNT: &str = "tHCCE3KWKx8i8cDjX2DQ3Z7EMJkScAVwkfxdWz8SqgP";
+pub const SOLANA_BASE_FEE: u64 = 5_000;
+pub const COMPUTE_UNIT_LIMIT: u32 = 500_000;
+pub const MIN_SOL_BALANCE: f64 = 0.1;

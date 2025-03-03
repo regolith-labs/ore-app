@@ -7,6 +7,7 @@ mod not_found;
 mod pair;
 mod pay;
 mod stake;
+mod topup;
 mod trade;
 
 pub use blog::*;
@@ -18,4 +19,5 @@ pub use not_found::*;
 pub use pair::*;
 pub use pay::*;
 pub use stake::*;
+pub use topup::*;
 pub use trade::*;

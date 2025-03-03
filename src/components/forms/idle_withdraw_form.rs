@@ -1,14 +1,14 @@
-use dioxus::prelude::*;
-use ore_api::consts::TOKEN_DECIMALS;
-use ore_boost_api::state::Stake;
-use ore_types::request::TransactionType;
 use crate::{
-    components::{Col, SubmitButton, TokenInputError, TokenInputForm},
+    components::{Col, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_idle_withdraw_transaction},
     solana::spl_token::amount_to_ui_amount,
 };
+use dioxus::prelude::*;
+use ore_api::consts::TOKEN_DECIMALS;
+use ore_boost_api::state::Stake;
+use ore_types::request::TransactionType;
 
 #[component]
 pub fn IdleWithdrawForm(
@@ -18,7 +18,7 @@ pub fn IdleWithdrawForm(
     let mut input_amount = use_signal::<String>(|| "".to_owned());
     let token = use_signal(|| Some(Token::ore()));
     let err = use_signal::<Option<TokenInputError>>(|| None);
-
+    let priority_fee = use_signal::<u64>(|| 0);
     // Get the stake balance
     let stake_balance = use_resource(move || async move {
         let Some(Ok(stake)) = stake.cloned() else {
@@ -35,7 +35,7 @@ pub fn IdleWithdrawForm(
     });
 
     // Build the withdraw transaction
-    let tx = use_idle_withdraw_transaction(stake, input_amount, err);
+    let tx = use_idle_withdraw_transaction(stake, input_amount, err, priority_fee);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
@@ -57,6 +57,10 @@ pub fn IdleWithdrawForm(
                 update: input_amount,
                 toolbar_shortcuts: true,
                 err: err
+            }
+            Col {
+                class: "w-full px-4",
+                Fee { priority_fee: priority_fee.clone() }
             }
             SubmitButton {
                 title: "Submit".to_string(),

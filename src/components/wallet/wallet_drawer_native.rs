@@ -34,10 +34,10 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
             div {
                 "{pubkey}"
             }
-            Row {
-                span { class: "mr-2", "SOL:" }
-                span { "{sol_balance_string}" }
-            }
+            // Row {
+            //     span { class: "mr-2", "SOL:" }
+            //     span { "{sol_balance_string}" }
+            // }
         }
     }
 }
