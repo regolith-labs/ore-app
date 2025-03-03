@@ -4,6 +4,7 @@ mod config;
 mod cores;
 mod gateway;
 mod hooks;
+mod logger;
 mod pages;
 mod route;
 mod solana;
@@ -25,10 +26,7 @@ use crate::{
 const CSS: &str = include_str!("../public/tailwind.css");
 
 fn main() {
-    #[cfg(feature = "web")]
-    wasm_logger::init(wasm_logger::Config::default());
-    #[cfg(not(feature = "web"))]
-    env_logger::init();
+    logger::init();
     dioxus_logger::init(Level::INFO).expect("failed to init logger");
     launch(App);
 }

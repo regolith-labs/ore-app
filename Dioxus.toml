@@ -31,3 +31,4 @@ index_on_404 = true
 [bundle]
 publisher = "Regolith Labs Inc."
 identifier = "ore.supply"
+icon = ["public/icon.png"]
