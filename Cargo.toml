@@ -160,6 +160,8 @@ opt-level = 1
 
 [profile.server-dev]
 inherits = "dev"
+debug = 1
+env = { RUST_LOG = "info" }
 
 [profile.android-dev]
 inherits = "dev"

@@ -134,11 +134,11 @@ async fn find_hash_par(
                             }
                             break;
                         } else if core_id.id == 0 {
+                            let remaining = cutoff_time.saturating_sub(timer.elapsed().as_secs());
+                            solutions_channel.send(OutputMessage::TimeRemaining(remaining));
                             log::info!(
                                 "Mining... Time remaining: {} {}",
-                                format_duration(
-                                    cutoff_time.saturating_sub(timer.elapsed().as_secs()) as u32
-                                ),
+                                format_duration(remaining as u32),
                                 nonce,
                             );
                         }

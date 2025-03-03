@@ -118,10 +118,12 @@ fn mine(
         // exit if time has elapsed
         if nonce % 10 == 0 {
             log::info!("mining: {:?}", nonce);
-            let time_expired = elapsed(t0).ge(&cutoff_time);
-            if time_expired {
+            let elapsed_time = elapsed(t0);
+            if elapsed_time > cutoff_time {
                 scope.respond(id, OutputMessage::Expired(challenge.challenge.lash_hash_at));
                 break;
+            } else {
+                scope.respond(id, OutputMessage::TimeRemaining(cutoff_time - elapsed_time));
             }
         }
         // increment nonce

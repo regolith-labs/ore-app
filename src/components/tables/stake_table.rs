@@ -11,7 +11,7 @@ use crate::{
     hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl},
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
-    utils::LiquidityPair,
+    utils::{format_percentage, LiquidityPair},
 };
 
 pub fn StakeTable() -> Element {
@@ -264,19 +264,7 @@ fn StakeTableRowMultiplier(
         let pct = (stake.balance + stake.balance_pending) as f64
             / (boost.total_deposits + stake.balance_pending) as f64
             * 100.0;
-        let pct = if pct < 1.0 {
-            // Find first non-zero decimal place
-            let mut decimals = 0;
-            let mut val = pct;
-            while val < 1.0 {
-                val *= 10.0;
-                decimals += 1;
-            }
-            (pct * 10f64.powi(decimals)).floor() / 10f64.powi(decimals)
-        } else {
-            (pct * 10.0).floor() / 10.0 // One decimal place
-        };
-        Some(pct)
+        Some(format_percentage(pct))
     });
 
     rsx! {
@@ -289,7 +277,7 @@ fn StakeTableRowMultiplier(
                 if let Some(percentage) = user_percentage.cloned() {
                     span {
                         class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
-                        "{percentage}%"
+                        "{percentage}"
                     }
                 }
             }

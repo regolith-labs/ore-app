@@ -1,13 +1,15 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
+use ore_miner_types::OutputMessage;
 
 use crate::{
     components::*,
     gateway::pool::PoolGateway,
     hooks::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner_claim_transaction, use_miner_cores, use_miner_is_active, use_miner_status,
-        use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus, Wallet,
+        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
+        use_miner_status, use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus,
+        Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -177,6 +179,7 @@ fn StopStartButton() -> Element {
 }
 
 fn MinerStatus() -> Element {
+    let (out_msg, _in_msg) = use_miner();
     let miner_status = use_miner_status();
     let status = use_memo(move || match miner_status.cloned() {
         MinerStatus::Registering => "Registering",
@@ -184,6 +187,18 @@ fn MinerStatus() -> Element {
         MinerStatus::Hashing => "Hashing",
         MinerStatus::SubmittingSolution => "Submitting",
         MinerStatus::Stopped => "Stopped",
+    });
+    let display_time_remaining = use_memo(move || match miner_status.cloned() {
+        MinerStatus::Hashing | MinerStatus::SubmittingSolution | MinerStatus::FetchingChallenge => {
+            true
+        }
+        _ => false,
+    });
+    let mut time_remaining = use_signal(|| 60);
+    use_effect(move || {
+        if let OutputMessage::TimeRemaining(time) = out_msg.cloned() {
+            time_remaining.set(time);
+        }
     });
     rsx! {
         Col {
@@ -201,10 +216,31 @@ fn MinerStatus() -> Element {
                 StopStartButton {}
             }
         }
+        if display_time_remaining.cloned() {
+            Col {
+                gap: 4,
+                Row {
+                    class: "text-elements-lowEmphasis font-medium justify-between",
+                    span {
+                        "Time remaining"
+                    }
+                    span {
+                        "{time_remaining.cloned()}s"
+                    }
+                }
+                div {
+                    class: "w-full h-2 bg-elements-lowEmphasis rounded-full",
+                    div {
+                        class: "h-full bg-elements-highEmphasis rounded-full transition-all",
+                        style: "width: {(100.0 - (time_remaining.cloned() as f32 / 60.0 * 100.0)).max(0.0)}%"
+                    }
+                }
+            }
+        }
     }
 }
 
-fn MinerHashpower() -> Element {
+fn _MinerHashpower() -> Element {
     rsx! {
         Col {
             gap: 4,
