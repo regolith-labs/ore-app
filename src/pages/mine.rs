@@ -31,6 +31,10 @@ pub fn Mine() -> Element {
                         class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
                         gold: *use_miner_is_active().read()
                     }
+                } else {
+                    div {
+                        class: "h-8",
+                    }
                 }
                 MinerData {}
             }
@@ -60,6 +64,9 @@ fn MinerData() -> Element {
             Alert {}
             MinerStatus {}
             MinerHashpower {}
+            if cfg!(not(feature = "web")) {
+                MinerCores {}
+            }
             MinerPendingRewards {}
             MinerRewards {}
             ClaimButton {
@@ -197,7 +204,6 @@ fn MinerStatus() -> Element {
     }
 }
 
-#[cfg(feature = "web")]
 fn MinerHashpower() -> Element {
     rsx! {
         Col {
@@ -214,91 +220,41 @@ fn MinerHashpower() -> Element {
     }
 }
 
-#[cfg(not(feature = "web"))]
-fn MinerHashpower() -> Element {
+fn MinerCores() -> Element {
+    let mut cores = use_miner_cores();
+    let max = crate::cores::get();
     rsx! {
         Col {
             gap: 4,
-            Row {
-                class: "justify-between",
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Hashpower"
-                }
-                span {
-                    class: "text-elements-lowEmphasis font-medium",
-                    "Cores"
-                }
+            span {
+                class: "text-elements-lowEmphasis font-medium",
+                "Cores"
             }
             Row {
                 class: "justify-between",
                 span {
                     class: "font-semibold text-2xl sm:text-3xl",
-                    "1230 H/s"
+                    "{cores}"
                 }
-                span {
-                    MinerSelectCores {}
-                }
-            }
-        }
-    }
-}
-
-#[cfg(not(feature = "web"))]
-fn MinerSelectCores() -> Element {
-    let mut cores = use_miner_cores();
-    let max = crate::cores::get();
-    rsx! {
-        Row {
-            class: "justify-between",
-            button {
-                class: "bg-white flex items-center justify-center w-12 h-12 bg-gray-200 border border-gray-300 text-black rounded-l hover:bg-gray-300 active:bg-gray-400",
-                onclick: move |_| {
-                    let current = cores.peek().clone() - 1;
-                    cores.set(current.max(1));
-                },
-                svg {
-                    class: "w-6 h-6",
-                    fill: "none",
-                    stroke: "currentColor",
-                    stroke_width: "2",
-                    stroke_linecap: "round",
-                    stroke_linejoin: "round",
-                    view_box: "0 0 24 24",
-                    path {
-                        d: "M20 12H4",
+                Row {
+                    gap: 2,
+                    button {
+                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
+                        onclick: move |_| {
+                            let current = cores.peek().clone() - 1;
+                            cores.set(current.max(1));
+                        },
+                        "–"
+                    }
+                    button {
+                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
+                        onclick: move |_| {
+                            let current = cores.peek().clone() + 1;
+                            cores.set(current.min(max));
+                        },
+                        "+"
                     }
                 }
-            }
-            button {
-                class: "bg-white flex items-center justify-center w-12 h-12 bg-gray-200 border border-gray-300 text-black rounded-l hover:bg-gray-300 active:bg-gray-400",
-                onclick: move |_| {
-                    let current = cores.peek().clone() + 1;
-                    cores.set(current.min(max));
-                },
-                svg {
-                    class: "w-6 h-6",
-                    fill: "none",
-                    stroke: "currentColor",
-                    stroke_width: "2",
-                    stroke_linecap: "round",
-                    stroke_linejoin: "round",
-                    view_box: "0 0 24 24",
-                    path {
-                        d: "M12 4v16M20 12H4",
-                    }
-                },
-            }
-            button {
-                class: "w-12 h-12 flex items-center justify-center border border-gray-300 mr-2",
-                onclick: move |_| {
-                    cores.set(max);
-                },
-                "Max"
-            }
-            span {
-                class: "w-12 h-12 flex items-center justify-center border border-gray-300",
-                "{cores}"
             }
         }
     }
