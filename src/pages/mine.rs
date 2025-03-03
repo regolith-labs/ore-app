@@ -47,6 +47,7 @@ fn MinerData() -> Element {
     // Get resources
     let mut member = use_member();
     let mut member_record = use_member_record();
+    let member_record_balance = use_member_record_balance();
 
     // Build the claim transaction
     let claim_tx = use_miner_claim_transaction(member);

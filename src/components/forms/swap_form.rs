@@ -149,11 +149,11 @@ fn SwapDetails(
     };
 
     rsx! {
-            Col {
-                class: "px-5",
-                gap: 3,
-                SwapDetailLabel { title: "Price impact", value: price_impact_value }
-                Fee { priority_fee: priority_fee.clone() }
+        Col {
+            class: "px-4",
+            gap: 2,
+            SwapDetailLabel { title: "Price impact", value: price_impact_value }
+            Fee { priority_fee: priority_fee.clone() }
         }
     }
 }

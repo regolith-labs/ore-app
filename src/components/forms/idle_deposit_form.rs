@@ -42,7 +42,10 @@ pub fn IdleDepositForm(
                 toolbar_shortcuts: true,
                 err: err
             }
-            Fee { priority_fee: priority_fee.clone() }
+            Col {
+                class: "w-full px-4",
+                Fee { priority_fee: priority_fee.clone() }
+            }
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
