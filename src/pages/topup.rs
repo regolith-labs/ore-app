@@ -23,7 +23,7 @@ pub fn Topup(address: String) -> Element {
     let priority_fee = use_signal(|| 0);
     let err = use_signal::<Option<TokenInputError>>(|| None);
     let tx = use_topup_transaction(destination, amount, sol_balance, err, priority_fee);
-    let mut status = use_signal(|| TopupStatus::Success);
+    let mut status = use_signal(|| TopupStatus::Editing);
 
     on_transaction_done(move |_| {
         status.set(TopupStatus::Success);
