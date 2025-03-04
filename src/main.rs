@@ -12,6 +12,8 @@ mod time;
 mod utils;
 
 use dioxus::prelude::*;
+#[cfg(feature = "web")]
+use hooks::use_download_url_provider;
 use hooks::{use_miner_cores_provider, use_miner_status_provider, use_mining_loop};
 use tracing::Level;
 
@@ -32,6 +34,8 @@ fn main() {
 }
 
 pub fn App() -> Element {
+    #[cfg(feature = "web")]
+    use_download_url_provider();
     use_miner_provider();
     use_miner_status_provider();
     use_miner_events_provider();
