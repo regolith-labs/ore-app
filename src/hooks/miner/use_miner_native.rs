@@ -1,73 +1,94 @@
+use std::sync::Arc;
+
 use dioxus::prelude::*;
 
 use anyhow::Result;
 use drillx::{equix, Solution};
 use futures::StreamExt;
 use ore_miner_types::{InputMessage, OutputMessage};
+use tokio::sync::Mutex;
 
 /// two way channel between us and miner
 pub fn use_miner_provider() {
+    // system cores monitor
+    let sys = sysinfo::System::new();
+    let sys = Arc::new(Mutex::new(sys));
     // from miner receiver
     let mut from_miner = use_context_provider(|| Signal::new(OutputMessage::Init));
     // to miner sender
     let _to_miner: Coroutine<InputMessage> = use_coroutine(
-        move |mut rx: dioxus::prelude::UnboundedReceiver<InputMessage>| async move {
-            // build continuous solutions channel
-            let (sender, mut receiver) = tokio::sync::mpsc::unbounded_channel::<OutputMessage>();
-            // poll for messages from controller
-            while let Some(msg) = rx.next().await {
-                log::info!("to worker: {:?}", msg);
-                // spawn miner
-                let sender = sender.clone();
-                tokio::spawn(async move {
-                    let device_id = 0;
-                    let cores = msg.cores as u8;
-                    log::info!("cores requested: {:?}", cores);
-                    let challenge = msg.challenge.challenge;
-                    match nonce_indices(&msg.member, &msg.challenge, cores, device_id) {
-                        Ok(nonce_indices) => {
-                            if let Err(err) = find_hash_par(
-                                &challenge.challenge,
-                                challenge.lash_hash_at,
-                                nonce_indices.as_slice(),
-                                msg.cutoff_time as u64,
-                                challenge.min_difficulty as u32,
-                                cores,
-                                &sender,
-                            )
-                            .await
-                            {
+        move |mut rx: dioxus::prelude::UnboundedReceiver<InputMessage>| {
+            let sys = Arc::clone(&sys);
+            async move {
+                // build continuous solutions channel
+                let (sender, mut receiver) =
+                    tokio::sync::mpsc::unbounded_channel::<OutputMessage>();
+                // poll for messages from controller
+                while let Some(msg) = rx.next().await {
+                    log::info!("to worker: {:?}", msg);
+                    // spawn miner
+                    let sender = sender.clone();
+                    tokio::spawn(async move {
+                        let device_id = 0;
+                        let cores = msg.cores as u8;
+                        let challenge = msg.challenge.challenge;
+                        // build nonce space
+                        match nonce_indices(&msg.member, &msg.challenge, cores, device_id) {
+                            Ok(nonce_indices) => {
+                                // spawn miner threads
+                                if let Err(err) = find_hash_par(
+                                    &challenge.challenge,
+                                    challenge.lash_hash_at,
+                                    nonce_indices.as_slice(),
+                                    msg.cutoff_time as u64,
+                                    challenge.min_difficulty as u32,
+                                    cores,
+                                    &sender,
+                                )
+                                .await
+                                {
+                                    log::error!("{:?}", err);
+                                }
+                            }
+                            Err(err) => {
                                 log::error!("{:?}", err);
                             }
                         }
-                        Err(err) => {
-                            log::error!("{:?}", err);
+                    });
+                    // listen for solutions from miner
+                    let mut best_difficulty = 0;
+                    while let Some(msg) = receiver.recv().await {
+                        // submit best solutions
+                        if let OutputMessage::Solution(solution) = msg {
+                            let difficulty = solution.to_hash().difficulty();
+                            // submit
+                            if difficulty.gt(&best_difficulty) {
+                                from_miner.set(msg);
+                                best_difficulty = difficulty;
+                                log::info!("found new best difficulty: {}", best_difficulty);
+                            }
                         }
-                    }
-                });
-                // listen for solutions from miner
-                let mut best_difficulty = 0;
-                while let Some(msg) = receiver.recv().await {
-                    // submit best solutions
-                    if let OutputMessage::Solution(solution) = msg {
-                        let difficulty = solution.to_hash().difficulty();
-                        // submit
-                        if difficulty.gt(&best_difficulty) {
+                        // exit if expired
+                        if let OutputMessage::Expired(_) = msg {
+                            log::info!("expired");
                             from_miner.set(msg);
-                            best_difficulty = difficulty;
-                            log::info!("found new best difficulty: {}", best_difficulty);
+                            break;
                         }
-                    }
-                    // exit if expired
-                    if let OutputMessage::Expired(_) = msg {
-                        log::info!("expired");
-                        from_miner.set(msg);
-                        break;
-                    }
-                    // time remaining
-                    if let OutputMessage::TimeRemaining(remaining) = msg {
-                        log::info!("time remaining: {}", remaining);
-                        from_miner.set(msg);
+                        // time remaining
+                        if let OutputMessage::TimeRemaining(remaining) = msg {
+                            log::info!("time remaining: {}", remaining);
+                            // send time remaining
+                            from_miner.set(msg);
+                            // check core utilization
+                            let mut sys = sys.lock().await;
+                            sys.refresh_cpu_usage(); // Refreshing CPU usage.
+                            let cpus = sys
+                                .cpus()
+                                .into_iter()
+                                .map(|cpu| cpu.cpu_usage())
+                                .collect::<Vec<_>>();
+                            log::info!("cpus: {:?}", cpus);
+                        }
                     }
                 }
             }
@@ -140,14 +161,15 @@ async fn find_hash_par(
                             break;
                         } else if core_id.id == 0 {
                             let remaining = cutoff_time.saturating_sub(timer.elapsed().as_secs());
-                            let _ = solutions_channel
-                                .send(OutputMessage::TimeRemaining(remaining as i64));
-                            log::info!(
-                                "Mining... Time remaining: {} {}",
-                                format_duration(remaining as u32),
-                                nonce,
-                            );
+                            if let Err(err) = solutions_channel
+                                .send(OutputMessage::TimeRemaining(remaining as i64))
+                            {
+                                log::error!("{:?}", err);
+                            }
                         }
+                    }
+                    if core_id.id == 0 {
+                        log::info!("nonce: {:?}", nonce);
                     }
                     // increment nonce
                     nonce += 1;
@@ -185,7 +207,6 @@ fn nonce_indices(
         let index = left_bound + n * range_per_core;
         nonce_indices.push(index);
     }
-    log::info!("nonces: {:?}", nonce_indices);
     Ok(nonce_indices)
 }
 
