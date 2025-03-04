@@ -13,6 +13,7 @@
     --color-elements-disabled: #585661;
     --color-elements-gold: #ECC771;
     --color-elements-purple: #5949B7;
+    --color-elements-green: #49B759;
     --color-elements-contrast: #0F0E11;
     --color-surface-elevated: #131216;
     --color-surface-elevatedHover: #151419;
@@ -41,12 +42,23 @@
 
     /* Keyframes */
     @keyframes marquee {
-        0% { transform: translateX(0%); }
-        100% { transform: translateX(-100%); }
+        0% {
+            transform: translateX(0%);
+        }
+
+        100% {
+            transform: translateX(-100%);
+        }
     }
+
     @keyframes marquee2 {
-        0% { transform: translateX(100%); }
-        100% { transform: translateX(0%); }
+        0% {
+            transform: translateX(100%);
+        }
+
+        100% {
+            transform: translateX(0%);
+        }
     }
 }
 
@@ -70,7 +82,7 @@ body {
     .elevated-border {
         @apply border border-gray-800;
     }
-  
+
     .top-safe {
         top: 0;
         padding-top: env(safe-area-inset-top);
@@ -100,24 +112,28 @@ body {
     font-weight: 300;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'Pilat';
     src: url('/assets/fonts/Pilat/Pilat-Regular.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'Pilat';
     src: url('/assets/fonts/Pilat/Pilat-Book.otf') format('opentype');
     font-weight: 500;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'Pilat';
     src: url('/assets/fonts/Pilat/Pilat-Demi.otf') format('opentype');
     font-weight: 600;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'Pilat';
     src: url('/assets/fonts/Pilat/Pilat-Bold.otf') format('opentype');
@@ -132,24 +148,28 @@ body {
     font-weight: 300;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatWide';
     src: url('/assets/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatWide';
     src: url('/assets/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
     font-weight: 500;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatWide';
     src: url('/assets/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
     font-weight: 600;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatWide';
     src: url('/assets/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
@@ -164,24 +184,28 @@ body {
     font-weight: 300;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatExtended';
     src: url('/assets/fonts/PilatExtended/PilatExtended-Regular.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatExtended';
     src: url('/assets/fonts/PilatExtended/PilatExtended-Book.otf') format('opentype');
     font-weight: 500;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatExtended';
     src: url('/assets/fonts/PilatExtended/PilatExtended-Demi.otf') format('opentype');
     font-weight: 600;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'PilatExtended';
     src: url('/assets/fonts/PilatExtended/PilatExtended-Bold.otf') format('opentype');

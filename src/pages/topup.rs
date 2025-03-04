@@ -1,13 +1,17 @@
 use dioxus::prelude::*;
 
-use crate::{components::*, config::Token, hooks::use_token_balance, route::Route};
-
-// TODO Web top up form
-// TODO Destop modal that links to web form
+use crate::{components::*, config::Token, hooks::use_token_balance};
 
 #[cfg(feature = "web")]
 #[component]
 pub fn Topup(address: String) -> Element {
+    use std::str::FromStr;
+
+    use ore_types::request::TransactionType;
+    use steel::Pubkey;
+
+    use crate::hooks::{on_transaction_done, use_topup_transaction};
+
     enum TopupStatus {
         Editing,
         Success,
@@ -19,7 +23,7 @@ pub fn Topup(address: String) -> Element {
     let priority_fee = use_signal(|| 0);
     let err = use_signal::<Option<TokenInputError>>(|| None);
     let tx = use_topup_transaction(destination, amount, sol_balance, err, priority_fee);
-    let mut status = use_signal(|| TopupStatus::Editing);
+    let mut status = use_signal(|| TopupStatus::Success);
 
     on_transaction_done(move |_| {
         status.set(TopupStatus::Success);
@@ -32,7 +36,7 @@ pub fn Topup(address: String) -> Element {
             Heading {
                 class: "mx-auto w-full",
                 title: "Top up",
-                subtitle: "Transfer SOL to your desktop wallet."
+                subtitle: "Send some SOL to your desktop wallet."
             }
 
             match *status.read() {
@@ -114,16 +118,26 @@ pub fn Topup(address: String) -> Element {
                         Col {
                             class: "mx-auto w-full",
                             gap: 8,
-                            span {
-                                class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
-                                "Success!"
+                            CheckCircleIcon {
+                                class: "mx-auto w-24 h-24 text-elements-green mt-8"
+                            }
+                            Col {
+                                gap: 2,
+                                span {
+                                    class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
+                                    "Success!"
+                                }
+                                span {
+                                    class: "text-elements-lowEmphasis font-medium mx-auto",
+                                    "Your desktop wallet has been topped up."
+                                }
                             }
                             a {
-                                class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
+                                class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer mt-8",
                                 href: "ore://",
                                 span {
                                     class: "mx-auto my-auto",
-                                    "Return to app"
+                                    "Return to app →"
                                 }
                             }
                         }
@@ -137,7 +151,10 @@ pub fn Topup(address: String) -> Element {
 #[cfg(not(feature = "web"))]
 #[component]
 pub fn Topup(address: String) -> Element {
-    use crate::hooks::{use_wallet, Wallet};
+    use crate::{
+        hooks::{use_wallet, Wallet},
+        route::Route,
+    };
 
     let wallet = use_wallet();
     let navigator = use_navigator();
