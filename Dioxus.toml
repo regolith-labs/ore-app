@@ -12,6 +12,9 @@ out_dir = "dist"
 # resource (public) file folder
 asset_dir = "public"
 
+[package]
+name = "ORE"
+
 [web.app]
 
 # HTML title tag content
@@ -29,6 +32,13 @@ watch_path = ["src", "public"]
 index_on_404 = true
 
 [bundle]
+
 publisher = "Regolith Labs Inc."
+
 identifier = "ore.supply"
+
 icon = ["public/icon.png"]
+
+[macos]
+
+info_plist_path = "Info.plist"

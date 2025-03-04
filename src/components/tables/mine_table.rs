@@ -1,7 +1,6 @@
 use crate::{
     components::*,
     hooks::{use_miner_events, MiningEvent},
-    utils::format_percentage,
 };
 use chrono::{DateTime, Local};
 use dioxus::prelude::*;
