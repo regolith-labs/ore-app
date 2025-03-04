@@ -9,7 +9,6 @@ use solana_sdk::{
     signature::Signature,
     system_instruction::transfer,
     transaction::VersionedTransaction,
-    
 };
 
 use crate::{
@@ -212,9 +211,10 @@ pub fn use_pair_withdraw_transaction(
         };
 
         // Add priority fee instruction
-        ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
-            dynamic_priority_fee,
-        ));
+        ixs.insert(
+            1,
+            ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
+        );
 
         // Calculate priority fee in lamports
         let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();

@@ -19,6 +19,7 @@ pub fn IdleWithdrawForm(
     let token = use_signal(|| Some(Token::ore()));
     let err = use_signal::<Option<TokenInputError>>(|| None);
     let priority_fee = use_signal::<u64>(|| 0);
+
     // Get the stake balance
     let stake_balance = use_resource(move || async move {
         let Some(Ok(stake)) = stake.cloned() else {

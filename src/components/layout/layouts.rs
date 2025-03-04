@@ -9,13 +9,23 @@ pub fn AppLayout() -> Element {
     rsx! {
         Col {
             class: "w-screen min-h-dvh",
-            AppNavBar {}
+            AppNavBar { tabs: true }
             MobileTabBar {}
             span {
                 class: "py-5 sm:py-8 w-full max-w-[80rem] mx-auto",
                 Outlet::<Route> {}
             }
             ToastDisplay {}
+        }
+    }
+}
+
+pub fn AppModalLayout() -> Element {
+    rsx! {
+        Col {
+            class: "w-screen h-screen",
+            AppNavBar { tabs: false }
+            Outlet::<Route> {}
         }
     }
 }

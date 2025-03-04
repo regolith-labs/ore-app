@@ -8,7 +8,8 @@ use crate::{
     route::Route,
 };
 
-pub(crate) fn AppNavBar() -> Element {
+#[component]
+pub(crate) fn AppNavBar(tabs: bool) -> Element {
     rsx! {
         Row {
             class: "w-screen h-20 sm:h-24 px-2 sm:px-6 sm:sticky sm:top-0 bg-black z-50 shrink-0",
@@ -18,9 +19,11 @@ pub(crate) fn AppNavBar() -> Element {
                     class: "hidden sm:flex my-auto",
                     Logo {}
                 }
-                div {
-                    class: "absolute left-1/2 -translate-x-1/2 my-auto",
-                    TabBar {}
+                if tabs {
+                    div {
+                        class: "absolute left-1/2 -translate-x-1/2 my-auto",
+                        TabBar {}
+                    }
                 }
                 WalletAdapter {}
             }

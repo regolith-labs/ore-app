@@ -10,7 +10,7 @@ pub fn Download() -> Element {
             Heading {
                 class: "w-full",
                 title: "Download",
-                subtitle: "Coming soon."
+                subtitle: "Install the ORE app."
             }
         }
     }

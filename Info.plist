@@ -6,6 +6,12 @@
     <string>com.ore.app</string>
     <key>CFBundleName</key>
     <string>ORE</string>
+    <key>CFBundleDisplayName</key>
+    <string>ORE</string>
+    <key>CFBundleURLSchemes</key>
+    <array>
+        <string>ore</string>
+    </array>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
