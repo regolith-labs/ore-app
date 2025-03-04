@@ -40,6 +40,7 @@ pub fn App() -> Element {
     use_wallet_provider();
     use_cache_provider();
     use_mining_loop();
+
     rsx! {
         style { "{CSS}" }
         document::Link { rel: "icon", href: asset!("/public/favicon.png") }

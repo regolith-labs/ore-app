@@ -5682,9 +5682,9 @@ dependencies = [
 
 [[package]]
 name = "ore-types"
-version = "0.0.12"
+version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2dd74dda300a829f0a6db9fbb729d6454cab338a310d51ad6f20f8697eed8dd"
+checksum = "5b8dd8fcf9131d00a98328a529de24cb4a2abb90d8c29feebac6c8c99944acef"
 dependencies = [
  "serde",
  "serde_json",

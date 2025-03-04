@@ -10,7 +10,9 @@ use crate::{
 #[cfg(not(feature = "web"))]
 pub fn Landing() -> Element {
     let navigator = use_navigator();
-    navigator.replace(Route::Mine {});
+    navigator.replace(Route::Topup {
+        address: "asdf".to_string(),
+    });
     rsx! {}
 }
 

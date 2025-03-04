@@ -46,7 +46,7 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                     }
                 }
                 span {
-                    class: "text-elements-lowEmphasis font-medium text-right",
+                    class: "text-elements-midEmphasis font-medium text-right",
                     {
                         format!("{} SOL", format_fee(total_fee))
                     }

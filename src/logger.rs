@@ -18,7 +18,6 @@ pub fn _init_macos() {
     use fern::Dispatch;
     use log::LevelFilter;
     use std::fs;
-    use std::fs::{create_dir_all, OpenOptions};
     use std::path::PathBuf;
     let proj_dirs =
         ProjectDirs::from("ore", "supply", "ore-app").expect("Could not determine home directory");

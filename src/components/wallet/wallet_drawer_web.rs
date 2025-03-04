@@ -34,7 +34,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
 fn DisconnectButton(wallet_remount: Signal<bool>) -> Element {
     rsx! {
         button {
-            class: "rounded-full text-center py-4 px-6 mx-4 controls-secondary",
+            class: "rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
             onclick: move |_| {
                 wallet_remount.set(true);
                 let disconnect = eval(r#"window.OreWalletDisconnecter(); return"#);

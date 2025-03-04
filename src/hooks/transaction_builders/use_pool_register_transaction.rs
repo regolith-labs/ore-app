@@ -48,9 +48,10 @@ pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransa
             };
 
             // Add priority fee instruction
-            ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
-                dynamic_priority_fee,
-            ));
+            ixs.insert(
+                1,
+                ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
+            );
 
             // Build transaction with priority fee
             let tx_with_priority_fee = Transaction::new_with_payer(&ixs, Some(&pubkey)).into();

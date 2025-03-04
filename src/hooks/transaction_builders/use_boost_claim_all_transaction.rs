@@ -71,9 +71,10 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
             };
 
             // Add priority fee instruction
-            ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
-                dynamic_priority_fee,
-            ));
+            ixs.insert(
+                1,
+                ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
+            );
 
             // Build final tx with priority fee
             let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
