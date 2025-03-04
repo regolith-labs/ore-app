@@ -211,7 +211,7 @@ pub fn Topup(address: String) -> Element {
             if let Wallet::Connected(address) = *wallet.read() {
                 a {
                     class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
-                    href: "https://ore.supply/topup/{address}",
+                    href: "https://beta.ore.supply/topup/{address}",
                     span {
                         class: "mx-auto my-auto",
                         "Top up →"
