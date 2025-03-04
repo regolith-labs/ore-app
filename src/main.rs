@@ -33,7 +33,7 @@ fn main() {
     logger::init();
     dioxus_logger::init(Level::INFO).expect("failed to init logger");
     #[cfg(target_os = "macos")]
-    let _nap_blocker = AppNapDisabler::new("My Rust App – Prevent App Nap");
+    let _nap_blocker = AppNapDisabler::new();
     launch(App);
 }
 

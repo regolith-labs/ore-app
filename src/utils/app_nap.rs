@@ -11,7 +11,8 @@ pub struct AppNapDisabler {
 impl AppNapDisabler {
     /// Call this to disable App Nap. Keep the instance alive as long
     /// as you need to remain active.
-    pub fn new(reason: &str) -> Self {
+    pub fn new() -> Self {
+        let reason: &str = "ORE -- Prevent App Nap";
         // Apple’s documented bitmask to disable system sleep, user-initiated activity, etc.
         const NS_ACTIVITY_IDLE_SYSTEM_SLEEP_DISABLED: u64 = 1 << 20;
         const NS_ACTIVITY_USER_INITIATED: u64 = 0x00FFFFFF | NS_ACTIVITY_IDLE_SYSTEM_SLEEP_DISABLED;

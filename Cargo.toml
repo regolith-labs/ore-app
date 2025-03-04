@@ -1,6 +1,6 @@
 [package]
 name = "ore-app"
-version = "1.1.2"
+version = "1.1.1"
 description = "Liquid digital gold."
 edition = "2021"
 license = "Apache-2.0"
@@ -11,7 +11,7 @@ readme = "./README.md"
 keywords = ["solana", "crypto", "mining"]
 
 [features]
-default = ["desktop"]
+default = ["web"]
 bundle = []
 desktop = [
   "cargo-packager-updater",
