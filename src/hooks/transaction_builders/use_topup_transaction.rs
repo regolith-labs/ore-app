@@ -1,6 +1,4 @@
 use dioxus::prelude::*;
-use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
-use ore_boost_api::state::Stake;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     native_token::sol_to_lamports,
@@ -14,7 +12,6 @@ use crate::{
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
     hooks::{use_gateway, use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
-    solana::spl_token::ui_amount_to_amount,
 };
 
 pub fn use_topup_transaction(
