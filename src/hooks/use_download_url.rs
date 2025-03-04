@@ -47,7 +47,6 @@ pub fn use_download_url_provider() {
     spawn(async move {
         match eval.recv::<String>().await {
             Ok(arch) => {
-                log::info!("arch: {:?}", arch);
                 let arch = arch_from_string(arch.as_str());
                 let artifact = artifact(&arch);
                 signal.set(artifact);
