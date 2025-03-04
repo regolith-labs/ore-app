@@ -1130,6 +1130,18 @@
   .border-t-elements-highEmphasis {
     border-top-color: var(--color-elements-highEmphasis);
   }
+  .bg-amber-800 {
+    background-color: var(--color-amber-800);
+  }
+  .bg-red-950 {
+    background-color: var(--color-red-950);
+  }
+  .bg-lime-950 {
+    background-color: var(--color-lime-950);
+  }
+  .bg-lime-800 {
+    background-color: var(--color-lime-800);
+  }
   .bg-amber-950 {
     background-color: var(--color-amber-950);
   }

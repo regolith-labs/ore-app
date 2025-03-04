@@ -1,0 +1,60 @@
+==Todos==
+use_idle_deposit_transaction (done)
+use_idle_withdraw_transaction (done)
+use_pair_deposit_transaction (done)
+use_pair_withdraw_transaction (done)
+
+
+
+=Pending=
+User's pending claimable balance on the mine page should update after they stop mining
+if it has changed or it should be increased as mining solutions are submitted
+
+==PoolRegister==
+7,613 -> with new account
+
+==PoolClaim==
+22,386
+42,925 -> with creating ata
+
+
+==BoostClaim==
+=All=
+17,110
+
+=Single=
+12,278
+13,778
+
+==deposits==
+=idle=
+28,580  (1)
+17,428
+17,428
+18,928
+18,928
+25,851
+
+=pair=
+317,704
+318,950 (1)
+289,159
+292,538
+287,092
+344,083 (1) -> with creating ata
+
+==withdraws==
+
+=idle=
+17,784
+17,784
+17,784
+
+=pair=
+167,603
+323,033 (1)
+316,718
+318,857
+322,248
+314,702
+317,096 -> with creating ata
