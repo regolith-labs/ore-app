@@ -79,6 +79,15 @@ pub fn use_miner_provider() {
                             log::info!("time remaining: {}", remaining);
                             // send time remaining
                             from_miner.set(msg);
+                            // check core utilization
+                            let mut sys = sys.lock().await;
+                            sys.refresh_cpu_usage(); // Refreshing CPU usage.
+                            let cpus = sys
+                                .cpus()
+                                .into_iter()
+                                .map(|cpu| cpu.cpu_usage())
+                                .collect::<Vec<_>>();
+                            log::info!("cpus: {:?}", cpus);
                         }
                     }
                 }
