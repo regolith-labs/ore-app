@@ -1,46 +1,7 @@
-/*
-Transaction builder
-- unix timestamp
-inAmount: u64,: total amount to sell
-inAmountPerCycle: ttal amount to slel per buy
-cycleFrequency: i64: number of seconds between peridic buys
-startAt: i64: unix timestamp of when to start
-
-
-
-
-pub fn open_dca_v2(
-    ctx: Context<OpenDcaOnBehalf>,
-    application_idx: u64,
-    in_amount: u64,
-    in_amount_per_cycle: u64,
-    cycle_frequency: i64,
-    min_out_amount: Option<u64>,
-    max_out_amount: Option<u64>,
-    start_at: Option<i64>,
-) -> Result<()> {
-
-
-
- const [dca] = await PublicKey.findProgramAddressSync(
-  [
-    Buffer.from("dca"),
-    userPubKey.toBuffer(),
-    inTokenPubKey.toBuffer(),
-    outTokenPubKey.toBuffer(),
-    new BN(parseInt((Date.now() / 1000).toString())).toArrayLike(
-      Buffer,
-      "le",
-      8
-    ),
-  ],
-  new PublicKey("DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M")
-);
-*/
-
 use std::str::FromStr;
 
 use crate::config::Token;
+use crate::gateway::jupiter::JupiterGateway;
 use crate::hooks::{use_gateway, use_wallet, GetPubkey};
 use crate::{
     components::TokenInputError,
@@ -69,22 +30,31 @@ pub fn use_recurring_transaction(
     mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let gateway = use_gateway();
 
     use_resource(move || async move {
-        let pubkey = wallet.pubkey()?;
+        // Check if wallet is connected
+        let Wallet::Connected(authority) = *wallet.read() else {
+            return Err(GatewayError::WalletDisconnected);
+        };
 
+        // Ensure we have sell token
         let Some(sell_token) = sell_token.read().clone() else {
             return Err(GatewayError::Unknown);
         };
 
+        // Ensure we have buy token
         let Some(buy_token) = buy_token.read().clone() else {
             return Err(GatewayError::Unknown);
         };
 
+        // Ensure we have enough sell token balances
         let Some(Ok(sell_token_balance)) = sell_token_balance.read().clone() else {
             err.set(Some(TokenInputError::InsufficientBalance(sell_token)));
             return Err(GatewayError::Unknown);
         };
+
+        // TODO REQUIRE MINIMUM SELL AMOUNT OF 100
 
         // Check if user's current balance is sufficient to cover the total sell amount
         let sell_token_balance_u64 = sell_token_balance
@@ -97,95 +67,67 @@ pub fn use_recurring_transaction(
             return Err(GatewayError::Unknown);
         }
 
-        // Rpc
+        let ixs = vec![];
+
+        // Set compute unit limit
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
+            COMPUTE_UNIT_LIMIT,
+        ));
+
+        let dca_ix = match gateway
+            .build_jupiter_dca_instruction(
+                authority,
+                sell_token,
+                buy_token,
+                sell_amount,
+                sell_amount_per_cycle,
+                cycle_frequency,
+                start_at,
+            )
+            .await
+        {
+            Ok(ix) => ix,
+            Err(e) => {
+                // err.set(Some(TokenInputError::Unknown(e.to_string())));
+                return Err(GatewayError::JupDcaError);
+            }
+        };
+
+        ixs.extend(dca_ix);
+
+        // Include ORE app fee
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, 5000));
+
+        // Build initial transaction to estimate priority fee
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        // Get priority fee estimate
         let gateway = use_gateway();
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
+            Ok(fee) => fee,
+            Err(_) => {
+                log::error!("Failed to fetch priority fee estimate");
+                return Err(GatewayError::Unknown);
+            }
+        };
 
-        // Unix timestamp
-        let clock = gateway.rpc.get_clock().await?;
-        let current_time = clock.unix_timestamp;
-        let timestamp = current_time.to_le_bytes();
+        // Add priority fee instruction
+        ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
+            dynamic_priority_fee,
+        ));
 
-        // Jup DCA Program ID
-        let dca_program_id =
-            Pubkey::from_str("DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M").unwrap();
+        // Calculate priority fee in lamports
+        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        let dynamic_priority_fee_in_lamports =
+            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
 
-        // Get DCA PDA for current user
-        let dca_pda = Pubkey::find_program_address(
-            &[
-                b"dca",
-                sell_token.mint.as_ref(),
-                buy_token.mint.as_ref(),
-                &timestamp,
-            ],
-            &dca_program_id,
-        )
-        .0;
+        // // Set priority fee for UI
+        // priority_fee.set(dynamic_priority_fee_in_lamports);
 
-        // let dca = Dca::new(
-        //     dca_pda,
-        //     sell_token.mint,
-        //     buy_token.mint,
-        //     current_time,
-        //     sell_amount,
-        //     sell_amount_count,
-        //     sell_frequency,
-        // );
+        // Build final tx with priority fee
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
-        // // Get ata for the sell token
-        // let sell_token_ata = get_associated_token_address(&sell_token.mint, &pubkey);
-
-        // // Create ata for the sell token based on PDA
-        // let in_ata = get_or_create_associated_token_address(&pubkey, &sell_token.mint);
-
-        // // Create ataa for the buy token based on PDA
-
-        // let mut ixs = vec![];
-        // let dca_ix_args = OpenDcaV2InstructionArgs {
-        //   dca: dca_pda,
-        //   user: pubkey,
-        //   payer: pubkey,
-        //   input_mint: sell_token.mint,
-        //   output_mint: buy_token.mint,
-        //   system_program: Pubkey::from_str("11111111111111111111111111111111").unwrap(),
-        //   token_program: Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap(),
-        //   associated_token_program: Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap(),
-        //   event_authority: Pubkey::from_str("Cspp27eGUDMXxPEdhmEXFVRn6Lt1L7xJyALF3nmnWoBj").unwrap(),
-        //   program: Pubkey::from_str("DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M").unwrap(),
-        //   // pub dca: solana_program::pubkey::Pubkey,
-
-        //   // pub user: solana_program::pubkey::Pubkey,
-
-        //   // pub payer: solana_program::pubkey::Pubkey,
-
-        //   // pub input_mint: solana_program::pubkey::Pubkey,
-
-        //   // pub output_mint: solana_program::pubkey::Pubkey,
-
-        //   // pub user_ata: solana_program::pubkey::Pubkey,
-
-        //   // pub in_ata: solana_program::pubkey::Pubkey,
-
-        //   // pub out_ata: solana_program::pubkey::Pubkey,
-
-        //   // pub system_program: solana_program::pubkey::Pubkey,
-
-        //   // pub token_program: solana_program::pubkey::Pubkey,
-
-        //   // pub associated_token_program: solana_program::pubkey::Pubkey,
-
-        //   // pub event_authority: solana_program::pubkey::Pubkey,
-
-        //   // pub program: solana_program::pubkey::Pubkey,ata:
-
-        // }
-
-        // let mut ixs = vec![];
-
-        // userAta will be the ata for the token that is being sold
-        // inAta will be the DCA PDA's ata for the token to sell
-        // getAssociatedTokenAddressSync(inputMint, dcaPubKey, true)
-        // outAta will be the DCA PDA's for the token to buy
-        // getAssociatedTokenAddressSync(outputMint, dcaPubKey, true)
         Ok(VersionedTransaction::default())
     })
 }

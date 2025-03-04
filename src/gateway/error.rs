@@ -15,6 +15,7 @@ pub enum GatewayError {
     ProgramBuilderFailed,
     WalletDisconnected,
     JupSwapError,
+    JupDcaError,
     ParseTokenStringAmmount,
     Keyring,
     BincodeSerialize,
@@ -54,6 +55,13 @@ impl From<jupiter_swap_api_client::ClientError> for GatewayError {
     fn from(value: jupiter_swap_api_client::ClientError) -> Self {
         log::error!("{:?}", value);
         GatewayError::JupSwapError
+    }
+}
+
+impl From<jupiter_dca_sdk::errors::DcaError> for GatewayError {
+    fn from(value: jupiter_dca_sdk::errors::DcaError) -> Self {
+        log::error!("{:?}", value);
+        GatewayError::JupDcaError
     }
 }
 
