@@ -11480,3 +11480,8 @@ dependencies = [
  "quote",
  "syn 2.0.98",
 ]
+
+[[patch.unused]]
+name = "jupiter-dca-sdk"
+version = "0.0.1"
+source = "git+https://github.com/regolith-labs/jupiter-dca-sdk?branch=master#3d3d79e30647fd25aaef8e46f5ab7575014132bb"

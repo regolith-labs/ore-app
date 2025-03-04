@@ -14,7 +14,27 @@ use solana_sdk::transaction::VersionedTransaction;
 
 use super::TokenInputError;
 
+/*
+Require:
+- min # of orders is 2
+- min allocation for 2 order is $100
 
+Order summary
+- sell total
+- sell per order
+- to buy -> Ticker
+- Order interval (frequency)
+- Estimated end date
+- Platform fee
+
+First purchase is made immediately after user orders DCA +/- 30 seconds
+We'll make ata if the user does not have one
+All of the sell tokkens will be stored in user's DCA vault
+
+inAta -> ata
+outAta
+
+*/
 
 #[component]
 pub fn RecurringForm(class: Option<String>) -> Element {
@@ -22,7 +42,7 @@ pub fn RecurringForm(class: Option<String>) -> Element {
 
     // Selected tokens
     let buy_token = use_signal(|| Some(Token::ore()));
-    let sell_token = use_signal(|| Some(Token::sol()));
+    let sell_token = use_signal(|| Some(Token::usdc()));
 
     // Input amounts
     let mut sell_input_amount = use_signal::<String>(|| "".to_string());
@@ -195,31 +215,6 @@ pub fn RecurringForm(class: Option<String>) -> Element {
                                 span {
                                     class: "relative h-12 pr-1 my-auto flex items-center justify-end text-right",
                                     "orders"
-                                    // select {
-                                    //     class: "text-md placeholder:text-gray-700 font-semibold bg-transparent h-12 pr-1 my-auto w-full outline-none text-right appearance-none",
-                                    //     value: value.read().clone(),
-                                    //     oninput: move |e: FormEvent| update.set(e.value()),
-                                    //     option {
-                                    //         value: "minute",
-                                    //         "Minute"
-                                    //     }
-                                    //     option {
-                                    //         value: "hour",
-                                    //         "Hour"
-                                    //     }
-                                    //     option {
-                                    //         value: "day",
-                                    //         "Day"
-                                    //     }
-                                    //     option {
-                                    //         value: "week",
-                                    //         "Week"
-                                    //     }
-                                    //     option {
-                                    //         value: "month",
-                                    //         "Month"
-                                    //     }
-                                    // }
                                 }
                             }
                         }

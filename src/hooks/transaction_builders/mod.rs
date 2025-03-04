@@ -7,6 +7,7 @@ mod use_miner_claim_transaction;
 mod use_pair_deposit_transaction;
 mod use_pair_withdraw_transaction;
 mod use_pool_register_transaction;
+mod use_recurring_transaction;
 mod use_swap_transaction;
 
 pub const MIN_SOL_BALANCE: f64 = 0.1;
@@ -24,4 +25,5 @@ pub use use_miner_claim_transaction::*;
 pub use use_pair_deposit_transaction::*;
 pub use use_pair_withdraw_transaction::*;
 pub use use_pool_register_transaction::*;
+pub use use_recurring_transaction::*;
 pub use use_swap_transaction::*;
