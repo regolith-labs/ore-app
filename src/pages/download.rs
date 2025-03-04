@@ -1,10 +1,17 @@
 use dioxus::prelude::*;
 
+#[cfg(feature = "web")]
 use crate::{
     components::{Col, Heading},
     hooks::use_download_url,
 };
 
+#[cfg(not(feature = "web"))]
+pub fn Download() -> Element {
+    rsx! {}
+}
+
+#[cfg(feature = "web")]
 pub fn Download() -> Element {
     let url = use_download_url();
 

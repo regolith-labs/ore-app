@@ -1,4 +1,3 @@
-use anyhow::Result;
 use dioxus::document::eval;
 use dioxus::prelude::*;
 
