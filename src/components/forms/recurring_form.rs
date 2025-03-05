@@ -62,6 +62,15 @@ pub fn RecurringForm(class: Option<String>) -> Element {
     // Priority fee
     let mut priority_fee = use_signal::<u64>(|| 0);
 
+    // Sell amount count
+    let mut sell_amount_count = use_signal(|| "1".to_string());
+
+    // Sell frequency
+    let mut sell_frequency = use_signal(|| "1".to_string());
+
+    // Number of orders
+    let mut num_orders = use_signal(|| "2".to_string());
+
     // When sell input amount changes, fetch a new quote
     use_effect(move || {
         let sell_input_amount = sell_input_amount.read().clone();
@@ -93,11 +102,7 @@ pub fn RecurringForm(class: Option<String>) -> Element {
     });
 
     let placeholder = "1";
-    let mut value = use_signal(|| "1".to_string());
-    let mut update = use_signal(|| "1".to_string());
 
-    // todo: make every component
-    // todo: make over component
     rsx! {
         Col {
             class: "w-full gap-4 {class}",
@@ -157,14 +162,14 @@ pub fn RecurringForm(class: Option<String>) -> Element {
                                     step: "any",
                                     inputmode: "numeric",
                                     value: value.read().clone(),
-                                    oninput: move |e: FormEvent| update.set(e.value()),
+                                    oninput: move |e: FormEvent| sell_amount_count.set(e.value()),
                                 }
                                 div {
                                     class: "relative w-full",
                                     select {
                                         class: "text-md placeholder:text-gray-700 bg-transparent h-12 pr-1 my-auto w-full outline-none text-right appearance-none",
                                         value: value.read().clone(),
-                                        oninput: move |e: FormEvent| update.set(e.value()),
+                                        oninput: move |e: FormEvent| sell_frequency.set(e.value()),
                                         option {
                                             value: "minute",
                                             selected: true,
@@ -210,7 +215,7 @@ pub fn RecurringForm(class: Option<String>) -> Element {
                                     step: "any",
                                     inputmode: "numeric",
                                     value: value.read().clone(),
-                                    oninput: move |e: FormEvent| update.set(e.value()),
+                                    oninput: move |e: FormEvent| num_orders.set(e.value()),
                                 }
                                 span {
                                     class: "relative h-12 pr-1 my-auto flex items-center justify-end text-right",
