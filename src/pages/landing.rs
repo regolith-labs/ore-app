@@ -86,6 +86,7 @@ fn HeroTitle() -> Element {
                 class: "md:mb-auto z-10",
                 "Gold"
             }
+
         }
     }
 }
@@ -104,7 +105,7 @@ fn Mining() -> Element {
                     }
                     MiningGuide {}
                     SectionCtas {
-                        primary_title: "Start mining →",
+                        primary_title: "Start now →",
                         primary_route: Route::Mine {},
                         secondary_title: "Learn more",
                         secondary_route: Route::Mine {}
@@ -221,13 +222,13 @@ fn MiningGuide() -> Element {
             }
             GuideStep {
                 step: "2",
-                title: "Hop in",
-                detail: "Join a mining pool to reduce transaction fees."
+                title: "Join a pool",
+                detail: "Save money and reduce transaction fees."
             }
             GuideStep {
                 step: "3",
                 title: "Mine crypto",
-                detail: "Utilize spare hashpower and earn rewards."
+                detail: "Earn rewards by utilizing spare hashpower."
             }
         }
     }
@@ -284,10 +285,10 @@ fn Liquidity() -> Element {
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is unifying liquidity across Solana onto a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the depth of the network."
+                        "ORE is consolidating liquidity across Solana around a new digital gold standard. Liquidity providers can earn competitive yield by strengthening the depth of the network."
                     }
                     SectionCtas {
-                        primary_title: "Earn yield →",
+                        primary_title: "Explore markets →",
                         primary_route: Route::Stake {},
                         secondary_title: "Learn more",
                         secondary_route: Route::Stake {}
