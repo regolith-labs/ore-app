@@ -832,9 +832,6 @@
   .w-5 {
     width: calc(var(--spacing) * 5);
   }
-  .w-5xl {
-    width: var(--container-5xl);
-  }
   .w-6 {
     width: calc(var(--spacing) * 6);
   }
@@ -864,6 +861,9 @@
   }
   .w-56 {
     width: calc(var(--spacing) * 56);
+  }
+  .w-5xl {
+    width: var(--container-5xl);
   }
   .w-96 {
     width: calc(var(--spacing) * 96);
@@ -1085,6 +1085,9 @@
   }
   .border-elements-lowEmphasis {
     border-color: var(--color-elements-lowEmphasis);
+  }
+  .border-elements-lowEmphasis\/40 {
+    border-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 40%, transparent);
   }
   .border-elements-midEmphasis {
     border-color: var(--color-elements-midEmphasis);

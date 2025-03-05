@@ -239,11 +239,11 @@ fn StakeTableRowTitle(
                     }
                     match boost_meta.lp_type {
                         LpType::Kamino => rsx! { img {
-                            class: "w-4 h-4 shrink-0 my-auto rounded",
+                            class: "w-4 h-4 shrink-0 my-auto rounded border border-elements-lowEmphasis/40",
                             src: asset!("/public/kamino_logo.jpg"),
                         }},
                         LpType::Meteora => rsx! { img {
-                            class: "w-4 h-4 shrink-0 my-auto rounded",
+                            class: "w-4 h-4 shrink-0 my-auto rounded border border-elements-lowEmphasis/40",
                             src: asset!("/public/meteora_logo.jpg"),
                         }},
                     }
