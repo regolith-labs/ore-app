@@ -285,7 +285,7 @@ fn Liquidity() -> Element {
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is attracting liquidity across Solana to a new digital gold standard. Liquidity providers can earn competitive yield by strengthening the depth of the network."
+                        "ORE is attracting liquidity across Solana onto a new digital gold standard. Liquidity providers can earn competitive yield by strengthening the depth of the network."
                     }
                     SectionCtas {
                         primary_title: "Explore markets →",
