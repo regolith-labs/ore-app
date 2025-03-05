@@ -191,7 +191,7 @@ fn SwapButton(
             class: "w-full",
             gap: 4,
             button {
-                class: "h-12 w-full rounded-full controls-primary transition-transform hover:not-disabled:scale-105",
+                class: "h-12 w-full rounded-full controls-primary transition-all duration-300 ease-in-out hover:not-disabled:scale-105",
                 disabled: is_disabled,
                 onclick: move |_| {
                     let swap_tx = &*swap_tx.read();

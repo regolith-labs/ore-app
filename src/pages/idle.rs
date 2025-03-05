@@ -135,7 +135,7 @@ pub fn StakeYield(
     rsx! {
         TitledResourceRow {
             title: "Yield",
-            description: "The amount of ORE you have earned from your deposits and may now claim. Native yield is not automatically compounded.",
+            description: "The amount of ORE you have earned and may now claim. Yield is not automatically compounded.",
             resource: stake,
             com: |stake| {
                 rsx! {
@@ -192,7 +192,7 @@ pub fn Apy() -> Element {
     rsx! {
         TitledRow {
             title: "APY",
-            description: "The estimated annualized percentage yield of participating in the boost. Calculation is derived from the last 7 days of distributed yield divided by the total deposits currently in the boost. This estimate in no way guarantees future returns.",
+            description: "An annualized percentage yield derived from the last 7 days of trailing returns divided by the total value of deposits currently in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
                 if let Ok(apy) = apy.cloned() {
                     span {
@@ -212,7 +212,7 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Multiplier",
-            description: "The multiplier measures the boost's relative priority for receiving native yield. The higher the multiplier, the more ORE will be allocated for stakers in the boost.",
+            description: "The multiplier is an indicator of this boost's priority relative to other LP protocols that receive ORE yield. The higher the multiplier, the more ORE will be allocated for stakers in the protocol.",
             resource: boost,
             com: |boost| rsx! {
                 span {
@@ -229,7 +229,7 @@ fn TotalDeposits(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Total deposits",
-            description: "The total amount of ORE deposited by participants in the boost.",
+            description: "The total amount of ORE deposited by stakers in the protocol.",
             resource: boost,
             com: |boost| {
                 rsx! {
@@ -249,7 +249,7 @@ pub fn TotalStakers(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Total stakers",
-            description: "The total number of users participating in the boost.",
+            description: "The total number of stakers participating in the protocol.",
             resource: boost,
             com: |boost| {
                 rsx! {
@@ -269,7 +269,7 @@ fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledRow {
             title: "TVL",
-            description: "The current notional value of all ORE deposited in the boost, denominated in US dollars.",
+            description: "The current notional value of all ORE deposited in the protocol, denominated in US dollars.",
             value: rsx! {
                 if let Some(ore_price) = ore_price.cloned() {
                     if let Some(Ok(boost)) = boost.cloned() {

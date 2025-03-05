@@ -228,7 +228,7 @@ fn MiningGuide() -> Element {
             GuideStep {
                 step: "3",
                 title: "Mine crypto",
-                detail: "Earn rewards by utilizing spare hashpower."
+                detail: "Earn rewards with just a computer."
             }
         }
     }
