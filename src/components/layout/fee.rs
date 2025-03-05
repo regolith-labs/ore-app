@@ -55,7 +55,7 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
             Col {
                 class: "overflow-hidden transition-all duration-300 ease-in-out w-full px-2 {max_height}",
                 Col {
-                    class: "pt-4 gap-2 transition-opacity duration-300 ease-in-out w-full {opacity}",
+                    class: "pt-2 gap-2 transition-opacity duration-300 ease-in-out w-full {opacity}",
                     Row {
                         class: "w-full justify-between",
                         span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "App fee" }
