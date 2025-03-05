@@ -84,7 +84,7 @@ fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Deposits",
-            description: "The amount of ORE you have deposited in the boost. This ORE is \"idle\" and thus earns the native idle yield rate.",
+            description: "The amount of ORE you have deposited in the protocol. This ORE is \"idle\" and thus earns the native idle yield rate.",
             resource: stake,
             com: |stake| {
                 rsx! {
@@ -110,7 +110,7 @@ fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
             if stake.balance_pending > 0 {
                 TitledRow {
                     title: "Deposits (pending)",
-                    description: "The amount of ORE you have deposited in the boost that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
+                    description: "The amount of ORE you have deposited that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
                     value: rsx! {
                         OreValue {
                             ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
@@ -135,7 +135,7 @@ pub fn StakeYield(
     rsx! {
         TitledResourceRow {
             title: "Yield",
-            description: "The amount of ORE you have earned and may now claim. Yield is not automatically compounded.",
+            description: "The amount of ORE you have earned and may claim. Yield is not automatically compounded.",
             resource: stake,
             com: |stake| {
                 rsx! {
@@ -192,7 +192,7 @@ pub fn Apy() -> Element {
     rsx! {
         TitledRow {
             title: "APY",
-            description: "An annualized percentage yield derived from the last 7 days of trailing returns divided by the total value of deposits currently in the protocol. This estimate in no way guarantees future returns.",
+            description: "The annualized percentage yield returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
                 if let Ok(apy) = apy.cloned() {
                     span {
@@ -212,7 +212,7 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Multiplier",
-            description: "The multiplier is an indicator of this boost's priority relative to other LP protocols that receive ORE yield. The higher the multiplier, the more ORE will be allocated for stakers in the protocol.",
+            description: "The multiplier is an indicator of this protocol's priority relative to other protocols that receive ORE yield. The higher the multiplier, the more ORE will be allocated to stakers in the protocol.",
             resource: boost,
             com: |boost| rsx! {
                 span {
@@ -229,7 +229,7 @@ fn TotalDeposits(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "Total deposits",
-            description: "The total amount of ORE deposited by stakers in the protocol.",
+            description: "The total amount of ORE currently deposited in this protocol.",
             resource: boost,
             com: |boost| {
                 rsx! {
@@ -269,7 +269,7 @@ fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledRow {
             title: "TVL",
-            description: "The current notional value of all ORE deposited in the protocol, denominated in US dollars.",
+            description: "The notional value of all ORE currently deposited in this protocol, denominated in US dollars.",
             value: rsx! {
                 if let Some(ore_price) = ore_price.cloned() {
                     if let Some(Ok(boost)) = boost.cloned() {

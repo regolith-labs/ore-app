@@ -120,7 +120,7 @@ fn Deposits(
     rsx! {
         TitledRow {
             title: "Deposits",
-            description: "The amount of liquidity you have deposited in the boost. These assets are \"productive\" and earn trading fees from market activity.",
+            description: "The amount of liquidity you have deposited in the protocol. These assets are \"productive\" and automatically earn trading fees from market activity.",
             value: rsx! {
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
                     if let Some(stake) = stake.cloned() {
@@ -160,7 +160,7 @@ fn PendingDeposits(
                 if stake.balance_pending > 0 {
                     TitledRow {
                         title: "Deposits (pending)",
-                        description: "The amount of liquidity you have deposited in the boost that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
+                        description: "The amount of liquidity you have deposited that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
                         value: rsx! {
                             LiquidityPairStakeValue {
                                 class: "pb-0 sm:pb-4",
@@ -193,7 +193,7 @@ fn UnstakedLp(
                 if lp_balance.ui_amount.unwrap_or(0.0) > 0.0 {
                     TitledRow {
                         title: "Unstaked",
-                        description: format!("You have {} LP tokens that have not been staked in the boost. Deposit these tokens to earn ORE native yield.", lp_balance.amount),
+                        description: format!("You have {} LP tokens that are not staked in the boost program. Deposit these tokens to earn ORE yield.", lp_balance.amount),
                         value: rsx! {
                             LiquidityPairStakeValue {
                                 stake_balance: lp_balance.amount.parse::<u64>().unwrap_or(0),
@@ -260,7 +260,7 @@ pub fn Apy(boost_meta: BoostMeta) -> Element {
     rsx! {
         TitledRow {
             title: "APY",
-            description: "The estimated annualized percentage yield of participating in the boost. This calculation is derived from the last 7 days of distributed yield divided by the total deposits currently in the boost. This estimate in no way guarantees future returns.",
+            description: "The annualized percentage yield returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
                 if let Ok(apy) = apy.cloned() {
                     span {
@@ -280,7 +280,7 @@ fn Protocol(boost_meta: BoostMeta) -> Element {
     rsx! {
         TitledRow {
             title: "Protocol",
-            description: "The underlying protocol managing all liquidity deposited in the boost. This protocol deploys provided assets into a strategy to earn trading fees from market activity.",
+            description: "The underlying protocol managing all deposited liquidity. This protocol deploys deposited assets into a strategy to earn trading fees from market activity.",
             value: rsx! {
                 a {
                     class: "text-elements-highEmphasis font-medium hover:underline",
@@ -301,7 +301,7 @@ fn TotalDeposits(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Elem
     rsx! {
         TitledResourceRow {
             title: "Total deposits",
-            description: "The total amount of liquidity deposited by participants in the boost.",
+            description: "The total amount of liquidity deposited in the protocol.",
             resource: liquidity_pair,
             com: |liquidity_pair| rsx! {
                 LiquidityPairValue {
@@ -319,7 +319,7 @@ fn Tvl(liquidity_pair: Resource<GatewayResult<LiquidityPair>>) -> Element {
     rsx! {
         TitledResourceRow {
             title: "TVL",
-            description: "The current notional value of all liquidity deposited in the boost, denominated in US dollars.",
+            description: "The notional value of all liquidity currently deposited in the protocol, denominated in US dollars.",
             resource: liquidity_pair,
             com: |liquidity_pair| rsx! {
                 UsdValue {
