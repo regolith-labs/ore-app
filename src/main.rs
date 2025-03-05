@@ -17,7 +17,7 @@ use hooks::use_download_url_provider;
 use hooks::{use_miner_cores_provider, use_miner_status_provider, use_mining_loop};
 use tracing::Level;
 
-#[cfg(target_os = "macos")]
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 use crate::utils::AppNapDisabler;
 use crate::{
     hooks::{
@@ -32,7 +32,7 @@ const CSS: &str = include_str!("../public/tailwind.css");
 fn main() {
     logger::init();
     dioxus_logger::init(Level::INFO).expect("failed to init logger");
-    #[cfg(target_os = "macos")]
+    #[cfg(all(feature = "desktop", target_os = "macos"))]
     let _nap_blocker = AppNapDisabler::new();
     launch(App);
 }

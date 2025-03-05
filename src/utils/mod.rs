@@ -1,6 +1,6 @@
 // #[cfg(feature = "desktop")]
 // mod file;
-#[cfg(target_os = "macos")]
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 mod app_nap;
 mod format;
 mod liquidity_pair;
@@ -8,7 +8,7 @@ mod liquidity_pair;
 mod metrics;
 mod serde;
 
-#[cfg(target_os = "macos")]
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 pub use app_nap::*;
 pub use format::*;
 pub use liquidity_pair::*;
