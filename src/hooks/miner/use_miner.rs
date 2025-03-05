@@ -48,3 +48,14 @@ pub fn use_miner_cores_provider() {
 pub fn use_miner_cores() -> Signal<usize> {
     use_context()
 }
+
+pub fn use_miner_cpu_utilization() -> Signal<Vec<f32>> {
+    let (from_miner, _to_miner) = use_miner();
+    let mut signal = use_signal(|| vec![]);
+    use_memo(move || {
+        if let OutputMessage::TimeRemaining(_, vec) = &*from_miner.read() {
+            signal.set(vec.clone());
+        }
+    });
+    signal
+}

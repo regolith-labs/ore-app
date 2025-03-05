@@ -7,9 +7,9 @@ use crate::{
     gateway::pool::PoolGateway,
     hooks::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
-        use_miner_status, use_pool_register_transaction, use_pool_url, use_wallet, MinerStatus,
-        Wallet,
+        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_cpu_utilization,
+        use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url,
+        use_wallet, MinerStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -197,9 +197,16 @@ fn MinerStatus() -> Element {
 
     let mut time_remaining = use_signal(|| 60);
     use_effect(move || {
-        if let OutputMessage::TimeRemaining(time) = out_msg.cloned() {
+        if let OutputMessage::TimeRemaining(time, _) = out_msg.cloned() {
             time_remaining.set(time);
         }
+    });
+
+    // TODO: display
+    let cpu_utilization = use_miner_cpu_utilization();
+    use_memo(move || {
+        let vec = cpu_utilization.read();
+        log::info!("cpu utilization: {:?}", vec);
     });
 
     rsx! {
