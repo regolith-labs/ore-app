@@ -285,7 +285,7 @@ fn Liquidity() -> Element {
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is attracting liquidity across Solana onto a new digital gold standard. Liquidity providers can earn competitive yield rates by deepening the network."
+                        "ORE is consolidating liquidity across Solana around a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the depth of the network."
                     }
                     SectionCtas {
                         primary_title: "Explore stake →",
@@ -325,10 +325,10 @@ struct TestimonialData {
 fn Testimonials() -> Element {
     let data = vec![
         TestimonialData {
-            image: "https://pbs.twimg.com/profile_images/1651271535800336406/vR1FxvDs_400x400.jpg".into(),
-            name: "Matty Tay".into(),
-            quote: "BTC walked so ORE could run.".into(),
-            link: "https://x.com/mattytay/status/1870887900663169059".into()
+            image: "https://pbs.twimg.com/profile_images/1892613729700691968/cG64Yc06_400x400.jpg".into(),
+            name: "Anatoly Yakovenko".into(),
+            quote: ".OREsupply is cool".into(),
+            link: "https://x.com/aeyakovenko/status/1891891612235727093".into()
         },
         TestimonialData {
             image: "https://pbs.twimg.com/profile_images/1857467519042232321/GLvZxG-T_400x400.jpg".into(),
@@ -349,10 +349,10 @@ fn Testimonials() -> Element {
             link: "https://x.com/oreHistorian/status/1877146737673981959".into()        
         },
         TestimonialData {
-            image: "https://pbs.twimg.com/profile_images/1892613729700691968/cG64Yc06_400x400.jpg".into(),
-            name: "Anatoly Yakovenko".into(),
-            quote: ".OREsupply is cool".into(),
-            link: "https://x.com/aeyakovenko/status/1891891612235727093".into()
+            image: "https://pbs.twimg.com/profile_images/1651271535800336406/vR1FxvDs_400x400.jpg".into(),
+            name: "Matty Tay".into(),
+            quote: "BTC walked so ORE could run.".into(),
+            link: "https://x.com/mattytay/status/1870887900663169059".into()
         },
         TestimonialData {
             image: "https://pbs.twimg.com/profile_images/1815598662006792192/ShUElYCu_400x400.jpg".into(),
