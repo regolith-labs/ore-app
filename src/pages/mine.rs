@@ -26,7 +26,7 @@ pub fn Mine() -> Element {
                 Heading {
                     class: "w-full",
                     title: "Mine",
-                    subtitle: "Earn crypto by spending compute."
+                    subtitle: "Earn crypto by expending compute."
                 }
                 if cfg!(feature = "web") {
                     OrbMiner {
