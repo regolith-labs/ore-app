@@ -325,7 +325,7 @@ struct TestimonialData {
 fn Testimonials() -> Element {
     let data = vec![
         TestimonialData {
-            image: "https://pbs.twimg.com/profile_images/1892613729700691968/cG64Yc06_400x400.jpg".into(),
+            image: "https://pbs.twimg.com/profile_images/1896990528748593152/jU2rStOc_400x400.jpg".into(),
             name: "Anatoly Yakovenko".into(),
             quote: ".OREsupply is cool".into(),
             link: "https://x.com/aeyakovenko/status/1891891612235727093".into()
