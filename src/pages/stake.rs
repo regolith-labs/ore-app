@@ -17,7 +17,7 @@ pub fn Stake() -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake",
-                subtitle: "Provide liquidity and earn native yield."
+                subtitle: "Provide liquidity and earn yield."
             }
             Col {
                 gap: 16,
