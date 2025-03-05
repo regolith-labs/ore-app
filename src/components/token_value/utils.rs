@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use num_format::{Locale, ToFormattedString};
 
+#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq)]
 pub enum TokenValueSize {
     XSmall,
