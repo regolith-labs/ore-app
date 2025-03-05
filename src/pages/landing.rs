@@ -713,14 +713,10 @@ fn Footer() -> Element {
                 class: "w-full h-min mx-auto max-w-7xl border-t border-elements-midEmphasis pt-4",
                 gap: 16,
                 Row {
-                    class: "w-full h-min mx-auto max-w-7xl justify-between px-2",
+                    class: "w-full h-min mx-auto max-w-7xl justify-end px-2",
                     span {
                         class: "text-elements-lowEmphasis text-sm font-medium",
-                        "© Regolith Labs 2025"
-                    }
-                    span {
-                        class: "text-elements-lowEmphasis text-sm font-medium",
-                        "Made in America."
+                        "© Regolith Labs 2025. Made in America."
                     }
                 }
                 OreWordmarkIcon {
