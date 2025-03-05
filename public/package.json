@@ -1,0 +1,9 @@
+{
+  "name": "ore-miner-web",
+  "version": "0.1.0",
+  "files": [
+    "miner_bg.wasm",
+    "miner.js"
+  ],
+  "browser": "miner.js"
+}
