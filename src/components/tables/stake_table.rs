@@ -29,7 +29,7 @@ pub fn StakeTable() -> Element {
                 header: rsx! {
                     TableHeader {
                         left: "Stake",
-                        right_1: "Multiplier",
+                        right_1: "APY",
                         right_2: "TVL",
                         right_3: "Yield",
                     }
@@ -71,9 +71,10 @@ fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
                 }
             },
             right_1: rsx! {
-                StakeTableRowMultiplier {
+                StakeTableRowApy {
+                    mint_address: MINT_ADDRESS,
                     boost,
-                    stake
+                    stake,
                 }
             },
             right_2: rsx! {
@@ -112,9 +113,10 @@ fn StakeTableRow(
                 }
             },
             right_1: rsx! {
-                StakeTableRowMultiplier {
+                StakeTableRowApy {
+                    mint_address: boost_meta.lp_mint,
                     boost,
-                    stake
+                    stake,
                 }
             },
             right_2: rsx! {
@@ -203,7 +205,7 @@ fn StakeTableRowTitle(
         let (ore_amount_f64, token_amount_f64, token_ticker, _token_decimals) =
             liquidity_pair.get_stake_amounts(stake.balance);
         Some(format!(
-            "{} {} • {} {}",
+            "{} {} / {} {}",
             format_token_amount(ore_amount_f64.to_string(), Some(true), Some(true)),
             "ORE",
             format_token_amount(token_amount_f64.to_string(), Some(true), Some(true)),
@@ -260,50 +262,6 @@ fn StakeTableRowTitle(
 }
 
 #[component]
-fn StakeTableRowMultiplier(
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
-) -> Element {
-    let user_percentage = use_memo(move || {
-        let Some(Ok(boost)) = boost.cloned() else {
-            return None;
-        };
-        let Some(Ok(stake)) = stake.cloned() else {
-            return None;
-        };
-        if stake.balance == 0 {
-            return None;
-        }
-        if boost.total_deposits == 0 {
-            return None;
-        }
-        let pct = (stake.balance + stake.balance_pending) as f64
-            / (boost.total_deposits + stake.balance_pending) as f64
-            * 100.0;
-        Some(format_percentage(pct))
-    });
-
-    rsx! {
-        if let Some(Ok(boost)) = boost.cloned() {
-            Col {
-                span {
-                    class: "text-right my-auto font-medium",
-                    "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
-                }
-                if let Some(percentage) = user_percentage.cloned() {
-                    span {
-                        class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
-                        "{percentage}"
-                    }
-                }
-            }
-        } else {
-            TableCellLoading {}
-        }
-    }
-}
-
-#[component]
 fn IdleTableRowTVL(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
@@ -325,7 +283,16 @@ fn IdleTableRowTVL(
             let total_deposits = boost.total_deposits + stake.balance_pending;
             let user_tvl =
                 (boost_tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
-            Some(user_tvl.to_formatted_string(&Locale::en))
+
+            let pct = (stake.balance + stake.balance_pending) as f64
+                / (boost.total_deposits + stake.balance_pending) as f64
+                * 100.0;
+
+            Some(format!(
+                "${}  ᐧ  {}",
+                user_tvl.to_formatted_string(&Locale::en),
+                format_percentage(pct)
+            ))
         } else {
             None
         }
@@ -340,7 +307,7 @@ fn IdleTableRowTVL(
                 if let Some(user_tvl) = user_tvl.cloned() {
                     span {
                         class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
-                        "${user_tvl}"
+                        "{user_tvl}"
                     }
                 }
             }
@@ -363,6 +330,9 @@ fn StakeTableRowTVL(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return None;
         };
+        let Some(Ok(boost)) = boost.cloned() else {
+            return None;
+        };
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
@@ -372,7 +342,16 @@ fn StakeTableRowTVL(
             let user_tvl = (liquidity_pair.total_value_usd
                 * (total_balance as f64 / liquidity_pair.shares as f64))
                 .floor() as u64;
-            Some(user_tvl.to_formatted_string(&Locale::en))
+
+            let pct = (stake.balance + stake.balance_pending) as f64
+                / (boost.total_deposits + stake.balance_pending) as f64
+                * 100.0;
+
+            Some(format!(
+                "${}  ᐧ  {}",
+                user_tvl.to_formatted_string(&Locale::en),
+                format_percentage(pct)
+            ))
         } else {
             None
         }
@@ -387,9 +366,47 @@ fn StakeTableRowTVL(
                 if let Some(user_tvl) = user_tvl.cloned() {
                     span {
                         class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
-                        "${user_tvl}"
+                        "{user_tvl}"
                     }
                 }
+            }
+        } else {
+            TableCellLoading {}
+        }
+    }
+}
+
+#[component]
+fn StakeTableRowApy(
+    mint_address: Pubkey,
+    boost: Resource<GatewayResult<Boost>>,
+    stake: Resource<GatewayResult<Stake>>,
+) -> Element {
+    let apy = use_boost_apy(mint_address);
+    rsx! {
+        if let Ok(apy) = apy.cloned() {
+            Col {
+                span {
+                    class: "text-right my-auto font-medium",
+                    "{apy:.0}%"
+                }
+                // if let Some(Ok(stake)) = stake.cloned() {
+                //     if stake.rewards > 0 {
+                //         OreValue {
+                //             class: "text-right ml-auto",
+                //             ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                //             with_decimal_units: true,
+                //             size: TokenValueSize::XSmall,
+                //             gold: true,
+                //             abbreviated: true,
+                //         }
+                //     } else {
+                //         span {
+                //             class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
+                //             "–"
+                //         }
+                //     }
+                // }
             }
         } else {
             TableCellLoading {}
@@ -403,21 +420,21 @@ fn StakeTableRowYield(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
-    let apy = use_boost_apy(mint_address);
+    // let apy = use_boost_apy(mint_address);
     rsx! {
-        if let Ok(apy) = apy.cloned() {
-            Col {
-                span {
-                    class: "text-right my-auto font-medium",
-                    "{apy:.0}%"
-                }
-                if let Some(Ok(stake)) = stake.cloned() {
+        Col {
+            // span {
+            //     class: "text-right my-auto font-medium",
+            //     "{apy:.0}%"
+            // }
+            if let Some(stake) = stake.cloned() {
+                if let Ok(stake) = stake.clone() {
                     if stake.rewards > 0 {
                         OreValue {
                             class: "text-right ml-auto",
                             ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
                             with_decimal_units: true,
-                            size: TokenValueSize::XSmall,
+                            size: TokenValueSize::Small,
                             gold: true,
                             abbreviated: true,
                         }
@@ -427,10 +444,15 @@ fn StakeTableRowYield(
                             "–"
                         }
                     }
+                } else {
+                    span {
+                        class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
+                        "–"
+                    }
                 }
+            } else {
+                TableCellLoading {}
             }
-        } else {
-            TableCellLoading {}
         }
     }
 }

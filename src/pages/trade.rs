@@ -12,7 +12,7 @@ pub fn Trade() -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Trade",
-                subtitle: "Swap tokens at the best price."
+                subtitle: "Swap tokens at the best available price."
             }
             SwapForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
