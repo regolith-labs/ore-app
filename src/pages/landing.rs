@@ -223,7 +223,7 @@ fn MiningGuide() -> Element {
             GuideStep {
                 step: "2",
                 title: "Join a pool",
-                detail: "Save money and reduce transaction fees."
+                detail: "Save money and avoid transaction fees."
             }
             GuideStep {
                 step: "3",
