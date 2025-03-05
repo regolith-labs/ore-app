@@ -123,7 +123,10 @@ fn mine(
                 scope.respond(id, OutputMessage::Expired(challenge.challenge.lash_hash_at));
                 break;
             } else {
-                scope.respond(id, OutputMessage::TimeRemaining(cutoff_time - elapsed_time));
+                scope.respond(
+                    id,
+                    OutputMessage::TimeRemaining(cutoff_time - elapsed_time, vec![]),
+                );
             }
         }
         // increment nonce

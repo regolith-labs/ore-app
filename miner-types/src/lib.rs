@@ -8,11 +8,13 @@ pub struct InputMessage {
     pub cores: usize,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum OutputMessage {
     Init,
     Solution(drillx::Solution),
     Expired(LastHashAt),
-    TimeRemaining(i64),
+    TimeRemaining(Seconds, CpuUtilization),
 }
 type LastHashAt = i64;
+type Seconds = i64;
+type CpuUtilization = Vec<f32>;

@@ -63,31 +63,30 @@ pub fn use_miner_provider() {
                             let difficulty = solution.to_hash().difficulty();
                             // submit
                             if difficulty.gt(&best_difficulty) {
-                                from_miner.set(msg);
+                                from_miner.set(msg.clone());
                                 best_difficulty = difficulty;
                                 log::info!("found new best difficulty: {}", best_difficulty);
                             }
                         }
                         // exit if expired
                         if let OutputMessage::Expired(_) = msg {
-                            log::info!("expired");
-                            from_miner.set(msg);
+                            from_miner.set(msg.clone());
                             break;
                         }
                         // time remaining
-                        if let OutputMessage::TimeRemaining(remaining) = msg {
-                            log::info!("time remaining: {}", remaining);
-                            // send time remaining
+                        if let OutputMessage::TimeRemaining(seconds, _) = msg {
+                            // check cpu utilization
+                            let cpus = {
+                                let mut sys = sys.lock().await;
+                                sys.refresh_cpu_usage();
+                                sys.cpus()
+                                    .into_iter()
+                                    .map(|cpu| cpu.cpu_usage())
+                                    .collect::<Vec<_>>()
+                            };
+                            // send cpu utilization
+                            let msg = OutputMessage::TimeRemaining(seconds, cpus);
                             from_miner.set(msg);
-                            // check core utilization
-                            let mut sys = sys.lock().await;
-                            sys.refresh_cpu_usage(); // Refreshing CPU usage.
-                            let cpus = sys
-                                .cpus()
-                                .into_iter()
-                                .map(|cpu| cpu.cpu_usage())
-                                .collect::<Vec<_>>();
-                            log::info!("cpus: {:?}", cpus);
                         }
                     }
                 }
@@ -149,7 +148,7 @@ async fn find_hash_par(
                         }
                     }
                     // exit if time has elapsed
-                    if nonce % 10 == 0 {
+                    if nonce % 2 == 0 {
                         if timer.elapsed().as_secs().ge(&cutoff_time) {
                             // send expiration message
                             if core_id.id == 0 {
@@ -162,7 +161,7 @@ async fn find_hash_par(
                         } else if core_id.id == 0 {
                             let remaining = cutoff_time.saturating_sub(timer.elapsed().as_secs());
                             if let Err(err) = solutions_channel
-                                .send(OutputMessage::TimeRemaining(remaining as i64))
+                                .send(OutputMessage::TimeRemaining(remaining as i64, vec![]))
                             {
                                 log::error!("{:?}", err);
                             }
