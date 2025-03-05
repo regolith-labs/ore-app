@@ -6,7 +6,7 @@ use steel::Pubkey;
 
 use crate::{
     components::*,
-    config::{BoostMeta, Token, LISTED_BOOSTS, LISTED_TOKENS},
+    config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
     hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl},
     route::Route,
@@ -105,7 +105,7 @@ fn StakeTableRow(
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
             left: rsx! {
                 StakeTableRowTitle {
-                    ticker: boost_meta.ticker.clone(),
+                    boost_meta: boost_meta.clone(),
                     pair_mint: boost_meta.pair_mint,
                     stake: stake.clone(),
                     liquidity_pair: liquidity_pair.clone(),
@@ -183,14 +183,14 @@ fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Ele
 
 #[component]
 fn StakeTableRowTitle(
-    ticker: String,
+    boost_meta: BoostMeta,
     pair_mint: Pubkey,
     stake: Resource<GatewayResult<Stake>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let token = LISTED_TOKENS.get(&pair_mint).cloned();
 
-    let ore_balance = use_resource(move || async move {
+    let token_balances = use_resource(move || async move {
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return None;
         };
@@ -200,12 +200,14 @@ fn StakeTableRowTitle(
         if stake.balance == 0 {
             return None;
         };
-        let (ore_amount_f64, _token_amount_f64, _token_ticker, _token_decimals) =
+        let (ore_amount_f64, token_amount_f64, token_ticker, _token_decimals) =
             liquidity_pair.get_stake_amounts(stake.balance);
-        Some(format_token_amount(
-            ore_amount_f64.to_string(),
-            Some(true),
-            Some(true),
+        Some(format!(
+            "{} {} • {} {}",
+            format_token_amount(ore_amount_f64.to_string(), Some(true), Some(true)),
+            "ORE",
+            format_token_amount(token_amount_f64.to_string(), Some(true), Some(true)),
+            token_ticker,
         ))
     });
 
@@ -228,14 +230,28 @@ fn StakeTableRowTitle(
                 }
             }
             Col {
-                span {
-                    class: "font-semibold my-auto",
-                    "{ticker}"
+                Row {
+                    class: "my-auto",
+                    gap: 2,
+                    span {
+                        class: "font-semibold my-auto",
+                        "{boost_meta.ticker}"
+                    }
+                    match boost_meta.lp_type {
+                        LpType::Kamino => rsx! { img {
+                            class: "w-4 h-4 shrink-0 my-auto rounded",
+                            src: asset!("/public/kamino_logo.jpg"),
+                        }},
+                        LpType::Meteora => rsx! { img {
+                            class: "w-4 h-4 shrink-0 my-auto rounded",
+                            src: asset!("/public/meteora_logo.jpg"),
+                        }},
+                    }
                 }
-                if let Some(Some(ore_balance)) = ore_balance.cloned() {
+                if let Some(Some(token_balances)) = token_balances.cloned() {
                     span {
                         class: "font-medium text-xs text-elements-lowEmphasis",
-                        "{ore_balance} ORE"
+                        "{token_balances}"
                     }
                 }
             }
