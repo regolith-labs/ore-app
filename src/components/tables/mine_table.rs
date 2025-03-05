@@ -11,6 +11,8 @@ use crate::solana::spl_token::amount_to_ui_amount_string;
 
 pub fn MineTable() -> Element {
     let miner_events = use_miner_events();
+    let events_guard = miner_events.read();
+    let events = events_guard.iter().collect::<Vec<_>>();
     rsx! {
         Col {
             class: "w-full",
@@ -19,34 +21,26 @@ pub fn MineTable() -> Element {
                 class: "px-5 sm:px-8",
                 title: "Activity"
             }
-            Table {
-                class: "mx-0 sm:mx-8",
-                header: rsx! {
-                    TableHeader {
-                        left: "Transaction",
-                        right_1: "Date",
-                        right_2: "Score",
-                        right_3: "Reward",
-                    }
-                },
-                rows: rsx! {
-                    {
-                        let events_guard = miner_events.read();
-                        let events = events_guard.iter().collect::<Vec<_>>();
-                        if events.is_empty() {
-                            rsx! {
-                                span {
-                                    class: "my-4 text-elements-lowEmphasis text-sm font-medium px-5 sm:px-3",
-                                    "No session activity yet"
-                                }
-                            }
-                        } else {
-                            rsx! {
-                                for event in events {
-                                    MineTableRow {
-                                        event: event.clone()
-                                    }
-                                }
+            if events.is_empty() {
+                span {
+                    class: "text-elements-lowEmphasis text-sm font-medium w-full min-w-max mx-0 sm:mx-8",
+                    "No session activity yet"
+                }
+            } else {
+                Table {
+                    class: "mx-0 sm:mx-8",
+                    header: rsx! {
+                        TableHeader {
+                            left: "Transaction",
+                            right_1: "Date",
+                            right_2: "Score",
+                            right_3: "Reward",
+                        }
+                    },
+                    rows: rsx! {
+                        for event in events {
+                            MineTableRow {
+                                event: event.clone()
                             }
                         }
                     }
