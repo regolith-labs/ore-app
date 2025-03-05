@@ -23,7 +23,7 @@ pub fn MineTable() -> Element {
             }
             if events.is_empty() {
                 span {
-                    class: "text-elements-lowEmphasis text-sm font-medium w-full min-w-max mx-0 sm:mx-8",
+                    class: "text-elements-lowEmphasis text-sm font-medium w-full min-w-max mx-0 sm:mx-8 px-5 sm:px-3",
                     "No session activity yet"
                 }
             } else {

@@ -26,7 +26,7 @@ pub fn Mine() -> Element {
                 Heading {
                     class: "w-full",
                     title: "Mine",
-                    subtitle: "Earn crypto by expending compute."
+                    subtitle: "Earn crypto by spending compute."
                 }
                 if cfg!(feature = "web") {
                     OrbMiner {
@@ -61,8 +61,7 @@ fn MinerData() -> Element {
 
     rsx! {
         Col {
-            class: "w-full flex-wrap mx-auto justify-between",
-            gap: 8,
+            class: "w-full flex-wrap mx-auto justify-between gap-10",
             Alert {}
             MinerStatus {}
             // MinerHashpower {}
@@ -231,9 +230,10 @@ fn MinerStatus() -> Element {
                 Row {
                     class: "text-elements-lowEmphasis font-medium justify-between",
                     span {
-                        "Time remaining"
+                        "New challenge in"
                     }
                     span {
+                        class: "mr-2",
                         "{time_remaining.cloned()}s"
                     }
                 }
