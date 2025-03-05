@@ -576,19 +576,19 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "ORE represents a new generation of digital gold, built for the new generation of crypto users. It takes the core properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new token native to Solana. "
+                    answer: "ORE represents a new generation of digital gold, built for the new generation of crypto users. It takes the core properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new token on the Solana blockchain. "
                 }
                 FaqItem {
                     question: "How does mining work?",
                     answer: "ORE can be mined by anyone with a laptop or home computer. Simply navigate to the mining page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be enrolled in a mining pool and do not need to pay any transaction fees while you mine."
                 }
                 FaqItem {
-                    question: "How does staking work?",
-                    answer: "ORE automatically allocates a portion of all newly mined tokens to liquidity providers as yield. These incentives help bootstrap liquidity and maintain deep markets with a network of strategic assets in the Solana ecosystem. By providing liquidity for boosted pairs, stakers can earn fees from traders as well as receive additional rewards in the form of native ORE yield."
+                    question: "How does liquidity work?",
+                    answer: "ORE automatically allocates a portion of all newly mined tokens for liquidity providers. These incentives help bootstrap liquidity and maintain active markets with a network of assets in the Solana ecosystem. By providing liquidity for ORE pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE yield."
                 }
                 FaqItem {
                     question: "Is it secure?",
-                    answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team has committed to freezing the protocol in the coming months to ensure longterm security."
+                    answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team is committed to freezing the protocol in the coming months to guarantee longterm security."
                 }
             }
         }
@@ -710,11 +710,18 @@ fn Footer() -> Element {
                 SocialLinks {}
             }
             Col {
-                class: "w-full h-min mx-auto max-w-7xl justify-between border-t border-elements-midEmphasis pt-4",
+                class: "w-full h-min mx-auto max-w-7xl border-t border-elements-midEmphasis pt-4",
                 gap: 16,
-                span {
-                    class: "text-elements-lowEmphasis text-sm font-medium ml-auto mr-2",
-                    "© Regolith Labs 2025"
+                Row {
+                    class: "w-full h-min mx-auto max-w-7xl justify-between px-2",
+                    span {
+                        class: "text-elements-lowEmphasis text-sm font-medium",
+                        "© Regolith Labs 2025"
+                    }
+                    span {
+                        class: "text-elements-lowEmphasis text-sm font-medium",
+                        "Made in America."
+                    }
                 }
                 OreWordmarkIcon {
                     class: "w-full"
