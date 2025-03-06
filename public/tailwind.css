@@ -1116,6 +1116,12 @@
   .border-t-elements-highEmphasis {
     border-top-color: var(--color-elements-highEmphasis);
   }
+  .bg-red-950 {
+    background-color: var(--color-red-950);
+  }
+  .bg-lime-950 {
+    background-color: var(--color-lime-950);
+  }
   .bg-amber-950 {
     background-color: var(--color-amber-950);
   }
