@@ -892,6 +892,9 @@
   .max-w-2xl {
     max-width: var(--container-2xl);
   }
+  .max-w-5xl {
+    max-width: var(--container-5xl);
+  }
   .max-w-7xl {
     max-width: var(--container-7xl);
   }
@@ -1555,13 +1558,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-controls-tertiaryHover);
-      }
-    }
-  }
-  .hover\:bg-elements-lowEmphasis\/10 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 10%, transparent);
       }
     }
   }
