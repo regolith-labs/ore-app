@@ -354,7 +354,7 @@ fn StakeTableRowTVL(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return None;
         };
-        let Some(Ok(boost)) = boost.cloned() else {
+        let Some(Ok(_boost)) = boost.cloned() else {
             return None;
         };
         let Some(Ok(stake)) = stake.cloned() else {
