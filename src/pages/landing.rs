@@ -584,7 +584,7 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "How does liquidity work?",
-                    answer: "ORE automatically allocates a portion of all newly mined tokens for liquidity providers. These incentives help bootstrap liquidity and maintain active markets with a network of assets in the Solana ecosystem. By providing liquidity for ORE pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE yield."
+                    answer: "ORE automatically distributes a portion of all newly mined supply to liquidity providers as yield. These incentives help bootstrap liquidity and maintain active markets with a network of assets in the Solana ecosystem. By providing liquidity for ORE pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE yield."
                 }
                 FaqItem {
                     question: "Is it secure?",

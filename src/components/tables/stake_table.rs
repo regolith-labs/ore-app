@@ -39,7 +39,7 @@ pub fn StakeTable() -> Element {
             }
             div {
                 class: "overflow-hidden transition-all duration-300 ease-in-out text-wrap text-elements-midEmphasis px-5 sm:px-8 {help_class}",
-                "Boosts automatically allocate a portion of all newly mined ORE to liquidity providers as yield."
+                "Boosts automatically distribute a portion of all newly mined supply to liquidity providers as yield."
             }
             Table {
                 class: "mt-8 mx-0 sm:mx-8",
