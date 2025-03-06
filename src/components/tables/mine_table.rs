@@ -13,28 +13,50 @@ pub fn MineTable() -> Element {
     let miner_events = use_miner_events();
     let events_guard = miner_events.read();
     let events = events_guard.iter().collect::<Vec<_>>();
+    let mut display_help = use_signal(|| false);
+    let help_class = if display_help.cloned() {
+        "max-h-96 opacity-100 pt-2"
+    } else {
+        "max-h-0 opacity-0 py-0"
+    };
     rsx! {
         Col {
             class: "w-full",
-            gap: 8,
-            Subheading {
-                class: "px-5 sm:px-8",
-                title: "Activity"
+            gap: 0,
+            button {
+                class: "flex flex-row gap-2 px-5 w-min sm:px-8 group hover:cursor-pointer",
+                onclick: move |_| display_help.set(!display_help.cloned()),
+                Subheading {
+                    class: "my-auto",
+                    title: "Activity"
+                }
+                InfoIcon {
+                    class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
+                }
+            }
+            div {
+                class: "overflow-hidden transition-all duration-300 ease-in-out text-wrap text-elements-midEmphasis px-5 sm:px-8 {help_class}",
+                "This table displays your recent mining activity from the current session."
             }
             if events.is_empty() {
                 span {
-                    class: "text-elements-lowEmphasis font-medium w-full min-w-max mx-0 sm:mx-8 px-5 sm:px-3",
-                    "No session activity yet"
+                    class: "text-elements-lowEmphasis font-medium w-full min-w-max mt-4 sm:mx-8 px-5 sm:px-3",
+                    "No activity yet"
                 }
             } else {
                 Table {
-                    class: "mx-0 sm:mx-8",
+                    class: "mt-4 mx-0 sm:mx-8",
                     header: rsx! {
                         TableHeader {
                             left: "Transaction",
                             right_1: "Date",
                             right_2: "Score",
                             right_3: "Reward",
+                            help_left: "Recent transactions submitted by the mining pool.",
+                            help_right_1: "Timestamp of the submitted transaction.",
+                            help_right_2: "Difficulty score of the pool's submitted solution and your contribution.",
+                            help_right_3: "Amount of ORE the pool earned and your share of the reward.",
+                            display_help
                         }
                     },
                     rows: rsx! {
