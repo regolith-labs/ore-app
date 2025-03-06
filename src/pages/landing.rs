@@ -717,7 +717,7 @@ fn Footer() -> Element {
                     gap: 4,
                     span {
                         class: "text-elements-lowEmphasis text-sm font-medium",
-                        "© Regolith Labs 2025. Made in America."
+                        "© Regolith Labs 2025."
                     }
                     span {
                         class: "text-elements-lowEmphasis text-sm font-medium",
