@@ -11,7 +11,7 @@ readme = "./README.md"
 keywords = ["solana", "crypto", "mining"]
 
 [features]
-default = ["web"]
+default = ["desktop"]
 bundle = []
 desktop = [
   "cargo-packager-updater",

@@ -3,10 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-use crate::{
-    components::Row,
-    hooks::{on_transaction_done, use_wallet, Wallet},
-};
+use crate::hooks::{on_transaction_done, use_wallet, use_wallet_native, Wallet};
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
@@ -14,7 +11,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let wallet = use_wallet();
     let mut pubkey = use_signal(|| "missing pubkey".to_string());
     let mut pubkey_splice = use_signal(|| Splice::Pubkey("0000...0000".to_string()));
+    let mut keypair_export = use_signal(|| "failed to export private key".to_string());
     let mut is_copied = use_signal(|| false);
+    let mut show_keypair_export = use_signal(|| false);
     // listen for wallet update
     use_memo(move || {
         if let Wallet::Connected(pk) = *wallet.read() {
@@ -41,16 +40,56 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
             });
         }
     });
+    // listen for keypair export
+    use_memo(move || {
+        if *show_keypair_export.read() {
+            if let Ok(keypair) = use_wallet_native::get() {
+                let keypair = keypair.creator.to_base58_string();
+                keypair_export.set(keypair.clone());
+            }
+        }
+    });
     rsx! {
         div { class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
             button {
-                class: "rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer flex justify-center items-center",
+                class: "flex justify-center items-center rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
                 onclick: move |e| {
                     e.stop_propagation();
-                    clipboard.set(pubkey.to_string());
+                    if let Err(err) = clipboard.set(pubkey.to_string()) {
+                        log::error!("failed to set clipboard: {:?}", err);
+                    }
                     pubkey_splice.set(Splice::Copied);
                 },
                 div { "{pubkey_splice.read().to_string()}" }
+            }
+            if *show_keypair_export.read() {
+                div {
+                    class: "flex flex-col gap-2 mt-auto mx-4",
+                    div {
+                        class: "p-4 controls-secondary break-all text-sm w-full",
+                        style: "word-break: break-word; white-space: pre-wrap;",
+                        "{keypair_export}"
+                    }
+                    button {
+                        class: "p-2 controls-secondary text-center text-sm w-full hover:cursor-pointer flex justify-center items-center",
+                        onclick: move |e| {
+                            e.stop_propagation();
+                            if let Err(err) = clipboard.set(keypair_export.to_string()) {
+                                log::error!("failed to set clipboard: {:?}", err);
+                            }
+                        },
+                        "Copy"
+                    }
+                }
+            } else {
+                button {
+                    class: "flex justify-center items-center text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer mt-auto",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        show_keypair_export.set(true);
+                    },
+                    "Export Keypair"
+                }
             }
         }
     }
