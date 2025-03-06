@@ -194,6 +194,8 @@ fn MinerStatus() -> Element {
         }
     });
 
+    // TODO: display
+
     rsx! {
         Col {
             gap: 4,
@@ -343,6 +345,171 @@ fn MinerRewards() -> Element {
             ClaimButton {
                 transaction: claim_tx,
                 tx_type: TransactionType::PoolClaim,
+            }
+        }
+    }
+}
+
+fn MinePower() -> Element {
+    let cpu_utilization = use_miner_cpu_utilization();
+    let cores = use_miner_cores();
+    let max = crate::cores::get();
+    let active_cores = *cores.read();
+    let miner_is_active = use_miner_is_active();
+
+    // Get the actual CPU utilization values and sort them
+    let use_rates = use_memo(move || {
+        let utilization_vec = cpu_utilization.read();
+        log::info!("Utilization vec: {:?}", utilization_vec);
+
+        // Create a vector of (core_index, utilization_rate) pairs
+        let mut indexed_rates: Vec<(usize, usize)> = vec![];
+
+        // Only process utilization data if the miner is active
+        if *miner_is_active.read() && !utilization_vec.is_empty() {
+            // Process all values in the utilization vector directly
+            for i in 0..max {
+                if i < utilization_vec.len() {
+                    // The values are already percentages, just round them and ensure they're in range
+                    let rate = utilization_vec[i].clamp(0.0, 100.0).round() as usize;
+                    indexed_rates.push((i, rate));
+                }
+            }
+
+            // Sort by utilization rate in descending order
+            indexed_rates.sort_by(|a, b| b.1.cmp(&a.1));
+        } else {
+            // If miner is not active, add all cores with 0 utilization
+            for i in 0..max {
+                indexed_rates.push((i, 0));
+            }
+        }
+
+        indexed_rates
+    });
+
+    // Create random animation durations for each core
+    let animation_durations = (0..max)
+        .map(|i| (((i * 17) % 7) as f32 * 0.1 + 0.3).to_string())
+        .collect::<Vec<_>>();
+
+    // Calculate how many cores go in each column
+    let cores_per_column = 6;
+    let num_columns = (max + cores_per_column - 1) / cores_per_column; // Ceiling division
+
+    // Create arrays of indices for each column (just sequential numbers for display order)
+    let column_indices: Vec<Vec<usize>> = (0..num_columns)
+        .map(|col| {
+            let start = col * cores_per_column;
+            let end = (start + cores_per_column).min(max);
+            (start..end).collect()
+        })
+        .collect();
+
+    rsx! {
+        Col {
+            // Updated class to match the elevated style from IdleDepositForm
+            class: "relative flex w-full mx-auto my-8 sm:my-16",
+            gap: 4,
+            // Add the keyframes for the animation
+            style {
+                "@keyframes blockPulse {{
+                    0% {{ opacity: 0; }} 
+                    100% {{ opacity: 1; }}
+                }}"
+            }
+            // Manual column layout
+            div {
+                class: "flex flex-col md:flex-row gap-4 w-full",
+                // Create a column for each group of cores
+                for column in column_indices {
+                    div {
+                        class: "flex-1",
+                        // Create system bars for each display position
+                        for display_idx in column {
+                            {
+                                // Get the core index and rate from the sorted list
+                                let (core_idx, rate) = if display_idx < use_rates.read().len() {
+                                    use_rates.read()[display_idx]
+                                } else {
+                                    (display_idx, 0)
+                                };
+
+                                // Determine if this is one of the active cores (top N by utilization)
+                                let is_active_core = display_idx < active_cores;
+
+                                rsx! {
+                                    div {
+                                        class: "flex items-center gap-1 w-full flex-shrink-0 mb-2",
+                                        // Show core index with fixed width, gold for active cores
+                                        span {
+                                            class: if is_active_core {
+                                                "text-elements-gold w-6 text-left flex-shrink-0 font-medium"
+                                            } else {
+                                                "text-elements-lowEmphasis w-6 text-left flex-shrink-0"
+                                            },
+                                            "{core_idx}"
+                                        }
+                                        // Progress bar container with fixed width
+                                        div {
+                                            class: "flex-1 mx-1 h-6 bg-gray-800 overflow-hidden",
+                                            // Container for all 10 blocks as a non-flex div
+                                            div {
+                                                class: "flex h-full w-full",
+                                                for j in 0..10 {
+                                                    {
+                                                        // Fixed block class assignment
+                                                        let block_class = if j < 6 {
+                                                            "h-full bg-lime-950"
+                                                        } else if j < 8 {
+                                                            "h-full bg-amber-950"
+                                                        } else {
+                                                            "h-full bg-red-950"
+                                                        };
+
+                                                        rsx! {
+                                                            if j < (rate + 5) / 10 {
+                                                                div {
+                                                                    class: "{block_class}",
+                                                                    style: "width: 9%; margin-right: 1%;"
+                                                                }
+                                                            } else if j == (rate + 5) / 10 && rate < 100 {
+                                                                // The "walking" block that appears and disappears
+                                                                div {
+                                                                    class: "{block_class}",
+                                                                    style: "width: 9%; margin-right: 1%; animation: blockPulse {0}s infinite alternate-reverse ease-in-out;".replace("{0}", &animation_durations[core_idx]),
+                                                                }
+                                                            } else {
+                                                                // Empty blocks
+                                                                div {
+                                                                    class: "h-full bg-gray-700",
+                                                                    style: "width: 9%; margin-right: 1%;"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        // Percentage with fixed width - using standard colors, not gold
+                                        span {
+                                            class: {
+                                                if rate > 80 {
+                                                    "text-red-950 text-xs w-8 text-right font-bold flex-shrink-0"
+                                                } else if rate > 50 {
+                                                    "text-amber-950 text-xs w-8 text-right flex-shrink-0"
+                                                } else {
+                                                    "text-lime-950 text-xs w-8 text-right flex-shrink-0"
+                                                }
+                                            },
+                                            "{rate}%"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
