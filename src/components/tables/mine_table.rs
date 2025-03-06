@@ -13,13 +13,21 @@ pub fn MineTable() -> Element {
     let miner_events = use_miner_events();
     let events_guard = miner_events.read();
     let events = events_guard.iter().collect::<Vec<_>>();
+    let display_help = use_signal(|| false);
     rsx! {
         Col {
             class: "w-full",
             gap: 8,
-            Subheading {
-                class: "px-5 sm:px-8",
-                title: "Activity"
+            Row {
+                class: "justify-between px-5 sm:px-8",
+                Subheading {
+                    class: "my-auto",
+                    title: "Activity"
+                }
+                HelpButton {
+                    class: "my-auto",
+                    display_help
+                }
             }
             if events.is_empty() {
                 span {
@@ -35,6 +43,11 @@ pub fn MineTable() -> Element {
                             right_1: "Date",
                             right_2: "Score",
                             right_3: "Reward",
+                            help_left: "Recent transactions submitted by the mining pool.",
+                            help_right_1: "Timestamp of the submitted transaction.",
+                            help_right_2: "Difficulty score of the pool's submitted solution and your contribution.",
+                            help_right_3: "Amount of ORE the pool earned and your share of the reward.",
+                            display_help
                         }
                     },
                     rows: rsx! {

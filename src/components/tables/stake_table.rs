@@ -11,18 +11,26 @@ use crate::{
     hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl},
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
-    utils::{format_percentage, LiquidityPair},
+    utils::LiquidityPair,
 };
 
 pub fn StakeTable() -> Element {
     let stake_accounts = use_all_stakes();
     let liquidity_pairs = use_all_liquidity_pairs();
+    let display_help = use_signal(|| false);
     rsx! {
         Col {
             gap: 8,
-            Subheading {
-                class: "px-5 sm:px-8",
-                title: "Boosts"
+            Row {
+                class: "justify-between px-5 sm:px-8",
+                Subheading {
+                    class: "my-auto",
+                    title: "Boosts"
+                }
+                HelpButton {
+                    class: "my-auto",
+                    display_help
+                }
             }
             Table {
                 class: "mx-0 sm:mx-8",
@@ -32,6 +40,11 @@ pub fn StakeTable() -> Element {
                         right_1: "APY",
                         right_2: "TVL",
                         right_3: "Yield",
+                        help_left: "Holders of the assets below are eligible to receive ORE yield.",
+                        help_right_1: "Estimated yield based on trailing 7d returns.",
+                        help_right_2: "The current notional value of assets deposited in the protocol.",
+                        help_right_3: "The amount of ORE you have earned and may claim.",
+                        display_help
                     }
                 },
                 rows: rsx! {
@@ -284,15 +297,17 @@ fn IdleTableRowTVL(
             let user_tvl =
                 (boost_tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
 
-            let pct = (stake.balance + stake.balance_pending) as f64
-                / (boost.total_deposits + stake.balance_pending) as f64
-                * 100.0;
+            Some(format!("${}", user_tvl.to_formatted_string(&Locale::en)))
 
-            Some(format!(
-                "${}  ᐧ  {}",
-                user_tvl.to_formatted_string(&Locale::en),
-                format_percentage(pct)
-            ))
+            // let pct = (stake.balance + stake.balance_pending) as f64
+            //     / (boost.total_deposits + stake.balance_pending) as f64
+            //     * 100.0;
+
+            // Some(format!(
+            //     "${}  •  {}",
+            //     user_tvl.to_formatted_string(&Locale::en),
+            //     format_percentage(pct)
+            // ))
         } else {
             None
         }
@@ -343,15 +358,17 @@ fn StakeTableRowTVL(
                 * (total_balance as f64 / liquidity_pair.shares as f64))
                 .floor() as u64;
 
-            let pct = (stake.balance + stake.balance_pending) as f64
-                / (boost.total_deposits + stake.balance_pending) as f64
-                * 100.0;
+            Some(format!("${}", user_tvl.to_formatted_string(&Locale::en)))
 
-            Some(format!(
-                "${}  ᐧ  {}",
-                user_tvl.to_formatted_string(&Locale::en),
-                format_percentage(pct)
-            ))
+            // let pct = (stake.balance + stake.balance_pending) as f64
+            //     / (boost.total_deposits + stake.balance_pending) as f64
+            //     * 100.0;
+
+            // Some(format!(
+            //     "${}  •  {}",
+            //     user_tvl.to_formatted_string(&Locale::en),
+            //     format_percentage(pct)
+            // ))
         } else {
             None
         }
@@ -390,23 +407,6 @@ fn StakeTableRowApy(
                     class: "text-right my-auto font-medium",
                     "{apy:.0}%"
                 }
-                // if let Some(Ok(stake)) = stake.cloned() {
-                //     if stake.rewards > 0 {
-                //         OreValue {
-                //             class: "text-right ml-auto",
-                //             ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                //             with_decimal_units: true,
-                //             size: TokenValueSize::XSmall,
-                //             gold: true,
-                //             abbreviated: true,
-                //         }
-                //     } else {
-                //         span {
-                //             class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
-                //             "–"
-                //         }
-                //     }
-                // }
             }
         } else {
             TableCellLoading {}
@@ -420,13 +420,8 @@ fn StakeTableRowYield(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
-    // let apy = use_boost_apy(mint_address);
     rsx! {
         Col {
-            // span {
-            //     class: "text-right my-auto font-medium",
-            //     "{apy:.0}%"
-            // }
             if let Some(stake) = stake.cloned() {
                 if let Ok(stake) = stake.clone() {
                     if stake.rewards > 0 {
