@@ -14,10 +14,15 @@ pub fn MineTable() -> Element {
     let events_guard = miner_events.read();
     let events = events_guard.iter().collect::<Vec<_>>();
     let display_help = use_signal(|| false);
+    let help_class = if display_help.cloned() {
+        "max-h-96 opacity-100 pt-2"
+    } else {
+        "max-h-0 opacity-0 py-0"
+    };
     rsx! {
         Col {
             class: "w-full",
-            gap: 8,
+            gap: 0,
             Row {
                 class: "justify-between px-5 sm:px-8",
                 Subheading {
@@ -29,14 +34,18 @@ pub fn MineTable() -> Element {
                     display_help
                 }
             }
+            div {
+                class: "overflow-hidden transition-all duration-300 ease-in-out text-wrap text-elements-midEmphasis px-5 sm:px-8 {help_class}",
+                "This table displays recent mining activity from the current session."
+            }
             if events.is_empty() {
                 span {
-                    class: "text-elements-lowEmphasis font-medium w-full min-w-max mx-0 sm:mx-8 px-5 sm:px-3",
-                    "No session activity yet"
+                    class: "text-elements-lowEmphasis font-medium w-full min-w-max mt-4 sm:mx-8 px-5 sm:px-3",
+                    "No activity yet"
                 }
             } else {
                 Table {
-                    class: "mx-0 sm:mx-8",
+                    class: "mt-4 mx-0 sm:mx-8",
                     header: rsx! {
                         TableHeader {
                             left: "Transaction",

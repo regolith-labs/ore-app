@@ -18,9 +18,14 @@ pub fn StakeTable() -> Element {
     let stake_accounts = use_all_stakes();
     let liquidity_pairs = use_all_liquidity_pairs();
     let display_help = use_signal(|| false);
+    let help_class = if display_help.cloned() {
+        "max-h-96 opacity-100 pt-2"
+    } else {
+        "max-h-0 opacity-0 pt-0"
+    };
     rsx! {
         Col {
-            gap: 8,
+            gap: 0,
             Row {
                 class: "justify-between px-5 sm:px-8",
                 Subheading {
@@ -32,18 +37,22 @@ pub fn StakeTable() -> Element {
                     display_help
                 }
             }
+            div {
+                class: "overflow-hidden transition-all duration-300 ease-in-out text-wrap text-elements-midEmphasis px-5 sm:px-8 {help_class}",
+                "Boosts automatically allocate a portion of all newly mined supply to stakers."
+            }
             Table {
-                class: "mx-0 sm:mx-8",
+                class: "mt-8 mx-0 sm:mx-8",
                 header: rsx! {
                     TableHeader {
                         left: "Stake",
                         right_1: "APY",
                         right_2: "TVL",
                         right_3: "Yield",
-                        help_left: "Holders of the assets below are eligible to receive ORE yield.",
+                        help_left: "Stakers of the assets below are eligible to receive ORE yield.",
                         help_right_1: "Estimated yield based on trailing 7d returns.",
-                        help_right_2: "The current notional value of assets deposited in the protocol.",
-                        help_right_3: "The amount of ORE you have earned and may claim.",
+                        help_right_2: "Current notional value of assets deposited in the protocol.",
+                        help_right_3: "Amount of ORE you have earned and may claim.",
                         display_help
                     }
                 },

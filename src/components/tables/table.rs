@@ -34,9 +34,9 @@ pub fn TableHeader(
 ) -> Element {
     let class = class.unwrap_or("".to_string());
     let help_class = if display_help.cloned() {
-        "max-h-96 opacity-100"
+        "max-h-96 opacity-100 py-2"
     } else {
-        "max-h-0 opacity-0"
+        "max-h-0 opacity-0 py-0"
     };
     rsx! {
         Row {
@@ -46,25 +46,25 @@ pub fn TableHeader(
                 Row {
                     class: "my-auto w-full sm:min-w-96 grow-0 shrink-0 sm:grow justify-between",
                     Col {
-                        class: "w-full mb-auto",
+                        class: "w-full mb-auto mt-2",
                         span {
                             {left}
                         }
                         if let Some(help_left) = help_left {
                             span {
-                                class: "overflow-hidden my-2 transition-all duration-300 ease-in-out text-xs text-wrap text-elements-midEmphasis {help_class}",
+                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap text-elements-midEmphasis {help_class}",
                                 "{help_left}"
                             }
                         }
                     }
                     Col {
-                        class: "text-right w-56 mb-auto",
+                        class: "text-right w-56 mb-auto mt-2",
                         span {
                             {right_1}
                         }
                         if let Some(help_right_1) = help_right_1 {
                             span {
-                                class: "overflow-hidden my-2 transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
+                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
                                 "{help_right_1}"
                             }
                         }
@@ -74,13 +74,13 @@ pub fn TableHeader(
             Row {
                 if let Some(right_2) = right_2 {
                     Col {
-                        class: "text-right w-56 mb-auto",
+                        class: "text-right w-56 mb-auto mt-2",
                         span {
                             {right_2}
                         }
                         if let Some(help_right_2) = help_right_2 {
                             span {
-                                class: "overflow-hidden my-2 transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
+                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
                                 "{help_right_2}"
                             }
                         }
@@ -88,13 +88,13 @@ pub fn TableHeader(
                 }
                 if let Some(right_3) = right_3 {
                     Col {
-                        class: "text-right w-56 mb-auto",
+                        class: "text-right w-56 mb-auto mt-2",
                         span {
                             {right_3}
                         }
                         if let Some(help_right_3) = help_right_3 {
                             span {
-                                class: "overflow-hidden my-2 transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
+                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
                                 "{help_right_3}"
                             }
                         }
@@ -102,13 +102,13 @@ pub fn TableHeader(
                 }
                 if let Some(right_4) = right_4 {
                     Col {
-                        class: "text-right w-56 mb-auto",
+                        class: "text-right w-56 mb-auto mt-2",
                         span {
                             {right_4}
                         }
                         if let Some(help_right_4) = help_right_4 {
                             span {
-                                class: "overflow-hidden my-2 transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
+                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
                                 "{help_right_4}"
                             }
                         }
