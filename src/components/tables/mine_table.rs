@@ -13,7 +13,7 @@ pub fn MineTable() -> Element {
     let miner_events = use_miner_events();
     let events_guard = miner_events.read();
     let events = events_guard.iter().collect::<Vec<_>>();
-    let display_help = use_signal(|| false);
+    let mut display_help = use_signal(|| false);
     let help_class = if display_help.cloned() {
         "max-h-96 opacity-100 pt-2"
     } else {
@@ -23,20 +23,20 @@ pub fn MineTable() -> Element {
         Col {
             class: "w-full",
             gap: 0,
-            Row {
-                class: "justify-between px-5 sm:px-8",
+            button {
+                class: "flex flex-row gap-2 px-5 w-min sm:px-8 group hover:cursor-pointer",
+                onclick: move |_| display_help.set(!display_help.cloned()),
                 Subheading {
                     class: "my-auto",
                     title: "Activity"
                 }
-                HelpButton {
-                    class: "my-auto",
-                    display_help
+                InfoIcon {
+                    class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
                 }
             }
             div {
                 class: "overflow-hidden transition-all duration-300 ease-in-out text-wrap text-elements-midEmphasis px-5 sm:px-8 {help_class}",
-                "This table displays recent mining activity from the current session."
+                "This table displays your recent mining activity from the current session."
             }
             if events.is_empty() {
                 span {

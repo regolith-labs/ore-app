@@ -17,7 +17,7 @@ use crate::{
 pub fn StakeTable() -> Element {
     let stake_accounts = use_all_stakes();
     let liquidity_pairs = use_all_liquidity_pairs();
-    let display_help = use_signal(|| false);
+    let mut display_help = use_signal(|| false);
     let help_class = if display_help.cloned() {
         "max-h-96 opacity-100 pt-2"
     } else {
@@ -26,20 +26,20 @@ pub fn StakeTable() -> Element {
     rsx! {
         Col {
             gap: 0,
-            Row {
-                class: "justify-between px-5 sm:px-8",
+            button {
+                class: "flex flex-row gap-2 px-5 sm:px-8 w-min group hover:cursor-pointer",
+                onclick: move |_| display_help.set(!display_help.cloned()),
                 Subheading {
                     class: "my-auto",
                     title: "Boosts"
                 }
-                HelpButton {
-                    class: "my-auto",
-                    display_help
+                InfoIcon {
+                    class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
                 }
             }
             div {
                 class: "overflow-hidden transition-all duration-300 ease-in-out text-wrap text-elements-midEmphasis px-5 sm:px-8 {help_class}",
-                "Boosts automatically allocate a portion of all newly mined supply to stakers."
+                "Boosts automatically allocate a portion of all newly mined ORE to liquidity providers as yield."
             }
             Table {
                 class: "mt-8 mx-0 sm:mx-8",
@@ -49,10 +49,10 @@ pub fn StakeTable() -> Element {
                         right_1: "APY",
                         right_2: "TVL",
                         right_3: "Yield",
-                        help_left: "Stakers of the assets below are eligible to receive ORE yield.",
-                        help_right_1: "Estimated yield based on trailing 7d returns.",
+                        help_left: "Holders of the assets below are eligible to receive ORE yield.",
+                        help_right_1: "Estimated annual yield based on trailing 7d returns.",
                         help_right_2: "Current notional value of assets deposited in the protocol.",
-                        help_right_3: "Amount of ORE you have earned and may claim.",
+                        help_right_3: "Amount of yield you have earned and may claim.",
                         display_help
                     }
                 },

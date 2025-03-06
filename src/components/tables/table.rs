@@ -46,13 +46,13 @@ pub fn TableHeader(
                 Row {
                     class: "my-auto w-full sm:min-w-96 grow-0 shrink-0 sm:grow justify-between",
                     Col {
-                        class: "w-full mb-auto mt-2",
+                        class: "mb-auto mt-2 sm:w-min sm:w-56 sm:min-w-56",
                         span {
                             {left}
                         }
                         if let Some(help_left) = help_left {
                             span {
-                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap text-elements-midEmphasis {help_class}",
+                                class: "overflow-hidden transition-all duration-300 w-full grow ease-in-out text-xs text-wrap text-elements-midEmphasis {help_class}",
                                 "{help_left}"
                             }
                         }

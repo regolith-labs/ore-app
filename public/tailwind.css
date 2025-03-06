@@ -838,6 +838,9 @@
   .w-5 {
     width: calc(var(--spacing) * 5);
   }
+  .w-5xl {
+    width: var(--container-5xl);
+  }
   .w-6 {
     width: calc(var(--spacing) * 6);
   }
@@ -867,9 +870,6 @@
   }
   .w-56 {
     width: calc(var(--spacing) * 56);
-  }
-  .w-5xl {
-    width: var(--container-5xl);
   }
   .w-96 {
     width: calc(var(--spacing) * 96);
@@ -1471,6 +1471,13 @@
       }
     }
   }
+  .group-hover\:text-elements-highEmphasis {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        color: var(--color-elements-highEmphasis);
+      }
+    }
+  }
   .group-hover\:opacity-100 {
     &:is(:where(.group):hover *) {
       @media (hover: hover) {
@@ -1711,6 +1718,11 @@
   .sm\:w-min {
     @media (width >= 40rem) {
       width: min-content;
+    }
+  }
+  .sm\:min-w-56 {
+    @media (width >= 40rem) {
+      min-width: calc(var(--spacing) * 56);
     }
   }
   .sm\:min-w-96 {

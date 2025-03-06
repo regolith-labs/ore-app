@@ -42,7 +42,7 @@ pub fn Fee(priority_fee: Signal<u64>) -> Element {
                         "Transaction fee"
                     }
                     InfoIcon {
-                        class: "h-4 w-4 shrink-0 group-hover:opacity-100 opacity-0 transition-opacity duration-300 ease-in-out",
+                        class: "h-4 w-4 shrink-0 group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out",
                     }
                 }
                 span {
