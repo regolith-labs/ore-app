@@ -10,7 +10,7 @@ pub fn format_abbreviated_number(amount: f64) -> String {
     }
 }
 
-pub fn format_percentage(pct: f64) -> String {
+pub fn _format_percentage(pct: f64) -> String {
     let pct = if pct < 1.0 {
         // Find first non-zero decimal place
         let mut decimals = 0;
