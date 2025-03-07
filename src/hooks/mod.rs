@@ -6,7 +6,7 @@ mod transaction_status;
 #[cfg(feature = "web")]
 mod use_download_url;
 mod use_gateway;
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 mod use_updater;
 mod wallet;
 // #[cfg(feature = "web")]
