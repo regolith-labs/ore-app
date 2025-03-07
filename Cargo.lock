@@ -393,6 +393,16 @@ checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
 
 [[package]]
 name = "async-broadcast"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c48ccdbf6ca6b121e0f586cbc0e73ae440e56c67c30fa0873b4e110d9c26d2b"
+dependencies = [
+ "event-listener 2.5.3",
+ "futures-core",
+]
+
+[[package]]
+name = "async-broadcast"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "435a87a52755b8f27fcf321ac4f04b2802e337c8c4872923137471ec39c37532"
@@ -2277,6 +2287,7 @@ version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b7b74aede7070ec1c0ef582dbec8bce93a5c40421155459fcdbcaa0e6ef0bf0"
 dependencies = [
+ "async-broadcast 0.5.1",
  "cfg-if",
  "copypasta",
  "dioxus",
@@ -7629,6 +7640,7 @@ dependencies = [
  "bs58 0.4.0",
  "clap",
  "futures",
+ "js-sys",
  "reqwest 0.11.27",
  "serde",
  "serde_derive",
@@ -7636,6 +7648,9 @@ dependencies = [
  "solana-extra-wasm",
  "solana-sdk",
  "thiserror 1.0.69",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]
@@ -10337,6 +10352,7 @@ version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93d59ca99a559661b96bf898d8fce28ed87935fd2bea9f05983c1464dd6c71b1"
 dependencies = [
+ "getrandom 0.3.1",
  "js-sys",
  "wasm-bindgen",
 ]
@@ -11396,7 +11412,7 @@ version = "4.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb97012beadd29e654708a0fdb4c84bc046f537aecfde2c3ee0a9e4b4d48c725"
 dependencies = [
- "async-broadcast",
+ "async-broadcast 0.7.2",
  "async-process",
  "async-recursion",
  "async-trait",
