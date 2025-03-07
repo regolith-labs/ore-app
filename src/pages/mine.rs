@@ -50,9 +50,6 @@ fn MinerData() -> Element {
     let mut member = use_member();
     let mut member_record = use_member_record();
 
-    // Build the claim transaction
-    let claim_tx = use_miner_claim_transaction(member);
-
     // Refresh member account
     on_transaction_done(move |_sig| {
         member.restart();
@@ -70,10 +67,6 @@ fn MinerData() -> Element {
             }
             MinerPendingRewards {}
             MinerRewards {}
-            ClaimButton {
-                transaction: claim_tx,
-                tx_type: TransactionType::PoolClaim,
-            }
         }
     }
 }
@@ -332,6 +325,7 @@ fn MinerPendingRewards() -> Element {
 
 fn MinerRewards() -> Element {
     let member = use_member();
+    let claim_tx = use_miner_claim_transaction(member);
     rsx! {
         Col {
             gap: 4,
@@ -352,6 +346,10 @@ fn MinerRewards() -> Element {
                 }
             } else {
                 LoadingValue {}
+            }
+            ClaimButton {
+                transaction: claim_tx,
+                tx_type: TransactionType::PoolClaim,
             }
         }
     }
