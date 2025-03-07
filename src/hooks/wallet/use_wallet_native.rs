@@ -8,7 +8,7 @@ use crate::gateway::GatewayError as Error;
 
 use super::Wallet;
 
-const SERVICE: &str = "ORE-xyz";
+const SERVICE: &str = "ORE";
 const USER_DEVICE_KEY: &str = "user-device-key";
 
 pub fn use_wallet_provider() {
