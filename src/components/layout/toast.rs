@@ -87,6 +87,7 @@ pub fn ToastDisplay() -> Element {
                 }
             }
         }
+
         // app updater
         Updater {}
     }
