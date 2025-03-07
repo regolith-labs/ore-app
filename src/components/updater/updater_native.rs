@@ -11,6 +11,15 @@ use crate::{
 
 pub fn Updater() -> Element {
     let mut updater = use_updater();
+    // poll for updates
+    use_memo(move || {
+        spawn(async move {
+            loop {
+                tokio::time::sleep(tokio::time::Duration::from_secs(600)).await;
+                updater.restart();
+            }
+        });
+    });
     rsx! {
         match &*updater.read() {
             Some(Ok(state)) => {
@@ -20,8 +29,6 @@ pub fn Updater() -> Element {
                     }
                     UpdateState::UpdateAvailable(update, binary) => {
                         let update = update.clone();
-                        let version = &update.version;
-                        let version = format!("");
                         let binary = Arc::clone(&binary);
                         rsx! {
                             Col {
@@ -32,7 +39,7 @@ pub fn Updater() -> Element {
                                     "A new version of ORE is available!"
                                 }
                                 Row {
-
+                                    gap: 2,
                                     // Install button
                                     button {
                                         class: "text-elements-lowEmphasis hover:cursor-pointer",
