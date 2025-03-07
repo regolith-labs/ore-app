@@ -21,24 +21,16 @@ name = "ORE"
 title = ""
 
 [web.watcher]
-
 # when watcher trigger, regenerate the `index.html`
 reload_html = true
-
 # which files or dirs will be watcher monitoring
 watch_path = ["src", "public"]
-
 # resolves a hot reloading issue
 index_on_404 = true
 
 [bundle]
-
 publisher = "Regolith Labs Inc."
-
 identifier = "ore.supply"
-
 icon = ["public/icon.png"]
-
 [macos]
-
 info_plist_path = "Info.plist"
