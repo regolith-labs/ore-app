@@ -20,6 +20,6 @@ pub use transaction_status::*;
 #[cfg(feature = "web")]
 pub use use_download_url::*;
 pub use use_gateway::*;
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 pub use use_updater::*;
 pub use wallet::*;
