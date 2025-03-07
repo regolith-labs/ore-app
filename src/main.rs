@@ -34,7 +34,11 @@ fn main() {
     dioxus_logger::init(Level::INFO).expect("failed to init logger");
     #[cfg(all(feature = "desktop", target_os = "macos"))]
     let _nap_blocker = AppNapDisabler::new();
-    launch(App);
+    use dioxus::desktop::Config;
+    use dioxus::desktop::WindowBuilder;
+    LaunchBuilder::desktop()
+        .with_cfg(Config::new().with_window(WindowBuilder::new().with_always_on_top(false)))
+        .launch(App)
 }
 
 pub fn App() -> Element {

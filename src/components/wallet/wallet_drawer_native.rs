@@ -74,7 +74,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     rsx! {
-        div { class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
+        div { class: "flex flex-col gap-2 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
             onclick: move |e| {
                 e.stop_propagation();
                 show_keypair_export.set(false);
@@ -89,6 +89,19 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     pubkey_splice.set(Splice::Copied);
                 },
                 div { "{pubkey_splice.read().to_string()}" }
+            }
+            div {
+                class: "flex flex-row justify-center items-center gap-2 mx-4 p-4",
+                a {
+                    class: "text-sm text-blue-400 hover:underline",
+                    href: "https://beta.ore.supply/topup/{pubkey.read()}",
+                    "top up"
+                }
+                a {
+                    class: "text-sm text-blue-400 hover:underline",
+                    href: "https://solscan.io/account/{pubkey.read()}",
+                    "explorer"
+                }
             }
             if *show_keypair_export.read() {
                 div {
@@ -117,13 +130,16 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                 }
             } else {
-                button {
-                    class: "flex justify-center items-center text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer mt-auto",
-                    onclick: move |e| {
-                        e.stop_propagation();
-                        show_keypair_export.set(true);
-                    },
-                    "Export Keypair"
+                div {
+                    class: "flex flex-col gap-2 mt-auto",
+                    button {
+                        class: "flex justify-center items-center text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
+                        onclick: move |e| {
+                            e.stop_propagation();
+                            show_keypair_export.set(true);
+                        },
+                        "Export Keypair"
+                    }
                 }
             }
         }
