@@ -17,7 +17,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let mut pubkey_copied = use_signal(|| false);
     // keypair
     let mut keypair = use_signal(|| "failed to read private key".to_string());
-    let mut show_keypair_export = use_signal(|| false);
+    let mut keypair_show_export = use_signal(|| false);
     let mut keypair_copied = use_signal(|| false);
     // listen for wallet update
     use_memo(move || {
@@ -63,7 +63,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     });
     // listen for keypair export
     use_memo(move || {
-        if *show_keypair_export.read() {
+        if *keypair_show_export.read() {
             if let Ok(kp) = use_wallet_native::get() {
                 let kp = kp.creator.to_base58_string();
                 keypair.set(kp.clone());
@@ -77,7 +77,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         div { class: "flex flex-col gap-2 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
             onclick: move |e| {
                 e.stop_propagation();
-                show_keypair_export.set(false);
+                keypair_show_export.set(false);
             },
             button {
                 class: "flex justify-center items-center rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
@@ -103,7 +103,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     "explorer"
                 }
             }
-            if *show_keypair_export.read() {
+            if *keypair_show_export.read() {
                 div {
                     class: "flex flex-col gap-2 mt-auto mx-4",
                     div {
@@ -136,7 +136,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                         class: "flex justify-center items-center text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
                         onclick: move |e| {
                             e.stop_propagation();
-                            show_keypair_export.set(true);
+                            keypair_show_export.set(true);
                         },
                         "Export Keypair"
                     }
