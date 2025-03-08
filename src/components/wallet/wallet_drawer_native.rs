@@ -74,9 +74,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     rsx! {
-        div { class: "flex flex-col gap-2 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
+        div {
+            class: "flex flex-col gap-2 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
             onclick: move |e| {
-                e.stop_propagation();
                 keypair_show_export.set(false);
             },
             button {
@@ -90,8 +90,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                 },
                 div { "{pubkey_splice.read().to_string()}" }
             }
-            div {
-                class: "flex flex-row justify-center items-center gap-2 mx-4 p-4",
+            div { class: "flex flex-row justify-center items-center gap-2 mx-4 p-4",
                 a {
                     class: "text-sm text-blue-400 hover:underline",
                     href: "https://beta.ore.supply/topup/{pubkey.read()}",
@@ -104,34 +103,31 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                 }
             }
             if *keypair_show_export.read() {
-                div {
+                button {
                     class: "flex flex-col gap-2 mt-auto mx-4",
-                    div {
-                        class: "p-4 controls-secondary break-all text-sm w-full",
-                        style: "word-break: break-word; white-space: pre-wrap;",
-                        "{keypair.read().to_string()}"
-                    }
-                    button {
-                        class: "p-2 controls-secondary text-center text-sm w-full hover:cursor-pointer flex justify-center items-center",
-                        onclick: move |e| {
-                            e.stop_propagation();
-                            if let Err(err) = clipboard.set(keypair.to_string()) {
-                                log::error!("failed to set clipboard: {:?}", err);
-                            }
-                            keypair_copied.set(true);
-                        },
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        if let Err(err) = clipboard.set(keypair.to_string()) {
+                            log::error!("failed to set clipboard: {:?}", err);
+                        }
+                        keypair_copied.set(true);
+                    },
+                    div { class: "p-2 controls-secondary text-center w-full hover:cursor-pointer flex justify-center items-center",
                         div {
                             if *keypair_copied.read() {
                                 "Copied!"
                             } else {
-                                "Copy"
+                                div {
+                                    class: "p-4 controls-secondary break-all text-sm w-full",
+                                    style: "word-break: break-word; white-space: pre-wrap;",
+                                    "{keypair.read().to_string()}"
+                                }
                             }
                         }
                     }
                 }
             } else {
-                div {
-                    class: "flex flex-col gap-2 mt-auto",
+                div { class: "flex flex-col gap-2 mt-auto",
                     button {
                         class: "flex justify-center items-center text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
                         onclick: move |e| {
