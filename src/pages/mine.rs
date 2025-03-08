@@ -186,8 +186,6 @@ fn MinerStatus() -> Element {
         }
     });
 
-    // TODO: display
-
     rsx! {
         Col {
             gap: 4,
