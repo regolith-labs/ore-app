@@ -4,7 +4,6 @@ mod config;
 mod cores;
 mod gateway;
 mod hooks;
-mod launcher;
 mod logger;
 mod pages;
 mod route;
@@ -35,7 +34,7 @@ fn main() {
     dioxus_logger::init(Level::INFO).expect("failed to init logger");
     #[cfg(all(feature = "desktop", target_os = "macos"))]
     let _nap_blocker = AppNapDisabler::new();
-    launcher::launch(App);
+    dioxus::launch(App)
 }
 
 pub fn App() -> Element {
