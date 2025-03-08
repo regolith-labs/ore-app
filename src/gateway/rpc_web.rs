@@ -5,7 +5,7 @@ use solana_sdk::{
 
 use super::{GatewayResult, Rpc, TransactionConfirmationStatus, UiTokenAmount};
 
-pub struct WebRpc(WasmClient);
+pub struct WebRpc(pub WasmClient);
 
 impl Rpc for WebRpc {
     fn new(rpc_url: String) -> Self {

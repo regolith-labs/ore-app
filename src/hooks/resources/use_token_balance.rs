@@ -1,10 +1,13 @@
+use base64::Engine;
 use dioxus::prelude::*;
+use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
 use std::collections::HashMap;
 
 use crate::{
     config::{Token, LISTED_TOKENS},
     gateway::{spl::SplGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount},
+    hooks::GetPubkey,
     utils::LiquidityPair,
 };
 
@@ -122,6 +125,55 @@ pub fn use_token_balances_for_liquidity_pair(
 
 pub fn _use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     return use_token_balance(Token::sol().mint);
+}
+
+pub fn use_ore_balance_wss() -> SyncSignal<GatewayResult<UiTokenAmount>> {
+    use base64::prelude::BASE64_STANDARD;
+    use solana_client_wasm::GetAccountInfoResponse;
+    use solana_extra_wasm::account_decoder::parse_token::TokenAccountType;
+    use solana_extra_wasm::account_decoder::{UiAccountData, UiAccountEncoding};
+    let wallet = use_wallet();
+    let signal = use_signal_sync(|| Err::<UiTokenAmount, _>(GatewayError::AccountNotFound));
+    use_effect(move || {
+        let gateway = use_gateway();
+        if let Ok(pubkey) = wallet.pubkey() {
+            let ata = crate::solana::spl_associated_token_account::get_associated_token_address(
+                &pubkey,
+                &MINT_ADDRESS,
+            );
+            log::info!("ore ata: {:?}", ata);
+            let callback = move |resp: GetAccountInfoResponse| {
+                let mut signal = signal.clone();
+                spawn(async move {
+                    if let Some(UiAccountData::Binary(string, UiAccountEncoding::Base64)) =
+                        resp.value.map(|val| val.data)
+                    {
+                        if let Ok(bytes) = BASE64_STANDARD.decode(&string) {
+                            log::info!("ata bytes: {:?}", bytes);
+                            if let Ok(TokenAccountType::Account(token_account)) =
+                                bincode::deserialize::<TokenAccountType>(&bytes)
+                            {
+                                let ui_token_amount = UiTokenAmount {
+                                    ui_amount: token_account.token_amount.ui_amount,
+                                    decimals: token_account.token_amount.decimals,
+                                    amount: token_account.token_amount.amount,
+                                    ui_amount_string: token_account.token_amount.ui_amount_string,
+                                };
+                                signal.set(Ok(ui_token_amount));
+                            }
+                        }
+                    }
+                });
+            };
+            // Subscribe to account changes
+            spawn(async move {
+                let id = gateway.rpc.0.account_subscribe(ata, callback).await;
+                log::info!("subscription id: {}", id);
+            });
+        }
+    });
+
+    signal
 }
 
 pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
