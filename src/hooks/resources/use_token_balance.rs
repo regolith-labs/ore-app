@@ -144,26 +144,24 @@ pub fn use_ore_balance_wss() -> SyncSignal<GatewayResult<UiTokenAmount>> {
             log::info!("ore ata: {:?}", ata);
             let callback = move |resp: GetAccountInfoResponse| {
                 let mut signal = signal.clone();
-                spawn(async move {
-                    if let Some(UiAccountData::Binary(string, UiAccountEncoding::Base64)) =
-                        resp.value.map(|val| val.data)
-                    {
-                        if let Ok(bytes) = BASE64_STANDARD.decode(&string) {
-                            log::info!("ata bytes: {:?}", bytes);
-                            if let Ok(TokenAccountType::Account(token_account)) =
-                                bincode::deserialize::<TokenAccountType>(&bytes)
-                            {
-                                let ui_token_amount = UiTokenAmount {
-                                    ui_amount: token_account.token_amount.ui_amount,
-                                    decimals: token_account.token_amount.decimals,
-                                    amount: token_account.token_amount.amount,
-                                    ui_amount_string: token_account.token_amount.ui_amount_string,
-                                };
-                                signal.set(Ok(ui_token_amount));
-                            }
+                if let Some(UiAccountData::Binary(string, UiAccountEncoding::Base64)) =
+                    resp.value.map(|val| val.data)
+                {
+                    if let Ok(bytes) = BASE64_STANDARD.decode(&string) {
+                        log::info!("ata bytes: {:?}", bytes);
+                        if let Ok(TokenAccountType::Account(token_account)) =
+                            bincode::deserialize::<TokenAccountType>(&bytes)
+                        {
+                            let ui_token_amount = UiTokenAmount {
+                                ui_amount: token_account.token_amount.ui_amount,
+                                decimals: token_account.token_amount.decimals,
+                                amount: token_account.token_amount.amount,
+                                ui_amount_string: token_account.token_amount.ui_amount_string,
+                            };
+                            signal.set(Ok(ui_token_amount));
                         }
                     }
-                });
+                }
             };
             // Subscribe to account changes
             spawn(async move {
