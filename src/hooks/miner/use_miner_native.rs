@@ -148,7 +148,7 @@ async fn find_hash_par(
                         }
                     }
                     // exit if time has elapsed
-                    if nonce % 2 == 0 {
+                    if nonce % 10 == 0 {
                         if timer.elapsed().as_secs().ge(&cutoff_time) {
                             // send expiration message
                             if core_id.id == 0 {
