@@ -92,12 +92,12 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
             }
             div { class: "flex flex-row justify-center items-center gap-2 mx-4 p-4",
                 a {
-                    class: "text-sm text-blue-400 hover:underline",
+                    class: "text-sm hover:underline",
                     href: "https://beta.ore.supply/topup/{pubkey.read()}",
                     "top up"
                 }
                 a {
-                    class: "text-sm text-blue-400 hover:underline",
+                    class: "text-sm hover:underline",
                     href: "https://solscan.io/account/{pubkey.read()}",
                     "explorer"
                 }
