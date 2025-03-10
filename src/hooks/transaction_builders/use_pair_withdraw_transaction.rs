@@ -39,6 +39,8 @@ pub fn use_pair_withdraw_transaction(
     stake: Resource<GatewayResult<Stake>>,
     stake_a_balance: Resource<GatewayResult<UiTokenAmount>>,
     stake_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
@@ -127,6 +129,28 @@ pub fn use_pair_withdraw_transaction(
             ));
             ixs.push(sync_native(&spl_token::ID, &wsol_ata).unwrap());
         }
+
+        // Build other atas, if necessary
+        if let Some(Ok(_token_a_balance)) = token_a_balance.cloned() {
+            // Noop
+        } else {
+            ixs.push(create_associated_token_account_idempotent(
+                &authority,
+                &authority,
+                &liquidity_pair.token_a.mint,
+                &spl_token::ID,
+            ));
+        };
+        if let Some(Ok(_token_b_balance)) = token_b_balance.cloned() {
+            // Noop
+        } else {
+            ixs.push(create_associated_token_account_idempotent(
+                &authority,
+                &authority,
+                &liquidity_pair.token_b.mint,
+                &spl_token::ID,
+            ));
+        };
 
         // Append kamino withdraw instructions
         let withdraw_ix = match boost_meta.lp_type {
