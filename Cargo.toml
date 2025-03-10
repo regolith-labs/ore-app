@@ -127,7 +127,7 @@ spl-token = { version = "^4", optional = true, features = ["no-entrypoint"] }
 spl-token-2022 = { version = "^6", optional = true, features = [
   "no-entrypoint",
 ] }
-steel = "3.0"
+steel = "4.0"
 sysinfo = { version = "0.33.1", optional = true }
 tokio = { version = "1.43.0", optional = true, features = ["full"] }
 tracing = "0.1.40"
@@ -167,6 +167,10 @@ solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/s
 kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }
 meteora-pools-sdk = { git = "https://github.com/regolith-labs/meteora-pools-sdk", branch = "master" }
 meteora-vault-sdk = { git = "https://github.com/regolith-labs/meteora-vault-sdk", branch = "master" }
+steel = { git = "https://github.com/regolith-labs/steel.git", branch = "hardhat/numeric" }
+ore-api = { git = "https://github.com/regolith-labs/ore.git", branch = "hardhat/boost-v3" }
+ore-boost-api = { git = "https://github.com/regolith-labs/ore-boost.git", branch = "hardhat/boost-v3" }
+ore-pool-api = { git = "https://github.com/regolith-labs/ore-pool.git", branch = "hardhat/boost-v3" }
 
 [profile]
 

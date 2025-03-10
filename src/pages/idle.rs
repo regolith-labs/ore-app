@@ -68,9 +68,6 @@ fn AccountMetrics(
             Deposits {
                 stake,
             }
-            PendingDeposits {
-                stake,
-            }
             StakeYield {
                 boost,
                 stake,
@@ -96,27 +93,6 @@ fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
                         }
                     } else {
                         NullValue {}
-                    }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
-    rsx! {
-        if let Some(Ok(stake)) = stake.cloned() {
-            if stake.balance_pending > 0 {
-                TitledRow {
-                    title: "Deposits (pending)",
-                    description: "The amount of ORE you have deposited that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
-                    value: rsx! {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                        }
                     }
                 }
             }
@@ -217,7 +193,7 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
             com: |boost| rsx! {
                 span {
                     class: "text-elements-highEmphasis font-medium",
-                    "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+                    "{boost.multiplier as f64 / ore_boost_api::consts::DENOMINATOR_MULTIPLIER as f64}x"
                 }
             }
         }

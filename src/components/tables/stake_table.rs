@@ -300,9 +300,9 @@ fn IdleTableRowTVL(
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
-        if stake.balance > 0 || stake.balance_pending > 0 {
-            let total_balance = stake.balance + stake.balance_pending;
-            let total_deposits = boost.total_deposits + stake.balance_pending;
+        if stake.balance > 0 {
+            let total_balance = stake.balance;
+            let total_deposits = boost.total_deposits;
             let user_tvl =
                 (boost_tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
 
@@ -360,9 +360,8 @@ fn StakeTableRowTVL(
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
-        if stake.balance > 0 || stake.balance_pending > 0 {
-            let total_balance = stake.balance + stake.balance_pending;
-            // let total_deposits = boost.total_deposits + stake.balance_pending;
+        if stake.balance > 0 {
+            let total_balance = stake.balance;
             let user_tvl = (liquidity_pair.total_value_usd
                 * (total_balance as f64 / liquidity_pair.shares as f64))
                 .floor() as u64;
