@@ -61,16 +61,18 @@ fn ConnectedWalletAdapter(address: Pubkey) -> Element {
                     }
                 }
             }
-            div {
-                class: "fixed inset-0 transition-colors duration-200 ease-in-out {drawer_container}",
-                onclick: move |_| drawer_open.set(false),
-                div {
-                    class: "fixed top-0 right-0 h-full transition-transform duration-200 ease-in-out {drawer_transform}",
-                    WalletDrawer {
-                        on_close: move |_| drawer_open.set(false),
+            if *drawer_open.read() {
+                    div {
+                        class: "fixed inset-0 transition-colors duration-200 ease-in-out wallet-drawer-fade bg-black/50",
+                        onclick: move |_| drawer_open.set(false),
+                        div {
+                            class: "fixed top-0 right-0 h-full wallet-drawer-slide",
+                            WalletDrawer {
+                                on_close: move |_| drawer_open.set(false),
+                            }
+                        }
                     }
                 }
-            }
         }
     }
 }
