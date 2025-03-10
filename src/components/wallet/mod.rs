@@ -1,8 +1,8 @@
-// #[cfg(not(feature = "web"))]
+#[cfg(not(feature = "web"))]
 mod wallet_adapter_native;
 #[cfg(feature = "web")]
 mod wallet_adapter_web;
-// #[cfg(not(feature = "web"))]
+#[cfg(not(feature = "web"))]
 mod wallet_drawer_native;
 #[cfg(feature = "web")]
 mod wallet_drawer_web;
