@@ -28,11 +28,7 @@ pub fn Download() -> Element {
 
             span {
                 class: "text-sm text-gray-500",
-                "System: {os}"
-            }
-            span {
-                class: "text-sm text-gray-500",
-                "Architecture: {arch}"
+                "System: {os} {arch}"
             }
 
             a {
