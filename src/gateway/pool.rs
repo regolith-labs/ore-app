@@ -128,12 +128,18 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
     ) -> GatewayResult<MemberChallenge> {
         loop {
             log::info!("Polling...");
-            let challenge = self.get_challenge(authority, pool_url.clone()).await?;
-            if challenge.challenge.lash_hash_at == last_hash_at {
-                async_std::task::sleep(std::time::Duration::from_secs(1)).await;
-            } else {
-                return Ok(challenge);
+            match self.get_challenge(authority, pool_url.clone()).await {
+                Ok(challenge) if challenge.challenge.lash_hash_at != last_hash_at => {
+                    return Ok(challenge)
+                }
+                Ok(_) => {
+                    log::info!("Same challenge, retry...");
+                }
+                Err(err) => {
+                    log::error!("Error polling challenge: {:?}", err);
+                }
             }
+            async_std::task::sleep(std::time::Duration::from_secs(1)).await;
         }
     }
 

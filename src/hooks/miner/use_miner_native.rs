@@ -75,6 +75,8 @@ pub fn use_miner_provider() {
                         }
                         // time remaining
                         if let OutputMessage::TimeRemaining(seconds, _) = msg {
+                            // sleep to allow solution submissions to process
+                            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
                             // check cpu utilization
                             let cpus = {
                                 let mut sys = sys.lock().await;
@@ -148,7 +150,7 @@ async fn find_hash_par(
                         }
                     }
                     // exit if time has elapsed
-                    if nonce % 2 == 0 {
+                    if nonce % 10 == 0 {
                         if timer.elapsed().as_secs().ge(&cutoff_time) {
                             // send expiration message
                             if core_id.id == 0 {
@@ -166,9 +168,6 @@ async fn find_hash_par(
                                 log::error!("{:?}", err);
                             }
                         }
-                    }
-                    if core_id.id == 0 {
-                        log::info!("nonce: {:?}", nonce);
                     }
                     // increment nonce
                     nonce += 1;

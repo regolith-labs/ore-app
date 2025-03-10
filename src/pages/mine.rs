@@ -194,13 +194,6 @@ fn MinerStatus() -> Element {
         }
     });
 
-    // TODO: display
-    let cpu_utilization = use_miner_cpu_utilization();
-    use_memo(move || {
-        let vec = cpu_utilization.read();
-        log::info!("cpu utilization: {:?}", vec);
-    });
-
     rsx! {
         Col {
             gap: 4,
