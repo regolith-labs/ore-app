@@ -460,7 +460,7 @@ fn MinePower() -> Element {
                                         }
                                         // Core usage bar
                                         div {
-                                            class: "flex-1 mx-1 h-6 bg-gray-800 overflow-hidden",
+                                            class: "flex-1 mx-1 h-6 overflow-hidden",
                                             // Container for all 10 blocks as a non-flex div
                                             div {
                                                 class: "flex h-full w-full",
@@ -468,11 +468,11 @@ fn MinePower() -> Element {
                                                     {
                                                         // Fixed block class assignment
                                                         let block_class = if j < 6 {
-                                                            "h-full bg-htop-green"
+                                                            "h-full bg-elements-green"
                                                         } else if j < 8 {
-                                                            "h-full bg-htop-yellow"
+                                                            "h-full bg-elements-yellow"
                                                         } else {
-                                                            "h-full bg-htop-red"
+                                                            "h-full bg-elements-red"
                                                         };
 
                                                         rsx! {
@@ -490,7 +490,7 @@ fn MinePower() -> Element {
                                                             } else {
                                                                 // Empty blocks
                                                                 div {
-                                                                    class: "h-full bg-gray-700",
+                                                                    class: "h-full",
                                                                     style: "width: 9%; margin-right: 1%;"
                                                                 }
                                                             }

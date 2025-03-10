@@ -1,33 +1,35 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
-  --color-transparent: 'transparent';
-  --color-white: #FAFAFA;
-  --color-black: #0F0E11;
-  --color-base-bg: #0F0E11;
-  --color-base-canvas: #0C0C0E;
-  --color-elements-highEmphasis: #FAFAFA;
-  --color-elements-midEmphasis: #D1D1D1;
-  --color-elements-lowEmphasis: #707070;
-  --color-elements-disabled: #585661;
-  --color-elements-gold: #ECC771;
-  --color-elements-purple: #5949B7;
-  --color-elements-green: #49B759;
-  --color-elements-contrast: #0F0E11;
-  --color-surface-elevated: #131216;
-  --color-surface-elevatedHover: #151419;
-  --color-surface-floating: #1A191F;
-  --color-controls-primary: #F5F5F5;
-  --color-controls-primaryHover: #FAFAFA;
-  --color-controls-secondary: #26242D;
-  --color-controls-secondaryHover: #2B2932;
-  --color-controls-tertiary: #1D1C22;
-  --color-controls-tertiaryHover: #222027;
-  --color-controls-danger: #CC3B28;
-  --color-controls-dangerHover: #BC3625;
-  --color-controls-disabled: #18171C;
-  --color-controls-handle: '#302E38';
+    /* Colors */
+    --color-transparent: 'transparent';
+    --color-white: #FAFAFA;
+    --color-black: #0F0E11;
+    --color-base-bg: #0F0E11;
+    --color-base-canvas: #0C0C0E;
+    --color-elements-highEmphasis: #FAFAFA;
+    --color-elements-midEmphasis: #D1D1D1;
+    --color-elements-lowEmphasis: #707070;
+    --color-elements-disabled: #585661;
+    --color-elements-gold: #ECC771;
+    --color-elements-purple: #5949B7;
+    --color-elements-green: #49B759;
+    --color-elements-red: #B92F19;
+    --color-elements-yellow: #C6C33E;
+    --color-elements-contrast: #0F0E11;
+    --color-surface-elevated: #131216;
+    --color-surface-elevatedHover: #151419;
+    --color-surface-floating: #1A191F;
+    --color-controls-primary: #F5F5F5;
+    --color-controls-primaryHover: #FAFAFA;
+    --color-controls-secondary: #26242D;
+    --color-controls-secondaryHover: #2B2932;
+    --color-controls-tertiary: #1D1C22;
+    --color-controls-tertiaryHover: #222027;
+    --color-controls-danger: #CC3B28;
+    --color-controls-dangerHover: #BC3625;
+    --color-controls-disabled: #18171C;
+    --color-controls-handle: '#302E38';
 
   /* Fonts */
   --font-mono: ui-monospace, monospace;
@@ -130,9 +132,19 @@ body {
     @apply flex font-semibold transition duration-300 ease-in-out bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis hover:not-disabled:cursor-pointer;
   }
 
-  .controls-gold {
-    @apply flex font-semibold transition duration-300 ease-in-out font-medium border-2 border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
-  }
+    .controls-gold {
+        @apply flex font-semibold transition duration-300 ease-in-out font-medium border-2 border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
+    }
+    .bg-elements-red {
+        background-color: var(--color-elements-red);
+    }
+    
+    .bg-elements-yellow {
+        background-color: var(--color-elements-yellow);
+    }
+    .bg-elements-green {
+        background-color: var(--color-elements-green);
+    }
 }
 
 /* Pilat */
