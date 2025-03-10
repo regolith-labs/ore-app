@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 #[cfg(feature = "web")]
 use crate::{
     components::{Col, Heading},
-    hooks::use_download_url,
+    hooks::{parse_download_url, use_download_url},
 };
 
 #[cfg(not(feature = "web"))]
@@ -14,6 +14,7 @@ pub fn Download() -> Element {
 #[cfg(feature = "web")]
 pub fn Download() -> Element {
     let url = use_download_url();
+    let (os, arch) = parse_download_url(&url.cloned());
 
     rsx! {
         Col {
@@ -23,6 +24,15 @@ pub fn Download() -> Element {
                 class: "w-full",
                 title: "Download",
                 subtitle: "Install the ORE desktop app."
+            }
+
+            span {
+                class: "text-sm text-gray-500",
+                "System: {os}"
+            }
+            span {
+                class: "text-sm text-gray-500",
+                "Architecture: {arch}"
             }
 
             a {
