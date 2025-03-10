@@ -167,9 +167,6 @@ async fn find_hash_par(
                             }
                         }
                     }
-                    if core_id.id == 0 {
-                        log::info!("nonce: {:?}", nonce);
-                    }
                     // increment nonce
                     nonce += 1;
                 }
