@@ -75,6 +75,8 @@ pub fn use_miner_provider() {
                         }
                         // time remaining
                         if let OutputMessage::TimeRemaining(seconds, _) = msg {
+                            // sleep to allow solution submissions to process
+                            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
                             // check cpu utilization
                             let cpus = {
                                 let mut sys = sys.lock().await;
