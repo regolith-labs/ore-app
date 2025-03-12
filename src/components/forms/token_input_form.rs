@@ -37,37 +37,38 @@ pub fn TokenInputForm(
     with_picker: Option<bool>,
     loading: Option<bool>,
     disabled: Option<bool>,
+    on_tokens_change: Option<EventHandler<(Option<Token>, Option<Token>)>>,
+    other_token: Option<Signal<Option<Token>>>,
 ) -> Element {
-    let class = class.unwrap_or("".to_string());
-    let disabled = disabled.unwrap_or(false);
-    let loading = loading.unwrap_or(false);
+    let class = class.unwrap_or_default();
+    let toolbar_shortcuts = toolbar_shortcuts.unwrap_or(false);
     let with_picker = with_picker.unwrap_or(false);
+    let loading = loading.unwrap_or(false);
+    let disabled = disabled.unwrap_or(false);
+
     let display_picker = use_signal(|| false);
-    let color = if let Some(token) = token.cloned() {
-        match err.cloned() {
-            Some(TokenInputError::InsufficientBalance(err_token))
-                if err_token.ticker == token.ticker =>
-            {
-                "text-red-500"
+
+    let placeholder = "0.0";
+    let color = if let Some(err) = err.read().as_ref() {
+        match err {
+            TokenInputError::InsufficientBalance(err_token) => {
+                if let Some(current_token) = token.read().as_ref() {
+                    if err_token.ticker == current_token.ticker {
+                        "text-red-500"
+                    } else {
+                        ""
+                    }
+                } else {
+                    ""
+                }
             }
-            Some(TokenInputError::_InsufficientSol) => "text-red-500",
-            _ => "text-elements-primary",
+            _ => "",
         }
-    } else {
-        "text-elements-primary"
-    };
-
-    let placeholder = if disabled {
-        "".to_string()
-    } else {
-        "0".to_string()
-    };
-
-    let disabled_class = if disabled {
-        "hover:cursor-not-allowed"
     } else {
         ""
     };
+
+    let disabled_class = if disabled { "opacity-50" } else { "" };
 
     rsx! {
         Col {
@@ -103,7 +104,7 @@ pub fn TokenInputForm(
                     } else {
                         input {
                             class: "text-3xl placeholder:text-gray-700 font-semibold bg-transparent h-12 pr-1 my-auto w-full outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none {color} {disabled_class}",
-                            placeholder: placeholder.clone(),
+                            placeholder: placeholder,
                             r#type: "number",
                             step: "any",
                             inputmode: "decimal",
@@ -125,6 +126,8 @@ pub fn TokenInputForm(
             TokenPicker {
                 show: display_picker,
                 token,
+                on_tokens_change,
+                other_token,
             }
         }
     }
@@ -171,7 +174,7 @@ fn Toolbar(
     balance: Resource<GatewayResult<UiTokenAmount>>,
     token: Token,
     update: Signal<String>,
-    toolbar_shortcuts: Option<bool>,
+    toolbar_shortcuts: bool,
 ) -> Element {
     // Get half and max values
     let (half_value, max_value) = if let Some(Ok(balance)) = balance.cloned() {
@@ -205,7 +208,7 @@ fn Toolbar(
             } else {
                 LoadingValue {}
             }
-            if toolbar_shortcuts.unwrap_or(false) {
+            if toolbar_shortcuts {
                 ToolbarButton {
                     title: "HALF".to_string(),
                     shortcut_value: half_value.to_string(),
@@ -230,6 +233,7 @@ fn ToolbarBalance(ui_amount_string: String, token: Token) -> Element {
         }
     }
 }
+
 #[component]
 fn ToolbarButton(title: String, shortcut_value: String, update: Signal<String>) -> Element {
     rsx! {

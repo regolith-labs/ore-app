@@ -157,7 +157,7 @@ fn MobileTab(title: String, route: Route) -> Element {
                             class: "h-5 w-5 mx-auto"
                         }
                     },
-                    Route::Trade {  } => rsx!{
+                    Route::Trade {} | Route::TradeWithPair { token_pair: _ } => rsx!{
                         GlobeIcon {
                             class: "h-5 w-5 mx-auto"
                         }
@@ -191,7 +191,7 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
             _ => false,
         },
         Route::Trade {} => match current_route {
-            Route::Trade {} => true,
+            Route::Trade {} | Route::TradeWithPair { token_pair: _ } => true,
             _ => false,
         },
         _ => false,
