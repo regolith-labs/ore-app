@@ -9,7 +9,7 @@ use crate::{
 // Update URL with token pair
 fn update_token_pair_url(navigator: &Navigator, buy: Option<Token>, sell: Option<Token>) {
     if let (Some(buy), Some(sell)) = (buy, sell) {
-        // Format URL with sell token first, then buy token
+        // Format URL with SELL-BUY
         let token_pair = format!("{}-{}", sell.ticker, buy.ticker);
         navigator.replace(Route::TradeWithPair { token_pair });
     }
@@ -26,7 +26,7 @@ pub fn Trade(token_pair: Option<String>) -> Element {
     let mut sell_token = use_signal(|| Some(Token::sol()));
 
     // Parse token pair from URL if included
-    use_memo(move || {
+    use_effect(move || {
         if let Some(pair) = &token_pair {
             // Parse the token pair in URL
             let parts: Vec<&str> = pair.split('-').collect();
@@ -49,11 +49,7 @@ pub fn Trade(token_pair: Option<String>) -> Element {
             }
         } else {
             // If we're on the /trade route without token pair, update the URL to include the default token pair
-            update_token_pair_url(
-                &navigator,
-                buy_token.peek().clone(),
-                sell_token.peek().clone(),
-            );
+            update_token_pair_url(&navigator, buy_token.cloned(), sell_token.cloned());
         }
     });
 
