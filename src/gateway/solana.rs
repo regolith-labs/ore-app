@@ -14,7 +14,7 @@ pub trait SolanaGateway {
 impl<R: Rpc> SolanaGateway for R {
     async fn get_clock(&self) -> GatewayResult<Clock> {
         let data = self
-            .get_account_data(&solana_sdk::sysvar::clock::ID)
+            .get_account_data(&solana_program::sysvar::clock::ID)
             .await
             .map_err(GatewayError::from)?;
         bincode::deserialize::<Clock>(&data).or(Err(GatewayError::FailedDeserialization))

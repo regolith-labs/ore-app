@@ -81,8 +81,13 @@ fn use_challenge_dispatch(
             if let Some(Ok(member_record)) = member_record.cloned() {
                 if let Some(Ok(challenge)) = challenge.cloned() {
                     spawn(async move {
+                        log::info!("challenge: {:?}", challenge);
                         if let Ok(cutoff_time) = use_gateway()
-                            .get_cutoff(challenge.challenge.lash_hash_at, 5)
+                            .get_cutoff(
+                                challenge.challenge.lash_hash_at,
+                                challenge.unix_timestamp,
+                                5,
+                            )
                             .await
                         {
                             miner_status.set(MinerStatus::Hashing);

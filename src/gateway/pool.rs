@@ -15,7 +15,12 @@ pub trait PoolGateway {
         authority: Pubkey,
         pool_url: String,
     ) -> GatewayResult<MemberChallenge>;
-    async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64>;
+    async fn get_cutoff(
+        &self,
+        last_hash_at: i64,
+        unix_timestamp: i64,
+        buffer_time: i64,
+    ) -> GatewayResult<i64>;
     async fn get_member(&self, address: Pubkey) -> GatewayResult<Member>;
     async fn get_member_record(
         &self,
@@ -82,12 +87,18 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         Ok(latest_event)
     }
 
-    async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64> {
-        let clock = self.rpc.get_clock().await?;
+    async fn get_cutoff(
+        &self,
+        last_hash_at: i64,
+        unix_timestamp: i64,
+        buffer_time: i64,
+    ) -> GatewayResult<i64> {
+        log::info!("buffer time: {}", buffer_time);
+        log::info!("clock: {:?}", unix_timestamp);
         let cutoff = last_hash_at
             .saturating_add(60)
             .saturating_sub(buffer_time)
-            .saturating_sub(clock.unix_timestamp)
+            .saturating_sub(unix_timestamp)
             .max(0);
         Ok(cutoff)
     }

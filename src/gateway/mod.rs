@@ -18,8 +18,8 @@ use solana_sdk::{
 };
 pub use utils::*;
 
-pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
-// pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";
+// pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
+pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";
 pub struct Gateway<R: Rpc> {
     pub rpc: R,
     pub http: reqwest::Client,
@@ -27,6 +27,7 @@ pub struct Gateway<R: Rpc> {
 
 impl<R: Rpc> Gateway<R> {
     pub fn new(rpc_url: String) -> Gateway<R> {
+        log::info!("rpc: {}", rpc_url);
         Gateway {
             rpc: R::new(rpc_url),
             http: reqwest::Client::new(),
