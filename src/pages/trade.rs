@@ -6,15 +6,6 @@ use crate::{
     route::Route,
 };
 
-// Update URL with token pair
-fn update_token_pair_url(navigator: &Navigator, buy: Option<Token>, sell: Option<Token>) {
-    if let (Some(buy), Some(sell)) = (buy, sell) {
-        // Format URL with SELL-BUY
-        let token_pair = format!("{}-{}", sell.ticker, buy.ticker);
-        navigator.replace(Route::TradeWithPair { token_pair });
-    }
-}
-
 // TODO Price chart component
 // TODO Activity component
 #[component]
@@ -28,24 +19,12 @@ pub fn Trade(token_pair: Option<String>) -> Element {
     // Parse token pair from URL if included
     use_effect(move || {
         if let Some(pair) = &token_pair {
-            // Parse the token pair in URL
-            let parts: Vec<&str> = pair.split('-').collect();
-            if parts.len() == 2 {
-                let sell_ticker = parts[0];
-                let buy_ticker = parts[1];
-
-                // Get tokens if they exist in our list
-                let found_sell = LISTED_TOKENS_BY_TICKER.get(sell_ticker).cloned();
-                let found_buy = LISTED_TOKENS_BY_TICKER.get(buy_ticker).cloned();
-
-                // Only update if both tokens were found, otherwise use defaults
-                if found_sell.is_some() && found_buy.is_some() {
-                    sell_token.set(found_sell);
-                    buy_token.set(found_buy);
-                } else {
-                    // If either token is invalid, update URL to default pair
-                    update_token_pair_url(&navigator, Some(Token::ore()), Some(Token::sol()));
-                }
+            if let Some((sell, buy)) = parse_token_pair(pair) {
+                sell_token.set(Some(sell));
+                buy_token.set(Some(buy));
+            } else {
+                // Invalid pair, redirect to default
+                update_token_pair_url(&navigator, Some(Token::ore()), Some(Token::sol()));
             }
         } else {
             // If we're on the /trade route without token pair, update the URL to include the default token pair
@@ -78,9 +57,41 @@ pub fn Trade(token_pair: Option<String>) -> Element {
 
 #[component]
 pub fn TradeWithPair(token_pair: String) -> Element {
+    // Determine if URL contains valid pair
+    let valid_pair = parse_token_pair(&token_pair).is_some();
+
+    // If valid, pass the token pair, otherwise default redirect to /trade/SOL-ORE
     rsx! {
         Trade {
-            token_pair: Some(token_pair)
+            token_pair: if valid_pair { Some(token_pair) } else { None }
         }
+    }
+}
+
+// Parse and validate a token pair string SELL-BUY
+fn parse_token_pair(token_pair: &str) -> Option<(Token, Token)> {
+    let parts: Vec<&str> = token_pair.split('-').collect();
+    if parts.len() == 2 {
+        let sell_ticker = parts[0];
+        let buy_ticker = parts[1];
+
+        // Get tokens if they exist in our listed tokens
+        let found_sell = LISTED_TOKENS_BY_TICKER.get(sell_ticker).cloned();
+        let found_buy = LISTED_TOKENS_BY_TICKER.get(buy_ticker).cloned();
+
+        // Return the pair if both tokens were found
+        if let (Some(sell), Some(buy)) = (found_sell, found_buy) {
+            return Some((sell, buy));
+        }
+    }
+    None
+}
+
+// Update URL with token pair
+fn update_token_pair_url(navigator: &Navigator, buy: Option<Token>, sell: Option<Token>) {
+    if let (Some(buy), Some(sell)) = (buy, sell) {
+        // Format URL with SELL-BUY
+        let token_pair = format!("{}-{}", sell.ticker, buy.ticker);
+        navigator.replace(Route::TradeWithPair { token_pair });
     }
 }
