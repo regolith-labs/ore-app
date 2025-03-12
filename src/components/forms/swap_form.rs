@@ -13,12 +13,24 @@ use solana_sdk::transaction::VersionedTransaction;
 use super::TokenInputError;
 
 #[component]
-pub fn SwapForm(class: Option<String>) -> Element {
+pub fn SwapForm(
+    class: Option<String>,
+    buy_token: Option<Signal<Option<Token>>>,
+    sell_token: Option<Signal<Option<Token>>>,
+    on_tokens_change: Option<EventHandler<(Option<Token>, Option<Token>)>>,
+) -> Element {
     let class = class.unwrap_or_default();
 
     // Selected tokens
-    let buy_token = use_signal(|| Some(Token::ore()));
-    let sell_token = use_signal(|| Some(Token::sol()));
+    let buy_token = match buy_token {
+        Some(token) => token,
+        None => use_signal(|| Some(Token::ore())),
+    };
+
+    let sell_token = match sell_token {
+        Some(token) => token,
+        None => use_signal(|| Some(Token::sol())),
+    };
 
     // Input amounts
     let mut sell_input_amount = use_signal::<String>(|| "".to_string());
@@ -58,7 +70,10 @@ pub fn SwapForm(class: Option<String>) -> Element {
         err,
     );
 
-    priority_fee.set(0000000000);
+    // TODO: remove priority fee from use_effect once we finish swap priority fee. Including now to avoid rerenders on write
+    use_effect(move || {
+        priority_fee.set(0000000000);
+    });
 
     // On successful transaction, reset input amounts
     on_transaction_done(move |_sig| {
@@ -83,6 +98,8 @@ pub fn SwapForm(class: Option<String>) -> Element {
                     toolbar_shortcuts: true,
                     with_picker: true,
                     err,
+                    on_tokens_change: on_tokens_change.clone(),
+                    other_token: Some(buy_token),
                 }
                 div {
                     class: "relative",
@@ -97,12 +114,15 @@ pub fn SwapForm(class: Option<String>) -> Element {
                         disabled: true,
                         with_picker: true,
                         err,
+                        on_tokens_change,
+                        other_token: Some(sell_token),
                     }
                     SwitchButton {
                         buy_token,
                         sell_token,
                         buy_input_amount,
                         sell_input_amount,
+                        on_tokens_change,
                     }
                 }
             }
@@ -222,21 +242,27 @@ fn SwitchButton(
     sell_token: Signal<Option<Token>>,
     buy_input_amount: Signal<String>,
     sell_input_amount: Signal<String>,
+    on_tokens_change: Option<EventHandler<(Option<Token>, Option<Token>)>>,
 ) -> Element {
     rsx! {
         button {
             class: "absolute flex w-12 h-12 -mt-6 -ml-6 inset-y-0 inset-x-1/2 rounded-full controls-tertiary hover:cursor-pointer",
             onclick: move |_| {
                 // Swap tokens
-                let buy_token_peek = buy_token.peek().clone();
-                let sell_token_peek = sell_token.peek().clone();
-                buy_token.set(sell_token_peek);
-                sell_token.set(buy_token_peek);
+                let buy_token_peek = buy_token.read().clone();
+                let sell_token_peek = sell_token.read().clone();
+                buy_token.set(sell_token_peek.clone());
+                sell_token.set(buy_token_peek.clone());
 
                 // Swap input amounts
                 let buy_input_peek = buy_input_amount.peek().clone();
                 sell_input_amount.set(buy_input_peek.clone());
                 buy_input_amount.set("".to_string());
+
+                // Call on_tokens_change event
+                if let Some(on_tokens_change) = on_tokens_change {
+                    on_tokens_change.call((sell_token_peek, buy_token_peek));
+                }
             },
             SwitchIcon {
                 class: "h-4 mx-auto my-auto"
