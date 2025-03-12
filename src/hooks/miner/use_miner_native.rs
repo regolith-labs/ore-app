@@ -163,6 +163,7 @@ async fn find_hash_par(
                             break;
                         } else if core_id.id == 0 {
                             let remaining = cutoff_time.saturating_sub(timer.elapsed().as_secs());
+                            log::info!("remaining time: {}", remaining);
                             if let Err(err) = solutions_channel
                                 .send(OutputMessage::TimeRemaining(remaining as i64, vec![]))
                             {
