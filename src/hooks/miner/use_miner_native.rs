@@ -215,40 +215,5 @@ fn solve(
     challenge: &[u8; 32],
     nonce: &[u8; 8],
 ) -> Vec<drillx::Hash> {
-    let mut hashes = Vec::with_capacity(7);
-    let seed = drillx::seed(challenge, nonce);
-    let solver = drillx::equix::EquiXBuilder::new()
-        .runtime(drillx::equix::RuntimeOption::InterpretOnly)
-        .build(seed.as_slice());
-    if let Ok(solver) = solver {
-        let solutions = solver.solve_with_memory(mem);
-        for solution in solutions {
-            let digest = solution.to_bytes();
-            hashes.push(drillx::Hash {
-                d: digest,
-                h: hashv(&digest, nonce),
-            });
-        }
-    }
-    hashes
-}
-
-#[inline(always)]
-fn hashv(digest: &[u8; 16], nonce: &[u8; 8]) -> [u8; 32] {
-    solana_program::keccak::hashv(&[sorted(*digest).as_slice(), &nonce.as_slice()]).to_bytes()
-}
-
-#[inline(always)]
-fn sorted(mut digest: [u8; 16]) -> [u8; 16] {
-    unsafe {
-        let u16_slice: &mut [u16; 8] = core::mem::transmute(&mut digest);
-        u16_slice.sort_unstable();
-        digest
-    }
-}
-
-fn format_duration(seconds: u32) -> String {
-    let minutes = seconds / 60;
-    let remaining_seconds = seconds % 60;
-    format!("{:02}:{:02}", minutes, remaining_seconds)
+    drillx::hashes_with_memory(mem, challenge, nonce)
 }
