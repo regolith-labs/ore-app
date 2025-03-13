@@ -4,6 +4,7 @@ use solana_sdk::transaction::VersionedTransaction;
 use crate::{
     components::submit_transaction,
     // components::token_icon::TokenIcon,
+    components::CheckCircleIcon,
     components::*,
     config::{Token, LISTED_TOKENS},
     gateway::GatewayResult,
@@ -114,9 +115,23 @@ pub fn Transfer() -> Element {
                                 Row {
                                     class: "lg:flex elevated elevated-border shrink-0 h-min rounded-lg",
                                     div {
-                                        class: "w-full",
+                                        class: "w-full relative flex items-center",
+                                        div {
+                                            class: "absolute inset-y-0 right-0 flex items-center pr-3 z-10 pointer-events-none",
+                                            if !destination_pubkey.read().is_empty() {
+                                                if let Some(Ok(_)) = tx.cloned() {
+                                                    CheckCircleIcon {
+                                                        class: "w-5 h-5 text-elements-green"
+                                                    }
+                                                } else {
+                                                    WarningIcon {
+                                                        class: "w-5 h-5 text-elements-red"
+                                                    }
+                                                }
+                                            }
+                                        }
                                         input {
-                                            class: "p-4 border-b border-gray-800 h-12 my-auto w-full text-left outline-none text-elements-highEmphasis",
+                                            class: "pl-3 pr-10 py-4 border-b border-gray-800 h-12 my-auto w-full text-left outline-none text-elements-highEmphasis",
                                             placeholder: "Enter wallet address",
                                             value: destination_pubkey.clone(),
                                             oninput: move |e: FormEvent| destination_pubkey.set(e.value()),
@@ -126,12 +141,12 @@ pub fn Transfer() -> Element {
                             }
                         }
 
-                        // Fee display
-                        Col {
-                            class: "px-4",
-                            gap: 2,
-                            Fee { priority_fee: priority_fee.clone() }
-                        }
+                        // // Fee display
+                        // Col {
+                        //     class: "px-4",
+                        //     gap: 2,
+                        //     Fee { priority_fee: priority_fee.clone() }
+                        // }
 
                         // Transfer Button
                         TransferButton {
@@ -246,7 +261,7 @@ fn TransferButton(
                 } else if amount_f64 > 0.0 {
                     span {
                         class: "mx-auto my-auto font-semibold",
-                        "Transfer {amount_f64} {token_ticker}"
+                        "Send {amount_f64} {token_ticker}"
                     }
                 } else {
                     span {
