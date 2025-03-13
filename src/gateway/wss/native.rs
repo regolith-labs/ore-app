@@ -15,9 +15,9 @@ use tokio_tungstenite::{
 use tungstenite::client::IntoClientRequest;
 
 use super::{
-    AccountContext, AccountNotification, AccountNotificationEnvelope, AccountNotificationResult,
-    AccountSubscribe, AccountSubscribeConfig, AccountSubscribeParams, AccountSubscribeResponse,
-    JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResponseWithError, SubscriptionError,
+    AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig,
+    AccountSubscribeResponse, JsonRpcRequest, JsonRpcResponse, JsonRpcResponseWithError,
+    SubscriptionError,
 };
 
 pub struct AccountSubscribeNative {

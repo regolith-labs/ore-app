@@ -7,8 +7,6 @@ pub mod solana;
 pub mod spl;
 mod utils;
 pub mod wss;
-mod wss_native;
-mod wss_web;
 
 pub use error::*;
 use serde_json::{json, Value};

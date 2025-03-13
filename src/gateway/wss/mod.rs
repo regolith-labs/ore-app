@@ -1,14 +1,17 @@
+#[cfg(not(feature = "web"))]
+mod native;
+#[cfg(feature = "web")]
+mod web;
+
+#[cfg(not(feature = "web"))]
+pub use native::*;
+#[cfg(feature = "web")]
+pub use web::*;
+
 use async_trait::async_trait;
-use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fmt::Debug;
-use tokio::net::TcpStream;
-use tokio_tungstenite::{
-    connect_async,
-    tungstenite::{self, Message},
-    MaybeTlsStream, WebSocketStream,
-};
 
 //
 // JSON‑RPC Types
@@ -54,7 +57,6 @@ pub struct AccountSubscribeConfig {
     pub commitment: String,
 }
 
-pub type AccountSubscribeParams = (String, AccountSubscribeConfig);
 pub type AccountSubscribeResponse = u64;
 
 //
@@ -101,7 +103,8 @@ pub enum SubscriptionError {
     Other(String),
 }
 
-#[async_trait]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
 pub trait AccountSubscribe {
     type SubscriptionId: Copy + Debug;
 
