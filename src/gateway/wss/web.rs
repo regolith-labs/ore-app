@@ -26,7 +26,7 @@ impl AccountSubscribeWeb {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "web")]
 #[async_trait(?Send)]
 impl AccountSubscribe for AccountSubscribeWeb {
     type SubscriptionId = u64;
