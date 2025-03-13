@@ -101,7 +101,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     class: "flex flex-col items-center gap-2",
                     a {
                         class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
-                        href: "https://beta.ore.supply/topup/{pubkey.read()}",
+                            
                         PlusIcon { class: "h-5" }
                     }
                     span {
