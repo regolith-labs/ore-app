@@ -5,7 +5,13 @@ pub fn init() {
 
 #[cfg(not(feature = "web"))]
 pub fn init() {
-    env_logger::init();
+    // one or the other
+    //
+    // either toggle env-logger
+    // or when debugging prod builds,
+    // toggle the init-macos logger
+    // env_logger::init();
+    init_macos()
 }
 
 // macos logger,
@@ -13,7 +19,7 @@ pub fn init() {
 //
 // cat ~/Library/Caches/ore.supply.ore-app/logs/ore.log
 #[cfg(not(feature = "web"))]
-pub fn _init_macos() {
+fn init_macos() {
     use directories::ProjectDirs;
     use fern::Dispatch;
     use log::LevelFilter;

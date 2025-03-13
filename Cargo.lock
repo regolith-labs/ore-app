@@ -5716,8 +5716,7 @@ dependencies = [
 [[package]]
 name = "ore-pool-types"
 version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d373e1f25cfd8c073dde2c90aada62bff5818cb72404d76c796f278e14d18382"
+source = "git+https://github.com/regolith-labs/ore-pool/?rev=8efb17b#8efb17b0ccc4758178b65e8475c24a1c84de4be7"
 dependencies = [
  "drillx",
  "serde",

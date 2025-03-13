@@ -21,7 +21,7 @@ pub use utils::*;
 pub use wss::*;
 
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
-// pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";
+
 pub struct Gateway<R: Rpc> {
     pub rpc: R,
     pub http: reqwest::Client,
