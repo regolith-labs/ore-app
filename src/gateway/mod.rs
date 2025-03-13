@@ -6,6 +6,9 @@ pub mod pool;
 pub mod solana;
 pub mod spl;
 mod utils;
+pub mod wss;
+mod wss_native;
+mod wss_web;
 
 pub use error::*;
 use serde_json::{json, Value};
@@ -17,6 +20,7 @@ use solana_sdk::{
     hash::Hash, pubkey::Pubkey, signature::Signature, transaction::VersionedTransaction,
 };
 pub use utils::*;
+pub use wss::*;
 
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 // pub const RPC_URL: &str = "https://rainy-alis-fast-mainnet.helius-rpc.com";

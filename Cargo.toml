@@ -33,6 +33,7 @@ desktop = [
   "spl-token-2022",
   "sysinfo",
   "tokio",
+  "tokio-tungstenite",
 ]
 web = [
   "dioxus/web",
@@ -40,6 +41,7 @@ web = [
   "gloo-storage",
   "gloo-worker",
   "gloo-utils",
+  "gloo-net",
   "js-sys",
   "ore-miner-web",
   "serde-wasm-bindgen",
@@ -57,6 +59,7 @@ directories = ["dep:directories"]
 anyhow = "1.0"
 async-retry = "0.3.1"
 async-std = "1.12.0"
+async-trait = "0.1.87"
 base64 = "0.22.1"
 bincode = "1.3.3"
 bs58 = "0.4"
@@ -82,6 +85,7 @@ gloo = { version = "0.11.0", optional = true }
 gloo-storage = { version = "0.3.0", optional = true }
 gloo-worker = { version = "0.5.0", optional = true }
 gloo-utils = { version = "0.2.0", optional = true }
+gloo-net = { version = "0.6.0", optional = true }
 is-url = { version = "1.0.4" }
 js-sys = { version = "0.3.67", optional = true }
 jupiter-swap-api-client = { git = "https://github.com/regolith-labs/jupiter-swap-api-client", package = "jupiter-swap-api-client", branch = "main" }
@@ -130,6 +134,9 @@ spl-token-2022 = { version = "^6", optional = true, features = [
 steel = "3.0"
 sysinfo = { version = "0.33.1", optional = true }
 tokio = { version = "1.43.0", optional = true, features = ["full"] }
+tokio-tungstenite = { version = "0.26.2", optional = true, features = [
+  "native-tls",
+] }
 tracing = "0.1.40"
 url = "2.5.0"
 wasm-bindgen = { version = "0.2.99", optional = true }
