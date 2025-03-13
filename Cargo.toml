@@ -102,7 +102,7 @@ ore-miner-web = { path = "./miner-web", features = [
   "app",
 ], default-features = false, optional = true }
 ore-pool-api = "1.3"
-ore-pool-types = "1.2"
+ore-pool-types = "1.4"
 ore-types = "0.0.13"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
@@ -162,6 +162,7 @@ features = [
 ]
 
 [patch.crates-io]
+ore-pool-types = { version = "1.4", git = "https://github.com/regolith-labs/ore-pool/", package = "ore-pool-types", rev = "8efb17b" }
 solana-client-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }
