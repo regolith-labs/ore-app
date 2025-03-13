@@ -3,7 +3,7 @@ use crate::{
     gateway::GatewayResult,
     hooks::{
         on_transaction_done, use_boost, use_boost_apy, use_boost_claim_transaction,
-        use_ore_balance, use_ore_price, use_stake,
+        use_claimable_yield, use_ore_balance, use_ore_price, use_stake,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
 };
@@ -106,25 +106,23 @@ pub fn StakeYield(
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     // Build claim transaction
+    let claimable_yield = use_claimable_yield(boost, stake);
     let claim_tx = use_boost_claim_transaction(boost, stake);
 
     rsx! {
-        TitledResourceRow {
+        TitledRow {
             title: "Yield",
             description: "The amount of ORE you have earned and may claim. Yield is not automatically compounded.",
-            resource: stake,
-            com: |stake| {
-                rsx! {
-                    if stake.rewards > 0 {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                            gold: true,
-                        }
-                    } else {
-                        NullValue {}
+            value: rsx! {
+                if *claimable_yield.read() > 0 {
+                    OreValue {
+                        ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
+                        with_decimal_units: true,
+                        size: TokenValueSize::Small,
+                        gold: true,
                     }
+                } else {
+                    NullValue {}
                 }
             }
         }

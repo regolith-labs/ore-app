@@ -9,7 +9,9 @@ use solana_sdk::{
 
 use crate::{
     gateway::{GatewayError, GatewayResult},
-    hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
+    hooks::{
+        use_claimable_yield, use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
+    },
     solana::spl_associated_token_account,
 };
 
@@ -18,6 +20,7 @@ pub fn use_boost_claim_transaction(
     stake: Resource<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let claimable_yield = use_claimable_yield(boost, stake);
     use_resource(move || async move {
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
@@ -33,7 +36,7 @@ pub fn use_boost_claim_transaction(
         };
 
         // Check if stake has rewards to claim
-        if stake.rewards == 0 {
+        if *claimable_yield.read() == 0 {
             return Err(GatewayError::Unknown);
         }
 

@@ -2,13 +2,16 @@ use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
 use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::{Boost, Stake};
-use steel::Pubkey;
+use steel::{Numeric, Pubkey};
 
 use crate::{
     components::*,
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
-    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl},
+    hooks::{
+        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl,
+        use_claimable_yield,
+    },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
     utils::LiquidityPair,
@@ -428,14 +431,17 @@ fn StakeTableRowYield(
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
+    // Calculate rewards
+    let claimable_yield = use_claimable_yield(boost, stake);
+
     rsx! {
         Col {
             if let Some(stake) = stake.cloned() {
-                if let Ok(stake) = stake.clone() {
-                    if stake.rewards > 0 {
+                if let Ok(_stake) = stake.clone() {
+                    if *claimable_yield.read() > 0 {
                         OreValue {
                             class: "text-right ml-auto",
-                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
+                            ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
                             with_decimal_units: true,
                             size: TokenValueSize::Small,
                             gold: true,
@@ -443,13 +449,13 @@ fn StakeTableRowYield(
                         }
                     } else {
                         span {
-                            class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
+                            class: "text-right ml-auto text-elements-midEmphasis font-medium mr-1",
                             "–"
                         }
                     }
                 } else {
                     span {
-                        class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
+                        class: "text-right ml-auto text-elements-midEmphasis font-medium mr-1",
                         "–"
                     }
                 }
