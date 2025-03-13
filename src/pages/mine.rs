@@ -2,13 +2,14 @@ use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
 
+use crate::time::Duration;
 use crate::{
     components::*,
     gateway::pool::PoolGateway,
     hooks::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_cpu_utilization,
-        use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url,
+        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
+        use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
         use_wallet, MinerStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
@@ -28,16 +29,7 @@ pub fn Mine() -> Element {
                     title: "Mine",
                     subtitle: "Convert energy into cryptocurrency."
                 }
-                if cfg!(feature = "web") {
-                    OrbMiner {
-                        class: "relative flex w-[16rem] h-[16rem] mx-auto my-8 sm:my-16",
-                        gold: *use_miner_is_active().read()
-                    }
-                } else {
-                    div {
-                        class: "h-8",
-                    }
-                }
+                MinePower {}
                 MinerData {}
             }
             MineTable {}
@@ -343,6 +335,181 @@ fn MinerRewards() -> Element {
             ClaimButton {
                 transaction: claim_tx,
                 tx_type: TransactionType::PoolClaim,
+            }
+        }
+    }
+}
+
+fn MinePower() -> Element {
+    // Handle CPU utilization differently for web and desktop
+    let cpu_utilization = if cfg!(feature = "web") {
+        // Web implementation with simulated values
+        let mut signal = use_signal(|| vec![0.0; 12]).clone();
+        let miner_is_active = use_miner_is_active();
+
+        // Set up web cpu usage with simulated values
+        use_future(move || {
+            async move {
+                loop {
+                    let mut new_values = vec![0.0; 12];
+
+                    // Miner is active
+                    if *miner_is_active.read() {
+                        // First core runs at ~70% (with some variation)
+                        new_values[0] = 65.0 + (rand::random::<f32>() * 10.0);
+
+                        // 2-3 additional cores hover around 10-30%
+                        for i in 1..4 {
+                            new_values[i] = 10.0 + (rand::random::<f32>() * 20.0);
+                        }
+                    } else {
+                        // Miner is paused,just have 2-3 cores hovering at 10-30%
+                        for i in 0..3 {
+                            new_values[i] = 10.0 + (rand::random::<f32>() * 20.0);
+                        }
+                    }
+
+                    signal.set(new_values);
+
+                    // Sleep to simulate some delay
+                    async_std::task::sleep(Duration::from_millis(1000)).await;
+                }
+            }
+        });
+
+        signal
+    } else {
+        // Get desktop CPU usage
+        use_system_cpu_utilization()
+    };
+
+    // let cores = use_miner_cores();
+    let max = if cfg!(feature = "web") {
+        12
+    } else {
+        crate::cores::get()
+    };
+
+    // Get the CPU utilization values
+    let use_rates = use_memo(move || {
+        // Create a vector of utilization rates for each core
+        let mut rates: Vec<usize> = vec![0; max];
+
+        // For both web and desktop, process the utilization values
+        let utilization_vec = cpu_utilization.read();
+        if !utilization_vec.is_empty() {
+            for i in 0..max {
+                if i < utilization_vec.len() {
+                    rates[i] = utilization_vec[i].clamp(0.0, 100.0).round() as usize;
+                }
+            }
+        }
+
+        rates
+    });
+
+    // Create random animation durations for each core
+    let animation_durations = (0..max)
+        .map(|i| (((i * 17) % 7) as f32 * 0.1 + 0.3).to_string())
+        .collect::<Vec<_>>();
+
+    // Calculate how many cores go in each column
+    let cores_per_column = 6;
+    let num_columns = (max + cores_per_column - 1) / cores_per_column;
+
+    // Create arrays of indices for each column (just sequential numbers for display order)
+    let column_indices: Vec<Vec<usize>> = (0..num_columns)
+        .map(|col| {
+            let start = col * cores_per_column;
+            let end = (start + cores_per_column).min(max);
+            (start..end).collect()
+        })
+        .collect();
+
+    rsx! {
+        Col {
+            class: "relative flex w-full mx-auto my-8 sm:my-16",
+            gap: 4,
+            // Keyframes for the animation
+            style {
+                "@keyframes blockPulse {{
+                    0% {{ opacity: 0; }} 
+                    100% {{ opacity: 1; }}
+                }}"
+            }
+            // Manual column layout with increased spacing between columns
+            div {
+                class: "flex flex-col md:flex-row gap-8 w-full",
+                // Create a column for each group of cores
+                for column in column_indices {
+                    div {
+                        class: "flex-1",
+                        // Create system bars for each core in numerical order
+                        for core_idx in column {
+                            {
+                                // Get the rate for this core
+                                let rate = use_rates.read()[core_idx];
+
+                                rsx! {
+                                    div {
+                                        // Core index
+                                        class: "flex items-center gap-1 w-full flex-shrink-0 mb-2",
+                                        span {
+                                            class: "text-elements-midEmphasis w-6 text-left flex-shrink-0 font-medium",
+                                            "{core_idx}"
+                                        }
+                                        // Core usage bar
+                                        div {
+                                            class: "flex-1 mx-1 h-6 overflow-hidden",
+                                            // Container for all 10 blocks as a non-flex div
+                                            div {
+                                                class: "flex h-full w-full",
+                                                for j in 0..10 {
+                                                    {
+                                                        // Fixed block class assignment
+                                                        let block_class = if j < 6 {
+                                                            "h-full bg-elements-green"
+                                                        } else if j < 8 {
+                                                            "h-full bg-elements-yellow"
+                                                        } else {
+                                                            "h-full bg-elements-red"
+                                                        };
+
+                                                        rsx! {
+                                                            if j < (rate + 5) / 10 {
+                                                                div {
+                                                                    class: "{block_class}",
+                                                                    style: "width: 9%; margin-right: 1%;"
+                                                                }
+                                                            } else if j == (rate + 5) / 10 && rate > 0 && rate < 100 {
+                                                                // The "walking" block that appears and disappears - only for non-zero rates
+                                                                div {
+                                                                    class: "{block_class}",
+                                                                    style: "width: 9%; margin-right: 1%; animation: blockPulse {0}s infinite alternate-reverse ease-in-out;".replace("{0}", &animation_durations[core_idx])
+                                                                }
+                                                            } else {
+                                                                // Empty blocks
+                                                                div {
+                                                                    class: "h-full",
+                                                                    style: "width: 9%; margin-right: 1%;"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        // Usage percentage for each core
+                                        span {
+                                            class: "text-elements-lowEmphasis text-xs w-8 text-right flex-shrink-0",
+                                            "{rate}%"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

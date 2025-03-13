@@ -10,10 +10,8 @@ use crate::{
 pub fn TokenPicker(
     show: Signal<bool>,
     token: Signal<Option<Token>>,
-    // buy_input_amount: Signal<String>,
-    // sell_input_amount: Signal<String>,
-    // sell_quote: UseDebounce<String>,
-    // quote_response: Signal<Option<QuoteResponse>>,
+    on_tokens_change: Option<EventHandler<(Option<Token>, Option<Token>)>>,
+    other_token: Option<Signal<Option<Token>>>,
 ) -> Element {
     let tokens = LISTED_TOKENS.values().collect::<Vec<_>>();
     let mut search = use_signal(|| String::new());
@@ -59,14 +57,21 @@ pub fn TokenPicker(
                                 onclick: {
                                     let t = t.clone();
                                     move |_| {
+                                        let old_token = token.cloned();
+
                                         // Select the new token
                                         token.set(Some(t.clone()));
                                         show.set(false);
 
-                                        // Get a new quote
-                                        // buy_input_amount.set("".to_string());
-                                        // quote_response.set(None);
-                                        // sell_quote.action(sell_input_amount.cloned());
+                                        // Update URL if on_tokens_change is provided
+                                        if let Some(on_tokens_change) = on_tokens_change {
+                                            if let Some(other_token) = other_token {
+                                                let other = other_token.cloned();
+                                                on_tokens_change.call((other, Some(t.clone())));
+                                            } else {
+                                                on_tokens_change.call((old_token, Some(t.clone())));
+                                            }
+                                        }
                                     }
                                 },
                                 img {
