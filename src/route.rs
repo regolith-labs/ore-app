@@ -26,6 +26,8 @@ pub enum Route {
     #[layout(AppModalLayout)]
         #[route("/topup/:address")]
         Topup { address: String },
+        #[route("/transfer")]
+        Transfer {},
     #[end_layout]
 
     #[layout(LandingLayout)]

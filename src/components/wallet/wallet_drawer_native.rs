@@ -3,7 +3,9 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
+use crate::components::{CopyIcon, GlobeIcon, PaperAirplaneIcon, PlayIcon, PlusIcon};
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
+use crate::route::Route;
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
@@ -88,18 +90,52 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                     pubkey_splice.set(Splice::Copied);
                 },
-                div { "{pubkey_splice.read().to_string()}" }
-            }
-            div { class: "flex flex-row justify-center items-center gap-2 mx-4 p-4",
-                a {
-                    class: "text-sm hover:underline",
-                    href: "https://beta.ore.supply/topup/{pubkey.read()}",
-                    "top up"
+                div { class: "flex items-center gap-2",
+                    div { "{pubkey_splice.read().to_string()}" }
+                    CopyIcon { class: "h-4 w-4", solid: false }
                 }
-                a {
-                    class: "text-sm hover:underline",
-                    href: "https://solscan.io/account/{pubkey.read()}",
-                    "explorer"
+            }
+            div {
+                class: "flex flex-row justify-center items-center gap-10 mx-4 p-4",
+                div {
+                    class: "flex flex-col items-center gap-2",
+                    a {
+                        class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                        href: "https://beta.ore.supply/topup/{pubkey.read()}",
+                        PlusIcon { class: "h-5" }
+                    }
+                    span {
+                        class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                        "Top Up"
+                    }
+                }
+                div {
+                    class: "flex flex-col items-center gap-2",
+                    a {
+                        class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                        href: "https://solscan.io/account/{pubkey.read()}",
+                        GlobeIcon { class: "h-5" }
+                    }
+                    span {
+                        class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                        "Explorer"
+                    }
+                }
+                div {
+                    class: "flex flex-col items-center gap-2",
+                    Link {
+                        class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                        to: Route::Transfer {},
+                        onclick: move |e: MouseEvent| {
+                            e.stop_propagation();
+                            on_close.call(e);
+                        },
+                        PaperAirplaneIcon { class: "h-5" }
+                    }
+                    span {
+                        class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                        "Transfer"
+                    }
                 }
             }
             if *keypair_show_export.read() {
@@ -129,7 +165,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
             } else {
                 div { class: "flex flex-col gap-2 mt-auto",
                     button {
-                        class: "flex justify-center items-center text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
+                        class: "flex justify-center items-center rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
                         onclick: move |e| {
                             e.stop_propagation();
                             keypair_show_export.set(true);
