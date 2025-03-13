@@ -106,7 +106,6 @@ async fn find_hash_par(
     cores: u8,
     solutions_channel: &tokio::sync::mpsc::UnboundedSender<OutputMessage>,
 ) -> Result<()> {
-    log::info!("cutoff time: {:?}", cutoff_time);
     // get cores
     let core_ids = core_affinity::get_core_ids().ok_or(anyhow::anyhow!("failed to query cores"))?;
     let core_ids = core_ids.into_iter().filter(|id| id.id < (cores as usize));
@@ -163,7 +162,6 @@ async fn find_hash_par(
                             break;
                         } else if core_id.id == 0 {
                             let remaining = cutoff_time.saturating_sub(timer.elapsed().as_secs());
-                            log::info!("remaining time: {}", remaining);
                             if let Err(err) = solutions_channel
                                 .send(OutputMessage::TimeRemaining(remaining as i64, vec![]))
                             {

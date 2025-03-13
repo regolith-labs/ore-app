@@ -93,8 +93,6 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         unix_timestamp: i64,
         buffer_time: i64,
     ) -> GatewayResult<i64> {
-        log::info!("buffer time: {}", buffer_time);
-        log::info!("clock: {:?}", unix_timestamp);
         let cutoff = last_hash_at
             .saturating_add(60)
             .saturating_sub(buffer_time)

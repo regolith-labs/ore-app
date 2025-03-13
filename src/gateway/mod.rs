@@ -27,7 +27,6 @@ pub struct Gateway<R: Rpc> {
 
 impl<R: Rpc> Gateway<R> {
     pub fn new(rpc_url: String) -> Gateway<R> {
-        log::info!("rpc: {}", rpc_url);
         Gateway {
             rpc: R::new(rpc_url),
             http: reqwest::Client::new(),
