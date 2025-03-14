@@ -14,7 +14,7 @@ use tokio_tungstenite::{
 };
 use tungstenite::client::IntoClientRequest;
 
-use crate::gateway::RPC_URL;
+use crate::gateway::WSS_URL;
 
 use super::{
     AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig,
@@ -22,23 +22,12 @@ use super::{
     SubscriptionError,
 };
 
-pub struct AccountSubscribeNative {
+pub struct AccountSubscribeGateway {
     writer: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
 }
 
-impl AccountSubscribeNative {
-    pub async fn connect() -> Result<Self, SubscriptionError> {
-        let url_parsed = RPC_URL
-            .into_client_request()
-            .map_err(|e| SubscriptionError::Other(e.to_string()))?;
-        let (ws_stream, _) = connect_async(url_parsed)
-            .await
-            .map_err(|e| SubscriptionError::ConnectionError(e.to_string()))?;
-        let (writer, reader) = ws_stream.split();
-        Ok(Self { writer, reader })
-    }
-
+impl AccountSubscribeGateway {
     async fn send_request<T: Serialize>(
         &mut self,
         request: &JsonRpcRequest<T>,
@@ -89,14 +78,27 @@ impl AccountSubscribeNative {
 }
 
 #[async_trait]
-impl AccountSubscribe for AccountSubscribeNative {
+impl AccountSubscribe for AccountSubscribeGateway {
     type SubscriptionId = u64;
+    async fn connect() -> Result<Self, SubscriptionError> {
+        let url_parsed = WSS_URL
+            .into_client_request()
+            .map_err(|e| SubscriptionError::Other(e.to_string()))?;
+        let (ws_stream, _) = connect_async(url_parsed)
+            .await
+            .map_err(|e| SubscriptionError::ConnectionError(e.to_string()))?;
+        let (writer, reader) = ws_stream.split();
+        Ok(Self { writer, reader })
+    }
 
     async fn subscribe(
         &mut self,
         account: &str,
-        config: AccountSubscribeConfig,
     ) -> Result<Self::SubscriptionId, SubscriptionError> {
+        let config = AccountSubscribeConfig {
+            encoding: "jsonParsed".to_string(),
+            commitment: "finalized".to_string(),
+        };
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: 1,
@@ -130,20 +132,22 @@ impl AccountSubscribe for AccountSubscribeNative {
 
     async fn next_notification(
         &mut self,
-    ) -> Option<Result<AccountNotificationEnvelope, SubscriptionError>> {
+    ) -> Result<AccountNotificationEnvelope, SubscriptionError> {
         while let Some(msg) = self.reader.next().await {
             match msg {
                 Ok(Message::Text(text)) => {
                     if let Ok(notification) =
                         serde_json::from_str::<AccountNotificationEnvelope>(&text)
                     {
-                        return Some(Ok(notification));
+                        return Ok(notification);
                     }
                 }
                 Ok(_) => continue,
-                Err(e) => return Some(Err(SubscriptionError::ConnectionError(e.to_string()))),
+                Err(e) => return Err(SubscriptionError::ConnectionError(e.to_string())),
             }
         }
-        None
+        Err(SubscriptionError::Other(
+            "WebSocket stream ended".to_string(),
+        ))
     }
 }

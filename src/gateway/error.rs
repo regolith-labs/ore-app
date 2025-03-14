@@ -103,3 +103,19 @@ impl From<ProgramError> for GatewayError {
         GatewayError::ProgramBuilderFailed
     }
 }
+
+impl From<crate::gateway::wss::SubscriptionError> for GatewayError {
+    fn from(value: crate::gateway::wss::SubscriptionError) -> Self {
+        log::error!("{:?}", value);
+        match value {
+            crate::gateway::wss::SubscriptionError::ConnectionError(_) => {
+                GatewayError::NetworkUnavailable
+            }
+            crate::gateway::wss::SubscriptionError::ParseError(_) => {
+                GatewayError::FailedDeserialization
+            }
+            crate::gateway::wss::SubscriptionError::RpcError(_) => GatewayError::RequestFailed,
+            crate::gateway::wss::SubscriptionError::Other(_) => GatewayError::Unknown,
+        }
+    }
+}

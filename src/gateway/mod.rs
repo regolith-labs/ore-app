@@ -21,6 +21,7 @@ pub use utils::*;
 pub use wss::*;
 
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
+pub const WSS_URL: &str = "wss://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
 
 pub struct Gateway<R: Rpc> {
     pub rpc: R,

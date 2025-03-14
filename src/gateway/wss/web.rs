@@ -5,7 +5,7 @@ use gloo_net::websocket::Message as GlooMessage;
 use serde::{de::DeserializeOwned, Serialize};
 use serde_json;
 
-use crate::gateway::RPC_URL;
+use crate::gateway::WSS_URL;
 
 use super::{
     AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig,
@@ -14,19 +14,12 @@ use super::{
 };
 
 /// A WebSocket client for account subscriptions on Solana RPC using gloo‑net.
-pub struct AccountSubscribeWeb {
+pub struct AccountSubscribeGateway {
     writer: futures_util::stream::SplitSink<WebSocket, GlooMessage>,
     reader: futures_util::stream::SplitStream<WebSocket>,
 }
 
-impl AccountSubscribeWeb {
-    /// Connects to the specified WebSocket URL and returns a new client.
-    pub async fn connect() -> Result<Self, SubscriptionError> {
-        let ws = WebSocket::open(RPC_URL)
-            .map_err(|e| SubscriptionError::ConnectionError(format!("{:?}", e)))?;
-        let (writer, reader) = ws.split();
-        Ok(Self { writer, reader })
-    }
+impl AccountSubscribeGateway {
     /// Sends a JSON-RPC request over the WebSocket connection
     async fn send_request<T: Serialize>(
         &mut self,
@@ -78,14 +71,24 @@ impl AccountSubscribeWeb {
 
 #[cfg(feature = "web")]
 #[async_trait(?Send)]
-impl AccountSubscribe for AccountSubscribeWeb {
+impl AccountSubscribe for AccountSubscribeGateway {
     type SubscriptionId = u64;
+    /// Connects to the specified WebSocket URL and returns a new client.
+    async fn connect() -> Result<Self, SubscriptionError> {
+        let ws = WebSocket::open(WSS_URL)
+            .map_err(|e| SubscriptionError::ConnectionError(format!("{:?}", e)))?;
+        let (writer, reader) = ws.split();
+        Ok(Self { writer, reader })
+    }
 
     async fn subscribe(
         &mut self,
         account: &str,
-        config: AccountSubscribeConfig,
     ) -> Result<Self::SubscriptionId, SubscriptionError> {
+        let config = AccountSubscribeConfig {
+            encoding: "jsonParsed".to_string(),
+            commitment: "finalized".to_string(),
+        };
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: 1,
@@ -121,20 +124,22 @@ impl AccountSubscribe for AccountSubscribeWeb {
 
     async fn next_notification(
         &mut self,
-    ) -> Option<Result<AccountNotificationEnvelope, SubscriptionError>> {
+    ) -> Result<AccountNotificationEnvelope, SubscriptionError> {
         while let Some(msg) = self.reader.next().await {
             match msg {
                 Ok(GlooMessage::Text(text)) => {
                     if let Ok(notification) =
                         serde_json::from_str::<AccountNotificationEnvelope>(&text)
                     {
-                        return Some(Ok(notification));
+                        return Ok(notification);
                     }
                 }
                 Ok(_) => continue,
-                Err(e) => return Some(Err(SubscriptionError::ConnectionError(e.to_string()))),
+                Err(e) => return Err(SubscriptionError::ConnectionError(e.to_string())),
             }
         }
-        None
+        Err(SubscriptionError::Other(
+            "WebSocket stream ended".to_string(),
+        ))
     }
 }

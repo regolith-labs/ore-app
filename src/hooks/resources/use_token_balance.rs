@@ -1,10 +1,15 @@
 use dioxus::prelude::*;
+use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
 use std::collections::HashMap;
 
 use crate::{
     config::{Token, LISTED_TOKENS},
-    gateway::{spl::SplGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount},
+    gateway::{
+        spl::SplGateway, AccountSubscribe, AccountSubscribeGateway, GatewayError, GatewayResult,
+        Rpc, UiTokenAmount,
+    },
+    hooks::GetPubkey,
     utils::LiquidityPair,
 };
 
@@ -132,6 +137,40 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
             Wallet::Connected(pubkey) => use_gateway().rpc.get_ore_balance(&pubkey).await,
         }
     })
+}
+
+pub fn use_ore_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
+    let wallet = use_wallet();
+    let mut balance = use_signal(|| Err::<UiTokenAmount, _>(GatewayError::AccountNotFound));
+    spawn(async move {
+        if let Err(e) = async {
+            let pubkey = wallet.pubkey()?;
+            let ata = crate::solana::spl_associated_token_account::get_associated_token_address(
+                &pubkey,
+                &MINT_ADDRESS,
+            );
+            let mut wss = AccountSubscribeGateway::connect().await?;
+            let id = wss.subscribe(ata.to_string().as_str()).await?;
+            log::info!("sub id: {}", id);
+            loop {
+                match wss.next_notification().await {
+                    Ok(msg) => {
+                        log::info!("{:?}", msg);
+                    }
+                    Err(err) => {
+                        log::error!("{:?}", err);
+                        break;
+                    }
+                }
+            }
+            Ok::<(), GatewayError>(())
+        }
+        .await
+        {
+            log::error!("WebSocket subscription error: {:?}", e);
+        }
+    });
+    balance
 }
 
 pub fn use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {

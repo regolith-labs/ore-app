@@ -18,7 +18,7 @@ use std::fmt::Debug;
 //
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct JsonRpcRequest<T> {
+pub(super) struct JsonRpcRequest<T> {
     pub jsonrpc: String,
     pub id: u64,
     pub method: String,
@@ -26,21 +26,21 @@ pub struct JsonRpcRequest<T> {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct JsonRpcResponse<T> {
+pub(super) struct JsonRpcResponse<T> {
     pub jsonrpc: String,
     pub id: u64,
     pub result: T,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct JsonRpcError {
+pub(super) struct JsonRpcError {
     pub code: i64,
     pub message: String,
     pub data: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct JsonRpcResponseWithError<T> {
+pub(super) struct JsonRpcResponseWithError<T> {
     pub jsonrpc: String,
     pub id: u64,
     pub result: Option<T>,
@@ -52,24 +52,24 @@ pub struct JsonRpcResponseWithError<T> {
 //
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AccountSubscribeConfig {
+pub(super) struct AccountSubscribeConfig {
     pub encoding: String,
     pub commitment: String,
 }
 
-pub type AccountSubscribeResponse = u64;
+pub(super) type AccountSubscribeResponse = u64;
 
 //
 // Account Notification Types
 //
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AccountContext {
+pub(super) struct AccountContext {
     pub slot: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AccountNotification {
+pub(super) struct AccountNotification {
     pub data: Vec<String>,
     pub executable: bool,
     pub lamports: u64,
@@ -80,7 +80,7 @@ pub struct AccountNotification {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AccountNotificationResult {
+pub(super) struct AccountNotificationResult {
     pub context: AccountContext,
     pub value: AccountNotification,
 }
@@ -105,21 +105,15 @@ pub enum SubscriptionError {
 
 #[cfg_attr(not(feature = "web"), async_trait)]
 #[cfg_attr(feature = "web", async_trait(?Send))]
-pub trait AccountSubscribe {
+pub trait AccountSubscribe: Sized {
     type SubscriptionId: Copy + Debug;
-
-    async fn subscribe(
-        &mut self,
-        account: &str,
-        config: AccountSubscribeConfig,
-    ) -> Result<Self::SubscriptionId, SubscriptionError>;
-
+    async fn connect() -> Result<Self, SubscriptionError>;
+    async fn subscribe(&mut self, account: &str)
+        -> Result<Self::SubscriptionId, SubscriptionError>;
     async fn unsubscribe(
         &mut self,
         subscription: Self::SubscriptionId,
     ) -> Result<(), SubscriptionError>;
-
-    async fn next_notification(
-        &mut self,
-    ) -> Option<Result<AccountNotificationEnvelope, SubscriptionError>>;
+    async fn next_notification(&mut self)
+        -> Result<AccountNotificationEnvelope, SubscriptionError>;
 }
