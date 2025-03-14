@@ -14,7 +14,6 @@ use crate::{
 use std::str::FromStr;
 
 use ore_types::request::TransactionType;
-use steel::Pubkey;
 
 use crate::hooks::on_transaction_done;
 
@@ -49,10 +48,6 @@ pub fn Transfer() -> Element {
     let show_confirmation = use_signal(|| false);
 
     let mut destination_pubkey: Signal<String> = use_signal::<String>(|| "".to_string());
-
-    use_effect(move || {
-        err.set(None);
-    });
 
     // Use the transfer transaction hook
     let tx = use_transfer_transaction(
@@ -156,6 +151,13 @@ pub fn Transfer() -> Element {
                             selected_token,
                             destination: destination_pubkey,
                             show_confirmation,
+                        }
+
+                        SubmitButton {
+                            title: "Send".to_string(),
+                            transaction: tx,
+                            err: err,
+                            tx_type: TransactionType::TopUp
                         }
 
                         // Confirmation Dialog
