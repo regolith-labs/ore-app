@@ -2,7 +2,6 @@ use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
 
-use crate::time::Duration;
 use crate::{
     components::*,
     gateway::pool::PoolGateway,
@@ -187,12 +186,6 @@ fn TimeRemaining() -> Element {
         if display_time_remaining.cloned() {
             Col {
                 gap: 4,
-                // Row {
-                //     class: "text-elements-lowEmphasis font-medium justify-between",
-                //     span {
-                //         "Time"
-                //     }
-                // }
                 button {
                     class: "flex flex-col gap-0 group",
                     onclick: move |_| info_hidden.set(!info_hidden.cloned()),
