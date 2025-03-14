@@ -23,13 +23,12 @@ pub fn Mine() -> Element {
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
             Col {
-                class: "w-full max-w-2xl mx-auto px-5 sm:px-8",
+                class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
                 Heading {
                     class: "w-full",
                     title: "Mine",
                     subtitle: "Convert energy into cryptocurrency."
                 }
-                MinePower {}
                 MinerData {}
             }
             MineTable {}
@@ -50,13 +49,15 @@ fn MinerData() -> Element {
 
     rsx! {
         Col {
-            class: "w-full flex-wrap mx-auto justify-between gap-10",
+            class: "w-full flex-wrap mx-auto justify-between gap-12",
             Alert {}
             MinerStatus {}
-            // MinerHashpower {}
-            if cfg!(not(feature = "web")) {
+            Col {
+                class: "w-full gap-4",
                 MinerCores {}
+                MinePower {}
             }
+            TimeRemaining {}
             MinerPendingRewards {}
             MinerRewards {}
         }
@@ -162,16 +163,10 @@ fn StopStartButton() -> Element {
     }
 }
 
-fn MinerStatus() -> Element {
+fn TimeRemaining() -> Element {
     let (out_msg, _in_msg) = use_miner();
     let miner_status = use_miner_status();
-    let status = use_memo(move || match miner_status.cloned() {
-        MinerStatus::Registering => "Registering",
-        MinerStatus::FetchingChallenge => "Fetching",
-        MinerStatus::Hashing => "Hashing",
-        MinerStatus::SubmittingSolution => "Submitting",
-        MinerStatus::Stopped => "Stopped",
-    });
+
     let display_time_remaining = use_memo(move || match miner_status.cloned() {
         MinerStatus::Hashing | MinerStatus::SubmittingSolution | MinerStatus::FetchingChallenge => {
             true
@@ -186,33 +181,42 @@ fn MinerStatus() -> Element {
         }
     });
 
+    let mut info_hidden = use_signal(|| true);
+
     rsx! {
-        Col {
-            gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Status"
-            }
-            Row {
-                class: "justify-between",
-                span {
-                    class: "font-semibold text-2xl sm:text-3xl",
-                    "{status}"
-                }
-                StopStartButton {}
-            }
-        }
         if display_time_remaining.cloned() {
             Col {
                 gap: 4,
-                Row {
-                    class: "text-elements-lowEmphasis font-medium justify-between",
-                    span {
-                        "New challenge in"
+                // Row {
+                //     class: "text-elements-lowEmphasis font-medium justify-between",
+                //     span {
+                //         "Time"
+                //     }
+                // }
+                button {
+                    class: "flex flex-col gap-0 group",
+                    onclick: move |_| info_hidden.set(!info_hidden.cloned()),
+                    Row {
+                        class: "w-full justify-between",
+                        Row {
+                            gap: 2,
+                            span {
+                                class: "text-elements-lowEmphasis font-medium",
+                                "Time"
+                            }
+                            InfoIcon {
+                                class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
+                            }
+                        }
+                        span {
+                            class: "mr-2",
+                            "{time_remaining.cloned()}s"
+                        }
                     }
-                    span {
-                        class: "mr-2",
-                        "{time_remaining.cloned()}s"
+                    InfoText {
+                        class: "text-wrap text-left text-sm max-w-lg mr-auto",
+                        text: "Seconds remaining until the mining challenge must be refreshed.",
+                        hidden: info_hidden,
                     }
                 }
                 div {
@@ -222,6 +226,53 @@ fn MinerStatus() -> Element {
                         style: "width: {(100.0 - (time_remaining.cloned() as f32 / 60.0 * 100.0)).max(0.0)}%"
                     }
                 }
+            }
+        }
+    }
+}
+
+fn MinerStatus() -> Element {
+    let (_out_msg, _in_msg) = use_miner();
+    let miner_status = use_miner_status();
+    let status = use_memo(move || match miner_status.cloned() {
+        MinerStatus::Registering => "Registering",
+        MinerStatus::FetchingChallenge => "Fetching",
+        MinerStatus::Hashing => "Hashing",
+        MinerStatus::SubmittingSolution => "Submitting",
+        MinerStatus::Stopped => "Stopped",
+    });
+
+    let mut info_hidden = use_signal(|| true);
+
+    rsx! {
+        Col {
+            gap: 4,
+            button {
+                class: "flex flex-col gap-0 group",
+                onclick: move |_| info_hidden.set(!info_hidden.cloned()),
+                Row {
+                    gap: 2,
+                    span {
+                        class: "text-elements-lowEmphasis font-medium",
+                        "Status"
+                    }
+                    InfoIcon {
+                        class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
+                    }
+                }
+                InfoText {
+                    class: "text-wrap text-left text-sm max-w-lg mr-auto",
+                    text: "The status of your miner.",
+                    hidden: info_hidden,
+                }
+            }
+            Row {
+                class: "justify-between",
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl",
+                    "{status}"
+                }
+                StopStartButton {}
             }
         }
     }
@@ -246,12 +297,28 @@ fn _MinerHashpower() -> Element {
 fn MinerCores() -> Element {
     let mut cores = use_miner_cores();
     let max = crate::cores::get();
+    let mut info_hidden = use_signal(|| true);
     rsx! {
         Col {
             gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Cores"
+            button {
+                class: "flex flex-col gap-0 group",
+                onclick: move |_| info_hidden.set(!info_hidden.cloned()),
+                Row {
+                    gap: 2,
+                    span {
+                        class: "text-elements-lowEmphasis font-medium",
+                        "Cores"
+                    }
+                    InfoIcon {
+                        class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
+                    }
+                }
+                InfoText {
+                    class: "text-wrap text-left text-sm max-w-lg mr-auto",
+                    text: "The number of CPU cores to dedicate to mining. Use more cores to increase your hashpower. The graph below visualizes the current utilization of each CPU core on your machine.",
+                    hidden: info_hidden,
+                }
             }
             Row {
                 class: "justify-between",
@@ -270,7 +337,8 @@ fn MinerCores() -> Element {
                         "–"
                     }
                     button {
-                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
+                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl hover:disabled:cursor-not-allowed",
+                        disabled: cfg!(feature = "web"),
                         onclick: move |_| {
                             let current = cores.peek().clone() + 1;
                             cores.set(current.min(max));
@@ -286,15 +354,35 @@ fn MinerCores() -> Element {
 fn MinerPendingRewards() -> Element {
     let member = use_member();
     let member_record_balance = use_member_record_balance();
+    let mut info_hidden = use_signal(|| true);
     rsx! {
         if let Some(Ok(member_record_balance)) = member_record_balance.cloned() {
             if let Some(Ok(member)) = member.cloned() {
                 if member_record_balance > member.total_balance {
                     Col {
                         gap: 4,
-                        span {
-                            class: "text-elements-lowEmphasis font-medium",
-                            "Rewards (pending)"
+                        // span {
+                        //     class: "text-elements-lowEmphasis font-medium",
+                        //     "Rewards (pending)"
+                        // }
+                        button {
+                            class: "flex flex-col gap-0 group",
+                            onclick: move |_| info_hidden.set(!info_hidden.cloned()),
+                            Row {
+                                gap: 2,
+                                span {
+                                    class: "text-elements-lowEmphasis font-medium",
+                                    "Rewards (pending)"
+                                }
+                                InfoIcon {
+                                    class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
+                                }
+                            }
+                            InfoText {
+                                class: "text-wrap text-left text-sm max-w-lg mr-auto",
+                                text: "ORE that you have mined, but cannot yet claim. Pending rewards are automatically committed to your claimable balance by the mining pool operator every few hours.",
+                                hidden: info_hidden,
+                            }
                         }
                         OreValue {
                             size: TokenValueSize::Large,
@@ -311,12 +399,32 @@ fn MinerPendingRewards() -> Element {
 fn MinerRewards() -> Element {
     let member = use_member();
     let claim_tx = use_miner_claim_transaction(member);
+    let mut info_hidden = use_signal(|| true);
     rsx! {
         Col {
             gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Rewards"
+            // span {
+            //     class: "text-elements-lowEmphasis font-medium",
+            //     "Rewards"
+            // }
+            button {
+                class: "flex flex-col gap-0 group",
+                onclick: move |_| info_hidden.set(!info_hidden.cloned()),
+                Row {
+                    gap: 2,
+                    span {
+                        class: "text-elements-lowEmphasis font-medium",
+                        "Rewards"
+                    }
+                    InfoIcon {
+                        class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
+                    }
+                }
+                InfoText {
+                    class: "text-wrap text-left text-sm max-w-lg mr-auto",
+                    text: "ORE that you have mined and may claim.",
+                    hidden: info_hidden,
+                }
             }
             if let Some(member) = member.cloned() {
                 if let Ok(member) = member {
@@ -341,61 +449,16 @@ fn MinerRewards() -> Element {
 }
 
 fn MinePower() -> Element {
-    // Handle CPU utilization differently for web and desktop
-    let cpu_utilization = if cfg!(feature = "web") {
-        // Web implementation with simulated values
-        let mut signal = use_signal(|| vec![0.0; 12]).clone();
-        let miner_is_active = use_miner_is_active();
+    // Get the number of cores
+    let max = crate::cores::get();
 
-        // Set up web cpu usage with simulated values
-        use_future(move || {
-            async move {
-                loop {
-                    let mut new_values = vec![0.0; 12];
+    // Get CPU utilization
+    let cpu_utilization = use_system_cpu_utilization();
 
-                    // Miner is active
-                    if *miner_is_active.read() {
-                        // First core runs at ~70% (with some variation)
-                        new_values[0] = 65.0 + (rand::random::<f32>() * 10.0);
-
-                        // 2-3 additional cores hover around 10-30%
-                        for i in 1..4 {
-                            new_values[i] = 10.0 + (rand::random::<f32>() * 20.0);
-                        }
-                    } else {
-                        // Miner is paused,just have 2-3 cores hovering at 10-30%
-                        for i in 0..3 {
-                            new_values[i] = 10.0 + (rand::random::<f32>() * 20.0);
-                        }
-                    }
-
-                    signal.set(new_values);
-
-                    // Sleep to simulate some delay
-                    async_std::task::sleep(Duration::from_millis(1000)).await;
-                }
-            }
-        });
-
-        signal
-    } else {
-        // Get desktop CPU usage
-        use_system_cpu_utilization()
-    };
-
-    // let cores = use_miner_cores();
-    let max = if cfg!(feature = "web") {
-        12
-    } else {
-        crate::cores::get()
-    };
-
-    // Get the CPU utilization values
-    let use_rates = use_memo(move || {
+    // Normalize rates for CPU utilization values
+    let normalized_cpu_utilization = use_memo(move || {
         // Create a vector of utilization rates for each core
         let mut rates: Vec<usize> = vec![0; max];
-
-        // For both web and desktop, process the utilization values
         let utilization_vec = cpu_utilization.read();
         if !utilization_vec.is_empty() {
             for i in 0..max {
@@ -404,39 +467,44 @@ fn MinePower() -> Element {
                 }
             }
         }
-
         rates
     });
 
-    // Create random animation durations for each core
-    let animation_durations = (0..max)
-        .map(|i| (((i * 17) % 7) as f32 * 0.1 + 0.3).to_string())
-        .collect::<Vec<_>>();
-
-    // Calculate how many cores go in each column
-    let cores_per_column = 6;
-    let num_columns = (max + cores_per_column - 1) / cores_per_column;
+    // Split cores evenly between 2 columns
+    let cores_per_column = (max + 1) / 2;
 
     // Create arrays of indices for each column (just sequential numbers for display order)
-    let column_indices: Vec<Vec<usize>> = (0..num_columns)
+    let column_indices: Vec<Vec<usize>> = (0..2)
         .map(|col| {
             let start = col * cores_per_column;
-            let end = (start + cores_per_column).min(max);
+            let end = if col == 0 {
+                // First column takes half (rounded up)
+                cores_per_column
+            } else {
+                // Second column takes remaining cores
+                max
+            };
             (start..end).collect()
         })
         .collect();
 
     rsx! {
         Col {
-            class: "relative flex w-full mx-auto my-8 sm:my-16",
+            class: "relative flex w-full mx-auto pr-2",
             gap: 4,
             // Keyframes for the animation
-            style {
-                "@keyframes blockPulse {{
-                    0% {{ opacity: 0; }} 
-                    100% {{ opacity: 1; }}
-                }}"
-            }
+            // style {
+            //     "@keyframes blockPulse {{
+            //         0% {{ opacity: 0; }}
+            //         100% {{ opacity: 1; }}
+            //     }}"
+            // }
+
+            // span {
+            //     class: "text-elements-lowEmphasis font-medium",
+            //     "Core utilization"
+            // }
+
             // Manual column layout with increased spacing between columns
             div {
                 class: "flex flex-col md:flex-row gap-8 w-full",
@@ -447,15 +515,15 @@ fn MinePower() -> Element {
                         // Create system bars for each core in numerical order
                         for core_idx in column {
                             {
-                                // Get the rate for this core
-                                let rate = use_rates.read()[core_idx];
+                                // Get the utilization rate for this core
+                                let rate = normalized_cpu_utilization.read()[core_idx];
 
                                 rsx! {
                                     div {
                                         // Core index
                                         class: "flex items-center gap-1 w-full flex-shrink-0 mb-2",
                                         span {
-                                            class: "text-elements-midEmphasis w-6 text-left flex-shrink-0 font-medium",
+                                            class: "text-elements-midEmphasis w-6 text-left text-sm flex-shrink-0 font-medium",
                                             "{core_idx}"
                                         }
                                         // Core usage bar
@@ -467,41 +535,34 @@ fn MinePower() -> Element {
                                                 for j in 0..10 {
                                                     {
                                                         // Fixed block class assignment
-                                                        let block_class = if j < 6 {
+                                                        let color = if j < 7 {
                                                             "h-full bg-elements-green"
-                                                        } else if j < 8 {
+                                                        } else if j < 9 {
                                                             "h-full bg-elements-yellow"
                                                         } else {
                                                             "h-full bg-elements-red"
                                                         };
 
+                                                        let opacity = if j < (rate + 5) / 10 {
+                                                            "opacity-100"
+                                                        } else {
+                                                            "opacity-0"
+                                                        };
+
                                                         rsx! {
-                                                            if j < (rate + 5) / 10 {
-                                                                div {
-                                                                    class: "{block_class}",
-                                                                    style: "width: 9%; margin-right: 1%;"
-                                                                }
-                                                            } else if j == (rate + 5) / 10 && rate > 0 && rate < 100 {
-                                                                // The "walking" block that appears and disappears - only for non-zero rates
-                                                                div {
-                                                                    class: "{block_class}",
-                                                                    style: "width: 9%; margin-right: 1%; animation: blockPulse {0}s infinite alternate-reverse ease-in-out;".replace("{0}", &animation_durations[core_idx])
-                                                                }
-                                                            } else {
-                                                                // Empty blocks
-                                                                div {
-                                                                    class: "h-full",
-                                                                    style: "width: 9%; margin-right: 1%;"
-                                                                }
+                                                            div {
+                                                                class: "transition-all duration-300 ease-in-out {opacity} {color}",
+                                                                style: "width: 9%; margin-right: 1%;"
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
+
                                         // Usage percentage for each core
                                         span {
-                                            class: "text-elements-lowEmphasis text-xs w-8 text-right flex-shrink-0",
+                                            class: "text-elements-lowEmphasis text-xs font-medium w-8 text-right flex-shrink-0",
                                             "{rate}%"
                                         }
                                     }
