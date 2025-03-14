@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -13,7 +12,12 @@ use crate::{
         use_all_stakes, use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
         COMPUTE_UNIT_LIMIT,
     },
-    solana::{spl_associated_token_account, spl_token},
+    solana::{
+        spl_associated_token_account::{
+            get_associated_token_address, instruction::create_associated_token_account,
+        },
+        spl_token,
+    },
 };
 
 pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
@@ -29,10 +33,8 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
             };
 
             // Derive beneficiary
-            let beneficiary = spl_associated_token_account::get_associated_token_address(
-                &authority,
-                &ore_api::consts::MINT_ADDRESS,
-            );
+            let beneficiary =
+                get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
 
             // Create instruction list
             let mut ixs = vec![];

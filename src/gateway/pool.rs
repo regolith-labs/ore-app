@@ -7,7 +7,7 @@ use steel::AccountDeserialize;
 
 use crate::hooks::MiningEvent;
 
-use super::{solana::SolanaGateway, Gateway, GatewayError, GatewayResult, Rpc};
+use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
 pub trait PoolGateway {
     async fn get_challenge(
