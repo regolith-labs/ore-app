@@ -3,6 +3,7 @@ mod miner;
 mod resources;
 mod transaction_builders;
 mod transaction_status;
+mod use_claimable_yield;
 #[cfg(feature = "web")]
 mod use_download_url;
 mod use_gateway;
@@ -17,6 +18,7 @@ pub use miner::*;
 pub use resources::*;
 pub use transaction_builders::*;
 pub use transaction_status::*;
+pub use use_claimable_yield::*;
 #[cfg(feature = "web")]
 pub use use_download_url::*;
 pub use use_gateway::*;

@@ -25,7 +25,7 @@ pub fn IdleWithdrawForm(
         let Some(Ok(stake)) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let amount_u64 = stake.balance + stake.balance_pending;
+        let amount_u64 = stake.balance;
         let amount_f64 = amount_to_ui_amount(amount_u64, TOKEN_DECIMALS);
         Ok(UiTokenAmount {
             ui_amount: Some(amount_f64),

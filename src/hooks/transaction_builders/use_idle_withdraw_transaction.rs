@@ -48,9 +48,7 @@ pub fn use_idle_withdraw_transaction(
 
         // If amount is greater than stake balance, disable
         if let Some(Ok(stake)) = stake.read().as_ref() {
-            if amount_to_ui_amount(stake.balance + stake.balance_pending, TOKEN_DECIMALS)
-                < amount_f64
-            {
+            if amount_to_ui_amount(stake.balance, TOKEN_DECIMALS) < amount_f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(Token::ore())));
                 return Err(GatewayError::Unknown);
             }

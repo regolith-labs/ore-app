@@ -95,8 +95,7 @@ pub fn PairWithdrawForm(
         };
 
         // Calculate percentage shares
-        let percentage_shares =
-            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares = stake.balance as f64 / liquidity_pair.shares as f64;
         let token_a_shares = liquidity_pair.balance_a_f64 * percentage_shares;
         let token_b_shares = liquidity_pair.balance_b_f64 * percentage_shares;
 

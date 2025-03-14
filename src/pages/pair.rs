@@ -93,10 +93,6 @@ fn AccountMetrics(
                 liquidity_pair,
                 stake,
             }
-            PendingDeposits {
-                liquidity_pair,
-                stake,
-            }
             UnstakedLp {
                 boost_meta,
                 boost,
@@ -143,33 +139,6 @@ fn Deposits(
                     }
                 } else {
                     LoadingValue {}
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn PendingDeposits(
-    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
-) -> Element {
-    rsx! {
-        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-            if let Some(Ok(stake)) = stake.cloned() {
-                if stake.balance_pending > 0 {
-                    TitledRow {
-                        title: "Deposits (pending)",
-                        description: "The amount of liquidity you have deposited that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
-                        value: rsx! {
-                            LiquidityPairStakeValue {
-                                class: "pb-0 sm:pb-4",
-                                stake_balance: stake.balance_pending,
-                                liquidity_pair: liquidity_pair,
-                                with_decimal_units: true,
-                            }
-                        }
-                    }
                 }
             }
         }
