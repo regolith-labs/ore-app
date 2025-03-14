@@ -14,6 +14,8 @@ use tokio_tungstenite::{
 };
 use tungstenite::client::IntoClientRequest;
 
+use crate::gateway::RPC_URL;
+
 use super::{
     AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig,
     AccountSubscribeResponse, JsonRpcRequest, JsonRpcResponse, JsonRpcResponseWithError,
@@ -26,8 +28,8 @@ pub struct AccountSubscribeNative {
 }
 
 impl AccountSubscribeNative {
-    pub async fn connect(url: &str) -> Result<Self, SubscriptionError> {
-        let url_parsed = url
+    pub async fn connect() -> Result<Self, SubscriptionError> {
+        let url_parsed = RPC_URL
             .into_client_request()
             .map_err(|e| SubscriptionError::Other(e.to_string()))?;
         let (ws_stream, _) = connect_async(url_parsed)
@@ -50,6 +52,40 @@ impl AccountSubscribeNative {
                 SubscriptionError::Other(e.to_string())
             })
     }
+
+    async fn handle_response<R: serde::de::DeserializeOwned>(
+        &mut self,
+        request_id: u64,
+    ) -> Result<R, SubscriptionError> {
+        while let Some(msg) = self.reader.next().await {
+            match msg {
+                Ok(Message::Text(text)) => {
+                    // Try parsing a successful response
+                    if let Ok(resp) = serde_json::from_str::<JsonRpcResponse<R>>(&text) {
+                        if resp.id == request_id {
+                            return Ok(resp.result);
+                        }
+                    }
+                    // Try parsing an error response
+                    if let Ok(resp_err) = serde_json::from_str::<JsonRpcResponseWithError<R>>(&text)
+                    {
+                        if resp_err.id == request_id {
+                            let err_msg = resp_err
+                                .error
+                                .map(|e| e.message)
+                                .unwrap_or_else(|| "Unknown RPC error".to_string());
+                            return Err(SubscriptionError::RpcError(err_msg));
+                        }
+                    }
+                }
+                Ok(_) => continue,
+                Err(e) => return Err(SubscriptionError::ConnectionError(e.to_string())),
+            }
+        }
+        Err(SubscriptionError::Other(
+            "WebSocket stream ended unexpectedly".to_string(),
+        ))
+    }
 }
 
 #[async_trait]
@@ -68,36 +104,7 @@ impl AccountSubscribe for AccountSubscribeNative {
             params: (account.to_string(), config),
         };
         self.send_request(&request).await?;
-        while let Some(msg) = self.reader.next().await {
-            match msg {
-                Ok(Message::Text(text)) => {
-                    if let Ok(resp) =
-                        serde_json::from_str::<JsonRpcResponse<AccountSubscribeResponse>>(&text)
-                    {
-                        if resp.id == 1 {
-                            return Ok(resp.result);
-                        }
-                    }
-                    if let Ok(resp_err) = serde_json::from_str::<
-                        JsonRpcResponseWithError<AccountSubscribeResponse>,
-                    >(&text)
-                    {
-                        if resp_err.id == 1 {
-                            let err_msg = resp_err
-                                .error
-                                .map(|e| e.message)
-                                .unwrap_or_else(|| "Unknown RPC error".to_string());
-                            return Err(SubscriptionError::RpcError(err_msg));
-                        }
-                    }
-                }
-                Ok(_) => continue,
-                Err(e) => return Err(SubscriptionError::ConnectionError(e.to_string())),
-            }
-        }
-        Err(SubscriptionError::Other(
-            "WebSocket stream ended unexpectedly".to_string(),
-        ))
+        self.handle_response(1).await
     }
 
     async fn unsubscribe(
@@ -111,39 +118,14 @@ impl AccountSubscribe for AccountSubscribeNative {
             params: (subscription,),
         };
         self.send_request(&request).await?;
-        while let Some(msg) = self.reader.next().await {
-            match msg {
-                Ok(Message::Text(text)) => {
-                    if let Ok(resp) = serde_json::from_str::<JsonRpcResponse<bool>>(&text) {
-                        if resp.id == 2 {
-                            if resp.result {
-                                return Ok(());
-                            } else {
-                                return Err(SubscriptionError::RpcError(
-                                    "Unsubscribe failed".to_string(),
-                                ));
-                            }
-                        }
-                    }
-                    if let Ok(resp_err) =
-                        serde_json::from_str::<JsonRpcResponseWithError<bool>>(&text)
-                    {
-                        if resp_err.id == 2 {
-                            let err_msg = resp_err
-                                .error
-                                .map(|e| e.message)
-                                .unwrap_or_else(|| "Unknown RPC error".to_string());
-                            return Err(SubscriptionError::RpcError(err_msg));
-                        }
-                    }
-                }
-                Ok(_) => continue,
-                Err(e) => return Err(SubscriptionError::ConnectionError(e.to_string())),
-            }
+        let result = self.handle_response::<bool>(2).await?;
+        if result {
+            Ok(())
+        } else {
+            Err(SubscriptionError::RpcError(
+                "Unsubscribe failed".to_string(),
+            ))
         }
-        Err(SubscriptionError::Other(
-            "WebSocket stream ended unexpectedly".to_string(),
-        ))
     }
 
     async fn next_notification(
