@@ -1,3 +1,15 @@
+[workspace]
+members = [".", "miner-types", "miner-web", "serve"]
+resolver = "2"
+
+[workspace.dependencies]
+anyhow = "1.0"
+drillx = "2.2"
+log = "0.4.20"
+ore-pool-types = { version = "1.4", git = "https://github.com/regolith-labs/ore-pool/", package = "ore-pool-types", rev = "8efb17b" }
+tokio = { version = "1.43.0", features = ["full"] }
+warp = "0.3"
+
 [package]
 name = "ore-app"
 version = "1.1.8"

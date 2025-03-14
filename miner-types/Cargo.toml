@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-drillx = "2.2"
+drillx.workspace = true
 serde = { version = "1.0", features = ["derive"] }
-ore-pool-types = { version = "1.4", git = "https://github.com/regolith-labs/ore-pool/", package = "ore-pool-types", rev = "8efb17b" }
+ore-pool-types.workspace = true
