@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -8,13 +9,17 @@ use solana_sdk::{
 
 use crate::{
     gateway::{GatewayError, GatewayResult},
-    hooks::{use_all_stakes, use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
-    solana::spl_associated_token_account,
+    hooks::{
+        use_all_stakes, use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
+        COMPUTE_UNIT_LIMIT,
+    },
+    solana::{spl_associated_token_account, spl_token},
 };
 
 pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     let stake_accounts = use_all_stakes();
+    let ore_balance = use_ore_balance();
     use_resource(move || {
         let stake_accounts = stake_accounts.clone();
         async move {
@@ -29,8 +34,22 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
                 &ore_api::consts::MINT_ADDRESS,
             );
 
-            // Get resources
+            // Create instruction list
             let mut ixs = vec![];
+
+            // Create associated token account if necessary
+            if let Some(Ok(_balance)) = ore_balance.cloned() {
+                // No op
+            } else {
+                ixs.push(create_associated_token_account(
+                    &authority,
+                    &authority,
+                    &ore_api::consts::MINT_ADDRESS,
+                    &spl_token::ID,
+                ));
+            }
+
+            // Get resources
             for (pubkey, stake) in stake_accounts.iter() {
                 if let Some(Ok(stake)) = stake.cloned() {
                     if stake.rewards > 0 {

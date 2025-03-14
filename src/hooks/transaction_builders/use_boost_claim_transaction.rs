@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::{Boost, Stake};
+use solana_extra_wasm::program::spl_associated_token_account::instruction::create_associated_token_account;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -9,8 +10,10 @@ use solana_sdk::{
 
 use crate::{
     gateway::{GatewayError, GatewayResult},
-    hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
-    solana::spl_associated_token_account,
+    hooks::{
+        use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
+    },
+    solana::{spl_associated_token_account, spl_token},
 };
 
 pub fn use_boost_claim_transaction(
@@ -18,6 +21,7 @@ pub fn use_boost_claim_transaction(
     stake: Resource<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let ore_balance = use_ore_balance();
     use_resource(move || async move {
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
@@ -50,6 +54,18 @@ pub fn use_boost_claim_transaction(
             &authority,
             &ore_api::consts::MINT_ADDRESS,
         );
+
+        // Create associated token account if necessary
+        if let Some(Ok(_balance)) = ore_balance.cloned() {
+            // No op
+        } else {
+            ixs.push(create_associated_token_account(
+                &authority,
+                &authority,
+                &ore_api::consts::MINT_ADDRESS,
+                &spl_token::ID,
+            ));
+        }
 
         // Claim rewards
         ixs.push(ore_boost_api::sdk::claim(
