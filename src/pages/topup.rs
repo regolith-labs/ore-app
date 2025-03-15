@@ -148,7 +148,7 @@ pub fn Topup(address: String) -> Element {
     }
 }
 
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 #[component]
 pub fn Topup(address: String) -> Element {
     use crate::{
@@ -215,6 +215,14 @@ pub fn Topup(address: String) -> Element {
                     span {
                         class: "mx-auto my-auto",
                         "Top up →"
+                    }
+                }
+            } else {
+                Col {
+                    class: "mx-auto w-full flex items-center justify-center",
+                    crate::components::ConnectButtonNative {
+                        wallet,
+                        width: 300,
                     }
                 }
             }
