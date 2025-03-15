@@ -8,20 +8,20 @@ use crate::gateway::GatewayError as Error;
 
 use super::Wallet;
 
-const SERVICE: &str = "ORE-1234";
+const SERVICE: &str = "ORE";
 const USER_DEVICE_KEY: &str = "user-device-key";
 
 pub fn use_wallet_provider() {
     let multisig_authority = get_or_set();
     let mut signal = use_context_provider(|| Signal::new(Wallet::Disconnected));
-    match multisig_authority {
+    use_effect(move || match &multisig_authority {
         Ok(multisig_authority) => {
             signal.set(Wallet::Connected(multisig_authority.creator.pubkey()));
         }
         Err(err) => {
             log::error!("{:?}", err);
         }
-    }
+    });
 }
 
 /// embeded keypair on device.
@@ -52,7 +52,7 @@ fn set(secret: &[u8]) -> Result<(), Error> {
     keyring.set_secret(secret).map_err(From::from)
 }
 
-fn get_or_set() -> Result<MultisigAuthority, Error> {
+pub fn get_or_set() -> Result<MultisigAuthority, Error> {
     match get() {
         // return wallet
         ok @ Ok(_) => ok,
