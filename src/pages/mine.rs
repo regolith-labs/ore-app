@@ -52,7 +52,7 @@ fn MinerData() -> Element {
             Alert {}
             MinerStatus {}
             Col {
-                class: "w-full gap-4",
+                class: "w-full gap-8",
                 MinerCores {}
                 MinePower {}
             }
@@ -527,7 +527,7 @@ fn MinePower() -> Element {
                                         class: "flex items-center gap-1 w-full flex-shrink-0 mb-2",
                                         span {
                                             class: "text-elements-midEmphasis w-6 text-left text-sm flex-shrink-0 font-medium",
-                                            "{core_idx}"
+                                            "{core_idx + 1}"
                                         }
                                         // Core usage bar
                                         div {
