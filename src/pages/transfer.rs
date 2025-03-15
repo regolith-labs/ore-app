@@ -3,19 +3,31 @@ use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{
     components::submit_transaction,
-    // components::token_icon::TokenIcon,
     components::CheckCircleIcon,
     components::*,
     config::{Token, LISTED_TOKENS},
     gateway::GatewayResult,
-    hooks::{use_token_balance, use_token_balance_for_token, use_transfer_transaction},
+    hooks::{use_token_balance_for_token, use_transfer_transaction},
 };
-
-use std::str::FromStr;
 
 use ore_types::request::TransactionType;
 
 use crate::hooks::on_transaction_done;
+
+use solana_sdk::pubkey::Pubkey;
+
+#[derive(Clone, PartialEq, Eq)]
+pub enum TransferError {
+    InvalidAddress,
+}
+
+impl ToString for TransferError {
+    fn to_string(&self) -> String {
+        match self {
+            TransferError::InvalidAddress => "Invalid Solana address".to_string(),
+        }
+    }
+}
 
 enum TransferStatus {
     Editing,
@@ -42,12 +54,12 @@ pub fn Transfer() -> Element {
     // Status
     let mut status = use_signal(|| TransferStatus::Editing);
 
-    let display_picker = use_signal(|| false);
-
     // Confirmation dialog
-    let show_confirmation = use_signal(|| false);
+    let show_confirmation = use_signal(|| true);
 
     let mut destination_pubkey: Signal<String> = use_signal::<String>(|| "".to_string());
+
+    let mut address_err = use_signal::<Option<TransferError>>(|| None);
 
     // Use the transfer transaction hook
     let tx = use_transfer_transaction(
@@ -57,12 +69,24 @@ pub fn Transfer() -> Element {
         token_balance,
         err,
         priority_fee,
+        address_err,
     );
 
     on_transaction_done(move |_| {
         status.set(TransferStatus::Success);
         destination_pubkey.set("".to_string());
     });
+
+    // Add validation function
+    let validate_destination = move |addr: &str| -> Option<TransferError> {
+        if addr.is_empty() {
+            None
+        } else if Pubkey::try_from(addr).is_err() {
+            Some(TransferError::InvalidAddress)
+        } else {
+            None
+        }
+    };
 
     rsx! {
         Col {
@@ -79,13 +103,9 @@ pub fn Transfer() -> Element {
                     rsx! {
                         Col {
                             class: "mx-auto w-full",
-                            gap: 2,
-                            span {
-                                class: "text-elements-lowEmphasis font-medium pl-1",
-                                "Token to transfer"
-                            }
-                            Row {
-                                class: "lg:flex elevated elevated-border shrink-0 h-min rounded-lg z-0",
+                            gap: 4,
+                            Col {
+                                class: "w-full lg:flex elevated elevated-border shrink-0 h-min rounded-xl z-0",
                                 TokenInputForm {
                                     class: "p-4 border-b border-gray-800 w-full",
                                     title: "Select token".to_string(),
@@ -96,40 +116,52 @@ pub fn Transfer() -> Element {
                                     with_picker: true,
                                     err,
                                 }
-                            }
-                        }
-                        // Destination
-                        if !display_picker.cloned() {
-                            Col {
-                                class: "mx-auto w-full",
-                                gap: 2,
-                                span {
-                                    class: "text-elements-lowEmphasis font-medium pl-1",
-                                    "Destination"
-                                }
-                                Row {
-                                    class: "lg:flex elevated elevated-border shrink-0 h-min rounded-lg",
-                                    div {
-                                        class: "w-full relative flex items-center",
+                                Col {
+                                    class: "w-full p-4",
+                                    gap: 2,
+                                    span {
+                                        class: "text-elements-lowEmphasis ",
+                                        "Enter address"
+                                    }
+                                    Row {
+                                        class: "w-full items-center",
                                         div {
-                                            class: "absolute inset-y-0 right-0 flex items-center pr-3 z-10 pointer-events-none",
-                                            if !destination_pubkey.read().is_empty() {
-                                                if let Some(Ok(_)) = tx.cloned() {
-                                                    CheckCircleIcon {
-                                                        class: "w-5 h-5 text-elements-green"
-                                                    }
-                                                } else {
-                                                    WarningIcon {
-                                                        class: "w-5 h-5 text-elements-red"
-                                                    }
-                                                }
+                                            class: "flex-grow w-full overflow-hidden mr-2",
+                                            input {
+                                                class: format!("h-12 outline-none w-full overflow-x-auto {}",
+                                                    if matches!(*address_err.read(), Some(TransferError::InvalidAddress)) {
+                                                        "text-red-500"
+                                                    } else if destination_pubkey.read().is_empty() {
+                                                        "text-elements-lowEmphasis"
+                                                    } else {
+                                                        "text-elements-highEmphasis"
+                                                    }),
+                                                placeholder: "Enter wallet address",
+                                                value: destination_pubkey.clone(),
+                                                oninput: move |e: FormEvent| {
+                                                    let new_value = e.value();
+                                                    address_err.set(validate_destination(&new_value));
+                                                    destination_pubkey.set(new_value);
+                                                },
                                             }
                                         }
-                                        input {
-                                            class: "pl-3 pr-10 py-4 border-b border-gray-800 h-12 my-auto w-full text-left outline-none text-elements-highEmphasis",
-                                            placeholder: "Enter wallet address",
-                                            value: destination_pubkey.clone(),
-                                            oninput: move |e: FormEvent| destination_pubkey.set(e.value()),
+                                        div {
+                                            class: "flex-shrink-0 flex-grow-0 w-6",
+                                            if !destination_pubkey.read().is_empty() {
+                                                match address_err.cloned() {
+                                                    Some(TransferError::InvalidAddress) => {
+                                                        rsx! {}
+                                                    }
+                                                    None => {
+                                                        rsx! {
+                                                            CheckCircleIcon {
+                                                                class: "w-5 h-5 text-elements-green"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                            }
                                         }
                                     }
                                 }
@@ -151,23 +183,17 @@ pub fn Transfer() -> Element {
                             selected_token,
                             destination: destination_pubkey,
                             show_confirmation,
+                            address_err
                         }
 
-                        SubmitButton {
-                            title: "Send".to_string(),
-                            transaction: tx,
-                            err: err,
-                            tx_type: TransactionType::TopUp
-                        }
-
-                        // Confirmation Dialog
-                        TransferConfirmation {
-                            show: show_confirmation,
-                            destination: destination_pubkey,
-                            amount,
-                            selected_token,
-                            transaction: tx,
-                        }
+                        // // Confirmation Dialog
+                        // TransferConfirmation {
+                        //     show: show_confirmation,
+                        //     destination: destination_pubkey,
+                        //     amount,
+                        //     selected_token,
+                        //     transaction: tx,
+                        // }
                     }
                 }
                 TransferStatus::Success => {
@@ -215,6 +241,7 @@ fn TransferButton(
     class: Option<String>,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
     err: Signal<Option<TokenInputError>>,
+    address_err: Signal<Option<TransferError>>,
     amount: Signal<String>,
     selected_token: Signal<Option<Token>>,
     destination: Signal<String>,
@@ -246,19 +273,27 @@ fn TransferButton(
             button {
                 class: "h-12 w-full rounded-full {class} transition-all duration-300 ease-in-out hover:not-disabled:scale-105",
                 disabled: is_disabled,
+                // onclick: move |_| {
+                //     if is_tx_ready.cloned() {
+                //         show_confirmation.set(true);
+                //     }
+                // },
                 onclick: move |_| {
-                    if is_tx_ready.cloned() {
-                        show_confirmation.set(true);
+                    let transfer_tx = &*transaction.read();
+                    if let Some(Ok(tx)) = transfer_tx {
+                        submit_transaction(tx.clone(), TransactionType::Swap);
                     }
                 },
-                if let UseResourceState::Pending = *transaction.state().read() {
-                    Spinner {
-                        class: "mx-auto my-auto",
-                    }
-                } else if let Some(err) = err.cloned() {
+                if let Some(err) = err.cloned() {
                     span {
                         class: "mx-auto my-auto font-semibold",
                         "{err.to_string()}"
+                    }
+
+                } else if let Some(address_err) = address_err.cloned() {
+                    span {
+                        class: "mx-auto my-auto font-semibold",
+                        "{address_err.to_string()}"
                     }
                 } else if amount_f64 > 0.0 {
                     span {
@@ -271,6 +306,11 @@ fn TransferButton(
                         "Transfer"
                     }
                 }
+                // if let UseResourceState::Pending = *transaction.state().read() {
+                //     Spinner {
+                //         class: "mx-auto my-auto",
+                //     }
+                // }
             }
             Alert {}
         }
@@ -308,27 +348,29 @@ fn TransferConfirmation(
         {
             show.read().then(|| rsx! {
                 div {
-                    class: "fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center",
+                    class: "p-4 fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center",
                     onclick: move |_| show.set(false),
                     div {
                         class: "bg-surface-floating rounded-lg p-6 w-96 border border-gray-800 max-w-md",
                         onclick: move |e| e.stop_propagation(),
-                        div {
-                            class: "flex flex-col gap-4",
-                            div {
+                        Col {
+                            class: "p-4",
+                            gap: 4,
+                            span {
                                 class: "text-xl font-semibold text-elements-highEmphasis text-center",
                                 "Confirm Transfer"
                             }
-                            div {
+                            span {
                                 class: "text-elements-midEmphasis text-center",
                                 "Are you sure you want to transfer {amount_f64} {token_ticker} to this address?"
                             }
-                            div {
-                                class: "text-elements-highEmphasis font-mono text-center bg-surface-elevated p-2 rounded",
+                            span {
+                                class: "text-elements-highEmphasis text-center bg-surface-elevated p-2 rounded",
                                 "{abbreviated_address}"
                             }
-                            div {
-                                class: "flex gap-3 mt-4",
+                            Row {
+                                class: "mt-4",
+                                gap: 3,
                                 button {
                                     class: "flex-1 h-12 rounded-full controls-secondary",
                                     onclick: move |_| show.set(false),

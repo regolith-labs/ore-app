@@ -11,6 +11,7 @@ use crate::{
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
     hooks::{use_gateway, use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
+    pages::TransferError,
     solana::{
         spl_associated_token_account,
         spl_token::{self, instruction::transfer as spl_transfer, ui_amount_to_amount},
@@ -24,13 +25,12 @@ pub fn use_transfer_transaction(
     token_balance: Resource<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
     mut priority_fee: Signal<u64>,
+    mut address_err: Signal<Option<TransferError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
         err.set(None);
-        log::info!("IN resource");
-        log::info!("input amount: {:?}", input_amount);
-        log::info!("token balance: {:?}", token_balance.cloned());
+        address_err.set(None);
 
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
@@ -39,62 +39,50 @@ pub fn use_transfer_transaction(
         };
 
         // Get the selected token
-        log::info!("before token");
         let Some(token) = selected_token.cloned() else {
             log::info!("select token");
             return Err(GatewayError::Unknown);
         };
-        log::info!("after token");
 
         // If empty, disable
-        log::info!("before string");
         let amount_str = input_amount.cloned();
         if amount_str.is_empty() {
-            log::info!("empty string");
             return Err(GatewayError::Unknown);
         }
-        log::info!("after string");
 
         // If input isn't a number, disable
-        log::info!("before parse");
         let Ok(amount_f64) = amount_str.parse::<f64>() else {
-            log::info!("nan");
             return Err(GatewayError::Unknown);
         };
-        log::info!("after parse");
 
         // If amount is 0, disable
-        log::info!("before 0");
         if amount_f64 == 0f64 {
-            log::info!("amount 0");
             return Err(GatewayError::Unknown);
         }
-        log::info!("after 0");
 
         // If amount is less than the token balance, disable
-        log::info!("before balance");
         if let Some(Ok(balance)) = token_balance.cloned() {
-            log::info!("outer balance");
             if balance.ui_amount.unwrap_or(0.0) < amount_f64 {
-                log::info!("INSUFFICIENT BALANCE");
                 err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
                 return Err(GatewayError::Unknown);
             }
         } else {
             // User might not have a token balance to begin with
-            log::info!("IN ELSE");
             err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
             return Err(GatewayError::Unknown);
         }
 
-        // Get the destination pubkey
+        // Check if address is empty
         let destination_str = destination.cloned();
         if destination_str.is_empty() {
             return Err(GatewayError::Unknown);
         }
 
-        // Check if address is valid
-        let Ok(destination) = Pubkey::try_from(destination_str.as_str()) else {
+        // Check if Pubkey is valid
+        let destination = if let Ok(dest) = Pubkey::try_from(destination_str.as_str()) {
+            dest
+        } else {
+            address_err.set(Some(TransferError::InvalidAddress));
             return Err(GatewayError::Unknown);
         };
 
