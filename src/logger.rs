@@ -10,8 +10,8 @@ pub fn init() {
     // either toggle env-logger
     // or when debugging prod builds,
     // toggle the init-macos logger
-    // env_logger::init();
-    init_macos()
+    env_logger::init();
+    // init_macos()
 }
 
 // macos logger,

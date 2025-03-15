@@ -8,7 +8,7 @@ use crate::gateway::GatewayError as Error;
 
 use super::Wallet;
 
-const SERVICE: &str = "ORE";
+const SERVICE: &str = "ORE-1234";
 const USER_DEVICE_KEY: &str = "user-device-key";
 
 pub fn use_wallet_provider() {
@@ -54,20 +54,30 @@ fn set(secret: &[u8]) -> Result<(), Error> {
 
 fn get_or_set() -> Result<MultisigAuthority, Error> {
     match get() {
+        // return wallet
         ok @ Ok(_) => ok,
-        Err(_err) => {
-            let creator = Keypair::new();
-            let create_key = Keypair::new();
-            let multisig_authority = MultisigAuthority {
-                creator,
-                create_key,
-            };
-            let bytes = bincode::serialize(&multisig_authority).map_err(|err| {
-                println!("{:?}", err);
-                Error::BincodeSerialize
-            })?;
-            set(bytes.as_slice())?;
-            Ok(multisig_authority)
+        Err(err) => {
+            // no wallet found
+            if let Error::KeyringNoEntry = err {
+                // create wallet
+                let creator = Keypair::new();
+                let create_key = Keypair::new();
+                let multisig_authority = MultisigAuthority {
+                    creator,
+                    create_key,
+                };
+                let bytes = bincode::serialize(&multisig_authority).map_err(|err| {
+                    println!("{:?}", err);
+                    Error::BincodeSerialize
+                })?;
+                set(bytes.as_slice())?;
+                Ok(multisig_authority)
+            } else {
+                // other error that doesn't indicate that there definitely is *not* already a
+                // wallet stored on the device keychain. just return error and invoke retry later
+                // to avoid overwrite.
+                Err(err)
+            }
         }
     }
 }
