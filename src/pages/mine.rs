@@ -235,6 +235,16 @@ fn MinerStatus() -> Element {
         MinerStatus::Stopped => "Stopped",
     });
 
+    let description = use_memo(move || match miner_status.cloned() {
+        MinerStatus::Registering => "Curerntly registering with the pool server.",
+        MinerStatus::FetchingChallenge => {
+            "Currently fetching the next challenge from the pool server."
+        }
+        MinerStatus::Hashing => "Currently searching for valid solutions.",
+        MinerStatus::SubmittingSolution => "Currently submitting the solution to the pool server.",
+        MinerStatus::Stopped => "Currently not active.",
+    });
+
     let mut info_hidden = use_signal(|| true);
 
     rsx! {
@@ -255,7 +265,7 @@ fn MinerStatus() -> Element {
                 }
                 InfoText {
                     class: "text-wrap text-left text-sm max-w-lg mr-auto",
-                    text: "The status of your miner.",
+                    text: "The status of your miner. {description}",
                     hidden: info_hidden,
                 }
             }
