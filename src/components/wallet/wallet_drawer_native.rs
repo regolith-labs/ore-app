@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-use crate::hooks::{use_ore_balance_wss, use_wallet, use_wallet_native, Wallet};
+use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {

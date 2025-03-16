@@ -87,8 +87,15 @@ pub(super) struct AccountNotificationResult {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccountNotificationEnvelope {
-    pub subscription: u64,
+    pub jsonrpc: String,
+    pub method: String,
+    pub params: AccountNotificationParams,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AccountNotificationParams {
     pub result: AccountNotificationResult,
+    pub subscription: u64,
 }
 
 //

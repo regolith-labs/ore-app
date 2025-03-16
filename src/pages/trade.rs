@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     config::{Token, LISTED_TOKENS_BY_TICKER},
-    hooks::use_ore_balance_wss,
+    hooks::use_sol_balance_wss,
     route::Route,
 };
 
@@ -38,7 +38,7 @@ pub fn Trade(token_pair: Option<String>) -> Element {
     });
 
     // wss ore balance
-    let ore_balance = use_ore_balance_wss();
+    // let sol_balance = use_sol_balance_wss();
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
@@ -48,12 +48,12 @@ pub fn Trade(token_pair: Option<String>) -> Element {
                 title: "Trade",
                 subtitle: "Swap tokens at the best price."
             }
-            div {
-                match ore_balance.cloned() {
-                    Ok(_) => "ok",
-                    Err(_err) => "err",
-                }
-            }
+            // div {
+            //     match sol_balance.cloned() {
+            //         Ok(_) => "ok",
+            //         Err(_err) => "err",
+            //     }
+            // }
             SwapForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 buy_token,

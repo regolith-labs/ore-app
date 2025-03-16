@@ -136,13 +136,25 @@ impl AccountSubscribe for AccountSubscribeGateway {
         while let Some(msg) = self.reader.next().await {
             match msg {
                 Ok(Message::Text(text)) => {
-                    if let Ok(notification) =
-                        serde_json::from_str::<AccountNotificationEnvelope>(&text)
-                    {
-                        return Ok(notification);
+                    match serde_json::from_str::<AccountNotificationEnvelope>(&text) {
+                        Ok(notification) => {
+                            if notification.method == "accountNotification" {
+                                return Ok(notification);
+                            } else {
+                                log::info!("Ignoring non-account notification: {:?}", notification);
+                                continue;
+                            }
+                        }
+                        Err(e) => {
+                            log::error!("Failed to parse notification: {}, text: {}", e, text);
+                            continue;
+                        }
                     }
                 }
-                Ok(_) => continue,
+                Ok(msg) => {
+                    log::info!("{:?}", msg);
+                    continue;
+                }
                 Err(e) => return Err(SubscriptionError::ConnectionError(e.to_string())),
             }
         }
