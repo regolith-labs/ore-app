@@ -148,7 +148,7 @@ pub fn Topup(address: String) -> Element {
     }
 }
 
-// #[cfg(not(feature = "web"))]
+#[cfg(not(feature = "web"))]
 #[component]
 pub fn Topup(address: String) -> Element {
     use crate::{
