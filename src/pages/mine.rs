@@ -52,7 +52,7 @@ fn MinerData() -> Element {
             Alert {}
             MinerStatus {}
             Col {
-                class: "w-full gap-4",
+                class: "w-full gap-8",
                 MinerCores {}
                 MinePower {}
             }
@@ -235,6 +235,16 @@ fn MinerStatus() -> Element {
         MinerStatus::Stopped => "Stopped",
     });
 
+    let description = use_memo(move || match miner_status.cloned() {
+        MinerStatus::Registering => "Curerntly registering with the pool server.",
+        MinerStatus::FetchingChallenge => {
+            "Currently fetching the next challenge from the pool server."
+        }
+        MinerStatus::Hashing => "Currently searching for valid solutions.",
+        MinerStatus::SubmittingSolution => "Currently submitting the solution to the pool server.",
+        MinerStatus::Stopped => "Currently not active.",
+    });
+
     let mut info_hidden = use_signal(|| true);
 
     rsx! {
@@ -255,7 +265,7 @@ fn MinerStatus() -> Element {
                 }
                 InfoText {
                     class: "text-wrap text-left text-sm max-w-lg mr-auto",
-                    text: "The status of your miner.",
+                    text: "The status of your miner. {description}",
                     hidden: info_hidden,
                 }
             }
@@ -517,7 +527,7 @@ fn MinePower() -> Element {
                                         class: "flex items-center gap-1 w-full flex-shrink-0 mb-2",
                                         span {
                                             class: "text-elements-midEmphasis w-6 text-left text-sm flex-shrink-0 font-medium",
-                                            "{core_idx}"
+                                            "{core_idx + 1}"
                                         }
                                         // Core usage bar
                                         div {

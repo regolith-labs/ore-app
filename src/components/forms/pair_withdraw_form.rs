@@ -52,6 +52,7 @@ pub fn PairWithdrawForm(
         stake_b_balance,
         token_a_balance,
         token_b_balance,
+        lp_balance,
         input_amount_a,
         input_amount_b,
         err,
