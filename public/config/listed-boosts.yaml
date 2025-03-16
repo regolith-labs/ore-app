@@ -17,6 +17,15 @@ boosts:
     ticker: SOL-ORE MLP
     lut:
 
+  - address: A2Sb1oxg2H3ecbAHaJFXccufyC7pD1CMEakJhcz2TeH9
+    lp_mint: 9BAWwtAZiF4XJC6vArPM8JhtgKXfeoeo9FJHeR3PEGac
+    pair_mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    lp_id: 7XNR3Ysqg2MbfQX8iMWD4iEF96h2GMsWNT8eZYsLTmua
+    lp_type: meteora
+    name: ORE-USDC Meteora LP
+    ticker: ORE-USDC MLP
+    lut:
+
   - address: EExSorxnhxVKqnhNT4dNPNa8zvRBNBgju6n91F9cnKKy
     lp_mint: 7G3dfZkSk1HpDGnyL37LMBbPEgT4Ca6vZmZPUyi2syWt
     pair_mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux 
@@ -26,11 +35,3 @@ boosts:
     ticker: kHNT-ORE
     lut: G9aqZtDcXYYzocyVMcsd4j2m3ootcb1kKNvTXciwJLQN
 
-  - address: A2Sb1oxg2H3ecbAHaJFXccufyC7pD1CMEakJhcz2TeH9
-    lp_mint: 9BAWwtAZiF4XJC6vArPM8JhtgKXfeoeo9FJHeR3PEGac
-    pair_mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-    lp_id: 7XNR3Ysqg2MbfQX8iMWD4iEF96h2GMsWNT8eZYsLTmua
-    lp_type: meteora
-    name: ORE-USDC Meteora LP
-    ticker: ORE-USDC MLP
-    lut:

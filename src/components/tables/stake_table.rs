@@ -17,18 +17,13 @@ use crate::{
 pub fn StakeTable() -> Element {
     let stake_accounts = use_all_stakes();
     let liquidity_pairs = use_all_liquidity_pairs();
-    let mut display_help = use_signal(|| false);
-    let help_class = if display_help.cloned() {
-        "max-h-96 opacity-100 pt-2"
-    } else {
-        "max-h-0 opacity-0 pt-0"
-    };
+    let mut info_hidden = use_signal(|| true);
     rsx! {
         Col {
             gap: 0,
             button {
                 class: "flex flex-row gap-2 px-5 sm:px-8 w-min group hover:cursor-pointer",
-                onclick: move |_| display_help.set(!display_help.cloned()),
+                onclick: move |_| info_hidden.set(!info_hidden.cloned()),
                 Subheading {
                     class: "my-auto",
                     title: "Boosts"
@@ -37,9 +32,10 @@ pub fn StakeTable() -> Element {
                     class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
                 }
             }
-            div {
-                class: "overflow-hidden transition-all duration-300 ease-in-out text-wrap text-elements-midEmphasis px-5 sm:px-8 {help_class}",
-                "Boosts automatically distribute a portion of all newly mined supply to liquidity providers as yield."
+            InfoText {
+                class: "text-wrap px-5 sm:px-8",
+                text: "Boosts automatically distribute a portion of all newly mined supply to liquidity providers as yield.",
+                hidden: info_hidden,
             }
             Table {
                 class: "mt-8 mx-0 sm:mx-8",
@@ -53,7 +49,7 @@ pub fn StakeTable() -> Element {
                         help_right_1: "Estimated annual yield based on trailing 7d returns.",
                         help_right_2: "Current notional value of assets deposited in the protocol.",
                         help_right_3: "Amount of yield you have earned and may claim.",
-                        display_help
+                        help_hidden: info_hidden,
                     }
                 },
                 rows: rsx! {
