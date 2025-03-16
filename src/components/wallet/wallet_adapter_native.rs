@@ -33,8 +33,6 @@ pub fn ConnectButtonNative(wallet: Signal<Wallet>, width: u64) -> Element {
             onclick: move |_| {
                 if let Ok(keypair) = use_wallet_native::get_or_set() {
                     wallet.set(Wallet::Connected(keypair.creator.pubkey()));
-                } else {
-                    log::info!("here and now");
                 }
             },
             "Connect"
