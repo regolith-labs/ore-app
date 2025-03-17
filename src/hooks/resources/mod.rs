@@ -19,6 +19,7 @@ pub use use_ore_holders::*;
 pub use use_ore_price::*;
 pub use use_stake::*;
 pub use use_token_balance::*;
+pub use use_wss::*;
 
 pub fn use_cache_provider() {
     use_boosts_provider();

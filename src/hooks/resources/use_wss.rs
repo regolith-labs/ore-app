@@ -39,16 +39,11 @@ pub fn use_wss() -> (FromWss, ToWss) {
 /// Two way channel backed by a WebSocket
 /// for subscribing to notifications from the RPC server.
 pub fn use_wss_provider() {
-    // Listen to wallet
-    let wallet = use_wallet();
     // Init from wss
     let mut from_wss = use_context_provider(|| Signal::new(FromWssMsg::Init));
     // Init to wss
-    let _to_wss = use_coroutine(move |mut rx: UnboundedReceiver<ToWssMsg>| async move {
+    let to_wss = use_coroutine(move |mut rx: UnboundedReceiver<ToWssMsg>| async move {
         if let Err(err) = async {
-            // Connect to wss
-            let pubkey = wallet.pubkey()?;
-
             // Create channel for sending commands to the WebSocket worker
             let (cmd_tx, cmd_rx) = mpsc::channel::<WssCommand>(10);
 
@@ -131,6 +126,7 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
                     Some(WssCommand::Subscribe(pubkey, resp_tx)) => {
                         match wss.subscribe(pubkey.to_string().as_str()).await {
                             Ok(sub_id) => {
+                            log::info!("here sub id: {}", sub_id);
                                 if let Err(e) = resp_tx.clone().send(sub_id).await {
                                     log::error!("Failed to send subscription ID response: {:?}", e);
                                 }

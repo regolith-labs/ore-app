@@ -1,11 +1,27 @@
 use dioxus::document::eval;
 use dioxus::prelude::*;
 
+use crate::hooks::{use_wallet, use_wss, GetPubkey, ToWssMsg};
+
 // use super::WalletTab;
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<bool>) -> Element {
     // let tab = use_signal(|| WalletTab::Tokens);
+    let wallet = use_wallet();
+    let (from_wss, to_wss) = use_wss();
+
+    use_effect(move || {
+        let msg = from_wss.read();
+        log::info!("from wss: {:?}", msg);
+    });
+
+    use_effect(move || {
+        if let Ok(pubkey) = wallet.pubkey() {
+            log::info!("pubkey: {:?}", pubkey);
+            to_wss.send(ToWssMsg::Subscribe(pubkey));
+        }
+    });
 
     rsx! {
         div {
