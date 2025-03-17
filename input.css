@@ -14,6 +14,8 @@
     --color-elements-gold: #ECC771;
     --color-elements-purple: #5949B7;
     --color-elements-green: #49B759;
+    --color-elements-red: #B92F19;
+    --color-elements-yellow: #C6C33E;
     --color-elements-contrast: #0F0E11;
     --color-surface-elevated: #131216;
     --color-surface-elevatedHover: #151419;
@@ -29,186 +31,226 @@
     --color-controls-disabled: #18171C;
     --color-controls-handle: '#302E38';
 
-    /* Fonts */
-    --font-mono: ui-monospace, monospace;
-    --font-serif: ui-serif;
-    --font-sans: Pilat, ui-sans-serif, system-ui;
-    --font-wide: PilatWide, ui-sans-serif, system-ui;
-    --font-extended: PilatExtended, ui-sans-serif, system-ui;
+  /* Fonts */
+  --font-mono: ui-monospace, monospace;
+  --font-serif: ui-serif;
+  --font-sans: Pilat, ui-sans-serif, system-ui;
+  --font-wide: PilatWide, ui-sans-serif, system-ui;
+  --font-extended: PilatExtended, ui-sans-serif, system-ui;
 
-    /* Animations */
-    --animate-marquee: marquee 30s linear infinite;
-    --animate-marquee2: marquee2 30s linear infinite;
+  /* Animations */
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-marquee2: marquee2 30s linear infinite;
+  --animate-wallet-drawer-fade: wallet-drawer-fade 200ms ease-in-out;
+  --animate-wallet-drawer-slide: wallet-drawer-slide 200ms ease-in-out;
 
-    /* Keyframes */
-    @keyframes marquee {
-        0% {
-            transform: translateX(0%);
-        }
-
-        100% {
-            transform: translateX(-100%);
-        }
+  /* Keyframes */
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
     }
 
-    @keyframes marquee2 {
-        0% {
-            transform: translateX(100%);
-        }
-
-        100% {
-            transform: translateX(0%);
-        }
+    100% {
+      transform: translateX(-100%);
     }
+  }
+
+  @keyframes marquee2 {
+    0% {
+      transform: translateX(100%);
+    }
+
+    100% {
+      transform: translateX(0%);
+    }
+  }
+
+  @keyframes wallet-drawer-fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes wallet-drawer-slide {
+    from {
+      transform: translateX(100%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
+  }
 }
 
 body {
-    @apply bg-base-bg text-elements-highEmphasis overflow-x-hidden;
+  @apply bg-base-bg text-elements-highEmphasis overflow-x-hidden;
 }
 
 @layer components {
-    .loading {
-        @apply transition bg-gray-800 animate-pulse;
-    }
+  .wallet-drawer-fade {
+    animation: var(--animate-wallet-drawer-fade);
+  }
 
-    .elevated {
-        @apply bg-surface-elevated;
-    }
+  .wallet-drawer-slide {
+    animation: var(--animate-wallet-drawer-slide);
+  }
 
-    .elevated-control {
-        @apply transition bg-surface-elevated hover:bg-surface-elevatedHover;
-    }
+  .loading {
+    @apply transition bg-gray-800 animate-pulse;
+  }
 
-    .elevated-border {
-        @apply border border-gray-800;
-    }
+  .elevated {
+    @apply bg-surface-elevated;
+  }
 
-    .top-safe {
-        top: 0;
-        padding-top: env(safe-area-inset-top);
-    }
+  .elevated-control {
+    @apply transition bg-surface-elevated hover:bg-surface-elevatedHover;
+  }
 
-    .controls-primary {
-        @apply flex font-semibold transition duration-300 ease-in-out bg-controls-primary text-black hover:bg-controls-primaryHover hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled;
-    }
+  .elevated-border {
+    @apply border border-gray-800;
+  }
 
-    .controls-secondary {
-        @apply flex font-semibold text-center transition duration-300 ease-in-out bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover hover:not-disabled:cursor-pointer;
-    }
+  .top-safe {
+    top: 0;
+    padding-top: env(safe-area-inset-top);
+  }
 
-    .controls-tertiary {
-        @apply flex font-semibold transition duration-300 ease-in-out bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis hover:not-disabled:cursor-pointer;
-    }
+  .controls-primary {
+    @apply flex font-semibold transition duration-300 ease-in-out bg-controls-primary text-black hover:bg-controls-primaryHover hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled;
+  }
+
+  .controls-secondary {
+    @apply flex font-semibold text-center transition duration-300 ease-in-out bg-controls-secondary text-elements-midEmphasis hover:bg-controls-secondaryHover hover:not-disabled:cursor-pointer;
+  }
+
+  .controls-tertiary {
+    @apply flex font-semibold transition duration-300 ease-in-out bg-controls-tertiary text-elements-lowEmphasis hover:bg-controls-tertiaryHover hover:text-elements-midEmphasis hover:not-disabled:cursor-pointer;
+  }
 
     .controls-gold {
-        @apply flex font-semibold transition duration-300 ease-in-out font-medium border-2 border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
+        @apply flex font-semibold transition duration-300 ease-in-out border-2 border-elements-gold text-elements-gold hover:bg-elements-gold hover:text-black hover:not-disabled:cursor-pointer hover:not-disabled:scale-105 disabled:bg-controls-disabled disabled:text-elements-disabled disabled:border-none;
+    }
+    .bg-elements-red {
+        background-color: var(--color-elements-red);
+    }
+    
+    .bg-elements-yellow {
+        background-color: var(--color-elements-yellow);
+    }
+    .bg-elements-green {
+        background-color: var(--color-elements-green);
     }
 }
 
 /* Pilat */
 @font-face {
-    font-family: 'Pilat';
-    src: url('/assets/fonts/Pilat/Pilat-Light.otf') format('opentype');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'Pilat';
+  src: url('/assets/fonts/Pilat/Pilat-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Pilat';
-    src: url('/assets/fonts/Pilat/Pilat-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
+  font-family: 'Pilat';
+  src: url('/assets/fonts/Pilat/Pilat-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Pilat';
-    src: url('/assets/fonts/Pilat/Pilat-Book.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
+  font-family: 'Pilat';
+  src: url('/assets/fonts/Pilat/Pilat-Book.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Pilat';
-    src: url('/assets/fonts/Pilat/Pilat-Demi.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
+  font-family: 'Pilat';
+  src: url('/assets/fonts/Pilat/Pilat-Demi.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Pilat';
-    src: url('/assets/fonts/Pilat/Pilat-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
+  font-family: 'Pilat';
+  src: url('/assets/fonts/Pilat/Pilat-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
 }
 
 /* PilatWide */
 @font-face {
-    font-family: 'PilatWide';
-    src: url('/assets/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'PilatWide';
+  src: url('/assets/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatWide';
-    src: url('/assets/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
+  font-family: 'PilatWide';
+  src: url('/assets/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatWide';
-    src: url('/assets/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
+  font-family: 'PilatWide';
+  src: url('/assets/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatWide';
-    src: url('/assets/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
+  font-family: 'PilatWide';
+  src: url('/assets/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatWide';
-    src: url('/assets/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
+  font-family: 'PilatWide';
+  src: url('/assets/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
 }
 
 /* PilatExtended */
 @font-face {
-    font-family: 'PilatExtended';
-    src: url('/assets/fonts/PilatExtended/PilatExtended-Light.otf') format('opentype');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'PilatExtended';
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatExtended';
-    src: url('/assets/fonts/PilatExtended/PilatExtended-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
+  font-family: 'PilatExtended';
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatExtended';
-    src: url('/assets/fonts/PilatExtended/PilatExtended-Book.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
+  font-family: 'PilatExtended';
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Book.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatExtended';
-    src: url('/assets/fonts/PilatExtended/PilatExtended-Demi.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
+  font-family: 'PilatExtended';
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Demi.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'PilatExtended';
-    src: url('/assets/fonts/PilatExtended/PilatExtended-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
+  font-family: 'PilatExtended';
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
 }

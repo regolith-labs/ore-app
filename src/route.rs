@@ -19,6 +19,8 @@ pub enum Route {
         Pair { lp_mint: String },
         #[route("/trade")]
         Trade {},
+        #[route("/trade/:token_pair")]
+        TradeWithPair { token_pair: String },
     #[end_layout]
 
     #[layout(AppModalLayout)]

@@ -7,7 +7,7 @@ use steel::AccountDeserialize;
 
 use crate::hooks::MiningEvent;
 
-use super::{solana::SolanaGateway, Gateway, GatewayError, GatewayResult, Rpc};
+use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
 pub trait PoolGateway {
     async fn get_challenge(
@@ -15,7 +15,12 @@ pub trait PoolGateway {
         authority: Pubkey,
         pool_url: String,
     ) -> GatewayResult<MemberChallenge>;
-    async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64>;
+    async fn get_cutoff(
+        &self,
+        last_hash_at: i64,
+        unix_timestamp: i64,
+        buffer_time: i64,
+    ) -> GatewayResult<i64>;
     async fn get_member(&self, address: Pubkey) -> GatewayResult<Member>;
     async fn get_member_record(
         &self,
@@ -82,12 +87,16 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         Ok(latest_event)
     }
 
-    async fn get_cutoff(&self, last_hash_at: i64, buffer_time: i64) -> GatewayResult<i64> {
-        let clock = self.rpc.get_clock().await?;
+    async fn get_cutoff(
+        &self,
+        last_hash_at: i64,
+        unix_timestamp: i64,
+        buffer_time: i64,
+    ) -> GatewayResult<i64> {
         let cutoff = last_hash_at
             .saturating_add(60)
             .saturating_sub(buffer_time)
-            .saturating_sub(clock.unix_timestamp)
+            .saturating_sub(unix_timestamp)
             .max(0);
         Ok(cutoff)
     }
@@ -128,12 +137,18 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
     ) -> GatewayResult<MemberChallenge> {
         loop {
             log::info!("Polling...");
-            let challenge = self.get_challenge(authority, pool_url.clone()).await?;
-            if challenge.challenge.lash_hash_at == last_hash_at {
-                async_std::task::sleep(std::time::Duration::from_secs(1)).await;
-            } else {
-                return Ok(challenge);
+            match self.get_challenge(authority, pool_url.clone()).await {
+                Ok(challenge) if challenge.challenge.lash_hash_at != last_hash_at => {
+                    return Ok(challenge)
+                }
+                Ok(_) => {
+                    log::info!("Same challenge, retry...");
+                }
+                Err(err) => {
+                    log::error!("Error polling challenge: {:?}", err);
+                }
             }
+            async_std::task::sleep(std::time::Duration::from_secs(1)).await;
         }
     }
 

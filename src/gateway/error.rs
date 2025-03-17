@@ -16,7 +16,8 @@ pub enum GatewayError {
     WalletDisconnected,
     JupSwapError,
     ParseTokenStringAmmount,
-    Keyring,
+    KeyringElse,
+    KeyringNoEntry,
     BincodeSerialize,
     BincodeDeserialize,
     Unknown,
@@ -32,7 +33,11 @@ impl From<solana_sdk::signer::SignerError> for GatewayError {
 impl From<keyring::Error> for GatewayError {
     fn from(value: keyring::Error) -> Self {
         log::error!("{:?}", value);
-        Self::Keyring
+        if let keyring::Error::NoEntry = value {
+            Self::KeyringNoEntry
+        } else {
+            Self::KeyringElse
+        }
     }
 }
 

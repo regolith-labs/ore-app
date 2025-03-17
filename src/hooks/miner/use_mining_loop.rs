@@ -82,7 +82,11 @@ fn use_challenge_dispatch(
                 if let Some(Ok(challenge)) = challenge.cloned() {
                     spawn(async move {
                         if let Ok(cutoff_time) = use_gateway()
-                            .get_cutoff(challenge.challenge.lash_hash_at, 5)
+                            .get_cutoff(
+                                challenge.challenge.lash_hash_at,
+                                challenge.unix_timestamp,
+                                5,
+                            )
                             .await
                         {
                             miner_status.set(MinerStatus::Hashing);
@@ -123,8 +127,10 @@ fn use_solution_contribute(
         // Process messsage from miner
         match *from_miner.read() {
             OutputMessage::Solution(solution) => {
+                log::info!("received solution");
                 // Submit solution
                 spawn(async move {
+                    log::info!("submitting solution");
                     // Submitting
                     miner_status.set(MinerStatus::SubmittingSolution);
                     if let Err(err) = use_gateway()
@@ -138,7 +144,7 @@ fn use_solution_contribute(
                     miner_status.set(MinerStatus::Hashing);
                     // Restart member balance for pending rewards
                     member_record_balance.restart();
-                    // Get latest pool event
+                    // Get latest mine event
                     match use_gateway()
                         .get_latest_event(pubkey, pool_url.clone())
                         .await
@@ -158,6 +164,23 @@ fn use_solution_contribute(
                 if lha > peek {
                     last_hash_at.set(lha);
                 }
+                // Poll for latest mine event
+                spawn(async move {
+                    // Restart member balance for pending rewards
+                    member_record_balance.restart();
+                    // Get latest mine event
+                    match use_gateway()
+                        .get_latest_event(pubkey, pool_url.clone())
+                        .await
+                    {
+                        Ok(latest_event) => {
+                            MiningEvent::add_to_signal(latest_event);
+                        }
+                        Err(err) => {
+                            log::error!("Error getting latest event: {:?}", err);
+                        }
+                    }
+                });
             }
             _ => {}
         }

@@ -41,6 +41,7 @@ pub fn use_pair_withdraw_transaction(
     stake_b_balance: Resource<GatewayResult<UiTokenAmount>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
     token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
@@ -148,6 +149,16 @@ pub fn use_pair_withdraw_transaction(
                 &authority,
                 &authority,
                 &liquidity_pair.token_b.mint,
+                &spl_token::ID,
+            ));
+        };
+        if let Some(Ok(_lp_balance)) = lp_balance.cloned() {
+            // Noop
+        } else {
+            ixs.push(create_associated_token_account_idempotent(
+                &authority,
+                &authority,
+                &boost_meta.lp_mint,
                 &spl_token::ID,
             ));
         };

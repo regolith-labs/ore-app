@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::{Col, Row},
+    components::{Col, InfoText, Row},
     route::Route,
 };
 
@@ -30,14 +30,9 @@ pub fn TableHeader(
     help_right_2: Option<String>,
     help_right_3: Option<String>,
     help_right_4: Option<String>,
-    display_help: Signal<bool>,
+    help_hidden: Signal<bool>,
 ) -> Element {
     let class = class.unwrap_or("".to_string());
-    let help_class = if display_help.cloned() {
-        "max-h-96 opacity-100 py-2"
-    } else {
-        "max-h-0 opacity-0 py-0"
-    };
     rsx! {
         Row {
             class: "min-h-8 sm:min-h-10 h-min w-full min-w-max px-5 sm:px-3 justify-between font-medium text-elements-lowEmphasis text-nowrap {class}",
@@ -51,9 +46,10 @@ pub fn TableHeader(
                             {left}
                         }
                         if let Some(help_left) = help_left {
-                            span {
-                                class: "overflow-hidden transition-all duration-300 w-full grow ease-in-out text-xs text-wrap text-elements-midEmphasis {help_class}",
-                                "{help_left}"
+                            InfoText {
+                                class: "text-xs mb-auto",
+                                text: help_left.clone(),
+                                hidden: help_hidden,
                             }
                         }
                     }
@@ -63,9 +59,10 @@ pub fn TableHeader(
                             {right_1}
                         }
                         if let Some(help_right_1) = help_right_1 {
-                            span {
-                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
-                                "{help_right_1}"
+                            InfoText {
+                                class: "text-xs text-wrap pl-2 mb-auto",
+                                text: help_right_1.clone(),
+                                hidden: help_hidden,
                             }
                         }
                     }
@@ -79,9 +76,10 @@ pub fn TableHeader(
                             {right_2}
                         }
                         if let Some(help_right_2) = help_right_2 {
-                            span {
-                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
-                                "{help_right_2}"
+                            InfoText {
+                                class: "text-xs text-wrap pl-2 mb-auto",
+                                text: help_right_2.clone(),
+                                hidden: help_hidden,
                             }
                         }
                     }
@@ -93,9 +91,10 @@ pub fn TableHeader(
                             {right_3}
                         }
                         if let Some(help_right_3) = help_right_3 {
-                            span {
-                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
-                                "{help_right_3}"
+                            InfoText {
+                                class: "text-xs text-wrap pl-2 mb-auto",
+                                text: help_right_3.clone(),
+                                hidden: help_hidden,
                             }
                         }
                     }
@@ -107,9 +106,10 @@ pub fn TableHeader(
                             {right_4}
                         }
                         if let Some(help_right_4) = help_right_4 {
-                            span {
-                                class: "overflow-hidden transition-all duration-300 ease-in-out text-xs text-wrap pl-2 text-elements-midEmphasis {help_class}",
-                                "{help_right_4}"
+                            InfoText {
+                                class: "text-xs text-wrap pl-2 mb-auto",
+                                text: help_right_4.clone(),
+                                hidden: help_hidden,
                             }
                         }
                     }
