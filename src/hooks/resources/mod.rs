@@ -28,4 +28,5 @@ pub fn use_cache_provider() {
     use_members_provider();
     use_boost_yield_provider();
     use_token_balance_provider();
+    use_token_price_provider();
 }

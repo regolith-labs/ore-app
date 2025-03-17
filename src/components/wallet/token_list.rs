@@ -6,13 +6,14 @@ use crate::{
     components::*,
     config::{Token, LISTED_TOKENS},
     gateway::{GatewayResult, UiTokenAmount},
-    hooks::{use_ore_price, use_token_balance, use_wallet, OrePrice, Wallet},
+    hooks::{
+        use_ore_price, use_token_balance, use_token_price, use_token_price_with_amount, use_wallet,
+        OrePrice, TokenPrice, Wallet,
+    },
 };
 
-// Token list component
 pub fn TokenList() -> Element {
     let token_list: Vec<Token> = LISTED_TOKENS.values().cloned().collect();
-    let ore_price = use_ore_price();
 
     // Get all token balances at top level
     let mut all_balances = HashMap::new();
@@ -21,33 +22,17 @@ pub fn TokenList() -> Element {
         all_balances.insert(token.mint, balance);
     }
 
-    // Ore price at top level
-    let ore_price_value = ore_price.read().clone();
-
-    // Now use_memo with values we already have
-    let tokens_with_data = use_memo(move || {
+    // Filter tokens with balance > 0
+    let tokens_with_balance = use_memo(move || {
         token_list
             .iter()
             .filter_map(|token| {
                 let balance = all_balances.get(&token.mint).unwrap();
 
-                // Get the balance if available
                 if let Some(Ok(amount)) = balance.read().as_ref() {
                     if let Some(ui_amount) = amount.ui_amount {
                         if ui_amount > 0.0 {
-                            // Calculate price based on previously fetched ore_price
-                            let price = if token.ticker == "ORE" {
-                                ore_price_value.clone().map(|OrePrice(price)| price)
-                            } else {
-                                match token.ticker.as_str() {
-                                    "SOL" => Some(21.30),
-                                    "USDC" => Some(1.00),
-                                    "HNT" => Some(3.47),
-                                    _ => Some(0.0),
-                                }
-                            };
-
-                            return Some((token.clone(), ui_amount, price));
+                            return Some((token.clone(), ui_amount));
                         }
                     }
                 }
@@ -60,7 +45,33 @@ pub fn TokenList() -> Element {
         Col {
             class: "w-full",
             {
-                tokens_with_data.read().iter().map(|(token, ui_amount, price)| {
+                tokens_with_balance.read().iter().map(|(token, ui_amount)| {
+                    // Price fetching logic (only for tokens with balance > 0)
+                    let price_display = {
+                        // Use the global token price resource for all tokens
+                        let token_price = use_token_price(token.mint);
+
+                        // Then use the value in the match (now simpler with Option<TokenPrice>)
+                        match token_price {
+                            Some(price) => {
+                                // Calculate the total value of user's tokens (price * balance)
+                                let total_value = price.0 * ui_amount;
+                                rsx! {
+                                    span {
+                                        class: "font-medium text-elements-highEmphasis",
+                                        "${total_value:.2}"
+                                    }
+                                }
+                            },
+                            None => rsx! {
+                                div {
+                                    class: "h-5 w-16 rounded-md animate-pulse bg-surface-primary/60 my-auto",
+                                }
+                            }
+                        }
+                    };
+
+                    // Render token row with price
                     rsx! {
                         Row {
                             key: "{token.mint}",
@@ -87,17 +98,7 @@ pub fn TokenList() -> Element {
                             // Right section with price
                             Col {
                                 class: "items-end",
-                                if let Some(price) = price {
-                                    span {
-                                        class: "font-medium text-elements-highEmphasis",
-                                        "${price:.2}"
-                                    }
-                                } else {
-                                    span {
-                                        class: "font-medium text-elements-highEmphasis",
-                                        "Price N/A"
-                                    }
-                                }
+                                {price_display}
                             }
                         }
                     }
