@@ -10,6 +10,7 @@ use crate::{
         use_ore_price, use_token_balance, use_token_price, use_token_price_with_amount, use_wallet,
         OrePrice, TokenPrice, Wallet,
     },
+    route::Route,
 };
 
 pub fn TokenList() -> Element {
@@ -73,32 +74,35 @@ pub fn TokenList() -> Element {
 
                     // Render token row with price
                     rsx! {
-                        Row {
-                            key: "{token.mint}",
-                            class: "w-full justify-between items-center py-4 px-4 sm:rounded-md transition duration-300 ease-in-out hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
-                            // Left section with icon and token info
+                        Link {
+                            to: crate::route::Route::TransferWithToken { token_ticker: token.ticker.clone() },
                             Row {
-                                class: "items-center",
-                                gap: 4,
-                                img {
-                                    class: "w-8 h-8 rounded-full shrink-0",
-                                    src: "{token.image}",
+                                key: "{token.mint}",
+                                class: "w-full justify-between items-center py-4 px-4 sm:rounded-md transition duration-300 ease-in-out hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
+                                // Left section with icon and token info
+                                Row {
+                                    class: "items-center",
+                                    gap: 4,
+                                    img {
+                                        class: "w-8 h-8 rounded-full shrink-0",
+                                        src: "{token.image}",
+                                    }
+                                    Col {
+                                        span {
+                                            class: "font-medium text-elements-highEmphasis",
+                                            "{token.name}"
+                                        }
+                                        span {
+                                            class: "font-medium text-xs text-elements-lowEmphasis",
+                                            {format!("{:.4} {}", ui_amount, token.ticker)}
+                                        }
+                                    }
                                 }
+                                // Right section with price
                                 Col {
-                                    span {
-                                        class: "font-medium text-elements-highEmphasis",
-                                        "{token.name}"
-                                    }
-                                    span {
-                                        class: "font-medium text-xs text-elements-lowEmphasis",
-                                        {format!("{:.4} {}", ui_amount, token.ticker)}
-                                    }
+                                    class: "items-end",
+                                    {price_display}
                                 }
-                            }
-                            // Right section with price
-                            Col {
-                                class: "items-end",
-                                {price_display}
                             }
                         }
                     }

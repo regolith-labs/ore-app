@@ -35,9 +35,18 @@ enum TransferStatus {
 }
 
 #[component]
-pub fn Transfer() -> Element {
-    // Selected token
-    let selected_token = use_signal(|| Some(Token::ore()));
+pub fn Transfer(token_ticker: Option<String>) -> Element {
+    // Selected token - now initialized based on the token_ticker parameter
+    let mut selected_token = use_signal(|| Some(Token::ore()));
+
+    // Initialize with the provided token ticker if available
+    use_effect(move || {
+        if let Some(ticker) = &token_ticker {
+            if let Some(token) = crate::config::LISTED_TOKENS_BY_TICKER.get(ticker) {
+                selected_token.set(Some(token.clone()));
+            }
+        }
+    });
 
     // Transfer amount
     let mut amount = use_signal::<String>(|| "".to_string());
@@ -391,6 +400,16 @@ fn TransferConfirmation(
                     }
                 }
             })
+        }
+    }
+}
+
+// Component for the /transfer/:token_ticker route
+#[component]
+pub fn TransferWithToken(token_ticker: String) -> Element {
+    rsx! {
+        Transfer {
+            token_ticker: Some(token_ticker)
         }
     }
 }
