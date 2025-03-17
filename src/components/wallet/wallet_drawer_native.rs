@@ -4,6 +4,7 @@ use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
+use crate::hooks::{use_wss, GetPubkey, ToWssMsg};
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
@@ -11,6 +12,17 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let mut clipboard = use_clipboard();
     // wallet
     let wallet = use_wallet();
+    let (from_wss, to_wss) = use_wss();
+    use_effect(move || {
+        let msg = from_wss.read();
+        log::info!("from wss: {:?}", msg);
+    });
+    use_effect(move || {
+        if let Ok(pubkey) = wallet.pubkey() {
+            log::info!("pubkey: {:?}", pubkey);
+            to_wss.send(ToWssMsg::Subscribe(pubkey));
+        }
+    });
     // pubkey
     let mut pubkey = use_signal(|| "missing pubkey".to_string());
     let mut pubkey_splice = use_signal(|| Splice::Pubkey("0000...0000".to_string()));

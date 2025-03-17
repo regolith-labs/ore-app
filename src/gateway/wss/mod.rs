@@ -115,6 +115,8 @@ pub enum SubscriptionError {
 pub trait AccountSubscribe: Sized {
     type SubscriptionId: Copy + Debug;
     async fn connect() -> Result<Self, SubscriptionError>;
+    // TODO: is a .method field returned in the response payload?
+    // can we distinguish between notifs and subscriptions?
     async fn subscribe(&mut self, account: &str)
         -> Result<Self::SubscriptionId, SubscriptionError>;
     async fn unsubscribe(
