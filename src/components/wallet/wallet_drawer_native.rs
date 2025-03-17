@@ -3,7 +3,9 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-use crate::components::{CopyIcon, GlobeIcon, PaperAirplaneIcon, PlayIcon, PlusIcon};
+use crate::components::{
+    Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlayIcon, PlusIcon, Row, TokenList,
+};
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 use crate::route::Route;
 
@@ -95,13 +97,15 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     CopyIcon { class: "h-4 w-4", solid: false }
                 }
             }
-            div {
-                class: "flex flex-row justify-center items-center gap-10 mx-4 p-4",
-                div {
-                    class: "flex flex-col items-center gap-2",
+            Row {
+                class: "justify-center items-center mx-4 p-4",
+                gap: 10,
+                Col {
+                    class: "items-center",
+                    gap: 2,
                     a {
                         class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
-                            
+
                         PlusIcon { class: "h-5" }
                     }
                     span {
@@ -109,8 +113,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                         "Top Up"
                     }
                 }
-                div {
-                    class: "flex flex-col items-center gap-2",
+                Col {
+                    class: "items-center",
+                    gap: 2,
                     a {
                         class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
                         href: "https://solscan.io/account/{pubkey.read()}",
@@ -121,8 +126,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                         "Explorer"
                     }
                 }
-                div {
-                    class: "flex flex-col items-center gap-2",
+                Col {
+                    class: "items-center",
+                    gap: 2,
                     Link {
                         class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
                         to: Route::Transfer {},
@@ -137,6 +143,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                         "Transfer"
                     }
                 }
+            }
+            Col {
+                TokenList {}
             }
             if *keypair_show_export.read() {
                 button {
