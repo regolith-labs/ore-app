@@ -1,3 +1,4 @@
+mod use_account;
 mod use_boost;
 mod use_boost_apy;
 mod use_boost_tvl;
@@ -7,6 +8,7 @@ mod use_ore_holders;
 mod use_ore_price;
 mod use_stake;
 mod use_token_balance;
+mod use_wss;
 
 pub use use_boost::*;
 pub use use_boost_apy::*;

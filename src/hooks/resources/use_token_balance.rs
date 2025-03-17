@@ -139,38 +139,6 @@ pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     })
 }
 
-pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
-    let wallet = use_wallet();
-    let mut balance = use_signal(|| Err::<UiTokenAmount, _>(GatewayError::AccountNotFound));
-    use_resource(move || async move {
-        if let Err(e) = async {
-            let pubkey = wallet.pubkey()?;
-            let mut wss = AccountSubscribeGateway::connect().await?;
-            let id = wss.subscribe(pubkey.to_string().as_str()).await?;
-            log::info!("sub id: {}", id);
-            loop {
-                log::info!("starting loop");
-                match wss.next_notification().await {
-                    Ok(msg) => {
-                        log::info!("{:?}", msg);
-                    }
-                    Err(err) => {
-                        log::error!("{:?}", err);
-                        break;
-                    }
-                }
-            }
-            log::info!("broke");
-            Ok::<(), GatewayError>(())
-        }
-        .await
-        {
-            log::error!("WebSocket subscription error: {:?}", e);
-        }
-    });
-    balance
-}
-
 pub fn use_ore_supply() -> Resource<GatewayResult<UiTokenAmount>> {
     use_resource(move || async move {
         use_gateway()
