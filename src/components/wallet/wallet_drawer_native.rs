@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-use crate::hooks::{use_wallet, use_wallet_native, Wallet};
+use crate::hooks::{use_wallet, use_wallet_native, FromWssMsg, Wallet};
 use crate::hooks::{use_wss, GetPubkey, ToWssMsg};
 
 #[component]
@@ -13,15 +13,23 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     // wallet
     let wallet = use_wallet();
     let (from_wss, to_wss) = use_wss();
+    let mut sub_id = use_signal(|| 0);
     use_effect(move || {
-        let msg = from_wss.read();
+        let msg = from_wss.cloned();
         log::info!("from wss: {:?}", msg);
+        if let FromWssMsg::Subscription(sid) = msg {
+            sub_id.set(sid);
+        };
     });
     use_effect(move || {
         if let Ok(pubkey) = wallet.pubkey() {
             log::info!("pubkey: {:?}", pubkey);
             to_wss.send(ToWssMsg::Subscribe(pubkey));
         }
+    });
+    use_drop(move || {
+        let sub_id = *sub_id.read();
+        to_wss.send(ToWssMsg::Unsubscribe(sub_id));
     });
     // pubkey
     let mut pubkey = use_signal(|| "missing pubkey".to_string());

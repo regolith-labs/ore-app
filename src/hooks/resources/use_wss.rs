@@ -13,7 +13,7 @@ use crate::{
 
 pub type FromWss = Signal<FromWssMsg>;
 pub type ToWss = Coroutine<ToWssMsg>;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FromWssMsg {
     Init,
     Subscription(SubId),

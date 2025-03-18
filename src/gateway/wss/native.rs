@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use async_trait::async_trait;
 use fastrand;
 use futures_util::{
@@ -6,7 +8,6 @@ use futures_util::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json;
-use std::fmt::Debug;
 use tokio::net::TcpStream;
 use tokio_tungstenite::{
     connect_async,
@@ -102,6 +103,7 @@ impl AccountSubscribe for AccountSubscribeGateway {
         };
         // Generate a random ID for this request
         let request_id = fastrand::u64(..);
+        log::info!("request id: {}", request_id);
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: request_id,
@@ -127,6 +129,7 @@ impl AccountSubscribe for AccountSubscribeGateway {
         self.send_request(&request).await?;
         let result = self.handle_response::<bool>(request_id).await?;
         if result {
+            log::info!("unsubcribed!");
             Ok(())
         } else {
             Err(SubscriptionError::RpcError(
@@ -144,6 +147,7 @@ impl AccountSubscribe for AccountSubscribeGateway {
                     match serde_json::from_str::<AccountNotificationEnvelope>(&text) {
                         Ok(notification) => {
                             if notification.method == "accountNotification" {
+                                log::info!("notif id: {:?}", notification.params.subscription);
                                 return Ok(notification);
                             } else {
                                 log::info!("Ignoring non-account notification: {:?}", notification);

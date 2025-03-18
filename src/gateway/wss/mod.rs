@@ -1,4 +1,4 @@
-#[cfg(not(feature = "web"))]
+// #[cfg(not(feature = "web"))]
 mod native;
 #[cfg(feature = "web")]
 mod web;
@@ -60,12 +60,12 @@ pub(super) type AccountSubscribeResponse = u64;
 ////////////////////////////////////////////////////////////////////////////
 // Account Notification Types
 ////////////////////////////////////////////////////////////////////////////
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub(super) struct AccountContext {
     pub slot: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub(super) struct AccountNotification {
     pub data: Vec<String>,
     pub executable: bool,
@@ -76,20 +76,20 @@ pub(super) struct AccountNotification {
     pub space: Option<u64>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub(super) struct AccountNotificationResult {
     pub context: AccountContext,
     pub value: AccountNotification,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AccountNotificationEnvelope {
     pub jsonrpc: String,
     pub method: String,
     pub params: AccountNotificationParams,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AccountNotificationParams {
     pub result: AccountNotificationResult,
     pub subscription: u64,
