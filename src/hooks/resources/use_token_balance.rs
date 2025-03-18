@@ -151,42 +151,36 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     use_balance_wss(Token::sol().mint, update_callback)
 }
 
-/// Generic function to handle WebSocket balance subscriptions
+/// Generic function to handle WebSocket subscriptions for any data type
 ///
-/// This function provides a unified API for subscribing to token balance updates via WebSocket.
-/// It handles the initial balance fetch, subscription management, and updates.
+/// This function provides a unified API for subscribing to any type of updates via WebSocket.
+/// It connects an existing data signal to WebSocket updates, handling subscription management
+/// and automatic unsubscription when the component is dropped.
+///
+/// # Type Parameters
+/// * `T` - The type of data being tracked (e.g., UiTokenAmount)
+/// * `U` - The update callback function type that processes WebSocket messages
 ///
 /// # Parameters
-/// * `mint` - The mint address of the token to track
-/// * `update_callback` - Callback that processes WebSocket messages and returns token amounts when relevant
+/// * `data` - Signal containing the data to be updated with WebSocket notifications
+/// * `update_callback` - Callback that processes WebSocket messages and returns updated data when relevant
+/// * `pubkey` - The public key of the account to subscribe to
 ///
 /// # Returns
-/// A Signal containing the current token balance or an error
-pub fn use_balance_wss<U>(mint: Pubkey, update_callback: U) -> Signal<GatewayResult<UiTokenAmount>>
+/// The same Signal that was passed in, now connected to WebSocket updates
+
+pub fn use_wss_subscription<T, U>(
+    data: Signal<GatewayResult<T>>,
+    update_callback: U,
+    pubkey: Pubkey,
+) -> Signal<GatewayResult<T>>
 where
-    U: Fn(&FromWssMsg, u64) -> Option<UiTokenAmount> + 'static,
+    T: Clone + 'static,
+    U: Fn(&FromWssMsg, u64) -> Option<T> + 'static,
 {
-    let wallet = use_wallet();
     let (from_wss, to_wss) = use_wss();
     let mut sub_id = use_signal(|| 0);
     let sub_request_id = use_memo(move || AccountSubscribeGateway::request_id());
-    let mut balance: Signal<GatewayResult<UiTokenAmount>> =
-        use_signal(|| Err(GatewayError::AccountNotFound));
-
-    // Fetch initial balance if wallet is connected
-    let mut balance_clone = balance.clone();
-    spawn(async move {
-        match *wallet.read() {
-            Wallet::Disconnected => balance_clone.set(Err(GatewayError::AccountNotFound)),
-            Wallet::Connected(pubkey) => match get_token_balance(pubkey, mint).await {
-                Ok(b) => balance_clone.set(Ok(b)),
-                Err(err) => {
-                    log::error!("Failed to fetch initial balance: {:?}", err);
-                    balance_clone.set(Err(err));
-                }
-            },
-        }
-    });
 
     // Handle subscription ID tracking
     use_effect(move || {
@@ -200,25 +194,24 @@ where
         }
     });
 
-    // Handle balance updates separately
+    // Handle data updates
+    let mut data_clone = data.clone();
     use_effect(move || {
         let msg = from_wss.cloned();
         let current_sub_id = *sub_id.read();
 
         // Only process notification messages
         if let FromWssMsg::Notif(_) = &msg {
-            // Update balance when notification is received
-            if let Some(token_amount) = update_callback(&msg, current_sub_id) {
-                balance.set(Ok(token_amount));
+            // Update data when notification is received
+            if let Some(updated_data) = update_callback(&msg, current_sub_id) {
+                data_clone.set(Ok(updated_data));
             }
         }
     });
 
-    // Subscribe to account updates when wallet is connected
+    // Subscribe when component mounts
     use_effect(move || {
-        if let Wallet::Connected(pubkey) = *wallet.read() {
-            to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
-        }
+        to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
     });
 
     // Unsubscribe when component is dropped
@@ -229,7 +222,55 @@ where
         }
     });
 
-    balance
+    data
+}
+
+/// Function to handle WebSocket token balance subscriptions
+///
+/// This function provides a specialized API for subscribing to token balance updates via WebSocket.
+/// It directly manages wallet state and subscription for token balances.
+///
+/// # Parameters
+/// * `mint` - The mint address of the token to track
+/// * `update_callback` - Callback that processes WebSocket messages and returns token amounts when relevant
+///
+/// # Returns
+/// A Signal containing the current token balance or an error
+pub fn use_balance_wss<U>(mint: Pubkey, update_callback: U) -> Signal<GatewayResult<UiTokenAmount>>
+where
+    U: Fn(&FromWssMsg, u64) -> Option<UiTokenAmount> + Clone + 'static,
+{
+    let wallet = use_wallet();
+
+    // Create and initialize the data signal
+    let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
+
+    // Initialize data with current balance
+    let wallet_clone = wallet.clone();
+    let mint_clone = mint;
+    let mut data_clone = data.clone();
+
+    spawn(async move {
+        if let Wallet::Connected(pubkey) = *wallet_clone.read() {
+            match get_token_balance(pubkey, mint_clone).await {
+                Ok(initial_data) => data_clone.set(Ok(initial_data)),
+                Err(err) => {
+                    log::error!("Failed to initialize token balance: {:?}", err);
+                    data_clone.set(Err(err));
+                }
+            }
+        }
+    });
+
+    // Set up WebSocket subscription when wallet is connected
+    let wallet_for_sub = wallet.clone();
+    use_effect(move || {
+        if let Wallet::Connected(pubkey) = *wallet_for_sub.read() {
+            use_wss_subscription(data.clone(), update_callback.clone(), pubkey);
+        }
+    });
+
+    data
 }
 
 pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
