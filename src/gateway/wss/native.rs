@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use fastrand;
 use futures_util::{
     stream::{SplitSink, SplitStream},
     SinkExt, StreamExt,
@@ -97,30 +98,34 @@ impl AccountSubscribe for AccountSubscribeGateway {
     ) -> Result<Self::SubscriptionId, SubscriptionError> {
         let config = AccountSubscribeConfig {
             encoding: "jsonParsed".to_string(),
-            commitment: "finalized".to_string(),
+            commitment: "confirmed".to_string(),
         };
+        // Generate a random ID for this request
+        let request_id = fastrand::u64(..);
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
-            id: 1,
+            id: request_id,
             method: "accountSubscribe".to_string(),
             params: (account.to_string(), config),
         };
         self.send_request(&request).await?;
-        self.handle_response(1).await
+        self.handle_response(request_id).await
     }
 
     async fn unsubscribe(
         &mut self,
         subscription: Self::SubscriptionId,
     ) -> Result<(), SubscriptionError> {
+        // Generate a random ID for this request
+        let request_id = fastrand::u64(..);
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
-            id: 2,
+            id: request_id,
             method: "accountUnsubscribe".to_string(),
             params: (subscription,),
         };
         self.send_request(&request).await?;
-        let result = self.handle_response::<bool>(2).await?;
+        let result = self.handle_response::<bool>(request_id).await?;
         if result {
             Ok(())
         } else {

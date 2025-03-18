@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use fastrand;
 use futures_util::{SinkExt, StreamExt};
 use gloo_net::websocket::futures::WebSocket;
 use gloo_net::websocket::Message as GlooMessage;
@@ -13,7 +14,7 @@ use super::{
     SubscriptionError,
 };
 
-/// A WebSocket client for account subscriptions on Solana RPC using gloo‑net.
+/// WebSocket client for account subscriptions on Solana RPC
 pub struct AccountSubscribeGateway {
     writer: futures_util::stream::SplitSink<WebSocket, GlooMessage>,
     reader: futures_util::stream::SplitStream<WebSocket>,
@@ -73,7 +74,7 @@ impl AccountSubscribeGateway {
 #[async_trait(?Send)]
 impl AccountSubscribe for AccountSubscribeGateway {
     type SubscriptionId = u64;
-    /// Connects to the specified WebSocket URL and returns a new client.
+
     async fn connect() -> Result<Self, SubscriptionError> {
         let ws = WebSocket::open(WSS_URL)
             .map_err(|e| SubscriptionError::ConnectionError(format!("{:?}", e)))?;
@@ -87,32 +88,36 @@ impl AccountSubscribe for AccountSubscribeGateway {
     ) -> Result<Self::SubscriptionId, SubscriptionError> {
         let config = AccountSubscribeConfig {
             encoding: "jsonParsed".to_string(),
-            commitment: "finalized".to_string(),
+            commitment: "confirmed".to_string(),
         };
+        // Generate a random ID for this request
+        let request_id = fastrand::u64(..);
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
-            id: 1,
+            id: request_id,
             method: "accountSubscribe".to_string(),
             params: (account.to_string(), config),
         };
 
         self.send_request(&request).await?;
-        self.handle_response(request.id).await
+        self.handle_response(request_id).await
     }
 
     async fn unsubscribe(
         &mut self,
         subscription: Self::SubscriptionId,
     ) -> Result<(), SubscriptionError> {
+        // Generate a random ID for this request
+        let request_id = fastrand::u64(..);
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
-            id: 2,
+            id: request_id,
             method: "accountUnsubscribe".to_string(),
             params: (subscription,),
         };
 
         self.send_request(&request).await?;
-        let result = self.handle_response::<bool>(request.id).await?;
+        let result = self.handle_response::<bool>(request_id).await?;
         if result {
             Ok(())
         } else {

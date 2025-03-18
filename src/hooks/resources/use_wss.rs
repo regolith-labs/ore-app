@@ -55,7 +55,6 @@ pub fn use_wss_provider() {
 
             // Handle UI commands and forward them to the WebSocket worker
             while let Some(msg) = rx.next().await {
-                log::info!("to wss: {:?}", msg);
                 match msg {
                     ToWssMsg::Subscribe(pubkey) => {
                         // Create a one-shot channel for the subscription ID response
@@ -73,7 +72,6 @@ pub fn use_wss_provider() {
 
                         // Wait for the subscription ID response
                         if let Some(sub_id) = sub_resp_rx.next().await {
-                            log::info!("sub id: {}", sub_id);
                             from_wss.set(FromWssMsg::Subscription(sub_id));
                         }
                     }
@@ -126,7 +124,6 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
                     Some(WssCommand::Subscribe(pubkey, resp_tx)) => {
                         match wss.subscribe(pubkey.to_string().as_str()).await {
                             Ok(sub_id) => {
-                            log::info!("here sub id: {}", sub_id);
                                 if let Err(e) = resp_tx.clone().send(sub_id).await {
                                     log::error!("Failed to send subscription ID response: {:?}", e);
                                 }
@@ -152,7 +149,6 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
             notification = wss.next_notification().fuse() => {
                 match notification {
                     Ok(notification) => {
-                        log::info!("WebSocket notification: {:?}", notification);
                         if let Err(e) = notification_tx.clone().send(notification.params).await {
                             log::error!("Failed to forward notification: {:?}", e);
                         }

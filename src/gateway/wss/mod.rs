@@ -13,10 +13,9 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fmt::Debug;
 
-//
+////////////////////////////////////////////////////////////////////////////
 // JSON‑RPC Types
-//
-
+////////////////////////////////////////////////////////////////////////////
 #[derive(Debug, Serialize, Deserialize)]
 pub(super) struct JsonRpcRequest<T> {
     pub jsonrpc: String,
@@ -47,10 +46,9 @@ pub(super) struct JsonRpcResponseWithError<T> {
     pub error: Option<JsonRpcError>,
 }
 
-//
+////////////////////////////////////////////////////////////////////////////
 // Account Subscription Request/Response Types
-//
-
+////////////////////////////////////////////////////////////////////////////
 #[derive(Debug, Serialize, Deserialize)]
 pub(super) struct AccountSubscribeConfig {
     pub encoding: String,
@@ -59,10 +57,9 @@ pub(super) struct AccountSubscribeConfig {
 
 pub(super) type AccountSubscribeResponse = u64;
 
-//
+////////////////////////////////////////////////////////////////////////////
 // Account Notification Types
-//
-
+////////////////////////////////////////////////////////////////////////////
 #[derive(Debug, Serialize, Deserialize)]
 pub(super) struct AccountContext {
     pub slot: u64,
@@ -98,10 +95,9 @@ pub struct AccountNotificationParams {
     pub subscription: u64,
 }
 
-//
+////////////////////////////////////////////////////////////////////////////
 // Subscription Trait
-//
-
+////////////////////////////////////////////////////////////////////////////
 #[derive(Debug)]
 pub enum SubscriptionError {
     ConnectionError(String),
@@ -115,8 +111,6 @@ pub enum SubscriptionError {
 pub trait AccountSubscribe: Sized {
     type SubscriptionId: Copy + Debug;
     async fn connect() -> Result<Self, SubscriptionError>;
-    // TODO: is a .method field returned in the response payload?
-    // can we distinguish between notifs and subscriptions?
     async fn subscribe(&mut self, account: &str)
         -> Result<Self::SubscriptionId, SubscriptionError>;
     async fn unsubscribe(
