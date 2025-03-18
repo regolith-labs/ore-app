@@ -150,8 +150,7 @@ pub fn use_wss_subscription<T, U>(
     data: Signal<GatewayResult<T>>,
     update_callback: U,
     pubkey: Pubkey,
-) -> Signal<GatewayResult<T>>
-where
+) where
     T: Clone + 'static,
     U: Fn(&AccountNotificationParams) -> GatewayResult<T> + 'static,
 {
@@ -176,10 +175,8 @@ where
     let mut data_clone = data.clone();
     use_effect(move || {
         let msg = from_wss.cloned();
-        let current_sub_id = *sub_id.read();
-
         // Only process notification messages
-        if let FromWssMsg::Notif(notif) = &msg {
+        if let FromWssMsg::Notif(notif) = msg {
             if notif.subscription.eq(&sub_id()) {
                 data_clone.set(update_callback(&notif));
             }
@@ -198,8 +195,6 @@ where
             to_wss.send(ToWssMsg::Unsubscribe(current_sub_id));
         }
     });
-
-    data
 }
 
 pub fn use_balance_wss<U>(mint: Pubkey, update_callback: U) -> Signal<GatewayResult<UiTokenAmount>>
