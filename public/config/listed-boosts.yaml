@@ -35,12 +35,3 @@ boosts:
     ticker: kHNT-ORE
     lut: G9aqZtDcXYYzocyVMcsd4j2m3ootcb1kKNvTXciwJLQN
 
-  - address: 8BEzwBTDsKWnjgjxi8Cca7ZatPZQhxUMgS8qWzBhDhrC
-    pair_mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-    lp_mint: 9BAWwtAZiF4XJC6vArPM8JhtgKXfeoeo9FJHeR3PEGac
-    lp_id: 7XNR3Ysqg2MbfQX8iMWD4iEF96h2GMsWNT8eZYsLTmua
-    lp_type: meteora
-    name: ORE-USDC Meteora LP
-    ticker: ORE-USDC MLP
-    lut:
-
