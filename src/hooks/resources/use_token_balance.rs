@@ -130,71 +130,105 @@ pub fn use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
 }
 
 pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
-    let gateway = use_gateway();
-    // signals
+    // Update callback for SOL balance
+    let update_callback = move |msg: &FromWssMsg, current_sub_id: u64| {
+        if let FromWssMsg::Notif(notif) = msg {
+            if notif.subscription.eq(&current_sub_id) {
+                let lamports = notif.result.value.lamports;
+                let sol = lamports_to_sol(lamports);
+                let token_amount = UiTokenAmount {
+                    ui_amount: Some(sol),
+                    decimals: 8,
+                    amount: format!("{}", lamports),
+                    ui_amount_string: format!("{}", sol),
+                };
+                return Some(token_amount);
+            }
+        }
+        None
+    };
+
+    use_balance_wss(Token::sol().mint, update_callback)
+}
+
+/// Generic function to handle WebSocket balance subscriptions
+///
+/// This function provides a unified API for subscribing to token balance updates via WebSocket.
+/// It handles the initial balance fetch, subscription management, and updates.
+///
+/// # Parameters
+/// * `mint` - The mint address of the token to track
+/// * `update_callback` - Callback that processes WebSocket messages and returns token amounts when relevant
+///
+/// # Returns
+/// A Signal containing the current token balance or an error
+pub fn use_balance_wss<U>(mint: Pubkey, update_callback: U) -> Signal<GatewayResult<UiTokenAmount>>
+where
+    U: Fn(&FromWssMsg, u64) -> Option<UiTokenAmount> + 'static,
+{
     let wallet = use_wallet();
     let (from_wss, to_wss) = use_wss();
     let mut sub_id = use_signal(|| 0);
     let sub_request_id = use_memo(move || AccountSubscribeGateway::request_id());
-    log::info!("A: {}", sub_request_id);
     let mut balance: Signal<GatewayResult<UiTokenAmount>> =
         use_signal(|| Err(GatewayError::AccountNotFound));
-    // fetch initial balance
+
+    // Fetch initial balance if wallet is connected
+    let mut balance_clone = balance.clone();
     spawn(async move {
-        if let Err(err) = async {
-            let pubkey = wallet.pubkey()?;
-            let b = get_token_balance(pubkey, Token::sol().mint).await?;
-            balance.set(Ok(b));
-            Ok::<_, GatewayError>(())
+        match *wallet.read() {
+            Wallet::Disconnected => balance_clone.set(Err(GatewayError::AccountNotFound)),
+            Wallet::Connected(pubkey) => match get_token_balance(pubkey, mint).await {
+                Ok(b) => balance_clone.set(Ok(b)),
+                Err(err) => {
+                    log::error!("Failed to fetch initial balance: {:?}", err);
+                    balance_clone.set(Err(err));
+                }
+            },
         }
-        .await
-        {
-            log::error!("{:?}", err);
-        };
     });
-    // notif
+
+    // Handle subscription ID tracking
     use_effect(move || {
         let msg = from_wss.cloned();
-        if let FromWssMsg::Notif(notif) = msg {
-            let sub_id = sub_id.read();
-            if notif.subscription.eq(&*sub_id) {
-                let lamports = notif.result.value.lamports;
-                let sol = lamports_to_sol(lamports);
-                let b = UiTokenAmount {
-                    ui_amount: Some(sol),
-                    decimals: 8,
-                    amount: format!("{}", lamports).to_owned(),
-                    ui_amount_string: format!("{}", sol).to_owned(),
-                };
-                balance.set(Ok(b));
-            }
-        };
-    });
-    // sub id
-    use_effect(move || {
-        let msg = from_wss.cloned();
-        log::info!("from wss: {:?}", msg);
+
+        // Track subscription ID
         if let FromWssMsg::Subscription(rid, sid) = msg {
-            log::info!("actual rid: {}", sub_request_id);
-            log::info!("rid: {}", rid);
-            log::info!("sid: {}", sid);
             if sub_request_id.eq(&rid) {
                 sub_id.set(sid);
             }
-        };
+        }
     });
-    // subscribe
+
+    // Handle balance updates separately
     use_effect(move || {
-        if let Ok(pubkey) = wallet.pubkey() {
-            log::info!("pubkey: {:?}", pubkey);
+        let msg = from_wss.cloned();
+        let current_sub_id = *sub_id.read();
+
+        // Only process notification messages
+        if let FromWssMsg::Notif(_) = &msg {
+            // Update balance when notification is received
+            if let Some(token_amount) = update_callback(&msg, current_sub_id) {
+                balance.set(Ok(token_amount));
+            }
+        }
+    });
+
+    // Subscribe to account updates when wallet is connected
+    use_effect(move || {
+        if let Wallet::Connected(pubkey) = *wallet.read() {
             to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
         }
     });
-    // drop
+
+    // Unsubscribe when component is dropped
     use_drop(move || {
-        let sub_id = *sub_id.read();
-        to_wss.send(ToWssMsg::Unsubscribe(sub_id));
+        let current_sub_id = *sub_id.read();
+        if current_sub_id > 0 {
+            to_wss.send(ToWssMsg::Unsubscribe(current_sub_id));
+        }
     });
+
     balance
 }
 
