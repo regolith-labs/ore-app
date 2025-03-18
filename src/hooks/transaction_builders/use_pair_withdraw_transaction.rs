@@ -88,14 +88,14 @@ pub fn use_pair_withdraw_transaction(
         let stake_a_balance_u64 = stake_a_balance.amount.parse::<u64>().unwrap();
 
         // Convert input amounts to LP shares
-        let shares_amount = ((stake.balance + stake.balance_pending) as u128)
+        let shares_amount = (stake.balance as u128)
             .checked_mul(amount_a_u64 as u128)
             .unwrap()
             .checked_div(stake_a_balance_u64 as u128)
             .unwrap() as u64;
 
         // Check if shares amount is sufficient
-        if shares_amount > stake.balance + stake.balance_pending {
+        if shares_amount > stake.balance {
             err.set(Some(TokenInputError::InsufficientBalance(
                 liquidity_pair.token_a.clone(),
             )));
