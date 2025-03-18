@@ -16,15 +16,16 @@ pub type ToWss = Coroutine<ToWssMsg>;
 #[derive(Debug, Clone)]
 pub enum FromWssMsg {
     Init,
-    Subscription(SubId),
+    Subscription(SubRequestId, SubId),
     Notif(AccountNotificationParams),
 }
 #[derive(Debug, Clone, Copy)]
 pub enum ToWssMsg {
-    Subscribe(Pubkey),
+    Subscribe(SubRequestId, Pubkey),
     Unsubscribe(SubId),
 }
 type SubId = u64;
+type SubRequestId = u64;
 
 /// Two way channel backed by a WebSocket
 /// for subscribing to notifications from the RPC server.
@@ -56,14 +57,14 @@ pub fn use_wss_provider() {
             // Handle UI commands and forward them to the WebSocket worker
             while let Some(msg) = rx.next().await {
                 match msg {
-                    ToWssMsg::Subscribe(pubkey) => {
+                    ToWssMsg::Subscribe(request_id, pubkey) => {
                         // Create a one-shot channel for the subscription ID response
                         let (sub_resp_tx, mut sub_resp_rx) = mpsc::channel::<SubId>(1);
 
                         // Send the subscribe command to the worker
                         if let Err(e) = cmd_tx
                             .clone()
-                            .send(WssCommand::Subscribe(pubkey, sub_resp_tx))
+                            .send(WssCommand::Subscribe(request_id, pubkey, sub_resp_tx))
                             .await
                         {
                             log::error!("Failed to send subscribe command: {:?}", e);
@@ -72,10 +73,11 @@ pub fn use_wss_provider() {
 
                         // Wait for the subscription ID response
                         if let Some(sub_id) = sub_resp_rx.next().await {
-                            from_wss.set(FromWssMsg::Subscription(sub_id));
+                            from_wss.set(FromWssMsg::Subscription(request_id, sub_id));
                         }
                     }
                     ToWssMsg::Unsubscribe(sub_id) => {
+                        log::info!("unsub id: {}", sub_id);
                         // Send the unsubscribe command to the worker
                         if let Err(e) = cmd_tx.clone().send(WssCommand::Unsubscribe(sub_id)).await {
                             log::error!("Failed to send unsubscribe command: {:?}", e);
@@ -121,8 +123,8 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
             // Handle commands from the UI
             cmd = cmd_rx.next() => {
                 match cmd {
-                    Some(WssCommand::Subscribe(pubkey, resp_tx)) => {
-                        match wss.subscribe(pubkey.to_string().as_str()).await {
+                    Some(WssCommand::Subscribe(request_id, pubkey, resp_tx)) => {
+                        match wss.subscribe(pubkey.to_string().as_str(), request_id).await {
                             Ok(sub_id) => {
                                 if let Err(e) = resp_tx.clone().send(sub_id).await {
                                     log::error!("Failed to send subscription ID response: {:?}", e);
@@ -165,6 +167,6 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
 // Internal message types for the WebSocket worker
 #[derive(Debug)]
 enum WssCommand {
-    Subscribe(Pubkey, Sender<SubId>),
+    Subscribe(SubRequestId, Pubkey, Sender<SubId>),
     Unsubscribe(SubId),
 }

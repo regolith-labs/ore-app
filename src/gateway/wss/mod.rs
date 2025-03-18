@@ -112,12 +112,18 @@ pub enum SubscriptionError {
 pub trait AccountSubscribe: Sized {
     type SubscriptionId: Copy + Debug;
     async fn connect() -> Result<Self, SubscriptionError>;
-    async fn subscribe(&mut self, account: &str)
-        -> Result<Self::SubscriptionId, SubscriptionError>;
+    async fn subscribe(
+        &mut self,
+        account: &str,
+        request_id: u64,
+    ) -> Result<Self::SubscriptionId, SubscriptionError>;
     async fn unsubscribe(
         &mut self,
         subscription: Self::SubscriptionId,
     ) -> Result<(), SubscriptionError>;
     async fn next_notification(&mut self)
         -> Result<AccountNotificationEnvelope, SubscriptionError>;
+    fn request_id() -> u64 {
+        fastrand::u64(..)
+    }
 }

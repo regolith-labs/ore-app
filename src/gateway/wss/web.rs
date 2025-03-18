@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use fastrand;
 use futures_util::{SinkExt, StreamExt};
 use gloo_net::websocket::futures::WebSocket;
 use gloo_net::websocket::Message as GlooMessage;
@@ -85,13 +84,12 @@ impl AccountSubscribe for AccountSubscribeGateway {
     async fn subscribe(
         &mut self,
         account: &str,
+        request_id: u64,
     ) -> Result<Self::SubscriptionId, SubscriptionError> {
         let config = AccountSubscribeConfig {
             encoding: "jsonParsed".to_string(),
             commitment: "confirmed".to_string(),
         };
-        // Generate a random ID for this request
-        let request_id = fastrand::u64(..);
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: request_id,

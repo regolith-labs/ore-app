@@ -135,6 +135,8 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     let wallet = use_wallet();
     let (from_wss, to_wss) = use_wss();
     let mut sub_id = use_signal(|| 0);
+    let sub_request_id = use_memo(move || AccountSubscribeGateway::request_id());
+    log::info!("A: {}", sub_request_id);
     let mut balance: Signal<GatewayResult<UiTokenAmount>> =
         use_signal(|| Err(GatewayError::AccountNotFound));
     // fetch initial balance
@@ -154,15 +156,20 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     use_effect(move || {
         let msg = from_wss.cloned();
         log::info!("from wss: {:?}", msg);
-        if let FromWssMsg::Subscription(sid) = msg {
-            sub_id.set(sid);
+        if let FromWssMsg::Subscription(rid, sid) = msg {
+            log::info!("actual rid: {}", sub_request_id);
+            log::info!("rid: {}", rid);
+            log::info!("sid: {}", sid);
+            if sub_request_id.eq(&rid) {
+                sub_id.set(sid);
+            }
         };
     });
     // subscribe
     use_effect(move || {
         if let Ok(pubkey) = wallet.pubkey() {
             log::info!("pubkey: {:?}", pubkey);
-            to_wss.send(ToWssMsg::Subscribe(pubkey));
+            to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
         }
     });
     // drop
