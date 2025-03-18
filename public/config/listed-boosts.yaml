@@ -1,5 +1,5 @@
 boosts:
-  - address: 48J2TSpVpwmrwW84sMERcZigeAeFuUnC8bKHp7ET6RXt
+  - address: 5ksboZUb57ZuwEkRRHCK8s6BpiNABneKndvkowZdvGhy
     pair_mint: So11111111111111111111111111111111111111112
     lp_mint: 8H8rPiWW4iTFCfEkSnf7jpqeNpFfvdH9gLouAL3Fe2Zx
     lp_id: 6TFdY15Mxty9sRCtzMXG8eHSbZy4oiAEQUvLQdz9YwEn
@@ -8,7 +8,7 @@ boosts:
     ticker: kSOL-ORE
     lut: RtzNY3VVuJHteXtF22v3ctLiksttnMSTLfgPFzyFDz2
 
-  - address: D4qtrWeNpJnZpmT9Fe2kx5oJf3E4ovorZgE6K6ux7Lqt
+  - address: 5qVQiZXaRffQUqD4NmJ5EXHBAbmfdABZxUb714cJATQp
     pair_mint: So11111111111111111111111111111111111111112
     lp_mint: DrSS5RM7zUd9qjUEdDaf31vnDUSbCrMto6mjqTrHFifN
     lp_id: GgaDTFbqdgjoZz3FP7zrtofGwnRS4E6MCzmmD5Ni1Mxj
@@ -17,18 +17,18 @@ boosts:
     ticker: SOL-ORE MLP
     lut:
 
-  - address: A2Sb1oxg2H3ecbAHaJFXccufyC7pD1CMEakJhcz2TeH9
-    lp_mint: 9BAWwtAZiF4XJC6vArPM8JhtgKXfeoeo9FJHeR3PEGac
+  - address: 8BEzwBTDsKWnjgjxi8Cca7ZatPZQhxUMgS8qWzBhDhrC
     pair_mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    lp_mint: 9BAWwtAZiF4XJC6vArPM8JhtgKXfeoeo9FJHeR3PEGac
     lp_id: 7XNR3Ysqg2MbfQX8iMWD4iEF96h2GMsWNT8eZYsLTmua
     lp_type: meteora
     name: ORE-USDC Meteora LP
     ticker: ORE-USDC MLP
     lut:
 
-  - address: EExSorxnhxVKqnhNT4dNPNa8zvRBNBgju6n91F9cnKKy
-    lp_mint: 7G3dfZkSk1HpDGnyL37LMBbPEgT4Ca6vZmZPUyi2syWt
+  - address: h4nsGY9yhdfSW6Fwb6WSJEi9hHCviLdzQjcqzYWeKhd
     pair_mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux 
+    lp_mint: 7G3dfZkSk1HpDGnyL37LMBbPEgT4Ca6vZmZPUyi2syWt
     lp_id: 9XsAPjk1yp4U6hKZj9r9szhcxBi3RidGuyxiC2Y8JtAe
     lp_type: kamino
     name: HNT-ORE Kamino LP
