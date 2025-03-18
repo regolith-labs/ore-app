@@ -14,9 +14,9 @@ pub fn use_claimable_yield(
             if let Some(Ok(stake)) = stake.cloned() {
                 rewards += stake.rewards;
                 if boost.rewards_factor > stake.last_rewards_factor {
-                    let accumulated_rewards = (boost.rewards_factor - stake.last_rewards_factor)
-                        * Numeric::from_u64(stake.balance);
-                    rewards += accumulated_rewards.to_u64();
+                    let accumulated_rewards = boost.rewards_factor - stake.last_rewards_factor;
+                    let personal_rewards = accumulated_rewards * Numeric::from_u64(stake.balance);
+                    rewards += personal_rewards.to_u64();
                 }
             }
         }

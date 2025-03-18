@@ -4603,7 +4603,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -5255,7 +5255,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af1844ef2428cc3e1cb900be36181049ef3d3193c63e43026cfe202983b27a56"
 dependencies = [
- "proc-macro-crate 2.0.0",
+ "proc-macro-crate 3.2.0",
  "proc-macro2",
  "quote",
  "syn 2.0.98",
@@ -5560,8 +5560,9 @@ dependencies = [
 
 [[package]]
 name = "ore-api"
-version = "3.1.0"
-source = "git+https://github.com/regolith-labs/ore.git?branch=hardhat%2Fboost-v3#aa16a2d2e64a801f8f6034fd6a7a1586dc1fc6c9"
+version = "3.2.0-boostv3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06956691f3138fabb379f1e991c94eb9f924715efaafbd1af8df07fc451c8ea6"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -5579,7 +5580,7 @@ dependencies = [
 
 [[package]]
 name = "ore-app"
-version = "1.1.12"
+version = "1.1.13"
 dependencies = [
  "anyhow",
  "async-retry",
@@ -5621,7 +5622,7 @@ dependencies = [
  "objc",
  "once_cell",
  "ore-api",
- "ore-boost-api 1.4.0 (git+https://github.com/regolith-labs/ore-boost.git?branch=hardhat%2Fboost-v3)",
+ "ore-boost-api 3.0.0",
  "ore-miner-types",
  "ore-miner-web",
  "ore-pool-api",
@@ -5661,16 +5662,15 @@ dependencies = [
 
 [[package]]
 name = "ore-boost-api"
-version = "1.4.0"
-source = "git+https://github.com/regolith-labs/ore-boost.git?branch=hardhat%2Fboost-v3#b19186fb6001fd3090e3cbf8950deb5b7ba3f0df"
+version = "1.5.0-boostv3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c423e9bcedb910473119e3a6ee8fa81e73875f3f15df92fc7e0de045091d6fd3"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
  "const-crypto",
- "fixed",
  "num_enum 0.7.3",
  "ore-api",
- "ore-boost-api 1.4.0 (git+https://github.com/regolith-labs/ore-boost.git?rev=d6d8d14)",
  "solana-program",
  "spl-associated-token-account 6.0.0",
  "spl-token 4.0.2",
@@ -5681,14 +5681,16 @@ dependencies = [
 
 [[package]]
 name = "ore-boost-api"
-version = "1.4.0"
-source = "git+https://github.com/regolith-labs/ore-boost.git?rev=d6d8d14#d6d8d14abb4d085376ea92b7697907ff01be817b"
+version = "3.0.0"
+source = "git+https://github.com/regolith-labs/ore-boost.git?rev=924105c#924105c494d950a2e2c3322972d18d6da83a5384"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
  "const-crypto",
+ "fixed",
  "num_enum 0.7.3",
  "ore-api",
+ "ore-boost-api 1.5.0-boostv3",
  "solana-program",
  "spl-associated-token-account 6.0.0",
  "spl-token 4.0.2",
@@ -5727,8 +5729,8 @@ dependencies = [
 
 [[package]]
 name = "ore-pool-api"
-version = "1.4.0"
-source = "git+https://github.com/regolith-labs/ore-pool.git?branch=hardhat%2Fboost-v3#2d5f1cfbdfbc3ac44ee8ba2f758300d51497c72f"
+version = "1.5.0"
+source = "git+https://github.com/regolith-labs/ore-pool?rev=aaff5fab2844#aaff5fab284413c1df6a77109ee3ad89ceda85e5"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -5736,7 +5738,7 @@ dependencies = [
  "drillx",
  "num_enum 0.7.3",
  "ore-api",
- "ore-boost-api 1.4.0 (git+https://github.com/regolith-labs/ore-boost.git?branch=hardhat%2Fboost-v3)",
+ "ore-boost-api 3.0.0",
  "solana-program",
  "spl-associated-token-account 6.0.0",
  "spl-token 4.0.2",
@@ -5747,8 +5749,8 @@ dependencies = [
 
 [[package]]
 name = "ore-pool-types"
-version = "1.4.0"
-source = "git+https://github.com/regolith-labs/ore-pool/?rev=8efb17b#8efb17b0ccc4758178b65e8475c24a1c84de4be7"
+version = "1.5.0"
+source = "git+https://github.com/regolith-labs/ore-pool?rev=aaff5fab2844#aaff5fab284413c1df6a77109ee3ad89ceda85e5"
 dependencies = [
  "drillx",
  "serde",
@@ -9517,7 +9519,8 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "steel"
 version = "4.0.0"
-source = "git+https://github.com/regolith-labs/steel.git?branch=hardhat%2Fnumeric#7080b36ef45c445e5b8b143db6ba2b13eb8093e7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21be30219d8df5a7c09a52a8a25ec5a681476f849db44e053cfd288a3d412281"
 dependencies = [
  "bytemuck",
  "fixed",
