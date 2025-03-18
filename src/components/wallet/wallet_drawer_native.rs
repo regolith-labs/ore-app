@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-use crate::hooks::{use_wallet, use_wallet_native, FromWssMsg, Wallet};
+use crate::hooks::{use_sol_balance_wss, use_wallet, use_wallet_native, FromWssMsg, Wallet};
 use crate::hooks::{use_wss, GetPubkey, ToWssMsg};
 
 #[component]
@@ -12,24 +12,29 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let mut clipboard = use_clipboard();
     // wallet
     let wallet = use_wallet();
-    let (from_wss, to_wss) = use_wss();
-    let mut sub_id = use_signal(|| 0);
+    // let (from_wss, to_wss) = use_wss();
+    // let mut sub_id = use_signal(|| 0);
+    // use_effect(move || {
+    //     let msg = from_wss.cloned();
+    //     log::info!("from wss: {:?}", msg);
+    //     if let FromWssMsg::Subscription(sid) = msg {
+    //         sub_id.set(sid);
+    //     };
+    // });
+    // use_effect(move || {
+    //     if let Ok(pubkey) = wallet.pubkey() {
+    //         log::info!("pubkey: {:?}", pubkey);
+    //         to_wss.send(ToWssMsg::Subscribe(pubkey));
+    //     }
+    // });
+    // use_drop(move || {
+    //     let sub_id = *sub_id.read();
+    //     to_wss.send(ToWssMsg::Unsubscribe(sub_id));
+    // });
+    let sol_balance = use_sol_balance_wss();
     use_effect(move || {
-        let msg = from_wss.cloned();
-        log::info!("from wss: {:?}", msg);
-        if let FromWssMsg::Subscription(sid) = msg {
-            sub_id.set(sid);
-        };
-    });
-    use_effect(move || {
-        if let Ok(pubkey) = wallet.pubkey() {
-            log::info!("pubkey: {:?}", pubkey);
-            to_wss.send(ToWssMsg::Subscribe(pubkey));
-        }
-    });
-    use_drop(move || {
-        let sub_id = *sub_id.read();
-        to_wss.send(ToWssMsg::Unsubscribe(sub_id));
+        let b = sol_balance.read();
+        log::info!("{:?}", b);
     });
     // pubkey
     let mut pubkey = use_signal(|| "missing pubkey".to_string());
@@ -40,7 +45,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let mut keypair_show_export = use_signal(|| false);
     let mut keypair_copied = use_signal(|| false);
     // listen for wallet update
-    use_memo(move || {
+    use_effect(move || {
         if let Wallet::Connected(pk) = *wallet.read() {
             let pk = pk.to_string();
             // set pubkey
@@ -52,7 +57,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for pubkey clipboard
-    use_memo(move || {
+    use_effect(move || {
         if let Splice::Copied = *pubkey_splice.read() {
             spawn(async move {
                 tokio::time::sleep(tokio::time::Duration::from_millis(1_500)).await;
@@ -64,7 +69,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for pubkey copied
-    use_memo(move || {
+    use_effect(move || {
         if *pubkey_copied.read() {
             spawn(async move {
                 tokio::time::sleep(tokio::time::Duration::from_millis(1_500)).await;
@@ -73,7 +78,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for keypair copied
-    use_memo(move || {
+    use_effect(move || {
         if *keypair_copied.read() {
             spawn(async move {
                 tokio::time::sleep(tokio::time::Duration::from_millis(1_500)).await;
@@ -82,7 +87,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for keypair export
-    use_memo(move || {
+    use_effect(move || {
         if *keypair_show_export.read() {
             if let Ok(kp) = use_wallet_native::get() {
                 let kp = kp.creator.to_base58_string();

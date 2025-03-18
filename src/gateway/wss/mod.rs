@@ -106,6 +106,7 @@ pub enum SubscriptionError {
     Other(String),
 }
 
+// TODO: reconnect logic
 #[cfg_attr(not(feature = "web"), async_trait)]
 #[cfg_attr(feature = "web", async_trait(?Send))]
 pub trait AccountSubscribe: Sized {

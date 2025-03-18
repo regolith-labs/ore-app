@@ -9,13 +9,13 @@ use crate::{
         spl::SplGateway, AccountSubscribe, AccountSubscribeGateway, GatewayError, GatewayResult,
         Rpc, UiTokenAmount,
     },
-    hooks::GetPubkey,
+    hooks::{FromWssMsg, GetPubkey, ToWssMsg},
     utils::LiquidityPair,
 };
 
 use crate::hooks::{use_gateway, use_wallet, Wallet};
 
-use super::{use_ore_price, OrePrice};
+use super::{use_ore_price, use_wss, OrePrice};
 
 pub(crate) fn use_token_balance_provider() {
     let mut token_balances = HashMap::new();
@@ -125,8 +125,52 @@ pub fn use_token_balances_for_liquidity_pair(
     (token_a_balance, token_b_balance)
 }
 
-pub fn _use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
+pub fn use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     return use_token_balance(Token::sol().mint);
+}
+
+pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
+    let gateway = use_gateway();
+    // signals
+    let wallet = use_wallet();
+    let (from_wss, to_wss) = use_wss();
+    let mut sub_id = use_signal(|| 0);
+    let mut balance: Signal<GatewayResult<UiTokenAmount>> =
+        use_signal(|| Err(GatewayError::AccountNotFound));
+    // fetch initial balance
+    spawn(async move {
+        if let Err(err) = async {
+            let pubkey = wallet.pubkey()?;
+            let b = get_token_balance(pubkey, Token::sol().mint).await?;
+            balance.set(Ok(b));
+            Ok::<_, GatewayError>(())
+        }
+        .await
+        {
+            log::error!("{:?}", err);
+        };
+    });
+    // sub id
+    use_effect(move || {
+        let msg = from_wss.cloned();
+        log::info!("from wss: {:?}", msg);
+        if let FromWssMsg::Subscription(sid) = msg {
+            sub_id.set(sid);
+        };
+    });
+    // subscribe
+    use_effect(move || {
+        if let Ok(pubkey) = wallet.pubkey() {
+            log::info!("pubkey: {:?}", pubkey);
+            to_wss.send(ToWssMsg::Subscribe(pubkey));
+        }
+    });
+    // drop
+    use_drop(move || {
+        let sub_id = *sub_id.read();
+        to_wss.send(ToWssMsg::Unsubscribe(sub_id));
+    });
+    balance
 }
 
 pub fn use_ore_balance() -> Resource<GatewayResult<UiTokenAmount>> {
