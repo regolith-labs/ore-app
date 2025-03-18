@@ -6,8 +6,8 @@ use std::collections::HashMap;
 use crate::{
     config::{Token, LISTED_TOKENS},
     gateway::{
-        spl::SplGateway, AccountSubscribe, AccountSubscribeGateway, GatewayError, GatewayResult,
-        Rpc, UiTokenAmount,
+        spl::SplGateway, AccountNotification, AccountNotificationParams, AccountSubscribe,
+        AccountSubscribeGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount,
     },
     hooks::{FromWssMsg, GetPubkey, ToWssMsg},
     utils::LiquidityPair,
@@ -131,43 +131,20 @@ pub fn use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
 
 pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     // Update callback for SOL balance
-    let update_callback = move |msg: &FromWssMsg, current_sub_id: u64| {
-        if let FromWssMsg::Notif(notif) = msg {
-            if notif.subscription.eq(&current_sub_id) {
-                let lamports = notif.result.value.lamports;
-                let sol = lamports_to_sol(lamports);
-                let token_amount = UiTokenAmount {
-                    ui_amount: Some(sol),
-                    decimals: 8,
-                    amount: format!("{}", lamports),
-                    ui_amount_string: format!("{}", sol),
-                };
-                return Some(token_amount);
-            }
-        }
-        None
+    let update_callback = move |notif: &AccountNotificationParams| {
+        let lamports = notif.result.value.lamports;
+        let sol = lamports_to_sol(lamports);
+        let token_amount = UiTokenAmount {
+            ui_amount: Some(sol),
+            decimals: 8,
+            amount: format!("{}", lamports),
+            ui_amount_string: format!("{}", sol),
+        };
+        Ok(token_amount)
     };
 
     use_balance_wss(Token::sol().mint, update_callback)
 }
-
-/// Generic function to handle WebSocket subscriptions for any data type
-///
-/// This function provides a unified API for subscribing to any type of updates via WebSocket.
-/// It connects an existing data signal to WebSocket updates, handling subscription management
-/// and automatic unsubscription when the component is dropped.
-///
-/// # Type Parameters
-/// * `T` - The type of data being tracked (e.g., UiTokenAmount)
-/// * `U` - The update callback function type that processes WebSocket messages
-///
-/// # Parameters
-/// * `data` - Signal containing the data to be updated with WebSocket notifications
-/// * `update_callback` - Callback that processes WebSocket messages and returns updated data when relevant
-/// * `pubkey` - The public key of the account to subscribe to
-///
-/// # Returns
-/// The same Signal that was passed in, now connected to WebSocket updates
 
 pub fn use_wss_subscription<T, U>(
     data: Signal<GatewayResult<T>>,
@@ -176,7 +153,7 @@ pub fn use_wss_subscription<T, U>(
 ) -> Signal<GatewayResult<T>>
 where
     T: Clone + 'static,
-    U: Fn(&FromWssMsg, u64) -> Option<T> + 'static,
+    U: Fn(&AccountNotificationParams) -> GatewayResult<T> + 'static,
 {
     let (from_wss, to_wss) = use_wss();
     let mut sub_id = use_signal(|| 0);
@@ -188,6 +165,7 @@ where
 
         // Track subscription ID
         if let FromWssMsg::Subscription(rid, sid) = msg {
+            // Only handle subscriptions originating from this component
             if sub_request_id.eq(&rid) {
                 sub_id.set(sid);
             }
@@ -201,10 +179,9 @@ where
         let current_sub_id = *sub_id.read();
 
         // Only process notification messages
-        if let FromWssMsg::Notif(_) = &msg {
-            // Update data when notification is received
-            if let Some(updated_data) = update_callback(&msg, current_sub_id) {
-                data_clone.set(Ok(updated_data));
+        if let FromWssMsg::Notif(notif) = &msg {
+            if notif.subscription.eq(&sub_id()) {
+                data_clone.set(update_callback(&notif));
             }
         }
     });
@@ -225,20 +202,9 @@ where
     data
 }
 
-/// Function to handle WebSocket token balance subscriptions
-///
-/// This function provides a specialized API for subscribing to token balance updates via WebSocket.
-/// It directly manages wallet state and subscription for token balances.
-///
-/// # Parameters
-/// * `mint` - The mint address of the token to track
-/// * `update_callback` - Callback that processes WebSocket messages and returns token amounts when relevant
-///
-/// # Returns
-/// A Signal containing the current token balance or an error
 pub fn use_balance_wss<U>(mint: Pubkey, update_callback: U) -> Signal<GatewayResult<UiTokenAmount>>
 where
-    U: Fn(&FromWssMsg, u64) -> Option<UiTokenAmount> + Clone + 'static,
+    U: Fn(&AccountNotificationParams) -> GatewayResult<UiTokenAmount> + Clone + 'static,
 {
     let wallet = use_wallet();
 
