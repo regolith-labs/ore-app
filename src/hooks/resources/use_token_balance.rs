@@ -152,6 +152,24 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
             log::error!("{:?}", err);
         };
     });
+    // notif
+    use_effect(move || {
+        let msg = from_wss.cloned();
+        if let FromWssMsg::Notif(notif) = msg {
+            let sub_id = sub_id.read();
+            if notif.subscription.eq(&*sub_id) {
+                let lamports = notif.result.value.lamports;
+                let sol = lamports_to_sol(lamports);
+                let b = UiTokenAmount {
+                    ui_amount: Some(sol),
+                    decimals: 8,
+                    amount: format!("{}", lamports).to_owned(),
+                    ui_amount_string: format!("{}", sol).to_owned(),
+                };
+                balance.set(Ok(b));
+            }
+        };
+    });
     // sub id
     use_effect(move || {
         let msg = from_wss.cloned();

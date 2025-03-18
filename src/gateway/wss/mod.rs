@@ -66,7 +66,7 @@ pub(super) struct AccountContext {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub(super) struct AccountNotification {
+pub struct AccountNotification {
     pub data: Vec<String>,
     pub executable: bool,
     pub lamports: u64,
@@ -77,7 +77,7 @@ pub(super) struct AccountNotification {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub(super) struct AccountNotificationResult {
+pub struct AccountNotificationResult {
     pub context: AccountContext,
     pub value: AccountNotification,
 }
