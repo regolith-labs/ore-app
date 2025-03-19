@@ -73,6 +73,7 @@ pub fn use_wss_provider() {
 
                         // Wait for the subscription ID response
                         if let Some(sub_id) = sub_resp_rx.next().await {
+                            log::info!("sub id: {:?}", sub_id);
                             from_wss.set(FromWssMsg::Subscription(request_id, sub_id));
                         }
                     }
@@ -112,6 +113,7 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
     // Spawn a task to listen for notifications from the WebSocket
     let _notification_task = spawn(async move {
         while let Some(notif) = notification_rx.next().await {
+            log::info!("notif: {:?}", notif);
             from_wss.set(FromWssMsg::Notif(notif));
         }
     });

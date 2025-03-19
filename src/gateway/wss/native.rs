@@ -99,7 +99,7 @@ impl AccountSubscribe for AccountSubscribeGateway {
         request_id: u64,
     ) -> Result<Self::SubscriptionId, SubscriptionError> {
         let config = AccountSubscribeConfig {
-            encoding: "jsonParsed".to_string(),
+            encoding: "base64".to_string(),
             commitment: "confirmed".to_string(),
         };
         log::info!("request id: {}", request_id);
@@ -143,6 +143,7 @@ impl AccountSubscribe for AccountSubscribeGateway {
         while let Some(msg) = self.reader.next().await {
             match msg {
                 Ok(Message::Text(text)) => {
+                    log::info!("text: {:?}", text);
                     match serde_json::from_str::<AccountNotificationEnvelope>(&text) {
                         Ok(notification) => {
                             if notification.method == "accountNotification" {

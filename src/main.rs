@@ -51,7 +51,12 @@ pub fn App() -> Element {
     use_mining_loop();
     use_wss_provider();
     // use_sol_balance_wss();
-    use_token_balance_wss(config::Token::ore());
+    let b = use_token_balance_wss(config::Token::ore());
+
+    use_effect(move || {
+        let b = b.cloned();
+        log::info!("b: {:?}", b);
+    });
 
     rsx! {
         style { "{CSS}" }

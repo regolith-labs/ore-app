@@ -87,7 +87,7 @@ impl AccountSubscribe for AccountSubscribeGateway {
         request_id: u64,
     ) -> Result<Self::SubscriptionId, SubscriptionError> {
         let config = AccountSubscribeConfig {
-            encoding: "jsonParsed".to_string(),
+            encoding: "base64".to_string(),
             commitment: "confirmed".to_string(),
         };
         let request = JsonRpcRequest {

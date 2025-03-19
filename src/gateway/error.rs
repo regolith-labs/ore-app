@@ -4,6 +4,7 @@ use steel::ProgramError;
 #[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum GatewayError {
+    Anyhow,
     FailedDeserialization,
     TransactionTimeout,
     NetworkUnavailable,
@@ -20,8 +21,14 @@ pub enum GatewayError {
     KeyringNoEntry,
     BincodeSerialize,
     BincodeDeserialize,
-    DecodingError(String),
     Unknown,
+}
+
+impl From<anyhow::Error> for GatewayError {
+    fn from(value: anyhow::Error) -> Self {
+        log::error!("{:?}", value);
+        Self::Anyhow
+    }
 }
 
 impl From<solana_sdk::signer::SignerError> for GatewayError {
