@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use ore_api::state::proof_pda;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -9,8 +10,8 @@ use solana_sdk::{
 use crate::{
     gateway::{GatewayError, GatewayResult},
     hooks::{
-        use_all_stakes, use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
-        COMPUTE_UNIT_LIMIT,
+        calculate_claimable_yield, use_all_boost_proofs, use_all_boosts, use_all_stakes,
+        use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
     },
     solana::{
         spl_associated_token_account::{
@@ -22,10 +23,14 @@ use crate::{
 
 pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let stake_accounts = use_all_stakes();
+    let boosts = use_all_boosts();
+    let boost_proofs = use_all_boost_proofs();
+    let stakes = use_all_stakes();
     let ore_balance = use_ore_balance();
     use_resource(move || {
-        let stake_accounts = stake_accounts.clone();
+        let boosts = boosts.clone();
+        let boost_proofs = boost_proofs.clone();
+        let stakes = stakes.clone();
         async move {
             // Check if wallet is connected
             let Wallet::Connected(authority) = *wallet.read() else {
@@ -52,15 +57,24 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
             }
 
             // Get resources
-            for (pubkey, stake) in stake_accounts.iter() {
+            for (_pubkey, stake) in stakes.iter() {
                 if let Some(Ok(stake)) = stake.cloned() {
-                    if stake.rewards > 0 {
-                        ixs.push(ore_boost_api::sdk::claim(
-                            authority,
-                            beneficiary,
-                            *pubkey,
-                            stake.rewards,
-                        ));
+                    let boost = boosts.get(&stake.boost).unwrap();
+                    if let Some(Ok(boost)) = boost.cloned() {
+                        let proof_address = proof_pda(stake.boost).0;
+                        let boost_proof = boost_proofs.get(&proof_address).unwrap();
+                        if let Some(Ok(boost_proof)) = boost_proof.cloned() {
+                            let claimable_yield =
+                                calculate_claimable_yield(boost, boost_proof, stake);
+                            if claimable_yield > 0 {
+                                ixs.push(ore_boost_api::sdk::claim(
+                                    authority,
+                                    beneficiary,
+                                    boost.mint,
+                                    claimable_yield,
+                                ));
+                            }
+                        }
                     }
                 }
             }
