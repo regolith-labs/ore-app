@@ -1,8 +1,11 @@
 use crate::{
     components::*,
     config::Token,
-    gateway::GatewayResult,
-    hooks::{on_transaction_done, use_quote, use_swap_transaction, use_token_balance_for_token},
+    gateway::{GatewayError, GatewayResult},
+    hooks::{
+        on_transaction_done, use_quote, use_swap_transaction, use_token_balance_for_token,
+        use_token_balance_wss,
+    },
 };
 use dioxus::prelude::*;
 use jupiter_swap_api_client::quote::QuoteResponse;
@@ -37,8 +40,14 @@ pub fn SwapForm(
     let mut buy_input_amount = use_signal::<String>(|| "".to_string());
 
     // Fetch token balances
-    let mut sell_token_balance = use_token_balance_for_token(sell_token);
-    let mut buy_token_balance = use_token_balance_for_token(buy_token);
+    let sell_token_balance = match *sell_token.read() {
+        Some(token) => use_token_balance_wss(token),
+        None => use_signal(|| Err(GatewayError::AccountNotFound)),
+    };
+    let buy_token_balance = match *buy_token.read() {
+        Some(token) => use_token_balance_wss(token),
+        None => use_signal(|| Err(GatewayError::AccountNotFound)),
+    };
 
     // Quote response
     let mut quote_response = use_signal::<Option<QuoteResponse>>(|| None);
@@ -79,8 +88,6 @@ pub fn SwapForm(
     on_transaction_done(move |_sig| {
         sell_input_amount.set("".to_string());
         buy_input_amount.set("".to_string());
-        sell_token_balance.restart();
-        buy_token_balance.restart();
     });
 
     rsx! {

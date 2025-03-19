@@ -23,7 +23,7 @@ const API_URL: &str = "https://quote-api.jup.ag/v6";
 pub fn use_swap_transaction(
     quote: Signal<Option<QuoteResponse>>,
     sell_token: Signal<Option<Token>>,
-    sell_token_balance: Resource<GatewayResult<UiTokenAmount>>,
+    sell_token_balance: Signal<GatewayResult<UiTokenAmount>>,
     _priority_fee: Signal<u64>,
     mut err: Signal<Option<TokenInputError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
@@ -39,7 +39,7 @@ pub fn use_swap_transaction(
             let Some(sell_token) = sell_token.read().clone() else {
                 return Err(GatewayError::Unknown);
             };
-            let Some(Ok(sell_token_balance)) = sell_token_balance.read().clone() else {
+            let Ok(sell_token_balance) = sell_token_balance.cloned() else {
                 err.set(Some(TokenInputError::InsufficientBalance(sell_token)));
                 return Err(GatewayError::Unknown);
             };

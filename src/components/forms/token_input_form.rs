@@ -29,7 +29,7 @@ pub fn TokenInputForm(
     class: Option<String>,
     title: String,
     token: Signal<Option<Token>>,
-    balance: Resource<GatewayResult<UiTokenAmount>>,
+    balance: Signal<GatewayResult<UiTokenAmount>>,
     value: Signal<String>,
     mut update: Signal<String>,
     err: Signal<Option<TokenInputError>>,
@@ -171,13 +171,13 @@ fn TokenDisplay(token: Token, with_picker: bool, display_picker: Signal<bool>) -
 
 #[component]
 fn Toolbar(
-    balance: Resource<GatewayResult<UiTokenAmount>>,
+    balance: Signal<GatewayResult<UiTokenAmount>>,
     token: Token,
     update: Signal<String>,
     toolbar_shortcuts: bool,
 ) -> Element {
     // Get half and max values
-    let (half_value, max_value) = if let Some(Ok(balance)) = balance.cloned() {
+    let (half_value, max_value) = if let Ok(balance) = balance.cloned() {
         if let Some(ui_amount) = balance.ui_amount {
             (
                 format!("{:.1$}", (ui_amount / 2.0), balance.decimals as usize),
@@ -193,17 +193,10 @@ fn Toolbar(
     rsx! {
         Row {
             gap: 2,
-            if let Some(balance) = balance.cloned() {
-                if let Ok(balance) = balance {
-                    ToolbarBalance {
-                        ui_amount_string: balance.ui_amount_string.clone(),
-                        token: token.clone(),
-                    }
-                } else {
-                    ToolbarBalance {
-                        ui_amount_string: "0".to_string(),
-                        token: token.clone(),
-                    }
+            if let Ok(balance) = balance.cloned() {
+                ToolbarBalance {
+                    ui_amount_string: balance.ui_amount_string.clone(),
+                    token: token.clone(),
                 }
             } else {
                 LoadingValue {}
