@@ -113,7 +113,6 @@ impl AccountSubscribe for AccountSubscribeGateway {
         &mut self,
         subscription: Self::SubscriptionId,
     ) -> Result<(), SubscriptionError> {
-        // Generate a random ID for this request
         let request_id = fastrand::u64(..);
         let request = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
