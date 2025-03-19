@@ -8,9 +8,8 @@ use serde_json;
 use crate::gateway::WSS_URL;
 
 use super::{
-    AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig,
-    AccountSubscribeResponse, JsonRpcRequest, JsonRpcResponse, JsonRpcResponseWithError,
-    SubscriptionError,
+    AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig, JsonRpcRequest,
+    JsonRpcResponse, JsonRpcResponseWithError, SubscriptionError,
 };
 
 /// WebSocket client for account subscriptions on Solana RPC
@@ -20,7 +19,6 @@ pub struct AccountSubscribeGateway {
 }
 
 impl AccountSubscribeGateway {
-    /// Sends a JSON-RPC request over the WebSocket connection
     async fn send_request<T: Serialize>(
         &mut self,
         request: &JsonRpcRequest<T>,
@@ -33,7 +31,6 @@ impl AccountSubscribeGateway {
             .map_err(|e| SubscriptionError::Other(e.to_string()))
     }
 
-    /// Handles the response stream and parses the response for a specific request ID
     async fn handle_response<R: serde::de::DeserializeOwned>(
         &mut self,
         request_id: u64,
@@ -41,13 +38,11 @@ impl AccountSubscribeGateway {
         while let Some(msg) = self.reader.next().await {
             match msg {
                 Ok(GlooMessage::Text(text)) => {
-                    // Try parsing a successful response
                     if let Ok(resp) = serde_json::from_str::<JsonRpcResponse<R>>(&text) {
                         if resp.id == request_id {
                             return Ok(resp.result);
                         }
                     }
-                    // Try parsing an error response
                     if let Ok(resp_err) = serde_json::from_str::<JsonRpcResponseWithError<R>>(&text)
                     {
                         if resp_err.id == request_id {

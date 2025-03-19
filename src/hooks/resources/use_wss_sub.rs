@@ -1,9 +1,7 @@
 use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 
-use crate::gateway::{
-    AccountNotificationParams, AccountSubscribe, AccountSubscribeGateway, GatewayResult,
-};
+use crate::gateway::{AccountNotificationParams, GatewayResult};
 
 use super::{use_wss, FromWssMsg, ToWssMsg};
 
@@ -27,7 +25,7 @@ pub fn use_wss_subscription<T, U>(
 {
     let (from_wss, to_wss) = use_wss();
     let mut sub_id = use_signal(|| 0);
-    let sub_request_id = use_memo(move || AccountSubscribeGateway::request_id());
+    let sub_request_id = use_memo(move || fastrand::u64(..));
 
     // Handle subscription ID tracking
     use_effect(move || {

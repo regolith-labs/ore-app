@@ -1,21 +1,16 @@
 use dioxus::prelude::*;
-use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::{native_token::lamports_to_sol, pubkey::Pubkey};
 use std::collections::HashMap;
 
 use crate::{
     config::{Token, LISTED_TOKENS},
-    gateway::{
-        spl::SplGateway, AccountNotification, AccountNotificationParams, AccountSubscribe,
-        AccountSubscribeGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount,
-    },
-    hooks::{FromWssMsg, GetPubkey, ToWssMsg},
+    gateway::{spl::SplGateway, GatewayError, GatewayResult, Rpc, UiTokenAmount},
     utils::LiquidityPair,
 };
 
 use crate::hooks::{use_gateway, use_wallet, Wallet};
 
-use super::{use_ore_price, use_wss, use_wss_subscription, OrePrice};
+use super::{use_ore_price, OrePrice};
 
 pub(crate) fn use_token_balance_provider() {
     let mut token_balances = HashMap::new();
@@ -128,7 +123,7 @@ pub fn use_token_balances_for_liquidity_pair(
     (token_a_balance, token_b_balance)
 }
 
-pub fn use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
+pub fn _use_sol_balance() -> Resource<GatewayResult<UiTokenAmount>> {
     return use_token_balance(Token::sol().mint);
 }
 

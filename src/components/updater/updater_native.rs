@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::Result;
-use cargo_packager_updater::Update;
 use dioxus::prelude::*;
 
 use crate::{

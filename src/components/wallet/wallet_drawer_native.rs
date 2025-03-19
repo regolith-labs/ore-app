@@ -76,7 +76,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     rsx! {
         div {
             class: "flex flex-col gap-2 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
-            onclick: move |e| {
+            onclick: move |_e| {
                 keypair_show_export.set(false);
             },
             button {

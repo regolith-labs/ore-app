@@ -1,4 +1,4 @@
-// #[cfg(not(feature = "web"))]
+#[cfg(not(feature = "web"))]
 mod native;
 #[cfg(feature = "web")]
 mod web;
@@ -55,13 +55,11 @@ pub(super) struct AccountSubscribeConfig {
     pub commitment: String,
 }
 
-pub(super) type AccountSubscribeResponse = u64;
-
 ////////////////////////////////////////////////////////////////////////////
 // Account Notification Types
 ////////////////////////////////////////////////////////////////////////////
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub(super) struct AccountContext {
+pub struct AccountContext {
     pub slot: u64,
 }
 
@@ -106,6 +104,19 @@ pub enum SubscriptionError {
     Other(String),
 }
 
+impl std::fmt::Display for SubscriptionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::ConnectionError(msg) => write!(f, "Connection error: {}", msg),
+            Self::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            Self::RpcError(msg) => write!(f, "RPC error: {}", msg),
+            Self::Other(msg) => write!(f, "Other error: {}", msg),
+        }
+    }
+}
+
+impl std::error::Error for SubscriptionError {}
+
 // TODO: reconnect logic
 #[cfg_attr(not(feature = "web"), async_trait)]
 #[cfg_attr(feature = "web", async_trait(?Send))]
@@ -123,7 +134,4 @@ pub trait AccountSubscribe: Sized {
     ) -> Result<(), SubscriptionError>;
     async fn next_notification(&mut self)
         -> Result<AccountNotificationEnvelope, SubscriptionError>;
-    fn request_id() -> u64 {
-        fastrand::u64(..)
-    }
 }

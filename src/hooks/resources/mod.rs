@@ -1,4 +1,3 @@
-mod use_account;
 mod use_boost;
 mod use_boost_apy;
 mod use_boost_proof;

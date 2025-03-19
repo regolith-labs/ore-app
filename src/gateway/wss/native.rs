@@ -1,12 +1,10 @@
-use std::fmt::Debug;
-
 use async_trait::async_trait;
 use fastrand;
 use futures_util::{
     stream::{SplitSink, SplitStream},
     SinkExt, StreamExt,
 };
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json;
 use tokio::net::TcpStream;
 use tokio_tungstenite::{
@@ -19,11 +17,11 @@ use tungstenite::client::IntoClientRequest;
 use crate::gateway::WSS_URL;
 
 use super::{
-    AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig,
-    AccountSubscribeResponse, JsonRpcRequest, JsonRpcResponse, JsonRpcResponseWithError,
-    SubscriptionError,
+    AccountNotificationEnvelope, AccountSubscribe, AccountSubscribeConfig, JsonRpcRequest,
+    JsonRpcResponse, JsonRpcResponseWithError, SubscriptionError,
 };
 
+/// WebSocket client for account subscriptions on Solana RPC
 pub struct AccountSubscribeGateway {
     writer: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,

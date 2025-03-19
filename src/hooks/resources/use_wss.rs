@@ -1,25 +1,25 @@
 use dioxus::prelude::*;
 use futures::{
     channel::mpsc::{self, Receiver, Sender},
-    future::{Fuse, FusedFuture},
-    pin_mut, FutureExt, SinkExt, StreamExt,
+    FutureExt, SinkExt, StreamExt,
 };
 use solana_sdk::pubkey::Pubkey;
 
-use crate::{
-    gateway::{AccountNotificationParams, AccountSubscribe, AccountSubscribeGateway, GatewayError},
-    hooks::{use_wallet, GetPubkey},
+use crate::gateway::{
+    AccountNotificationParams, AccountSubscribe, AccountSubscribeGateway, GatewayError,
 };
 
 pub type FromWss = Signal<FromWssMsg>;
 pub type ToWss = Coroutine<ToWssMsg>;
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub enum FromWssMsg {
     Init,
     Subscription(SubRequestId, SubId),
     Notif(AccountNotificationParams),
 }
 #[derive(Debug, Clone, Copy)]
+#[allow(dead_code)]
 pub enum ToWssMsg {
     Subscribe(SubRequestId, Pubkey),
     Unsubscribe(SubId),
@@ -43,16 +43,13 @@ pub fn use_wss_provider() {
     // Init from wss
     let mut from_wss = use_context_provider(|| Signal::new(FromWssMsg::Init));
     // Init to wss
-    let to_wss = use_coroutine(move |mut rx: UnboundedReceiver<ToWssMsg>| async move {
+    let _to_wss = use_coroutine(move |mut rx: UnboundedReceiver<ToWssMsg>| async move {
         if let Err(err) = async {
             // Create channel for sending commands to the WebSocket worker
             let (cmd_tx, cmd_rx) = mpsc::channel::<WssCommand>(10);
 
-            // Clone signal for the WebSocket worker
-            let mut from_wss_worker = from_wss.clone();
-
             // Spawn the WebSocket worker task that owns the WebSocket connection exclusively
-            spawn(wss_worker(cmd_rx, from_wss_worker));
+            spawn(wss_worker(cmd_rx, from_wss.clone()));
 
             // Handle UI commands and forward them to the WebSocket worker
             while let Some(msg) = rx.next().await {
@@ -73,12 +70,10 @@ pub fn use_wss_provider() {
 
                         // Wait for the subscription ID response
                         if let Some(sub_id) = sub_resp_rx.next().await {
-                            log::info!("sub id: {:?}", sub_id);
                             from_wss.set(FromWssMsg::Subscription(request_id, sub_id));
                         }
                     }
                     ToWssMsg::Unsubscribe(sub_id) => {
-                        log::info!("unsub id: {}", sub_id);
                         // Send the unsubscribe command to the worker
                         if let Err(e) = cmd_tx.clone().send(WssCommand::Unsubscribe(sub_id)).await {
                             log::error!("Failed to send unsubscribe command: {:?}", e);
@@ -113,7 +108,6 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
     // Spawn a task to listen for notifications from the WebSocket
     let _notification_task = spawn(async move {
         while let Some(notif) = notification_rx.next().await {
-            log::info!("notif: {:?}", notif);
             from_wss.set(FromWssMsg::Notif(notif));
         }
     });
