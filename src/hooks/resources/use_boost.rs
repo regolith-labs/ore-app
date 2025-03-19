@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 
 use dioxus::prelude::*;
-use ore_api::{
-    consts::MINT_ADDRESS,
-    state::{proof_pda, Proof},
-};
+use ore_api::consts::MINT_ADDRESS;
 use ore_boost_api::state::{boost_pda, Boost};
 use steel::Pubkey;
 
