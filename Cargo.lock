@@ -4603,7 +4603,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.52.6",
+ "windows-targets 0.48.5",
 ]
 
 [[package]]
@@ -5255,7 +5255,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af1844ef2428cc3e1cb900be36181049ef3d3193c63e43026cfe202983b27a56"
 dependencies = [
- "proc-macro-crate 3.2.0",
+ "proc-macro-crate 2.0.0",
  "proc-macro2",
  "quote",
  "syn 2.0.98",
@@ -5622,7 +5622,7 @@ dependencies = [
  "objc",
  "once_cell",
  "ore-api",
- "ore-boost-api 3.0.0",
+ "ore-boost-api",
  "ore-miner-types",
  "ore-miner-web",
  "ore-pool-api",
@@ -5662,27 +5662,8 @@ dependencies = [
 
 [[package]]
 name = "ore-boost-api"
-version = "1.5.0-boostv3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c423e9bcedb910473119e3a6ee8fa81e73875f3f15df92fc7e0de045091d6fd3"
-dependencies = [
- "array-const-fn-init",
- "bytemuck",
- "const-crypto",
- "num_enum 0.7.3",
- "ore-api",
- "solana-program",
- "spl-associated-token-account 6.0.0",
- "spl-token 4.0.2",
- "static_assertions",
- "steel",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "ore-boost-api"
 version = "3.0.0"
-source = "git+https://github.com/regolith-labs/ore-boost.git?rev=924105c#924105c494d950a2e2c3322972d18d6da83a5384"
+source = "git+https://github.com/regolith-labs/ore-boost.git?rev=feb9e12#feb9e1272ac8b6e5ee0d2c83ccc7da9601c0aa41"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -5690,7 +5671,6 @@ dependencies = [
  "fixed",
  "num_enum 0.7.3",
  "ore-api",
- "ore-boost-api 1.5.0-boostv3",
  "solana-program",
  "spl-associated-token-account 6.0.0",
  "spl-token 4.0.2",
@@ -5738,7 +5718,7 @@ dependencies = [
  "drillx",
  "num_enum 0.7.3",
  "ore-api",
- "ore-boost-api 3.0.0",
+ "ore-boost-api",
  "solana-program",
  "spl-associated-token-account 6.0.0",
  "spl-token 4.0.2",

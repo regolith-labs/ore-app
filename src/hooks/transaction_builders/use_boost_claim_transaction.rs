@@ -77,7 +77,7 @@ pub fn use_boost_claim_transaction(
             authority,
             beneficiary,
             boost.mint,
-            stake.rewards,
+            *claimable_yield.read(),
         ));
 
         // Include ORE app fee
