@@ -5560,9 +5560,9 @@ dependencies = [
 
 [[package]]
 name = "ore-api"
-version = "3.2.0-boostv3"
+version = "3.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06956691f3138fabb379f1e991c94eb9f924715efaafbd1af8df07fc451c8ea6"
+checksum = "759a7970fa49d3561d1f16b0543be5d05532a5ae45572bcdf81e643e7ef76f84"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -5665,8 +5665,9 @@ dependencies = [
 
 [[package]]
 name = "ore-boost-api"
-version = "3.0.0"
-source = "git+https://github.com/regolith-labs/ore-boost.git?rev=feb9e12#feb9e1272ac8b6e5ee0d2c83ccc7da9601c0aa41"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3500a9e03d7cf4acc920400476fea51883261247f89796a3b7aedb5a921a8fb0"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
