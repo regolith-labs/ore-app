@@ -37,7 +37,7 @@ pub fn use_boost_claim_transaction(
         };
 
         // Get resources
-        let Some(Ok(stake)) = *stake.read() else {
+        let Some(Ok(_stake)) = *stake.read() else {
             return Err(GatewayError::Unknown);
         };
         let Some(Ok(boost)) = *boost.read() else {
@@ -45,7 +45,7 @@ pub fn use_boost_claim_transaction(
         };
 
         // Check if stake has rewards to claim
-        if *claimable_yield.read() == 0 {
+        if claimable_yield.cloned() == 0 {
             return Err(GatewayError::Unknown);
         }
 
@@ -73,11 +73,12 @@ pub fn use_boost_claim_transaction(
         }
 
         // Claim rewards
+        log::info!("claimable_yield: {}", claimable_yield.cloned());
         ixs.push(ore_boost_api::sdk::claim(
             authority,
             beneficiary,
             boost.mint,
-            *claimable_yield.read(),
+            claimable_yield.cloned(),
         ));
 
         // Include ORE app fee
