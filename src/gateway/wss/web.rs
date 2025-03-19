@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use futures_util::{SinkExt, StreamExt};
 use gloo_net::websocket::futures::WebSocket;
 use gloo_net::websocket::Message as GlooMessage;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::Serialize;
 use serde_json;
 
 use crate::gateway::WSS_URL;
