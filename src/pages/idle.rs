@@ -23,6 +23,7 @@ pub fn Idle() -> Element {
         balance.restart();
         stake.restart();
         boost.restart();
+        boost_proof.restart();
     });
 
     rsx! {

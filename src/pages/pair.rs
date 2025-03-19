@@ -34,6 +34,7 @@ pub fn Pair(lp_mint: String) -> Element {
     on_transaction_done(move |_sig| {
         stake.restart();
         boost.restart();
+        boost_proof.restart();
         liquidity_pair.restart();
         lp_balance.restart();
     });
