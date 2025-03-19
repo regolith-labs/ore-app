@@ -30,6 +30,7 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
 
 pub fn use_token_balance_wss(token: Token) -> Signal<GatewayResult<UiTokenAmount>> {
     let update_callback = move |notif: &AccountNotificationParams| {
+        // Base64 decode
         let data = &notif.result.value.data;
         let data = data.first().ok_or(GatewayError::AccountNotFound)?;
         let data = BASE64_STANDARD
@@ -40,13 +41,8 @@ pub fn use_token_balance_wss(token: Token) -> Signal<GatewayResult<UiTokenAmount
         let token_account = crate::solana::spl_token::state::Account::unpack(data.as_slice())
             .map_err(|err| anyhow::anyhow!(err))?;
 
-        // Get the token amount
         let amount = token_account.amount;
-
-        // Calculate the UI amount
         let ui_amount = amount as f64 / 10f64.powi(token.decimals as i32);
-
-        // Create the UiTokenAmount
         let token_amount = UiTokenAmount {
             ui_amount: Some(ui_amount),
             decimals: token.decimals,
