@@ -7,6 +7,16 @@ use crate::gateway::{
 
 use super::{use_wss, FromWssMsg, ToWssMsg};
 
+/// End to end management of websocket subscriptions.
+///
+/// We have exactly one wss connection and all notifications come thru the same channel.
+/// This means we need to differentiate between subscribers, and route the correct notifs to
+/// the respective subscribing components.
+///
+/// This hook manages
+/// 1) Creating new subscriptions
+/// 2) Routing notifications
+/// 3) Closing subscriptions when the parent component unmounts
 pub fn use_wss_subscription<T, U>(
     mut data: Signal<GatewayResult<T>>,
     update_callback: U,
