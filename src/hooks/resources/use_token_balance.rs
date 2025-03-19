@@ -147,7 +147,7 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
 }
 
 pub fn use_wss_subscription<T, U>(
-    data: Signal<GatewayResult<T>>,
+    mut data: Signal<GatewayResult<T>>,
     update_callback: U,
     pubkey: Pubkey,
 ) where
@@ -161,7 +161,6 @@ pub fn use_wss_subscription<T, U>(
     // Handle subscription ID tracking
     use_effect(move || {
         let msg = from_wss.cloned();
-
         // Track subscription ID
         if let FromWssMsg::Subscription(rid, sid) = msg {
             // Only handle subscriptions originating from this component
@@ -172,13 +171,12 @@ pub fn use_wss_subscription<T, U>(
     });
 
     // Handle data updates
-    let mut data_clone = data.clone();
     use_effect(move || {
         let msg = from_wss.cloned();
         // Only process notification messages
         if let FromWssMsg::Notif(notif) = msg {
             if notif.subscription.eq(&sub_id()) {
-                data_clone.set(update_callback(&notif));
+                data.set(update_callback(&notif));
             }
         }
     });
@@ -207,26 +205,21 @@ where
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
 
     // Initialize data with current balance
-    let wallet_clone = wallet.clone();
-    let mint_clone = mint;
-    let mut data_clone = data.clone();
-
     spawn(async move {
-        if let Wallet::Connected(pubkey) = *wallet_clone.read() {
-            match get_token_balance(pubkey, mint_clone).await {
-                Ok(initial_data) => data_clone.set(Ok(initial_data)),
+        if let Wallet::Connected(pubkey) = *wallet.read() {
+            match get_token_balance(pubkey, mint).await {
+                Ok(initial_data) => data.set(Ok(initial_data)),
                 Err(err) => {
                     log::error!("Failed to initialize token balance: {:?}", err);
-                    data_clone.set(Err(err));
+                    data.set(Err(err));
                 }
             }
         }
     });
 
     // Set up WebSocket subscription when wallet is connected
-    let wallet_for_sub = wallet.clone();
     use_effect(move || {
-        if let Wallet::Connected(pubkey) = *wallet_for_sub.read() {
+        if let Wallet::Connected(pubkey) = *wallet.read() {
             use_wss_subscription(data.clone(), update_callback.clone(), pubkey);
         }
     });
