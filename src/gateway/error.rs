@@ -2,7 +2,7 @@ use async_std::future::TimeoutError;
 use steel::ProgramError;
 
 #[allow(dead_code)]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum GatewayError {
     FailedDeserialization,
     TransactionTimeout,
@@ -20,6 +20,7 @@ pub enum GatewayError {
     KeyringNoEntry,
     BincodeSerialize,
     BincodeDeserialize,
+    DecodingError(String),
     Unknown,
 }
 

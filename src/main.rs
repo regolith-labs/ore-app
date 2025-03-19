@@ -14,6 +14,7 @@ mod utils;
 use dioxus::prelude::*;
 #[cfg(feature = "web")]
 use hooks::use_download_url_provider;
+use hooks::{use_sol_balance_wss, use_token_balance_wss};
 use tracing::Level;
 
 #[cfg(all(feature = "desktop", target_os = "macos"))]
@@ -49,6 +50,8 @@ pub fn App() -> Element {
     use_cache_provider();
     use_mining_loop();
     use_wss_provider();
+    // use_sol_balance_wss();
+    use_token_balance_wss(config::Token::ore());
 
     rsx! {
         style { "{CSS}" }

@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
 
+use base64;
 use solana_sdk::native_token::lamports_to_sol;
+use solana_sdk::program_pack::Pack;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::config::Token;
@@ -10,8 +12,8 @@ use crate::hooks::{use_wallet, use_wss_subscription, Wallet};
 use super::get_token_balance;
 
 pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
-    // Update callback for SOL balance
     let update_callback = move |notif: &AccountNotificationParams| {
+        log::info!("notif: {:?}", notif);
         let lamports = notif.result.value.lamports;
         let sol = lamports_to_sol(lamports);
         let token_amount = UiTokenAmount {
@@ -26,6 +28,45 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     use_balance_wss(Token::sol().mint, update_callback)
 }
 
+pub fn use_token_balance_wss(token: Token) -> Signal<GatewayResult<UiTokenAmount>> {
+    let update_callback = move |notif: &AccountNotificationParams| {
+        log::info!("notif: {:?}", notif);
+        // let data = &notif.result.value.data;
+
+        // // Unpack the token account data
+        // let token_account = match crate::solana::spl_token::state::Account::unpack(data.as_slice())
+        // {
+        //     Ok(account) => account,
+        //     Err(err) => {
+        //         return Err(GatewayError::DecodingError(format!(
+        //             "Failed to unpack token account: {}",
+        //             err
+        //         )))
+        //     }
+        // };
+
+        // // Get the token amount
+        // let amount = token_account.amount;
+
+        // // Calculate the UI amount
+        // let ui_amount = amount as f64 / 10f64.powi(token.decimals as i32);
+
+        // // Create the UiTokenAmount
+        // let token_amount = UiTokenAmount {
+        //     ui_amount: Some(ui_amount),
+        //     decimals,
+        //     amount: amount.to_string(),
+        //     ui_amount_string: ui_amount.to_string(),
+        // };
+
+        // Ok(token_amount)
+        Err(GatewayError::AccountNotFound)
+    };
+
+    use_balance_wss(token.mint, update_callback)
+}
+
+/// Common impl for token balance subscriptions
 pub fn use_balance_wss<U>(mint: Pubkey, update_callback: U) -> Signal<GatewayResult<UiTokenAmount>>
 where
     U: Fn(&AccountNotificationParams) -> GatewayResult<UiTokenAmount> + Clone + 'static,
@@ -51,7 +92,10 @@ where
     // Set up WebSocket subscription when wallet is connected
     use_effect(move || {
         if let Wallet::Connected(pubkey) = *wallet.read() {
-            use_wss_subscription(data.clone(), update_callback.clone(), pubkey);
+            let ata = crate::solana::spl_associated_token_account::get_associated_token_address(
+                &pubkey, &mint,
+            );
+            use_wss_subscription(data.clone(), update_callback.clone(), ata);
         }
     });
 
