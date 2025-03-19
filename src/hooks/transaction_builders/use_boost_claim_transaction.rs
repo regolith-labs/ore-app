@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
@@ -10,7 +11,8 @@ use solana_sdk::{
 use crate::{
     gateway::{GatewayError, GatewayResult},
     hooks::{
-        use_claimable_yield, use_ore_balance, use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
+        use_claimable_yield, use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
+        COMPUTE_UNIT_LIMIT,
     },
     solana::{
         spl_associated_token_account::{
@@ -22,10 +24,11 @@ use crate::{
 
 pub fn use_boost_claim_transaction(
     boost: Resource<GatewayResult<Boost>>,
+    boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let claimable_yield = use_claimable_yield(boost, stake);
+    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
     let ore_balance = use_ore_balance();
     use_resource(move || async move {
         // Check if wallet is connected

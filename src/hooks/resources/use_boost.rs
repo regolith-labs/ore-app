@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
 use dioxus::prelude::*;
-use ore_api::consts::MINT_ADDRESS;
+use ore_api::{
+    consts::MINT_ADDRESS,
+    state::{proof_pda, Proof},
+};
 use ore_boost_api::state::{boost_pda, Boost};
 use steel::Pubkey;
 
@@ -58,4 +61,21 @@ pub fn use_boost(mint_address: Pubkey) -> Resource<GatewayResult<Boost>> {
     } else {
         use_boost_resource(boost_address)
     }
+}
+
+pub fn use_boost_proof(mint_address: Pubkey) -> Resource<GatewayResult<Proof>> {
+    let boost_address = boost_pda(mint_address).0;
+    let boost_proof_address = proof_pda(boost_address).0;
+    use_resource(move || async move {
+        use_gateway()
+            .get_proof(boost_proof_address)
+            .await
+            .map_err(GatewayError::from)
+    })
+
+    // let boosts: HashMap<Pubkey, Resource<GatewayResult<Boost>>> = use_context();
+    // let boost_address = boost_pda(mint_address).0;
+    // if let Some(boost) = boosts.get(&boost_address) {
+    //     *boost
+    // }
 }

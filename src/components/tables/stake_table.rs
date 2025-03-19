@@ -1,16 +1,19 @@
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
-use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
+use ore_api::{
+    consts::{MINT_ADDRESS, TOKEN_DECIMALS},
+    state::Proof,
+};
 use ore_boost_api::state::{Boost, Stake};
-use steel::{Numeric, Pubkey};
+use steel::Pubkey;
 
 use crate::{
     components::*,
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
     hooks::{
-        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl,
-        use_claimable_yield,
+        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_proof,
+        use_boost_tvl, use_claimable_yield,
     },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
@@ -82,6 +85,7 @@ pub fn StakeTable() -> Element {
 fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
     let token = Token::ore();
     let boost = use_boost(token.mint);
+    let boost_proof = use_boost_proof(token.mint);
     rsx! {
         TableRowLink {
             to: Route::Idle {},
@@ -108,6 +112,7 @@ fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
                 StakeTableRowYield {
                     mint_address: MINT_ADDRESS,
                     boost,
+                    boost_proof,
                     stake,
                 }
             },
@@ -122,6 +127,7 @@ fn StakeTableRow(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let boost = use_boost(boost_meta.lp_mint);
+    let boost_proof = use_boost_proof(boost_meta.lp_mint);
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -152,6 +158,7 @@ fn StakeTableRow(
                 StakeTableRowYield {
                     mint_address: boost_meta.lp_mint,
                     boost,
+                    boost_proof,
                     stake,
                 }
             },
@@ -425,10 +432,11 @@ fn StakeTableRowApy(
 fn StakeTableRowYield(
     mint_address: Pubkey,
     boost: Resource<GatewayResult<Boost>>,
+    boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     // Calculate rewards
-    let claimable_yield = use_claimable_yield(boost, stake);
+    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
 
     rsx! {
         Col {
