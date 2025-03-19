@@ -24,7 +24,7 @@ pub fn use_claimable_yield(
 }
 
 pub fn calculate_claimable_yield(boost: Boost, boost_proof: Proof, stake: Stake) -> u64 {
-    let mut rewards = 0;
+    let mut rewards = stake.rewards;
     let mut boost_rewards_factor = boost.rewards_factor;
     if boost_proof.balance > 0 {
         boost_rewards_factor += Numeric::from_fraction(boost_proof.balance, boost.total_deposits);
