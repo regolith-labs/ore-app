@@ -40,11 +40,11 @@ pub fn SwapForm(
     let mut buy_input_amount = use_signal::<String>(|| "".to_string());
 
     // Fetch token balances
-    let sell_token_balance = match *sell_token.read() {
+    let sell_token_balance = match sell_token.cloned() {
         Some(token) => use_token_balance_wss(token),
         None => use_signal(|| Err(GatewayError::AccountNotFound)),
     };
-    let buy_token_balance = match *buy_token.read() {
+    let buy_token_balance = match buy_token.cloned() {
         Some(token) => use_token_balance_wss(token),
         None => use_signal(|| Err(GatewayError::AccountNotFound)),
     };

@@ -28,6 +28,10 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     use_balance_wss(Token::sol().mint, update_callback)
 }
 
+pub fn use_ore_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
+    use_token_balance_wss(Token::ore())
+}
+
 pub fn use_token_balance_wss(token: Token) -> Signal<GatewayResult<UiTokenAmount>> {
     let update_callback = move |notif: &AccountNotificationParams| {
         let data = &notif.result.value.data;

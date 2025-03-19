@@ -74,7 +74,7 @@ pub fn use_pair_deposit_transaction(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(token_a_balance)) = token_a_balance.cloned() else {
+        let Ok(token_a_balance) = token_a_balance.cloned() else {
             if amount_a_f64 > 0f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(
                     liquidity_pair.token_a.clone(),
@@ -82,7 +82,7 @@ pub fn use_pair_deposit_transaction(
             }
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(token_b_balance)) = token_b_balance.cloned() else {
+        let Ok(token_b_balance) = token_b_balance.cloned() else {
             if amount_b_f64 > 0f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(
                     liquidity_pair.token_b.clone(),

@@ -33,13 +33,12 @@ use crate::{
 };
 
 // Build pair deposit transaction
-// TODO: stake balances
 pub fn use_pair_withdraw_transaction(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     stake: Resource<GatewayResult<Stake>>,
-    stake_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    stake_a_balance: Signal<GatewayResult<UiTokenAmount>>,
+    stake_b_balance: Signal<GatewayResult<UiTokenAmount>>,
     token_a_balance: Signal<GatewayResult<UiTokenAmount>>,
     token_b_balance: Signal<GatewayResult<UiTokenAmount>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
@@ -76,10 +75,10 @@ pub fn use_pair_withdraw_transaction(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(stake_a_balance)) = stake_a_balance.cloned() else {
+        let Ok(stake_a_balance) = stake_a_balance.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(_stake_b_balance)) = stake_b_balance.cloned() else {
+        let Ok(_stake_b_balance) = stake_b_balance.cloned() else {
             return Err(GatewayError::Unknown);
         };
 
