@@ -88,12 +88,11 @@ where
     // Set up WebSocket subscription when wallet is connected
     use_effect(move || {
         if let Wallet::Connected(pubkey) = *wallet.read() {
-            let address = if mint.eq(&Token::sol().mint) {
-                pubkey
-            } else {
-                crate::solana::spl_associated_token_account::get_associated_token_address(
+            let address = match mint.eq(&Token::sol().mint) {
+                true => pubkey,
+                false => crate::solana::spl_associated_token_account::get_associated_token_address(
                     &pubkey, &mint,
-                )
+                ),
             };
             use_wss_subscription(data.clone(), update_callback.clone(), address);
         }
