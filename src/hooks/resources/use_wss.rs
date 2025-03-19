@@ -29,7 +29,7 @@ type SubRequestId = u64;
 
 /// Two way channel backed by a WebSocket
 /// for subscribing to notifications from the RPC server.
-pub fn use_wss() -> (FromWss, ToWss) {
+pub(super) fn use_wss() -> (FromWss, ToWss) {
     let from = use_context::<Signal<FromWssMsg>>();
     let to = use_coroutine_handle::<ToWssMsg>();
     (from, to)

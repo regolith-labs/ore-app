@@ -9,6 +9,7 @@ mod use_ore_price;
 mod use_stake;
 mod use_token_balance;
 mod use_wss;
+mod use_wss_sub;
 
 pub use use_boost::*;
 pub use use_boost_apy::*;
@@ -20,6 +21,7 @@ pub use use_ore_price::*;
 pub use use_stake::*;
 pub use use_token_balance::*;
 pub use use_wss::*;
+pub use use_wss_sub::*;
 
 pub fn use_cache_provider() {
     use_boosts_provider();

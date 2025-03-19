@@ -15,7 +15,7 @@ use crate::{
 
 use crate::hooks::{use_gateway, use_wallet, Wallet};
 
-use super::{use_ore_price, use_wss, OrePrice};
+use super::{use_ore_price, use_wss, use_wss_subscription, OrePrice};
 
 pub(crate) fn use_token_balance_provider() {
     let mut token_balances = HashMap::new();
@@ -144,55 +144,6 @@ pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     };
 
     use_balance_wss(Token::sol().mint, update_callback)
-}
-
-pub fn use_wss_subscription<T, U>(
-    mut data: Signal<GatewayResult<T>>,
-    update_callback: U,
-    pubkey: Pubkey,
-) where
-    T: Clone + 'static,
-    U: Fn(&AccountNotificationParams) -> GatewayResult<T> + 'static,
-{
-    let (from_wss, to_wss) = use_wss();
-    let mut sub_id = use_signal(|| 0);
-    let sub_request_id = use_memo(move || AccountSubscribeGateway::request_id());
-
-    // Handle subscription ID tracking
-    use_effect(move || {
-        let msg = from_wss.cloned();
-        // Track subscription ID
-        if let FromWssMsg::Subscription(rid, sid) = msg {
-            // Only handle subscriptions originating from this component
-            if sub_request_id.eq(&rid) {
-                sub_id.set(sid);
-            }
-        }
-    });
-
-    // Handle data updates
-    use_effect(move || {
-        let msg = from_wss.cloned();
-        // Only process notification messages
-        if let FromWssMsg::Notif(notif) = msg {
-            if notif.subscription.eq(&sub_id()) {
-                data.set(update_callback(&notif));
-            }
-        }
-    });
-
-    // Subscribe when component mounts
-    use_effect(move || {
-        to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
-    });
-
-    // Unsubscribe when component is dropped
-    use_drop(move || {
-        let current_sub_id = *sub_id.read();
-        if current_sub_id > 0 {
-            to_wss.send(ToWssMsg::Unsubscribe(current_sub_id));
-        }
-    });
 }
 
 pub fn use_balance_wss<U>(mint: Pubkey, update_callback: U) -> Signal<GatewayResult<UiTokenAmount>>
