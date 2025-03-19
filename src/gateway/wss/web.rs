@@ -12,7 +12,7 @@ use super::{
     JsonRpcResponse, JsonRpcResponseWithError, SubscriptionError,
 };
 
-/// WebSocket client for account subscriptions on Solana RPC
+/// WebSocket client for account subscriptions
 pub struct AccountSubscribeGateway {
     writer: futures_util::stream::SplitSink<WebSocket, GlooMessage>,
     reader: futures_util::stream::SplitStream<WebSocket>,

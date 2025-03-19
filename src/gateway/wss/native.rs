@@ -21,7 +21,7 @@ use super::{
     JsonRpcResponse, JsonRpcResponseWithError, SubscriptionError,
 };
 
-/// WebSocket client for account subscriptions on Solana RPC
+/// WebSocket client for account subscriptions
 pub struct AccountSubscribeGateway {
     writer: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
@@ -49,13 +49,11 @@ impl AccountSubscribeGateway {
         while let Some(msg) = self.reader.next().await {
             match msg {
                 Ok(Message::Text(text)) => {
-                    // Try parsing a successful response
                     if let Ok(resp) = serde_json::from_str::<JsonRpcResponse<R>>(&text) {
                         if resp.id == request_id {
                             return Ok(resp.result);
                         }
                     }
-                    // Try parsing an error response
                     if let Ok(resp_err) = serde_json::from_str::<JsonRpcResponseWithError<R>>(&text)
                     {
                         if resp_err.id == request_id {
