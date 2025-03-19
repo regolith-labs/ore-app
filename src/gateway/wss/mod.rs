@@ -96,6 +96,25 @@ pub struct AccountNotificationParams {
 ////////////////////////////////////////////////////////////////////////////
 // Subscription Trait
 ////////////////////////////////////////////////////////////////////////////
+// TODO: reconnect logic
+#[cfg_attr(not(feature = "web"), async_trait)]
+#[cfg_attr(feature = "web", async_trait(?Send))]
+pub trait AccountSubscribe: Sized {
+    type SubscriptionId: Copy + Debug;
+    async fn connect() -> Result<Self, SubscriptionError>;
+    async fn subscribe(
+        &mut self,
+        account: &str,
+        request_id: u64,
+    ) -> Result<Self::SubscriptionId, SubscriptionError>;
+    async fn unsubscribe(
+        &mut self,
+        subscription: Self::SubscriptionId,
+    ) -> Result<(), SubscriptionError>;
+    async fn next_notification(&mut self)
+        -> Result<AccountNotificationEnvelope, SubscriptionError>;
+}
+
 #[derive(Debug)]
 pub enum SubscriptionError {
     ConnectionError(String),
@@ -116,22 +135,3 @@ impl std::fmt::Display for SubscriptionError {
 }
 
 impl std::error::Error for SubscriptionError {}
-
-// TODO: reconnect logic
-#[cfg_attr(not(feature = "web"), async_trait)]
-#[cfg_attr(feature = "web", async_trait(?Send))]
-pub trait AccountSubscribe: Sized {
-    type SubscriptionId: Copy + Debug;
-    async fn connect() -> Result<Self, SubscriptionError>;
-    async fn subscribe(
-        &mut self,
-        account: &str,
-        request_id: u64,
-    ) -> Result<Self::SubscriptionId, SubscriptionError>;
-    async fn unsubscribe(
-        &mut self,
-        subscription: Self::SubscriptionId,
-    ) -> Result<(), SubscriptionError>;
-    async fn next_notification(&mut self)
-        -> Result<AccountNotificationEnvelope, SubscriptionError>;
-}
