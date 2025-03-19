@@ -25,3 +25,22 @@ pub fn _format_percentage(pct: f64) -> String {
     };
     format!("{:.1}%", pct)
 }
+
+pub fn format_time_since(timestamp: u64) -> String {
+    let now = crate::time::SystemTime::now()
+        .duration_since(crate::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    let diff = now.saturating_sub(timestamp);
+
+    if diff < 60 {
+        format!("{} sec", diff)
+    } else if diff < 3600 {
+        format!("{} min", diff / 60)
+    } else if diff < 86400 {
+        format!("{} hours", diff / 3600)
+    } else {
+        format!("{} days", diff / 86400)
+    }
+}

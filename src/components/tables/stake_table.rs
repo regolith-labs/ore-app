@@ -17,7 +17,7 @@ use crate::{
     },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
-    utils::LiquidityPair,
+    utils::{format_time_since, LiquidityPair},
 };
 
 pub fn StakeTable() -> Element {
@@ -441,15 +441,21 @@ fn StakeTableRowYield(
     rsx! {
         Col {
             if let Some(stake) = stake.cloned() {
-                if let Ok(_stake) = stake.clone() {
+                if let Ok(stake) = stake.clone() {
                     if *claimable_yield.read() > 0 {
-                        OreValue {
-                            class: "text-right ml-auto",
-                            ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                            gold: true,
-                            abbreviated: true,
+                        Col {
+                            OreValue {
+                                class: "text-right ml-auto",
+                                ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
+                                with_decimal_units: true,
+                                size: TokenValueSize::Small,
+                                gold: true,
+                                abbreviated: true,
+                            }
+                            span {
+                                class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
+                                "{format_time_since(stake.last_claim_at as u64)}"
+                            }
                         }
                     } else {
                         span {
