@@ -2,8 +2,9 @@ use async_std::future::TimeoutError;
 use steel::ProgramError;
 
 #[allow(dead_code)]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum GatewayError {
+    Anyhow,
     FailedDeserialization,
     TransactionTimeout,
     NetworkUnavailable,
@@ -21,6 +22,13 @@ pub enum GatewayError {
     BincodeSerialize,
     BincodeDeserialize,
     Unknown,
+}
+
+impl From<anyhow::Error> for GatewayError {
+    fn from(value: anyhow::Error) -> Self {
+        log::error!("{:?}", value);
+        Self::Anyhow
+    }
 }
 
 impl From<solana_sdk::signer::SignerError> for GatewayError {
@@ -106,5 +114,21 @@ impl From<ProgramError> for GatewayError {
     fn from(value: ProgramError) -> Self {
         log::error!("err: {}", value);
         GatewayError::ProgramBuilderFailed
+    }
+}
+
+impl From<crate::gateway::wss::SubscriptionError> for GatewayError {
+    fn from(value: crate::gateway::wss::SubscriptionError) -> Self {
+        log::error!("{:?}", value);
+        match value {
+            crate::gateway::wss::SubscriptionError::ConnectionError(_) => {
+                GatewayError::NetworkUnavailable
+            }
+            crate::gateway::wss::SubscriptionError::ParseError(_) => {
+                GatewayError::FailedDeserialization
+            }
+            crate::gateway::wss::SubscriptionError::RpcError(_) => GatewayError::RequestFailed,
+            crate::gateway::wss::SubscriptionError::Other(_) => GatewayError::Unknown,
+        }
     }
 }

@@ -202,7 +202,7 @@ fn nonce_indices(
     let range_per_core = device_search_space_size.saturating_div(cores);
     let mut nonce_indices = Vec::with_capacity(cores as usize);
     for n in 0..(cores) {
-        let index = left_bound + n * range_per_core;
+        let index = left_bound.saturating_add(n.saturating_mul(range_per_core));
         nonce_indices.push(index);
     }
     Ok(nonce_indices)

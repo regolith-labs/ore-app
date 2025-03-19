@@ -57,7 +57,10 @@ pub fn use_token_balance_for_token(
     }
 }
 
-async fn get_token_balance(pubkey: Pubkey, mint: Pubkey) -> GatewayResult<UiTokenAmount> {
+pub(super) async fn get_token_balance(
+    pubkey: Pubkey,
+    mint: Pubkey,
+) -> GatewayResult<UiTokenAmount> {
     if mint == Token::sol().mint {
         use_gateway()
             .rpc

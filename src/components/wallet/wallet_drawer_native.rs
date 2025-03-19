@@ -20,7 +20,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let mut keypair_show_export = use_signal(|| false);
     let mut keypair_copied = use_signal(|| false);
     // listen for wallet update
-    use_memo(move || {
+    use_effect(move || {
         if let Wallet::Connected(pk) = *wallet.read() {
             let pk = pk.to_string();
             // set pubkey
@@ -32,7 +32,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for pubkey clipboard
-    use_memo(move || {
+    use_effect(move || {
         if let Splice::Copied = *pubkey_splice.read() {
             spawn(async move {
                 tokio::time::sleep(tokio::time::Duration::from_millis(1_500)).await;
@@ -44,7 +44,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for pubkey copied
-    use_memo(move || {
+    use_effect(move || {
         if *pubkey_copied.read() {
             spawn(async move {
                 tokio::time::sleep(tokio::time::Duration::from_millis(1_500)).await;
@@ -53,7 +53,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for keypair copied
-    use_memo(move || {
+    use_effect(move || {
         if *keypair_copied.read() {
             spawn(async move {
                 tokio::time::sleep(tokio::time::Duration::from_millis(1_500)).await;
@@ -62,7 +62,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
         }
     });
     // listen for keypair export
-    use_memo(move || {
+    use_effect(move || {
         if *keypair_show_export.read() {
             if let Ok(kp) = use_wallet_native::get() {
                 let kp = kp.creator.to_base58_string();
@@ -76,7 +76,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     rsx! {
         div {
             class: "flex flex-col gap-2 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
-            onclick: move |e| {
+            onclick: move |_e| {
                 keypair_show_export.set(false);
             },
             button {

@@ -7,7 +7,7 @@ use crate::components::*;
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 
 pub fn WalletAdapter() -> Element {
-    let mut wallet = use_wallet();
+    let wallet = use_wallet();
     match wallet.cloned() {
         Wallet::Connected(address) => {
             rsx! {
