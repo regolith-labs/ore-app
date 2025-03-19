@@ -15,7 +15,7 @@ boosts:
     lp_type: meteora
     name: SOL-ORE Meteora LP
     ticker: SOL-ORE MLP
-    lut:
+    lut: A8Zg5ak7MiRu4xxx3q2dexiQX4rrbenhy1Bd3bGQfosy
 
   - address: 8BEzwBTDsKWnjgjxi8Cca7ZatPZQhxUMgS8qWzBhDhrC
     pair_mint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
@@ -24,7 +24,7 @@ boosts:
     lp_type: meteora
     name: ORE-USDC Meteora LP
     ticker: ORE-USDC MLP
-    lut:
+    lut: 3aodeu4A9st3RYwP3ob88uuuyix5sDKDpgP8jmA7pKzP
 
   - address: h4nsGY9yhdfSW6Fwb6WSJEi9hHCviLdzQjcqzYWeKhd
     pair_mint: hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux 

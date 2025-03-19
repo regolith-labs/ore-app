@@ -73,7 +73,6 @@ pub fn use_boost_claim_transaction(
         }
 
         // Claim rewards
-        log::info!("claimable_yield: {}", claimable_yield.cloned());
         ixs.push(ore_boost_api::sdk::claim(
             authority,
             beneficiary,

@@ -1,18 +1,23 @@
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
 use solana_sdk::{
+    address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount},
     compute_budget::ComputeBudgetInstruction,
+    hash::Hash,
+    message::{v0::Message, VersionedMessage},
     native_token::sol_to_lamports,
     pubkey::Pubkey,
+    signature::Signature,
     system_instruction::transfer,
-    transaction::{Transaction, VersionedTransaction},
+    transaction::VersionedTransaction,
 };
 
 use crate::{
     components::TokenInputError,
     config::{BoostMeta, LpType, Token},
     gateway::{
-        kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, UiTokenAmount,
+        kamino::KaminoGateway, meteora::MeteoraGateway, GatewayError, GatewayResult, Rpc,
+        UiTokenAmount,
     },
     hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     solana::{
@@ -221,8 +226,27 @@ pub fn use_pair_deposit_transaction(
         let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
         ixs.push(transfer(&authority, &app_fee_account, 5000));
 
+        // Fetch lookup tables
+        let mut luts = vec![];
+        if let Some(lut) = boost_meta.lut {
+            if let Ok(account_data) = use_gateway().rpc.get_account_data(&lut).await {
+                if let Ok(address_lookup_table) = AddressLookupTable::deserialize(&account_data) {
+                    let address_lookup_table_account = AddressLookupTableAccount {
+                        key: lut,
+                        addresses: address_lookup_table.addresses.to_vec(),
+                    };
+                    luts.push(address_lookup_table_account);
+                }
+            }
+        }
+
         // Build initial transaction to estimate priority fee
-        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+        let tx = VersionedTransaction {
+            signatures: vec![Signature::default()],
+            message: VersionedMessage::V0(
+                Message::try_compile(&authority, &ixs, &luts, Hash::default()).unwrap(),
+            ),
+        };
 
         // Get priority fee estimate
         let gateway = use_gateway();
@@ -249,7 +273,12 @@ pub fn use_pair_deposit_transaction(
         priority_fee.set(dynamic_priority_fee_in_lamports);
 
         // Build final tx with priority fee
-        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+        let tx = VersionedTransaction {
+            signatures: vec![Signature::default()],
+            message: VersionedMessage::V0(
+                Message::try_compile(&authority, &ixs, &luts, Hash::default()).unwrap(),
+            ),
+        };
 
         Ok(tx)
     })
