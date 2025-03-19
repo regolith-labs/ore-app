@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
+use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionType;
 use steel::Pubkey;
@@ -10,7 +11,7 @@ use crate::{
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        on_transaction_done, use_boost, use_boost_apy, use_liquidity_pair,
+        on_transaction_done, use_boost, use_boost_apy, use_boost_proof, use_liquidity_pair,
         use_lp_deposit_transaction, use_stake, use_token_balance,
         use_token_balances_for_liquidity_pair,
     },
@@ -25,6 +26,7 @@ pub fn Pair(lp_mint: String) -> Element {
     let mut liquidity_pair = use_liquidity_pair(lp_mint);
     let mut lp_balance = use_token_balance(lp_mint);
     let mut boost = use_boost(lp_mint);
+    let mut boost_proof = use_boost_proof(lp_mint);
     let mut stake = use_stake(lp_mint);
     let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
 
@@ -32,6 +34,7 @@ pub fn Pair(lp_mint: String) -> Element {
     on_transaction_done(move |_sig| {
         stake.restart();
         boost.restart();
+        boost_proof.restart();
         liquidity_pair.restart();
         lp_balance.restart();
     });
@@ -61,6 +64,7 @@ pub fn Pair(lp_mint: String) -> Element {
                     liquidity_pair: liquidity_pair,
                     lp_balance: lp_balance,
                     boost,
+                    boost_proof,
                     stake
                 }
                 BoostMetrics {
@@ -79,6 +83,7 @@ fn AccountMetrics(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     boost: Resource<GatewayResult<Boost>>,
+    boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
@@ -93,10 +98,6 @@ fn AccountMetrics(
                 liquidity_pair,
                 stake,
             }
-            PendingDeposits {
-                liquidity_pair,
-                stake,
-            }
             UnstakedLp {
                 boost_meta,
                 boost,
@@ -106,6 +107,7 @@ fn AccountMetrics(
             }
             StakeYield {
                 boost,
+                boost_proof,
                 stake,
             }
         }
@@ -143,33 +145,6 @@ fn Deposits(
                     }
                 } else {
                     LoadingValue {}
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn PendingDeposits(
-    liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
-) -> Element {
-    rsx! {
-        if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-            if let Some(Ok(stake)) = stake.cloned() {
-                if stake.balance_pending > 0 {
-                    TitledRow {
-                        title: "Deposits (pending)",
-                        description: "The amount of liquidity you have deposited that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
-                        value: rsx! {
-                            LiquidityPairStakeValue {
-                                class: "pb-0 sm:pb-4",
-                                stake_balance: stake.balance_pending,
-                                liquidity_pair: liquidity_pair,
-                                with_decimal_units: true,
-                            }
-                        }
-                    }
                 }
             }
         }

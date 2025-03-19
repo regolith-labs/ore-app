@@ -73,8 +73,7 @@ pub fn use_withdrawable_balances(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let percentage_shares =
-            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares = stake.balance as f64 / liquidity_pair.shares as f64;
         let amount_f64 = liquidity_pair.balance_a_f64 * percentage_shares;
         let token_a_decimals = liquidity_pair.token_a.decimals;
         let amount_u64 = ui_amount_to_amount(amount_f64, token_a_decimals);
@@ -96,8 +95,7 @@ pub fn use_withdrawable_balances(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let percentage_shares =
-            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares = stake.balance as f64 / liquidity_pair.shares as f64;
         let amount_f64 = liquidity_pair.balance_b_f64 * percentage_shares;
         let token_b_decimals = liquidity_pair.token_b.decimals;
         let amount_u64 = ui_amount_to_amount(amount_f64, token_b_decimals);

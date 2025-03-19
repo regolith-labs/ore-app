@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
@@ -10,7 +11,8 @@ use solana_sdk::{
 use crate::{
     gateway::{GatewayError, GatewayResult},
     hooks::{
-        use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
+        use_claimable_yield, use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
+        COMPUTE_UNIT_LIMIT,
     },
     solana::{
         spl_associated_token_account::{
@@ -22,9 +24,11 @@ use crate::{
 
 pub fn use_boost_claim_transaction(
     boost: Resource<GatewayResult<Boost>>,
+    boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
     let ore_balance = use_ore_balance();
     use_resource(move || async move {
         // Check if wallet is connected
@@ -33,7 +37,7 @@ pub fn use_boost_claim_transaction(
         };
 
         // Get resources
-        let Some(Ok(stake)) = *stake.read() else {
+        let Some(Ok(_stake)) = *stake.read() else {
             return Err(GatewayError::Unknown);
         };
         let Some(Ok(boost)) = *boost.read() else {
@@ -41,7 +45,7 @@ pub fn use_boost_claim_transaction(
         };
 
         // Check if stake has rewards to claim
-        if stake.rewards == 0 {
+        if claimable_yield.cloned() == 0 {
             return Err(GatewayError::Unknown);
         }
 
@@ -73,7 +77,7 @@ pub fn use_boost_claim_transaction(
             authority,
             beneficiary,
             boost.mint,
-            stake.rewards,
+            claimable_yield.cloned(),
         ));
 
         // Include ORE app fee

@@ -3,18 +3,19 @@ use crate::{
     gateway::GatewayResult,
     hooks::{
         on_transaction_done, use_boost, use_boost_apy, use_boost_claim_transaction,
-        use_ore_balance, use_ore_price, use_stake,
+        use_boost_proof, use_claimable_yield, use_ore_balance, use_ore_price, use_stake,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
 };
 use dioxus::prelude::*;
-use ore_api::consts::TOKEN_DECIMALS;
+use ore_api::{consts::TOKEN_DECIMALS, state::Proof};
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionType;
 
 pub fn Idle() -> Element {
     let mut balance = use_ore_balance();
     let mut boost = use_boost(ore_api::consts::MINT_ADDRESS);
+    let mut boost_proof = use_boost_proof(ore_api::consts::MINT_ADDRESS);
     let mut stake = use_stake(ore_api::consts::MINT_ADDRESS);
 
     // Refresh data if successful transaction
@@ -22,6 +23,7 @@ pub fn Idle() -> Element {
         balance.restart();
         stake.restart();
         boost.restart();
+        boost_proof.restart();
     });
 
     rsx! {
@@ -42,6 +44,7 @@ pub fn Idle() -> Element {
                 }
                 AccountMetrics {
                     boost,
+                    boost_proof,
                     stake,
                 }
                 BoostMetrics {
@@ -55,6 +58,7 @@ pub fn Idle() -> Element {
 #[component]
 fn AccountMetrics(
     boost: Resource<GatewayResult<Boost>>,
+    boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
@@ -68,11 +72,9 @@ fn AccountMetrics(
             Deposits {
                 stake,
             }
-            PendingDeposits {
-                stake,
-            }
             StakeYield {
                 boost,
+                boost_proof,
                 stake,
             }
         }
@@ -104,51 +106,29 @@ fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
 }
 
 #[component]
-fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
-    rsx! {
-        if let Some(Ok(stake)) = stake.cloned() {
-            if stake.balance_pending > 0 {
-                TitledRow {
-                    title: "Deposits (pending)",
-                    description: "The amount of ORE you have deposited that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
-                    value: rsx! {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-#[component]
 pub fn StakeYield(
     boost: Resource<GatewayResult<Boost>>,
+    boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     // Build claim transaction
-    let claim_tx = use_boost_claim_transaction(boost, stake);
+    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
+    let claim_tx = use_boost_claim_transaction(boost, boost_proof, stake);
 
     rsx! {
-        TitledResourceRow {
+        TitledRow {
             title: "Yield",
             description: "The amount of ORE you have earned and may claim. Yield is not automatically compounded.",
-            resource: stake,
-            com: |stake| {
-                rsx! {
-                    if stake.rewards > 0 {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                            gold: true,
-                        }
-                    } else {
-                        NullValue {}
+            value: rsx! {
+                if *claimable_yield.read() > 0 {
+                    OreValue {
+                        ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
+                        with_decimal_units: true,
+                        size: TokenValueSize::Small,
+                        gold: true,
                     }
+                } else {
+                    NullValue {}
                 }
             }
         }
@@ -217,7 +197,7 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
             com: |boost| rsx! {
                 span {
                     class: "text-elements-highEmphasis font-medium",
-                    "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+                    "{boost.multiplier as f64 / ore_boost_api::consts::DENOMINATOR_MULTIPLIER as f64}x"
                 }
             }
         }

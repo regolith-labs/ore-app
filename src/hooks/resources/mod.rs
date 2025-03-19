@@ -1,6 +1,7 @@
 mod use_account;
 mod use_boost;
 mod use_boost_apy;
+mod use_boost_proof;
 mod use_boost_tvl;
 mod use_liquidity_pair;
 mod use_member;
@@ -14,6 +15,7 @@ mod use_wss_sub;
 
 pub use use_boost::*;
 pub use use_boost_apy::*;
+pub use use_boost_proof::*;
 pub use use_boost_tvl::*;
 pub use use_liquidity_pair::*;
 pub use use_member::*;
@@ -27,6 +29,7 @@ pub use use_wss_sub::*;
 
 pub fn use_cache_provider() {
     use_boosts_provider();
+    use_boost_proofs_provider();
     use_liquidity_pairs_provider();
     use_stakes_provider();
     use_ore_price_provider();

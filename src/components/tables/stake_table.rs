@@ -1,6 +1,9 @@
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
-use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
+use ore_api::{
+    consts::{MINT_ADDRESS, TOKEN_DECIMALS},
+    state::Proof,
+};
 use ore_boost_api::state::{Boost, Stake};
 use steel::Pubkey;
 
@@ -8,10 +11,13 @@ use crate::{
     components::*,
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
-    hooks::{use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_tvl},
+    hooks::{
+        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_proof,
+        use_boost_tvl, use_claimable_yield,
+    },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
-    utils::LiquidityPair,
+    utils::{format_time_since, LiquidityPair},
 };
 
 pub fn StakeTable() -> Element {
@@ -79,6 +85,7 @@ pub fn StakeTable() -> Element {
 fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
     let token = Token::ore();
     let boost = use_boost(token.mint);
+    let boost_proof = use_boost_proof(token.mint);
     rsx! {
         TableRowLink {
             to: Route::Idle {},
@@ -105,6 +112,7 @@ fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
                 StakeTableRowYield {
                     mint_address: MINT_ADDRESS,
                     boost,
+                    boost_proof,
                     stake,
                 }
             },
@@ -119,6 +127,7 @@ fn StakeTableRow(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let boost = use_boost(boost_meta.lp_mint);
+    let boost_proof = use_boost_proof(boost_meta.lp_mint);
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -149,6 +158,7 @@ fn StakeTableRow(
                 StakeTableRowYield {
                     mint_address: boost_meta.lp_mint,
                     boost,
+                    boost_proof,
                     stake,
                 }
             },
@@ -296,9 +306,9 @@ fn IdleTableRowTVL(
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
-        if stake.balance > 0 || stake.balance_pending > 0 {
-            let total_balance = stake.balance + stake.balance_pending;
-            let total_deposits = boost.total_deposits + stake.balance_pending;
+        if stake.balance > 0 {
+            let total_balance = stake.balance;
+            let total_deposits = boost.total_deposits;
             let user_tvl =
                 (boost_tvl * (total_balance as f64 / total_deposits as f64)).floor() as u64;
 
@@ -356,9 +366,8 @@ fn StakeTableRowTVL(
         let Some(Ok(stake)) = stake.cloned() else {
             return None;
         };
-        if stake.balance > 0 || stake.balance_pending > 0 {
-            let total_balance = stake.balance + stake.balance_pending;
-            // let total_deposits = boost.total_deposits + stake.balance_pending;
+        if stake.balance > 0 {
+            let total_balance = stake.balance;
             let user_tvl = (liquidity_pair.total_value_usd
                 * (total_balance as f64 / liquidity_pair.shares as f64))
                 .floor() as u64;
@@ -423,30 +432,40 @@ fn StakeTableRowApy(
 fn StakeTableRowYield(
     mint_address: Pubkey,
     boost: Resource<GatewayResult<Boost>>,
+    boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
+    // Calculate rewards
+    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
+
     rsx! {
         Col {
             if let Some(stake) = stake.cloned() {
                 if let Ok(stake) = stake.clone() {
-                    if stake.rewards > 0 {
-                        OreValue {
-                            class: "text-right ml-auto",
-                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                            gold: true,
-                            abbreviated: true,
+                    if *claimable_yield.read() > 0 {
+                        Col {
+                            OreValue {
+                                class: "text-right ml-auto",
+                                ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
+                                with_decimal_units: true,
+                                size: TokenValueSize::Small,
+                                gold: true,
+                                abbreviated: true,
+                            }
+                            span {
+                                class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
+                                "{format_time_since(stake.last_claim_at as u64)}"
+                            }
                         }
                     } else {
                         span {
-                            class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
+                            class: "text-right ml-auto text-elements-midEmphasis font-medium mr-1",
                             "–"
                         }
                     }
                 } else {
                     span {
-                        class: "text-right ml-auto text-elements-lowEmphasis font-medium text-xs mr-1",
+                        class: "text-right ml-auto text-elements-midEmphasis font-medium mr-1",
                         "–"
                     }
                 }
