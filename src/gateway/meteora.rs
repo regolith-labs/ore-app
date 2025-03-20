@@ -189,6 +189,7 @@ impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
             vault_program: meteora_vault_sdk::programs::VAULT_ID,
             token_program: spl_token::ID,
         };
+
         Ok(accounts.instruction(args))
     }
 

@@ -8,15 +8,16 @@ use crate::{
     utils::LiquidityPair,
 };
 
+// TODO: lp balance
 #[component]
 pub fn PairStakeForm(
     class: Option<String>,
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    stake: Signal<GatewayResult<Stake>>,
+    token_a_balance: Signal<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Signal<GatewayResult<UiTokenAmount>>,
 ) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);

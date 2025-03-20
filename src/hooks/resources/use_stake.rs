@@ -46,7 +46,7 @@ fn use_stake_resource(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
     })
 }
 
-pub fn use_stake(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
+pub fn _use_stake(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
     let stakes: HashMap<Pubkey, Resource<GatewayResult<Stake>>> = use_context();
     if let Some(stake) = stakes.get(&mint_address) {
         *stake
@@ -61,20 +61,19 @@ pub fn use_all_stakes() -> HashMap<Pubkey, Resource<GatewayResult<Stake>>> {
 
 pub fn use_withdrawable_balances(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> (
-    Resource<GatewayResult<UiTokenAmount>>,
-    Resource<GatewayResult<UiTokenAmount>>,
+    Signal<GatewayResult<UiTokenAmount>>,
+    Signal<GatewayResult<UiTokenAmount>>,
 ) {
     let stake_a_balance = use_resource(move || async move {
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let percentage_shares =
-            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares = stake.balance as f64 / liquidity_pair.shares as f64;
         let amount_f64 = liquidity_pair.balance_a_f64 * percentage_shares;
         let token_a_decimals = liquidity_pair.token_a.decimals;
         let amount_u64 = ui_amount_to_amount(amount_f64, token_a_decimals);
@@ -90,14 +89,13 @@ pub fn use_withdrawable_balances(
     });
 
     let stake_b_balance = use_resource(move || async move {
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let percentage_shares =
-            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares = stake.balance as f64 / liquidity_pair.shares as f64;
         let amount_f64 = liquidity_pair.balance_b_f64 * percentage_shares;
         let token_b_decimals = liquidity_pair.token_b.decimals;
         let amount_u64 = ui_amount_to_amount(amount_f64, token_b_decimals);

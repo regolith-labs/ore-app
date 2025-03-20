@@ -1,6 +1,6 @@
 [package]
 name = "ore-app"
-version = "1.1.8"
+version = "1.1.14"
 description = "Liquid digital gold."
 edition = "2021"
 license = "Apache-2.0"
@@ -33,6 +33,7 @@ desktop = [
   "spl-token-2022",
   "sysinfo",
   "tokio",
+  "tokio-tungstenite",
 ]
 web = [
   "dioxus/web",
@@ -40,6 +41,7 @@ web = [
   "gloo-storage",
   "gloo-worker",
   "gloo-utils",
+  "gloo-net",
   "js-sys",
   "ore-miner-web",
   "serde-wasm-bindgen",
@@ -57,6 +59,7 @@ directories = ["dep:directories"]
 anyhow = "1.0"
 async-retry = "0.3.1"
 async-std = "1.12.0"
+async-trait = "0.1.87"
 base64 = "0.22.1"
 bincode = "1.3.3"
 bs58 = "0.4"
@@ -82,6 +85,7 @@ gloo = { version = "0.11.0", optional = true }
 gloo-storage = { version = "0.3.0", optional = true }
 gloo-worker = { version = "0.5.0", optional = true }
 gloo-utils = { version = "0.2.0", optional = true }
+gloo-net = { version = "0.6.0", optional = true }
 is-url = { version = "1.0.4" }
 js-sys = { version = "0.3.67", optional = true }
 jupiter-swap-api-client = { git = "https://github.com/regolith-labs/jupiter-swap-api-client", package = "jupiter-swap-api-client", branch = "main" }
@@ -95,14 +99,14 @@ num_cpus = "1.16.0"
 num-format = "0.4.4"
 objc = { version = "0.2", optional = true }
 once_cell = "1.18"
-ore-api = "3.0"
-ore-boost-api = "1.2"
+ore-api = "3.2.0"
+ore-boost-api = "3.0.1"
 ore-miner-types = { path = "./miner-types" }
 ore-miner-web = { path = "./miner-web", features = [
   "app",
 ], default-features = false, optional = true }
-ore-pool-api = "1.3"
-ore-pool-types = "1.2"
+ore-pool-api = { git = "https://github.com/regolith-labs/ore-pool",  package = "ore-pool-api", rev = "aaff5fab2844" }
+ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool",  package = "ore-pool-types", rev = "aaff5fab2844" }
 ore-types = "0.0.13"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
@@ -127,9 +131,12 @@ spl-token = { version = "^4", optional = true, features = ["no-entrypoint"] }
 spl-token-2022 = { version = "^6", optional = true, features = [
   "no-entrypoint",
 ] }
-steel = "3.0"
+steel = "4.0"
 sysinfo = { version = "0.33.1", optional = true }
 tokio = { version = "1.43.0", optional = true, features = ["full"] }
+tokio-tungstenite = { version = "0.26.2", optional = true, features = [
+  "native-tls",
+] }
 tracing = "0.1.40"
 url = "2.5.0"
 wasm-bindgen = { version = "0.2.99", optional = true }

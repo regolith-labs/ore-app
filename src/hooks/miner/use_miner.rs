@@ -100,8 +100,42 @@ pub fn use_system_cpu_utilization() -> Signal<Vec<f32>> {
     signal
 }
 
-// For web, we don't need this function as we'll handle it differently in the MinePower component
+// For web, we simulate the cpu usage
 #[cfg(feature = "web")]
 pub fn use_system_cpu_utilization() -> Signal<Vec<f32>> {
-    use_signal(|| vec![])
+    // Web implementation with simulated values
+    let mut signal = use_signal(|| vec![0.0; 12]).clone();
+    let miner_is_active = use_miner_is_active();
+
+    // Set up web cpu usage with simulated values
+    use_future(move || {
+        async move {
+            loop {
+                let mut new_values = vec![0.0; 12];
+
+                // Miner is active
+                if *miner_is_active.read() {
+                    // First core runs at ~70% (with some variation)
+                    new_values[0] = 65.0 + (rand::random::<f32>() * 10.0);
+
+                    // 2-3 additional cores hover around 10-30%
+                    for i in 1..4 {
+                        new_values[i] = 10.0 + (rand::random::<f32>() * 20.0);
+                    }
+                } else {
+                    // Miner is paused,just have 2-3 cores hovering at 10-30%
+                    for i in 0..3 {
+                        new_values[i] = 10.0 + (rand::random::<f32>() * 20.0);
+                    }
+                }
+
+                signal.set(new_values);
+
+                // Sleep to simulate some delay
+                async_std::task::sleep(crate::time::Duration::from_millis(1000)).await;
+            }
+        }
+    });
+
+    signal
 }

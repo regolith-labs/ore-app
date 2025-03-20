@@ -15,9 +15,9 @@ pub fn PairWithdrawForm(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    stake: Signal<GatewayResult<Stake>>,
+    token_a_balance: Signal<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Signal<GatewayResult<UiTokenAmount>>,
 ) -> Element {
     let class = class.unwrap_or_default();
     let mut token_a = use_signal(|| None);
@@ -52,6 +52,7 @@ pub fn PairWithdrawForm(
         stake_b_balance,
         token_a_balance,
         token_b_balance,
+        lp_balance,
         input_amount_a,
         input_amount_b,
         err,
@@ -90,13 +91,12 @@ pub fn PairWithdrawForm(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return;
         };
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return;
         };
 
         // Calculate percentage shares
-        let percentage_shares =
-            (stake.balance as f64 + stake.balance_pending as f64) / liquidity_pair.shares as f64;
+        let percentage_shares = stake.balance as f64 / liquidity_pair.shares as f64;
         let token_a_shares = liquidity_pair.balance_a_f64 * percentage_shares;
         let token_b_shares = liquidity_pair.balance_b_f64 * percentage_shares;
 

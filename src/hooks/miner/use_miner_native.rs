@@ -150,7 +150,7 @@ async fn find_hash_par(
                         }
                     }
                     // exit if time has elapsed
-                    if nonce % 10 == 0 {
+                    if nonce % 100 == 0 {
                         if timer.elapsed().as_secs().ge(&cutoff_time) {
                             // send expiration message
                             if core_id.id == 0 {
@@ -202,7 +202,7 @@ fn nonce_indices(
     let range_per_core = device_search_space_size.saturating_div(cores);
     let mut nonce_indices = Vec::with_capacity(cores as usize);
     for n in 0..(cores) {
-        let index = left_bound + n * range_per_core;
+        let index = left_bound.saturating_add(n.saturating_mul(range_per_core));
         nonce_indices.push(index);
     }
     Ok(nonce_indices)
@@ -214,40 +214,5 @@ fn solve(
     challenge: &[u8; 32],
     nonce: &[u8; 8],
 ) -> Vec<drillx::Hash> {
-    let mut hashes = Vec::with_capacity(7);
-    let seed = drillx::seed(challenge, nonce);
-    let solver = drillx::equix::EquiXBuilder::new()
-        .runtime(drillx::equix::RuntimeOption::InterpretOnly)
-        .build(seed.as_slice());
-    if let Ok(solver) = solver {
-        let solutions = solver.solve_with_memory(mem);
-        for solution in solutions {
-            let digest = solution.to_bytes();
-            hashes.push(drillx::Hash {
-                d: digest,
-                h: hashv(&digest, nonce),
-            });
-        }
-    }
-    hashes
-}
-
-#[inline(always)]
-fn hashv(digest: &[u8; 16], nonce: &[u8; 8]) -> [u8; 32] {
-    solana_program::keccak::hashv(&[sorted(*digest).as_slice(), &nonce.as_slice()]).to_bytes()
-}
-
-#[inline(always)]
-fn sorted(mut digest: [u8; 16]) -> [u8; 16] {
-    unsafe {
-        let u16_slice: &mut [u16; 8] = core::mem::transmute(&mut digest);
-        u16_slice.sort_unstable();
-        digest
-    }
-}
-
-fn format_duration(seconds: u32) -> String {
-    let minutes = seconds / 60;
-    let remaining_seconds = seconds % 60;
-    format!("{:02}:{:02}", minutes, remaining_seconds)
+    drillx::hashes_with_memory(mem, challenge, nonce)
 }

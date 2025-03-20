@@ -38,7 +38,7 @@ pub fn use_updater() -> Resource<Result<UpdateState>> {
         // which supports a sync sender *and* async reader
         let (sender, receiver) = tokio::sync::oneshot::channel::<UpdateState>();
         // check for update
-        let handle = std::thread::spawn(move || {
+        let _handle = std::thread::spawn(move || {
             let update = cargo_packager_updater::check_update(current_version, config);
             let state = if let Ok(Some(update)) = update {
                 log::info!("update found: {:?}", update);

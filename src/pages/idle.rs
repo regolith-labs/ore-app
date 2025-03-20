@@ -2,27 +2,21 @@ use crate::{
     components::*,
     gateway::GatewayResult,
     hooks::{
-        on_transaction_done, use_boost, use_boost_apy, use_boost_claim_transaction,
-        use_ore_balance, use_ore_price, use_stake,
+        use_boost_apr, use_boost_claim_transaction, use_boost_proof_wss, use_boost_wss,
+        use_claimable_yield, use_ore_balance_wss, use_ore_price, use_stake_wss,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
 };
 use dioxus::prelude::*;
-use ore_api::consts::TOKEN_DECIMALS;
+use ore_api::{consts::TOKEN_DECIMALS, state::Proof};
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionType;
 
 pub fn Idle() -> Element {
-    let mut balance = use_ore_balance();
-    let mut boost = use_boost(ore_api::consts::MINT_ADDRESS);
-    let mut stake = use_stake(ore_api::consts::MINT_ADDRESS);
-
-    // Refresh data if successful transaction
-    on_transaction_done(move |_sig| {
-        balance.restart();
-        stake.restart();
-        boost.restart();
-    });
+    let balance = use_ore_balance_wss();
+    let boost = use_boost_wss(ore_api::consts::MINT_ADDRESS);
+    let boost_proof = use_boost_proof_wss(ore_api::consts::MINT_ADDRESS);
+    let stake = use_stake_wss(ore_api::consts::MINT_ADDRESS);
 
     rsx! {
         Col {
@@ -42,6 +36,7 @@ pub fn Idle() -> Element {
                 }
                 AccountMetrics {
                     boost,
+                    boost_proof,
                     stake,
                 }
                 BoostMetrics {
@@ -54,8 +49,9 @@ pub fn Idle() -> Element {
 
 #[component]
 fn AccountMetrics(
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost: Signal<GatewayResult<Boost>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
         Col {
@@ -68,11 +64,9 @@ fn AccountMetrics(
             Deposits {
                 stake,
             }
-            PendingDeposits {
-                stake,
-            }
             StakeYield {
                 boost,
+                boost_proof,
                 stake,
             }
         }
@@ -80,12 +74,12 @@ fn AccountMetrics(
 }
 
 #[component]
-fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
+fn Deposits(stake: Signal<GatewayResult<Stake>>) -> Element {
     rsx! {
-        TitledResourceRow {
+        TitledSignalRow {
             title: "Deposits",
             description: "The amount of ORE you have deposited in the protocol. This ORE is \"idle\" and thus earns the native idle yield rate.",
-            resource: stake,
+            signal: stake,
             com: |stake| {
                 rsx! {
                     if stake.balance > 0 {
@@ -104,51 +98,29 @@ fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
 }
 
 #[component]
-fn PendingDeposits(stake: Resource<GatewayResult<Stake>>) -> Element {
-    rsx! {
-        if let Some(Ok(stake)) = stake.cloned() {
-            if stake.balance_pending > 0 {
-                TitledRow {
-                    title: "Deposits (pending)",
-                    description: "The amount of ORE you have deposited that is pending to be committed. Pending deposits are automatically committed approximately every hour.",
-                    value: rsx! {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.balance_pending, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-#[component]
 pub fn StakeYield(
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost: Signal<GatewayResult<Boost>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     // Build claim transaction
-    let claim_tx = use_boost_claim_transaction(boost, stake);
+    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
+    let claim_tx = use_boost_claim_transaction(boost, boost_proof, stake);
 
     rsx! {
-        TitledResourceRow {
+        TitledRow {
             title: "Yield",
             description: "The amount of ORE you have earned and may claim. Yield is not automatically compounded.",
-            resource: stake,
-            com: |stake| {
-                rsx! {
-                    if stake.rewards > 0 {
-                        OreValue {
-                            ui_amount_string: amount_to_ui_amount_string(stake.rewards, TOKEN_DECIMALS),
-                            with_decimal_units: true,
-                            size: TokenValueSize::Small,
-                            gold: true,
-                        }
-                    } else {
-                        NullValue {}
+            value: rsx! {
+                if *claimable_yield.read() > 0 {
+                    OreValue {
+                        ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
+                        with_decimal_units: true,
+                        size: TokenValueSize::Small,
+                        gold: true,
                     }
+                } else {
+                    NullValue {}
                 }
             }
         }
@@ -160,7 +132,7 @@ pub fn StakeYield(
 }
 
 #[component]
-fn BoostMetrics(boost: Resource<GatewayResult<Boost>>) -> Element {
+fn BoostMetrics(boost: Signal<GatewayResult<Boost>>) -> Element {
     rsx! {
         Col {
             class: "w-full h-full mx-auto max-w-2xl px-5 sm:px-8",
@@ -169,7 +141,7 @@ fn BoostMetrics(boost: Resource<GatewayResult<Boost>>) -> Element {
                 class: "mb-4",
                 title: "Boost"
             }
-            Apy {}
+            Apr {}
             Multiplier {
                 boost,
             }
@@ -187,17 +159,17 @@ fn BoostMetrics(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-pub fn Apy() -> Element {
-    let apy = use_boost_apy(ore_api::consts::MINT_ADDRESS);
+pub fn Apr() -> Element {
+    let apr = use_boost_apr(ore_api::consts::MINT_ADDRESS);
     rsx! {
         TitledRow {
-            title: "APY",
-            description: "The annualized percentage yield returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
+            title: "APR",
+            description: "The annualized percentage rate returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
-                if let Ok(apy) = apy.cloned() {
+                if let Ok(apr) = apr.cloned() {
                     span {
                         class: "text-elements-highEmphasis font-medium",
-                        "{apy:.0}%"
+                        "{apr:.0}%"
                     }
                 } else {
                     LoadingValue {}
@@ -208,16 +180,16 @@ pub fn Apy() -> Element {
 }
 
 #[component]
-pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
+pub fn Multiplier(boost: Signal<GatewayResult<Boost>>) -> Element {
     rsx! {
-        TitledResourceRow {
+        TitledSignalRow {
             title: "Multiplier",
             description: "The multiplier is an indicator of this protocol's priority relative to other protocols that receive ORE yield. The higher the multiplier, the more ORE will be allocated to stakers in this protocol.",
-            resource: boost,
+            signal: boost,
             com: |boost| rsx! {
                 span {
                     class: "text-elements-highEmphasis font-medium",
-                    "{boost.multiplier as f64 / ore_boost_api::consts::BOOST_DENOMINATOR as f64}x"
+                    "{boost.multiplier as f64 / ore_boost_api::consts::DENOMINATOR_MULTIPLIER as f64}x"
                 }
             }
         }
@@ -225,12 +197,12 @@ pub fn Multiplier(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-fn TotalDeposits(boost: Resource<GatewayResult<Boost>>) -> Element {
+fn TotalDeposits(boost: Signal<GatewayResult<Boost>>) -> Element {
     rsx! {
-        TitledResourceRow {
+        TitledSignalRow {
             title: "Total deposits",
             description: "The total amount of ORE currently deposited in this protocol.",
-            resource: boost,
+            signal: boost,
             com: |boost| {
                 rsx! {
                     OreValue {
@@ -245,12 +217,12 @@ fn TotalDeposits(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-pub fn TotalStakers(boost: Resource<GatewayResult<Boost>>) -> Element {
+pub fn TotalStakers(boost: Signal<GatewayResult<Boost>>) -> Element {
     rsx! {
-        TitledResourceRow {
+        TitledSignalRow {
             title: "Total stakers",
             description: "The total number of stakers participating in the protocol.",
-            resource: boost,
+            signal: boost,
             com: |boost| {
                 rsx! {
                     span {
@@ -264,7 +236,7 @@ pub fn TotalStakers(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
+fn Tvl(boost: Signal<GatewayResult<Boost>>) -> Element {
     let ore_price = use_ore_price();
     rsx! {
         TitledRow {
@@ -272,7 +244,7 @@ fn Tvl(boost: Resource<GatewayResult<Boost>>) -> Element {
             description: "The notional value of all ORE currently deposited in this protocol, denominated in US dollars.",
             value: rsx! {
                 if let Some(ore_price) = ore_price.cloned() {
-                    if let Some(Ok(boost)) = boost.cloned() {
+                    if let Ok(boost) = boost.cloned() {
                         UsdValue {
                             ui_amount_string: (amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS) * ore_price.0).to_string(),
                         }

@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
@@ -9,15 +10,26 @@ use solana_sdk::{
 
 use crate::{
     gateway::{GatewayError, GatewayResult},
-    hooks::{use_gateway, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
-    solana::spl_associated_token_account,
+    hooks::{
+        use_claimable_yield, use_gateway, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
+        COMPUTE_UNIT_LIMIT,
+    },
+    solana::{
+        spl_associated_token_account::{
+            get_associated_token_address, instruction::create_associated_token_account,
+        },
+        spl_token,
+    },
 };
 
 pub fn use_boost_claim_transaction(
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost: Signal<GatewayResult<Boost>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
+    let ore_balance = use_ore_balance();
     use_resource(move || async move {
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
@@ -25,15 +37,15 @@ pub fn use_boost_claim_transaction(
         };
 
         // Get resources
-        let Some(Ok(stake)) = *stake.read() else {
+        let Ok(_stake) = *stake.read() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(boost)) = *boost.read() else {
+        let Ok(boost) = *boost.read() else {
             return Err(GatewayError::Unknown);
         };
 
         // Check if stake has rewards to claim
-        if stake.rewards == 0 {
+        if claimable_yield.cloned() == 0 {
             return Err(GatewayError::Unknown);
         }
 
@@ -46,17 +58,26 @@ pub fn use_boost_claim_transaction(
         ));
 
         // Derive beneficiary
-        let beneficiary = spl_associated_token_account::get_associated_token_address(
-            &authority,
-            &ore_api::consts::MINT_ADDRESS,
-        );
+        let beneficiary = get_associated_token_address(&authority, &ore_api::consts::MINT_ADDRESS);
+
+        // Create associated token account if necessary
+        if let Some(Ok(_balance)) = ore_balance.cloned() {
+            // No op
+        } else {
+            ixs.push(create_associated_token_account(
+                &authority,
+                &authority,
+                &ore_api::consts::MINT_ADDRESS,
+                &spl_token::ID,
+            ));
+        }
 
         // Claim rewards
         ixs.push(ore_boost_api::sdk::claim(
             authority,
             beneficiary,
             boost.mint,
-            stake.rewards,
+            claimable_yield.cloned(),
         ));
 
         // Include ORE app fee

@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::Result;
-use cargo_packager_updater::Update;
 use dioxus::prelude::*;
 
 use crate::{
@@ -15,7 +13,7 @@ pub fn Updater() -> Element {
     use_memo(move || {
         spawn(async move {
             loop {
-                tokio::time::sleep(tokio::time::Duration::from_secs(600)).await;
+                tokio::time::sleep(tokio::time::Duration::from_secs(6_000)).await;
                 updater.restart();
             }
         });

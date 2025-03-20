@@ -14,15 +14,15 @@ mod utils;
 use dioxus::prelude::*;
 #[cfg(feature = "web")]
 use hooks::use_download_url_provider;
-use hooks::{use_miner_cores_provider, use_miner_status_provider, use_mining_loop};
 use tracing::Level;
 
 #[cfg(all(feature = "desktop", target_os = "macos"))]
 use crate::utils::AppNapDisabler;
 use crate::{
     hooks::{
-        use_cache_provider, use_miner_events_provider, use_miner_provider,
-        use_transaction_status_provider, use_wallet_drawer_state_provider, use_wallet_provider,
+        use_cache_provider, use_miner_cores_provider, use_miner_events_provider,
+        use_miner_provider, use_miner_status_provider, use_mining_loop,
+        use_transaction_status_provider, use_wallet_drawer_state_provider, use_wallet_provider, use_wss_provider,
     },
     route::Route,
 };
@@ -46,6 +46,7 @@ pub fn App() -> Element {
     use_miner_cores_provider();
     use_transaction_status_provider();
     use_wallet_provider();
+    use_wss_provider();
     use_cache_provider();
     use_mining_loop();
     use_wallet_drawer_state_provider();

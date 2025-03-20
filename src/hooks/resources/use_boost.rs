@@ -11,8 +11,6 @@ use crate::{
     hooks::use_gateway,
 };
 
-// TODO: REFerence resoourcee
-// we can call restart on the resource
 pub(crate) fn use_boosts_provider() {
     // Hashmap to cache resources
     let mut boosts = HashMap::new();
@@ -20,9 +18,6 @@ pub(crate) fn use_boosts_provider() {
     // Idle ORE boost
     let boost_address = boost_pda(MINT_ADDRESS).0;
     boosts.insert(boost_address, use_boost_resource(boost_address));
-
-    // TODO: for the listed, go thrugh the list of tokens and fetch the atas ffr tthe current wallet
-    // in the cases waallet changes, then we would reset the reseurrce and refetch the new atas
 
     // Listed boosts
     for boost_meta in LISTED_BOOSTS.iter() {
@@ -43,14 +38,11 @@ fn use_boost_resource(address: Pubkey) -> Resource<GatewayResult<Boost>> {
     })
 }
 
-/*
-use the tokens resurce
-fetch the
+pub fn use_all_boosts() -> HashMap<Pubkey, Resource<GatewayResult<Boost>>> {
+    use_context()
+}
 
-
-esseentilly the use_bosot but use token accounts instead
-*/
-pub fn use_boost(mint_address: Pubkey) -> Resource<GatewayResult<Boost>> {
+pub fn _use_boost(mint_address: Pubkey) -> Resource<GatewayResult<Boost>> {
     let boosts: HashMap<Pubkey, Resource<GatewayResult<Boost>>> = use_context();
     let boost_address = boost_pda(mint_address).0;
     if let Some(boost) = boosts.get(&boost_address) {

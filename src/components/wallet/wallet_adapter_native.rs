@@ -1,9 +1,10 @@
 use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
+use solana_sdk::signer::Signer;
 use std::time::Duration;
 
 use crate::components::*;
-use crate::hooks::{use_wallet, Wallet};
+use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 
 pub fn WalletAdapter() -> Element {
     let wallet = use_wallet();
@@ -15,8 +16,26 @@ pub fn WalletAdapter() -> Element {
         }
         Wallet::Disconnected => {
             rsx! {
-                div { class: "rounded-full transition-colors my-auto h-10 text-black bg-white" }
+                div {
+                    ConnectButtonNative { wallet, width: 100 }
+                }
             }
+        }
+    }
+}
+
+#[component]
+pub fn ConnectButtonNative(wallet: Signal<Wallet>, width: u64) -> Element {
+    rsx! {
+        button {
+            class: "rounded-full transition my-auto h-12 text-black bg-white hover:cursor-pointer hover:scale-105 duration-300 ease-in-out bg-controls-primary flex items-center justify-center",
+            style: "width: {width}px;",
+            onclick: move |_| {
+                if let Ok(keypair) = use_wallet_native::get_or_set() {
+                    wallet.set(Wallet::Connected(keypair.creator.pubkey()));
+                }
+            },
+            "Connect"
         }
     }
 }
@@ -77,4 +96,3 @@ fn ConnectedWalletAdapter(address: Pubkey) -> Element {
         }
     }
 }
-
