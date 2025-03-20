@@ -66,19 +66,6 @@ where
     // Create and initialize the data signal
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
 
-    // Initialize data with current balance
-    spawn(async move {
-        if let Wallet::Connected(pubkey) = *wallet.read() {
-            match get_token_balance(pubkey, mint).await {
-                Ok(initial_data) => data.set(Ok(initial_data)),
-                Err(err) => {
-                    log::error!("Failed to initialize token balance: {:?}", err);
-                    data.set(Err(err));
-                }
-            }
-        }
-    });
-
     // Set up WebSocket subscription when wallet is connected
     use_effect(move || {
         if let Wallet::Connected(pubkey) = *wallet.read() {
@@ -88,6 +75,17 @@ where
                     &pubkey, &mint,
                 ),
             };
+
+            spawn(async move {
+                match get_token_balance(pubkey, mint).await {
+                    Ok(initial_data) => data.set(Ok(initial_data)),
+                    Err(err) => {
+                        log::error!("Failed to initialize token balance: {:?}", err);
+                        data.set(Err(err));
+                    }
+                }
+            });
+
             use_wss_subscription(data.clone(), update_callback.clone(), address);
         }
     });
