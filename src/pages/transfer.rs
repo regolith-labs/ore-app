@@ -74,7 +74,21 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
     let mut amount = use_signal::<String>(|| "".to_string());
 
     // Token balance
-    let token_balance = use_token_balance_for_token(selected_token);
+    let resource_token_balance = use_token_balance_for_token(selected_token);
+
+    // Convert Resource to Signal
+    let mut token_balance = use_signal(|| {
+        resource_token_balance
+            .cloned()
+            .unwrap_or(Err(crate::gateway::GatewayError::Unknown))
+    });
+
+    // Update the signal when the resource changes
+    use_effect(move || {
+        if let Some(balance) = resource_token_balance.cloned() {
+            token_balance.set(balance);
+        }
+    });
 
     // Error handling
     let err = use_signal::<Option<TokenInputError>>(|| None);
@@ -97,7 +111,7 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
         destination_pubkey,
         selected_token,
         amount,
-        token_balance,
+        resource_token_balance,
         err,
         // priority_fee,
         address_err,
