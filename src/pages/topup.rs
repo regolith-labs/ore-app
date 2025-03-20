@@ -160,13 +160,13 @@ pub fn Topup(address: String) -> Element {
     let navigator = use_navigator();
     let mut sol_balance = use_token_balance(Token::sol().mint);
 
-    use_effect(move || {
-        if let Some(Ok(balance)) = sol_balance.cloned() {
-            if balance.amount.parse::<u64>().unwrap() > 0 {
-                navigator.push(Route::Mine {});
-            }
-        }
-    });
+    // use_effect(move || {
+    //     if let Some(Ok(balance)) = sol_balance.cloned() {
+    //         if balance.amount.parse::<u64>().unwrap() > 0 {
+    //             navigator.push(Route::Mine {});
+    //         }
+    //     }
+    // });
 
     use_effect(move || {
         spawn(async move {
@@ -209,12 +209,24 @@ pub fn Topup(address: String) -> Element {
             // TODO Generate QR code
 
             if let Wallet::Connected(address) = *wallet.read() {
-                a {
-                    class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
-                    href: "https://beta.ore.supply/topup/{address}",
-                    span {
-                        class: "mx-auto my-auto",
-                        "Top up →"
+                Col {
+                    class: "mx-auto w-full",
+                    gap: 8,
+                    a {
+                        class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
+                        href: "https://beta.ore.supply/topup/{address}",
+                        span {
+                            class: "mx-auto my-auto",
+                            "Top up →"
+                        }
+                    }
+                    Link {
+                        class: "flex text-sm text-elements-lowEmphasis font-medium mx-auto",
+                        to: Route::Mine {},
+                        span {
+                            class: "mx-auto my-auto",
+                            "Skip for now"
+                        }
                     }
                 }
             } else {
