@@ -20,6 +20,7 @@ pub type ToWss = Coroutine<ToWssMsg>;
 pub enum FromWssMsg {
     Init,
     Subscription(SubRequestId, SubId),
+    ReSubscription(SubRequestId, SubId),
     Notif(AccountNotificationParams),
 }
 #[derive(Debug, Clone, Copy)]
@@ -143,7 +144,7 @@ async fn wss_worker(
                 {
                     Ok(new_sub_id) => {
                         sub_info.sub_id = Some(new_sub_id);
-                        from_wss.set(FromWssMsg::Subscription(request_id, new_sub_id));
+                        from_wss.set(FromWssMsg::ReSubscription(request_id, new_sub_id));
                     }
                     Err(err) => {
                         log::error!(

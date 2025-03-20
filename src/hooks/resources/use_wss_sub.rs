@@ -31,11 +31,14 @@ pub fn use_wss_subscription<T, U>(
     use_effect(move || {
         let msg = from_wss.cloned();
         // Track subscription ID
-        if let FromWssMsg::Subscription(rid, sid) = msg {
-            // Only handle subscriptions originating from this component
-            if sub_request_id.eq(&rid) {
-                sub_id.set(sid);
+        match msg {
+            FromWssMsg::Subscription(rid, sid) | FromWssMsg::ReSubscription(rid, sid) => {
+                // Only handle subscriptions originating from this component
+                if sub_request_id.eq(&rid) {
+                    sub_id.set(sid);
+                }
             }
+            _ => {}
         }
     });
 
