@@ -3,10 +3,7 @@ use ore_types::request::TransactionType;
 
 use crate::{
     components::*,
-    hooks::{
-        on_transaction_done, use_all_stakes, use_boost_claim_all_transaction, use_net_deposits,
-        use_net_yield,
-    },
+    hooks::{use_boost_claim_all_transaction, use_net_deposits, use_net_yield},
 };
 
 pub fn Stake() -> Element {
@@ -98,14 +95,6 @@ fn NetYield() -> Element {
 }
 
 fn ClaimButton() -> Element {
-    // Refresh stake accounts after transaction
-    let mut stake_accounts = use_all_stakes();
-    on_transaction_done(move |_sig| {
-        for (_mint, stake_account) in stake_accounts.iter_mut() {
-            stake_account.restart();
-        }
-    });
-
     // Build claim all transaction
     let tx = use_boost_claim_all_transaction();
     let is_enabled = if let Some(Ok(_)) = *tx.read() {

@@ -16,12 +16,12 @@ pub fn use_net_yield() -> Memo<GatewayResult<UiTokenAmount>> {
         // Iterate through all stake accounts and sum the rewards
         let mut net_yield = 0;
         for (_pubkey, stake) in stakes.iter() {
-            if let Some(Ok(stake)) = stake.cloned() {
+            if let Ok(stake) = stake.cloned() {
                 let boost = boosts.get(&stake.boost).unwrap();
-                if let Some(Ok(boost)) = boost.cloned() {
+                if let Ok(boost) = boost.cloned() {
                     let proof_address = proof_pda(stake.boost).0;
                     let boost_proof = boost_proofs.get(&proof_address).unwrap();
-                    if let Some(Ok(boost_proof)) = boost_proof.cloned() {
+                    if let Ok(boost_proof) = boost_proof.cloned() {
                         let claimable_yield = calculate_claimable_yield(boost, boost_proof, stake);
                         net_yield += claimable_yield;
                     }
