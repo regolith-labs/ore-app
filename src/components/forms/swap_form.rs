@@ -36,11 +36,9 @@ pub fn SwapForm(
             Some(token) => {
                 let wss = use_token_balance_wss(&token.mint);
                 let read = wss.cloned();
-                log::info!("read: {:?}", read);
                 sell_token_balance.set(read);
             }
             None => {
-                log::error!("missing");
                 sell_token_balance.set(Err(GatewayError::AccountNotFound));
             }
         }
@@ -52,11 +50,9 @@ pub fn SwapForm(
             Some(token) => {
                 let wss = use_token_balance_wss(&token.mint);
                 let read = wss.cloned();
-                log::info!("read: {:?}", read);
                 buy_token_balance.set(read);
             }
             None => {
-                log::error!("missing");
                 buy_token_balance.set(Err(GatewayError::AccountNotFound));
             }
         }
