@@ -103,7 +103,6 @@ where
     // Initialize data with current balance
     use_effect(move || {
         if let Wallet::Connected(pubkey) = *wallet.read() {
-            log::info!("connected");
             spawn(async move {
                 match get_token_balance(pubkey, mint).await {
                     Ok(initial_data) => {
