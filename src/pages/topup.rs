@@ -162,8 +162,12 @@ pub fn Topup(address: String) -> Element {
 
     use_effect(move || {
         if let Ok(balance) = sol_balance.cloned() {
-            if balance.amount.parse::<u64>().unwrap() > 0 {
-                navigator.push(Route::Mine {});
+            if let Ok(amount) = balance.amount.parse::<u64>() {
+                if amount > 0 {
+                    navigator.push(Route::Mine {});
+                }
+            } else {
+                log::error!("failed to parse sol balance: {:?}", balance);
             }
         }
     });

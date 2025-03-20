@@ -1,8 +1,8 @@
 use crate::{
     components::*,
     config::Token,
-    gateway::GatewayResult,
-    hooks::{on_transaction_done, use_quote, use_swap_transaction, use_token_balance_for_token},
+    gateway::{GatewayError, GatewayResult},
+    hooks::{on_transaction_done, use_quote, use_swap_transaction, use_token_balance_wss},
 };
 use dioxus::prelude::*;
 use jupiter_swap_api_client::quote::QuoteResponse;
@@ -15,30 +15,45 @@ use super::TokenInputError;
 #[component]
 pub fn SwapForm(
     class: Option<String>,
-    buy_token: Option<Signal<Option<Token>>>,
-    sell_token: Option<Signal<Option<Token>>>,
+    buy_token: Signal<Option<Token>>,
+    sell_token: Signal<Option<Token>>,
     on_tokens_change: Option<EventHandler<(Option<Token>, Option<Token>)>>,
 ) -> Element {
     let class = class.unwrap_or_default();
-
-    // Selected tokens
-    let buy_token = match buy_token {
-        Some(token) => token,
-        None => use_signal(|| Some(Token::ore())),
-    };
-
-    let sell_token = match sell_token {
-        Some(token) => token,
-        None => use_signal(|| Some(Token::sol())),
-    };
 
     // Input amounts
     let mut sell_input_amount = use_signal::<String>(|| "".to_string());
     let mut buy_input_amount = use_signal::<String>(|| "".to_string());
 
     // Fetch token balances
-    let mut sell_token_balance = use_token_balance_for_token(sell_token);
-    let mut buy_token_balance = use_token_balance_for_token(buy_token);
+    let mut sell_token_balance = use_signal(|| Err(GatewayError::AccountNotFound));
+    use_effect(move || {
+        let sell_token = sell_token.cloned();
+        match sell_token {
+            Some(token) => {
+                let wss = use_token_balance_wss(&token.mint);
+                let read = wss.cloned();
+                sell_token_balance.set(read);
+            }
+            None => {
+                sell_token_balance.set(Err(GatewayError::AccountNotFound));
+            }
+        }
+    });
+    let mut buy_token_balance = use_signal(|| Err(GatewayError::AccountNotFound));
+    use_effect(move || {
+        let buy_token = buy_token.cloned();
+        match buy_token {
+            Some(token) => {
+                let wss = use_token_balance_wss(&token.mint);
+                let read = wss.cloned();
+                buy_token_balance.set(read);
+            }
+            None => {
+                buy_token_balance.set(Err(GatewayError::AccountNotFound));
+            }
+        }
+    });
 
     // Quote response
     let mut quote_response = use_signal::<Option<QuoteResponse>>(|| None);
@@ -79,8 +94,6 @@ pub fn SwapForm(
     on_transaction_done(move |_sig| {
         sell_input_amount.set("".to_string());
         buy_input_amount.set("".to_string());
-        sell_token_balance.restart();
-        buy_token_balance.restart();
     });
 
     rsx! {

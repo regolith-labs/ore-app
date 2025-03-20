@@ -42,7 +42,7 @@ pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>>
     }
 }
 
-pub fn use_token_balance_for_token(
+pub fn _use_token_balance_for_token(
     token: Signal<Option<Token>>,
 ) -> Resource<GatewayResult<UiTokenAmount>> {
     let token_balances: HashMap<Pubkey, Resource<GatewayResult<UiTokenAmount>>> = use_context();
@@ -85,38 +85,63 @@ pub(super) async fn get_token_balance(
     }
 }
 
-// TODO: Shouldn't we be using use_token_balance instead of get_token_balance?
 pub fn use_token_balances_for_liquidity_pair(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> (
-    Resource<GatewayResult<UiTokenAmount>>,
-    Resource<GatewayResult<UiTokenAmount>>,
+    Signal<GatewayResult<UiTokenAmount>>,
+    Signal<GatewayResult<UiTokenAmount>>,
 ) {
     let wallet = use_wallet();
 
-    let token_a_balance = use_resource(move || async move {
-        if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-            match *wallet.read() {
-                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
-                Wallet::Connected(authority) => {
-                    get_token_balance(authority, liquidity_pair.token_a.mint).await
-                }
+    let token_a_balance = use_signal(|| Err(GatewayError::AccountNotFound));
+    use_effect({
+        let mut token_a_balance = token_a_balance.clone();
+        move || {
+            if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
+                match *wallet.read() {
+                    Wallet::Disconnected => {
+                        token_a_balance.set(Err(GatewayError::AccountNotFound.into()))
+                    }
+                    Wallet::Connected(authority) => {
+                        let token_mint = liquidity_pair.token_a.mint;
+                        spawn({
+                            let mut token_a_balance = token_a_balance.clone();
+                            async move {
+                                let bal = get_token_balance(authority, token_mint).await;
+                                token_a_balance.set(bal);
+                            }
+                        });
+                    }
+                };
+            } else {
+                token_a_balance.set(Err(GatewayError::Unknown));
             }
-        } else {
-            Err(GatewayError::Unknown)
         }
     });
 
-    let token_b_balance = use_resource(move || async move {
-        if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
-            match *wallet.read() {
-                Wallet::Disconnected => Err(GatewayError::AccountNotFound.into()),
-                Wallet::Connected(authority) => {
-                    get_token_balance(authority, liquidity_pair.token_b.mint).await
-                }
+    let token_b_balance = use_signal(|| Err(GatewayError::AccountNotFound));
+    use_effect({
+        let mut token_b_balance = token_b_balance.clone();
+        move || {
+            if let Some(Ok(liquidity_pair)) = liquidity_pair.read().as_ref() {
+                match *wallet.read() {
+                    Wallet::Disconnected => {
+                        token_b_balance.set(Err(GatewayError::AccountNotFound.into()))
+                    }
+                    Wallet::Connected(authority) => {
+                        let token_mint = liquidity_pair.token_b.mint;
+                        spawn({
+                            let mut token_b_balance = token_b_balance.clone();
+                            async move {
+                                let bal = get_token_balance(authority, token_mint).await;
+                                token_b_balance.set(bal);
+                            }
+                        });
+                    }
+                };
+            } else {
+                token_b_balance.set(Err(GatewayError::Unknown));
             }
-        } else {
-            Err(GatewayError::Unknown)
         }
     });
 

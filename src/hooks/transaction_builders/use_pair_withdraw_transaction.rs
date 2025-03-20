@@ -37,10 +37,10 @@ pub fn use_pair_withdraw_transaction(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     stake: Signal<GatewayResult<Stake>>,
-    stake_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake_b_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
-    token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
+    stake_a_balance: Signal<GatewayResult<UiTokenAmount>>,
+    stake_b_balance: Signal<GatewayResult<UiTokenAmount>>,
+    token_a_balance: Signal<GatewayResult<UiTokenAmount>>,
+    token_b_balance: Signal<GatewayResult<UiTokenAmount>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
@@ -75,10 +75,10 @@ pub fn use_pair_withdraw_transaction(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(stake_a_balance)) = stake_a_balance.cloned() else {
+        let Ok(stake_a_balance) = stake_a_balance.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(_stake_b_balance)) = stake_b_balance.cloned() else {
+        let Ok(_stake_b_balance) = stake_b_balance.cloned() else {
             return Err(GatewayError::Unknown);
         };
 
@@ -132,7 +132,7 @@ pub fn use_pair_withdraw_transaction(
         }
 
         // Build other atas, if necessary
-        if let Some(Ok(_token_a_balance)) = token_a_balance.cloned() {
+        if let Ok(_token_a_balance) = token_a_balance.cloned() {
             // Noop
         } else {
             ixs.push(create_associated_token_account_idempotent(
@@ -142,7 +142,7 @@ pub fn use_pair_withdraw_transaction(
                 &spl_token::ID,
             ));
         };
-        if let Some(Ok(_token_b_balance)) = token_b_balance.cloned() {
+        if let Ok(_token_b_balance) = token_b_balance.cloned() {
             // Noop
         } else {
             ixs.push(create_associated_token_account_idempotent(

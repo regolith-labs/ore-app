@@ -18,7 +18,7 @@ use crate::{
 
 pub fn use_idle_deposit_transaction(
     stake: Signal<GatewayResult<Stake>>,
-    ore_balance: Resource<GatewayResult<UiTokenAmount>>,
+    ore_balance: Signal<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
     mut priority_fee: Signal<u64>,
@@ -49,7 +49,7 @@ pub fn use_idle_deposit_transaction(
         }
 
         // If amount is greater than ore balance, disable
-        if let Some(Ok(ore_balance)) = ore_balance.read().as_ref() {
+        if let Ok(ore_balance) = ore_balance.read().as_ref() {
             if ore_balance.ui_amount.unwrap_or(0.0) < amount_f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(Token::ore())));
                 return Err(GatewayError::Unknown);

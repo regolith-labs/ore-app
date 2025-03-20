@@ -7,7 +7,7 @@ use crate::gateway::{GatewayResult, UiTokenAmount};
 #[component]
 pub fn IdleStakeForm(
     class: Option<String>,
-    balance: Resource<GatewayResult<UiTokenAmount>>,
+    balance: Signal<GatewayResult<UiTokenAmount>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     let class = class.unwrap_or_default();
