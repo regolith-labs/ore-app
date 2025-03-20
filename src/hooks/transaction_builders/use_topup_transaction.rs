@@ -17,7 +17,7 @@ use crate::{
 pub fn use_topup_transaction(
     destination: Memo<Result<Pubkey, ParsePubkeyError>>,
     input_amount: Signal<String>,
-    sol_balance: Resource<GatewayResult<UiTokenAmount>>,
+    sol_balance: Signal<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
     mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
@@ -52,7 +52,7 @@ pub fn use_topup_transaction(
         }
 
         // If amount is greater than SOL balance, disable
-        if let Some(Ok(sol_balance)) = sol_balance.read().as_ref() {
+        if let Ok(sol_balance) = sol_balance.read().as_ref() {
             if sol_balance.ui_amount.unwrap_or(0.0) < amount_f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(Token::sol())));
                 return Err(GatewayError::Unknown);

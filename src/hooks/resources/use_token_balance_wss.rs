@@ -39,6 +39,14 @@ pub fn use_token_balance_wss(mint: &Pubkey) -> Signal<GatewayResult<UiTokenAmoun
     }
 }
 
+pub fn use_sol_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
+    let cache: HashMap<Pubkey, Signal<GatewayResult<UiTokenAmount>>> = use_context();
+    match cache.get(&Token::sol().mint) {
+        Some(signal) => *signal,
+        None => use_signal(|| Err(GatewayError::AccountNotFound)),
+    }
+}
+
 pub fn use_ore_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     let cache: HashMap<Pubkey, Signal<GatewayResult<UiTokenAmount>>> = use_context();
     match cache.get(&MINT_ADDRESS) {
