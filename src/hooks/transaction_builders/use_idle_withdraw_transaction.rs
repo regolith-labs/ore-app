@@ -16,7 +16,7 @@ use solana_sdk::{
 };
 
 pub fn use_idle_withdraw_transaction(
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
     input_amount: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
     mut priority_fee: Signal<u64>,
@@ -47,7 +47,7 @@ pub fn use_idle_withdraw_transaction(
         }
 
         // If amount is greater than stake balance, disable
-        if let Some(Ok(stake)) = stake.read().as_ref() {
+        if let Ok(stake) = stake.read().as_ref() {
             if amount_to_ui_amount(stake.balance, TOKEN_DECIMALS) < amount_f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(Token::ore())));
                 return Err(GatewayError::Unknown);

@@ -24,8 +24,8 @@ use crate::{
 
 pub fn use_boost_claim_transaction(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Resource<GatewayResult<Proof>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
@@ -37,7 +37,7 @@ pub fn use_boost_claim_transaction(
         };
 
         // Get resources
-        let Some(Ok(_stake)) = *stake.read() else {
+        let Ok(_stake) = *stake.read() else {
             return Err(GatewayError::Unknown);
         };
         let Ok(boost) = *boost.read() else {

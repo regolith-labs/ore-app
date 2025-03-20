@@ -13,7 +13,7 @@ use ore_types::request::TransactionType;
 #[component]
 pub fn IdleWithdrawForm(
     balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     let mut input_amount = use_signal::<String>(|| "".to_owned());
     let token = use_signal(|| Some(Token::ore()));
@@ -22,7 +22,7 @@ pub fn IdleWithdrawForm(
 
     // Get the stake balance
     let stake_balance = use_resource(move || async move {
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
         let amount_u64 = stake.balance;
@@ -41,7 +41,6 @@ pub fn IdleWithdrawForm(
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
         balance.restart();
-        stake.restart();
         input_amount.set("".to_owned());
     });
 

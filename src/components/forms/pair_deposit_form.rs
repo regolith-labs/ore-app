@@ -15,7 +15,7 @@ pub fn PairDepositForm(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
     token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
 ) -> Element {

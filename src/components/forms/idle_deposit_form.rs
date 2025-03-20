@@ -11,7 +11,7 @@ use ore_types::request::TransactionType;
 #[component]
 pub fn IdleDepositForm(
     balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     let mut input_amount = use_signal::<String>(|| "".to_owned());
     let token = use_signal(|| Some(Token::ore()));
@@ -24,7 +24,6 @@ pub fn IdleDepositForm(
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
         balance.restart();
-        stake.restart();
         input_amount.set("".to_owned());
     });
 

@@ -15,7 +15,7 @@ pub fn PairWithdrawForm(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
     token_a_balance: Resource<GatewayResult<UiTokenAmount>>,
     token_b_balance: Resource<GatewayResult<UiTokenAmount>>,
 ) -> Element {
@@ -91,7 +91,7 @@ pub fn PairWithdrawForm(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return;
         };
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return;
         };
 

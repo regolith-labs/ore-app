@@ -2,8 +2,8 @@ use crate::{
     components::*,
     gateway::GatewayResult,
     hooks::{
-        on_transaction_done, use_boost_apr, use_boost_claim_transaction, use_boost_proof,
-        use_boost_wss, use_claimable_yield, use_ore_balance, use_ore_price, use_stake,
+        on_transaction_done, use_boost_apr, use_boost_claim_transaction, use_boost_proof_wss,
+        use_boost_wss, use_claimable_yield, use_ore_balance, use_ore_price, use_stake_wss,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
 };
@@ -15,14 +15,12 @@ use ore_types::request::TransactionType;
 pub fn Idle() -> Element {
     let mut balance = use_ore_balance();
     let boost = use_boost_wss(ore_api::consts::MINT_ADDRESS);
-    let mut boost_proof = use_boost_proof(ore_api::consts::MINT_ADDRESS);
-    let mut stake = use_stake(ore_api::consts::MINT_ADDRESS);
+    let boost_proof = use_boost_proof_wss(ore_api::consts::MINT_ADDRESS);
+    let stake = use_stake_wss(ore_api::consts::MINT_ADDRESS);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
         balance.restart();
-        stake.restart();
-        boost_proof.restart();
     });
 
     rsx! {
@@ -57,8 +55,8 @@ pub fn Idle() -> Element {
 #[component]
 fn AccountMetrics(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Resource<GatewayResult<Proof>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
         Col {
@@ -81,12 +79,12 @@ fn AccountMetrics(
 }
 
 #[component]
-fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
+fn Deposits(stake: Signal<GatewayResult<Stake>>) -> Element {
     rsx! {
-        TitledResourceRow {
+        TitledSignalRow {
             title: "Deposits",
             description: "The amount of ORE you have deposited in the protocol. This ORE is \"idle\" and thus earns the native idle yield rate.",
-            resource: stake,
+            signal: stake,
             com: |stake| {
                 rsx! {
                     if stake.balance > 0 {
@@ -107,8 +105,8 @@ fn Deposits(stake: Resource<GatewayResult<Stake>>) -> Element {
 #[component]
 pub fn StakeYield(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Resource<GatewayResult<Proof>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     // Build claim transaction
     let claimable_yield = use_claimable_yield(boost, boost_proof, stake);

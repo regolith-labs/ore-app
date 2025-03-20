@@ -11,8 +11,8 @@ use crate::{
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        on_transaction_done, use_boost_apr, use_boost_proof, use_boost_wss, use_liquidity_pair,
-        use_lp_deposit_transaction, use_stake, use_token_balance,
+        on_transaction_done, use_boost_apr, use_boost_proof_wss, use_boost_wss, use_liquidity_pair,
+        use_lp_deposit_transaction, use_stake_wss, use_token_balance,
         use_token_balances_for_liquidity_pair,
     },
     pages::{Multiplier, StakeYield, TotalStakers},
@@ -26,14 +26,12 @@ pub fn Pair(lp_mint: String) -> Element {
     let mut liquidity_pair = use_liquidity_pair(lp_mint);
     let mut lp_balance = use_token_balance(lp_mint);
     let boost = use_boost_wss(lp_mint);
-    let mut boost_proof = use_boost_proof(lp_mint);
-    let mut stake = use_stake(lp_mint);
+    let boost_proof = use_boost_proof_wss(lp_mint);
+    let stake = use_stake_wss(lp_mint);
     let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
-        stake.restart();
-        boost_proof.restart();
         liquidity_pair.restart();
         lp_balance.restart();
     });
@@ -82,8 +80,8 @@ fn AccountMetrics(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Resource<GatewayResult<Proof>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
         Col {
@@ -116,7 +114,7 @@ fn AccountMetrics(
 #[component]
 fn Deposits(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
         TitledRow {
@@ -124,23 +122,19 @@ fn Deposits(
             description: "The amount of liquidity you have deposited in the protocol. These assets are \"productive\" and automatically earn trading fees from market activity.",
             value: rsx! {
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-                    if let Some(stake) = stake.cloned() {
-                        if let Ok(stake) = stake {
-                            if stake.balance > 0 {
-                                LiquidityPairStakeValue {
-                                    class: "pb-0 sm:pb-4",
-                                    stake_balance: stake.balance,
-                                    liquidity_pair: liquidity_pair,
-                                    with_decimal_units: true,
-                                }
-                            } else {
-                                NullValue {}
+                    if let Ok(stake) = stake.cloned() {
+                        if stake.balance > 0 {
+                            LiquidityPairStakeValue {
+                                class: "pb-0 sm:pb-4",
+                                stake_balance: stake.balance,
+                                liquidity_pair: liquidity_pair,
+                                with_decimal_units: true,
                             }
                         } else {
                             NullValue {}
                         }
                     } else {
-                        LoadingValue {}
+                        NullValue {}
                     }
                 } else {
                     LoadingValue {}
@@ -156,7 +150,7 @@ fn UnstakedLp(
     boost: Signal<GatewayResult<Boost>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     let err = use_signal(|| None);
     let lp_deposit_tx = use_lp_deposit_transaction(boost, stake);

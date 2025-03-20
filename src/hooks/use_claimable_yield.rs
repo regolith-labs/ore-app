@@ -7,14 +7,14 @@ use crate::gateway::GatewayResult;
 
 pub fn use_claimable_yield(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Resource<GatewayResult<Proof>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Memo<u64> {
     use_memo(move || {
         let mut rewards = 0;
         if let Ok(boost) = boost.cloned() {
-            if let Some(Ok(stake)) = stake.cloned() {
-                if let Some(Ok(boost_proof)) = boost_proof.cloned() {
+            if let Ok(stake) = stake.cloned() {
+                if let Ok(boost_proof) = boost_proof.cloned() {
                     rewards += calculate_claimable_yield(boost, boost_proof, stake);
                 }
             }
