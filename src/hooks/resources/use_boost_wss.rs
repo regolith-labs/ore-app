@@ -80,6 +80,5 @@ pub fn use_boost_wss(mint_address: Pubkey) -> Signal<GatewayResult<Boost>> {
 }
 
 pub fn use_all_boosts() -> HashMap<Pubkey, Signal<GatewayResult<Boost>>> {
-    log::info!("use_all_boosts");
     use_context()
 }

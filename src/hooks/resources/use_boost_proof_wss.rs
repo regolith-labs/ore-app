@@ -72,7 +72,6 @@ fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>>
 }
 
 pub fn use_boost_proof_wss(mint_address: Pubkey) -> Signal<GatewayResult<Proof>> {
-    log::info!("use_boost_proof_wss: {:?}", mint_address);
     let boost_proofs: HashMap<Pubkey, Signal<GatewayResult<Proof>>> = use_context();
     let boost_address = boost_pda(mint_address).0;
     let proof_address = proof_pda(boost_address).0;
@@ -80,11 +79,9 @@ pub fn use_boost_proof_wss(mint_address: Pubkey) -> Signal<GatewayResult<Proof>>
         *boost_proof
     } else {
         panic!("use_boost_proof_wss: {:?} not found", mint_address);
-        // use_boost_proof_signal(mint_address)
     }
 }
 
 pub fn use_all_boost_proofs() -> HashMap<Pubkey, Signal<GatewayResult<Proof>>> {
-    log::info!("use_all_boost_proofs");
     use_context()
 }

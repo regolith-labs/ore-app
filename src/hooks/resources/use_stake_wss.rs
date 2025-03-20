@@ -90,7 +90,6 @@ fn use_stake_signal(mint_address: Pubkey) -> Signal<GatewayResult<Stake>> {
 }
 
 pub fn use_stake_wss(mint_address: Pubkey) -> Signal<GatewayResult<Stake>> {
-    log::info!("use_stake_wss: {:?}", mint_address);
     let stakes: HashMap<Pubkey, Signal<GatewayResult<Stake>>> = use_context();
     if let Some(stake) = stakes.get(&mint_address) {
         *stake
@@ -100,7 +99,6 @@ pub fn use_stake_wss(mint_address: Pubkey) -> Signal<GatewayResult<Stake>> {
 }
 
 pub fn use_all_stakes() -> HashMap<Pubkey, Signal<GatewayResult<Stake>>> {
-    log::info!("use_all_stakes");
     use_context()
 }
 
