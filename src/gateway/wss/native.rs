@@ -138,11 +138,9 @@ impl AccountSubscribe for AccountSubscribeGateway {
         while let Some(msg) = self.reader.next().await {
             match msg {
                 Ok(Message::Text(text)) => {
-                    log::info!("text: {:?}", text);
                     match serde_json::from_str::<AccountNotificationEnvelope>(&text) {
                         Ok(notification) => {
                             if notification.method == "accountNotification" {
-                                log::info!("notif id: {:?}", notification.params.subscription);
                                 return Ok(notification);
                             } else {
                                 log::info!("Ignoring non-account notification: {:?}", notification);
@@ -156,7 +154,6 @@ impl AccountSubscribe for AccountSubscribeGateway {
                     }
                 }
                 Ok(msg) => {
-                    log::info!("{:?}", msg);
                     continue;
                 }
                 Err(e) => return Err(SubscriptionError::ConnectionError(e.to_string())),
