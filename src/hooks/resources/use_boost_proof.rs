@@ -47,7 +47,7 @@ pub fn use_all_boost_proofs() -> HashMap<Pubkey, Resource<GatewayResult<Proof>>>
     use_context()
 }
 
-pub fn use_boost_proof(mint_address: Pubkey) -> Resource<GatewayResult<Proof>> {
+pub fn _use_boost_proof(mint_address: Pubkey) -> Resource<GatewayResult<Proof>> {
     let boost_proofs: HashMap<Pubkey, Resource<GatewayResult<Proof>>> = use_context();
     let boost_address = boost_pda(mint_address).0;
     let boost_proof_address = proof_pda(boost_address).0;

@@ -15,7 +15,7 @@ pub fn use_net_deposits() -> Memo<GatewayResult<UiTokenAmount>> {
         // Iterate through all stake accounts and sum the deposits
         let mut net_deposits = 0;
         for (mint, stake) in stake_accounts.iter() {
-            if let Some(Ok(stake)) = *stake.read() {
+            if let Ok(stake) = stake.cloned() {
                 if mint == &MINT_ADDRESS {
                     net_deposits += stake.balance;
                 } else if let Some(liquidity_pair_resource) = liquidity_pairs.get(&mint) {

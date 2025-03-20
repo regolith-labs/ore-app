@@ -12,8 +12,8 @@ use crate::{
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
     hooks::{
-        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apr, use_boost_proof,
-        use_boost_tvl, use_claimable_yield,
+        use_all_liquidity_pairs, use_boost_apr, use_boost_proof_wss, use_boost_tvl, use_boost_wss,
+        use_claimable_yield, use_stake_wss,
     },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
@@ -21,7 +21,6 @@ use crate::{
 };
 
 pub fn StakeTable() -> Element {
-    let stake_accounts = use_all_stakes();
     let liquidity_pairs = use_all_liquidity_pairs();
     let mut info_hidden = use_signal(|| true);
     rsx! {
@@ -59,19 +58,12 @@ pub fn StakeTable() -> Element {
                     }
                 },
                 rows: rsx! {
-                    if let Some(stake) = stake_accounts.get(&MINT_ADDRESS) {
-                        IdleTableRow {
-                            stake: *stake
-                        }
-                    }
+                    IdleTableRow {}
                     for boost_meta in LISTED_BOOSTS.iter() {
-                        if let Some(stake) = stake_accounts.get(&boost_meta.lp_mint) {
-                            if let Some(liquidity_pair) = liquidity_pairs.get(&boost_meta.lp_mint) {
-                                StakeTableRow {
-                                    boost_meta: boost_meta.clone(),
-                                    stake: *stake,
-                                    liquidity_pair: *liquidity_pair
-                                }
+                        if let Some(liquidity_pair) = liquidity_pairs.get(&boost_meta.lp_mint) {
+                            StakeTableRow {
+                                boost_meta: boost_meta.clone(),
+                                liquidity_pair: *liquidity_pair
                             }
                         }
                     }
@@ -81,11 +73,11 @@ pub fn StakeTable() -> Element {
     }
 }
 
-#[component]
-fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
+fn IdleTableRow() -> Element {
     let token = Token::ore();
-    let boost = use_boost(token.mint);
-    let boost_proof = use_boost_proof(token.mint);
+    let stake = use_stake_wss(token.mint);
+    let boost = use_boost_wss(token.mint);
+    let boost_proof = use_boost_proof_wss(token.mint);
     rsx! {
         TableRowLink {
             to: Route::Idle {},
@@ -98,7 +90,6 @@ fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
             right_1: rsx! {
                 StakeTableRowAPR {
                     mint_address: MINT_ADDRESS,
-                    boost,
                     stake,
                 }
             },
@@ -123,11 +114,11 @@ fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
 #[component]
 fn StakeTableRow(
     boost_meta: BoostMeta,
-    stake: Resource<GatewayResult<Stake>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
-    let boost = use_boost(boost_meta.lp_mint);
-    let boost_proof = use_boost_proof(boost_meta.lp_mint);
+    let stake = use_stake_wss(boost_meta.lp_mint);
+    let boost = use_boost_wss(boost_meta.lp_mint);
+    let boost_proof = use_boost_proof_wss(boost_meta.lp_mint);
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -142,14 +133,12 @@ fn StakeTableRow(
             right_1: rsx! {
                 StakeTableRowAPR {
                     mint_address: boost_meta.lp_mint,
-                    boost,
                     stake,
                 }
             },
             right_2: rsx! {
                 StakeTableRowTVL {
                     boost_meta: boost_meta.clone(),
-                    boost,
                     stake,
                     liquidity_pair
                 }
@@ -167,9 +156,9 @@ fn StakeTableRow(
 }
 
 #[component]
-fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Element {
+fn IdleTableRowTitle(token: Token, stake: Signal<GatewayResult<Stake>>) -> Element {
     let balance = use_resource(move || async move {
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return None;
         };
         Some(format_token_amount(
@@ -215,7 +204,7 @@ fn IdleTableRowTitle(token: Token, stake: Resource<GatewayResult<Stake>>) -> Ele
 fn StakeTableRowTitle(
     boost_meta: BoostMeta,
     pair_mint: Pubkey,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let token = LISTED_TOKENS.get(&pair_mint).cloned();
@@ -224,7 +213,7 @@ fn StakeTableRowTitle(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return None;
         };
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return None;
         };
         if stake.balance == 0 {
@@ -291,8 +280,8 @@ fn StakeTableRowTitle(
 
 #[component]
 fn IdleTableRowTVL(
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost: Signal<GatewayResult<Boost>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     let boost_tvl = use_boost_tvl(MINT_ADDRESS);
 
@@ -300,10 +289,10 @@ fn IdleTableRowTVL(
         let Ok(boost_tvl) = boost_tvl.cloned() else {
             return None;
         };
-        let Some(Ok(boost)) = boost.cloned() else {
+        let Ok(boost) = boost.cloned() else {
             return None;
         };
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return None;
         };
         if stake.balance > 0 {
@@ -350,8 +339,7 @@ fn IdleTableRowTVL(
 #[component]
 fn StakeTableRowTVL(
     boost_meta: BoostMeta,
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
     let boost_tvl = use_boost_tvl(boost_meta.lp_mint);
@@ -360,10 +348,7 @@ fn StakeTableRowTVL(
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
             return None;
         };
-        let Some(Ok(_boost)) = boost.cloned() else {
-            return None;
-        };
-        let Some(Ok(stake)) = stake.cloned() else {
+        let Ok(stake) = stake.cloned() else {
             return None;
         };
         if stake.balance > 0 {
@@ -408,11 +393,7 @@ fn StakeTableRowTVL(
 }
 
 #[component]
-fn StakeTableRowAPR(
-    mint_address: Pubkey,
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
-) -> Element {
+fn StakeTableRowAPR(mint_address: Pubkey, stake: Signal<GatewayResult<Stake>>) -> Element {
     let apr = use_boost_apr(mint_address);
     rsx! {
         if let Ok(apr) = apr.cloned() {
@@ -431,36 +412,29 @@ fn StakeTableRowAPR(
 #[component]
 fn StakeTableRowYield(
     mint_address: Pubkey,
-    boost: Resource<GatewayResult<Boost>>,
-    boost_proof: Resource<GatewayResult<Proof>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost: Signal<GatewayResult<Boost>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     // Calculate rewards
     let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
 
     rsx! {
         Col {
-            if let Some(stake) = stake.cloned() {
-                if let Ok(stake) = stake.clone() {
-                    if *claimable_yield.read() > 0 {
-                        Col {
-                            OreValue {
-                                class: "text-right ml-auto",
-                                ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
-                                with_decimal_units: true,
-                                size: TokenValueSize::Small,
-                                gold: true,
-                                abbreviated: true,
-                            }
-                            span {
-                                class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
-                                "{format_time_since(stake.last_claim_at as u64)}"
-                            }
+            if let Ok(stake) = stake.cloned() {
+                if *claimable_yield.read() > 0 {
+                    Col {
+                        OreValue {
+                            class: "text-right ml-auto",
+                            ui_amount_string: amount_to_ui_amount_string(*claimable_yield.read(), TOKEN_DECIMALS),
+                            with_decimal_units: true,
+                            size: TokenValueSize::Small,
+                            gold: true,
+                            abbreviated: true,
                         }
-                    } else {
                         span {
-                            class: "text-right ml-auto text-elements-midEmphasis font-medium mr-1",
-                            "–"
+                            class: "text-right my-auto font-medium text-elements-lowEmphasis text-xs",
+                            "{format_time_since(stake.last_claim_at as u64)}"
                         }
                     }
                 } else {
@@ -470,7 +444,10 @@ fn StakeTableRowYield(
                     }
                 }
             } else {
-                TableCellLoading {}
+                span {
+                    class: "text-right ml-auto text-elements-midEmphasis font-medium mr-1",
+                    "–"
+                }
             }
         }
     }

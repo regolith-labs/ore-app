@@ -58,12 +58,12 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
 
             // Get resources
             for (_pubkey, stake) in stakes.iter() {
-                if let Some(Ok(stake)) = stake.cloned() {
+                if let Ok(stake) = stake.cloned() {
                     let boost = boosts.get(&stake.boost).unwrap();
-                    if let Some(Ok(boost)) = boost.cloned() {
+                    if let Ok(boost) = boost.cloned() {
                         let proof_address = proof_pda(stake.boost).0;
                         let boost_proof = boost_proofs.get(&proof_address).unwrap();
-                        if let Some(Ok(boost_proof)) = boost_proof.cloned() {
+                        if let Ok(boost_proof) = boost_proof.cloned() {
                             let claimable_yield =
                                 calculate_claimable_yield(boost, boost_proof, stake);
                             if claimable_yield > 0 {

@@ -13,8 +13,8 @@ use crate::{
 };
 
 pub fn use_lp_deposit_transaction(
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost: Signal<GatewayResult<Boost>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -24,7 +24,7 @@ pub fn use_lp_deposit_transaction(
         };
 
         // Get resources
-        let Some(Ok(boost)) = *boost.read() else {
+        let Ok(boost) = *boost.read() else {
             return Err(GatewayError::Unknown);
         };
 
@@ -37,7 +37,7 @@ pub fn use_lp_deposit_transaction(
         ));
 
         // Open the stake account, if needed
-        if let Some(Ok(_stake)) = stake.read().as_ref() {
+        if let Ok(_) = stake.read().as_ref() {
             // Do nothing
         } else {
             ixs.push(ore_boost_api::sdk::open(authority, authority, boost.mint));

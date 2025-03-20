@@ -8,7 +8,7 @@ use crate::gateway::{GatewayResult, UiTokenAmount};
 pub fn IdleStakeForm(
     class: Option<String>,
     balance: Signal<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     let class = class.unwrap_or_default();
     let tab = use_signal(|| StakeTab::Deposit);

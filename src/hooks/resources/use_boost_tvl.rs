@@ -5,15 +5,15 @@ use steel::Pubkey;
 use crate::gateway::{GatewayError, GatewayResult};
 use crate::solana::spl_token::amount_to_ui_amount;
 
-use super::{use_boost, use_liquidity_pair, use_ore_price, OrePrice};
+use super::{use_boost_wss, use_liquidity_pair, use_ore_price, OrePrice};
 
 pub fn use_boost_tvl(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
-    let boost = use_boost(mint_address);
+    let boost = use_boost_wss(mint_address);
     let liquidity_pair = use_liquidity_pair(mint_address);
     let ore_price = use_ore_price();
 
     use_memo(move || {
-        let Some(Ok(boost)) = boost.cloned() else {
+        let Ok(boost) = boost.cloned() else {
             return Err(GatewayError::Unknown);
         };
         if mint_address == MINT_ADDRESS {

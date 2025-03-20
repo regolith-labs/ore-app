@@ -11,6 +11,7 @@ pub fn OreValue(
     abbreviated: Option<bool>,
     gold: Option<bool>,
     size: Option<TokenValueSize>,
+    mono: Option<bool>,
     color_override: Option<String>,
 ) -> Element {
     let class = class.unwrap_or("".to_string());
@@ -30,6 +31,13 @@ pub fn OreValue(
             ("text-elements-highEmphasis", "text-elements-lowEmphasis")
         }
     };
+
+    let font_style = if mono.unwrap_or(false) {
+        "font-mono"
+    } else {
+        ""
+    };
+
     let whole_units_color = color_override
         .clone()
         .unwrap_or(whole_units_color.to_string());
@@ -63,7 +71,7 @@ pub fn OreValue(
                 class: "my-auto {icon_size} {whole_units_color}"
             }
             Row {
-                class: "my-auto",
+                class: "my-auto {font_style}",
                 span {
                     class: "mt-auto {whole_units_size} {whole_units_color} {font_weight}",
                     "{units[0]}"

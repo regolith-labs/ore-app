@@ -41,7 +41,7 @@ pub fn use_pair_deposit_transaction(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
     token_a_balance: Signal<GatewayResult<UiTokenAmount>>,
     token_b_balance: Signal<GatewayResult<UiTokenAmount>>,
     input_amount_a: Signal<String>,
@@ -205,7 +205,7 @@ pub fn use_pair_deposit_transaction(
         }
 
         // Open the stake account, if needed
-        if let Some(Ok(_stake)) = stake.read().as_ref() {
+        if let Ok(_) = stake.read().as_ref() {
             // Do nothing
         } else {
             ixs.push(ore_boost_api::sdk::open(
