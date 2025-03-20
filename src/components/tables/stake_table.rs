@@ -12,7 +12,7 @@ use crate::{
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
     hooks::{
-        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apy, use_boost_proof,
+        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apr, use_boost_proof,
         use_boost_tvl, use_claimable_yield,
     },
     route::Route,
@@ -48,11 +48,11 @@ pub fn StakeTable() -> Element {
                 header: rsx! {
                     TableHeader {
                         left: "Stake",
-                        right_1: "APY",
+                        right_1: "APR",
                         right_2: "TVL",
                         right_3: "Yield",
                         help_left: "Holders of the assets below are eligible to receive ORE yield.",
-                        help_right_1: "Estimated annual yield based on trailing 7d returns.",
+                        help_right_1: "Estimated annual percentage rate based on 7d trailing returns.",
                         help_right_2: "Current notional value of assets deposited in the protocol.",
                         help_right_3: "Amount of yield you have earned and may claim.",
                         help_hidden: info_hidden,
@@ -96,7 +96,7 @@ fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
                 }
             },
             right_1: rsx! {
-                StakeTableRowApy {
+                StakeTableRowAPR {
                     mint_address: MINT_ADDRESS,
                     boost,
                     stake,
@@ -140,7 +140,7 @@ fn StakeTableRow(
                 }
             },
             right_1: rsx! {
-                StakeTableRowApy {
+                StakeTableRowAPR {
                     mint_address: boost_meta.lp_mint,
                     boost,
                     stake,
@@ -408,18 +408,18 @@ fn StakeTableRowTVL(
 }
 
 #[component]
-fn StakeTableRowApy(
+fn StakeTableRowAPR(
     mint_address: Pubkey,
     boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
-    let apy = use_boost_apy(mint_address);
+    let apr = use_boost_apr(mint_address);
     rsx! {
-        if let Ok(apy) = apy.cloned() {
+        if let Ok(apr) = apr.cloned() {
             Col {
                 span {
                     class: "text-right my-auto font-medium",
-                    "{apy:.0}%"
+                    "{apr:.0}%"
                 }
             }
         } else {

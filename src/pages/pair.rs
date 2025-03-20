@@ -11,7 +11,7 @@ use crate::{
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        on_transaction_done, use_boost, use_boost_apy, use_boost_proof, use_liquidity_pair,
+        on_transaction_done, use_boost, use_boost_apr, use_boost_proof, use_liquidity_pair,
         use_lp_deposit_transaction, use_stake, use_token_balance,
         use_token_balances_for_liquidity_pair,
     },
@@ -207,7 +207,7 @@ fn BoostMetrics(
                 class: "mb-4",
                 title: "Boost"
             }
-            Apy {
+            Apr {
                 boost_meta: boost_meta.clone(),
             }
             Multiplier {
@@ -230,17 +230,17 @@ fn BoostMetrics(
 }
 
 #[component]
-pub fn Apy(boost_meta: BoostMeta) -> Element {
-    let apy = use_boost_apy(boost_meta.lp_mint);
+pub fn Apr(boost_meta: BoostMeta) -> Element {
+    let apr = use_boost_apr(boost_meta.lp_mint);
     rsx! {
         TitledRow {
-            title: "APY",
+            title: "APR",
             description: "An estimated annualized percentage yield, derived from the trailing 7 days of returns, divided by the current notional value of all deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
-                if let Ok(apy) = apy.cloned() {
+                if let Ok(apr) = apr.cloned() {
                     span {
                         class: "text-elements-highEmphasis font-medium",
-                        "{apy:.0}%"
+                        "{apr:.0}%"
                     }
                 } else {
                     LoadingValue {}
