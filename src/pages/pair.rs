@@ -235,7 +235,7 @@ pub fn Apr(boost_meta: BoostMeta) -> Element {
     rsx! {
         TitledRow {
             title: "APR",
-            description: "An estimated annualized percentage yield, derived from the trailing 7 days of returns, divided by the current notional value of all deposits in the protocol. This estimate in no way guarantees future returns.",
+            description: "An estimated annualized percentage rate, derived from the trailing 7 days of returns, divided by the current notional value of all deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
                 if let Ok(apr) = apr.cloned() {
                     span {
