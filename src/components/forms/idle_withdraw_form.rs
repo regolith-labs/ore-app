@@ -20,19 +20,22 @@ pub fn IdleWithdrawForm(
     let err = use_signal::<Option<TokenInputError>>(|| None);
     let priority_fee = use_signal::<u64>(|| 0);
 
-   // Get the stake balance
-    let stake_balance = use_resource(move || async move {
-        let Ok(stake) = stake.cloned() else {
-            return Err(GatewayError::Unknown);
+    // Get the stake balance
+    let mut stake_balance = use_signal(|| Err(GatewayError::AccountNotFound));
+    use_effect(move || {
+        match stake.cloned() {
+            Ok(stake) => {
+                let amount_u64 = stake.balance;
+                let amount_f64 = amount_to_ui_amount(amount_u64, TOKEN_DECIMALS);
+                stake_balance.set(Ok(UiTokenAmount {
+                    ui_amount: Some(amount_f64),
+                    ui_amount_string: format!("{:.1$}", amount_f64, TOKEN_DECIMALS as usize),
+                    amount: amount_u64.to_string(),
+                    decimals: TOKEN_DECIMALS as u8,
+                }));
+            }
+            _ => stake_balance.set(Err(GatewayError::Unknown)),
         };
-        let amount_u64 = stake.balance;
-        let amount_f64 = amount_to_ui_amount(amount_u64, TOKEN_DECIMALS);
-        Ok(UiTokenAmount {
-            ui_amount: Some(amount_f64),
-            ui_amount_string: format!("{:.1$}", amount_f64, TOKEN_DECIMALS as usize),
-            amount: amount_u64.to_string(),
-            decimals: TOKEN_DECIMALS as u8,
-        })
     });
 
     // Build the withdraw transaction

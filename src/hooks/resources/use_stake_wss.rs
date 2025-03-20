@@ -106,10 +106,10 @@ pub fn use_withdrawable_balances(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> (
-    Resource<GatewayResult<UiTokenAmount>>,
-    Resource<GatewayResult<UiTokenAmount>>,
+    Signal<GatewayResult<UiTokenAmount>>,
+    Signal<GatewayResult<UiTokenAmount>>,
 ) {
-    let stake_a_balance = use_resource(move || async move {
+    let stake_a_balance = use_signal(|| {
         let Ok(stake) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
@@ -131,7 +131,7 @@ pub fn use_withdrawable_balances(
         })
     });
 
-    let stake_b_balance = use_resource(move || async move {
+    let stake_b_balance = use_signal(|| {
         let Ok(stake) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };

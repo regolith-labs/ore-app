@@ -2,8 +2,8 @@ use crate::{
     components::*,
     gateway::GatewayResult,
     hooks::{
-        on_transaction_done, use_boost_apr, use_boost_claim_transaction, use_boost_proof_wss,
-        use_boost_wss, use_claimable_yield, use_ore_balance_wss, use_ore_price, use_stake_wss,
+        use_boost_apr, use_boost_claim_transaction, use_boost_proof_wss, use_boost_wss,
+        use_claimable_yield, use_ore_balance_wss, use_ore_price, use_stake_wss,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
 };
@@ -17,11 +17,6 @@ pub fn Idle() -> Element {
     let boost = use_boost_wss(ore_api::consts::MINT_ADDRESS);
     let boost_proof = use_boost_proof_wss(ore_api::consts::MINT_ADDRESS);
     let stake = use_stake_wss(ore_api::consts::MINT_ADDRESS);
-
-    // Refresh data if successful transaction
-    on_transaction_done(move |_sig| {
-        balance.restart();
-    });
 
     rsx! {
         Col {
