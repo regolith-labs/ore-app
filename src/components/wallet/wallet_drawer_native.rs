@@ -79,77 +79,105 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     });
     rsx! {
         div {
-            class: "flex flex-col gap-2 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
+            class: "flex flex-col h-full w-screen sm:w-96 elevated elevated-border text-white z-50",
             onclick: move |e| {
                 keypair_show_export.set(false);
             },
-            button {
-                class: "flex justify-center items-center rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
-                onclick: move |e| {
-                    e.stop_propagation();
-                    if let Err(err) = clipboard.set(pubkey.to_string()) {
-                        log::error!("failed to set clipboard: {:?}", err);
-                    }
-                    pubkey_splice.set(Splice::Copied);
-                },
-                div { class: "flex items-center gap-2",
-                    div { "{pubkey_splice.read().to_string()}" }
-                    CopyIcon { class: "h-4 w-4", solid: false }
-                }
-            }
-            Row {
-                class: "justify-center items-center mx-4 p-4",
-                gap: 10,
-                Col {
-                    class: "items-center",
-                    gap: 2,
-                    a {
-                        class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
 
-                        PlusIcon { class: "h-5" }
-                    }
+            // Header section with fixed content
+            div {
+                class: "px-4 pt-4 pb-2",
+
+                // Close wallet button
+                button {
+                    class: "rounded-full text-center py-1 w-8 h-8 flex items-center justify-center bg-surface-floating hover:bg-surface-floating-hover self-center cursor-pointer mb-4",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        on_close.call(e);
+                    },
                     span {
-                        class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
-                        "Top Up"
+                        class: "text-xl font-semibold",
+                        "×"
                     }
                 }
-                Col {
-                    class: "items-center",
-                    gap: 2,
-                    a {
-                        class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
-                        href: "https://solscan.io/account/{pubkey.read()}",
-                        GlobeIcon { class: "h-5" }
-                    }
-                    span {
-                        class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
-                        "Explorer"
+
+                // Clipboard button
+                button {
+                    class: "flex justify-center items-center rounded-full text-center py-4 px-6 w-full controls-secondary hover:cursor-pointer mb-4",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        if let Err(err) = clipboard.set(pubkey.to_string()) {
+                            log::error!("failed to set clipboard: {:?}", err);
+                        }
+                        pubkey_splice.set(Splice::Copied);
+                    },
+                    div { class: "flex items-center gap-2",
+                        div { "{pubkey_splice.read().to_string()}" }
+                        CopyIcon { class: "h-4 w-4", solid: false }
                     }
                 }
-                Col {
-                    class: "items-center",
-                    gap: 2,
-                    Link {
-                        class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
-                        to: Route::Transfer {},
-                        onclick: move |e: MouseEvent| {
-                            e.stop_propagation();
-                            on_close.call(e);
-                        },
-                        PaperAirplaneIcon { class: "h-5" }
+
+                // Action links row
+                Row {
+                    class: "justify-center items-center mb-4",
+                    gap: 10,
+                    Col {
+                        class: "items-center",
+                        gap: 2,
+                        a {
+                            class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                            href: "https://beta.ore.supply/topup/{pubkey.read()}",
+                            PlusIcon { class: "h-5" }
+                        }
+                        span {
+                            class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                            "Top Up"
+                        }
                     }
-                    span {
-                        class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
-                        "Transfer"
+                    Col {
+                        class: "items-center",
+                        gap: 2,
+                        a {
+                            class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                            href: "https://solscan.io/account/{pubkey.read()}",
+                            GlobeIcon { class: "h-5" }
+                        }
+                        span {
+                            class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                            "Explorer"
+                        }
+                    }
+                    Col {
+                        class: "items-center",
+                        gap: 2,
+                        Link {
+                            class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                            to: Route::Transfer {},
+                            onclick: move |e: MouseEvent| {
+                                e.stop_propagation();
+                                on_close.call(e);
+                            },
+                            PaperAirplaneIcon { class: "h-5" }
+                        }
+                        span {
+                            class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                            "Transfer"
+                        }
                     }
                 }
             }
-            Col {
+
+            // Token List with overflow handling - the content area
+            div {
+                class: "flex-1 overflow-y-auto",
+                style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
                 TokenList {}
             }
+
+            // Wallet actions at the bottom
             if *keypair_show_export.read() {
                 button {
-                    class: "flex flex-col gap-2 mt-auto mx-4",
+                    class: "flex flex-col gap-2 px-4 py-4 mb-4",
                     onclick: move |e| {
                         e.stop_propagation();
                         if let Err(err) = clipboard.set(keypair.to_string()) {
@@ -172,9 +200,10 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                 }
             } else {
-                div { class: "flex flex-col gap-2 mt-auto",
+                Col {
+                    class: "px-4 py-4 mb-4",
                     button {
-                        class: "flex justify-center items-center rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
+                        class: "flex w-full rounded-full py-4 px-6 controls-secondary hover:cursor-pointer justify-center items-center",
                         onclick: move |e| {
                             e.stop_propagation();
                             keypair_show_export.set(true);
@@ -211,3 +240,5 @@ impl FromStr for Splice {
         Ok(Splice::Pubkey(splice))
     }
 }
+//class: "flex flex-col h-full sm:w-96 w-screen elevated elevated-border text-white pt-8 z-50",
+// class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",

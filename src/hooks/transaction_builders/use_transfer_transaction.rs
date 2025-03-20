@@ -10,7 +10,7 @@ use crate::{
     components::TokenInputError,
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
-    hooks::{use_gateway, use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
+    hooks::{use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     pages::TransferError,
     solana::{
         spl_associated_token_account,
@@ -24,7 +24,7 @@ pub fn use_transfer_transaction(
     input_amount: Signal<String>,
     token_balance: Resource<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
-    mut priority_fee: Signal<u64>,
+    // priority_fee: Signal<u64>,
     mut address_err: Signal<Option<TransferError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
@@ -124,8 +124,8 @@ pub fn use_transfer_transaction(
         )?);
 
         // // Include ORE app fee
-        // let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
-        // ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
+        let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
+        ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
 
         // // Build initial transaction to estimate priority fee
         // let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();

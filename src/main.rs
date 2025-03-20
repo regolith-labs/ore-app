@@ -22,7 +22,7 @@ use crate::utils::AppNapDisabler;
 use crate::{
     hooks::{
         use_cache_provider, use_miner_events_provider, use_miner_provider,
-        use_transaction_status_provider, use_wallet_provider,
+        use_transaction_status_provider, use_wallet_drawer_state_provider, use_wallet_provider,
     },
     route::Route,
 };
@@ -48,6 +48,7 @@ pub fn App() -> Element {
     use_wallet_provider();
     use_cache_provider();
     use_mining_loop();
+    use_wallet_drawer_state_provider();
 
     rsx! {
         style { "{CSS}" }

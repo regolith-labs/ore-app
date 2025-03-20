@@ -1,31 +1,196 @@
+use crate::components::{Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, Row, TokenList};
+use crate::hooks::{use_wallet, Wallet};
+use crate::route::Route;
 use dioxus::document::eval;
 use dioxus::prelude::*;
+use std::str::FromStr;
+use {wasm_bindgen_futures, web_sys};
+
+struct WebClipboard;
+
+impl WebClipboard {
+    fn new() -> Self {
+        WebClipboard
+    }
+
+    fn set(&self, text: String) -> Result<(), String> {
+        let window = web_sys::window().ok_or("No window available")?;
+        let navigator = window.navigator();
+
+        // Navigator.clipboard() returns the clipboard object directly
+        let clipboard = navigator.clipboard();
+
+        let promise = clipboard.write_text(&text);
+        wasm_bindgen_futures::spawn_local(async {
+            let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
+        });
+
+        Ok(())
+    }
+}
 
 // use super::WalletTab;
 
+enum Splice {
+    Pubkey(String),
+    Copied,
+}
+
+impl ToString for Splice {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Pubkey(pubkey) => pubkey.to_string(),
+            Self::Copied => "Copied!".to_string(),
+        }
+    }
+}
+
+impl FromStr for Splice {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let len = s.len();
+        let first_four = &s[0..4];
+        let last_four = &s[len - 4..len];
+        let splice = format!("{}...{}", first_four, last_four);
+        Ok(Splice::Pubkey(splice))
+    }
+}
+
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<bool>) -> Element {
-    // let tab = use_signal(|| WalletTab::Tokens);
+    // Platform-specific clipboard
+    #[cfg(feature = "web")]
+    let clipboard = WebClipboard::new();
+
+    // wallet
+    let wallet = use_wallet();
+    let mut pubkey = use_signal(|| "missing pubkey".to_string());
+    let mut pubkey_splice = use_signal(|| Splice::Pubkey("0000...0000".to_string()));
+    let mut pubkey_copied = use_signal(|| false);
+
+    // listen for wallet update
+    use_memo(move || {
+        if let Wallet::Connected(pk) = *wallet.read() {
+            let pk = pk.to_string();
+            // set pubkey
+            pubkey.set(pk.clone());
+            // set pubkey splice
+            if let Ok(splice) = Splice::from_str(pk.as_str()) {
+                pubkey_splice.set(splice);
+            }
+        }
+    });
+
+    // listen for pubkey clipboard reset
+    use_memo(move || {
+        if let Splice::Copied = *pubkey_splice.read() {
+            spawn(async move {
+                async_std::task::sleep(std::time::Duration::from_millis(1500)).await;
+                let pk = pubkey.read();
+                if let Ok(splice) = Splice::from_str(pk.as_str()) {
+                    pubkey_splice.set(splice);
+                }
+            });
+        }
+    });
+
+    // listen for pubkey copied reset
+    use_memo(move || {
+        if *pubkey_copied.read() {
+            spawn(async move {
+                async_std::task::sleep(std::time::Duration::from_millis(1500)).await;
+                pubkey_copied.set(false);
+            });
+        }
+    });
 
     rsx! {
         div {
-            class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
+            class: "flex flex-col h-full w-screen sm:w-96 elevated elevated-border text-white z-50 relative",
             onclick: move |e| e.stop_propagation(),
 
-            // "TODO: Wallet address + copy button"
+            // Header section with fixed content
+            div {
+                class: "px-4 pt-4 pb-2",
 
-            DisconnectButton { wallet_remount },
-            // Col {
-            //     WalletTabs { tab },
-            //     match *tab.read() {
-            //         WalletTab::Tokens => rsx! {
-            //             TokenTable { on_close }
-            //         },
-            //         WalletTab::Liquidity => rsx! {
-            //             LiquidityTable { on_close }
-            //         }
-            //     }
-            // }
+                // Close wallet button
+                button {
+                    class: "rounded-full text-center py-1 w-8 h-8 flex items-center justify-center bg-surface-floating hover:bg-surface-floating-hover self-center cursor-pointer mb-4",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        on_close.call(e);
+                    },
+                    span {
+                        class: "text-xl font-semibold",
+                        "×"
+                    }
+                }
+
+                // Clipboard button
+                button {
+                    class: "flex justify-center items-center rounded-full text-center py-4 px-6 w-full controls-secondary hover:cursor-pointer mb-4",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        if let Err(err) = clipboard.set(pubkey.to_string()) {
+                            log::error!("failed to set clipboard: {:?}", err);
+                        }
+                        pubkey_splice.set(Splice::Copied);
+                    },
+                    div { class: "flex items-center gap-2",
+                        div { "{pubkey_splice.read().to_string()}" }
+                        CopyIcon { class: "h-4 w-4", solid: false }
+                    }
+                }
+
+                // Action links row
+                Row {
+                    class: "justify-center items-center mb-4",
+                    gap: 10,
+                    Col {
+                        class: "items-center",
+                        gap: 2,
+                        a {
+                            class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                            href: "https://solscan.io/account/{pubkey.read()}",
+                            GlobeIcon { class: "h-5" }
+                        }
+                        span {
+                            class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                            "Explorer"
+                        }
+                    }
+                    Col {
+                        class: "items-center",
+                        gap: 2,
+                        Link {
+                            class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
+                            to: Route::Transfer {},
+                            onclick: move |e: MouseEvent| {
+                                e.stop_propagation();
+                                on_close.call(e);
+                            },
+                            PaperAirplaneIcon { class: "h-5" }
+                        }
+                        span {
+                            class: "text-xs whitespace-nowrap text-elements-lowEmphasis",
+                            "Transfer"
+                        }
+                    }
+                }
+            }
+
+            // Token List with overflow handling - the content area
+            div {
+                class: "flex-1 overflow-y-auto px-4",
+                style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
+                TokenList {}
+            }
+
+            // Disconnect button - with matching styling to native version
+            Col {
+                class: "mt-auto px-4 py-4 mb-4",
+                DisconnectButton { wallet_remount }
+            }
         }
     }
 }
@@ -34,7 +199,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
 fn DisconnectButton(wallet_remount: Signal<bool>) -> Element {
     rsx! {
         button {
-            class: "rounded-full text-center py-4 px-6 mx-4 controls-secondary hover:cursor-pointer",
+            class: "w-full rounded-full text-center py-4 px-6 controls-secondary hover:cursor-pointer",
             onclick: move |_| {
                 wallet_remount.set(true);
                 let disconnect = eval(r#"window.OreWalletDisconnecter(); return"#);

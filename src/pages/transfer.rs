@@ -5,7 +5,7 @@ use crate::{
     components::submit_transaction,
     components::CheckCircleIcon,
     components::*,
-    config::{Token, LISTED_TOKENS},
+    config::Token,
     gateway::GatewayResult,
     hooks::{use_token_balance_for_token, use_transfer_transaction},
 };
@@ -15,6 +15,8 @@ use ore_types::request::TransactionType;
 use crate::hooks::on_transaction_done;
 
 use solana_sdk::pubkey::Pubkey;
+
+use dioxus::router::prelude::use_navigator;
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum TransferError {
@@ -36,14 +38,34 @@ enum TransferStatus {
 
 #[component]
 pub fn Transfer(token_ticker: Option<String>) -> Element {
+    let navigator = use_navigator();
+
     // Selected token - now initialized based on the token_ticker parameter
     let mut selected_token = use_signal(|| Some(Token::ore()));
 
+    // Clone token_ticker for different uses
+    let token_ticker_for_init = token_ticker.clone();
+    let token_ticker_for_sync = token_ticker;
+
     // Initialize with the provided token ticker if available
     use_effect(move || {
-        if let Some(ticker) = &token_ticker {
+        if let Some(ticker) = &token_ticker_for_init {
             if let Some(token) = crate::config::LISTED_TOKENS_BY_TICKER.get(ticker) {
                 selected_token.set(Some(token.clone()));
+            }
+        }
+    });
+
+    // Add this effect to sync URL when token changes manually
+    use_effect(move || {
+        let current_token = selected_token.read().clone();
+        if let Some(token) = current_token {
+            // Only update URL if the token ticker doesn't match the URL parameter
+            if token_ticker_for_sync.as_ref() != Some(&token.ticker) {
+                // Update the URL without a full page reload
+                navigator.replace(crate::route::Route::TransferWithToken {
+                    token_ticker: token.ticker.clone(),
+                });
             }
         }
     });
@@ -55,10 +77,10 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
     let token_balance = use_token_balance_for_token(selected_token);
 
     // Error handling
-    let mut err = use_signal::<Option<TokenInputError>>(|| None);
+    let err = use_signal::<Option<TokenInputError>>(|| None);
 
     // Priority fee
-    let priority_fee = use_signal(|| 0);
+    let _priority_fee = use_signal(|| 0);
 
     // Status
     let mut status = use_signal(|| TransferStatus::Editing);
@@ -77,7 +99,7 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
         amount,
         token_balance,
         err,
-        priority_fee,
+        // priority_fee,
         address_err,
     );
 
@@ -194,15 +216,6 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
                             show_confirmation,
                             address_err
                         }
-
-                        // // Confirmation Dialog
-                        // TransferConfirmation {
-                        //     show: show_confirmation,
-                        //     destination: destination_pubkey,
-                        //     amount,
-                        //     selected_token,
-                        //     transaction: tx,
-                        // }
                     }
                 }
                 TransferStatus::Success => {
@@ -282,11 +295,6 @@ fn TransferButton(
             button {
                 class: "h-12 w-full rounded-full {class} transition-all duration-300 ease-in-out hover:not-disabled:scale-105",
                 disabled: is_disabled,
-                // onclick: move |_| {
-                //     if is_tx_ready.cloned() {
-                //         show_confirmation.set(true);
-                //     }
-                // },
                 onclick: move |_| {
                     let transfer_tx = &*transaction.read();
                     if let Some(Ok(tx)) = transfer_tx {
@@ -315,11 +323,6 @@ fn TransferButton(
                         "Transfer"
                     }
                 }
-                // if let UseResourceState::Pending = *transaction.state().read() {
-                //     Spinner {
-                //         class: "mx-auto my-auto",
-                //     }
-                // }
             }
             Alert {}
         }
