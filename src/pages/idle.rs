@@ -3,7 +3,7 @@ use crate::{
     gateway::GatewayResult,
     hooks::{
         on_transaction_done, use_boost, use_boost_apr, use_boost_claim_transaction,
-        use_boost_proof, use_claimable_yield, use_ore_balance, use_ore_price, use_stake,
+        use_boost_proof, use_claimable_yield, use_ore_balance_wss, use_ore_price, use_stake,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
 };
@@ -13,14 +13,13 @@ use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionType;
 
 pub fn Idle() -> Element {
-    let mut balance = use_ore_balance();
+    let balance = use_ore_balance_wss();
     let mut boost = use_boost(ore_api::consts::MINT_ADDRESS);
     let mut boost_proof = use_boost_proof(ore_api::consts::MINT_ADDRESS);
     let mut stake = use_stake(ore_api::consts::MINT_ADDRESS);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
-        balance.restart();
         stake.restart();
         boost.restart();
         boost_proof.restart();
