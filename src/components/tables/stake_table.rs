@@ -12,8 +12,8 @@ use crate::{
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
     hooks::{
-        use_all_liquidity_pairs, use_all_stakes, use_boost, use_boost_apr, use_boost_proof,
-        use_boost_tvl, use_claimable_yield,
+        use_all_liquidity_pairs, use_all_stakes, use_boost_apr, use_boost_proof, use_boost_tvl,
+        use_boost_wss, use_claimable_yield,
     },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
@@ -84,7 +84,7 @@ pub fn StakeTable() -> Element {
 #[component]
 fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
     let token = Token::ore();
-    let boost = use_boost(token.mint);
+    let boost = use_boost_wss(token.mint);
     let boost_proof = use_boost_proof(token.mint);
     rsx! {
         TableRowLink {
@@ -98,7 +98,6 @@ fn IdleTableRow(stake: Resource<GatewayResult<Stake>>) -> Element {
             right_1: rsx! {
                 StakeTableRowAPR {
                     mint_address: MINT_ADDRESS,
-                    boost,
                     stake,
                 }
             },
@@ -126,7 +125,7 @@ fn StakeTableRow(
     stake: Resource<GatewayResult<Stake>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
-    let boost = use_boost(boost_meta.lp_mint);
+    let boost = use_boost_wss(boost_meta.lp_mint);
     let boost_proof = use_boost_proof(boost_meta.lp_mint);
     rsx! {
         TableRowLink {
@@ -142,14 +141,12 @@ fn StakeTableRow(
             right_1: rsx! {
                 StakeTableRowAPR {
                     mint_address: boost_meta.lp_mint,
-                    boost,
                     stake,
                 }
             },
             right_2: rsx! {
                 StakeTableRowTVL {
                     boost_meta: boost_meta.clone(),
-                    boost,
                     stake,
                     liquidity_pair
                 }
@@ -291,7 +288,7 @@ fn StakeTableRowTitle(
 
 #[component]
 fn IdleTableRowTVL(
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
     let boost_tvl = use_boost_tvl(MINT_ADDRESS);
@@ -300,7 +297,7 @@ fn IdleTableRowTVL(
         let Ok(boost_tvl) = boost_tvl.cloned() else {
             return None;
         };
-        let Some(Ok(boost)) = boost.cloned() else {
+        let Ok(boost) = boost.cloned() else {
             return None;
         };
         let Some(Ok(stake)) = stake.cloned() else {
@@ -350,7 +347,6 @@ fn IdleTableRowTVL(
 #[component]
 fn StakeTableRowTVL(
     boost_meta: BoostMeta,
-    boost: Resource<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
@@ -358,9 +354,6 @@ fn StakeTableRowTVL(
 
     let user_tvl = use_memo(move || {
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
-            return None;
-        };
-        let Some(Ok(_boost)) = boost.cloned() else {
             return None;
         };
         let Some(Ok(stake)) = stake.cloned() else {
@@ -408,11 +401,7 @@ fn StakeTableRowTVL(
 }
 
 #[component]
-fn StakeTableRowAPR(
-    mint_address: Pubkey,
-    boost: Resource<GatewayResult<Boost>>,
-    stake: Resource<GatewayResult<Stake>>,
-) -> Element {
+fn StakeTableRowAPR(mint_address: Pubkey, stake: Resource<GatewayResult<Stake>>) -> Element {
     let apr = use_boost_apr(mint_address);
     rsx! {
         if let Ok(apr) = apr.cloned() {
@@ -431,7 +420,7 @@ fn StakeTableRowAPR(
 #[component]
 fn StakeTableRowYield(
     mint_address: Pubkey,
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {

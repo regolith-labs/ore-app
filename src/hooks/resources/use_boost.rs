@@ -42,7 +42,7 @@ pub fn use_all_boosts() -> HashMap<Pubkey, Resource<GatewayResult<Boost>>> {
     use_context()
 }
 
-pub fn use_boost(mint_address: Pubkey) -> Resource<GatewayResult<Boost>> {
+pub fn _use_boost(mint_address: Pubkey) -> Resource<GatewayResult<Boost>> {
     let boosts: HashMap<Pubkey, Resource<GatewayResult<Boost>>> = use_context();
     let boost_address = boost_pda(mint_address).0;
     if let Some(boost) = boosts.get(&boost_address) {

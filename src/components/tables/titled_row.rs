@@ -74,6 +74,27 @@ pub fn TitledResourceRow<T: Clone + PartialEq + 'static>(
 }
 
 #[component]
+pub fn TitledSignalRow<T: Clone + PartialEq + 'static>(
+    title: String,
+    description: String,
+    signal: Signal<GatewayResult<T>>,
+    com: Component<T>,
+) -> Element {
+    rsx! {
+        TitledRow {
+            title: title,
+            description: description,
+            value: rsx! {
+                LoadableSignal {
+                    signal: signal,
+                    com: com,
+                }
+            }
+        }
+    }
+}
+
+#[component]
 pub fn LoadableResource<T: Clone + PartialEq + 'static>(
     resource: Resource<GatewayResult<T>>,
     com: Component<T>,
@@ -85,4 +106,15 @@ pub fn LoadableResource<T: Clone + PartialEq + 'static>(
         return rsx! { NullValue {} };
     };
     rsx! { { com(resource) } }
+}
+
+#[component]
+pub fn LoadableSignal<T: Clone + PartialEq + 'static>(
+    signal: Signal<GatewayResult<T>>,
+    com: Component<T>,
+) -> Element {
+    let Ok(signal) = signal.cloned() else {
+        return rsx! { NullValue {} };
+    };
+    rsx! { { com(signal) } }
 }

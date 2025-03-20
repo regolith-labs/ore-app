@@ -23,7 +23,7 @@ use crate::{
 };
 
 pub fn use_boost_claim_transaction(
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
@@ -40,7 +40,7 @@ pub fn use_boost_claim_transaction(
         let Some(Ok(_stake)) = *stake.read() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(Ok(boost)) = *boost.read() else {
+        let Ok(boost) = *boost.read() else {
             return Err(GatewayError::Unknown);
         };
 

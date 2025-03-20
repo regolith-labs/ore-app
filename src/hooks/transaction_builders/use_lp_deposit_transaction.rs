@@ -13,7 +13,7 @@ use crate::{
 };
 
 pub fn use_lp_deposit_transaction(
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
@@ -24,7 +24,7 @@ pub fn use_lp_deposit_transaction(
         };
 
         // Get resources
-        let Some(Ok(boost)) = *boost.read() else {
+        let Ok(boost) = *boost.read() else {
             return Err(GatewayError::Unknown);
         };
 

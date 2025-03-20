@@ -6,13 +6,13 @@ use steel::Numeric;
 use crate::gateway::GatewayResult;
 
 pub fn use_claimable_yield(
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Memo<u64> {
     use_memo(move || {
         let mut rewards = 0;
-        if let Some(Ok(boost)) = boost.cloned() {
+        if let Ok(boost) = boost.cloned() {
             if let Some(Ok(stake)) = stake.cloned() {
                 if let Some(Ok(boost_proof)) = boost_proof.cloned() {
                     rewards += calculate_claimable_yield(boost, boost_proof, stake);

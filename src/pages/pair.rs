@@ -11,7 +11,7 @@ use crate::{
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        on_transaction_done, use_boost, use_boost_apr, use_boost_proof, use_liquidity_pair,
+        on_transaction_done, use_boost_apr, use_boost_proof, use_boost_wss, use_liquidity_pair,
         use_lp_deposit_transaction, use_stake, use_token_balance,
         use_token_balances_for_liquidity_pair,
     },
@@ -25,7 +25,7 @@ pub fn Pair(lp_mint: String) -> Element {
     let boost_meta = LISTED_BOOSTS_BY_MINT.get(&lp_mint).unwrap();
     let mut liquidity_pair = use_liquidity_pair(lp_mint);
     let mut lp_balance = use_token_balance(lp_mint);
-    let mut boost = use_boost(lp_mint);
+    let boost = use_boost_wss(lp_mint);
     let mut boost_proof = use_boost_proof(lp_mint);
     let mut stake = use_stake(lp_mint);
     let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
@@ -33,7 +33,6 @@ pub fn Pair(lp_mint: String) -> Element {
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
         stake.restart();
-        boost.restart();
         boost_proof.restart();
         liquidity_pair.restart();
         lp_balance.restart();
@@ -82,7 +81,7 @@ fn AccountMetrics(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     boost_proof: Resource<GatewayResult<Proof>>,
     stake: Resource<GatewayResult<Stake>>,
 ) -> Element {
@@ -154,7 +153,7 @@ fn Deposits(
 #[component]
 fn UnstakedLp(
     boost_meta: BoostMeta,
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     stake: Resource<GatewayResult<Stake>>,
@@ -195,7 +194,7 @@ fn UnstakedLp(
 
 #[component]
 fn BoostMetrics(
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
