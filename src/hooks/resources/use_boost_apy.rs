@@ -52,7 +52,7 @@ pub fn use_boost_yield(mint_address: Pubkey) -> Resource<GatewayResult<BoostYiel
     }
 }
 
-pub fn use_boost_apy(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
+pub fn use_boost_apr(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
     let boost_yield = use_boost_yield(mint_address);
     let boost_tvl = use_boost_tvl(mint_address);
     let boost = use_boost(mint_address);
@@ -83,7 +83,7 @@ pub fn use_boost_apy(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
             boost_tvl * deposited_shares_pct
         };
 
-        let apy = ((boost_yield * ore_price_f64) / boost_tvl) * 52.0 * 100.0;
-        Ok(apy)
+        let apr = ((boost_yield * ore_price_f64) / boost_tvl) * 52.0 * 100.0;
+        Ok(apr)
     })
 }

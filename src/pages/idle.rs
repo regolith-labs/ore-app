@@ -2,7 +2,7 @@ use crate::{
     components::*,
     gateway::GatewayResult,
     hooks::{
-        on_transaction_done, use_boost, use_boost_apy, use_boost_claim_transaction,
+        on_transaction_done, use_boost, use_boost_apr, use_boost_claim_transaction,
         use_boost_proof, use_claimable_yield, use_ore_balance_wss, use_ore_price, use_stake,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
@@ -148,7 +148,7 @@ fn BoostMetrics(boost: Resource<GatewayResult<Boost>>) -> Element {
                 class: "mb-4",
                 title: "Boost"
             }
-            Apy {}
+            Apr {}
             Multiplier {
                 boost,
             }
@@ -166,17 +166,17 @@ fn BoostMetrics(boost: Resource<GatewayResult<Boost>>) -> Element {
 }
 
 #[component]
-pub fn Apy() -> Element {
-    let apy = use_boost_apy(ore_api::consts::MINT_ADDRESS);
+pub fn Apr() -> Element {
+    let apr = use_boost_apr(ore_api::consts::MINT_ADDRESS);
     rsx! {
         TitledRow {
-            title: "APY",
-            description: "The annualized percentage yield returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
+            title: "APR",
+            description: "The annualized percentage rate returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
-                if let Ok(apy) = apy.cloned() {
+                if let Ok(apr) = apr.cloned() {
                     span {
                         class: "text-elements-highEmphasis font-medium",
-                        "{apy:.0}%"
+                        "{apr:.0}%"
                     }
                 } else {
                     LoadingValue {}
