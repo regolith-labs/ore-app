@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{components::*, config::Token, hooks::use_token_balance};
+use crate::{components::*, hooks::use_sol_balance_wss};
 
 #[cfg(feature = "web")]
 #[component]
@@ -19,7 +19,7 @@ pub fn Topup(address: String) -> Element {
 
     let destination = use_memo(move || Pubkey::from_str(&address));
     let mut amount = use_signal(|| "0.2".to_string());
-    let sol_balance = use_token_balance(Token::sol().mint);
+    let sol_balance = use_sol_balance_wss();
     let priority_fee = use_signal(|| 0);
     let err = use_signal::<Option<TokenInputError>>(|| None);
     let tx = use_topup_transaction(destination, amount, sol_balance, err, priority_fee);
@@ -158,29 +158,14 @@ pub fn Topup(address: String) -> Element {
 
     let wallet = use_wallet();
     let navigator = use_navigator();
-    let mut sol_balance = use_token_balance(Token::sol().mint);
-
-    // use_effect(move || {
-    //     if let Some(Ok(balance)) = sol_balance.cloned() {
-    //         if balance.amount.parse::<u64>().unwrap() > 0 {
-    //             navigator.push(Route::Mine {});
-    //         }
-    //     }
-    // });
+    let sol_balance = use_sol_balance_wss();
 
     use_effect(move || {
-        spawn(async move {
-            let mut t = 0;
-            loop {
-                sol_balance.restart();
-                async_std::task::sleep(std::time::Duration::from_millis(2000)).await;
-                t += 1;
-                if t > 600 {
-                    // Wait 20 minutes and then stop polling
-                    break;
-                }
+        if let Ok(balance) = sol_balance.cloned() {
+            if balance.amount.parse::<u64>().unwrap() > 0 {
+                navigator.push(Route::Mine {});
             }
-        });
+        }
     });
 
     rsx! {
@@ -200,10 +185,18 @@ pub fn Topup(address: String) -> Element {
                     class: "text-elements-lowEmphasis font-medium mx-auto",
                     "Wallet balance"
                 }
-                span {
-                    class: "text-elements-highEmphasis font-semibold text-3xl mx-auto",
-                    "0 SOL"
+                if let Ok(balance) = sol_balance.cloned() {
+                    span {
+                        class: "text-elements-highEmphasis font-semibold text-3xl mx-auto",
+                        "{balance.ui_amount_string} SOL"
+                    }
+                } else {
+                    span {
+                        class: "text-elements-highEmphasis font-semibold text-3xl mx-auto",
+                        "0 SOL"
+                    }
                 }
+
             }
 
             // TODO Generate QR code
