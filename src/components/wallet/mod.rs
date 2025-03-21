@@ -17,5 +17,3 @@ pub use wallet_adapter_web::*;
 pub use wallet_drawer_native::WalletDrawer;
 #[cfg(feature = "web")]
 pub use wallet_drawer_web::WalletDrawer;
-
-pub use token_list::TokenList;

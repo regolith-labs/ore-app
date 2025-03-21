@@ -42,7 +42,7 @@ pub fn use_token_balance(mint: Pubkey) -> Resource<GatewayResult<UiTokenAmount>>
     }
 }
 
-pub fn use_token_balance_for_token(
+pub fn _use_token_balance_for_token(
     token: Signal<Option<Token>>,
 ) -> Resource<GatewayResult<UiTokenAmount>> {
     let token_balances: HashMap<Pubkey, Resource<GatewayResult<UiTokenAmount>>> = use_context();

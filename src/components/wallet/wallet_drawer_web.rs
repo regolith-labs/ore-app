@@ -1,4 +1,4 @@
-use crate::components::{Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, Row, TokenList};
+use crate::components::{Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, Row};
 use crate::hooks::{use_wallet, Wallet};
 use crate::route::Route;
 use dioxus::document::eval;
@@ -69,7 +69,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
     let mut pubkey_copied = use_signal(|| false);
 
     // listen for wallet update
-    use_memo(move || {
+    use_effect(move || {
         if let Wallet::Connected(pk) = *wallet.read() {
             let pk = pk.to_string();
             // set pubkey
@@ -82,7 +82,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
     });
 
     // listen for pubkey clipboard reset
-    use_memo(move || {
+    use_effect(move || {
         if let Splice::Copied = *pubkey_splice.read() {
             spawn(async move {
                 async_std::task::sleep(std::time::Duration::from_millis(1500)).await;
@@ -95,7 +95,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
     });
 
     // listen for pubkey copied reset
-    use_memo(move || {
+    use_effect(move || {
         if *pubkey_copied.read() {
             spawn(async move {
                 async_std::task::sleep(std::time::Duration::from_millis(1500)).await;
