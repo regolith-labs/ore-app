@@ -5,13 +5,12 @@ use futures::{
 };
 use solana_sdk::pubkey::Pubkey;
 use std::collections::HashMap;
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use crate::gateway::{
     AccountNotificationParams, AccountSubscribe, AccountSubscribeGateway, GatewayError,
 };
+use crate::time;
 
 pub type FromWss = Signal<FromWssMsg>;
 pub type ToWss = Coroutine<ToWssMsg>;
@@ -129,14 +128,20 @@ async fn wss_worker(
             Err(e) => {
                 log::error!("Failed to connect to WebSocket: {:?}", e);
                 // Wait a bit before retrying.
-                tokio::time::sleep(Duration::from_secs(5)).await;
+                time::sleep(5_000).await;
                 continue;
             }
         };
 
         // Re-subscribe to active subscriptions.
         {
-            let mut active = active_subs.lock().await;
+            let mut active = match active_subs.lock() {
+                Ok(active) => active,
+                Err(err) => {
+                    log::error!("Failed to lock active_subs: {:?}", err);
+                    continue;
+                }
+            };
             for (&request_id, sub_info) in active.iter_mut() {
                 match wss
                     .subscribe(sub_info.pubkey.to_string().as_str(), request_id)
@@ -160,7 +165,7 @@ async fn wss_worker(
         // Create a channel for notifications.
         let (notification_tx, mut notification_rx) = mpsc::channel(10);
 
-        // Spawn a task to forward notifications to the UI context.
+        // Spawn a task to listen for notifications from the WebSocket
         let _notification_task = spawn(async move {
             while let Some(notif) = notification_rx.next().await {
                 from_wss.set(FromWssMsg::Notif(notif));
@@ -176,14 +181,20 @@ async fn wss_worker(
                         Some(WssCommand::Subscribe(request_id, pubkey, resp_tx)) => {
                             match wss.subscribe(pubkey.to_string().as_str(), request_id).await {
                                 Ok(new_sub_id) => {
-                                    // Update active subscriptions state.
-                                    {
-                                        let mut active = active_subs.lock().await;
+                            // Update active subscriptions state.
+                            {
+                                match active_subs.lock() {
+                                    Ok(mut active) => {
                                         active.insert(request_id, SubscriptionInfo {
                                             pubkey,
                                             sub_id: Some(new_sub_id),
                                         });
+                                    },
+                                    Err(err) => {
+                                        log::error!("Failed to lock active_subs: {:?}", err);
                                     }
+                                }
+                            }
                                     if let Err(e) = resp_tx.clone().send(new_sub_id).await {
                                         log::error!("Failed to send subscription ID response: {:?}", e);
                                     }
@@ -199,9 +210,15 @@ async fn wss_worker(
                                 log::error!("Failed to unsubscribe: {:?}", err);
                             } else {
                                 // Remove the subscription from shared state.
-                                let mut active = active_subs.lock().await;
-                                if let Some((&req_id, _)) = active.iter().find(|(_, info)| info.sub_id == Some(sub_id)) {
-                                    active.remove(&req_id);
+                                match active_subs.lock() {
+                                    Ok(mut active) => {
+                                        if let Some((&req_id, _)) = active.iter().find(|(_, info)| info.sub_id == Some(sub_id)) {
+                                            active.remove(&req_id);
+                                        }
+                                    },
+                                    Err(err) => {
+                                        log::error!("Failed to lock active_subs: {:?}", err);
+                                    }
                                 }
                             }
                         }
@@ -227,10 +244,11 @@ async fn wss_worker(
                         }
                     }
                 }
+
             }
         }
         log::info!("WebSocket connection lost, reconnecting in 5 seconds...");
-        tokio::time::sleep(Duration::from_secs(5)).await;
+        time::sleep(5_000).await;
     }
 }
 

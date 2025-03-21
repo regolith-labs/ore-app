@@ -5608,6 +5608,7 @@ dependencies = [
  "gloo",
  "gloo-net 0.6.0",
  "gloo-storage",
+ "gloo-timers",
  "gloo-utils",
  "gloo-worker",
  "is-url",

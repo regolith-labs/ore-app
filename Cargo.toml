@@ -39,6 +39,7 @@ web = [
   "dioxus/web",
   "gloo",
   "gloo-storage",
+  "gloo-timers",
   "gloo-worker",
   "gloo-utils",
   "gloo-net",
@@ -83,6 +84,7 @@ futures = "0.3.30"
 futures-util = "0.3.30"
 gloo = { version = "0.11.0", optional = true }
 gloo-storage = { version = "0.3.0", optional = true }
+gloo-timers = { version = "0.3.0", optional = true }
 gloo-worker = { version = "0.5.0", optional = true }
 gloo-utils = { version = "0.2.0", optional = true }
 gloo-net = { version = "0.6.0", optional = true }
@@ -105,8 +107,8 @@ ore-miner-types = { path = "./miner-types" }
 ore-miner-web = { path = "./miner-web", features = [
   "app",
 ], default-features = false, optional = true }
-ore-pool-api = { git = "https://github.com/regolith-labs/ore-pool",  package = "ore-pool-api", rev = "aaff5fab2844" }
-ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool",  package = "ore-pool-types", rev = "aaff5fab2844" }
+ore-pool-api = { git = "https://github.com/regolith-labs/ore-pool", package = "ore-pool-api", rev = "aaff5fab2844" }
+ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool", package = "ore-pool-types", rev = "aaff5fab2844" }
 ore-types = "0.0.13"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
