@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::components::*;
-use crate::hooks::{use_wallet, Wallet};
+use crate::hooks::{use_wallet, use_wallet_drawer_state, Wallet};
 use crate::time::Duration;
 
 pub fn WalletAdapter() -> Element {
@@ -56,24 +56,15 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
     let first_four = &address.to_string()[0..4];
     let last_four = &address.to_string()[len - 4..len];
 
-    let mut drawer_open = use_signal(|| false);
-    let drawer_container = if *drawer_open.read() {
-        "bg-black/50"
-    } else {
-        "bg-transparent pointer-events-none"
-    };
-    let drawer_transform = if *drawer_open.read() {
-        "translate-x-0"
-    } else {
-        "translate-x-full"
-    };
+    let mut drawer_state = use_wallet_drawer_state();
+    let is_open = *drawer_state.read();
 
     rsx! {
         div {
             class: "relative",
             button {
                 onclick: move |_| {
-                    drawer_open.set(!drawer_open.cloned());
+                    drawer_state.set(!is_open);
                 },
                 Row {
                     class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer gap-3",
@@ -87,15 +78,49 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
                     }
                 }
             }
+
+            // Drawer overlay and content
+            WalletDrawerOverlay {
+                is_open: is_open,
+                on_close: move |_| drawer_state.set(false),
+                wallet_remount: wallet_remount
+            }
+        }
+    }
+}
+
+#[component]
+fn WalletDrawerOverlay(
+    is_open: bool,
+    on_close: EventHandler<MouseEvent>,
+    wallet_remount: Signal<bool>,
+) -> Element {
+    // Render nothing when closed
+    if !is_open {
+        return rsx! { Fragment {} };
+    }
+
+    // Render drawer when open
+    rsx! {
+        Fragment {
+            // Only show dark backdrop overlay on mobile (sm:hidden)
             div {
-                class: "fixed inset-0 transition-colors duration-200 ease-in-out {drawer_container}",
-                onclick: move |_| drawer_open.set(false),
-                div {
-                    class: "fixed top-0 right-0 h-full transition-transform duration-200 ease-in-out {drawer_transform}",
-                    WalletDrawer {
-                        on_close: move |_| drawer_open.set(false),
-                        wallet_remount: wallet_remount
-                    }
+                class: "fixed inset-0 bg-black bg-opacity-50 z-[1000] sm:hidden",
+                style: "height: 100vh; width: 100vw;",
+                onclick: move |e| on_close.call(e)
+            }
+            // Invisible overlay for desktop to capture clicks outside (hidden on mobile)
+            div {
+                class: "fixed inset-0 z-[1000] hidden sm:block",
+                style: "height: 100vh; width: 100vw;",
+                onclick: move |e| on_close.call(e)
+            }
+            div {
+                class: "fixed top-0 right-0 bottom-0 h-full w-screen sm:w-96 z-[1001]",
+                style: "height: 100vh;",
+                WalletDrawer {
+                    on_close: on_close.clone(),
+                    wallet_remount: wallet_remount
                 }
             }
         }

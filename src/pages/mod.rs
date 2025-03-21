@@ -9,6 +9,7 @@ mod pay;
 mod stake;
 mod topup;
 mod trade;
+mod transfer;
 
 pub use blog::*;
 pub use download::*;
@@ -21,3 +22,4 @@ pub use pay::*;
 pub use stake::*;
 pub use topup::*;
 pub use trade::*;
+pub use transfer::*;
