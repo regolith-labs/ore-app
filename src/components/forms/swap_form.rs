@@ -2,10 +2,7 @@ use crate::{
     components::*,
     config::Token,
     gateway::{GatewayError, GatewayResult},
-    hooks::{
-        on_transaction_done, use_quote, use_swap_transaction, use_token_balance_for_token,
-        use_token_balance_wss,
-    },
+    hooks::{on_transaction_done, use_quote, use_swap_transaction, use_token_balance_wss},
 };
 use dioxus::prelude::*;
 use jupiter_swap_api_client::quote::QuoteResponse;
@@ -36,11 +33,9 @@ pub fn SwapForm(
             Some(token) => {
                 let wss = use_token_balance_wss(&token.mint);
                 let read = wss.cloned();
-                log::info!("read: {:?}", read);
                 sell_token_balance.set(read);
             }
             None => {
-                log::error!("missing");
                 sell_token_balance.set(Err(GatewayError::AccountNotFound));
             }
         }
@@ -52,11 +47,9 @@ pub fn SwapForm(
             Some(token) => {
                 let wss = use_token_balance_wss(&token.mint);
                 let read = wss.cloned();
-                log::info!("read: {:?}", read);
                 buy_token_balance.set(read);
             }
             None => {
-                log::error!("missing");
                 buy_token_balance.set(Err(GatewayError::AccountNotFound));
             }
         }

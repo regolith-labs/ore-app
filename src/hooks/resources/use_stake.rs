@@ -46,7 +46,7 @@ fn use_stake_resource(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
     })
 }
 
-pub fn use_stake(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
+pub fn _use_stake(mint_address: Pubkey) -> Resource<GatewayResult<Stake>> {
     let stakes: HashMap<Pubkey, Resource<GatewayResult<Stake>>> = use_context();
     if let Some(stake) = stakes.get(&mint_address) {
         *stake
@@ -61,13 +61,13 @@ pub fn use_all_stakes() -> HashMap<Pubkey, Resource<GatewayResult<Stake>>> {
 
 pub fn use_withdrawable_balances(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> (
     Signal<GatewayResult<UiTokenAmount>>,
     Signal<GatewayResult<UiTokenAmount>>,
 ) {
-    let stake_a_balance = use_signal(|| {
-        let Some(Ok(stake)) = stake.cloned() else {
+    let stake_a_balance = use_resource(move || async move {
+        let Ok(stake) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {
@@ -88,8 +88,8 @@ pub fn use_withdrawable_balances(
         })
     });
 
-    let stake_b_balance = use_signal(|| {
-        let Some(Ok(stake)) = stake.cloned() else {
+    let stake_b_balance = use_resource(move || async move {
+        let Ok(stake) = stake.cloned() else {
             return Err(GatewayError::Unknown);
         };
         let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() else {

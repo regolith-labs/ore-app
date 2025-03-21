@@ -11,8 +11,8 @@ use crate::{
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        on_transaction_done, use_boost, use_boost_apy, use_boost_proof, use_liquidity_pair,
-        use_lp_deposit_transaction, use_stake, use_token_balance,
+        on_transaction_done, use_boost_apr, use_boost_proof_wss, use_boost_wss, use_liquidity_pair,
+        use_lp_deposit_transaction, use_stake_wss, use_token_balance,
         use_token_balances_for_liquidity_pair,
     },
     pages::{Multiplier, StakeYield, TotalStakers},
@@ -25,16 +25,13 @@ pub fn Pair(lp_mint: String) -> Element {
     let boost_meta = LISTED_BOOSTS_BY_MINT.get(&lp_mint).unwrap();
     let mut liquidity_pair = use_liquidity_pair(lp_mint);
     let mut lp_balance = use_token_balance(lp_mint);
-    let mut boost = use_boost(lp_mint);
-    let mut boost_proof = use_boost_proof(lp_mint);
-    let mut stake = use_stake(lp_mint);
+    let boost = use_boost_wss(lp_mint);
+    let boost_proof = use_boost_proof_wss(lp_mint);
+    let stake = use_stake_wss(lp_mint);
     let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
-        stake.restart();
-        boost.restart();
-        boost_proof.restart();
         liquidity_pair.restart();
         lp_balance.restart();
     });
@@ -82,9 +79,9 @@ fn AccountMetrics(
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
-    boost: Resource<GatewayResult<Boost>>,
-    boost_proof: Resource<GatewayResult<Proof>>,
-    stake: Resource<GatewayResult<Stake>>,
+    boost: Signal<GatewayResult<Boost>>,
+    boost_proof: Signal<GatewayResult<Proof>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
         Col {
@@ -117,7 +114,7 @@ fn AccountMetrics(
 #[component]
 fn Deposits(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
         TitledRow {
@@ -125,23 +122,19 @@ fn Deposits(
             description: "The amount of liquidity you have deposited in the protocol. These assets are \"productive\" and automatically earn trading fees from market activity.",
             value: rsx! {
                 if let Some(Ok(liquidity_pair)) = liquidity_pair.cloned() {
-                    if let Some(stake) = stake.cloned() {
-                        if let Ok(stake) = stake {
-                            if stake.balance > 0 {
-                                LiquidityPairStakeValue {
-                                    class: "pb-0 sm:pb-4",
-                                    stake_balance: stake.balance,
-                                    liquidity_pair: liquidity_pair,
-                                    with_decimal_units: true,
-                                }
-                            } else {
-                                NullValue {}
+                    if let Ok(stake) = stake.cloned() {
+                        if stake.balance > 0 {
+                            LiquidityPairStakeValue {
+                                class: "pb-0 sm:pb-4",
+                                stake_balance: stake.balance,
+                                liquidity_pair: liquidity_pair,
+                                with_decimal_units: true,
                             }
                         } else {
                             NullValue {}
                         }
                     } else {
-                        LoadingValue {}
+                        NullValue {}
                     }
                 } else {
                     LoadingValue {}
@@ -154,10 +147,10 @@ fn Deposits(
 #[component]
 fn UnstakedLp(
     boost_meta: BoostMeta,
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     let err = use_signal(|| None);
     let lp_deposit_tx = use_lp_deposit_transaction(boost, stake);
@@ -195,7 +188,7 @@ fn UnstakedLp(
 
 #[component]
 fn BoostMetrics(
-    boost: Resource<GatewayResult<Boost>>,
+    boost: Signal<GatewayResult<Boost>>,
     boost_meta: BoostMeta,
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
 ) -> Element {
@@ -207,7 +200,7 @@ fn BoostMetrics(
                 class: "mb-4",
                 title: "Boost"
             }
-            Apy {
+            Apr {
                 boost_meta: boost_meta.clone(),
             }
             Multiplier {
@@ -230,17 +223,17 @@ fn BoostMetrics(
 }
 
 #[component]
-pub fn Apy(boost_meta: BoostMeta) -> Element {
-    let apy = use_boost_apy(boost_meta.lp_mint);
+pub fn Apr(boost_meta: BoostMeta) -> Element {
+    let apr = use_boost_apr(boost_meta.lp_mint);
     rsx! {
         TitledRow {
-            title: "APY",
-            description: "An estimated annualized percentage yield, derived from the trailing 7 days of returns, divided by the current notional value of all deposits in the protocol. This estimate in no way guarantees future returns.",
+            title: "APR",
+            description: "An estimated annualized percentage rate, derived from the trailing 7 days of returns, divided by the current notional value of all deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
-                if let Ok(apy) = apy.cloned() {
+                if let Ok(apr) = apr.cloned() {
                     span {
                         class: "text-elements-highEmphasis font-medium",
-                        "{apy:.0}%"
+                        "{apr:.0}%"
                     }
                 } else {
                     LoadingValue {}

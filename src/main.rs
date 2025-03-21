@@ -46,9 +46,9 @@ pub fn App() -> Element {
     use_miner_cores_provider();
     use_transaction_status_provider();
     use_wallet_provider();
+    use_wss_provider();
     use_cache_provider();
     use_mining_loop();
-    use_wss_provider();
 
     rsx! {
         style { "{CSS}" }

@@ -17,7 +17,7 @@ use crate::{
 };
 
 pub fn use_idle_deposit_transaction(
-    stake: Resource<GatewayResult<Stake>>,
+    stake: Signal<GatewayResult<Stake>>,
     ore_balance: Signal<GatewayResult<UiTokenAmount>>,
     input_amount: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
@@ -68,7 +68,7 @@ pub fn use_idle_deposit_transaction(
         ));
 
         // Open stake account, if necessary
-        if let Some(Ok(_)) = *stake.read() {
+        if let Ok(_) = *stake.read() {
             // Do nothing
         } else {
             ixs.push(ore_boost_api::sdk::open(authority, authority, MINT_ADDRESS));
