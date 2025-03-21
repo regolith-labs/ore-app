@@ -1,10 +1,12 @@
 use crate::{
     gateway::{GatewayError, GatewayResult},
     hooks::{
-        use_gateway, use_pool, use_wallet, GetPubkey, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
+        use_gateway, use_member_resource_deprecated, use_pool, use_pool_deprecated, use_wallet,
+        GetPubkey, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
     },
 };
 use dioxus::prelude::*;
+use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -14,9 +16,11 @@ use solana_sdk::{
 
 pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
     let pool = use_pool();
+    let pool_deprecated = use_pool_deprecated();
+    let member_deprecated = use_member_resource_deprecated();
     let wallet = use_wallet();
     use_resource(move || async move {
-        if let Some(pool) = pool.cloned() {
+        if let (Some(pool), Some(pool_deprecated)) = (pool.cloned(), pool_deprecated.cloned()) {
             let pubkey = wallet.pubkey()?;
             // Aggregate instructions
             let mut ixs = vec![];
@@ -25,6 +29,25 @@ pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransa
             ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
                 COMPUTE_UNIT_LIMIT,
             ));
+
+            // Check for deprecated member account
+            let member_balance_deprecated = match member_deprecated.cloned() {
+                Some(Ok(m)) => m.balance,
+                _ => 0,
+            };
+            if member_balance_deprecated.gt(&0) {
+                let ata = crate::solana::spl_associated_token_account::get_associated_token_address(
+                    &pubkey,
+                    &MINT_ADDRESS,
+                );
+                let claim = ore_pool_api::sdk::claim(
+                    pubkey,
+                    ata,
+                    pool_deprecated.address,
+                    member_balance_deprecated,
+                );
+                ixs.push(claim);
+            };
 
             // Build join instruction
             let join_ix = ore_pool_api::sdk::join(pubkey, pool.address, pubkey);

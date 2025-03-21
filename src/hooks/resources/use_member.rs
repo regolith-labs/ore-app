@@ -4,7 +4,7 @@ use ore_pool_types::Member as MemberRecord;
 
 use crate::{
     gateway::{pool::PoolGateway, GatewayError, GatewayResult},
-    hooks::{use_gateway, use_pool, use_wallet, GetPubkey},
+    hooks::{use_gateway, use_pool, use_pool_deprecated, use_wallet, GetPubkey},
 };
 
 pub(crate) fn use_members_provider() {
@@ -18,6 +18,19 @@ pub(crate) fn use_members_provider() {
 
 fn use_member_resource() -> Resource<GatewayResult<Member>> {
     let pool = use_pool();
+    let wallet = use_wallet();
+    use_resource(move || async move {
+        let pubkey = wallet.pubkey()?;
+        let Some(pool) = pool.cloned() else {
+            return Err(GatewayError::AccountNotFound);
+        };
+        let member_pda = ore_pool_api::state::member_pda(pubkey, pool.address);
+        use_gateway().get_member(member_pda.0).await
+    })
+}
+
+pub fn use_member_resource_deprecated() -> Resource<GatewayResult<Member>> {
+    let pool = use_pool_deprecated();
     let wallet = use_wallet();
     use_resource(move || async move {
         let pubkey = wallet.pubkey()?;
