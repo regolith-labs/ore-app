@@ -103,9 +103,15 @@ fn WalletDrawerOverlay(
     // Render drawer when open
     rsx! {
         Fragment {
-            // Only show backdrop overlay on mobile (sm:hidden)
+            // Only show dark backdrop overlay on mobile (sm:hidden)
             div {
                 class: "fixed inset-0 bg-black bg-opacity-50 z-[1000] sm:hidden",
+                style: "height: 100vh; width: 100vw;",
+                onclick: move |e| on_close.call(e)
+            }
+            // Invisible overlay for desktop to capture clicks outside (hidden on mobile)
+            div {
+                class: "fixed inset-0 z-[1000] hidden sm:block",
                 style: "height: 100vh; width: 100vw;",
                 onclick: move |e| on_close.call(e)
             }

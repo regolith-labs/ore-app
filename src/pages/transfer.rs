@@ -7,7 +7,7 @@ use crate::{
     components::*,
     config::Token,
     gateway::GatewayResult,
-    hooks::{use_token_balance_for_token, use_transfer_transaction},
+    hooks::{use_token_balance, use_transfer_transaction},
 };
 
 use ore_types::request::TransactionType;
@@ -73,19 +73,28 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
     // Transfer amount
     let mut amount = use_signal::<String>(|| "".to_string());
 
-    // Token balance
-    let resource_token_balance = use_token_balance_for_token(selected_token);
+    // Token balance - use a memo to get the current token mint for use_token_balance
+    let token_mint = use_memo(move || selected_token.read().as_ref().map(|token| token.mint));
+
+    // Get token balance using use_token_balance - store in a local variable first
+    let token_balance_resource = {
+        if let Some(mint) = token_mint() {
+            use_token_balance(mint)
+        } else {
+            use_resource(move || async move { Err(crate::gateway::GatewayError::Unknown.into()) })
+        }
+    };
 
     // Convert Resource to Signal
     let mut token_balance = use_signal(|| {
-        resource_token_balance
+        token_balance_resource
             .cloned()
             .unwrap_or(Err(crate::gateway::GatewayError::Unknown))
     });
 
     // Update the signal when the resource changes
     use_effect(move || {
-        if let Some(balance) = resource_token_balance.cloned() {
+        if let Some(balance) = token_balance_resource.cloned() {
             token_balance.set(balance);
         }
     });
@@ -111,7 +120,7 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
         destination_pubkey,
         selected_token,
         amount,
-        resource_token_balance,
+        token_balance_resource,
         err,
         // priority_fee,
         address_err,

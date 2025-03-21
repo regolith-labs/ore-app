@@ -119,8 +119,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
 
                 // Action links row
                 Row {
-                    class: "justify-center items-center mb-4",
-                    gap: 10,
+                    class: "justify-center items-center mb-4 gap-8",
                     Col {
                         class: "items-center",
                         gap: 2,
