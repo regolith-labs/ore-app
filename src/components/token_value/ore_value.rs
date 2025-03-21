@@ -77,9 +77,23 @@ pub fn OreValue(
                     "{units[0]}"
                 }
                 if units.len() > 1 {
-                    span {
+                    Row {
                         class: "mt-auto {decimal_units_size} {decimal_units_color} {font_weight}",
-                        ".{units[1]}"
+                        span {
+                            class: "w-[0.4em] text-center",
+                            "."
+                        }
+                        {
+                            units[1].chars().map(|c| {
+                                let alignment = if c == '1' { "text-right" } else { "text-center" };
+                                rsx!(
+                                    span {
+                                        class: "w-[0.6em] tracking-[0.1em] {alignment} overflow-visible px-[0.1em]",
+                                        "{c}"
+                                    }
+                                )
+                            })
+                        }
                     }
                 }
             }
