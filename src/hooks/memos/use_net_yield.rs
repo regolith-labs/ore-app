@@ -33,10 +33,7 @@ pub fn use_net_yield() -> Memo<GatewayResult<UiTokenAmount>> {
         let net_yield_f64 = amount_to_ui_amount(net_yield, TOKEN_DECIMALS);
         Ok(UiTokenAmount {
             ui_amount: Some(net_yield_f64),
-            ui_amount_string: format!("{:.1$}", net_yield_f64, TOKEN_DECIMALS as usize)
-                .trim_end_matches("0")
-                .trim_end_matches(".")
-                .to_string(),
+            ui_amount_string: format!("{:.1$}", net_yield_f64, TOKEN_DECIMALS as usize).to_string(),
             amount: net_yield.to_string(),
             decimals: TOKEN_DECIMALS,
         })
