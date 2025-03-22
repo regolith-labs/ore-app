@@ -22,7 +22,7 @@ pub fn use_transfer_transaction(
     destination: Signal<String>,
     selected_token: Signal<Option<Token>>,
     input_amount: Signal<String>,
-    token_balance: Resource<GatewayResult<UiTokenAmount>>,
+    token_balance: Signal<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
     // priority_fee: Signal<u64>,
     mut address_err: Signal<Option<TransferError>>,
@@ -61,8 +61,9 @@ pub fn use_transfer_transaction(
         }
 
         // If amount is less than the token balance, disable
-        if let Some(Ok(balance)) = token_balance.cloned() {
-            if balance.ui_amount.unwrap_or(0.0) < amount_f64 {
+        let balance = token_balance.cloned();
+        if let Ok(balance_data) = balance {
+            if balance_data.ui_amount.unwrap_or(0.0) < amount_f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
                 return Err(GatewayError::Unknown);
             }
@@ -123,36 +124,9 @@ pub fn use_transfer_transaction(
             amount_u64,
         )?);
 
-        // // Include ORE app fee
+        // Include ORE app fee
         let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
         ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
-
-        // // Build initial transaction to estimate priority fee
-        // let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
-
-        // // Get priority fee estimate
-        // let gateway = use_gateway();
-        // let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
-        //     Ok(fee) => fee,
-        //     Err(_) => {
-        //         log::error!("Failed to fetch priority fee estimate");
-        //         return Err(GatewayError::Unknown);
-        //     }
-        // };
-
-        // // Add priority fee instruction
-        // ixs.insert(
-        //     1,
-        //     ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-        // );
-
-        // // Calculate priority fee in lamports
-        // let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
-        // let dynamic_priority_fee_in_lamports =
-        //     (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
-
-        // // Set priority fee for UI
-        // priority_fee.set(dynamic_priority_fee_in_lamports);
 
         // Build final tx
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
