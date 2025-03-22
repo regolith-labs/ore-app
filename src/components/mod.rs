@@ -1,6 +1,7 @@
 mod buttons;
 mod common;
 mod forms;
+mod help;
 mod layout;
 mod submit_transaction;
 mod tables;
@@ -11,6 +12,7 @@ mod wallet;
 pub use buttons::*;
 pub use common::*;
 pub use forms::*;
+pub use help::*;
 pub use layout::*;
 pub use submit_transaction::*;
 pub use tables::*;

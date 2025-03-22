@@ -19,10 +19,12 @@ use tracing::Level;
 #[cfg(all(feature = "desktop", target_os = "macos"))]
 use crate::utils::AppNapDisabler;
 use crate::{
+    components::HelpDrawerOverlay,
     hooks::{
-        use_cache_provider, use_miner_cores_provider, use_miner_events_provider,
-        use_miner_provider, use_miner_status_provider, use_mining_loop,
-        use_transaction_status_provider, use_wallet_drawer_state_provider, use_wallet_provider, use_wss_provider,
+        use_cache_provider, use_help_drawer_state, use_help_drawer_state_provider,
+        use_miner_cores_provider, use_miner_events_provider, use_miner_provider,
+        use_miner_status_provider, use_mining_loop, use_transaction_status_provider,
+        use_wallet_drawer_state_provider, use_wallet_provider, use_wss_provider,
     },
     route::Route,
 };
@@ -50,6 +52,12 @@ pub fn App() -> Element {
     use_cache_provider();
     use_mining_loop();
     use_wallet_drawer_state_provider();
+    use_help_drawer_state_provider();
+
+    // Get help drawer state
+    let mut help_drawer_state = use_help_drawer_state();
+    // Get wallet drawer state
+    let wallet_drawer_state = hooks::use_wallet_drawer_state();
 
     rsx! {
         style { "{CSS}" }
@@ -67,5 +75,12 @@ pub fn App() -> Element {
             }
         }
         Router::<Route> {}
+
+        // Show HelpDrawerOverlay when help drawer is open
+        if *help_drawer_state.read() {
+            HelpDrawerOverlay {
+                on_close: move |_| help_drawer_state.set(false)
+            }
+        }
     }
 }

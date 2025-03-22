@@ -126,6 +126,8 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
         address_err,
     );
 
+    let show_confirmation = use_signal(|| true);
+
     on_transaction_done(move |_| {
         status.set(TransferStatus::Success);
         destination_pubkey.set("".to_string());
@@ -220,6 +222,13 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
                                     }
                                 }
                             }
+                        }
+                        TransferConfirmation {
+                            show: show_confirmation,
+                            destination: destination_pubkey,
+                            amount,
+                            selected_token,
+                            transaction: tx
                         }
 
                         // // Fee display
@@ -399,17 +408,20 @@ fn TransferConfirmation(
                                 class: "text-elements-midEmphasis text-center",
                                 "Are you sure you want to transfer {amount_f64} {token_ticker} to this address?"
                             }
-                            span {
-                                class: "text-elements-highEmphasis text-center bg-surface-elevated p-2 rounded",
-                                "{abbreviated_address}"
-                            }
+                            // span {
+                            //     class: "text-elements-highEmphasis text-center bg-surface-elevated p-2 rounded",
+                            //     "{abbreviated_address}"
+                            // }
                             Row {
                                 class: "mt-4",
                                 gap: 3,
                                 button {
                                     class: "flex-1 h-12 rounded-full controls-secondary",
                                     onclick: move |_| show.set(false),
-                                    "Cancel"
+                                    span {
+                                        class: "mx-auto my-auto",
+                                        "Cancel"
+                                    }
                                 }
                                 button {
                                     class: "flex-1 h-12 rounded-full controls-primary",
@@ -419,7 +431,10 @@ fn TransferConfirmation(
                                             show.set(false);
                                         }
                                     },
-                                    "Yes, I'm sure"
+                                    span {
+                                        class: "mx-auto my-auto",
+                                        "Yes, I'm sure"
+                                    }
                                 }
                             }
                         }

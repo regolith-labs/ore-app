@@ -6,10 +6,10 @@ use crate::{
     components::*,
     gateway::pool::PoolGateway,
     hooks::{
-        on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
-        use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_wallet, MinerStatus, Wallet,
+        on_transaction_done, use_gateway, use_help_drawer_state, use_member, use_member_record,
+        use_member_record_balance, use_miner, use_miner_claim_transaction, use_miner_cores,
+        use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url,
+        use_system_cpu_utilization, use_wallet, use_wallet_drawer_state, MinerStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -23,14 +23,37 @@ pub fn Mine() -> Element {
             gap: 16,
             Col {
                 class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
-                Heading {
-                    class: "w-full",
-                    title: "Mine",
-                    subtitle: "Convert energy into cryptocurrency."
+                Row {
+                    class: "w-full justify-between items-center",
+                    Heading {
+                        class: "w-full",
+                        title: "Mine",
+                        subtitle: "Convert energy into cryptocurrency."
+                    }
+                    // Temporary Help Button
+                    HelpButton {}
                 }
                 MinerData {}
             }
             MineTable {}
+        }
+    }
+}
+
+// Temporary help button component
+fn HelpButton() -> Element {
+    let mut help_drawer_state = use_help_drawer_state();
+
+    rsx! {
+        button {
+            class: "h-10 px-6 rounded-full controls-secondary text-elements-highEmphasis font-semibold hidden sm:flex items-center",
+            onclick: move |_| {
+                help_drawer_state.set(true);
+            },
+            InfoIcon {
+                class: "h-4 w-4 mr-2"
+            }
+            "Help"
         }
     }
 }
