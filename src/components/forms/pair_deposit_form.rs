@@ -1,5 +1,5 @@
 use crate::{
-    components::{Col, Fee, SubmitButton, TokenInputError, TokenInputForm},
+    components::{Col, Confirmation, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::BoostMeta,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_pair_deposit_transaction},
@@ -28,6 +28,7 @@ pub fn PairDepositForm(
     let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
     let priority_fee = use_signal::<u64>(|| 0);
+    let mut show_confirmation = use_signal(|| false);
 
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
@@ -156,11 +157,21 @@ pub fn PairDepositForm(
                 class: "w-full px-4",
                 Fee { priority_fee: priority_fee.clone() }
             }
-            SubmitButton {
-                title: "Submit".to_string(),
+
+            button {
+                class: "h-12 w-full rounded-full controls-primary transition-all duration-300 ease-in-out hover:not-disabled:scale-105",
+                disabled: err.read().is_some(),
+                onclick: move |_| show_confirmation.set(true),
+                span {
+                    class: "mx-auto my-auto font-semibold",
+                    "Submit"
+                }
+            }
+
+            Confirmation {
+                show: show_confirmation,
                 transaction: tx,
-                err: err,
-                tx_type: TransactionType::BoostDeposit
+                transaction_type: TransactionType::BoostDeposit,
             }
         }
     }
