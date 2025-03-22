@@ -28,6 +28,7 @@ pub fn PairDepositForm(
     let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
     let priority_fee = use_signal::<u64>(|| 0);
+    let mut show_confirmation = use_signal(|| false);
 
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
