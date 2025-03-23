@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use ore_api::consts::MINT_ADDRESS;
 use ore_pool_types::BalanceUpdate;
 use solana_sdk::compute_budget::ComputeBudgetInstruction;
+use solana_sdk::transaction::Transaction;
 use steel::AccountDeserialize;
 
 use crate::config::Pool;
@@ -15,7 +16,9 @@ pub fn use_pool_commit_claim_transaction(
 ) -> Resource<GatewayResult<BalanceUpdate>> {
     let gateway = use_gateway();
     use_resource(move || async move {
-        if let (Some(Ok(pool)), Some(Ok(member_record))) = (pool.cloned(), member_record.cloned()) {
+        if let (Some(Ok(pool)), Some(Ok(member_record)), Some(Ok(member))) =
+            (pool.cloned(), member_record.cloned(), member.cloned())
+        {
             let mut instructions = Vec::with_capacity(4);
             // compute budget
             instructions.push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
@@ -35,9 +38,16 @@ pub fn use_pool_commit_claim_transaction(
                     &member_record.authority,
                     &MINT_ADDRESS,
                 );
-            // TODO:
-            let claim_ix =
-                ore_pool_api::sdk::claim(member_record.authority, claim_ata, pool.address, _);
+            let diff = member_record.total_balance - member.total_balance;
+            let claim_amount = member.balance + diff;
+            let claim_ix = ore_pool_api::sdk::claim(
+                member_record.authority,
+                claim_ata,
+                pool.address,
+                claim_amount,
+            );
+            instructions.push(claim_ix);
+            // transaction
         }
         Ok(())
     })
