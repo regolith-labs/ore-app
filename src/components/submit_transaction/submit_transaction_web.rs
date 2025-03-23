@@ -10,73 +10,84 @@ use crate::{
     hooks::{use_gateway, use_transaction_status},
 };
 
-/// TODO; signal that returns signed transaction
 /// signs transactions
-pub fn submit_transaction(mut tx: VersionedTransaction) {
-    spawn(async move {
-        // Set blockhash
-        let gateway = use_gateway();
+pub fn submit_transaction(mut tx: VersionedTransaction) -> Signal<Option<VersionedTransaction>> {
+    let mut signal = use_signal(|| None);
+    use_effect(move || {
+        spawn(async move {
+            // Set blockhash
+            let gateway = use_gateway();
 
-        if let Ok(hash) = gateway.rpc.get_latest_blockhash().await {
-            match &mut tx.message {
-                VersionedMessage::V0(message) => {
-                    message.recent_blockhash = hash;
-                }
-                VersionedMessage::Legacy(message) => {
-                    message.recent_blockhash = hash;
+            if let Ok(hash) = gateway.rpc.get_latest_blockhash().await {
+                match &mut tx.message {
+                    VersionedMessage::V0(message) => {
+                        message.recent_blockhash = hash;
+                    }
+                    VersionedMessage::Legacy(message) => {
+                        message.recent_blockhash = hash;
+                    }
                 }
             }
-        }
 
-        // Build eval command for wallet signing
-        let mut eval = eval(
-            r#"
+            // Build eval command for wallet signing
+            let mut eval = eval(
+                r#"
             let msg = await dioxus.recv();
             let signed = await window.OreTxSigner({b64: msg});
             dioxus.send(signed);
             "#,
-        );
+            );
 
-        // Serialized the transaction to send to wallet
-        match bincode::serialize(&tx) {
-            Ok(vec) => {
-                let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
-                let res = eval.send(serde_json::Value::String(b64));
-                match res {
-                    Ok(()) => {
-                        // Execute eval command
-                        let res = eval.recv().await;
+            // Serialized the transaction to send to wallet
+            match bincode::serialize(&tx) {
+                Ok(vec) => {
+                    let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
+                    let res = eval.send(serde_json::Value::String(b64));
+                    match res {
+                        Ok(()) => {
+                            // Execute eval command
+                            let res = eval.recv().await;
 
-                        // Process eval result
-                        match res {
-                            // Process valid signing result
-                            Ok(serde_json::Value::String(string)) => {
-                                // Decode signed transaction
+                            // Process eval result
+                            if let Ok(serde_json::Value::String(string)) = res {
+                                // Decode b64 signed transaction
                                 let gateway = use_gateway();
                                 let decode_res = base64::engine::general_purpose::STANDARD
                                     .decode(string)
-                                    .ok();
+                                    .map_err(From::from);
+                                // Deserialize binary to transaction
                                 let decode_res = decode_res.and_then(|buffer| {
-                                    bincode::deserialize::<VersionedTransaction>(&buffer).ok()
+                                    bincode::deserialize::<VersionedTransaction>(&buffer)
+                                        .map_err(From::from)
                                 });
-                            }
+                                match decode_res {
+                                    Ok(tx) => {
+                                        signal.set(Some(s));
+                                    }
+                                    Err(err) => {
+                                        log::error!(
+                                            "failed to deserialize signed signature: {:?}",
+                                            err
+                                        );
+                                    }
+                                }
+                            };
+                        }
+
+                        // Process eval errors
+                        Err(err) => {
+                            log::error!("error executing wallet signing script: {}", err);
                         }
                     }
-
-                    // Process eval errors
-                    Err(err) => {
-                        log::error!("error executing wallet signing script: {}", err);
-                        transaction_status.set(Some(TransactionStatus::Error))
-                    }
                 }
-            }
-            // Process serialization errors
-            Err(err) => {
-                log::error!("err serializing tx: {}", err);
-                transaction_status.set(Some(TransactionStatus::Error))
-            }
-        };
+                // Process serialization errors
+                Err(err) => {
+                    log::error!("err serializing tx: {}", err);
+                }
+            };
+        });
     });
+    signal
 }
 
 /// signs and submits
