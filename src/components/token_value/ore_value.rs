@@ -71,29 +71,15 @@ pub fn OreValue(
                 class: "my-auto {icon_size} {whole_units_color}"
             }
             Row {
-                class: "my-auto {font_style}",
+                class: "my-auto",
                 span {
                     class: "mt-auto {whole_units_size} {whole_units_color} {font_weight}",
                     "{units[0]}"
                 }
                 if units.len() > 1 {
-                    Row {
+                    span {
                         class: "mt-auto {decimal_units_size} {decimal_units_color} {font_weight}",
-                        span {
-                            class: "w-[0.4em] text-center",
-                            "."
-                        }
-                        {
-                            units[1].chars().map(|c| {
-                                let alignment = if c == '1' { "text-right" } else { "text-center" };
-                                rsx!(
-                                    span {
-                                        class: "w-[0.6em] tracking-[0.1em] {alignment} overflow-visible px-[0.1em]",
-                                        "{c}"
-                                    }
-                                )
-                            })
-                        }
+                        ".{units[1]}"
                     }
                 }
             }
