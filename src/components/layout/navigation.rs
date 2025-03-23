@@ -5,6 +5,7 @@ use crate::{
         BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon,
         OreWordmarkIcon, Row, WalletAdapter, XIcon,
     },
+    hooks::use_wallet_drawer_state,
     route::Route,
 };
 
@@ -106,11 +107,14 @@ fn Tab(title: String, route: Route) -> Element {
 
 pub(crate) fn MobileTabBar() -> Element {
     let current_route: Route = use_route();
-    let hidden = if is_navbar_hidden(&current_route) {
+    let drawer_state = use_wallet_drawer_state();
+
+    let hidden = if is_navbar_hidden(&current_route) || *drawer_state.read() {
         "hidden"
     } else {
         ""
     };
+
     rsx! {
         Row {
             class: "{hidden} sm:hidden fixed bottom-0 w-full elevated z-50",
