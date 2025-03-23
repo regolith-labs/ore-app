@@ -105,8 +105,8 @@ ore-miner-types = { path = "./miner-types" }
 ore-miner-web = { path = "./miner-web", features = [
   "app",
 ], default-features = false, optional = true }
-ore-pool-api = { git = "https://github.com/regolith-labs/ore-pool",  package = "ore-pool-api", rev = "aaff5fab2844" }
-ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool",  package = "ore-pool-types", rev = "aaff5fab2844" }
+ore-pool-api = "1.6.1"
+ore-pool-types = "1.6.1"
 ore-types = "0.0.13"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"
