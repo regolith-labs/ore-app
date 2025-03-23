@@ -30,12 +30,11 @@ pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransa
                 COMPUTE_UNIT_LIMIT,
             ));
 
+            // Set priority fee
+            ixs.push(ComputeBudgetInstruction::set_compute_unit_price(10_000));
+
             // Check for deprecated member account
-            let member_balance_deprecated = match member_deprecated.cloned() {
-                Some(Ok(m)) => m.balance,
-                _ => 0,
-            };
-            if member_balance_deprecated.gt(&0) {
+            if let Some(Ok(m)) = member_deprecated.cloned() {
                 let ata = crate::solana::spl_associated_token_account::get_associated_token_address(
                     &pubkey,
                     &MINT_ADDRESS,
@@ -47,7 +46,7 @@ pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransa
                     member_balance_deprecated,
                 );
                 ixs.push(claim);
-            };
+            }
 
             // Build join instruction
             let join_ix = ore_pool_api::sdk::join(pubkey, pool.address, pubkey);

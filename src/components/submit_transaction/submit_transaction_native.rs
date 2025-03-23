@@ -10,25 +10,39 @@ use crate::{
 
 pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
     let mut transaction_status = use_transaction_status();
-    spawn(async move {
-        transaction_status.set(Some(TransactionStatus::Waiting));
-        // get signer
-        match crate::hooks::use_wallet_native::get() {
-            Ok(signer) => {
-                let gateway = use_gateway();
-                transaction_status.set(Some(TransactionStatus::Sending(0)));
-                // sign
-                if let Err(err) = sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
+    use_effect(move || {
+        spawn(async move {
+            transaction_status.set(Some(TransactionStatus::Waiting));
+            // get signer
+            match crate::hooks::use_wallet_native::get() {
+                Ok(signer) => {
+                    let gateway = use_gateway();
+                    transaction_status.set(Some(TransactionStatus::Sending(0)));
+                    // sign
+                    if let Err(err) = sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
+                        log::error!("{:?}", err);
+                        transaction_status.set(Some(TransactionStatus::Error));
+                    }
+                }
+                Err(err) => {
                     log::error!("{:?}", err);
-                    transaction_status.set(Some(TransactionStatus::Error));
+                    transaction_status.set(Some(TransactionStatus::Denied));
                 }
             }
-            Err(err) => {
-                log::error!("{:?}", err);
-                transaction_status.set(Some(TransactionStatus::Denied));
-            }
-        }
+        });
     });
+}
+
+pub async fn sign(
+    rpc: &NativeRpc,
+    signer: &Keypair,
+    tx: VersionedTransaction,
+) -> GatewayResult<VersionedTransaction> {
+    let hash = rpc.get_latest_blockhash().await?;
+    let mut message = tx.message;
+    message.set_recent_blockhash(hash);
+    let signed = VersionedTransaction::try_new(message, &[signer])?;
+    Ok(signed)
 }
 
 async fn sign_submit_confirm(
@@ -38,10 +52,7 @@ async fn sign_submit_confirm(
 ) -> GatewayResult<()> {
     let mut transaction_status = use_transaction_status();
     // sign
-    let hash = rpc.get_latest_blockhash().await?;
-    let mut message = tx.message;
-    message.set_recent_blockhash(hash);
-    let signed = VersionedTransaction::try_new(message, &[signer])?;
+    let signed = sign(rpc, signer, tx).await?;
     // submit
     let sig = rpc.send_transaction(&signed).await?;
     // confirm

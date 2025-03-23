@@ -1,8 +1,9 @@
 use ore_pool_api::state::Member;
 use ore_pool_types::{
-    ContributePayloadV2, Member as MemberRecord, MemberChallenge, RegisterPayload,
+    BalanceUpdate, ContributePayloadV2, Member as MemberRecord, MemberChallenge, RegisterPayload,
+    UpdateBalancePayload,
 };
-use solana_sdk::pubkey::Pubkey;
+use solana_sdk::{hash::Hash, pubkey::Pubkey, transaction::Transaction};
 use steel::AccountDeserialize;
 
 use crate::hooks::MiningEvent;
@@ -10,6 +11,11 @@ use crate::hooks::MiningEvent;
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
 pub trait PoolGateway {
+    async fn commit_claim(
+        &self,
+        authority: Pubkey,
+        pool_url: String,
+    ) -> GatewayResult<BalanceUpdate>;
     async fn get_challenge(
         &self,
         authority: Pubkey,
@@ -170,6 +176,33 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
             .await
             .map_err(GatewayError::from)?;
         Ok(())
+    }
+
+    async fn commit_claim(
+        &self,
+        authority: Pubkey,
+        pool_url: String,
+        transaction: Transaction,
+        hash: Hash,
+    ) -> GatewayResult<BalanceUpdate> {
+        let post_url = format!("{}/commit", pool_url);
+        let body = UpdateBalancePayload {
+            authority,
+            transaction,
+            hash,
+        };
+        let resp = self
+            .http
+            .post(post_url)
+            .json(&body)
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
+        let balance_update = resp
+            .json::<BalanceUpdate>()
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(balance_update)
     }
 
     async fn register(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord> {
