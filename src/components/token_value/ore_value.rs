@@ -66,12 +66,12 @@ pub fn OreValue(
 
     rsx! {
         Row {
-            class: "w-min {class} {icon_gap}",
+            class: "w-min {class} {icon_gap} {font_style}",
             OreIcon {
                 class: "my-auto {icon_size} {whole_units_color}"
             }
             Row {
-                class: "my-auto {font_style}",
+                class: "my-auto",
                 span {
                     class: "mt-auto {whole_units_size} {whole_units_color} {font_weight}",
                     "{units[0]}"

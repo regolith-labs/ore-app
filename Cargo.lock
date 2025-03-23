@@ -5560,9 +5560,9 @@ dependencies = [
 
 [[package]]
 name = "ore-api"
-version = "3.2.0"
+version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "759a7970fa49d3561d1f16b0543be5d05532a5ae45572bcdf81e643e7ef76f84"
+checksum = "02dc54bfe5b59c3cf2459092d07a7944a3568007718afcfdcf1b66f3e17eb6d5"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -5580,7 +5580,7 @@ dependencies = [
 
 [[package]]
 name = "ore-app"
-version = "1.1.14"
+version = "1.1.16"
 dependencies = [
  "anyhow",
  "async-retry",
@@ -5713,8 +5713,9 @@ dependencies = [
 
 [[package]]
 name = "ore-pool-api"
-version = "1.5.0"
-source = "git+https://github.com/regolith-labs/ore-pool?rev=aaff5fab2844#aaff5fab284413c1df6a77109ee3ad89ceda85e5"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc20098c4fca711d4445d6eed43673b73ab83375028ba28b61f3dd3231593b17"
 dependencies = [
  "array-const-fn-init",
  "bytemuck",
@@ -5733,8 +5734,9 @@ dependencies = [
 
 [[package]]
 name = "ore-pool-types"
-version = "1.5.0"
-source = "git+https://github.com/regolith-labs/ore-pool?rev=aaff5fab2844#aaff5fab284413c1df6a77109ee3ad89ceda85e5"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b99a417281da2476b954cb4dea51ccc71f7e43ade4b923e0fbb669a7ca261f98"
 dependencies = [
  "drillx",
  "serde",

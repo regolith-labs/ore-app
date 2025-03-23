@@ -902,6 +902,12 @@
   .w-96 {
     width: calc(var(--spacing) * 96);
   }
+  .w-\[0\.4em\] {
+    width: 0.4em;
+  }
+  .w-\[0\.6em\] {
+    width: 0.6em;
+  }
   .w-full {
     width: 100%;
   }
@@ -1273,6 +1279,9 @@
   .px-8 {
     padding-inline: calc(var(--spacing) * 8);
   }
+  .px-\[0\.1em\] {
+    padding-inline: 0.1em;
+  }
   .py-0 {
     padding-block: calc(var(--spacing) * 0);
   }
@@ -1405,6 +1414,10 @@
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
+  }
+  .tracking-\[0\.1em\] {
+    --tw-tracking: 0.1em;
+    letter-spacing: 0.1em;
   }
   .text-nowrap {
     text-wrap: nowrap;
@@ -2655,6 +2668,10 @@ body {
   initial-value: 100%;
 }
 @property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-tracking {
   syntax: "*";
   inherits: false;
 }
