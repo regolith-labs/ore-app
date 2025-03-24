@@ -1,5 +1,5 @@
 use crate::{
-    components::{Col, Confirmation, Fee, TokenInputError, TokenInputForm},
+    components::{Alert, Col, Confirmation, Fee, TokenInputError, TokenInputForm},
     config::BoostMeta,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_pair_deposit_transaction},
@@ -174,6 +174,8 @@ pub fn PairDepositForm(
                     "Submit"
                 }
             }
+
+            Alert {}
 
             Confirmation {
                 show: show_confirmation_with_validation,
