@@ -1,5 +1,5 @@
 use crate::{
-    components::{Col, Confirmation, Fee, SubmitButton, TokenInputError, TokenInputForm},
+    components::{Col, Confirmation, Fee, TokenInputError, TokenInputForm},
     config::BoostMeta,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_pair_deposit_transaction},
@@ -29,6 +29,8 @@ pub fn PairDepositForm(
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
     let priority_fee = use_signal::<u64>(|| 0);
     let mut show_confirmation = use_signal(|| false);
+    let show_confirmation_with_validation =
+        use_memo(move || *show_confirmation.read() && err.read().is_none());
 
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
@@ -160,7 +162,12 @@ pub fn PairDepositForm(
 
             button {
                 class: "h-12 w-full rounded-full controls-primary transition-all duration-300 ease-in-out hover:not-disabled:scale-105",
-                disabled: err.read().is_some(),
+                disabled: {
+                    err.read().is_some() ||
+                    input_amount_a.read().is_empty() ||
+                    input_amount_b.read().is_empty() ||
+                    !matches!(tx.read().as_ref(), Some(Ok(_)))
+                },
                 onclick: move |_| show_confirmation.set(true),
                 span {
                     class: "mx-auto my-auto font-semibold",
@@ -169,7 +176,8 @@ pub fn PairDepositForm(
             }
 
             Confirmation {
-                show: show_confirmation,
+                show: show_confirmation_with_validation,
+                show_signal: show_confirmation,
                 transaction: tx,
                 transaction_type: TransactionType::BoostDeposit,
             }
