@@ -105,18 +105,14 @@ pub fn use_pair_deposit_transaction(
             return Err(GatewayError::Unknown);
         }
 
-        log::info!("BEFORE CHECK");
-
         // Check that neither of the amounts are zero
         if amount_a_f64 <= 0f64 {
-            log::info!("AMOUNT IS 0");
             err.set(Some(TokenInputError::InsufficientBalance(
                 liquidity_pair.token_a.clone(),
             )));
             return Err(GatewayError::Unknown);
         }
         if amount_b_f64 <= 0f64 {
-            log::info!("AMOUNT IS 0");
             err.set(Some(TokenInputError::InsufficientBalance(
                 liquidity_pair.token_b.clone(),
             )));
