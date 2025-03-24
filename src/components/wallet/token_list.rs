@@ -2,10 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{components::*, hooks::use_tokens_with_values, route::Route};
 
-// Allow dead code warning since this is used in the native drawer
-// but might not be compiled when using the web feature
-#[allow(dead_code)]
-pub(crate) fn TokenList() -> Element {
+pub fn TokenList() -> Element {
     let tokens = use_tokens_with_values();
 
     rsx! {

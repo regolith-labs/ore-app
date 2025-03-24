@@ -3,9 +3,8 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-use crate::components::{
-    Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlayIcon, PlusIcon, Row, TokenList,
-};
+use super::token_list::TokenList;
+use crate::components::{Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row};
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 use crate::route::Route;
 
@@ -80,7 +79,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     rsx! {
         div {
             class: "flex flex-col h-full w-screen sm:w-96 elevated elevated-border text-white z-50",
-            onclick: move |e| {
+            onclick: move |_e| {
                 keypair_show_export.set(false);
             },
 

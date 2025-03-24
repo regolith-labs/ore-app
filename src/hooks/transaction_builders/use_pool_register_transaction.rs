@@ -1,12 +1,13 @@
 use crate::{
+    components::sign_transaction,
     gateway::{GatewayError, GatewayResult},
     hooks::{
-        use_gateway, use_member_resource_deprecated, use_pool, use_pool_deprecated, use_wallet,
-        GetPubkey, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
+        use_gateway, use_member_record_resource_deprecated, use_member_resource_deprecated,
+        use_pool, use_pool_deprecated, use_wallet, GetPubkey, APP_FEE, APP_FEE_ACCOUNT,
+        COMPUTE_UNIT_LIMIT,
     },
 };
 use dioxus::prelude::*;
-use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -14,45 +15,45 @@ use solana_sdk::{
     transaction::{Transaction, VersionedTransaction},
 };
 
+use super::use_pool_commit_claim_transaction;
+
 pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
+    // wallet
+    let wallet = use_wallet();
+    // pool and deprecated pool
     let pool = use_pool();
     let pool_deprecated = use_pool_deprecated();
+    // deprecated onchain and db member accounts
     let member_deprecated = use_member_resource_deprecated();
-    let wallet = use_wallet();
+    let member_record_deprecated = use_member_record_resource_deprecated();
     use_resource(move || async move {
         if let (Some(pool), Some(pool_deprecated)) = (pool.cloned(), pool_deprecated.cloned()) {
             let pubkey = wallet.pubkey()?;
-            // Aggregate instructions
+            // aggregate instructions
             let mut ixs = vec![];
-
-            // Set compute unit limit
+            // set compute unit limit
             ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
                 COMPUTE_UNIT_LIMIT,
             ));
-
-            // Set priority fee
+            // set priority fee
             ixs.push(ComputeBudgetInstruction::set_compute_unit_price(10_000));
-
-            // Check for deprecated member account
-            if let Some(Ok(m)) = member_deprecated.cloned() {
-                let ata = crate::solana::spl_associated_token_account::get_associated_token_address(
-                    &pubkey,
-                    &MINT_ADDRESS,
-                );
-                let claim = ore_pool_api::sdk::claim(
-                    pubkey,
-                    ata,
-                    pool_deprecated.address,
-                    member_balance_deprecated,
-                );
-                ixs.push(claim);
+            // check for deprecated member account, and claim remaining balance
+            if let (Some(Ok(member)), Some(Ok(member_record))) = (
+                member_deprecated.cloned(),
+                member_record_deprecated.cloned(),
+            ) {
+                // build claim-commit transaction
+                let tx = use_pool_commit_claim_transaction(pool_deprecated, member_record, member)
+                    .await?;
+                // sign
+                let (tx, hash) = sign_transaction(tx.into()).await?;
+                // post transaction to server
+                // TODO; partial sign
             }
-
-            // Build join instruction
+            // build join instruction
             let join_ix = ore_pool_api::sdk::join(pubkey, pool.address, pubkey);
             ixs.push(join_ix);
-
-            // Include ORE app fee
+            // include ORE app fee
             let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
             ixs.push(transfer(&pubkey, &app_fee_account, APP_FEE));
 

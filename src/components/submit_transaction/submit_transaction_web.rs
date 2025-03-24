@@ -2,92 +2,50 @@ use base64::Engine;
 use dioxus::{document::eval, prelude::*};
 use js_sys::Date;
 use ore_types::request::{AppId, TransactionEvent, TransactionType};
-use solana_sdk::{message::VersionedMessage, transaction::VersionedTransaction};
+use solana_sdk::{hash::Hash, message::VersionedMessage, transaction::VersionedTransaction};
 
 use crate::{
     components::*,
-    gateway::{ore::OreGateway, solana::SolanaGateway, Rpc},
+    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
-/// signs transactions
-pub fn submit_transaction(mut tx: VersionedTransaction) -> Signal<Option<VersionedTransaction>> {
-    let mut signal = use_signal(|| None);
-    use_effect(move || {
-        spawn(async move {
-            // Set blockhash
-            let gateway = use_gateway();
-
-            if let Ok(hash) = gateway.rpc.get_latest_blockhash().await {
-                match &mut tx.message {
-                    VersionedMessage::V0(message) => {
-                        message.recent_blockhash = hash;
-                    }
-                    VersionedMessage::Legacy(message) => {
-                        message.recent_blockhash = hash;
-                    }
-                }
-            }
-
-            // Build eval command for wallet signing
-            let mut eval = eval(
-                r#"
-            let msg = await dioxus.recv();
-            let signed = await window.OreTxSigner({b64: msg});
-            dioxus.send(signed);
-            "#,
-            );
-
-            // Serialized the transaction to send to wallet
-            match bincode::serialize(&tx) {
-                Ok(vec) => {
-                    let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
-                    let res = eval.send(serde_json::Value::String(b64));
-                    match res {
-                        Ok(()) => {
-                            // Execute eval command
-                            let res = eval.recv().await;
-
-                            // Process eval result
-                            if let Ok(serde_json::Value::String(string)) = res {
-                                // Decode b64 signed transaction
-                                let gateway = use_gateway();
-                                let decode_res = base64::engine::general_purpose::STANDARD
-                                    .decode(string)
-                                    .map_err(From::from);
-                                // Deserialize binary to transaction
-                                let decode_res = decode_res.and_then(|buffer| {
-                                    bincode::deserialize::<VersionedTransaction>(&buffer)
-                                        .map_err(From::from)
-                                });
-                                match decode_res {
-                                    Ok(tx) => {
-                                        signal.set(Some(s));
-                                    }
-                                    Err(err) => {
-                                        log::error!(
-                                            "failed to deserialize signed signature: {:?}",
-                                            err
-                                        );
-                                    }
-                                }
-                            };
-                        }
-
-                        // Process eval errors
-                        Err(err) => {
-                            log::error!("error executing wallet signing script: {}", err);
-                        }
-                    }
-                }
-                // Process serialization errors
-                Err(err) => {
-                    log::error!("err serializing tx: {}", err);
-                }
-            };
-        });
-    });
-    signal
+/// sign transactions without necessarily submitting them,
+/// useful for things like posting signed transactions to servers.
+pub async fn sign_transaction(
+    tx: VersionedTransaction,
+) -> GatewayResult<(VersionedTransaction, Hash)> {
+    // set blockhash
+    let gateway = use_gateway();
+    let hash = gateway.rpc.get_latest_blockhash().await?;
+    let mut message = tx.message;
+    message.set_recent_blockhash(hash);
+    // build eval command for wallet signing
+    let mut eval = eval(
+        r#"
+        let msg = await dioxus.recv();
+        let signed = await window.OreTxSigner({b64: msg});
+        dioxus.send(signed);
+        "#,
+    );
+    // serialize transaction to send to wallet
+    let vec = bincode::serialize(&tx)?;
+    let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
+    let res = eval.send(serde_json::Value::String(b64))?;
+    // wait on eval
+    let res = eval.recv().await;
+    // process eval result
+    if let Ok(serde_json::Value::String(string)) = res {
+        // decode b64 signed transaction
+        let gateway = use_gateway();
+        let buffer = base64::engine::general_purpose::STANDARD.decode(string)?;
+        // deserialize binary to transaction
+        let tx = bincode::deserialize::<VersionedTransaction>(&buffer)?;
+        Ok((tx, hash))
+    } else {
+        log::error!("unexpected response format");
+        Err("unexpected response format".into())
+    }
 }
 
 /// signs and submits
@@ -158,8 +116,8 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                 if let Some(sig) = rpc_res {
                                     match gateway
                                         .log_transaction_event(TransactionEvent {
-                                            sig: sig,
-                                            signer: signer,
+                                            sig,
+                                            signer,
                                             transaction_type: tx_type,
                                             app: AppId::OreWeb,
                                             ts: timestamp,

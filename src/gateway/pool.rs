@@ -15,6 +15,8 @@ pub trait PoolGateway {
         &self,
         authority: Pubkey,
         pool_url: String,
+        transaction: Transaction,
+        hash: Hash,
     ) -> GatewayResult<BalanceUpdate>;
     async fn get_challenge(
         &self,
