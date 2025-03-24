@@ -4,12 +4,10 @@ use jupiter_swap_api_client::JupiterSwapApiClient;
 use std::time::Duration;
 
 use crate::config::{Token, LISTED_TOKENS};
-use crate::hooks::{use_token_balance, use_wallet, Wallet};
+use crate::hooks::{use_token_balance_wss, use_wallet, Wallet};
 use crate::solana::spl_token::amount_to_ui_amount;
 
 const API_URL: &str = "https://quote-api.jup.ag/v6";
-const REFRESH_INTERVAL_SECS: u64 = 300; // 5 minutes
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct TokenWithValue {
     pub token: Token,
@@ -50,20 +48,6 @@ pub(crate) fn use_token_price_provider() {
                     async_std::task::sleep(Duration::from_millis(RETRY_DELAY_MS)).await;
                 }
             }
-
-            // Continue with periodic refresh
-            loop {
-                async_std::task::sleep(Duration::from_secs(REFRESH_INTERVAL_SECS)).await;
-
-                if matches!(*use_wallet().read(), Wallet::Connected(_)) {
-                    let tokens = get_tokens_with_balance();
-
-                    if !tokens.is_empty() {
-                        let values = fetch_token_values(&tokens).await;
-                        token_values.set(values);
-                    }
-                }
-            }
         });
     });
 
@@ -72,9 +56,30 @@ pub(crate) fn use_token_price_provider() {
 
 // Unified hook for token prices
 pub fn use_tokens_with_values() -> Vec<TokenWithValue> {
-    let token_values: Signal<Vec<TokenWithValue>> = use_context();
-    let values = token_values.cloned();
-    values
+    let mut token_values: Signal<Vec<TokenWithValue>> = use_context();
+
+    // Get all token signals to track changes
+    let token_list: Vec<Token> = LISTED_TOKENS.values().cloned().collect();
+    let balance_signals: Vec<_> = token_list
+        .iter()
+        .map(|token| use_token_balance_wss(&token.mint))
+        .collect();
+
+    // Force re-evaluation when any token balance changes
+    use_effect(move || {
+        // Create dependencies on all balance signals
+        let _: Vec<_> = balance_signals.iter().map(|signal| signal.read()).collect();
+
+        let tokens = get_tokens_with_balance();
+        if !tokens.is_empty() {
+            spawn(async move {
+                let values = fetch_token_values(&tokens).await;
+                token_values.set(values);
+            });
+        }
+    });
+
+    token_values.cloned()
 }
 
 // Helper to get tokens with balance > 0
@@ -86,10 +91,11 @@ fn get_tokens_with_balance() -> Vec<(Token, f64)> {
 
     //Go through tokens and find those with balance > 0
     for token in token_list {
-        let balance = use_token_balance(token.mint);
+        // let balance = use_token_balance(token.mint);
+        let balance = use_token_balance_wss(&token.mint);
 
         match balance.cloned() {
-            Some(Ok(amount)) => {
+            Ok(amount) => {
                 if let Some(ui_amount) = amount.ui_amount {
                     if ui_amount > 0.0 {
                         tokens_with_balance.push((token, ui_amount));
