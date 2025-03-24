@@ -7,7 +7,7 @@ use crate::{
     components::*,
     config::Token,
     gateway::GatewayResult,
-    hooks::{use_token_balance, use_transfer_transaction},
+    hooks::{use_token_balance_wss, use_transfer_transaction},
 };
 
 use ore_types::request::TransactionType;
@@ -40,12 +40,12 @@ enum TransferStatus {
 pub fn Transfer(token_ticker: Option<String>) -> Element {
     let navigator = use_navigator();
 
-    // Selected token - now initialized based on the token_ticker parameter
+    // Selected token
     let mut selected_token = use_signal(|| Some(Token::ore()));
 
     // Clone token_ticker for different uses
     let token_ticker_for_init = token_ticker.clone();
-    let token_ticker_for_sync = token_ticker;
+    let token_ticker_for_sync = token_ticker.clone();
 
     // Initialize with the provided token ticker if available
     use_effect(move || {
@@ -70,32 +70,38 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
         }
     });
 
+    // Intermediate signal to track URL changes
+    let current_url_ticker = use_memo(move || token_ticker.clone());
+
+    // Update the selected token when the URL changes
+    use_effect(move || {
+        if let Some(ticker) = current_url_ticker() {
+            if let Some(token) = crate::config::LISTED_TOKENS_BY_TICKER.get(&ticker) {
+                selected_token.set(Some(token.clone()));
+            }
+        }
+    });
+
     // Transfer amount
     let mut amount = use_signal::<String>(|| "".to_string());
 
-    // Token balance - use a memo to get the current token mint for use_token_balance
-    let token_mint = use_memo(move || selected_token.read().as_ref().map(|token| token.mint));
+    // We'll use a memo to track token changes instead of a signal we read/write in the same effect
+    let _token_mint = use_memo(move || selected_token.read().as_ref().map(|token| token.mint));
 
-    // Get token balance using use_token_balance - store in a local variable first
-    let token_balance_resource = {
-        if let Some(mint) = token_mint() {
-            use_token_balance(mint)
-        } else {
-            use_resource(move || async move { Err(crate::gateway::GatewayError::Unknown.into()) })
-        }
-    };
-
-    // Convert Resource to Signal
-    let mut token_balance = use_signal(|| {
-        token_balance_resource
-            .cloned()
-            .unwrap_or(Err(crate::gateway::GatewayError::Unknown))
+    // Effect that resets amount when token changes
+    use_effect(move || {
+        amount.set("".to_string());
     });
 
-    // Update the signal when the resource changes
+    // Use WebSocket version for UI display
+    let mut token_balance = use_signal(|| Err(crate::gateway::GatewayError::Unknown));
+
+    // Update token_balance when selected_token changes
     use_effect(move || {
-        if let Some(balance) = token_balance_resource.cloned() {
-            token_balance.set(balance);
+        if let Some(token) = selected_token.read().as_ref() {
+            // Get real-time balance updates via WebSocket
+            let balance_wss = use_token_balance_wss(&token.mint);
+            token_balance.set(balance_wss.cloned());
         }
     });
 
@@ -115,12 +121,12 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
 
     let mut address_err = use_signal::<Option<TransferError>>(|| None);
 
-    // Use the transfer transaction hook
+    // Use the transfer transaction hook with WebSocket token balance
     let tx = use_transfer_transaction(
         destination_pubkey,
         selected_token,
         amount,
-        token_balance_resource,
+        token_balance,
         err,
         // priority_fee,
         address_err,
@@ -168,6 +174,7 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
                                     value: amount,
                                     update: amount,
                                     with_picker: true,
+                                    toolbar_shortcuts: true,
                                     err,
                                 }
                                 Col {
@@ -221,13 +228,6 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
                                 }
                             }
                         }
-
-                        // // Fee display
-                        // Col {
-                        //     class: "px-4",
-                        //     gap: 2,
-                        //     Fee { priority_fee: priority_fee.clone() }
-                        // }
 
                         // Transfer Button
                         TransferButton {
