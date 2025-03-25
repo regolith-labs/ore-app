@@ -31,6 +31,13 @@ impl From<anyhow::Error> for GatewayError {
     }
 }
 
+impl From<solana_sdk::message::CompileError> for GatewayError {
+    fn from(value: solana_sdk::message::CompileError) -> Self {
+        log::error!("{:?}", value);
+        Self::SignatureFailed
+    }
+}
+
 impl From<solana_sdk::signer::SignerError> for GatewayError {
     fn from(value: solana_sdk::signer::SignerError) -> Self {
         log::error!("{:?}", value);

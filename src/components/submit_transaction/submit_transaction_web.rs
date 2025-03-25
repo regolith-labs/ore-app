@@ -48,6 +48,18 @@ pub async fn sign_transaction(
     }
 }
 
+/// partially sign a transaction
+///
+/// the javascript client does not overwrite signtures, so we can ignore this second signer
+/// as the builder of the transaction is responsible for embedding that default sig before asking
+/// for this signature.
+pub async fn sign_transaction_partial(
+    tx: VersionedTransaction,
+    _second_signer: SecondSigner,
+) -> GatewayResult<(VersionedTransaction, Hash)> {
+    sign_transaction(tx).await
+}
+
 /// signs and submits
 pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType) {
     let mut transaction_status = use_transaction_status();
