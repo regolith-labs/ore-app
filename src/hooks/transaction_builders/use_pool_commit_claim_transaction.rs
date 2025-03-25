@@ -1,24 +1,31 @@
 use dioxus::prelude::*;
 use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::compute_budget::ComputeBudgetInstruction;
-use solana_sdk::message::{v0, VersionedMessage};
-use solana_sdk::signature::null_signer::NullSigner;
 use solana_sdk::transaction::Transaction;
 use steel::AccountDeserialize;
 
-use crate::components::{sign_transaction_partial, SecondSigner};
+use crate::components::{sign_transaction_partial, TransactionStatus};
 use crate::config::Pool;
 use crate::gateway::pool::PoolGateway;
 use crate::gateway::{GatewayError, GatewayResult, Rpc};
-use crate::hooks::use_gateway;
+use crate::hooks::{use_gateway, use_transaction_status};
+
+#[derive(Copy, Clone)]
+pub enum CommitClaimStatus {
+    Init,
+    Done,
+    Skip,
+    CaughtError,
+}
 
 pub fn use_pool_commit_claim_transaction_submit(
     pool: Resource<Pool>,
     member_record: Resource<GatewayResult<ore_pool_types::Member>>,
     member: Resource<GatewayResult<ore_pool_api::state::Member>>,
     start: Signal<bool>,
-) -> Signal<bool> {
-    let mut finished = use_signal(|| false);
+) -> Signal<CommitClaimStatus> {
+    let mut status = use_signal(|| CommitClaimStatus::Init);
+    let mut transaction_status = use_transaction_status();
     use_effect(move || {
         // fired off by register button
         if *start.read() {
@@ -28,7 +35,7 @@ pub fn use_pool_commit_claim_transaction_submit(
             {
                 spawn(async move {
                     if let Err(err) = async {
-                        log::info!("spawned commit claim");
+                        transaction_status.set(Some(TransactionStatus::Waiting));
                         let gateway = use_gateway();
                         let mut instructions = Vec::with_capacity(4);
                         // compute budget
@@ -36,12 +43,9 @@ pub fn use_pool_commit_claim_transaction_submit(
                             .push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
                         instructions.push(ComputeBudgetInstruction::set_compute_unit_price(20_000));
                         // commit
-                        log::info!("fetching pool data");
                         let pool_data = gateway.rpc.get_account_data(&pool.address).await?;
-                        log::info!("pool data: {:?}", pool_data);
                         let pool_account =
                             ore_pool_api::state::Pool::try_from_bytes(pool_data.as_slice())?;
-                        log::info!("pool account: {:?}", pool_account);
                         let commit_ix = ore_pool_api::sdk::attribute(
                             pool_account.authority,
                             member.authority,
@@ -77,19 +81,23 @@ pub fn use_pool_commit_claim_transaction_submit(
                             .commit_claim(member.authority, pool.url, signed, hash)
                             .await?;
                         log::info!("update balance: {:?}", update_balance);
-                        finished.set(true);
+                        transaction_status
+                            .set(Some(TransactionStatus::Done(update_balance.signature)));
+                        status.set(CommitClaimStatus::Done);
                         Ok::<_, GatewayError>(())
                     }
                     .await
                     {
                         log::error!("{:?}", err);
+                        transaction_status.set(Some(TransactionStatus::Error));
+                        status.set(CommitClaimStatus::CaughtError);
                     }
                 });
             } else {
                 // if the user is not registed in this pool just return immediately as finished
-                finished.set(true)
+                status.set(CommitClaimStatus::Skip);
             }
         }
     });
-    finished
+    status
 }

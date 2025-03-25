@@ -4,12 +4,12 @@ use ore_miner_types::OutputMessage;
 
 use crate::{
     components::*,
-    gateway::{pool::PoolGateway, Rpc},
+    gateway::pool::PoolGateway,
     hooks::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
         use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
         use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_wallet, MinerStatus, Wallet,
+        use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -70,6 +70,20 @@ fn StopStartButton() -> Element {
     let register_tx = use_pool_register_transaction(register_tx_start);
     let is_active = use_miner_is_active();
 
+    // listen for onchain pool registration
+    use_effect(move || match register_tx.cloned() {
+        // commit claim dependency failed, reset
+        Some(Ok(PoolRegisterStatus::CommitClaimFailed)) => {
+            miner_status.set(MinerStatus::Stopped);
+        }
+        // submit tx
+        Some(Ok(PoolRegisterStatus::Transaction(tx))) => {
+            submit_transaction(tx, TransactionType::PoolJoin);
+        }
+        _ => {}
+    });
+
+    // offchain pool server registration
     let mut register_with_pool_server = use_future(move || async move {
         let Wallet::Connected(authority) = *wallet.read() else {
             return;
@@ -84,13 +98,6 @@ fn StopStartButton() -> Element {
             member.restart();
             member_record.restart();
             miner_status.set(MinerStatus::FetchingChallenge);
-        }
-    });
-
-    // submit registration onchain
-    use_effect(move || {
-        if let Some(Ok(tx)) = register_tx.cloned() {
-            submit_transaction(tx, TransactionType::PoolJoin);
         }
     });
 
