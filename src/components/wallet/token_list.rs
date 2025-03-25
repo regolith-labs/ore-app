@@ -4,7 +4,6 @@ use crate::{components::*, hooks::use_tokens_with_values, route::Route};
 
 pub fn TokenList() -> Element {
     let tokens = use_tokens_with_values();
-
     rsx! {
         Col {
             class: "w-full",

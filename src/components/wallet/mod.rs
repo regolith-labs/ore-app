@@ -10,6 +10,8 @@ mod wallet_drawer_native;
 mod wallet_drawer_web;
 
 #[cfg(not(feature = "web"))]
+pub use token_list::*;
+#[cfg(not(feature = "web"))]
 pub use wallet_adapter_native::*;
 #[cfg(feature = "web")]
 pub use wallet_adapter_web::*;

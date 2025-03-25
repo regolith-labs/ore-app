@@ -29,13 +29,22 @@ pub fn use_net_yield() -> Memo<GatewayResult<UiTokenAmount>> {
             }
         }
 
-        // Convert to a UI amount
-        let net_yield_f64 = amount_to_ui_amount(net_yield, TOKEN_DECIMALS);
-        Ok(UiTokenAmount {
-            ui_amount: Some(net_yield_f64),
-            ui_amount_string: format!("{:.1$}", net_yield_f64, TOKEN_DECIMALS as usize).to_string(),
-            amount: net_yield.to_string(),
-            decimals: TOKEN_DECIMALS,
-        })
+        if net_yield == 0 {
+            Ok(UiTokenAmount {
+                ui_amount: Some(0.0),
+                ui_amount_string: "0.000".to_string(),
+                amount: "0".to_string(),
+                decimals: TOKEN_DECIMALS,
+            })
+        } else {
+            let net_yield_f64 = amount_to_ui_amount(net_yield, TOKEN_DECIMALS);
+            Ok(UiTokenAmount {
+                ui_amount: Some(net_yield_f64),
+                ui_amount_string: format!("{:.1$}", net_yield_f64, TOKEN_DECIMALS as usize)
+                    .to_string(),
+                amount: net_yield.to_string(),
+                decimals: TOKEN_DECIMALS,
+            })
+        }
     })
 }
