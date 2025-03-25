@@ -170,7 +170,7 @@ async fn find_hash_par(
                         }
                     }
                     // increment nonce
-                    nonce += 1;
+                    nonce = nonce.saturating_add(1);
                 }
             }
         });
