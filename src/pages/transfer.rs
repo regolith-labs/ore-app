@@ -1,4 +1,3 @@
-use crate::route::Route;
 use crate::{
     components::submit_transaction,
     components::CheckCircleIcon,
@@ -29,11 +28,6 @@ impl ToString for TransferError {
             TransferError::InvalidAddress => "Invalid Solana address".to_string(),
         }
     }
-}
-
-enum TransferStatus {
-    Editing,
-    Success,
 }
 
 #[component]
@@ -247,24 +241,6 @@ fn TransferButton(
     destination: Signal<String>,
 ) -> Element {
     let class = class.unwrap_or("controls-primary".to_string());
-
-    // let is_tx_ready = use_memo(move || {
-    //     if let Some(Ok(_tx)) = transaction.cloned() {
-    //         true
-    //     } else {
-    //         false
-    //     }
-    // });
-
-    // let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
-    //     if let Some(_) = err.cloned() {
-    //         false
-    //     } else {
-    //         true
-    //     }
-    // } else {
-    //     false
-    // };
 
     let is_tx_ready = use_memo(move || {
         if let Some(Ok(_tx)) = transaction.cloned() {

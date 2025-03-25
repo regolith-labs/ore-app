@@ -16,7 +16,6 @@ pub struct TokenWithValue {
     pub total_value: f64,
 }
 
-// Main provider for token values
 pub(crate) fn use_token_price_provider() {
     // Create a signal for storing token values
     let token_values = use_signal(Vec::<TokenWithValue>::new);
@@ -54,7 +53,6 @@ pub(crate) fn use_token_price_provider() {
     use_context_provider(|| token_values);
 }
 
-// Unified hook for token prices
 pub fn use_tokens_with_values() -> Vec<TokenWithValue> {
     let mut token_values: Signal<Vec<TokenWithValue>> = use_context();
 
@@ -91,7 +89,6 @@ fn get_tokens_with_balance() -> Vec<(Token, f64)> {
 
     //Go through tokens and find those with balance > 0
     for token in token_list {
-        // let balance = use_token_balance(token.mint);
         let balance = use_token_balance_wss(&token.mint);
 
         match balance.cloned() {
