@@ -87,6 +87,12 @@ pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Tra
         // deserialize binary to transaction
         let tx =
             bincode::deserialize::<Transaction>(&buffer).map_err(|err| anyhow::anyhow!(err))?;
+        {
+            let program_ids = tx.message.program_ids().clone();
+            log::info!("program ids: {:?}", program_ids);
+            let instructions = tx.message.instructions.clone();
+            log::info!("instructions: {:?}", instructions);
+        }
         Ok((tx, hash))
     } else {
         Err(anyhow::anyhow!("unexpected response format").into())

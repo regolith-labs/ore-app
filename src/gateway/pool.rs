@@ -201,11 +201,22 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
             }
         };
         log::info!("balance update resp: {:?}", resp);
-        let balance_update = match resp.json::<BalanceUpdate>().await {
-            Ok(update) => update,
+
+        // Clone the response so we can use it for error handling if needed
+        let resp_text = resp.text().await.unwrap_or_default();
+
+        // Try to parse the response as a BalanceUpdate
+        let balance_update = match serde_json::from_str::<BalanceUpdate>(&resp_text) {
+            Ok(update) => {
+                log::info!("Successfully received balance update");
+                update
+            }
             Err(err) => {
-                log::error!("Error deserializing balance update: {:?}", err);
-                return Err(GatewayError::from(err));
+                log::error!("Error deserializing response as BalanceUpdate: {:?}", err);
+                // Use the already extracted text for the error message
+                let error_text = format!("Server response: {}", resp_text);
+                log::error!("{}", error_text);
+                return Err(anyhow::anyhow!("{}", error_text).into());
             }
         };
         Ok(balance_update)
