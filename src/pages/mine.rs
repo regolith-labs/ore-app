@@ -69,7 +69,8 @@ fn StopStartButton() -> Element {
     let mut miner_status = use_miner_status();
     let mut member = use_member();
     let mut member_record = use_member_record();
-    let register_tx = use_pool_register_transaction();
+    let mut register_tx_start = use_signal(|| false);
+    let register_tx = use_pool_register_transaction(register_tx_start);
     let is_active = use_miner_is_active();
 
     let mut register_with_pool_server = use_future(move || async move {
@@ -138,10 +139,10 @@ fn StopStartButton() -> Element {
                             // only registered onchain, submit registration to pool server
                             miner_status.set(MinerStatus::Registering);
                         }
-                    } else if let Some(Ok(tx)) = register_tx.cloned() {
-                        // not registered onchain, submit registration transaction
-                        miner_status.set(MinerStatus::Registering);
-                        submit_transaction(tx, TransactionType::PoolJoin);
+                    } else  {
+                        // not registered onchain
+                        register_tx_start.set(true);
+                            miner_status.set(MinerStatus::Registering);
                     }
                 }
             },

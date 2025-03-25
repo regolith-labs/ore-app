@@ -193,17 +193,20 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
             transaction,
             hash,
         };
-        let resp = self
-            .http
-            .post(post_url)
-            .json(&body)
-            .send()
-            .await
-            .map_err(GatewayError::from)?;
-        let balance_update = resp
-            .json::<BalanceUpdate>()
-            .await
-            .map_err(GatewayError::from)?;
+        let resp = match self.http.post(post_url).json(&body).send().await {
+            Ok(response) => response,
+            Err(err) => {
+                log::error!("Error sending commit request: {:?}", err);
+                return Err(GatewayError::from(err));
+            }
+        };
+        let balance_update = match resp.json::<BalanceUpdate>().await {
+            Ok(update) => update,
+            Err(err) => {
+                log::error!("Error deserializing balance update: {:?}", err);
+                return Err(GatewayError::from(err));
+            }
+        };
         Ok(balance_update)
     }
 
