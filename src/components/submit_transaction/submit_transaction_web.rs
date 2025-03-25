@@ -2,7 +2,11 @@ use base64::Engine;
 use dioxus::{document::eval, prelude::*};
 use js_sys::Date;
 use ore_types::request::{AppId, TransactionEvent, TransactionType};
-use solana_sdk::{hash::Hash, message::VersionedMessage, transaction::VersionedTransaction};
+use solana_sdk::{
+    hash::Hash,
+    message::VersionedMessage,
+    transaction::{Transaction, VersionedTransaction},
+};
 
 use crate::{
     components::*,
@@ -48,16 +52,38 @@ pub async fn sign_transaction(
     }
 }
 
-/// partially sign a transaction
-///
-/// the javascript client does not overwrite signtures, so we can ignore this second signer
-/// as the builder of the transaction is responsible for embedding that default sig before asking
-/// for this signature.
-pub async fn sign_transaction_partial(
-    tx: VersionedTransaction,
-    _second_signer: SecondSigner,
-) -> GatewayResult<(VersionedTransaction, Hash)> {
-    sign_transaction(tx).await
+pub async fn sign_transaction_partial(tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
+    // set blockhash
+    let gateway = use_gateway();
+    let hash = gateway.rpc.get_latest_blockhash().await?;
+    let mut message = tx.message;
+    message.recent_blockhash = hash;
+    // build eval command for wallet signing
+    let mut eval = eval(
+        r#"
+        let msg = await dioxus.recv();
+        let signed = await window.OreTxSigner({b64: msg});
+        dioxus.send(signed);
+        "#,
+    );
+    // serialize transaction to send to wallet
+    let vec = bincode::serialize(&tx)?;
+    let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
+    let res = eval.send(serde_json::Value::String(b64))?;
+    // wait on eval
+    let res = eval.recv().await;
+    // process eval result
+    if let Ok(serde_json::Value::String(string)) = res {
+        // decode b64 signed transaction
+        let gateway = use_gateway();
+        let buffer = base64::engine::general_purpose::STANDARD.decode(string)?;
+        // deserialize binary to transaction
+        let tx = bincode::deserialize::<Transaction>(&buffer)?;
+        Ok((tx, hash))
+    } else {
+        log::error!("unexpected response format");
+        Err("unexpected response format".into())
+    }
 }
 
 /// signs and submits

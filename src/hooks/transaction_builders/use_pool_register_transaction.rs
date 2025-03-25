@@ -47,8 +47,6 @@ pub fn use_pool_register_transaction(
                 ixs.push(ComputeBudgetInstruction::set_compute_unit_limit(
                     COMPUTE_UNIT_LIMIT,
                 ));
-                // set priority fee
-                ixs.push(ComputeBudgetInstruction::set_compute_unit_price(10_000));
                 // build join instruction
                 let join_ix = ore_pool_api::sdk::join(pubkey, pool.address, pubkey);
                 ixs.push(join_ix);

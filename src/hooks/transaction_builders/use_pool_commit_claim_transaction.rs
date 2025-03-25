@@ -3,7 +3,7 @@ use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::compute_budget::ComputeBudgetInstruction;
 use solana_sdk::message::{v0, VersionedMessage};
 use solana_sdk::signature::null_signer::NullSigner;
-use solana_sdk::transaction::VersionedTransaction;
+use solana_sdk::transaction::Transaction;
 use steel::AccountDeserialize;
 
 use crate::components::{sign_transaction_partial, SecondSigner};
@@ -64,36 +64,20 @@ pub fn use_pool_commit_claim_transaction_submit(
                         );
                         instructions.push(claim_ix);
                         // build transaction
-                        let hash = gateway.rpc.get_latest_blockhash().await?;
-                        let message = v0::Message::try_compile(
-                            &member.authority,
+                        let transaction = Transaction::new_with_payer(
                             instructions.as_slice(),
-                            &[],
-                            hash,
-                        )?;
-                        let member_authority = NullSigner::new(&member.authority);
-                        let pool_authority = NullSigner::new(&pool_account.authority);
-                        let transaction = VersionedTransaction::try_new(
-                            VersionedMessage::V0(message),
-                            &[&member_authority, &pool_authority],
-                        )?;
+                            Some(&member.authority),
+                        );
                         log::info!("signing partial");
-                        let second_signer = SecondSigner {
-                            signer: pool_authority,
-                            payer: false,
-                        };
                         // partial sign transaction
-                        let (signed, hash) =
-                            sign_transaction_partial(transaction, second_signer).await?;
+                        let (signed, hash) = sign_transaction_partial(transaction).await?;
                         log::info!("posting to server");
                         // post transaction to pool server
-                        if let Some(tx) = signed.into_legacy_transaction() {
-                            let update_balance = gateway
-                                .commit_claim(member.authority, pool.url, tx, hash)
-                                .await?;
-                            log::info!("update balance: {:?}", update_balance);
-                            finished.set(true);
-                        }
+                        let update_balance = gateway
+                            .commit_claim(member.authority, pool.url, signed, hash)
+                            .await?;
+                        log::info!("update balance: {:?}", update_balance);
+                        finished.set(true);
                         Ok::<_, GatewayError>(())
                     }
                     .await

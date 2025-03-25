@@ -1,6 +1,10 @@
 use dioxus::prelude::*;
 use ore_types::request::TransactionType;
-use solana_sdk::{hash::Hash, signature::Keypair, transaction::VersionedTransaction};
+use solana_sdk::{
+    hash::Hash,
+    signature::Keypair,
+    transaction::{Transaction, VersionedTransaction},
+};
 
 use crate::{
     components::*,
@@ -18,22 +22,12 @@ pub async fn sign_transaction(
     sign(&gateway.rpc, &signer.creator, tx).await
 }
 
-pub async fn sign_transaction_partial(
-    tx: VersionedTransaction,
-    second_signer: SecondSigner,
-) -> GatewayResult<(VersionedTransaction, Hash)> {
+pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
     let gateway = use_gateway();
     let signer = crate::hooks::use_wallet_native::get()?;
     let hash = gateway.rpc.get_latest_blockhash().await?;
-    let mut message = tx.message;
-    message.set_recent_blockhash(hash);
-    let present = MixedSigners::Present(signer.creator);
-    let absent = MixedSigners::Absent(second_signer.signer);
-    let signed = match second_signer.payer {
-        true => VersionedTransaction::try_new(message, &[&absent, &present])?,
-        false => VersionedTransaction::try_new(message, &[&present, &absent])?,
-    };
-    Ok((signed, hash))
+    tx.try_partial_sign(&[&signer.creator], hash)?;
+    Ok((tx, hash))
 }
 
 pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {

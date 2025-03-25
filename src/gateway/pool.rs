@@ -200,6 +200,7 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
                 return Err(GatewayError::from(err));
             }
         };
+        log::info!("balance update resp: {:?}", resp);
         let balance_update = match resp.json::<BalanceUpdate>().await {
             Ok(update) => update,
             Err(err) => {
