@@ -10,19 +10,19 @@ use solana_sdk::{
 
 use crate::{
     components::*,
-    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc},
+    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayError, GatewayResult, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
 /// sign transactions without necessarily submitting them,
 /// useful for things like posting signed transactions to servers.
 pub async fn sign_transaction(
-    tx: VersionedTransaction,
+    mut tx: VersionedTransaction,
 ) -> GatewayResult<(VersionedTransaction, Hash)> {
     // set blockhash
     let gateway = use_gateway();
     let hash = gateway.rpc.get_latest_blockhash().await?;
-    let mut message = tx.message;
+    let message = &mut tx.message;
     message.set_recent_blockhash(hash);
     // build eval command for wallet signing
     let mut eval = eval(
@@ -33,30 +33,33 @@ pub async fn sign_transaction(
         "#,
     );
     // serialize transaction to send to wallet
-    let vec = bincode::serialize(&tx)?;
+    let vec = bincode::serialize(&tx).map_err(|_| GatewayError::BincodeSerialize)?;
     let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
-    let res = eval.send(serde_json::Value::String(b64))?;
+    let _send = eval
+        .send(serde_json::Value::String(b64))
+        .map_err(|_| GatewayError::RequestFailed)?;
     // wait on eval
     let res = eval.recv().await;
     // process eval result
     if let Ok(serde_json::Value::String(string)) = res {
         // decode b64 signed transaction
-        let gateway = use_gateway();
-        let buffer = base64::engine::general_purpose::STANDARD.decode(string)?;
+        let buffer = base64::engine::general_purpose::STANDARD
+            .decode(string)
+            .map_err(|err| anyhow::anyhow!(err))?;
         // deserialize binary to transaction
-        let tx = bincode::deserialize::<VersionedTransaction>(&buffer)?;
+        let tx = bincode::deserialize::<VersionedTransaction>(&buffer)
+            .map_err(|err| anyhow::anyhow!(err))?;
         Ok((tx, hash))
     } else {
-        log::error!("unexpected response format");
-        Err("unexpected response format".into())
+        Err(anyhow::anyhow!("unexpected response format").into())
     }
 }
 
-pub async fn sign_transaction_partial(tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
+pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
     // set blockhash
     let gateway = use_gateway();
     let hash = gateway.rpc.get_latest_blockhash().await?;
-    let mut message = tx.message;
+    let message = &mut tx.message;
     message.recent_blockhash = hash;
     // build eval command for wallet signing
     let mut eval = eval(
@@ -67,22 +70,26 @@ pub async fn sign_transaction_partial(tx: Transaction) -> GatewayResult<(Transac
         "#,
     );
     // serialize transaction to send to wallet
-    let vec = bincode::serialize(&tx)?;
+    let vec = bincode::serialize(&tx).map_err(|err| anyhow::anyhow!(err))?;
     let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
-    let res = eval.send(serde_json::Value::String(b64))?;
+    let res = eval
+        .send(serde_json::Value::String(b64))
+        .map_err(|err| anyhow::anyhow!(err))?;
     // wait on eval
     let res = eval.recv().await;
     // process eval result
     if let Ok(serde_json::Value::String(string)) = res {
         // decode b64 signed transaction
         let gateway = use_gateway();
-        let buffer = base64::engine::general_purpose::STANDARD.decode(string)?;
+        let buffer = base64::engine::general_purpose::STANDARD
+            .decode(string)
+            .map_err(|err| anyhow::anyhow!(err))?;
         // deserialize binary to transaction
-        let tx = bincode::deserialize::<Transaction>(&buffer)?;
+        let tx =
+            bincode::deserialize::<Transaction>(&buffer).map_err(|err| anyhow::anyhow!(err))?;
         Ok((tx, hash))
     } else {
-        log::error!("unexpected response format");
-        Err("unexpected response format".into())
+        Err(anyhow::anyhow!("unexpected response format").into())
     }
 }
 
