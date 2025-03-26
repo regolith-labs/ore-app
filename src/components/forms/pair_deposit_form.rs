@@ -163,8 +163,8 @@ pub fn PairDepositForm(
                 err: err,
                 tx_type: TransactionType::BoostDeposit,
                 confirmation: ConfirmationDialog {
-                    title: "Risks".to_string(),
-                    detail: "Providing market liquidity involves financial risk, including but not limited to, divergence loss. Divergence loss can occur when the relative price of the tokens in the pool changes and the value of the LP’s initial token deposit in the pool becomes less compared to holding the tokens separately without depositing them in a pool. This means your deposit is exposed to the price movements of both tokens in the pair, and your exposure to each token can also change.".to_string(),
+                    title: "Financial risks".to_string(),
+                    detail: "Providing liquidity comes with financial risk, including but not limited to, divergence loss.\nDivergence loss can occur when the relative price of the tokens in the pool changes and the value of the deposit becomes less compared to holding the tokens separately.\nOnce deposited, your exposure to each token can change.".to_string(),
                     ack: "I acknowledge the risks, and I alone am responsible for my financial decisions".to_string(),
                 },
             }

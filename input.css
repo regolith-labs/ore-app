@@ -149,7 +149,7 @@ body {
   }
 
   .checkbox {
-    @apply w-4 h-4 appearance-none border-2 border-elements-lowEmphasis rounded bg-transparent cursor-pointer relative;
+    @apply w-5 h-5 appearance-none border-2 border-elements-lowEmphasis rounded bg-transparent cursor-pointer relative;
   }
 
   .checkbox:checked {

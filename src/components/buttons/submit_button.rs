@@ -17,7 +17,7 @@ pub fn SubmitButton(
 ) -> Element {
     let class = class.unwrap_or("controls-primary".to_string());
 
-    let show_confirmation = use_signal(|| false);
+    let mut show_confirmation = use_signal(|| false);
 
     let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
         if let Some(_) = err.cloned() {
@@ -29,6 +29,8 @@ pub fn SubmitButton(
         false
     };
 
+    let confimration_is_some = confirmation.is_some();
+
     rsx! {
         Col {
             class: "w-full",
@@ -37,7 +39,9 @@ pub fn SubmitButton(
                 class: "flex h-12 w-full rounded-full {class} transition-transform hover:not-disabled:scale-105",
                 disabled: !enabled,
                 onclick: move |_| {
-                    if let Some(Ok(transaction)) = transaction.cloned() {
+                    if confimration_is_some {
+                        show_confirmation.set(true);
+                    } else if let Some(Ok(transaction)) = transaction.cloned() {
                         submit_transaction(transaction, tx_type.clone());
                     }
                 },

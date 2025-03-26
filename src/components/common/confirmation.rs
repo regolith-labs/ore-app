@@ -22,6 +22,8 @@ pub fn Confirmation(
 
     let show = use_memo(move || *show_signal.read() && err.read().is_none());
 
+    let lines = dialog.detail.split('\n').collect::<Vec<&str>>();
+
     rsx! {
         {
             show.read().then(|| rsx! {
@@ -38,27 +40,30 @@ pub fn Confirmation(
                                 class: "text-xl font-semibold text-elements-highEmphasis text-left",
                                 "{dialog.title}"
                             }
-                            span {
-                                class: "text-elements-midEmphasis text-left",
-                                "{dialog.detail}"
-                            }
-                            label {
-                                class: "text-sm flex justify-between items-center gap-2 text-elements-lowEmphasis cursor-pointer",
-                                input {
-                                    r#type: "checkbox",
-                                    checked: is_confirmed,
-                                    onchange: move |e| is_confirmed.set(e.checked()),
-                                    class: "checkbox h-12"
-                                }
+                            for line in lines {
                                 span {
-                                    class: "text-sm text-elements-lowEmphasis text-right",
-                                    "{dialog.ack}"
+                                    class: "text-elements-midEmphasis text-left",
+                                    "{line}"
                                 }
                             }
                             Row {
-                                gap: 3,
+                                class: "justify-between w-full my-8",
+                                gap: 8,
+                                input {
+                                    class: "checkbox mb-auto",
+                                    r#type: "checkbox",
+                                    checked: is_confirmed,
+                                    onchange: move |e| is_confirmed.set(e.checked()),
+                                }
+                                span {
+                                    class: "text-sm text-elements-midEmphasis text-right",
+                                    "{dialog.ack}"
+                                }
+                            }
+                            Col {
+                                gap: 2,
                                 button {
-                                    class: "flex-1 h-12 rounded-full controls-secondary",
+                                    class: "h-12 w-full rounded-full controls-secondary",
                                     onclick: move |_| show_signal.set(false),
                                     span {
                                         class: "mx-auto my-auto",
@@ -66,7 +71,7 @@ pub fn Confirmation(
                                     }
                                 }
                                 button {
-                                    class: "flex-1 h-12 rounded-full controls-primary",
+                                    class: "h-12 w-full rounded-full controls-primary",
                                     disabled: !*is_confirmed.read(),
                                     onclick: move |_| {
                                         if let Some(Ok(tx)) = transaction.cloned() {
