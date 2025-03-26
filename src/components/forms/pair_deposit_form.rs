@@ -164,7 +164,7 @@ pub fn PairDepositForm(
                 tx_type: TransactionType::BoostDeposit,
                 confirmation: ConfirmationDialog {
                     title: "Financial risks".to_string(),
-                    detail: "Providing liquidity comes with financial risk, including but not limited to, divergence loss.\nDivergence loss can occur when the relative price of the tokens in the pool changes and the value of the deposit becomes less compared to holding the tokens separately.\nOnce deposited, your exposure to each token can change.".to_string(),
+                    detail: "Providing liquidity comes with inherentfinancial risk, including but not limited to, divergence loss.\nDivergence loss can occur when the relative price of the deposited tokens changes and the value of the deposit becomes less compared to holding the tokens separately.\nOnce deposited, your exposure to each token can change.".to_string(),
                     ack: "I acknowledge the risks, and I alone am responsible for my financial decisions".to_string(),
                 },
             }

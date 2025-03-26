@@ -29,7 +29,7 @@ pub fn SubmitButton(
         false
     };
 
-    let confimration_is_some = confirmation.is_some();
+    let confirmation_is_some = confirmation.is_some();
 
     rsx! {
         Col {
@@ -39,7 +39,7 @@ pub fn SubmitButton(
                 class: "flex h-12 w-full rounded-full {class} transition-transform hover:not-disabled:scale-105",
                 disabled: !enabled,
                 onclick: move |_| {
-                    if confimration_is_some {
+                    if confirmation_is_some {
                         show_confirmation.set(true);
                     } else if let Some(Ok(transaction)) = transaction.cloned() {
                         submit_transaction(transaction, tx_type.clone());

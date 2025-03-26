@@ -37,7 +37,7 @@ pub fn Confirmation(
                             class: "p-4 justify-start",
                             gap: 4,
                             span {
-                                class: "text-xl font-semibold text-elements-highEmphasis text-left",
+                                class: "text-2xl font-semibold text-elements-highEmphasis text-left",
                                 "{dialog.title}"
                             }
                             for line in lines {
