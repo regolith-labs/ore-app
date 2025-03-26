@@ -105,9 +105,6 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
     // Priority fee
     let _priority_fee = use_signal(|| 0);
 
-    // Status
-    // let mut status = use_signal(|| TransferStatus::Editing);
-
     let mut destination_pubkey: Signal<String> = use_signal::<String>(|| "".to_string());
 
     let mut address_err = use_signal::<Option<TransferError>>(|| None);
@@ -124,7 +121,6 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
     );
 
     on_transaction_done(move |_| {
-        // status.set(TransferStatus::Success);
         destination_pubkey.set("".to_string());
         amount.set("".to_string());
     });
@@ -224,7 +220,6 @@ pub fn Transfer(token_ticker: Option<String>) -> Element {
                 selected_token,
                 destination: destination_pubkey,
                 address_err,
-                // status
             }
         }
     }
