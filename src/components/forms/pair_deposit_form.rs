@@ -1,5 +1,5 @@
 use crate::{
-    components::{Col, Fee, SubmitButton, TokenInputError, TokenInputForm},
+    components::{Col, ConfirmationDialog, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::BoostMeta,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_pair_deposit_transaction},
@@ -154,13 +154,19 @@ pub fn PairDepositForm(
             }
             Col {
                 class: "w-full px-4",
-                Fee { priority_fee: priority_fee.clone() }
+                Fee { priority_fee: priority_fee.clone() },
             }
+
             SubmitButton {
                 title: "Submit".to_string(),
                 transaction: tx,
                 err: err,
-                tx_type: TransactionType::BoostDeposit
+                tx_type: TransactionType::BoostDeposit,
+                confirmation: ConfirmationDialog {
+                    title: "Financial risks".to_string(),
+                    detail: "Providing liquidity comes with financial risk, including but not limited to, divergence loss.\nDivergence loss can occur when the relative price of the tokens in the pool changes and the value of the deposit becomes less compared to holding the tokens separately.\nOnce deposited, your exposure to each token can change.".to_string(),
+                    ack: "I acknowledge the risks, and I alone am responsible for my financial decisions".to_string(),
+                },
             }
         }
     }

@@ -147,6 +147,27 @@ body {
   .bg-elements-green {
     background-color: var(--color-elements-green);
   }
+
+  .checkbox {
+    @apply w-5 h-5 appearance-none border-2 border-elements-lowEmphasis rounded bg-transparent cursor-pointer relative;
+  }
+
+  .checkbox:checked {
+    @apply bg-elements-highEmphasis border-elements-highEmphasis;
+  }
+
+  .checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    display: block;
+  }
 }
 
 /* Pilat */

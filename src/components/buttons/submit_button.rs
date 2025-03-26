@@ -1,10 +1,10 @@
 use dioxus::prelude::*;
-use solana_sdk::transaction::VersionedTransaction;
 use ore_types::request::TransactionType;
+use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{components::submit_transaction, gateway::GatewayResult};
 
-use crate::components::{Alert, Col, Spinner, TokenInputError};
+use crate::components::{Alert, Col, Confirmation, ConfirmationDialog, Spinner, TokenInputError};
 
 #[component]
 pub fn SubmitButton(
@@ -12,9 +12,12 @@ pub fn SubmitButton(
     title: String,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
     err: Signal<Option<TokenInputError>>,
-    tx_type: TransactionType
+    tx_type: TransactionType,
+    confirmation: Option<ConfirmationDialog>,
 ) -> Element {
     let class = class.unwrap_or("controls-primary".to_string());
+
+    let mut show_confirmation = use_signal(|| false);
 
     let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
         if let Some(_) = err.cloned() {
@@ -26,6 +29,8 @@ pub fn SubmitButton(
         false
     };
 
+    let confimration_is_some = confirmation.is_some();
+
     rsx! {
         Col {
             class: "w-full",
@@ -34,7 +39,9 @@ pub fn SubmitButton(
                 class: "flex h-12 w-full rounded-full {class} transition-transform hover:not-disabled:scale-105",
                 disabled: !enabled,
                 onclick: move |_| {
-                    if let Some(Ok(transaction)) = transaction.cloned() {
+                    if confimration_is_some {
+                        show_confirmation.set(true);
+                    } else if let Some(Ok(transaction)) = transaction.cloned() {
                         submit_transaction(transaction, tx_type.clone());
                     }
                 },
@@ -55,6 +62,15 @@ pub fn SubmitButton(
                 }
             }
             Alert {}
+            if let Some(confirmation) = confirmation {
+                Confirmation {
+                    show_signal: show_confirmation,
+                    err: err,
+                    transaction: transaction,
+                    transaction_type: TransactionType::BoostDeposit,
+                    dialog: confirmation,
+                }
+            }
         }
     }
 }

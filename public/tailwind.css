@@ -644,6 +644,12 @@
   .z-100 {
     z-index: 100;
   }
+  .z-\[1000\] {
+    z-index: 1000;
+  }
+  .z-\[1001\] {
+    z-index: 1001;
+  }
   .\!container {
     width: 100% !important;
     @media (width >= 40rem) {
@@ -692,14 +698,14 @@
   .mx-1 {
     margin-inline: calc(var(--spacing) * 1);
   }
-  .mx-4 {
-    margin-inline: calc(var(--spacing) * 4);
-  }
   .mx-auto {
     margin-inline: auto;
   }
   .my-4 {
     margin-block: calc(var(--spacing) * 4);
+  }
+  .my-8 {
+    margin-block: calc(var(--spacing) * 8);
   }
   .my-auto {
     margin-block: auto;
@@ -902,12 +908,6 @@
   .w-96 {
     width: calc(var(--spacing) * 96);
   }
-  .w-\[0\.4em\] {
-    width: 0.4em;
-  }
-  .w-\[0\.6em\] {
-    width: 0.6em;
-  }
   .w-full {
     width: 100%;
   }
@@ -938,6 +938,9 @@
   .max-w-lg {
     max-width: var(--container-lg);
   }
+  .max-w-md {
+    max-width: var(--container-md);
+  }
   .max-w-screen {
     max-width: 100vw;
   }
@@ -967,6 +970,12 @@
   }
   .shrink-0 {
     flex-shrink: 0;
+  }
+  .flex-grow {
+    flex-grow: 1;
+  }
+  .flex-grow-0 {
+    flex-grow: 0;
   }
   .grow {
     flex-grow: 1;
@@ -1027,6 +1036,9 @@
   .items-center {
     align-items: center;
   }
+  .items-end {
+    align-items: flex-end;
+  }
   .justify-between {
     justify-content: space-between;
   }
@@ -1066,6 +1078,9 @@
   .gap-16 {
     gap: calc(var(--spacing) * 16);
   }
+  .self-center {
+    align-self: center;
+  }
   .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1079,6 +1094,9 @@
   }
   .overflow-x-auto {
     overflow-x: auto;
+  }
+  .overflow-y-auto {
+    overflow-y: auto;
   }
   .rounded {
     border-radius: 0.25rem;
@@ -1279,9 +1297,6 @@
   .px-8 {
     padding-inline: calc(var(--spacing) * 8);
   }
-  .px-\[0\.1em\] {
-    padding-inline: 0.1em;
-  }
   .py-0 {
     padding-block: calc(var(--spacing) * 0);
   }
@@ -1326,6 +1341,9 @@
   }
   .pb-0 {
     padding-bottom: calc(var(--spacing) * 0);
+  }
+  .pb-2 {
+    padding-bottom: calc(var(--spacing) * 2);
   }
   .pb-4 {
     padding-bottom: calc(var(--spacing) * 4);
@@ -1414,10 +1432,6 @@
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
-  }
-  .tracking-\[0\.1em\] {
-    --tw-tracking: 0.1em;
-    letter-spacing: 0.1em;
   }
   .text-nowrap {
     text-wrap: nowrap;
@@ -2431,6 +2445,34 @@ body {
   .bg-elements-green {
     background-color: var(--color-elements-green);
   }
+  .checkbox {
+    position: relative;
+    height: calc(var(--spacing) * 5);
+    width: calc(var(--spacing) * 5);
+    cursor: pointer;
+    appearance: none;
+    border-radius: 0.25rem;
+    border-style: var(--tw-border-style);
+    border-width: 2px;
+    border-color: var(--color-elements-lowEmphasis);
+    background-color: transparent;
+  }
+  .checkbox:checked {
+    border-color: var(--color-elements-highEmphasis);
+    background-color: var(--color-elements-highEmphasis);
+  }
+  .checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    display: block;
+  }
 }
 @font-face {
   font-family: 'Pilat';
@@ -2668,10 +2710,6 @@ body {
   initial-value: 100%;
 }
 @property --tw-font-weight {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-tracking {
   syntax: "*";
   inherits: false;
 }
