@@ -1,5 +1,5 @@
 use crate::{
-    components::{Alert, Col, Confirmation, Fee, TokenInputError, TokenInputForm},
+    components::{Col, ConfirmationDialog, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::BoostMeta,
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{on_transaction_done, use_pair_deposit_transaction},
@@ -28,9 +28,6 @@ pub fn PairDepositForm(
     let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
     let priority_fee = use_signal::<u64>(|| 0);
-    let mut show_confirmation = use_signal(|| false);
-    let show_confirmation_with_validation =
-        use_memo(move || *show_confirmation.read() && err.read().is_none());
 
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
@@ -157,31 +154,19 @@ pub fn PairDepositForm(
             }
             Col {
                 class: "w-full px-4",
-                Fee { priority_fee: priority_fee.clone() }
+                Fee { priority_fee: priority_fee.clone() },
             }
 
-            button {
-                class: "h-12 w-full rounded-full controls-primary transition-all duration-300 ease-in-out hover:not-disabled:scale-105",
-                disabled: {
-                    err.read().is_some() ||
-                    input_amount_a.read().is_empty() ||
-                    input_amount_b.read().is_empty() ||
-                    !matches!(tx.read().as_ref(), Some(Ok(_)))
-                },
-                onclick: move |_| show_confirmation.set(true),
-                span {
-                    class: "mx-auto my-auto font-semibold",
-                    "Submit"
-                }
-            }
-
-            Alert {}
-
-            Confirmation {
-                show: show_confirmation_with_validation,
-                show_signal: show_confirmation,
+            SubmitButton {
+                title: "Submit".to_string(),
                 transaction: tx,
-                transaction_type: TransactionType::BoostDeposit,
+                err: err,
+                tx_type: TransactionType::BoostDeposit,
+                confirmation: ConfirmationDialog {
+                    title: "Risks".to_string(),
+                    detail: "Providing market liquidity involves financial risk, including but not limited to, divergence loss. Divergence loss can occur when the relative price of the tokens in the pool changes and the value of the LP’s initial token deposit in the pool becomes less compared to holding the tokens separately without depositing them in a pool. This means your deposit is exposed to the price movements of both tokens in the pair, and your exposure to each token can also change.".to_string(),
+                    ack: "I acknowledge the risks, and I alone am responsible for my financial decisions".to_string(),
+                },
             }
         }
     }

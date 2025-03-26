@@ -1,10 +1,10 @@
 use dioxus::prelude::*;
-use solana_sdk::transaction::VersionedTransaction;
 use ore_types::request::TransactionType;
+use solana_sdk::transaction::VersionedTransaction;
 
 use crate::{components::submit_transaction, gateway::GatewayResult};
 
-use crate::components::{Alert, Col, Spinner, TokenInputError};
+use crate::components::{Alert, Col, Confirmation, ConfirmationDialog, Spinner, TokenInputError};
 
 #[component]
 pub fn SubmitButton(
@@ -12,9 +12,12 @@ pub fn SubmitButton(
     title: String,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
     err: Signal<Option<TokenInputError>>,
-    tx_type: TransactionType
+    tx_type: TransactionType,
+    confirmation: Option<ConfirmationDialog>,
 ) -> Element {
     let class = class.unwrap_or("controls-primary".to_string());
+
+    let show_confirmation = use_signal(|| false);
 
     let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
         if let Some(_) = err.cloned() {
@@ -55,6 +58,15 @@ pub fn SubmitButton(
                 }
             }
             Alert {}
+            if let Some(confirmation) = confirmation {
+                Confirmation {
+                    show_signal: show_confirmation,
+                    err: err,
+                    transaction: transaction,
+                    transaction_type: TransactionType::BoostDeposit,
+                    dialog: confirmation,
+                }
+            }
         }
     }
 }

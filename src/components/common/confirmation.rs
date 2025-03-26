@@ -3,14 +3,24 @@ use dioxus::prelude::*;
 use ore_types::request::TransactionType;
 use solana_sdk::transaction::VersionedTransaction;
 
+#[derive(Clone, PartialEq, Eq)]
+pub struct ConfirmationDialog {
+    pub title: String,
+    pub detail: String,
+    pub ack: String,
+}
+
 #[component]
 pub fn Confirmation(
-    show: Memo<bool>,
+    err: Signal<Option<TokenInputError>>,
     show_signal: Signal<bool>,
     transaction: Resource<GatewayResult<VersionedTransaction>>,
+    dialog: ConfirmationDialog,
     transaction_type: TransactionType,
 ) -> Element {
     let mut is_confirmed = use_signal(|| false);
+
+    let show = use_memo(move || *show_signal.read() && err.read().is_none());
 
     rsx! {
         {
@@ -25,22 +35,25 @@ pub fn Confirmation(
                             class: "p-4 justify-start",
                             gap: 4,
                             span {
-                                class: "text-xl font-semibold text-elements-highEmphasis text-center",
-                                "Confirm Pair Deposit"
+                                class: "text-xl font-semibold text-elements-highEmphasis text-left",
+                                "{dialog.title}"
                             }
                             span {
-                                class: "text-elements-midEmphasis text-center",
-                                "Are you sure you want to deposit?"
+                                class: "text-elements-midEmphasis text-left",
+                                "{dialog.detail}"
                             }
                             label {
-                                class: "text-sm flex justify-center items-center gap-2 text-elements-lowEmphasis h-12 cursor-pointer",
+                                class: "text-sm flex justify-between items-center gap-2 text-elements-lowEmphasis cursor-pointer",
                                 input {
                                     r#type: "checkbox",
                                     checked: is_confirmed,
                                     onchange: move |e| is_confirmed.set(e.checked()),
-                                    class: "checkbox"
+                                    class: "checkbox h-12"
                                 }
-                                "Yes, I'm sure I want to deposit"
+                                span {
+                                    class: "text-sm text-elements-lowEmphasis text-right",
+                                    "{dialog.ack}"
+                                }
                             }
                             Row {
                                 gap: 3,
@@ -63,7 +76,7 @@ pub fn Confirmation(
                                     },
                                     span {
                                         class: "mx-auto my-auto",
-                                        "Deposit"
+                                        "Continue"
                                     }
                                 }
                             }
