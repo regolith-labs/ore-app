@@ -6,7 +6,6 @@ use crate::{
     hooks::use_all_token_balances,
 };
 
-// TODO Close on ESC click
 #[component]
 pub fn TokenPicker(
     show: Signal<bool>,
@@ -139,35 +138,6 @@ pub fn TokenPicker(
                                     }
 
                                 }
-                                // img {
-                                //     class: "w-8 h-8 rounded-full",
-                                //     src: "{t.image}",
-                                // }
-                                // div {
-                                //     class: "flex flex-col",
-                                //     span {
-                                //         class: "font-semibold",
-                                //         "{t.ticker}"
-                                //     }
-                                //     // Display balance if available
-                                //     {
-                                //         token_balances.iter().find_map(|(token_info, balance)| {
-                                //             if token_info.mint == t.mint {
-                                //                 if let Ok(amount) = balance {
-                                //                     if let Some(ui_amount) = amount.ui_amount {
-                                //                         return Some(rsx!(
-                                //                             span {
-                                //                                 class: "text-sm text-elements-lowEmphasis",
-                                //                                 "{ui_amount:.6}"
-                                //                             }
-                                //                         ))
-                                //                     }
-                                //                 }
-                                //             }
-                                //             None
-                                //         })
-                                //     }
-                                // }
                             }
                         }
                     }
