@@ -23,10 +23,14 @@ pub fn Mine() -> Element {
             gap: 16,
             Col {
                 class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
-                Heading {
-                    class: "w-full",
-                    title: "Mine",
-                    subtitle: "Convert energy into cryptocurrency."
+                Row {
+                    class: "w-full justify-between",
+                    Heading {
+                        class: "w-full",
+                        title: "Mine",
+                        subtitle: "Convert energy into cryptocurrency."
+                    }
+                    HelpDrawerMount {}
                 }
                 MinerData {}
             }

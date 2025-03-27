@@ -35,8 +35,8 @@ pub fn MineTable() -> Element {
                 hidden: info_hidden,
             }
             if events.is_empty() {
-                span {
-                    class: "text-elements-lowEmphasis font-medium w-full min-w-max mt-4 sm:mx-8 px-5 sm:px-3",
+                Row {
+                    class: "text-elements-lowEmphasis font-medium w-full min-w-max mt-4 sm:px-8 px-5",
                     "No activity yet"
                 }
             } else {
