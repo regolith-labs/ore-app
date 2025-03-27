@@ -696,9 +696,6 @@
   .mx-auto {
     margin-inline: auto;
   }
-  .my-2 {
-    margin-block: calc(var(--spacing) * 2);
-  }
   .my-4 {
     margin-block: calc(var(--spacing) * 4);
   }
@@ -2461,14 +2458,9 @@ body {
   }
   .checkbox:checked::after {
     content: '';
-<<<<<<< HEAD
-    width: 8px;
-    height: 8px;
-=======
     position: absolute;
     width: 6px;
     height: 10px;
->>>>>>> 3fc6738 (Fix confirmation dialog styling)
     border: solid black;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);

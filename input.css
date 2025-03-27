@@ -159,16 +159,16 @@ body {
   .checkbox:checked::after {
     content: '';
     position: absolute;
-    width: 6px; /* Reduced from 8px */
-    height: 10px; /* Increased from 8px for better proportions */
+    width: 6px; 
+    height: 10px; 
     border: solid black;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
     display: block;
     left: 50%;
     top: 50%;
-    margin-left: -3px; /* Half the width */
-    margin-top: -7px; /* Adjusted to account for the rotation and visual center */
+    margin-left: -3px; 
+    margin-top: -7px; 
   }
 }
 
