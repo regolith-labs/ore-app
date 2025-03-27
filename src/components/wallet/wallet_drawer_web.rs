@@ -29,8 +29,6 @@ impl WebClipboard {
     }
 }
 
-// use super::WalletTab;
-
 enum Splice {
     Pubkey(String),
     Copied,
@@ -179,23 +177,20 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
                 }
             }
 
-            // Token List with overflow handling - the content area
+            // Token List for web
             div {
                 class: "flex-1 overflow-y-auto",
-                style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
+                style: "padding-bottom: 1rem;",
 
                 // Add a token list with click handling to close drawer like in native version
                 {
                     let tokens = crate::hooks::use_tokens_with_values();
-                    // let navigate = use_navigator();
 
                     rsx! {
                         Col {
                             class: "w-full",
                             {tokens.iter().map(|token| {
                                 let token_clone = token.clone();
-                                // let on_close_clone = on_close.clone();
-                                // let navigate_clone = navigate.clone();
 
                                 rsx! {
                                     div {
@@ -210,7 +205,6 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
                                             navigator.push(Route::TransferWithToken {
                                                 token_ticker: token_clone.token.ticker.clone()
                                             });
-                                            // navigator.push(Route::Transfer {});
                                         },
                                         Row {
                                             class: "w-full justify-between items-center",
