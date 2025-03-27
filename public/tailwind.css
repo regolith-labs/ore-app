@@ -477,7 +477,6 @@
   }
   img, svg, video, canvas, audio, iframe, embed, object {
     display: block;
-    vertical-align: middle;
   }
   img, video {
     max-width: 100%;
@@ -900,6 +899,7 @@
   .w-96 {
     width: calc(var(--spacing) * 96);
   }
+
   .w-full {
     width: 100%;
   }
