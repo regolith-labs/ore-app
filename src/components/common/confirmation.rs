@@ -46,29 +46,19 @@ pub fn Confirmation(
                                     "{line}"
                                 }
                             }
-                            label {
-                                class: "text-sm flex justify-center items-center gap-2 text-elements-lowEmphasis h-12 cursor-pointer",
-                                input {
-                                    r#type: "checkbox",
-                                    checked: is_confirmed,
-                                    onchange: move |e| is_confirmed.set(e.checked()),
-                                    class: "checkbox"
-                                }
-                                "Yes, I'm sure I want to deposit"
-                            }
                             Row {
-                                class: "justify-between w-full my-8",
-                                gap: 8,
-                                input {
-                                    class: "checkbox mb-auto",
-                                    r#type: "checkbox",
-                                    checked: is_confirmed,
-                                    onchange: move |e| is_confirmed.set(e.checked()),
-                                }
-                                span {
-                                    class: "text-sm text-elements-midEmphasis text-right",
-                                    "{dialog.ack}"
-                                }
+                                class: "text-sm items-start text-elements-lowEmphasis my-4",
+                               gap: 2,
+                               input {
+                                   r#type: "checkbox",
+                                   checked: is_confirmed,
+                                   onchange: move |e| is_confirmed.set(e.checked()),
+                                   class: "checkbox mt-1 flex-shrink-0",
+                               }
+                               span {
+                                   class: "flex-grow",
+                                   "{dialog.ack}"
+                               }
                             }
                             Col {
                                 gap: 2,

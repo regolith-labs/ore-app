@@ -151,19 +151,24 @@ body {
   .checkbox {
     @apply w-4 h-4 appearance-none border-2 border-elements-lowEmphasis rounded bg-transparent cursor-pointer relative;
   }
-
+  
   .checkbox:checked {
     @apply bg-elements-highEmphasis border-elements-highEmphasis;
   }
-
+  
   .checkbox:checked::after {
     content: '';
-    width: 8px;
-    height: 8px;
+    position: absolute;
+    width: 6px; /* Reduced from 8px */
+    height: 10px; /* Increased from 8px for better proportions */
     border: solid black;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
     display: block;
+    left: 50%;
+    top: 50%;
+    margin-left: -3px; /* Half the width */
+    margin-top: -7px; /* Adjusted to account for the rotation and visual center */
   }
 }
 

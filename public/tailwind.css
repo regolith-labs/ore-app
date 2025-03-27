@@ -696,11 +696,11 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .my-2 {
+    margin-block: calc(var(--spacing) * 2);
+  }
   .my-4 {
     margin-block: calc(var(--spacing) * 4);
-  }
-  .my-8 {
-    margin-block: calc(var(--spacing) * 8);
   }
   .my-auto {
     margin-block: auto;
@@ -1033,6 +1033,9 @@
   }
   .items-end {
     align-items: flex-end;
+  }
+  .items-start {
+    align-items: flex-start;
   }
   .justify-between {
     justify-content: space-between;
@@ -2458,12 +2461,22 @@ body {
   }
   .checkbox:checked::after {
     content: '';
+<<<<<<< HEAD
     width: 8px;
     height: 8px;
+=======
+    position: absolute;
+    width: 6px;
+    height: 10px;
+>>>>>>> 3fc6738 (Fix confirmation dialog styling)
     border: solid black;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
     display: block;
+    left: 50%;
+    top: 50%;
+    margin-left: -3px;
+    margin-top: -7px;
   }
 }
 @font-face {
