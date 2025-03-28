@@ -1,12 +1,13 @@
-use dioxus::prelude::*;
-
 use crate::components::*;
 use crate::hooks::{use_help_drawer_state, HelpDrawerPage};
 use crate::route::Route;
+use dioxus::prelude::*;
+use std::time::Duration;
 
 pub fn HelpDrawer() -> Element {
     let mut drawer_state = use_help_drawer_state();
     let drawer_remount = use_signal(|| false);
+    let mut is_animating = use_signal(|| false);
 
     // Get the current route to determine if we should show the drawer
     let current_route: Route = use_route();
@@ -15,10 +16,18 @@ pub fn HelpDrawer() -> Element {
     rsx! {
         HelpDrawerOverlay {
             drawer_state: drawer_state,
+            is_animating: is_animating,
             on_close: move |_| {
-                let mut current = drawer_state.read().clone();
-                current.is_open = false;
-                drawer_state.set(current);
+                if !is_animating.cloned() {
+                    is_animating.set(true);
+                    let mut current = drawer_state.read().clone();
+                    current.is_open = false;
+                    drawer_state.set(current);
+                    spawn(async move {
+                        async_std::task::sleep(Duration::from_millis(500)).await;
+                        is_animating.set(false);
+                    });
+                }
             },
             drawer_remount: drawer_remount
         }
@@ -28,31 +37,30 @@ pub fn HelpDrawer() -> Element {
 #[component]
 fn HelpDrawerOverlay(
     drawer_state: Signal<crate::hooks::HelpDrawerState>,
+    is_animating: Signal<bool>,
     on_close: EventHandler<MouseEvent>,
     drawer_remount: Signal<bool>,
 ) -> Element {
-    // Render nothing when closed
-    if !drawer_state.read().is_open {
+    let is_open = drawer_state.read().is_open;
+
+    // Render nothing when closed and not animating
+    if !is_open && !*is_animating.read() {
         return rsx! { Fragment {} };
     }
 
-    // Render drawer when open
+    // Render drawer when open or animating
     rsx! {
         Fragment {
-            // Only show dark backdrop overlay on mobile (sm:hidden)
+            // Background overlay with fade effect
             div {
-                class: "fixed inset-0 bg-black bg-opacity-50 z-[1000] sm:hidden",
-                style: "height: 100vh; width: 100vw;",
-                onclick: move |e| on_close.call(e)
+                class: "fixed inset-0 transition-all duration-500 ease-in-out bg-black/50",
+                class: if is_open { "wallet-drawer-fade opacity-100" } else { "wallet-drawer-fade-out opacity-0" },
+                onclick: move |e| on_close(e)
             }
-            // Invisible overlay for desktop to capture clicks outside (hidden on mobile)
+            // Drawer content
             div {
-                class: "fixed inset-0 z-[1000] hidden sm:block",
-                style: "height: 100vh; width: 100vw;",
-                onclick: move |e| on_close.call(e)
-            }
-            div {
-                class: "fixed top-0 right-0 bottom-0 h-full w-screen sm:w-[574px] z-[1001]",
+                class: "fixed top-0 right-0 h-full w-screen sm:w-[574px] transition-transform duration-500 ease-in-out transform z-[1001]",
+                class: if is_open { "wallet-drawer-slide translate-x-0" } else { "wallet-drawer-slide-out translate-x-full" },
                 style: "height: 100vh;",
                 HelpDrawerWrapper {
                     drawer_state: drawer_state,
@@ -63,3 +71,4 @@ fn HelpDrawerOverlay(
         }
     }
 }
+
