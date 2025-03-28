@@ -13,7 +13,7 @@ use crate::route::Route;
 pub fn Landing() -> Element {
     let navigator = use_navigator();
     navigator.replace(Route::Topup {
-        address: "asdf".to_string(),
+        address: "".to_string(),
     });
     rsx! {}
 }
@@ -78,7 +78,7 @@ fn LaunchButton() -> Element {
 fn HeroTitle() -> Element {
     rsx! {
         Col {
-            class: "absolute left-0 right-0 bottom-32 sm:left-8 sm:right-8 md:bottom-0 md:top-0 font-extended font-bold text-7xl md:text-8xl lg:text-9xl text-center md:text-left text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black",
+            class: "absolute left-0 right-0 bottom-16 sm:left-8 sm:right-8 md:bottom-0 md:top-0 font-extended font-bold text-7xl md:text-8xl lg:text-9xl text-center md:text-left text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black",
             gap: 2,
             span {
                 class: "md:mt-auto z-30",
@@ -89,10 +89,13 @@ fn HeroTitle() -> Element {
                 "Digital"
             }
             span {
-                class: "md:mb-auto z-10",
+                class: "mb-4 md:mb-8 z-10",
                 "Gold"
             }
-
+            span {
+                class: "md:mb-auto z-10 text-elements-midEmphasis leading-8 font-wide font-medium text-2xl md:text-3xl lg:text-4xl text-center md:text-left max-w-2xl",
+                "Convert energy into cryptocurrency."
+            }
         }
     }
 }
@@ -113,7 +116,7 @@ fn Mining() -> Element {
                     }
                     MiningGuide {}
                     SectionCtas {
-                        primary_title: "Start now →",
+                        primary_title: "Start mining →",
                         primary_route: Route::Mine {},
                         secondary_title: "Learn more",
                         secondary_route: Route::Mine {}
@@ -235,7 +238,7 @@ fn MiningGuide() -> Element {
             GuideStep {
                 step: "2",
                 title: "Join a pool",
-                detail: "Save money and avoid transaction fees."
+                detail: "Lower costs and avoid transaction fees."
             }
             GuideStep {
                 step: "3",
@@ -299,10 +302,10 @@ fn Liquidity() -> Element {
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is consolidating liquidity across Solana around a new digital gold standard. Liquidity providers can earn competitive yield rates by strengthening the depth of the network."
+                        "ORE generates longterm yield for stakers. Farm competitive yield rates by providing liquidity for ORE markets."
                     }
                     SectionCtas {
-                        primary_title: "Explore stake →",
+                        primary_title: "Explore staking →",
                         primary_route: Route::Stake {},
                         secondary_title: "Learn more",
                         secondary_route: Route::Stake {}
@@ -594,23 +597,23 @@ fn Faq() -> Element {
                 class: "w-full h-min justify-start md:mt-16",
                 FaqItem {
                     question: "What is ORE?",
-                    answer: "ORE is a new \"digital gold\" primitive for decentralized finance. It is a crypto commodity mineable via proof-of-work on the Solana blockchain."
+                    answer: "ORE is digital commodity, mineable via proof-of-work on Solana."
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "ORE represents a new generation of digital gold, built for the new generation of crypto users. It takes the core properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new token on the Solana blockchain. "
+                    answer: "ORE allows anyone to convert electricity and spare compute resources into liquid financial capital. This allows data centers to monetize underutilized compute capacity, and individuals to permissionlessly onramp to Solana without relying on financial institutions."
                 }
                 FaqItem {
                     question: "How does mining work?",
                     answer: "ORE can be mined by anyone with a laptop or home computer. Simply navigate to the mining page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be enrolled in a mining pool and do not need to pay any transaction fees while you mine."
                 }
                 FaqItem {
-                    question: "How does liquidity work?",
+                    question: "How does staking work?",
                     answer: "ORE automatically distributes a portion of all newly mined supply to liquidity providers as yield. These incentives help bootstrap liquidity and maintain active markets with a network of assets in the Solana ecosystem. By providing liquidity for ORE pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE yield."
                 }
                 FaqItem {
                     question: "Is it secure?",
-                    answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team is committed to freezing the protocol in the coming months to guarantee longterm security."
+                    answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team is committed to permenantly freezing the protocol in the near future to guarantee longterm security."
                 }
             }
         }

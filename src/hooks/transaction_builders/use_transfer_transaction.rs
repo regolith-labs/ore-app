@@ -115,14 +115,18 @@ pub fn use_transfer_transaction(
         );
 
         // Add transfer instruction
-        ixs.push(spl_transfer(
-            &spl_token::ID,
-            &from_ata,
-            &to_ata,
-            &authority,
-            &[],
-            amount_u64,
-        )?);
+        if token.mint == Token::sol().mint {
+            ixs.push(transfer(&authority, &destination, amount_u64));
+        } else {
+            ixs.push(spl_transfer(
+                &spl_token::ID,
+                &from_ata,
+                &to_ata,
+                &authority,
+                &[],
+                amount_u64,
+            )?);
+        }
 
         // Include ORE app fee
         let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
