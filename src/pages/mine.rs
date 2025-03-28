@@ -6,10 +6,10 @@ use crate::{
     components::*,
     gateway::pool::PoolGateway,
     hooks::{
-        on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
-        use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_wallet, MinerStatus, Wallet,
+        on_transaction_done, use_gateway, use_help_drawer_state, use_member, use_member_record,
+        use_member_record_balance, use_miner, use_miner_claim_transaction, use_miner_cores,
+        use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url,
+        use_system_cpu_utilization, use_wallet, HelpDrawerPage, MinerStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -30,7 +30,7 @@ pub fn Mine() -> Element {
                         title: "Mine",
                         subtitle: "Convert energy into cryptocurrency."
                     }
-                    HelpDrawerMount {}
+                    MineHelpButton {}
                 }
                 MinerData {}
             }
@@ -577,6 +577,33 @@ fn MinePower() -> Element {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+// Help button specific to the Mine page
+fn MineHelpButton() -> Element {
+    let mut drawer_state = use_help_drawer_state();
+
+    rsx! {
+        button {
+            onclick: move |_| {
+                let mut current = drawer_state.read().clone();
+                current.is_open = true;
+                current.current_page = HelpDrawerPage::Mine;
+                drawer_state.set(current);
+            },
+            Row {
+                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer gap-3",
+                gap: 3,
+                span {
+                    class: "mx-auto my-auto",
+                    "Help"
+                }
+                DrawerIcon {
+                    class: "w-3 text-gray-700"
                 }
             }
         }
