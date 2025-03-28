@@ -55,6 +55,18 @@ pub fn use_ore_balance_wss() -> Signal<GatewayResult<UiTokenAmount>> {
     }
 }
 
+pub fn use_all_token_balances() -> Vec<(Token, GatewayResult<UiTokenAmount>)> {
+    let token_balances: HashMap<Pubkey, Signal<GatewayResult<UiTokenAmount>>> = use_context();
+    let mut result = Vec::new();
+    for (mint, token) in LISTED_TOKENS.iter() {
+        if let Some(balance_signal) = token_balances.get(mint) {
+            result.push((token.clone(), balance_signal.cloned()));
+        }
+    }
+
+    result
+}
+
 fn use_sol_balance_wss_provider() -> Signal<GatewayResult<UiTokenAmount>> {
     let update_callback = move |notif: &AccountNotificationParams| {
         let lamports = notif.result.value.lamports;

@@ -3,9 +3,9 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     config::{Token, LISTED_TOKENS},
+    hooks::use_all_token_balances,
 };
 
-// TODO Close on ESC click
 #[component]
 pub fn TokenPicker(
     show: Signal<bool>,
@@ -16,6 +16,11 @@ pub fn TokenPicker(
     let tokens = LISTED_TOKENS.values().collect::<Vec<_>>();
     let mut search = use_signal(|| String::new());
     let search_str = search.cloned();
+
+    // Get all token balances
+    let token_balances = use_all_token_balances();
+
+    // Filter tokens by search
     let filtered_tokens = tokens
         .iter()
         .map(|t| (*t).clone())
@@ -30,6 +35,29 @@ pub fn TokenPicker(
             }
         })
         .collect::<Vec<_>>();
+
+    // Sort by balance
+    let filtered_tokens = {
+        let mut sorted = filtered_tokens;
+        sorted.sort_by(|a, b| {
+            let a_balance = token_balances
+                .iter()
+                .find(|(token_info, _)| token_info.mint == a.mint)
+                .and_then(|(_, balance)| balance.as_ref().ok()?.ui_amount)
+                .unwrap_or(0.0);
+
+            let b_balance = token_balances
+                .iter()
+                .find(|(token_info, _)| token_info.mint == b.mint)
+                .and_then(|(_, balance)| balance.as_ref().ok()?.ui_amount)
+                .unwrap_or(0.0);
+
+            b_balance
+                .partial_cmp(&a_balance)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        sorted
+    };
 
     rsx! {
         div {
@@ -74,13 +102,41 @@ pub fn TokenPicker(
                                         }
                                     }
                                 },
-                                img {
-                                    class: "w-8 h-8 rounded-full",
-                                    src: "{t.image}",
-                                }
-                                span {
-                                    class: "font-semibold",
-                                    "{t.ticker}"
+                                Row {
+                                    class: "items-center justify-between w-full",
+                                    Row {
+                                        class: "items-center",
+                                        gap: 2,
+                                        img {
+                                            class: "w-8 h-8 rounded-full",
+                                            src: "{t.image}",
+                                        }
+                                        span {
+                                            class: "font-semibold",
+                                            "{t.ticker}"
+                                        }
+                                    }
+                                    Col {
+                                        {
+                                            token_balances.iter().find_map(|(token_info, balance)| {
+                                                if token_info.mint == t.mint {
+                                                    if let Ok(amount) = balance {
+                                                        if let Some(ui_amount) = amount.ui_amount {
+                                                            return Some(rsx!(
+                                                                span {
+                                                                    class: "text-sm text-elements-lowEmphasis",
+                                                                    "{ui_amount:.6}"
+                                                                }
+                                                            ))
+                                                        }
+                                                    }
+                                                }
+                                                None
+                                            })
+                                        }
+
+                                    }
+
                                 }
                             }
                         }
