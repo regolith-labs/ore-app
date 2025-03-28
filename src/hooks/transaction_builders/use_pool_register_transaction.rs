@@ -1,14 +1,12 @@
 use crate::{
-    gateway::{GatewayError, GatewayResult, Rpc},
+    gateway::{GatewayError, GatewayResult},
     hooks::{
         use_gateway, use_member_record_resource_deprecated, use_member_resource_deprecated,
         use_pool, use_pool_deprecated, use_wallet, GetPubkey, APP_FEE, APP_FEE_ACCOUNT,
         COMPUTE_UNIT_LIMIT,
     },
-    solana::spl_associated_token_account,
 };
 use dioxus::prelude::*;
-use ore_api::consts::MINT_ADDRESS;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -59,23 +57,6 @@ pub fn use_pool_register_transaction(
                     // build join instruction
                     let join_ix = ore_pool_api::sdk::join(pubkey, pool.address, pubkey);
                     ixs.push(join_ix);
-                    // create claim ata if doesn't exist
-                    let gateway = use_gateway();
-                    let claim_ata = spl_associated_token_account::get_associated_token_address(
-                        &pubkey,
-                        &MINT_ADDRESS,
-                    );
-                    let claim_ata_data = gateway.rpc.get_account_data(&claim_ata).await;
-                    if let Err(_err) = claim_ata_data {
-                        log::info!("claim ata missing");
-                        let create_ata = spl_associated_token_account::instruction::create_associated_token_account(
-                            &pubkey,
-                            &pubkey,
-                            &MINT_ADDRESS,
-                            &crate::solana::spl_token::ID,
-                        );
-                        ixs.push(create_ata);
-                    };
                     // include app fee
                     let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
                     ixs.push(transfer(&pubkey, &app_fee_account, APP_FEE));
