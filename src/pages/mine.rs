@@ -94,10 +94,15 @@ fn StopStartButton() -> Element {
         if miner_status.cloned() != MinerStatus::Registering {
             return;
         }
-        if let Ok(_member_record) = use_gateway().register(authority, pool_url).await {
-            member.restart();
-            member_record.restart();
-            miner_status.set(MinerStatus::FetchingChallenge);
+        match use_gateway().register(authority, pool_url).await {
+            Ok(_member_record) => {
+                member.restart();
+                member_record.restart();
+                miner_status.set(MinerStatus::FetchingChallenge);
+            }
+            Err(err) => {
+                log::error!("Error registering with server: {:?}", err);
+            }
         }
     });
 
@@ -107,8 +112,10 @@ fn StopStartButton() -> Element {
     // this is the happy path,
     // first the onchain registration signature lands
     // and then we submit for registration with the offchain pool server
-    on_transaction_done(move |_sig| {
+    on_transaction_done(move |sig| {
+        log::info!("registration sig: {:?}", sig);
         if miner_status.cloned() == MinerStatus::Registering {
+            log::info!("reg sig, status registering caught");
             register_with_pool_server.restart();
         }
     });
@@ -119,6 +126,7 @@ fn StopStartButton() -> Element {
     // but the server registration failed or hasn't been submitted yet
     use_effect(move || {
         if miner_status.cloned() == MinerStatus::Registering {
+            log::info!("backup caught");
             register_with_pool_server.restart();
         }
     });
@@ -138,12 +146,16 @@ fn StopStartButton() -> Element {
                     miner_status.set(MinerStatus::Stopped);
                 } else {
                     if let Some(Ok(_member)) = member.cloned() {
+                        log::info!("member found");
                         if let Some(Ok(_member_db)) = member_record.cloned() {
+                            log::info!("member db found");
                             miner_status.set(MinerStatus::FetchingChallenge);
                         } else {
+                            log::info!("member db missing");
                             miner_status.set(MinerStatus::Registering);
                         }
                     } else {
+                        log::info!("member missing");
                         register_tx_start.set(true);
                         miner_status.set(MinerStatus::Registering);
                     }

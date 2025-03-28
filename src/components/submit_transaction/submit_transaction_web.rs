@@ -61,6 +61,7 @@ pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Tra
     let hash = gateway.rpc.get_latest_blockhash().await?;
     let message = &mut tx.message;
     message.recent_blockhash = hash;
+    log::info!("input len: {:?}", message.instructions.len());
     // build eval command for wallet signing
     let mut eval = eval(
         r#"
@@ -92,6 +93,7 @@ pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Tra
             log::info!("program ids: {:?}", program_ids);
             let instructions = tx.message.instructions.clone();
             log::info!("instructions: {:?}", instructions);
+            log::info!("output len: {:?}", tx.message.instructions.len());
         }
         Ok((tx, hash))
     } else {

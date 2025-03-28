@@ -12,6 +12,7 @@ pub enum GatewayError {
     RetryFailed,
     TimeoutError,
     SignatureFailed,
+    SerdeJson,
     RequestFailed,
     ProgramBuilderFailed,
     WalletDisconnected,
@@ -28,6 +29,13 @@ impl From<anyhow::Error> for GatewayError {
     fn from(value: anyhow::Error) -> Self {
         log::error!("{:?}", value);
         Self::Anyhow
+    }
+}
+
+impl From<serde_json::Error> for GatewayError {
+    fn from(value: serde_json::Error) -> Self {
+        log::error!("{:?}", value);
+        Self::SerdeJson
     }
 }
 

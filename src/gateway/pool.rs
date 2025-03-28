@@ -201,11 +201,7 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
             }
         };
         log::info!("balance update resp: {:?}", resp);
-
-        // Clone the response so we can use it for error handling if needed
         let resp_text = resp.text().await.unwrap_or_default();
-
-        // Try to parse the response as a BalanceUpdate
         let balance_update = match serde_json::from_str::<BalanceUpdate>(&resp_text) {
             Ok(update) => {
                 log::info!("Successfully received balance update");
@@ -213,7 +209,6 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
             }
             Err(err) => {
                 log::error!("Error deserializing response as BalanceUpdate: {:?}", err);
-                // Use the already extracted text for the error message
                 let error_text = format!("Server response: {}", resp_text);
                 log::error!("{}", error_text);
                 return Err(anyhow::anyhow!("{}", error_text).into());
@@ -225,17 +220,35 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
     async fn register(&self, authority: Pubkey, pool_url: String) -> GatewayResult<MemberRecord> {
         let post_url = format!("{}/register", pool_url);
         let body = RegisterPayload { authority };
-        let resp = self
-            .http
-            .post(post_url)
-            .json(&body)
-            .send()
-            .await
-            .map_err(GatewayError::from)?;
-        let member_record = resp
-            .json::<MemberRecord>()
-            .await
-            .map_err(GatewayError::from)?;
+        let resp = match self.http.post(post_url).json(&body).send().await {
+            Ok(response) => response,
+            Err(err) => {
+                log::error!("Error sending request: {:?}", err);
+                return Err(GatewayError::from(err));
+            }
+        };
+        log::info!("resp: {:?}", resp);
+        let member_record = match resp.text().await {
+            Ok(text) => match serde_json::from_str::<serde_json::Value>(&text) {
+                Ok(value) => match serde_json::from_value::<MemberRecord>(value) {
+                    Ok(record) => record,
+                    Err(err) => {
+                        log::error!("Error deserializing member record from value: {:?}", err);
+                        log::error!("Raw response: {}", text);
+                        return Err(GatewayError::from(err));
+                    }
+                },
+                Err(err) => {
+                    log::error!("Error deserializing response as JSON: {:?}", err);
+                    log::error!("Raw response: {}", text);
+                    return Err(GatewayError::from(err));
+                }
+            },
+            Err(err) => {
+                log::error!("Error reading response text: {:?}", err);
+                return Err(GatewayError::from(err));
+            }
+        };
         Ok(member_record)
     }
 }

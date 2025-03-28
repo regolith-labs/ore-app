@@ -51,6 +51,7 @@ async fn build_commit_claim_instructions<R: Rpc>(
     member: &ore_pool_api::state::Member,
     member_record: &ore_pool_types::Member,
 ) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
+    log::info!("building web version of tx");
     let mut instructions = Vec::with_capacity(2);
     // commit
     let pool_data = gateway.get_account_data(&pool.address).await?;
@@ -71,6 +72,7 @@ async fn build_commit_claim_instructions<R: Rpc>(
     let claim_ix =
         ore_pool_api::sdk::claim(member.authority, claim_ata, pool.address, claim_amount);
     instructions.push(claim_ix);
+    log::info!("total ix count: {:?}", instructions.len());
     Ok(instructions)
 }
 
