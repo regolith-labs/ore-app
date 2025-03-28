@@ -105,6 +105,20 @@ pub fn use_pair_deposit_transaction(
             return Err(GatewayError::Unknown);
         }
 
+        // Check that neither of the amounts are zero
+        if amount_a_f64 <= 0f64 {
+            err.set(Some(TokenInputError::InsufficientBalance(
+                liquidity_pair.token_a.clone(),
+            )));
+            return Err(GatewayError::Unknown);
+        }
+        if amount_b_f64 <= 0f64 {
+            err.set(Some(TokenInputError::InsufficientBalance(
+                liquidity_pair.token_b.clone(),
+            )));
+            return Err(GatewayError::Unknown);
+        }
+
         // Aggregate instructions
         let mut ixs: Vec<steel::Instruction> = vec![];
 

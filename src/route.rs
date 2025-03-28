@@ -21,15 +21,15 @@ pub enum Route {
         Trade {},
         #[route("/trade/:token_pair")]
         TradeWithPair { token_pair: String },
+        #[route("/transfer")]
+        Transfer {},
+        #[route("/transfer/:token_ticker")]
+        TransferWithToken { token_ticker: String },        
     #[end_layout]
 
     #[layout(AppModalLayout)]
         #[route("/topup/:address")]
         Topup { address: String },
-        #[route("/transfer")]
-        Transfer {},
-        #[route("/transfer/:token_ticker")]
-        TransferWithToken { token_ticker: String },
     #[end_layout]
 
     #[layout(LandingLayout)]

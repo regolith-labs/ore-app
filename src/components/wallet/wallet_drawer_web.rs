@@ -29,8 +29,6 @@ impl WebClipboard {
     }
 }
 
-// use super::WalletTab;
-
 enum Splice {
     Pubkey(String),
     Copied,
@@ -67,6 +65,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
     let mut pubkey = use_signal(|| "missing pubkey".to_string());
     let mut pubkey_splice = use_signal(|| Splice::Pubkey("0000...0000".to_string()));
     let mut pubkey_copied = use_signal(|| false);
+    let navigator = use_navigator();
 
     // listen for wallet update
     use_effect(move || {
@@ -163,11 +162,11 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
                         gap: 2,
                         Link {
                             class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
-                            to: Route::Transfer {},
                             onclick: move |e: MouseEvent| {
                                 e.stop_propagation();
                                 on_close.call(e);
                             },
+                            to: Route::TransferWithToken { token_ticker: "ORE".to_string() },
                             PaperAirplaneIcon { class: "h-5" }
                         }
                         span {
@@ -178,23 +177,20 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
                 }
             }
 
-            // Token List with overflow handling - the content area
+            // Token List for web
             div {
                 class: "flex-1 overflow-y-auto",
-                style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
+                style: "padding-bottom: 1rem;",
 
                 // Add a token list with click handling to close drawer like in native version
                 {
                     let tokens = crate::hooks::use_tokens_with_values();
-                    let navigate = use_navigator();
 
                     rsx! {
                         Col {
                             class: "w-full",
                             {tokens.iter().map(|token| {
                                 let token_clone = token.clone();
-                                let on_close_clone = on_close.clone();
-                                let navigate_clone = navigate.clone();
 
                                 rsx! {
                                     div {
@@ -203,10 +199,10 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
                                         onclick: move |e| {
                                             // First close drawer (like in native version)
                                             e.stop_propagation();
-                                            on_close_clone.call(e.clone());
+                                            on_close.call(e.clone());
 
                                             // Then navigate
-                                            navigate_clone.push(Route::TransferWithToken {
+                                            navigator.push(Route::TransferWithToken {
                                                 token_ticker: token_clone.token.ticker.clone()
                                             });
                                         },
