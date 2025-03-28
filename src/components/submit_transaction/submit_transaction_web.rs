@@ -10,50 +10,9 @@ use solana_sdk::{
 
 use crate::{
     components::*,
-    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayError, GatewayResult, Rpc},
+    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
-
-/// sign transactions without necessarily submitting them,
-/// useful for things like posting signed transactions to servers.
-pub async fn sign_transaction(
-    mut tx: VersionedTransaction,
-) -> GatewayResult<(VersionedTransaction, Hash)> {
-    // set blockhash
-    let gateway = use_gateway();
-    let hash = gateway.rpc.get_latest_blockhash().await?;
-    let message = &mut tx.message;
-    message.set_recent_blockhash(hash);
-    // build eval command for wallet signing
-    let mut eval = eval(
-        r#"
-        let msg = await dioxus.recv();
-        let signed = await window.OreTxSigner({b64: msg});
-        dioxus.send(signed);
-        "#,
-    );
-    // serialize transaction to send to wallet
-    let vec = bincode::serialize(&tx).map_err(|_| GatewayError::BincodeSerialize)?;
-    let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
-    let _send = eval
-        .send(serde_json::Value::String(b64))
-        .map_err(|_| GatewayError::RequestFailed)?;
-    // wait on eval
-    let res = eval.recv().await;
-    // process eval result
-    if let Ok(serde_json::Value::String(string)) = res {
-        // decode b64 signed transaction
-        let buffer = base64::engine::general_purpose::STANDARD
-            .decode(string)
-            .map_err(|err| anyhow::anyhow!(err))?;
-        // deserialize binary to transaction
-        let tx = bincode::deserialize::<VersionedTransaction>(&buffer)
-            .map_err(|err| anyhow::anyhow!(err))?;
-        Ok((tx, hash))
-    } else {
-        Err(anyhow::anyhow!("unexpected response format").into())
-    }
-}
 
 pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
     // set blockhash
@@ -73,7 +32,7 @@ pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Tra
     // serialize transaction to send to wallet
     let vec = bincode::serialize(&tx).map_err(|err| anyhow::anyhow!(err))?;
     let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
-    let res = eval
+    let _send = eval
         .send(serde_json::Value::String(b64))
         .map_err(|err| anyhow::anyhow!(err))?;
     // wait on eval
@@ -81,7 +40,6 @@ pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Tra
     // process eval result
     if let Ok(serde_json::Value::String(string)) = res {
         // decode b64 signed transaction
-        let gateway = use_gateway();
         let buffer = base64::engine::general_purpose::STANDARD
             .decode(string)
             .map_err(|err| anyhow::anyhow!(err))?;

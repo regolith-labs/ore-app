@@ -12,16 +12,6 @@ use crate::{
     hooks::{use_gateway, use_transaction_status},
 };
 
-/// sign transactions without necessarily submitting them,
-/// useful for things like posting signed transactions to servers.
-pub async fn sign_transaction(
-    tx: VersionedTransaction,
-) -> GatewayResult<(VersionedTransaction, Hash)> {
-    let gateway = use_gateway();
-    let signer = crate::hooks::use_wallet_native::get()?;
-    sign(&gateway.rpc, &signer.creator, tx).await
-}
-
 pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
     let gateway = use_gateway();
     let signer = crate::hooks::use_wallet_native::get()?;
