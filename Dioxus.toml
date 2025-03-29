@@ -9,9 +9,6 @@ default_platform = "web"
 # `build` & `serve` dist path
 out_dir = "dist"
 
-# resource (public) file folder
-asset_dir = "public"
-
 [package]
 name = "ORE"
 
