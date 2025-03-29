@@ -44,6 +44,13 @@
   --animate-wallet-drawer-fade: wallet-drawer-fade 200ms ease-in-out;
   --animate-wallet-drawer-slide: wallet-drawer-slide 200ms ease-in-out;
 
+
+/* Chrome, Edge, and Safari */
+/* *::-webkit-scrollbar {
+  display: none;
+} */
+
+
   /* Keyframes */
   @keyframes marquee {
     0% {

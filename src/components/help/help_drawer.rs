@@ -53,13 +53,13 @@ fn HelpDrawerOverlay(
         Fragment {
             // Background overlay with fade effect
             div {
-                class: "fixed inset-0 transition-all duration-500 ease-in-out bg-black/50",
+                class: "fixed inset-0 transition-all duration-500 ease-in-out bg-black/50 backdrop-blur-md",
                 class: if is_open { "wallet-drawer-fade opacity-100" } else { "wallet-drawer-fade-out opacity-0" },
                 onclick: move |e| on_close(e)
             }
             // Drawer content
             div {
-                class: "fixed top-0 right-0 h-full w-screen sm:w-[574px] transition-transform duration-500 ease-in-out transform z-[1001]",
+                class: "fixed top-0 right-0 h-full w-screen sm:w-[574px] transition-transform duration-500 ease-in-out transform z-[1001] scrollbar-hide",
                 class: if is_open { "wallet-drawer-slide translate-x-0" } else { "wallet-drawer-slide-out translate-x-full" },
                 style: "height: 100vh;",
                 HelpDrawerWrapper {
@@ -71,4 +71,3 @@ fn HelpDrawerOverlay(
         }
     }
 }
-

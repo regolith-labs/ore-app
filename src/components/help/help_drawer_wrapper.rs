@@ -1,4 +1,4 @@
-use crate::components::{Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row};
+use crate::components::{Col, PlusIcon, Row};
 use crate::hooks::{HelpDrawerPage, HelpDrawerState};
 use dioxus::prelude::*;
 
@@ -33,8 +33,8 @@ struct StakeTitles {
 
 const HELP_TITLES: HelpTitles = HelpTitles {
     mine: MineTitles {
-        title: "Mining",
-        subtitle: "Learn more about mining and the details of the mining process.",
+        title: "Mining Overview",
+        subtitle: "Discover how mining works and its role in the ecosystem.",
         tabs: [
             ("Mining", MineHelpTabs::Mining),
             ("Supply", MineHelpTabs::Supply),
@@ -78,7 +78,7 @@ fn LabelText(text: String) -> Element {
             div {
                 class: "mb-4",
                 h3 {
-                    class: "text-xl font-semibold text-elements-highEmphasis h-8",
+                    class: "text-xl font-semibold text-elements-highEmphasis",
                     "{text}"
                 }
             }
@@ -89,10 +89,10 @@ fn LabelText(text: String) -> Element {
 #[component]
 fn BodyText(text: String) -> Element {
     rsx! {
-        span {
-            class: "text-elements-midEmphasis mb-4",
-            "{text}"
-        }
+            span {
+                class: "text-lg text-elements-midEmphasis pb-8",
+                "{text}"
+            }
     }
 }
 
@@ -118,13 +118,44 @@ fn MiningContent() -> Element {
             BodyText {
                 text: "Mining is the process by which energy can be converted into cryptocurrency. It works by having a computer perform a large calculation that irreversibly turns electric power into a mathematical solution and heat."
             }
-            MineBullets {}
-            img {
-                class: "relative w-full h-full object-contain z-10 rounded-lg my-8",
-                src: asset!("/public/ore-emissions-curve.png")
+            LabelText {
+                text: "How do I start mining ORE?"
             }
+            StartMiningBullets {}
+            LabelText {
+                text: "How does ORE mining work?"
+            }
+            BodyText {
+                text: "A computer performs a large calculation, converting electricity into a mathematical solution and heat. This solution serves as proof that the computation was done correctly. Another program verifies the proof and uses it to mint new ORE tokens as a reward"
+            }
+            // HowMiningWorksBullets {}
+            // Col {
+            //     class: "py-8",
+            //     img {
+            //         class: "relative w-full h-full object-contain z-10 rounded-lg",
+            //         src: asset!("/public/ore-emissions-curve.png")
+            //     }
+            // }
             LabelText {text: "FAQ"}
             Faq {}
+        }
+    }
+}
+
+fn SupplyContent() -> Element {
+    rsx! {
+        ContentSection {
+            LabelText {
+                text: "What Is ORE's Supply Curve?"
+            }
+            SupplyCurveBullets {}
+            Col {
+                class: "py-8",
+                img {
+                    class: "relative w-full h-full object-contain z-10 rounded-lg",
+                    src: asset!("/public/ore-emissions-curve.png")
+                }
+            }
         }
     }
 }
@@ -189,7 +220,7 @@ fn MineHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                 }
                 // Title content
                 Col {
-                    class: "justify-start my-4",
+                    class: "justify-start py-8",
                     gap: 4,
                     span {
                         class: "text-2xl font-semibold",
@@ -223,11 +254,11 @@ fn MineHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
 
             // Content
             div {
-                class: "overflow-y-auto",
+                class: "overflow-y-auto scrollbar-hide",
                 style: "padding-bottom: 1rem;",
                 match *current_tab.read() {
                     MineHelpTabs::Mining => rsx! { MiningContent {} },
-                    MineHelpTabs::Supply => rsx! { MiningFAQContent {} },
+                    MineHelpTabs::Supply => rsx! { SupplyContent {} },
                 }
             }
         }
@@ -291,7 +322,7 @@ fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
 
             // Content
             div {
-                class: "overflow-y-auto",
+                class: "overflow-y-auto scrollbar-hide",
                 style: "padding-bottom: 1rem;",
                 match *current_tab.read() {
                     StakeHelpTabs::Yield => rsx! { StakeYieldContent {} },
@@ -489,21 +520,18 @@ fn TokenContent(on_close: EventHandler<MouseEvent>) -> Element {
                         key: "{token.token.mint}",
                         class: "w-full justify-between items-center py-4 px-4 sm:rounded-md transition duration-300 ease-in-out hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
                         onclick: move |e| {
-                            // First close drawer
                             e.stop_propagation();
                             on_close.call(e.clone());
-
-                            // // Then navigate
-                            // navigator.push(Route::TransferWithToken {
-                            //     token_ticker: token_clone.token.ticker.clone()
-                            // });
                         },
                         Row {
                             class: "w-full justify-between items-center",
                             Row {
                                 class: "items-center",
                                 gap: 4,
-                                img { class: "w-8 h-8 rounded-full shrink-0", src: "{token.token.image}" }
+                                Col {
+                                    class: "my-4",
+                                    img { class: "w-8 h-8 rounded-full shrink-0", src: "{token.token.image}" }
+                                }
                                 Col {
                                     span { class: "font-medium text-elements-highEmphasis", "{token.token.name}" }
                                     span { class: "font-medium text-xs text-elements-lowEmphasis",
@@ -613,34 +641,23 @@ fn Faq() -> Element {
     rsx! {
         Col {
             class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start my-8",
-            // SectionCopy {
-            //     class: "text-left md:min-w-sm lg:min-w-md",
-            //     align: Align::Left,
-            //     tip: "Support",
-            //     title: "FAQ",
-            //     detail: "Commonly asked questions."
-            // }
             Col {
                 class: "w-full h-min justify-start",
                 FaqItem {
-                    question: "What is ORE?",
-                    answer: "ORE is a new \"digital gold\" primitive for decentralized finance. It is a crypto commodity mineable via proof-of-work on the Solana blockchain."
+                    question: "How much computer power does it use?",
+                    answer: "When mining through the browser, you can only use 1 core. By downloading the ORE desktop application, you can choose how many cores to use, ranging from one to the maximum available on your device."
                 }
                 FaqItem {
-                    question: "Why should I care?",
-                    answer: "ORE represents a new generation of digital gold, built for the new generation of crypto users. It takes the core properties of Bitcoin – fair launch, fixed supply, proof-of-work, immutability – and brings them to a new token on the Solana blockchain. "
+                    question: "How do I claim my rewards?",
+                    answer: "To claim your rewards, simply click Claim and then confirm the transaction."
                 }
                 FaqItem {
-                    question: "How does mining work?",
-                    answer: "ORE can be mined by anyone with a laptop or home computer. Simply navigate to the mining page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be enrolled in a mining pool and do not need to pay any transaction fees while you mine."
+                    question: "Does it use my CPU or GPU?",
+                    answer: "Currently, ORE mining on both the web and desktop app uses your CPU. We are planning to release a GPU implementation soon, which will be open-sourced."
                 }
                 FaqItem {
-                    question: "How does liquidity work?",
-                    answer: "ORE automatically distributes a portion of all newly mined supply to liquidity providers as yield. These incentives help bootstrap liquidity and maintain active markets with a network of assets in the Solana ecosystem. By providing liquidity for ORE pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE yield."
-                }
-                FaqItem {
-                    question: "Is it secure?",
-                    answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team is committed to freezing the protocol in the coming months to guarantee longterm security."
+                    question: "What Hash Function Does ORE Use?",
+                    answer: "ORE employs Drillx, a CPU-friendly hash function tailored for its mining process, ensuring accessibility for anyone with a standard home computer."
                 }
             }
         }
@@ -665,7 +682,7 @@ fn FaqItem(question: String, answer: String) -> Element {
             class: "flex flex-col w-full py-4 px-2 sm:px-4 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
             onclick: move |_| is_open.set(!is_open.cloned()),
             Row {
-                class: "justify-between font-wide text-left font-bold text-md w-full text-elements-highEmphasis",
+                class: "justify-between font-wide text-left text-md w-full text-elements-highEmphasis",
                 gap: 8,
                 "{question}"
                 PlusIcon {
@@ -675,7 +692,7 @@ fn FaqItem(question: String, answer: String) -> Element {
             div {
                 class: "overflow-hidden transition-all duration-300 ease-in-out {answer_class}",
                 p {
-                    class: "text-elements-midEmphasis mt-4 text-lg text-left",
+                    class: "text-elements-midEmphasis mt-4 text-left",
                     "{answer}"
                 }
             }
@@ -740,10 +757,10 @@ fn BulletPointList(children: Element) -> Element {
 }
 
 #[component]
-fn BulletPoint(title: String, description: String) -> Element {
+fn BulletPoint(title: Option<String>, description: String) -> Element {
     rsx! {
         Row {
-            class: "items-start",
+            class: "items-start pl-2",
             // Bullet point
             span {
                 class: "text-elements-highEmphasis mr-2 select-none",
@@ -753,9 +770,11 @@ fn BulletPoint(title: String, description: String) -> Element {
             span {
                 class: "flex-1",
                 // Title in white with colon
-                span {
-                    class: "font-semibold text-elements-highEmphasis",
-                    "{title}: "
+                if let Some(title_text) = &title {
+                    span {
+                        class: "font-semibold text-elements-highEmphasis",
+                        "{title_text}: "
+                    }
                 }
                 // Description in gray on the same line
                 span {
@@ -768,22 +787,92 @@ fn BulletPoint(title: String, description: String) -> Element {
 }
 
 // Example usage with the content from the image:
-fn MineBullets() -> Element {
+fn StartMiningBullets() -> Element {
+    rsx! {
+        Col {
+            class: "w-full ml-4 pb-8",
+            BulletPointList {
+                BulletPoint {
+                    title: None,
+                    description: "Connect any supported Solana wallet"
+                }
+                BulletPoint {
+                    title: None,
+                    description: "Click \"Start\" to join a pool–you will pay a small one-time Solana transaction fee"
+                }
+                BulletPoint {
+                    title: None,
+                    description: "Once the fee is paid, your machine will start mining and earning rewards"
+                }
+            }
+        }
+    }
+}
+
+fn HowMiningWorksBullets() -> Element {
     rsx! {
         Col {
             class: "w-full ml-4",
             BulletPointList {
                 BulletPoint {
-                    title: "Income",
-                    description: "Exchange variable yields for fixed yield tokens and earn predictable returns at maturity."
+                    title: Some("Conversion".to_string()),
+                    description: "A computer performs a large calculation, converting electricity into a mathematical solution and heat"
                 }
                 BulletPoint {
-                    title: "Farm",
-                    description: "Get leveraged exposure to variable yields and protocol points by buying yield tokens at an Implied APY."
+                    title: Some("Proof".to_string()),
+                    description: "This solution serves as proof that the computation was done correctly"
                 }
                 BulletPoint {
-                    title: "Liquidity",
-                    description: "Earn extra yield on your productive assets by supplying them into Liquidity Vaults."
+                    title: Some("Reward".to_string()),
+                    description: "Another program verifies the proof and uses it to mint new ORE tokens as a reward"
+                }
+            }
+        }
+    }
+}
+
+// fn HowMiningWorksBullets() -> Element {
+//     rsx! {
+//         Col {
+//             class: "w-full ml-4",
+//             BulletPointList {
+//                 BulletPoint {
+//                     title: "Income",
+//                     description: "A computer performs a large calculation, converting electricity into a mathematical solution and heat"
+//                 }
+//                 BulletPoint {
+//                     title: "Farm",
+//                     description: "This solution serves as proof that the computation was done correctly"
+//                 }
+//                 BulletPoint {
+//                     title: "Liquidity",
+//                     description: "Another program verifies the proof and uses it to mint new ORE tokens as a reward"
+//                 }
+//             }
+//         }
+//     }
+// }
+
+fn SupplyCurveBullets() -> Element {
+    rsx! {
+        Col {
+            class: "w-full ml-4",
+            BulletPointList {
+                BulletPoint {
+                    title: Some("Emissions".to_string()),
+                    description: "Starts at 1 ORE per minute, with emissions reducing by 10% every 12 months"
+                }
+                BulletPoint {
+                    title: Some("Limit".to_string()),
+                    description: "Capped at a 5 million token hard limit"
+                }
+                BulletPoint {
+                    title: Some("Duration".to_string()),
+                    description: "Will take approximately 30 years to reach max supply"
+                }
+                BulletPoint {
+                    title: Some("Deterministic".to_string()),
+                    description: "The curve is deterministic — it remains the same regardless of the number of miners"
                 }
             }
         }
