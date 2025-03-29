@@ -13,7 +13,7 @@ use crate::route::Route;
 pub fn Landing() -> Element {
     let navigator = use_navigator();
     navigator.replace(Route::Topup {
-        address: "".to_string(),
+        address: "asdf".to_string(),
     });
     rsx! {}
 }
