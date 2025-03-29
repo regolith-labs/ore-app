@@ -53,7 +53,7 @@ fn HelpDrawerOverlay(
         Fragment {
             // Background overlay with fade effect
             div {
-                class: "fixed inset-0 transition-all duration-500 ease-in-out bg-black/50 backdrop-blur-md",
+                class: "fixed inset-0 transition-all duration-500 ease-in-out bg-black/50 blur-md",
                 class: if is_open { "wallet-drawer-fade opacity-100" } else { "wallet-drawer-fade-out opacity-0" },
                 onclick: move |e| on_close(e)
             }
