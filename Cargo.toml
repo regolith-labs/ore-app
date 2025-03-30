@@ -33,8 +33,7 @@ desktop = [
   "tokio",
   "tokio-tungstenite",
 ]
-# Feature for macOS-specific dependencies that will be automatically 
-# enabled when building with the desktop feature on macOS
+# Feature for macOS-specific dependencies
 macos-desktop = ["cocoa", "objc"]
 web = [
   "dioxus/web",
@@ -177,8 +176,8 @@ meteora-pools-sdk = { git = "https://github.com/regolith-labs/meteora-pools-sdk"
 meteora-vault-sdk = { git = "https://github.com/regolith-labs/meteora-vault-sdk", branch = "master" }
 
 [target.'cfg(target_os = "macos")'.dependencies]
-cocoa = { version = "0.24", optional = true, features = [] }
-objc = { version = "0.2", optional = true, features = [] }
+cocoa = { version = "0.24", features = [] }
+objc = { version = "0.2", features = [] }
 
 
 [profile]
