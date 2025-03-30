@@ -24,11 +24,11 @@ async fn main() {
             };
 
             // Set the Content-Type based on the file extension
-            let reply = if path_str.ends_with(".otf") {
-                warp::reply::with_header(reply, CONTENT_TYPE, "font/otf")
-            } else {
-                warp::reply::with_header(reply, CONTENT_TYPE, "")
-            };
+            // let reply = if path_str.ends_with(".otf") {
+            //     warp::reply::with_header(reply, CONTENT_TYPE, "font/otf")
+            // } else {
+            //     warp::reply::with_header(reply, CONTENT_TYPE, "")
+            // };
 
             // Set the Access-Control-Allow-Origin header
             warp::reply::with_header(reply, ACCESS_CONTROL, "*")
