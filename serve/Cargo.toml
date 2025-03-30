@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.39", features = ["full"] }
 warp = "0.3"
 ore-miner = { git = "https://github.com/regolith-labs/ore-pool-private", package = "ore-miner", branch = "master" }
