@@ -1,6 +1,6 @@
 [package]
 name = "ore-app"
-version = "0.0.2"
+version = "0.0.3"
 description = "Liquid digital gold."
 edition = "2021"
 license = "Apache-2.0"
