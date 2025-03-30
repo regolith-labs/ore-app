@@ -1,6 +1,6 @@
 [package]
 name = "ore-app"
-version = "1.1.17"
+version = "1.1.18"
 description = "Liquid digital gold."
 edition = "2021"
 license = "Apache-2.0"
@@ -16,13 +16,11 @@ bundle = []
 desktop = [
   "cargo-packager-updater",
   "core_affinity",
-  "cocoa",
   "dioxus/desktop",
   "dioxus-sdk/clipboard",
   "directories",
   "env_logger",
   "fern",
-  "objc",
   "solana-account-decoder",
   "solana-client",
   "solana-program",
@@ -35,6 +33,8 @@ desktop = [
   "tokio",
   "tokio-tungstenite",
 ]
+# Feature for macOS-specific dependencies
+macos-desktop = ["cocoa", "objc"]
 web = [
   "dioxus/web",
   "gloo",
@@ -69,7 +69,7 @@ cargo-packager-updater = { git = "https://github.com/regolith-labs/cargo-package
   "native-tls",
 ] }
 chrono = { version = "0.4", features = ["wasmbind"] }
-cocoa = { version = "0.24", optional = true }
+cocoa = { version = "0.24", optional = true, features = [] }
 core_affinity = { version = "0.8.1", optional = true }
 dioxus = { version = "0.6.1", features = ["router"] }
 dioxus-sdk = { version = "0.6", features = ["timing"] }
@@ -97,7 +97,7 @@ meteora-pools-sdk = "0.1"
 meteora-vault-sdk = "0.1"
 num_cpus = "1.16.0"
 num-format = "0.4.4"
-objc = { version = "0.2", optional = true }
+objc = { version = "0.2", optional = true, features = [] }
 once_cell = "1.18"
 ore-api = "3.4.0"
 ore-boost-api = "3.0.1"
@@ -174,6 +174,11 @@ solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/s
 kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }
 meteora-pools-sdk = { git = "https://github.com/regolith-labs/meteora-pools-sdk", branch = "master" }
 meteora-vault-sdk = { git = "https://github.com/regolith-labs/meteora-vault-sdk", branch = "master" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = { version = "0.24", features = [] }
+objc = { version = "0.2", features = [] }
+
 
 [profile]
 
