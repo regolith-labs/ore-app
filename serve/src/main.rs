@@ -2,7 +2,7 @@ use warp::Filter;
 
 const CACHE_CONTROL: &str = "Cache-Control";
 const ACCESS_CONTROL: &str = "Access-Control-Allow-Origin";
-
+const CONTENT_TYPE: &str = "Content-Type";
 #[tokio::main]
 async fn main() {
     // Define the directory to serve files from with conditional caching
