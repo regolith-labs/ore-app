@@ -44,8 +44,8 @@ const HELP_TITLES: HelpTitles = HelpTitles {
         title: "Stake",
         subtitle: "Learn more about yield and the details of the yield process.",
         tabs: [
-            ("Staking", StakeHelpTabs::Boosts),
-            ("Liquidity Rewards", StakeHelpTabs::Yield),
+            ("Boosts", StakeHelpTabs::Boosts),
+            ("Yield", StakeHelpTabs::Yield),
         ],
     },
 };
@@ -113,7 +113,7 @@ fn MiningContent() -> Element {
     rsx! {
         ContentSection {
             LabelText {
-                text: "What is mining?"
+                text: "Mining"
             }
             BodyText {
                 text: "Mining is the process by which energy can be converted into cryptocurrency."
@@ -138,7 +138,7 @@ fn BoostsContent() -> Element {
     rsx! {
         ContentSection {
             LabelText {
-                text: "Boosts"
+                text: "Overview"
             }
             BoostsBullets {}
             LabelText {text: "FAQ"}
@@ -151,14 +151,16 @@ fn YieldContent() -> Element {
     rsx! {
         ContentSection {
             LabelText {
-                text: "Yield"
+                text: "Overview"
             }
             YieldBullets {}
+            LabelText {
+                text: "Liquidity Incentives"
+            }
             Col {
-                class: "py-8",
                 img {
                     class: "relative w-full h-full object-contain z-10 rounded-lg",
-                    src: asset!("/public/liquidity-incentives.jpg")
+                    src: asset!("/public/liquidity-incentives.png")
                 }
             }
         }
@@ -172,13 +174,13 @@ fn SupplyContent() -> Element {
                 text: "What is ORE's supply curve?"
             }
             SupplyCurveBullets {}
-            Col {
-                class: "py-8",
+            LabelText {
+                text: "Ore Emission Curve"
+            }
                 img {
                     class: "relative w-full h-full object-contain z-10 rounded-lg",
-                    src: asset!("/public/ore-emissions-curve.jpg")
+                    src: asset!("/public/ore-emissions-curve.png")
                 }
-            }
         }
     }
 }
@@ -730,11 +732,11 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Does it use my CPU or GPU?",
-                    answer: "Currently, ORE mining on both the web and desktop app uses your CPU. We are planning to release a GPU implementation soon, which will be open-sourced.",
+                    answer: "Currently, ORE mining on both the web and desktop app uses your CPU. GPU mining is currently in development.",
                     answer_with_link: None
                 }
                 FaqItem {
-                    question: "What Hash Function Does ORE Use?",
+                    question: "What hash function does ORE use?",
                     // answer: "ORE employs Drillx, a CPU-friendly hash function tailored for its mining process, ensuring accessibility for anyone with a standard home computer.",
                     answer_with_link: rsx! {
                         p {
@@ -817,7 +819,7 @@ fn FaqItem(question: String, answer: Option<String>, answer_with_link: Option<El
             class: "flex flex-col w-full py-4 px-2 sm:px-4 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
             onclick: move |_| is_open.set(!is_open.cloned()),
             Row {
-                class: "justify-between font-wide text-left text-md w-full text-elements-highEmphasis",
+                class: "justify-between text-left text-lg w-full text-elements-highEmphasis",
                 gap: 8,
                 "{question}"
                 PlusIcon {
@@ -828,7 +830,7 @@ fn FaqItem(question: String, answer: Option<String>, answer_with_link: Option<El
                 div {
                     class: "overflow-hidden transition-all duration-300 ease-in-out {answer_class}",
                     p {
-                        class: "text-elements-midEmphasis mt-4 text-left",
+                        class: "text-elements-midEmphasis mt-4 text-left text-lg",
                         "{answer}"
                     }
                 }
@@ -942,17 +944,8 @@ fn BulletPoint(
 fn StartMiningBullets() -> Element {
     rsx! {
         Col {
-            class: "w-full ml-4 pb-8",
+           class: "w-full ml-4 pb-8",
             BulletPointList {
-                BulletPoint {
-                    title: None,
-                    description: rsx! {
-                        span {
-                            class: "text-lg text-elements-midEmphasis",
-                            "Connect any supported Solana wallet"
-                        }
-                    }
-                }
                 BulletPoint {
                     title: None,
                     description: {
@@ -960,18 +953,36 @@ fn StartMiningBullets() -> Element {
                             p {
                                 class: "text-lg text-elements-midEmphasis text-left",
                                 span {
+                                    "Connect any supported Solana wallet"
+                                }
+                            }
+                            p {
+                                span {
+                                    class: "text-elements-lowEmphasis text-md",
                                     "If you do not have a wallet, download the phantom wallet "
                                 }
                                 Link {
                                     new_tab: true,
-                                    to: "https://beta.ore.supply/download",
+                                    to: "https://phantom.com/download",
                                     span {
-                                        class: "text-elements-gold hover:underline",
+                                        class: "text-elements-gold hover:underline text-md",
                                         "here"
                                     }
                                 }
-                                " to create a wallet."
+                                span {
+                                    class: "text-elements-lowEmphasis text-md",
+                                    " to create a wallet."
+                                }
                             }
+                        }
+                    }
+                }
+                BulletPoint {
+                    title: None,
+                    description: rsx! {
+                        span {
+                            class: "text-lg text-elements-midEmphasis",
+                            "Click \"start\" to begin mining"
                         }
                     }
                 }
@@ -1005,7 +1016,7 @@ fn HowMiningWorksBullets() -> Element {
 fn YieldBullets() -> Element {
     rsx! {
         Col {
-            class: "w-full ml-4",
+            class: "w-full ml-4 pb-8",
             BulletPointList {
                 BulletPoint {
                     title: Some("Liquidity".to_string()),
@@ -1027,7 +1038,7 @@ fn YieldBullets() -> Element {
 fn SupplyCurveBullets() -> Element {
     rsx! {
         Col {
-            class: "w-full ml-4",
+            class: "w-full ml-4 pb-8",
             BulletPointList {
                 BulletPoint {
                     title: Some("Emissions".to_string()),
@@ -1053,11 +1064,11 @@ fn SupplyCurveBullets() -> Element {
 fn BoostsBullets() -> Element {
     rsx! {
         Col {
-            class: "w-full ml-4",
+            class: "w-full ml-4 pb-8",
             BulletPointList {
                 BulletPoint {
                     title: Some("Boosts".to_string()),
-                    description: rsx!("Boosts are ORE's native staking mechanism used to bootstrap liquidity")
+                    description: rsx!("ORE's native staking mechanism used to bootstrap liquidity")
                 }
                 BulletPoint {
                     title: Some("Yield".to_string()),
