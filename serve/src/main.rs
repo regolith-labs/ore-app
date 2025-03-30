@@ -1,8 +1,9 @@
 use warp::Filter;
 
-const CACHE_CONTROL: &str = "Cache-Control";
 const ACCESS_CONTROL: &str = "Access-Control-Allow-Origin";
+const CACHE_CONTROL: &str = "Cache-Control";
 const CONTENT_TYPE: &str = "Content-Type";
+
 #[tokio::main]
 async fn main() {
     // Define the directory to serve files from with conditional caching
@@ -10,6 +11,8 @@ async fn main() {
         .and(warp::path::full())
         .map(|reply, path: warp::path::FullPath| {
             let path_str = path.as_str();
+
+            // Set the Cache-Control header
             let reply = if should_cache(path_str) {
                 warp::reply::with_header(
                     reply,
@@ -19,19 +22,15 @@ async fn main() {
             } else {
                 warp::reply::with_header(reply, CACHE_CONTROL, "no-cache, must-revalidate")
             };
-            // Set Content-Type based on file extension
-            let reply = match path_str {
-                p if p.ends_with(".otf") => {
-                    warp::reply::with_header(reply, CONTENT_TYPE, "font/otf")
-                }
-                p if p.ends_with(".woff") => {
-                    warp::reply::with_header(reply, CONTENT_TYPE, "font/woff")
-                }
-                p if p.ends_with(".woff2") => {
-                    warp::reply::with_header(reply, CONTENT_TYPE, "font/woff2")
-                }
-                _ => reply, // Default, let Warp handle other types (e.g., .css, .png)
+
+            // Set the Content-Type based on the file extension
+            let reply = if path_str.ends_with(".otf") {
+                warp::reply::with_header(reply, CONTENT_TYPE, "font/otf")
+            } else {
+                warp::reply::with_header(reply, CONTENT_TYPE, "")
             };
+
+            // Set the Access-Control-Allow-Origin header
             warp::reply::with_header(reply, ACCESS_CONTROL, "*")
         });
 
