@@ -6,6 +6,7 @@ use crate::{
         use_claimable_yield, use_ore_balance_wss, use_ore_price, use_stake_wss,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
+    utils::format_bps_as_percent,
 };
 use dioxus::prelude::*;
 use ore_api::{consts::TOKEN_DECIMALS, state::Proof};
@@ -142,7 +143,7 @@ fn BoostMetrics(boost: Signal<GatewayResult<Boost>>) -> Element {
                 title: "Boost"
             }
             Apr {}
-            Multiplier {
+            TakeRate {
                 boost,
             }
             TotalDeposits {
@@ -180,16 +181,16 @@ pub fn Apr() -> Element {
 }
 
 #[component]
-pub fn Multiplier(boost: Signal<GatewayResult<Boost>>) -> Element {
+pub fn TakeRate(boost: Signal<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledSignalRow {
-            title: "Multiplier",
-            description: "The multiplier is an indicator of this protocol's priority relative to other protocols that receive ORE yield. The higher the multiplier, the more ORE will be allocated to stakers in this protocol.",
+            title: "Take rate",
+            description: "The percentage of the mining reward that gets allocated to this boost when active. The higher the take rate, the more ORE will be shared with stakers in the protocol.",
             signal: boost,
             com: |boost| rsx! {
                 span {
                     class: "text-elements-highEmphasis font-medium",
-                    "{boost.multiplier as f64 / ore_boost_api::consts::DENOMINATOR_MULTIPLIER as f64}x"
+                    "{format_bps_as_percent(boost.multiplier as f64)}"
                 }
             }
         }

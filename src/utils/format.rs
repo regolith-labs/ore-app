@@ -54,3 +54,12 @@ pub fn format_time_since(timestamp: u64) -> String {
         }
     }
 }
+
+pub fn format_bps_as_percent(bps: f64) -> String {
+    let percent = bps / ore_boost_api::consts::DENOMINATOR_BPS as f64 * 100.0;
+    if percent < 0.1 {
+        format!("{:.2}%", percent)
+    } else {
+        format!("{:.1}%", percent)
+    }
+}
