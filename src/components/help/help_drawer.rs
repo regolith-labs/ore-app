@@ -1,6 +1,5 @@
 use crate::components::*;
-use crate::hooks::{use_help_drawer_state, HelpDrawerPage};
-use crate::route::Route;
+use crate::hooks::use_help_drawer_state;
 use dioxus::prelude::*;
 use std::time::Duration;
 
@@ -8,9 +7,6 @@ pub fn HelpDrawer() -> Element {
     let mut drawer_state = use_help_drawer_state();
     let drawer_remount = use_signal(|| false);
     let mut is_animating = use_signal(|| false);
-
-    // Get the current route to determine if we should show the drawer
-    let current_route: Route = use_route();
 
     // Only render the drawer, not the button
     rsx! {
