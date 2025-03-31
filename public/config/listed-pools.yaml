@@ -6,7 +6,7 @@ pools:
     image: https://pbs.twimg.com/profile_images/1736827532312211456/V0bvyS_2_400x400.jpg
 
   - address: D44JYBNTy2PovNM5wxfYjCUbN7bmnqrPDz3jdUEHtRuL
-    url: https://ore-pool.onrender.com
+    url: https://pool.ore.supply
     name: ORE Pool
     description: ""
     image: "" 
