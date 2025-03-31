@@ -1,4 +1,4 @@
-#[cfg(feature = "desktop")]
+#[cfg(not(feature = "web"))]
 mod token_list;
 #[cfg(not(feature = "web"))]
 mod wallet_adapter_native;
@@ -9,7 +9,7 @@ mod wallet_drawer_native;
 #[cfg(feature = "web")]
 mod wallet_drawer_web;
 
-#[cfg(feature = "desktop")]
+#[cfg(not(feature = "web"))]
 pub use token_list::*;
 #[cfg(not(feature = "web"))]
 pub use wallet_adapter_native::*;

@@ -1,12 +1,24 @@
 use dioxus::prelude::*;
 use ore_types::request::TransactionType;
-use solana_sdk::{signature::Keypair, transaction::VersionedTransaction};
+use solana_sdk::{
+    hash::Hash,
+    signature::Keypair,
+    transaction::{Transaction, VersionedTransaction},
+};
 
 use crate::{
     components::*,
     gateway::{solana::SolanaGateway, GatewayResult, NativeRpc, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
+
+pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
+    let gateway = use_gateway();
+    let signer = crate::hooks::use_wallet_native::get()?;
+    let hash = gateway.rpc.get_latest_blockhash().await?;
+    tx.try_partial_sign(&[&signer.creator], hash)?;
+    Ok((tx, hash))
+}
 
 pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
     let mut transaction_status = use_transaction_status();
@@ -31,6 +43,18 @@ pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
     });
 }
 
+async fn sign(
+    rpc: &NativeRpc,
+    signer: &Keypair,
+    tx: VersionedTransaction,
+) -> GatewayResult<(VersionedTransaction, Hash)> {
+    let hash = rpc.get_latest_blockhash().await?;
+    let mut message = tx.message;
+    message.set_recent_blockhash(hash);
+    let signed = VersionedTransaction::try_new(message, &[signer])?;
+    Ok((signed, hash))
+}
+
 async fn sign_submit_confirm(
     rpc: &NativeRpc,
     signer: &Keypair,
@@ -38,10 +62,7 @@ async fn sign_submit_confirm(
 ) -> GatewayResult<()> {
     let mut transaction_status = use_transaction_status();
     // sign
-    let hash = rpc.get_latest_blockhash().await?;
-    let mut message = tx.message;
-    message.set_recent_blockhash(hash);
-    let signed = VersionedTransaction::try_new(message, &[signer])?;
+    let (signed, _) = sign(rpc, signer, tx).await?;
     // submit
     let sig = rpc.send_transaction(&signed).await?;
     // confirm

@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use steel::Pubkey;
@@ -14,12 +16,8 @@ pub static LISTED_POOLS: Lazy<Vec<Pool>> = Lazy::new(|| {
     config.pools
 });
 
-pub const FIRST_POOL: Lazy<Pool> = Lazy::new(|| {
-    LISTED_POOLS
-        .first()
-        .expect("Must be at least one entry in listed-pools.yaml")
-        .clone()
-});
+pub const FIRST_POOL: Lazy<Pool> = Lazy::new(|| LISTED_POOLS.index(0).clone());
+pub const SECOND_POOL: Lazy<Pool> = Lazy::new(|| LISTED_POOLS.index(1).clone());
 
 #[derive(Clone, PartialEq, Eq, Deserialize)]
 pub struct Pool {

@@ -9,6 +9,3 @@ pub use submit_transaction_native::*;
 #[cfg(feature = "web")]
 pub use submit_transaction_web::*;
 pub use transaction_status::*;
-
-// TODO Create a toast component to display the transaction status
-// TODO Route all transactions through toast system

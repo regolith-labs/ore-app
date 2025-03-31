@@ -5,7 +5,7 @@ import {
   BaseWalletMultiButton,
   WalletModalProvider,
 } from '@solana/wallet-adapter-react-ui';
-import { Transaction, VersionedTransaction } from '@solana/web3.js';
+import { VersionedTransaction } from '@solana/web3.js';
 import * as buffer from "buffer";
 window.Buffer = buffer.Buffer;
 
