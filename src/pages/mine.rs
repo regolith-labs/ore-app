@@ -9,7 +9,7 @@ use crate::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
         use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
         use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_wallet, MinerStatus, Wallet,
+        use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -21,12 +21,11 @@ pub fn Mine() -> Element {
             // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
-            Col {
-                class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
+            Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
                 Heading {
                     class: "w-full",
                     title: "Mine",
-                    subtitle: "Convert energy into cryptocurrency."
+                    subtitle: "Convert energy into cryptocurrency.",
                 }
                 MinerData {}
             }
@@ -47,12 +46,10 @@ fn MinerData() -> Element {
     });
 
     rsx! {
-        Col {
-            class: "w-full flex-wrap mx-auto justify-between gap-12",
+        Col { class: "w-full flex-wrap mx-auto justify-between gap-12",
             Alert {}
             MinerStatus {}
-            Col {
-                class: "w-full gap-8",
+            Col { class: "w-full gap-8",
                 MinerCores {}
                 MinePower {}
             }
@@ -69,9 +66,24 @@ fn StopStartButton() -> Element {
     let mut miner_status = use_miner_status();
     let mut member = use_member();
     let mut member_record = use_member_record();
-    let register_tx = use_pool_register_transaction();
+    let mut register_tx_start = use_signal(|| false);
+    let register_tx = use_pool_register_transaction(register_tx_start);
     let is_active = use_miner_is_active();
 
+    // listen for onchain pool registration
+    use_effect(move || match register_tx.cloned() {
+        // commit claim dependency failed, reset
+        Some(Ok(PoolRegisterStatus::CommitClaimFailed)) => {
+            miner_status.set(MinerStatus::Stopped);
+        }
+        // submit tx
+        Some(Ok(PoolRegisterStatus::Transaction(tx))) => {
+            submit_transaction(tx, TransactionType::PoolJoin);
+        }
+        _ => {}
+    });
+
+    // offchain pool server registration
     let mut register_with_pool_server = use_future(move || async move {
         let Wallet::Connected(authority) = *wallet.read() else {
             return;
@@ -82,10 +94,15 @@ fn StopStartButton() -> Element {
         if miner_status.cloned() != MinerStatus::Registering {
             return;
         }
-        if let Ok(_member_record) = use_gateway().register(authority, pool_url).await {
-            member.restart();
-            member_record.restart();
-            miner_status.set(MinerStatus::FetchingChallenge);
+        match use_gateway().register(authority, pool_url).await {
+            Ok(_member_record) => {
+                member.restart();
+                member_record.restart();
+                miner_status.set(MinerStatus::FetchingChallenge);
+            }
+            Err(err) => {
+                log::error!("Error registering with server: {:?}", err);
+            }
         }
     });
 
@@ -95,7 +112,8 @@ fn StopStartButton() -> Element {
     // this is the happy path,
     // first the onchain registration signature lands
     // and then we submit for registration with the offchain pool server
-    on_transaction_done(move |_sig| {
+    on_transaction_done(move |sig| {
+        log::info!("registration sig: {:?}", sig);
         if miner_status.cloned() == MinerStatus::Registering {
             register_with_pool_server.restart();
         }
@@ -106,7 +124,7 @@ fn StopStartButton() -> Element {
     // this is the recovery path,
     // where the onchain registration landed
     // but the server registration failed or hasn't been submitted yet
-    use_memo(move || {
+    use_effect(move || {
         if miner_status.cloned() == MinerStatus::Registering {
             register_with_pool_server.restart();
         }
@@ -123,41 +141,27 @@ fn StopStartButton() -> Element {
             class: "flex flex-row gap-2 my-auto px-8 h-12 rounded-full {controls_class}",
             disabled: matches!(*wallet.read(), Wallet::Disconnected),
             onclick: move |_| {
-                // set to stopped (miner is active)
                 if *is_active.read() {
                     miner_status.set(MinerStatus::Stopped);
                 } else {
-                    // stopped
-                    // if already registered in pool fetch next challenge
-                    // or else try registering (both onchain and then with the pool server)
                     if let Some(Ok(_member)) = member.cloned() {
-                        // already registered on chain, check if registered with pool server
                         if let Some(Ok(_member_db)) = member_record.cloned() {
-                            // registered with the pool server too, fetch challenge
                             miner_status.set(MinerStatus::FetchingChallenge);
                         } else {
-                            // only registered onchain, submit registration to pool server
                             miner_status.set(MinerStatus::Registering);
                         }
-                    } else if let Some(Ok(tx)) = register_tx.cloned() {
-                        // not registered onchain, submit registration transaction
+                    } else {
+                        register_tx_start.set(true);
                         miner_status.set(MinerStatus::Registering);
-                        submit_transaction(tx, TransactionType::PoolJoin);
                     }
                 }
             },
             if !*is_active.read() {
                 PlayIcon { class: "my-auto h-5" }
-                span {
-                    class: "my-auto",
-                    "Start"
-                }
+                span { class: "my-auto", "Start" }
             } else {
-                StopIcon { class: "my-auto h-5"  }
-                span {
-                    class: "my-auto",
-                    "Stop"
-                }
+                StopIcon { class: "my-auto h-5" }
+                span { class: "my-auto", "Stop" }
             }
         }
     }
@@ -185,27 +189,16 @@ fn TimeRemaining() -> Element {
 
     rsx! {
         if display_time_remaining.cloned() {
-            Col {
-                gap: 4,
+            Col { gap: 4,
                 button {
                     class: "flex flex-col gap-0 group",
                     onclick: move |_| info_hidden.set(!info_hidden.cloned()),
-                    Row {
-                        class: "w-full justify-between",
-                        Row {
-                            gap: 2,
-                            span {
-                                class: "text-elements-lowEmphasis font-medium",
-                                "Time"
-                            }
-                            InfoIcon {
-                                class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
-                            }
+                    Row { class: "w-full justify-between",
+                        Row { gap: 2,
+                            span { class: "text-elements-lowEmphasis font-medium", "Time" }
+                            InfoIcon { class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto" }
                         }
-                        span {
-                            class: "mr-2",
-                            "{time_remaining.cloned()}s"
-                        }
+                        span { class: "mr-2", "{time_remaining.cloned()}s" }
                     }
                     InfoText {
                         class: "text-wrap text-left text-sm max-w-lg mr-auto",
@@ -213,11 +206,10 @@ fn TimeRemaining() -> Element {
                         hidden: info_hidden,
                     }
                 }
-                div {
-                    class: "w-full h-2 bg-elements-lowEmphasis rounded-full",
+                div { class: "w-full h-2 bg-elements-lowEmphasis rounded-full",
                     div {
                         class: "h-full bg-elements-highEmphasis rounded-full transition-all",
-                        style: "width: {(100.0 - (time_remaining.cloned() as f32 / 60.0 * 100.0)).max(0.0)}%"
+                        style: "width: {(100.0 - (time_remaining.cloned() as f32 / 60.0 * 100.0)).max(0.0)}%",
                     }
                 }
             }
@@ -249,20 +241,13 @@ fn MinerStatus() -> Element {
     let mut info_hidden = use_signal(|| true);
 
     rsx! {
-        Col {
-            gap: 4,
+        Col { gap: 4,
             button {
                 class: "flex flex-col gap-0 group",
                 onclick: move |_| info_hidden.set(!info_hidden.cloned()),
-                Row {
-                    gap: 2,
-                    span {
-                        class: "text-elements-lowEmphasis font-medium",
-                        "Status"
-                    }
-                    InfoIcon {
-                        class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
-                    }
+                Row { gap: 2,
+                    span { class: "text-elements-lowEmphasis font-medium", "Status" }
+                    InfoIcon { class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto" }
                 }
                 InfoText {
                     class: "text-wrap text-left text-sm max-w-lg mr-auto",
@@ -270,12 +255,8 @@ fn MinerStatus() -> Element {
                     hidden: info_hidden,
                 }
             }
-            Row {
-                class: "justify-between",
-                span {
-                    class: "font-semibold text-2xl sm:text-3xl",
-                    "{status}"
-                }
+            Row { class: "justify-between",
+                span { class: "font-semibold text-2xl sm:text-3xl", "{status}" }
                 StopStartButton {}
             }
         }
@@ -284,16 +265,9 @@ fn MinerStatus() -> Element {
 
 fn _MinerHashpower() -> Element {
     rsx! {
-        Col {
-            gap: 4,
-            span {
-                class: "text-elements-lowEmphasis font-medium",
-                "Hashpower"
-            }
-            span {
-                class: "font-semibold text-2xl sm:text-3xl",
-                "1230 H/s"
-            }
+        Col { gap: 4,
+            span { class: "text-elements-lowEmphasis font-medium", "Hashpower" }
+            span { class: "font-semibold text-2xl sm:text-3xl", "1230 H/s" }
         }
     }
 }
@@ -303,20 +277,13 @@ fn MinerCores() -> Element {
     let max = crate::cores::get();
     let mut info_hidden = use_signal(|| true);
     rsx! {
-        Col {
-            gap: 4,
+        Col { gap: 4,
             button {
                 class: "flex flex-col gap-0 group",
                 onclick: move |_| info_hidden.set(!info_hidden.cloned()),
-                Row {
-                    gap: 2,
-                    span {
-                        class: "text-elements-lowEmphasis font-medium",
-                        "Cores"
-                    }
-                    InfoIcon {
-                        class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
-                    }
+                Row { gap: 2,
+                    span { class: "text-elements-lowEmphasis font-medium", "Cores" }
+                    InfoIcon { class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto" }
                 }
                 InfoText {
                     class: "text-wrap text-left text-sm max-w-lg mr-auto",
@@ -324,14 +291,9 @@ fn MinerCores() -> Element {
                     hidden: info_hidden,
                 }
             }
-            Row {
-                class: "justify-between",
-                span {
-                    class: "font-semibold text-2xl sm:text-3xl",
-                    "{cores}"
-                }
-                Row {
-                    gap: 2,
+            Row { class: "justify-between",
+                span { class: "font-semibold text-2xl sm:text-3xl", "{cores}" }
+                Row { gap: 2,
                     button {
                         class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
                         onclick: move |_| {
@@ -363,8 +325,7 @@ fn MinerPendingRewards() -> Element {
         if let Some(Ok(member_record_balance)) = member_record_balance.cloned() {
             if let Some(Ok(member)) = member.cloned() {
                 if member_record_balance > member.total_balance {
-                    Col {
-                        gap: 4,
+                    Col { gap: 4,
                         // span {
                         //     class: "text-elements-lowEmphasis font-medium",
                         //     "Rewards (pending)"
@@ -372,15 +333,11 @@ fn MinerPendingRewards() -> Element {
                         button {
                             class: "flex flex-col gap-0 group",
                             onclick: move |_| info_hidden.set(!info_hidden.cloned()),
-                            Row {
-                                gap: 2,
-                                span {
-                                    class: "text-elements-lowEmphasis font-medium",
+                            Row { gap: 2,
+                                span { class: "text-elements-lowEmphasis font-medium",
                                     "Rewards (pending)"
                                 }
-                                InfoIcon {
-                                    class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
-                                }
+                                InfoIcon { class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto" }
                             }
                             InfoText {
                                 class: "text-wrap text-left text-sm max-w-lg mr-auto",
@@ -390,7 +347,10 @@ fn MinerPendingRewards() -> Element {
                         }
                         OreValue {
                             size: TokenValueSize::Large,
-                            ui_amount_string: amount_to_ui_amount_string(member_record_balance - member.total_balance, TOKEN_DECIMALS),
+                            ui_amount_string: amount_to_ui_amount_string(
+                                member_record_balance - member.total_balance,
+                                TOKEN_DECIMALS,
+                            ),
                             with_decimal_units: true,
                         }
                     }
@@ -405,8 +365,7 @@ fn MinerRewards() -> Element {
     let claim_tx = use_miner_claim_transaction(member);
     let mut info_hidden = use_signal(|| true);
     rsx! {
-        Col {
-            gap: 4,
+        Col { gap: 4,
             // span {
             //     class: "text-elements-lowEmphasis font-medium",
             //     "Rewards"
@@ -414,15 +373,9 @@ fn MinerRewards() -> Element {
             button {
                 class: "flex flex-col gap-0 group",
                 onclick: move |_| info_hidden.set(!info_hidden.cloned()),
-                Row {
-                    gap: 2,
-                    span {
-                        class: "text-elements-lowEmphasis font-medium",
-                        "Rewards"
-                    }
-                    InfoIcon {
-                        class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto",
-                    }
+                Row { gap: 2,
+                    span { class: "text-elements-lowEmphasis font-medium", "Rewards" }
+                    InfoIcon { class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto" }
                 }
                 InfoText {
                     class: "text-wrap text-left text-sm max-w-lg mr-auto",
@@ -444,10 +397,7 @@ fn MinerRewards() -> Element {
             } else {
                 LoadingValue {}
             }
-            ClaimButton {
-                transaction: claim_tx,
-                tx_type: TransactionType::PoolClaim,
-            }
+            ClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
         }
     }
 }
@@ -493,9 +443,7 @@ fn MinePower() -> Element {
         .collect();
 
     rsx! {
-        Col {
-            class: "relative flex w-full mx-auto pr-2",
-            gap: 4,
+        Col { class: "relative flex w-full mx-auto pr-2", gap: 4,
             // Keyframes for the animation
             // style {
             //     "@keyframes blockPulse {{
@@ -510,35 +458,27 @@ fn MinePower() -> Element {
             // }
 
             // Manual column layout with increased spacing between columns
-            div {
-                class: "flex flex-col md:flex-row gap-8 w-full",
+            div { class: "flex flex-col md:flex-row gap-8 w-full",
                 // Create a column for each group of cores
                 for column in column_indices {
-                    div {
-                        class: "flex-1",
+                    div { class: "flex-1",
                         // Create system bars for each core in numerical order
                         for core_idx in column {
                             {
-                                // Get the utilization rate for this core
                                 let rate = normalized_cpu_utilization.read()[core_idx];
-
                                 rsx! {
                                     div {
                                         // Core index
                                         class: "flex items-center gap-1 w-full flex-shrink-0 mb-2",
-                                        span {
-                                            class: "text-elements-midEmphasis w-6 text-left text-sm flex-shrink-0 font-medium",
+                                        span { class: "text-elements-midEmphasis w-6 text-left text-sm flex-shrink-0 font-medium",
                                             "{core_idx + 1}"
                                         }
                                         // Core usage bar
-                                        div {
-                                            class: "flex-1 mx-1 h-6 overflow-hidden",
+                                        div { class: "flex-1 mx-1 h-6 overflow-hidden",
                                             // Container for all 10 blocks as a non-flex div
-                                            div {
-                                                class: "flex h-full w-full",
+                                            div { class: "flex h-full w-full",
                                                 for j in 0..10 {
                                                     {
-                                                        // Fixed block class assignment
                                                         let color = if j < 7 {
                                                             "h-full bg-elements-green"
                                                         } else if j < 9 {
@@ -546,17 +486,11 @@ fn MinePower() -> Element {
                                                         } else {
                                                             "h-full bg-elements-red"
                                                         };
-
-                                                        let opacity = if j < (rate + 5) / 10 {
-                                                            "opacity-100"
-                                                        } else {
-                                                            "opacity-0"
-                                                        };
-
+                                                        let opacity = if j < (rate + 5) / 10 { "opacity-100" } else { "opacity-0" };
                                                         rsx! {
                                                             div {
                                                                 class: "transition-all duration-300 ease-in-out {opacity} {color}",
-                                                                style: "width: 9%; margin-right: 1%;"
+                                                                style: "width: 9%; margin-right: 1%;",
                                                             }
                                                         }
                                                     }
@@ -565,8 +499,7 @@ fn MinePower() -> Element {
                                         }
 
                                         // Usage percentage for each core
-                                        span {
-                                            class: "text-elements-lowEmphasis text-xs font-medium w-8 text-right flex-shrink-0",
+                                        span { class: "text-elements-lowEmphasis text-xs font-medium w-8 text-right flex-shrink-0",
                                             "{rate}%"
                                         }
                                     }

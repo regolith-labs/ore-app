@@ -2,14 +2,56 @@ use base64::Engine;
 use dioxus::{document::eval, prelude::*};
 use js_sys::Date;
 use ore_types::request::{AppId, TransactionEvent, TransactionType};
-use solana_sdk::{message::VersionedMessage, transaction::VersionedTransaction};
+use solana_sdk::{
+    hash::Hash,
+    message::VersionedMessage,
+    transaction::{Transaction, VersionedTransaction},
+};
 
 use crate::{
     components::*,
-    gateway::{ore::OreGateway, solana::SolanaGateway, Rpc},
+    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
+pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
+    // set blockhash
+    let gateway = use_gateway();
+    let hash = gateway.rpc.get_latest_blockhash().await?;
+    let message = &mut tx.message;
+    message.recent_blockhash = hash;
+    // build eval command for wallet signing
+    let mut eval = eval(
+        r#"
+        let msg = await dioxus.recv();
+        let signed = await window.OreTxSigner({b64: msg});
+        dioxus.send(signed);
+        "#,
+    );
+    // serialize transaction to send to wallet
+    let vec = bincode::serialize(&tx).map_err(|err| anyhow::anyhow!(err))?;
+    let b64 = base64::engine::general_purpose::STANDARD.encode(vec);
+    let _send = eval
+        .send(serde_json::Value::String(b64))
+        .map_err(|err| anyhow::anyhow!(err))?;
+    // wait on eval
+    let res = eval.recv().await;
+    // process eval result
+    if let Ok(serde_json::Value::String(string)) = res {
+        // decode b64 signed transaction
+        let buffer = base64::engine::general_purpose::STANDARD
+            .decode(string)
+            .map_err(|err| anyhow::anyhow!(err))?;
+        // deserialize binary to transaction
+        let tx =
+            bincode::deserialize::<Transaction>(&buffer).map_err(|err| anyhow::anyhow!(err))?;
+        Ok((tx, hash))
+    } else {
+        Err(anyhow::anyhow!("unexpected response format").into())
+    }
+}
+
+/// signs and submits
 pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType) {
     let mut transaction_status = use_transaction_status();
 
@@ -77,10 +119,14 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                 if let Some(sig) = rpc_res {
                                     match gateway
                                         .log_transaction_event(TransactionEvent {
-                                            sig: sig,
-                                            signer: signer,
+                                            sig,
+                                            signer,
                                             transaction_type: tx_type,
-                                            app: AppId::OreWeb,
+                                            app: if cfg!(feature = "web") {
+                                                AppId::OreWeb
+                                            } else {
+                                                AppId::OreDesktop
+                                            },
                                             ts: timestamp,
                                             status: None,
                                             fee: None,

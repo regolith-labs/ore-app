@@ -2502,91 +2502,91 @@ body {
 }
 @font-face {
   font-family: 'Pilat';
-  src: url('/assets/fonts/Pilat/Pilat-Light.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Light.otf') format('opentype'), url('/assets/fonts/Pilat/Pilat-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
   font-family: 'Pilat';
-  src: url('/assets/fonts/Pilat/Pilat-Regular.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Regular.otf') format('opentype'), url('/assets/fonts/Pilat/Pilat-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
   font-family: 'Pilat';
-  src: url('/assets/fonts/Pilat/Pilat-Book.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Book.otf') format('opentype'), url('/assets/fonts/Pilat/Pilat-Book.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
 }
 @font-face {
   font-family: 'Pilat';
-  src: url('/assets/fonts/Pilat/Pilat-Demi.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Demi.otf') format('opentype'), url('/assets/fonts/Pilat/Pilat-Demi.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
 }
 @font-face {
   font-family: 'Pilat';
-  src: url('/assets/fonts/Pilat/Pilat-Bold.otf') format('opentype');
+  src: url('/assets/fonts/Pilat/Pilat-Bold.otf') format('opentype'), url('/assets/fonts/Pilat/Pilat-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatWide';
-  src: url('/assets/fonts/PilatWide/PilatWide-Light.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Light.otf') format('opentype'), url('/assets/fonts/PilatWide/PilatWide-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatWide';
-  src: url('/assets/fonts/PilatWide/PilatWide-Regular.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Regular.otf') format('opentype'), url('/assets/fonts/PilatWide/PilatWide-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatWide';
-  src: url('/assets/fonts/PilatWide/PilatWide-Book.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Book.otf') format('opentype'), url('/assets/fonts/PilatWide/PilatWide-Book.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatWide';
-  src: url('/assets/fonts/PilatWide/PilatWide-Demi.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Demi.otf') format('opentype'), url('/assets/fonts/PilatWide/PilatWide-Demi.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatWide';
-  src: url('/assets/fonts/PilatWide/PilatWide-Bold.otf') format('opentype');
+  src: url('/assets/fonts/PilatWide/PilatWide-Bold.otf') format('opentype'), url('/assets/fonts/PilatWide/PilatWide-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatExtended';
-  src: url('/assets/fonts/PilatExtended/PilatExtended-Light.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Light.otf') format('opentype'), url('/assets/fonts/PilatExtended/PilatExtended-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatExtended';
-  src: url('/assets/fonts/PilatExtended/PilatExtended-Regular.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Regular.otf') format('opentype'), url('/assets/fonts/PilatExtended/PilatExtended-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatExtended';
-  src: url('/assets/fonts/PilatExtended/PilatExtended-Book.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Book.otf') format('opentype'), url('/assets/fonts/PilatExtended/PilatExtended-Book.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatExtended';
-  src: url('/assets/fonts/PilatExtended/PilatExtended-Demi.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Demi.otf') format('opentype'), url('/assets/fonts/PilatExtended/PilatExtended-Demi.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
 }
 @font-face {
   font-family: 'PilatExtended';
-  src: url('/assets/fonts/PilatExtended/PilatExtended-Bold.otf') format('opentype');
+  src: url('/assets/fonts/PilatExtended/PilatExtended-Bold.otf') format('opentype'), url('/assets/fonts/PilatExtended/PilatExtended-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
 }

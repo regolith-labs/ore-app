@@ -2,7 +2,6 @@ use warp::Filter;
 
 const ACCESS_CONTROL: &str = "Access-Control-Allow-Origin";
 const CACHE_CONTROL: &str = "Cache-Control";
-const CONTENT_TYPE: &str = "Content-Type";
 
 #[tokio::main]
 async fn main() {
@@ -21,13 +20,6 @@ async fn main() {
                 )
             } else {
                 warp::reply::with_header(reply, CACHE_CONTROL, "no-cache, must-revalidate")
-            };
-
-            // Set the Content-Type based on the file extension
-            let reply = if path_str.ends_with(".otf") {
-                warp::reply::with_header(reply, CONTENT_TYPE, "font/otf")
-            } else {
-                warp::reply::with_header(reply, CONTENT_TYPE, "")
             };
 
             // Set the Access-Control-Allow-Origin header
@@ -77,4 +69,5 @@ fn should_cache(path: &str) -> bool {
         || path.ends_with(".gif")
         || path.ends_with(".webp")
         || path.ends_with(".otf")
+        || path.ends_with(".woff2")
 }
