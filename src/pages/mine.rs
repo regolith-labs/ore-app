@@ -530,14 +530,14 @@ fn MineHelpButton() -> Element {
                 drawer_state.set(current);
             },
             Row {
-                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer gap-3",
-                gap: 3,
+                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer",
+                gap: 2,
                 span {
                     class: "mx-auto my-auto",
                     "Help"
                 }
-                DrawerIcon {
-                    class: "w-3 text-gray-700"
+                BulbIcon {
+                    class: "w-4 text-elements-midEmphasis"
                 }
             }
         }

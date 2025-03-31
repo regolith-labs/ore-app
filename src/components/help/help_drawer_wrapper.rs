@@ -72,17 +72,14 @@ pub fn HelpDrawerWrapper(
     }
 }
 
-// Mining Components
 #[component]
 fn MineHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
     let mut current_tab = use_signal(|| MineHelpTabs::Mining);
 
     rsx! {
         Fragment {
-            // Header
             Col {
                 class: "px-8 pt-4 pb-2",
-                // Close button
                 button {
                     class: "rounded-full text-center py-1 w-8 h-8 flex items-center justify-center bg-surface-floating hover:bg-surface-floating-hover cursor-pointer",
                     onclick: move |e| {
@@ -94,7 +91,6 @@ fn MineHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                         "×"
                     }
                 }
-                // Title content
                 Col {
                     class: "justify-start py-8",
                     gap: 4,
@@ -108,8 +104,6 @@ fn MineHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                 }
             }
-
-            // Tabs
             Row {
                 class: "w-full mb-4 bg-surface-elevated border-b border-gray-800",
                 {HELP_TITLES.mine.tabs.iter().map(|(label, tab)| {
@@ -127,8 +121,6 @@ fn MineHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                 })}
             }
-
-            // Content
             div {
                 class: "overflow-y-auto scrollbar-hide",
                 style: "padding-bottom: 1rem;",
@@ -144,9 +136,6 @@ fn MineHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
 fn MiningContent() -> Element {
     rsx! {
         ContentSection {
-            // LabelText {
-            //     text: "Mining"
-            // }
             BodyText {
                 text: "Mining is the process by which energy can be converted into cryptocurrency."
             }
@@ -155,7 +144,6 @@ fn MiningContent() -> Element {
             }
             StartMiningBullets {}
             SuggestionText {}
-
             LabelText {
                 text: "How does ORE mining work?"
             }
@@ -168,7 +156,6 @@ fn MiningContent() -> Element {
     }
 }
 
-// Mining FAQ content component
 #[component]
 fn MiningFAQContent() -> Element {
     rsx! {
@@ -218,27 +205,19 @@ fn StartMiningBullets() -> Element {
             BulletPointList {
                 BulletPoint {
                     title: None,
-                    description: {
-                        rsx! {
-                            p {
-                                class: "text-lg text-elements-midEmphasis text-left",
-                                span {
-                                    "Connect any supported Solana wallet"
-                                }
-                            }
+                    description: rsx! {
+                        p {
+                            class: "text-lg text-elements-midEmphasis text-left",
+                            span { "Connect any supported Solana wallet" }
                         }
                     }
                 }
                 BulletPoint {
                     title: None,
-                    description: {
-                        rsx! {
-                            p {
-                                class: "text-lg text-elements-midEmphasis text-left",
-                                span {
-                                    "Click \"start\" to begin mining"
-                                }
-                            }
+                    description: rsx! {
+                        p {
+                            class: "text-lg text-elements-midEmphasis text-left",
+                            span { "Click \"start\" to begin mining" }
                         }
                     }
                 }
@@ -249,18 +228,17 @@ fn StartMiningBullets() -> Element {
 
 fn SupplyContent() -> Element {
     rsx! {
-    ContentSection {
-        LabelText {
-            text: "What is ORE's supply curve?"
-        }
-        SupplyCurveBullets {}
-
-        LabelText {
-            text: "ORE Emission Curve"
-        }
-        BodyText {
-            text: "The ORE emission curve is a function that determines the rate at which ORE is emitted into the network."
-        }
+        ContentSection {
+            LabelText {
+                text: "What is ORE's supply curve?"
+            }
+            SupplyCurveBullets {}
+            LabelText {
+                text: "ORE Emission Curve"
+            }
+            BodyText {
+                text: "The ORE emission curve is a function that determines the rate at which ORE is emitted into the network."
+            }
             img {
                 class: "relative w-full h-full object-contain z-10 rounded-lg",
                 src: asset!("/public/ore-emissions-curve.webp"),
@@ -297,24 +275,20 @@ fn SupplyCurveBullets() -> Element {
     }
 }
 
-// Staking Components
 #[component]
 fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
     let mut current_tab = use_signal(|| StakeHelpTabs::Boosts);
     let mut rewards_data: Signal<Option<Vec<RewardData>>> = use_signal(|| None);
     let mut total_supply: Signal<Option<UiTokenAmount>> = use_signal(|| None);
 
-    // Prefetch rewards data and total supply when the component mounts
     use_effect(move || {
         spawn(async move {
-            // Fetch rewards data
             if let Ok(data) = use_gateway().get_rewards_data().await {
                 rewards_data.set(Some(data));
             } else {
                 log::error!("Failed to fetch rewards data");
             }
 
-            // Fetch total supply
             if let Ok(data) = use_gateway().rpc.get_token_supply(&Token::ore().mint).await {
                 total_supply.set(Some(data));
             }
@@ -323,10 +297,8 @@ fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
 
     rsx! {
         Fragment {
-            // Header
             Col {
                 class: "px-8 pt-4 pb-2",
-                // Close button
                 button {
                     class: "rounded-full text-center py-1 w-8 h-8 flex items-center justify-center bg-surface-floating hover:bg-surface-floating-hover cursor-pointer",
                     onclick: move |e| {
@@ -338,7 +310,6 @@ fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                         "×"
                     }
                 }
-                // Title content
                 Col {
                     class: "justify-start py-8",
                     gap: 4,
@@ -353,7 +324,6 @@ fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                 }
             }
 
-            // Tabs
             Row {
                 class: "w-full mb-4 bg-surface-elevated border-b border-gray-800",
                 {HELP_TITLES.stake.tabs.iter().map(|(label, tab)| {
@@ -372,7 +342,6 @@ fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                 })}
             }
 
-            // Content
             div {
                 class: "overflow-y-auto scrollbar-hide",
                 style: "padding-bottom: 1rem;",
@@ -391,11 +360,9 @@ fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
 fn BoostsContent() -> Element {
     rsx! {
         ContentSection {
-            LabelText {
-                text: "Overview"
-            }
+            LabelText { text: "Overview" }
             BoostsBullets {}
-            LabelText {text: "FAQ"}
+            LabelText { text: "FAQ" }
             StakeFaq {}
         }
     }
@@ -411,13 +378,9 @@ fn YieldContent(
             TokenSupply {
                 total_supply: total_supply.clone()
             }
-            LabelText {
-                text: "Yield Concepts"
-            }
+            LabelText { text: "Yield Concepts" }
             YieldBullets {}
-            LabelText {
-                text: "Liquidity Incentives"
-            }
+            LabelText { text: "Liquidity Incentives" }
             BodyText {
                 text: "Liquidity providers stake eligible LP tokens with the ORE boost protocol."
             }
@@ -429,10 +392,7 @@ fn YieldContent(
                     decoding: "sync",
                 }
             }
-            // TODO: ADDD SUBTEXTT TO CHARTS
-            LabelText {
-                text: "Rewards Rates"
-            }
+            LabelText { text: "Rewards Rates" }
             BodyText {
                 text: "The reward rates are determined by the difficulty level achieved when a miner submits a hash. More hashpower increases the probability of landing a higher difficulty."
             }
@@ -463,7 +423,6 @@ fn YieldBullets() -> Element {
     }
 }
 
-// Staking FAQ content component
 #[component]
 fn StakingFAQContent() -> Element {
     rsx! {
@@ -512,7 +471,6 @@ fn StakeFaq() -> Element {
                     answer: "Yes, we plan to add boosts on strategic pairs to further strengthen the ORE liquidity network.",
                 }
                 FaqItem {
-                    // TODO: FIX SPACING
                     question: "Why does the APY change?",
                     answer: "APY is calculated based on a 7-day rolling average. As more ORE is staked in a boost, the yield is split among more participants, causing the APY to decrease. Conversely, if the total staked amount goes down, the APY will rise. This is because a maximum of 1 ORE per minute is distributed between miners and stakers.",
                     answer_with_link: rsx! {
@@ -542,7 +500,6 @@ fn StakeFaq() -> Element {
     }
 }
 
-// Shared/Utility Components
 #[component]
 fn LabelText(text: String) -> Element {
     rsx! {
@@ -562,10 +519,10 @@ fn LabelText(text: String) -> Element {
 #[component]
 fn BodyText(text: String) -> Element {
     rsx! {
-            span {
-                class: "text-lg text-elements-midEmphasis pb-8",
-                "{text}"
-            }
+        span {
+            class: "text-lg text-elements-midEmphasis pb-8",
+            "{text}"
+        }
     }
 }
 
@@ -574,10 +531,7 @@ fn ContentSection(children: Element) -> Element {
     rsx! {
         Col {
             class: "w-full px-8 py-8 scrollbar-hide",
-            Col {
-                // gap: 8,
-                {children}
-            }
+            Col { {children} }
         }
     }
 }
@@ -622,10 +576,8 @@ fn TokenSupply(total_supply: Signal<Option<UiTokenAmount>>) -> Element {
                 class: "items-end justify-end",
                 match total_supply.read().as_ref() {
                     Some(supply) => {
-                        // Use the ui_amount directly, defaulting to 0.0 if None
                         let amount_value = supply.ui_amount.unwrap_or(0.0);
                         let formatted_supply = format_abbreviated_number(amount_value);
-
                         rsx! {
                             span {
                                 class: "text-elements-gold text-xl font-semibold",
@@ -651,15 +603,12 @@ fn RewardsData(rewards_data: Signal<Option<Vec<RewardData>>>) -> Element {
         div {
             match rewards_data.read().as_ref() {
                 Some(rewards) if !rewards.is_empty() => {
-                    // Split the rewards into two groups for two columns
-                    let mid_point = (rewards.len() + 1) / 2; // Ceiling division to handle odd numbers
+                    let mid_point = (rewards.len() + 1) / 2;
                     let (left_column, right_column) = rewards.split_at(mid_point);
-
                     rsx! {
                         Row {
                             class: "justify-between",
                             gap: 8,
-                            // Left Column
                             Col {
                                 class: "w-1/2 justify-start",
                                 for reward in left_column {
@@ -677,7 +626,6 @@ fn RewardsData(rewards_data: Signal<Option<Vec<RewardData>>>) -> Element {
                                     }
                                 }
                             }
-                            // Right Column
                             Col {
                                 class: "w-1/2 justify-start",
                                 for reward in right_column {
@@ -698,12 +646,14 @@ fn RewardsData(rewards_data: Signal<Option<Vec<RewardData>>>) -> Element {
                         }
                     }
                 },
-                Some(_) => rsx! {
-
-                },
+                Some(_) => rsx! {},
                 None => rsx! {
-                    div { class: "flex justify-center items-center py-4",
-                        span { class: "text-elements-midEmphasis", "Loading rewards data..." }
+                    div {
+                        class: "flex justify-center items-center py-4",
+                        span {
+                            class: "text-elements-midEmphasis",
+                            "Loading rewards data..."
+                        }
                     }
                 }
             }
@@ -733,8 +683,8 @@ fn Faq() -> Element {
                 FaqItem {
                     question: "Do I pay transaction fees to mine?",
                     answer_with_link: rsx! {
-                        div {
-                            class: "flex flex-wrap items-baseline text-left mt-4",
+                        p {
+                            class: "items-baseline text-left mt-4",
                             span {
                                 class: "text-elements-midEmphasis",
                                 "No, you only pay a small one time transaction fee to register with a "
@@ -742,10 +692,7 @@ fn Faq() -> Element {
                             Link {
                                 new_tab: true,
                                 to: "https://github.com/regolith-labs/ore-pool",
-                                span {
-                                    class: "text-elements-gold hover:underline inline",
-                                    "mining pool."
-                                }
+                                span { class: "text-elements-gold hover:underline inline", "mining pool." }
                             }
                         }
                     }
@@ -755,17 +702,11 @@ fn Faq() -> Element {
                     answer_with_link: rsx! {
                         p {
                             class: "text-elements-midEmphasis mt-4 text-left",
-                            span {
-                                "When mining through the browser, you can only use 1 core. By downloading the ORE "
-                            }
+                            span { "When mining through the browser, you can only use 1 core. By downloading the ORE " }
                             Link {
-                                class: "ml-1",
                                 new_tab: true,
                                 to: "https://beta.ore.supply/download",
-                                span {
-                                    class: "text-elements-gold hover:underline",
-                                    " desktop application"
-                                }
+                                span { class: "text-elements-gold hover:underline", "desktop application" }
                             }
                             ", you can choose how many cores to use, ranging from one to the maximum available on your device."
                         }
@@ -781,16 +722,11 @@ fn Faq() -> Element {
                     answer_with_link: rsx! {
                         p {
                             class: "text-elements-midEmphasis mt-4 text-left",
-                            span {
-                                "ORE employs "
-                            }
+                            span { "ORE employs " }
                             Link {
                                 new_tab: true,
                                 to: "https://beta.ore.supply/download",
-                                span {
-                                    class: "text-elements-gold hover:underline",
-                                    "Drillx"
-                                }
+                                span { class: "text-elements-gold hover:underline", "Drillx" }
                             }
                             ", a CPU-friendly hash function tailored for its mining process, ensuring accessibility for anyone with a standard home computer."
                         }
@@ -814,6 +750,7 @@ fn FaqItem(question: String, answer: Option<String>, answer_with_link: Option<El
     } else {
         "max-h-0 opacity-0"
     };
+
     rsx! {
         button {
             class: "flex flex-col w-full py-4 px-2 sm:px-4 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
@@ -865,15 +802,12 @@ fn BulletPoint(
     rsx! {
         Row {
             class: "items-start pl-2",
-            // Bullet point
             span {
-                class: "text-elements-highEmphasis mr-2 select-none",
+                class: "text-elements-highEmphasis mr-2 select-none text-xl",
                 "•"
             }
-            // Content
             div {
                 class: "flex-1",
-                // Title in white with colon
                 if let Some(title_text) = &title {
                     span {
                         class: "text-lg font-semibold text-elements-highEmphasis",
@@ -883,7 +817,6 @@ fn BulletPoint(
                 if let Some(description_with_link) = description_with_link {
                     {description_with_link}
                 }
-                // Description in gray on the same line
                 if let Some(description) = description {
                     span {
                         class: "text-lg text-elements-midEmphasis",
