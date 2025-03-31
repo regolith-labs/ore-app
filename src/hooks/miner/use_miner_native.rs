@@ -25,7 +25,6 @@ pub fn use_miner_provider() {
                     tokio::sync::mpsc::unbounded_channel::<OutputMessage>();
                 // poll for messages from controller
                 while let Some(msg) = rx.next().await {
-                    log::info!("to worker: {:?}", msg);
                     // spawn miner
                     let sender = sender.clone();
                     tokio::spawn(async move {
@@ -65,7 +64,6 @@ pub fn use_miner_provider() {
                             if difficulty.gt(&best_difficulty) {
                                 from_miner.set(msg.clone());
                                 best_difficulty = difficulty;
-                                log::info!("found new best difficulty: {}", best_difficulty);
                             }
                         }
                         // exit if expired
@@ -136,8 +134,6 @@ async fn find_hash_par(
                             if difficulty.ge(&min_difficulty) {
                                 let diggest = hx.d;
                                 let nonce = nonce.to_le_bytes();
-                                log::info!("/////////////////////////////////////");
-                                log::info!("difficulty: {}", difficulty);
                                 let solution = Solution {
                                     d: diggest,
                                     n: nonce,
@@ -169,8 +165,7 @@ async fn find_hash_par(
                             }
                         }
                     }
-                    // increment nonce
-                    nonce = nonce.saturating_add(1);
+                    nonce = nonce.wrapping_add(1);
                 }
             }
         });
@@ -197,7 +192,6 @@ fn nonce_indices(
     // calculate bounds on nonce space
     let left_bound = member_search_space_size.saturating_mul(member.id as u64)
         + (device_id as u64).saturating_mul(device_search_space_size);
-    log::info!("left bound: {}", left_bound);
     // split nonce-device space for muliple cores
     let range_per_core = device_search_space_size.saturating_div(cores);
     let mut nonce_indices = Vec::with_capacity(cores as usize);
