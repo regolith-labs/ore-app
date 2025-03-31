@@ -179,7 +179,11 @@ fn MobileTab(title: String, route: Route) -> Element {
 
 fn is_navbar_hidden(current_route: &Route) -> bool {
     match current_route {
-        Route::Pay {} => true,
+        Route::Creator {}
+        | Route::Callback {
+            oauth_token: _,
+            oauth_verifier: _,
+        } => true,
         _ => false,
     }
 }

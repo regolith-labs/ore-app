@@ -663,6 +663,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b7e4c2464d97fe331d41de9d5db0def0a96f4d823b8b32a2efd503578988973"
 
 [[package]]
+name = "b64"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7afdd34e1f84d4a66e30add7c0d8c784c2b8b2240dbc7feaccee75682a369f26"
+
+[[package]]
 name = "backtrace"
 version = "0.3.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5586,6 +5592,7 @@ dependencies = [
  "async-retry",
  "async-std",
  "async-trait",
+ "b64",
  "base64 0.22.1",
  "bincode",
  "bs58 0.4.0",
@@ -5746,8 +5753,6 @@ dependencies = [
 [[package]]
 name = "ore-types"
 version = "0.0.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b8dd8fcf9131d00a98328a529de24cb4a2abb90d8c29feebac6c8c99944acef"
 dependencies = [
  "serde",
  "serde_json",

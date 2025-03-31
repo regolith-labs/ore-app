@@ -1,7 +1,9 @@
 use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
-use ore_types::request::TransactionEvent;
-use serde::{Deserialize, Serialize};
+use ore_types::{
+    request::TransactionEvent,
+    response::{AccessTokenResponse, RequestTokenResponse},
+};
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Signature;
 use std::str::FromStr;
@@ -9,7 +11,8 @@ use steel::AccountDeserialize;
 
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
-const ORE_API_URL: &str = "https://api.ore.supply";
+// const ORE_API_URL: &str = "https://api.ore.supply";
+const ORE_API_URL: &str = "http://localhost:3000";
 
 pub trait OreGateway {
     // Accounts
@@ -25,6 +28,11 @@ pub trait OreGateway {
         transaction: TransactionEvent,
     ) -> GatewayResult<Signature>;
     async fn get_twitter_request_token(&self) -> GatewayResult<String>;
+    async fn get_access_token(
+        &self,
+        oauth_token: String,
+        oauth_verifier: String,
+    ) -> GatewayResult<AccessTokenResponse>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -97,7 +105,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
     }
 
     async fn get_twitter_request_token(&self) -> GatewayResult<String> {
-        let get_url = format!("{}/auth/twitter/token", ORE_API_URL);
+        let get_url = format!("{}/auth/twitter/request_token", ORE_API_URL);
         let resp = self
             .http
             .get(get_url)
@@ -109,11 +117,26 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             serde_json::from_str::<RequestTokenResponse>(&body).map_err(GatewayError::from)?;
         Ok(token.oauth_token)
     }
-}
 
-#[derive(Clone, Serialize, Deserialize)]
-struct RequestTokenResponse {
-    oauth_callback_confirmed: String,
-    oauth_token: String,
-    oauth_token_secret: String,
+    async fn get_access_token(
+        &self,
+        oauth_token: String,
+        oauth_verifier: String,
+    ) -> GatewayResult<AccessTokenResponse> {
+        let url = format!("{}/auth/twitter/access_token", ORE_API_URL);
+        let resp = self
+            .http
+            .get(url)
+            .query(&[
+                ("oauth_token", oauth_token),
+                ("oauth_verifier", oauth_verifier),
+            ])
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
+        let body = resp.text().await.map_err(GatewayError::from)?;
+        let access_token =
+            serde_json::from_str::<AccessTokenResponse>(&body).map_err(GatewayError::from)?;
+        Ok(access_token)
+    }
 }

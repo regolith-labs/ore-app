@@ -99,13 +99,6 @@ impl From<TimeoutError> for GatewayError {
     }
 }
 
-impl From<serde_json::Error> for GatewayError {
-    fn from(value: serde_json::Error) -> Self {
-        log::error!("{:?}", value);
-        GatewayError::FailedDeserialization
-    }
-}
-
 #[cfg(feature = "web")]
 impl From<solana_client_wasm::ClientError> for GatewayError {
     fn from(value: solana_client_wasm::ClientError) -> Self {

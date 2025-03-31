@@ -22,6 +22,26 @@ pub fn use_persistent<T: Serialize + DeserializeOwned + Default + 'static>(
     UsePersistent { inner: state }
 }
 
+/// A persistent storage hook that can be used to store data across application reloads.
+#[allow(clippy::needless_return)]
+pub fn use_persistent_override<T: Serialize + DeserializeOwned + Default + 'static>(
+    // A unique key for the storage entry
+    key: impl ToString,
+    // A function that returns the initial value if the storage entry is empty
+    init: impl FnOnce() -> T,
+) -> UsePersistent<T> {
+    // Use the use_signal hook to create a mutable state for the storage entry
+    let state = use_signal(move || {
+        // This closure will run when the hook is created
+        let key = key.to_string();
+        let value = init();
+        StorageEntry { key, value }
+    });
+
+    // Wrap the state in a new struct with a custom API
+    UsePersistent { inner: state }
+}
+
 struct StorageEntry<T> {
     key: String,
     value: T,
