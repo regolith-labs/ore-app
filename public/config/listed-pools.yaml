@@ -4,10 +4,15 @@ pools:
     name: Ec1ipse
     description: ""
     image: https://pbs.twimg.com/profile_images/1736827532312211456/V0bvyS_2_400x400.jpg
+
+  - address: D44JYBNTy2PovNM5wxfYjCUbN7bmnqrPDz3jdUEHtRuL
+    url: https://pool.ore.supply
+    name: ORE Pool
+    description: ""
+    image: "" 
   
   # - address: DrSS5RM7zUd9qjUEdDaf31vnDUSbCrMto6mjqTrHFifN
   #   url: ""
   #   name: Rush
   #   description: ""
   #   image: https://pbs.twimg.com/profile_images/1825694276929368064/GJcGr3rR_400x400.jpg
-  

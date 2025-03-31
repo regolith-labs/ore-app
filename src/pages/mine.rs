@@ -9,7 +9,7 @@ use crate::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
         use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
         use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_wallet, MinerStatus, Wallet,
+        use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -65,9 +65,24 @@ fn StopStartButton() -> Element {
     let mut miner_status = use_miner_status();
     let mut member = use_member();
     let mut member_record = use_member_record();
-    let register_tx = use_pool_register_transaction();
+    let mut register_tx_start = use_signal(|| false);
+    let register_tx = use_pool_register_transaction(register_tx_start);
     let is_active = use_miner_is_active();
 
+    // listen for onchain pool registration
+    use_effect(move || match register_tx.cloned() {
+        // commit claim dependency failed, reset
+        Some(Ok(PoolRegisterStatus::CommitClaimFailed)) => {
+            miner_status.set(MinerStatus::Stopped);
+        }
+        // submit tx
+        Some(Ok(PoolRegisterStatus::Transaction(tx))) => {
+            submit_transaction(tx, TransactionType::PoolJoin);
+        }
+        _ => {}
+    });
+
+    // offchain pool server registration
     let mut register_with_pool_server = use_future(move || async move {
         let Wallet::Connected(authority) = *wallet.read() else {
             return;
@@ -78,10 +93,15 @@ fn StopStartButton() -> Element {
         if miner_status.cloned() != MinerStatus::Registering {
             return;
         }
-        if let Ok(_member_record) = use_gateway().register(authority, pool_url).await {
-            member.restart();
-            member_record.restart();
-            miner_status.set(MinerStatus::FetchingChallenge);
+        match use_gateway().register(authority, pool_url).await {
+            Ok(_member_record) => {
+                member.restart();
+                member_record.restart();
+                miner_status.set(MinerStatus::FetchingChallenge);
+            }
+            Err(err) => {
+                log::error!("Error registering with server: {:?}", err);
+            }
         }
     });
 
@@ -91,7 +111,8 @@ fn StopStartButton() -> Element {
     // this is the happy path,
     // first the onchain registration signature lands
     // and then we submit for registration with the offchain pool server
-    on_transaction_done(move |_sig| {
+    on_transaction_done(move |sig| {
+        log::info!("registration sig: {:?}", sig);
         if miner_status.cloned() == MinerStatus::Registering {
             register_with_pool_server.restart();
         }
@@ -101,7 +122,7 @@ fn StopStartButton() -> Element {
     // this is the recovery path,
     // where the onchain registration landed
     // but the server registration failed or hasn't been submitted yet
-    use_memo(move || {
+    use_effect(move || {
         if miner_status.cloned() == MinerStatus::Registering {
             register_with_pool_server.restart();
         }
@@ -127,9 +148,9 @@ fn StopStartButton() -> Element {
                         } else {
                             miner_status.set(MinerStatus::Registering);
                         }
-                    } else if let Some(Ok(tx)) = register_tx.cloned() {
+                    } else {
+                        register_tx_start.set(true);
                         miner_status.set(MinerStatus::Registering);
-                        submit_transaction(tx, TransactionType::PoolJoin);
                     }
                 }
             },
@@ -294,6 +315,7 @@ fn MinerCores() -> Element {
     }
 }
 
+#[derive(Eq, PartialEq, Clone)]
 pub enum MemberBalance {
     Loading,
     Null,
@@ -303,7 +325,6 @@ pub enum MemberBalance {
 fn MinerRewards() -> Element {
     let member = use_member();
     let member_db_balance = use_member_record_balance();
-    #[derive(Eq, PartialEq, Clone)]
     let member_claimable_balance =
         use_memo(
             move || match (member_db_balance.cloned(), member.cloned()) {

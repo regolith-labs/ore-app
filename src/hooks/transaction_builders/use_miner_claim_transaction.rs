@@ -38,7 +38,7 @@ pub fn use_miner_claim_transaction(
         };
 
         // Get the member balance
-        let member_balance = match member_claimable_balance.read() {
+        let member_balance = match *member_claimable_balance.read() {
             MemberBalance::Balance(balance) => balance,
             _ => return Err(GatewayError::Unknown),
         };

@@ -1,11 +1,13 @@
 use dioxus::prelude::*;
 
+#[cfg(feature = "web")]
 use crate::{
     components::*,
     hooks::{use_ore_holders, use_ore_market_cap},
-    route::Route,
     utils::format_abbreviated_number,
 };
+
+use crate::route::Route;
 
 #[cfg(not(feature = "web"))]
 pub fn Landing() -> Element {
@@ -29,6 +31,7 @@ pub fn Landing() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn Hero() -> Element {
     rsx! {
         Col {
@@ -43,6 +46,7 @@ fn Hero() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn LandingNavbar() -> Element {
     rsx! {
         Row {
@@ -56,6 +60,7 @@ fn LandingNavbar() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn LaunchButton() -> Element {
     rsx! {
         Link {
@@ -69,6 +74,7 @@ fn LaunchButton() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn HeroTitle() -> Element {
     rsx! {
         Col {
@@ -93,6 +99,8 @@ fn HeroTitle() -> Element {
         }
     }
 }
+
+#[cfg(feature = "web")]
 fn Mining() -> Element {
     rsx! {
         Col {
@@ -120,6 +128,7 @@ fn Mining() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn SectionCtas(
     primary_title: String,
@@ -151,6 +160,7 @@ fn SectionCtas(
     }
 }
 
+#[cfg(feature = "web")]
 fn MiningIllustration() -> Element {
     rsx! {
         div {
@@ -167,6 +177,7 @@ fn MiningIllustration() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn HashAnimation() -> Element {
     let mut hash_text = use_signal(|| "".to_string());
     let length = 512;
@@ -213,6 +224,7 @@ fn HashAnimation() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn MiningGuide() -> Element {
     rsx! {
         Col {
@@ -237,6 +249,7 @@ fn MiningGuide() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn GuideStep(step: String, title: String, detail: String) -> Element {
     rsx! {
@@ -268,6 +281,7 @@ fn GuideStep(step: String, title: String, detail: String) -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn Liquidity() -> Element {
     rsx! {
         Col {
@@ -303,6 +317,7 @@ fn Liquidity() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn Community() -> Element {
     rsx! {
         Col {
@@ -317,6 +332,7 @@ fn Community() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 #[derive(Clone, PartialEq)]
 struct TestimonialData {
     image: String,
@@ -325,6 +341,7 @@ struct TestimonialData {
     link: String,
 }
 
+#[cfg(feature = "web")]
 fn Testimonials() -> Element {
     let data = vec![
         TestimonialData {
@@ -422,6 +439,7 @@ fn Testimonials() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn TestimonialList(class: Option<String>, testimonial_data: Vec<TestimonialData>) -> Element {
     let class = class.unwrap_or_default();
@@ -438,6 +456,7 @@ fn TestimonialList(class: Option<String>, testimonial_data: Vec<TestimonialData>
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>) -> Element {
     let class = class.unwrap_or_default();
@@ -472,6 +491,7 @@ fn TestimonialWall(class: Option<String>, testimonial_data: Vec<TestimonialData>
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn Testimonial(class: Option<String>, data: TestimonialData) -> Element {
     let class = class.unwrap_or_default();
@@ -502,6 +522,7 @@ fn Testimonial(class: Option<String>, data: TestimonialData) -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn Stats() -> Element {
     // TODO
     let holders = use_ore_holders();
@@ -560,6 +581,7 @@ fn Stats() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 fn Faq() -> Element {
     rsx! {
         Col {
@@ -598,6 +620,7 @@ fn Faq() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn FaqItem(question: String, answer: String) -> Element {
     let mut is_open = use_signal(|| false);
@@ -634,12 +657,14 @@ fn FaqItem(question: String, answer: String) -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 #[derive(Clone, PartialEq)]
 enum Align {
     Left,
     Center,
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn SectionCopy(
     class: Option<String>,
@@ -685,6 +710,7 @@ fn SectionCopy(
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn SectionCopyResponsive(tip: Option<String>, title: String, subtitle: Option<String>) -> Element {
     rsx! {
@@ -704,6 +730,7 @@ fn SectionCopyResponsive(tip: Option<String>, title: String, subtitle: Option<St
     }
 }
 
+#[cfg(feature = "web")]
 fn Footer() -> Element {
     rsx! {
         Col {
