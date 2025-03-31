@@ -23,10 +23,7 @@ pub fn ClaimButton(
                     submit_transaction(transaction, tx_type.clone());
                 }
             },
-            span {
-                class: "mx-auto my-auto font-semibold",
-                "Claim"
-            }
+            span { class: "mx-auto my-auto font-semibold", "Claim" }
         }
     }
 }

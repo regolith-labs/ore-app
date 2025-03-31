@@ -1,15 +1,16 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
+use solana_sdk::transaction::Transaction;
 
 use crate::{
     components::*,
-    gateway::pool::PoolGateway,
+    gateway::{pool::PoolGateway, GatewayResult},
     hooks::{
         on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
         use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
         use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
+        use_transaction_status, use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -112,8 +113,8 @@ fn StopStartButton() -> Element {
     // first the onchain registration signature lands
     // and then we submit for registration with the offchain pool server
     on_transaction_done(move |sig| {
-        log::info!("registration sig: {:?}", sig);
         if miner_status.cloned() == MinerStatus::Registering {
+            log::info!("registration sig: {:?}", sig);
             register_with_pool_server.restart();
         }
     });
@@ -323,15 +324,18 @@ pub enum MemberBalance {
 }
 
 fn MinerRewards() -> Element {
-    let member = use_member();
-    let member_db_balance = use_member_record_balance();
+    let mut member = use_member();
+    let member_db = use_member_record();
+    let mut member_db_balance = use_member_record_balance();
+    // claimable balance
     let member_claimable_balance =
         use_memo(
             move || match (member_db_balance.cloned(), member.cloned()) {
                 (Some(member_db_balance), Some(member)) => {
                     if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member) {
                         let diff = member_db_balance - member.total_balance;
-                        MemberBalance::Balance(diff)
+                        let claimable_balance = member.balance + diff;
+                        MemberBalance::Balance(claimable_balance)
                     } else {
                         MemberBalance::Null
                     }
@@ -339,8 +343,18 @@ fn MinerRewards() -> Element {
                 _ => MemberBalance::Loading,
             },
         );
-    let claim_tx = use_miner_claim_transaction(member, member_claimable_balance);
+    // claim transaction builder
+    let claim_tx = use_miner_claim_transaction(member, member_db, member_claimable_balance);
     let mut info_hidden = use_signal(|| true);
+    // on claim success restart balance
+    // TODO: wss
+    on_transaction_done(move |_| {
+        spawn(async move {
+            crate::time::sleep(1000).await;
+            member.restart();
+            member_db_balance.restart();
+        });
+    });
     rsx! {
         Col { gap: 4,
             button {
@@ -378,7 +392,68 @@ fn MinerRewards() -> Element {
                     }
                 }
             }
-            ClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
+            MinerRewardsClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
+        }
+    }
+}
+
+#[component]
+pub fn MinerRewardsClaimButton(
+    transaction: Resource<GatewayResult<Transaction>>,
+    tx_type: TransactionType,
+) -> Element {
+    let pool_url = use_pool_url();
+    let mut member = use_member();
+    let mut transaction_status = use_transaction_status();
+
+    let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
+        true
+    } else {
+        false
+    };
+
+    rsx! {
+        button {
+            class: "h-12 w-full rounded-full controls-gold",
+            disabled: !enabled,
+            onclick: move |_| {
+                spawn(async move {
+                    if let (Some(pool_url), Some(Ok(member)), Some(Ok(tx))) = (
+                        pool_url.cloned(),
+                        member.cloned(),
+                        transaction.cloned(),
+                    ) {
+                        transaction_status.set(Some(TransactionStatus::Waiting));
+                        let sign_partial = sign_transaction_partial(tx).await;
+                        match sign_partial {
+                            Ok((tx, hash)) => {
+                                transaction_status.set(Some(TransactionStatus::Sending(0)));
+                                let gateway = use_gateway();
+                                match gateway
+                                    .commit_claim(member.authority, pool_url, tx, hash)
+                                    .await
+                                {
+                                    Ok(balance_update) => {
+                                        transaction_status
+                                            .set(
+                                                Some(TransactionStatus::Done(balance_update.signature)),
+                                            );
+                                    }
+                                    Err(err) => {
+                                        transaction_status.set(Some(TransactionStatus::Error));
+                                        log::error!("{:?}", err);
+                                    }
+                                }
+                            }
+                            Err(err) => {
+                                transaction_status.set(Some(TransactionStatus::Error));
+                                log::error!("{:?}", err);
+                            }
+                        }
+                    }
+                });
+            },
+            span { class: "mx-auto my-auto font-semibold", "Claim" }
         }
     }
 }

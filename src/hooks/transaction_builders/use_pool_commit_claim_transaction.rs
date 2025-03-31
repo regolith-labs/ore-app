@@ -68,6 +68,44 @@ pub fn use_pool_commit_claim_transaction_submit(
     status
 }
 
+#[cfg(not(feature = "web"))]
+pub async fn build_commit_claim_instructions<R: Rpc>(
+    gateway: &R,
+    pool: &Pool,
+    member: &ore_pool_api::state::Member,
+    member_record: &ore_pool_types::Member,
+) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
+    use solana_sdk::compute_budget::ComputeBudgetInstruction;
+    let mut instructions = Vec::with_capacity(4);
+    // compute budget
+    instructions.push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
+    instructions.push(ComputeBudgetInstruction::set_compute_unit_price(20_000));
+    // add core instructions
+    let mut core_instructions =
+        build_core_commit_claim_instructions(gateway, pool, member, member_record).await?;
+    instructions.append(&mut core_instructions);
+    Ok(instructions)
+}
+
+#[cfg(feature = "web")]
+pub async fn build_commit_claim_instructions<R: Rpc>(
+    gateway: &R,
+    pool: &Pool,
+    member: &ore_pool_api::state::Member,
+    member_record: &ore_pool_types::Member,
+) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
+    // For web, we just use the core instructions directly
+    build_core_commit_claim_instructions(gateway, pool, member, member_record).await
+}
+
+#[derive(Copy, Clone)]
+pub enum CommitClaimStatus {
+    Init,
+    Done,
+    Skip,
+    CaughtError,
+}
+
 async fn build_core_commit_claim_instructions<R: Rpc>(
     gateway: &R,
     pool: &Pool,
@@ -113,42 +151,4 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
     instructions.push(claim_ix);
 
     Ok(instructions)
-}
-
-#[cfg(not(feature = "web"))]
-async fn build_commit_claim_instructions<R: Rpc>(
-    gateway: &R,
-    pool: &Pool,
-    member: &ore_pool_api::state::Member,
-    member_record: &ore_pool_types::Member,
-) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
-    use solana_sdk::compute_budget::ComputeBudgetInstruction;
-    let mut instructions = Vec::with_capacity(4);
-    // compute budget
-    instructions.push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
-    instructions.push(ComputeBudgetInstruction::set_compute_unit_price(20_000));
-    // add core instructions
-    let mut core_instructions =
-        build_core_commit_claim_instructions(gateway, pool, member, member_record).await?;
-    instructions.append(&mut core_instructions);
-    Ok(instructions)
-}
-
-#[cfg(feature = "web")]
-async fn build_commit_claim_instructions<R: Rpc>(
-    gateway: &R,
-    pool: &Pool,
-    member: &ore_pool_api::state::Member,
-    member_record: &ore_pool_types::Member,
-) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
-    // For web, we just use the core instructions directly
-    build_core_commit_claim_instructions(gateway, pool, member, member_record).await
-}
-
-#[derive(Copy, Clone)]
-pub enum CommitClaimStatus {
-    Init,
-    Done,
-    Skip,
-    CaughtError,
 }
