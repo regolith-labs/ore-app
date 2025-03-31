@@ -30,6 +30,10 @@ pub enum Route {
     #[layout(AppModalLayout)]
         #[route("/topup/:address")]
         Topup { address: String },
+        #[route("/social")]
+        Social {},
+        #[route("/oauth/callback")]
+        Callback { oauth_token: String, oauth_verifier: String },
     #[end_layout]
 
     #[layout(LandingLayout)]

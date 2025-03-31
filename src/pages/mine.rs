@@ -100,6 +100,7 @@ fn StopStartButton() -> Element {
             register_with_pool_server.restart();
         }
     });
+
     // submit pool server registration
     //
     // this is the recovery path,

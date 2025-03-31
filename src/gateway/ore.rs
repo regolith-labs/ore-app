@@ -1,6 +1,7 @@
 use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionEvent;
+use serde::{Deserialize, Serialize};
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Signature;
 use std::str::FromStr;
@@ -23,6 +24,7 @@ pub trait OreGateway {
         &self,
         transaction: TransactionEvent,
     ) -> GatewayResult<Signature>;
+    async fn get_twitter_request_token(&self) -> GatewayResult<String>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -93,4 +95,25 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
         Ok(sig)
     }
+
+    async fn get_twitter_request_token(&self) -> GatewayResult<String> {
+        let get_url = format!("{}/auth/twitter/token", ORE_API_URL);
+        let resp = self
+            .http
+            .get(get_url)
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
+        let body = resp.text().await.map_err(GatewayError::from)?;
+        let token =
+            serde_json::from_str::<RequestTokenResponse>(&body).map_err(GatewayError::from)?;
+        Ok(token.oauth_token)
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+struct RequestTokenResponse {
+    oauth_callback_confirmed: String,
+    oauth_token: String,
+    oauth_token_secret: String,
 }
