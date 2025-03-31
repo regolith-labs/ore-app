@@ -294,15 +294,16 @@ fn MinerCores() -> Element {
     }
 }
 
+pub enum MemberBalance {
+    Loading,
+    Null,
+    Balance(u64),
+}
+
 fn MinerRewards() -> Element {
     let member = use_member();
     let member_db_balance = use_member_record_balance();
     #[derive(Eq, PartialEq, Clone)]
-    enum MemberBalance {
-        Loading,
-        Null,
-        Balance(u64),
-    };
     let member_claimable_balance =
         use_memo(
             move || match (member_db_balance.cloned(), member.cloned()) {
@@ -317,7 +318,7 @@ fn MinerRewards() -> Element {
                 _ => MemberBalance::Loading,
             },
         );
-    let claim_tx = use_miner_claim_transaction(member);
+    let claim_tx = use_miner_claim_transaction(member, member_claimable_balance);
     let mut info_hidden = use_signal(|| true);
     rsx! {
         Col { gap: 4,

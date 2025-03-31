@@ -1,4 +1,4 @@
-use crate::gateway::Rpc;
+use crate::{gateway::Rpc, pages::MemberBalance};
 use dioxus::prelude::*;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
@@ -18,6 +18,7 @@ use crate::{
 
 pub fn use_miner_claim_transaction(
     member_on_chain: Resource<GatewayResult<ore_pool_api::state::Member>>,
+    member_claimable_balance: Memo<MemberBalance>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -36,8 +37,14 @@ pub fn use_miner_claim_transaction(
             None => return Err(GatewayError::Unknown), // Handle the None case
         };
 
+        // Get the member balance
+        let member_balance = match member_claimable_balance.read() {
+            MemberBalance::Balance(balance) => balance,
+            _ => return Err(GatewayError::Unknown),
+        };
+
         // Check if miner has no balance to claim
-        if member_data.balance <= 0 {
+        if member_balance <= 0 {
             return Err(GatewayError::Unknown);
         }
 
@@ -71,7 +78,10 @@ pub fn use_miner_claim_transaction(
         // Use the ata_address directly since it should now exist
         let beneficiary = ata_address;
 
-        // Add claim transaction
+        // Add the commit (attribute) instruction
+        // TODO:
+
+        // Add claim instruction
         ixs.push(ore_pool_api::sdk::claim(
             authority,
             beneficiary,
