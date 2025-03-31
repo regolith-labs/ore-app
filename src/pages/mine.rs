@@ -321,10 +321,6 @@ fn MinerRewards() -> Element {
     let mut info_hidden = use_signal(|| true);
     rsx! {
         Col { gap: 4,
-            // span {
-            //     class: "text-elements-lowEmphasis font-medium",
-            //     "Rewards"
-            // }
             button {
                 class: "flex flex-col gap-0 group",
                 onclick: move |_| info_hidden.set(!info_hidden.cloned()),
