@@ -4,6 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+mime_guess = "2.0.5"
 tokio = { version = "1", features = ["full"] }
 warp = "0.3"
 
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"

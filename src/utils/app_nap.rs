@@ -1,13 +1,19 @@
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 use cocoa::base::nil;
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 use cocoa::foundation::NSString;
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 use objc::runtime::Object;
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 use objc::{class, msg_send, sel, sel_impl};
 
 /// A struct that disables App Nap while it is alive.
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 pub struct AppNapDisabler {
     token: *mut Object,
 }
 
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 impl AppNapDisabler {
     /// Call this to disable App Nap. Keep the instance alive as long
     /// as you need to remain active.

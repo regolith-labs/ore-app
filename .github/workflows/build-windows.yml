@@ -1,0 +1,104 @@
+name: Build and Release (Windows)
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    env:
+      # Build constants
+      TARGET: windows
+      ARCH: x64
+      VERSION: ${{ github.ref_name }}
+
+      # Where dioxus-cli places the .exe
+      APP_DIR: ${{ github.workspace }}\dist
+
+      # AWS publish constants
+      AWS_REGION: us-east-1
+      S3_BUCKET_NAME: ore-app-xyz
+
+    steps:
+      # 1) Check out code
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # 2) Cache Cargo registry
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      # 3) Cache target directory
+      - name: Cache target directory
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-
+
+      # 4) Install Rust (stable)
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          profile: minimal
+          override: true
+
+      # 5) Install CLI tools (dioxus, cargo-packager)
+      - name: Install dioxus-cli and cargo-packager
+        run: |
+          cargo install cargo-packager@0.11.3 dioxus-cli@0.6.3
+
+      # 6) Build & Package
+      - name: Build and Package
+        run: |
+          dx bundle --platform desktop --package-types nsis --release
+
+      # 7) Configure AWS credentials (for final uploads)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 8) Sign and Upload installer
+      - name: Sign and Upload installer
+        env:
+          CARGO_PACKAGER_SIGN_PRIVATE_KEY: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY }}
+          CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD: ${{ secrets.CARGO_PACKAGER_SIGN_PRIVATE_KEY_PASSWORD }}
+        run: |
+          $INSTALLER_FILE = "OreApp_${{ env.VERSION }}_${{ env.ARCH }}-setup.exe"
+          $INSTALLER_PATH = "${{ env.APP_DIR }}\$INSTALLER_FILE"
+          
+          # Sign the installer for your self-updater
+          cargo packager signer sign "$INSTALLER_PATH"
+          
+          # --- Upload to VERSIONED path ---
+          aws s3 cp "$INSTALLER_PATH" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/x86_64/${{ env.VERSION }}/ore_${{ env.VERSION }}_${{ env.ARCH }}.exe"
+          aws s3 cp "$INSTALLER_PATH.sig" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/x86_64/${{ env.VERSION }}/ore_${{ env.VERSION }}_${{ env.ARCH }}.exe.sig"
+          
+          # --- ALSO publish to "latest" path ---
+          aws s3 cp "$INSTALLER_PATH" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/x86_64/latest/ore_latest_${{ env.ARCH }}.exe"
+          aws s3 cp "$INSTALLER_PATH.sig" "s3://${{ env.S3_BUCKET_NAME }}/${{ env.TARGET }}/x86_64/latest/ore_latest_${{ env.ARCH }}.exe.sig"
+
+      # 9) Print download links
+      - name: Print Download Links
+        run: |
+          Write-Host "Download Windows installer at:"
+          Write-Host "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/x86_64/${{ env.VERSION }}/ore_${{ env.VERSION }}_${{ env.ARCH }}.exe"
+          
+          Write-Host "Download Windows installer signature at:"
+          Write-Host "https://${{ env.S3_BUCKET_NAME }}.s3.amazonaws.com/${{ env.TARGET }}/x86_64/${{ env.VERSION }}/ore_${{ env.VERSION }}_${{ env.ARCH }}.exe.sig"
+

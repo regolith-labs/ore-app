@@ -3,7 +3,12 @@ pub fn init() {
     wasm_logger::init(wasm_logger::Config::default());
 }
 
-#[cfg(not(feature = "web"))]
+#[cfg(all(feature = "desktop", target_os = "windows"))]
+pub fn init() {
+    env_logger::init();
+}
+
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 pub fn init() {
     // one or the other
     //
@@ -18,7 +23,7 @@ pub fn init() {
 // use for debugging production apps with no dev server.
 //
 // cat ~/Library/Caches/ore.supply.ore-app/logs/ore.log
-#[cfg(not(feature = "web"))]
+#[cfg(all(feature = "desktop", target_os = "macos"))]
 fn init_macos() {
     use directories::ProjectDirs;
     use fern::Dispatch;

@@ -15,7 +15,7 @@ use crate::{
         use_lp_deposit_transaction, use_stake_wss, use_token_balance,
         use_token_balances_for_liquidity_pair,
     },
-    pages::{Multiplier, StakeYield, TotalStakers},
+    pages::{StakeYield, TakeRate, TotalStakers},
     utils::LiquidityPair,
 };
 
@@ -203,11 +203,11 @@ fn BoostMetrics(
             Apr {
                 boost_meta: boost_meta.clone(),
             }
-            Multiplier {
-                boost,
-            }
             Protocol {
                 boost_meta,
+            }
+            TakeRate {
+                boost,
             }
             TotalDeposits {
                 liquidity_pair,

@@ -1,3 +1,5 @@
+// Prevents additional console window on Windows in release
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![allow(non_snake_case)]
 mod components;
 mod config;
@@ -22,7 +24,8 @@ use crate::{
     hooks::{
         use_cache_provider, use_miner_cores_provider, use_miner_events_provider,
         use_miner_provider, use_miner_status_provider, use_mining_loop,
-        use_transaction_status_provider, use_wallet_drawer_state_provider, use_wallet_provider, use_wss_provider,
+        use_transaction_status_provider, use_wallet_drawer_state_provider, use_wallet_provider,
+        use_wss_provider,
     },
     route::Route,
 };
