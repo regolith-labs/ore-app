@@ -2,13 +2,8 @@ use crate::components::{Col, PlusIcon, Row};
 use crate::config::Token;
 use crate::gateway::{ore::OreGateway, ore::RewardData, Rpc, UiTokenAmount};
 use crate::hooks::{use_gateway, HelpDrawerPage, HelpDrawerState};
+use crate::utils::format_abbreviated_number;
 use dioxus::prelude::*;
-
-#[derive(Clone, PartialEq)]
-enum Align {
-    Left,
-    Center,
-}
 
 #[derive(Clone, Copy, PartialEq)]
 pub(crate) enum MineHelpTabs {
@@ -173,43 +168,6 @@ fn MiningContent() -> Element {
     }
 }
 
-#[component]
-fn MiningGuideContent() -> Element {
-    rsx! {
-        Col {
-            class: "w-full px-8 py-8",
-            gap: 4,
-            div {
-                class: "mb-4",
-                h3 {
-                    class: "text-xl font-semibold mb-2",
-                    "What is mining?"
-                }
-                p {
-                    class: "text-elements-lowEmphasis",
-                    "Mining is the process by which energy can be converted into cryptocurrency. It works by having a computer perform a large calculation that irreversibly turns electric power into a mathematical solution and heat. The generated solution serves as an unforgeable proof that the computation was performed correctly and without error. Another computer program can then verify this proof and use it to securely mint a token rewarding its creator for their work. For this reason, this process is also often referred to as proof-of-work. "
-                }
-            }
-            div {
-                class: "mb-4",
-                img {
-                    class: "relative w-full h-full pb-8 pt-8 object-contain z-10 rounded-lg",
-                    src: asset!("/public/ore-emissions-curve.png")
-                }
-                h4 {
-                    class: "text-lg font-semibold mb-2",
-                    "How to Mine"
-                }
-                p {
-                    class: "text-elements-lowEmphasis",
-                    "Click the Start button to begin mining. You can adjust the number of CPU cores to allocate for mining."
-                }
-            }
-            Faq {}
-        }
-    }
-}
-
 // Mining FAQ content component
 #[component]
 fn MiningFAQContent() -> Element {
@@ -300,9 +258,14 @@ fn SupplyContent() -> Element {
         LabelText {
             text: "ORE Emission Curve"
         }
+        BodyText {
+            text: "The ORE emission curve is a function that determines the rate at which ORE is emitted into the network."
+        }
             img {
                 class: "relative w-full h-full object-contain z-10 rounded-lg",
-                src: asset!("/public/ore-emissions-curve.png")
+                src: asset!("/public/ore-emissions-curve.webp"),
+                loading: "eager",
+                decoding: "sync",
             }
         }
     }
@@ -338,6 +301,25 @@ fn SupplyCurveBullets() -> Element {
 #[component]
 fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
     let mut current_tab = use_signal(|| StakeHelpTabs::Boosts);
+    let mut rewards_data: Signal<Option<Vec<RewardData>>> = use_signal(|| None);
+    let mut total_supply: Signal<Option<UiTokenAmount>> = use_signal(|| None);
+
+    // Prefetch rewards data and total supply when the component mounts
+    use_effect(move || {
+        spawn(async move {
+            // Fetch rewards data
+            if let Ok(data) = use_gateway().get_rewards_data().await {
+                rewards_data.set(Some(data));
+            } else {
+                log::error!("Failed to fetch rewards data");
+            }
+
+            // Fetch total supply
+            if let Ok(data) = use_gateway().rpc.get_token_supply(&Token::ore().mint).await {
+                total_supply.set(Some(data));
+            }
+        });
+    });
 
     rsx! {
         Fragment {
@@ -396,7 +378,10 @@ fn StakeHelpContent(on_close: EventHandler<MouseEvent>) -> Element {
                 style: "padding-bottom: 1rem;",
                 match *current_tab.read() {
                     StakeHelpTabs::Boosts => rsx! { BoostsContent {} },
-                    StakeHelpTabs::Yield => rsx! { YieldContent {} },
+                    StakeHelpTabs::Yield => rsx! { YieldContent {
+                        rewards_data: rewards_data.clone(),
+                        total_supply: total_supply.clone()
+                    } },
                 }
             }
         }
@@ -416,16 +401,11 @@ fn BoostsContent() -> Element {
     }
 }
 
-fn YieldContent() -> Element {
-    let mut total_supply: Signal<Option<UiTokenAmount>> = use_signal(|| None);
-    use_effect(move || {
-        spawn(async move {
-            if let Ok(data) = use_gateway().rpc.get_token_supply(&Token::ore().mint).await {
-                total_supply.set(Some(data));
-            }
-        });
-    });
-
+#[component]
+fn YieldContent(
+    rewards_data: Signal<Option<Vec<RewardData>>>,
+    total_supply: Signal<Option<UiTokenAmount>>,
+) -> Element {
     rsx! {
         ContentSection {
             TokenSupply {
@@ -438,21 +418,25 @@ fn YieldContent() -> Element {
             LabelText {
                 text: "Liquidity Incentives"
             }
-            // TODDO: add subtitle for staking yields
-            // ChartText {
-            //     text: "Liquidity Incentives"
-            // }
+            BodyText {
+                text: "Liquidity providers stake eligible LP tokens with the ORE boost protocol."
+            }
             Col {
                 img {
                     class: "relative w-full h-full object-contain z-10 rounded-lg",
-                    src: asset!("/public/liquidity-incentives.png")
+                    src: asset!("/public/liquidity-incentives.webp"),
+                    loading: "eager",
+                    decoding: "sync",
                 }
             }
             // TODO: ADDD SUBTEXTT TO CHARTS
             LabelText {
                 text: "Rewards Rates"
             }
-            RewardsData {}
+            BodyText {
+                text: "The reward rates are determined by the difficulty level achieved when a miner submits a hash. More hashpower increases the probability of landing a higher difficulty."
+            }
+            RewardsData { rewards_data: rewards_data.clone() }
         }
     }
 }
@@ -535,7 +519,7 @@ fn StakeFaq() -> Element {
                         p {
                             class: "text-elements-midEmphasis mt-4 text-left",
                             span {
-                                "When mining through the browser, you can only use 1 core. By downloading the ORE"
+                                "When mining through the browser, you can only use 1 core. By downloading the ORE "
                             }
                             Link {
                                 new_tab: true,
@@ -626,30 +610,34 @@ fn SuggestionText() -> Element {
 
 #[component]
 fn TokenSupply(total_supply: Signal<Option<UiTokenAmount>>) -> Element {
-    let mut token_supply: Signal<Option<UiTokenAmount>> = use_signal(|| None);
-
-    use_effect(move || {
-        spawn(async move {
-            if let Ok(data) = use_gateway().rpc.get_token_supply(&Token::ore().mint).await {
-                token_supply.set(Some(data));
-            }
-        });
-    });
-
     rsx! {
-        if let Some(supply) = token_supply.read().as_ref() {
-            Row {
-                class: "items-center pb-8",
-                gap: 2,
-                span {
-                    class: "text-xl font-semibold text-elements-highEmphasis",
-                    "Current Supply:"
-                }
-                Col {
-                    class: "items-end justify-end",
-                    span {
-                        class: "text-elements-gold text-xl font-semibold",
-                        "{supply.ui_amount_string}"
+        Row {
+            class: "items-center pb-8",
+            gap: 2,
+            span {
+                class: "text-xl font-semibold text-elements-highEmphasis",
+                "Current Supply:"
+            }
+            Col {
+                class: "items-end justify-end",
+                match total_supply.read().as_ref() {
+                    Some(supply) => {
+                        // Use the ui_amount directly, defaulting to 0.0 if None
+                        let amount_value = supply.ui_amount.unwrap_or(0.0);
+                        let formatted_supply = format_abbreviated_number(amount_value);
+
+                        rsx! {
+                            span {
+                                class: "text-elements-gold text-xl font-semibold",
+                                "{formatted_supply}"
+                            }
+                        }
+                    },
+                    None => rsx! {
+                        span {
+                            class: "w-16 h-8 rounded my-auto loading",
+                            ""
+                        }
                     }
                 }
             }
@@ -657,19 +645,8 @@ fn TokenSupply(total_supply: Signal<Option<UiTokenAmount>>) -> Element {
     }
 }
 
-fn RewardsData() -> Element {
-    let mut rewards_data: Signal<Option<Vec<RewardData>>> = use_signal(|| Some(Vec::new()));
-
-    use_effect(move || {
-        spawn(async move {
-            if let Ok(data) = use_gateway().get_rewards_data().await {
-                rewards_data.set(Some(data));
-            } else {
-                log::error!("Failed to fetch rewards data");
-            }
-        });
-    });
-
+#[component]
+fn RewardsData(rewards_data: Signal<Option<Vec<RewardData>>>) -> Element {
     rsx! {
         div {
             match rewards_data.read().as_ref() {
@@ -721,8 +698,13 @@ fn RewardsData() -> Element {
                         }
                     }
                 },
-                _ => rsx! {
-                    div { "No rewards data available" }
+                Some(_) => rsx! {
+
+                },
+                None => rsx! {
+                    div { class: "flex justify-center items-center py-4",
+                        span { class: "text-elements-midEmphasis", "Loading rewards data..." }
+                    }
                 }
             }
         }
@@ -796,7 +778,6 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "What hash function does ORE use?",
-                    // answer: "ORE employs Drillx, a CPU-friendly hash function tailored for its mining process, ensuring accessibility for anyone with a standard home computer.",
                     answer_with_link: rsx! {
                         p {
                             class: "text-elements-midEmphasis mt-4 text-left",
@@ -858,51 +839,6 @@ fn FaqItem(question: String, answer: Option<String>, answer_with_link: Option<El
                 div {
                     class: "overflow-hidden transition-all duration-300 ease-in-out {answer_class}",
                     {answer_with_link}
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn SectionCopy(
-    class: Option<String>,
-    align: Option<Align>,
-    tip: Option<String>,
-    title: String,
-    subtitle: Option<String>,
-    detail: Option<String>,
-) -> Element {
-    let class = class.unwrap_or_default();
-    let (text_align, text_margin) = match align.unwrap_or(Align::Center) {
-        Align::Left => ("text-left", "mr-auto"),
-        Align::Center => ("text-center", "mx-auto"),
-    };
-    rsx! {
-        Col {
-            class: "py-8 font-wide font-bold text-4xl md:text-5xl lg:text-6xl text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black px-4 {class} {text_align}",
-            gap: 2,
-            if let Some(tip) = tip {
-                span {
-                    // class: "z-30 text-elements-gold rounded-full w-min text-sm font-semibold mb-4 text-nowrap {text_margin}",
-                    class: "z-30 border-2 border-elements-gold text-elements-gold rounded-full w-min px-3 py-1 text-xs font-semibold mb-4 text-nowrap {text_margin}",
-                    "{tip}"
-                }
-            }
-            span {
-                class: "z-30",
-                "{title}"
-            }
-            if let Some(subtitle) = subtitle {
-                span {
-                    class: "z-20 text-elements-lowEmphasis",
-                    "{subtitle}"
-                }
-            }
-            if let Some(detail) = detail {
-                span {
-                    class: "md:mb-auto mt-4 z-10 text-elements-midEmphasis font-wide font-medium text-lg sm:text-xl md:text-2xl {text_margin}",
-                    "{detail}"
                 }
             }
         }

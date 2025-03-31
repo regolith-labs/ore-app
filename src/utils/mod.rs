@@ -2,7 +2,7 @@
 // mod file;
 #[cfg(all(feature = "desktop", target_os = "macos"))]
 mod app_nap;
-mod format;
+pub mod format;
 mod liquidity_pair;
 #[cfg(feature = "web")]
 mod metrics;
