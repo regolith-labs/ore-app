@@ -746,6 +746,9 @@
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
   }
+  .mr-4 {
+    margin-right: calc(var(--spacing) * 4);
+  }
   .mr-auto {
     margin-right: auto;
   }
@@ -1493,9 +1496,6 @@
   }
   .text-elements-midEmphasis\/50 {
     color: color-mix(in oklab, var(--color-elements-midEmphasis) 50%, transparent);
-  }
-  .text-gray-500 {
-    color: var(--color-gray-500);
   }
   .text-gray-700 {
     color: var(--color-gray-700);
