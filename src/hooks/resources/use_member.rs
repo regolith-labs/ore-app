@@ -24,9 +24,7 @@ fn use_member_resource() -> Resource<GatewayResult<Member>> {
         let Some(pool) = pool.cloned() else {
             return Err(GatewayError::AccountNotFound);
         };
-        log::info!("pool pda: {:?}", pool.address);
         let member_pda = ore_pool_api::state::member_pda(pubkey, pool.address);
-        log::info!("member pda: {:?}", member_pda);
         use_gateway().get_member(member_pda.0).await
     })
 }

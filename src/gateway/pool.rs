@@ -200,13 +200,9 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
                 return Err(GatewayError::from(err));
             }
         };
-        log::info!("balance update resp: {:?}", resp);
         let resp_text = resp.text().await.unwrap_or_default();
         let balance_update = match serde_json::from_str::<BalanceUpdate>(&resp_text) {
-            Ok(update) => {
-                log::info!("Successfully received balance update");
-                update
-            }
+            Ok(update) => update,
             Err(err) => {
                 log::error!("Error deserializing response as BalanceUpdate: {:?}", err);
                 let error_text = format!("Server response: {}", resp_text);
@@ -227,7 +223,6 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
                 return Err(GatewayError::from(err));
             }
         };
-        log::info!("resp: {:?}", resp);
         let member_record = match resp.text().await {
             Ok(text) => match serde_json::from_str::<serde_json::Value>(&text) {
                 Ok(value) => match serde_json::from_value::<MemberRecord>(value) {

@@ -41,15 +41,12 @@ pub fn use_pool_commit_claim_transaction_submit(
                             instructions.as_slice(),
                             Some(&member.authority),
                         );
-                        log::info!("signing partial");
                         // partial sign transaction
                         let (signed, hash) = sign_transaction_partial(transaction).await?;
-                        log::info!("posting to server");
                         // post transaction to pool server
                         let update_balance = gateway
                             .commit_claim(member.authority, pool.url, signed, hash)
                             .await?;
-                        log::info!("update balance: {:?}", update_balance);
                         transaction_status
                             .set(Some(TransactionStatus::Done(update_balance.signature)));
                         status.set(CommitClaimStatus::Done);
@@ -99,7 +96,6 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
     // 1) check that beneficiary token account exists o.w. create
     let claim_ata_data = gateway.get_account_data(&claim_ata).await;
     if let Err(_err) = claim_ata_data {
-        log::info!("benef ata missing");
         let create_ata = spl_associated_token_account::instruction::create_associated_token_account(
             &member.authority,
             &member.authority,
