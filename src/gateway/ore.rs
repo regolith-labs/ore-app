@@ -1,3 +1,6 @@
+use crate::solana::spl_token::amount_to_ui_amount;
+use ore_api::consts::{CONFIG_ADDRESS, TOKEN_DECIMALS};
+use ore_api::state::Config;
 use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionEvent;
@@ -9,6 +12,12 @@ use steel::AccountDeserialize;
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
 const ORE_API_URL: &str = "https://api.ore.supply";
+
+#[derive(Debug, Clone)]
+pub struct RewardData {
+    pub key: String,
+    pub value: String,
+}
 
 pub trait OreGateway {
     // Accounts
@@ -23,6 +32,8 @@ pub trait OreGateway {
         &self,
         transaction: TransactionEvent,
     ) -> GatewayResult<Signature>;
+    async fn get_rewards_data(&self) -> GatewayResult<Vec<RewardData>>;
+    async fn get_config(&self) -> GatewayResult<Config>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -92,5 +103,37 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         let body = resp.text().await.map_err(GatewayError::from)?;
         let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
         Ok(sig)
+    }
+
+    async fn get_rewards_data(&self) -> GatewayResult<Vec<RewardData>> {
+        let mut data = Vec::new();
+        let config = self.get_config().await?;
+        for i in 0..32 {
+            let reward_rate = config
+                .base_reward_rate
+                .saturating_mul(2u64.saturating_pow(i));
+            let amount = amount_to_ui_amount(reward_rate, TOKEN_DECIMALS).min(1.0);
+            data.push(RewardData {
+                key: format!(
+                    "{}{}",
+                    config.min_difficulty as u32 + i,
+                    if amount >= 1.0 { "+" } else { "" }
+                ),
+                value: format!("{:#.11} ORE", amount),
+            });
+            if amount >= 1.0 {
+                break;
+            }
+        }
+        Ok(data)
+    }
+
+    async fn get_config(&self) -> GatewayResult<Config> {
+        let data = self
+            .rpc
+            .get_account_data(&CONFIG_ADDRESS)
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(*Config::try_from_bytes(&data)?)
     }
 }

@@ -1,6 +1,11 @@
 use crate::components::{Col, PlusIcon, Row};
-use crate::hooks::{HelpDrawerPage, HelpDrawerState};
+use crate::config::Token;
+use crate::gateway::{
+    ore::OreGateway, ore::RewardData, GatewayError, GatewayResult, Rpc, UiTokenAmount,
+};
+use crate::hooks::{use_gateway, HelpDrawerPage, HelpDrawerState};
 use dioxus::prelude::*;
+use log;
 
 #[derive(Clone, Copy, PartialEq)]
 pub(crate) enum MineHelpTabs {
@@ -57,7 +62,6 @@ pub fn HelpDrawerWrapper(
     drawer_remount: Signal<bool>,
 ) -> Element {
     let current_page = &drawer_state.read().current_page;
-
     rsx! {
         div {
             class: "fixed right-0 top-0 flex flex-col h-full w-screen sm:w-[574px] elevated elevated-border text-white z-50 transition-transform duration-300 ease-in-out transform translate-x-0",
@@ -70,6 +74,7 @@ pub fn HelpDrawerWrapper(
     }
 }
 
+// todo: optional class
 #[component]
 fn LabelText(text: String) -> Element {
     rsx! {
@@ -77,7 +82,7 @@ fn LabelText(text: String) -> Element {
             class: "w-full",
             div {
                 class: "mb-4",
-                h3 {
+                span {
                     class: "text-xl font-semibold text-elements-highEmphasis",
                     "{text}"
                 }
@@ -109,12 +114,38 @@ fn ContentSection(children: Element) -> Element {
     }
 }
 
+fn SuggestionText() -> Element {
+    rsx! {
+        Row {
+            class: "pb-8",
+            p {
+                span {
+                    class: "text-elements-lowEmphasis",
+                    "If you do not have a wallet, download the phantom wallet "
+                }
+                Link {
+                    new_tab: true,
+                    to: "https://phantom.com/download",
+                    span {
+                        class: "text-elements-gold hover:underline text-sm",
+                        "here"
+                    }
+                }
+                span {
+                    class: "text-elements-lowEmphasis text-sm",
+                    " to create a wallet."
+                }
+            }
+        }
+    }
+}
+
 fn MiningContent() -> Element {
     rsx! {
         ContentSection {
-            LabelText {
-                text: "Mining"
-            }
+            // LabelText {
+            //     text: "Mining"
+            // }
             BodyText {
                 text: "Mining is the process by which energy can be converted into cryptocurrency."
             }
@@ -122,6 +153,8 @@ fn MiningContent() -> Element {
                 text: "How do I start mining ORE?"
             }
             StartMiningBullets {}
+            SuggestionText {}
+
             LabelText {
                 text: "How does ORE mining work?"
             }
@@ -148,19 +181,208 @@ fn BoostsContent() -> Element {
 }
 
 fn YieldContent() -> Element {
+    let mut total_supply: Signal<Option<UiTokenAmount>> = use_signal(|| None);
+    use_effect(move || {
+        spawn(async move {
+            if let Ok(data) = use_gateway().rpc.get_token_supply(&Token::ore().mint).await {
+                total_supply.set(Some(data));
+            }
+        });
+    });
+
     rsx! {
         ContentSection {
+            TokenSupply {
+                total_supply: total_supply.clone()
+            }
             LabelText {
-                text: "Overview"
+                text: "Yield Concepts"
             }
             YieldBullets {}
             LabelText {
                 text: "Liquidity Incentives"
             }
+            // TODDO: add subtitle for staking yields
+            // ChartText {
+            //     text: "Liquidity Incentives"
+            // }
             Col {
                 img {
                     class: "relative w-full h-full object-contain z-10 rounded-lg",
                     src: asset!("/public/liquidity-incentives.png")
+                }
+            }
+            // TODO: ADDD SUBTEXTT TO CHARTS
+            LabelText {
+                text: "Rewards Rates"
+            }
+            RewardsData {}
+        }
+    }
+}
+
+// TODDO: USE UTILS FOR STRING FORMATTING
+
+#[component]
+fn ChartText(text: String) -> Element {
+    rsx! {
+    Col {
+        class: "items-center pb-8",
+            span {
+                class: "text-center text-lg text-elements-highEmphasis font-semibold",
+                "{text}"
+            }
+        }
+    }
+}
+
+#[component]
+fn TokenSupply(total_supply: Signal<Option<UiTokenAmount>>) -> Element {
+    let mut token_supply: Signal<Option<UiTokenAmount>> = use_signal(|| None);
+
+    use_effect(move || {
+        spawn(async move {
+            if let Ok(data) = use_gateway().rpc.get_token_supply(&Token::ore().mint).await {
+                token_supply.set(Some(data));
+            }
+        });
+    });
+
+    rsx! {
+        if let Some(supply) = token_supply.read().as_ref() {
+            Row {
+                class: "items-center pb-8",
+                gap: 2,
+                span {
+                    class: "text-xl font-semibold text-elements-highEmphasis",
+                    "Current Supply:"
+                }
+                Col {
+                    class: "items-end justify-end",
+                    span {
+                        class: "text-elements-gold text-xl font-semibold",
+                        "{supply.ui_amount_string}"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// fn RewardsData() -> Element {
+//     let mut rewards_data: Signal<Option<Vec<RewardData>>> = use_signal(|| Some(Vec::new()));
+
+//     use_effect(move || {
+//         spawn(async move {
+//             if let Ok(data) = use_gateway().get_rewards_data().await {
+//                 rewards_data.set(Some(data));
+//             } else {
+//                 log::error!("Failed to fetch rewards data");
+//             }
+//         });
+//     });
+
+//     rsx! {
+//         match rewards_data.read().as_ref() {
+//             Some(rewards) if !rewards.is_empty() => {
+//                 rsx! {
+//                     div {
+//                         class: "grid grid-cols-2 gap-4",
+//                         for reward in rewards {
+//                             div {
+//                                 class: "my-2",
+//                                 div {
+//                                     class: "flex justify-between items-center",
+//                                     span {
+//                                         class: "text-sm font-semibold",
+//                                         "{reward.key}:"
+//                                     }
+//                                     span {
+//                                         class: "text-sm text-elements-highEmphasis",
+//                                         "{reward.value}"
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             },
+//             _ => rsx! {
+//                 div { "No rewards data available" }
+//             }
+//         }
+//     }
+// }
+
+// TODO: Improve load time
+// TODO: move to mining section
+// TODO: addd subext to explain what the reward rates are
+fn RewardsData() -> Element {
+    let mut rewards_data: Signal<Option<Vec<RewardData>>> = use_signal(|| Some(Vec::new()));
+
+    use_effect(move || {
+        spawn(async move {
+            if let Ok(data) = use_gateway().get_rewards_data().await {
+                rewards_data.set(Some(data));
+            } else {
+                log::error!("Failed to fetch rewards data");
+            }
+        });
+    });
+
+    rsx! {
+        div {
+            match rewards_data.read().as_ref() {
+                Some(rewards) if !rewards.is_empty() => {
+                    // Split the rewards into two groups for two columns
+                    let mid_point = (rewards.len() + 1) / 2; // Ceiling division to handle odd numbers
+                    let (left_column, right_column) = rewards.split_at(mid_point);
+
+                    rsx! {
+                        Row {
+                            class: "justify-between",
+                            gap: 8,
+                            // Left Column
+                            Col {
+                                class: "w-1/2 justify-start",
+                                for reward in left_column {
+                                    Row {
+                                        class: "justify-between items-center my-1",
+                                        gap: 4,
+                                        span {
+                                            class: "text-sm text-elements-midEmphasis",
+                                            "{reward.key}:"
+                                        }
+                                        span {
+                                            class: "text-sm text-elements-highEmphasis font-semibold",
+                                            "{reward.value}"
+                                        }
+                                    }
+                                }
+                            }
+                            // Right Column
+                            Col {
+                                class: "w-1/2 justify-start",
+                                for reward in right_column {
+                                    Row {
+                                        class: "justify-between items-center my-1",
+                                        gap: 4,
+                                        span {
+                                            class: "text-sm text-elements-midEmphasis",
+                                            "{reward.key}:"
+                                        }
+                                        span {
+                                            class: "text-sm text-elements-highEmphasis font-semibold",
+                                            "{reward.value}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                _ => rsx! {
+                    div { "No rewards data available" }
                 }
             }
         }
@@ -169,18 +391,19 @@ fn YieldContent() -> Element {
 
 fn SupplyContent() -> Element {
     rsx! {
-        ContentSection {
-            LabelText {
-                text: "What is ORE's supply curve?"
+    ContentSection {
+        LabelText {
+            text: "What is ORE's supply curve?"
+        }
+        SupplyCurveBullets {}
+
+        LabelText {
+            text: "ORE Emission Curve"
+        }
+            img {
+                class: "relative w-full h-full object-contain z-10 rounded-lg",
+                src: asset!("/public/ore-emissions-curve.png")
             }
-            SupplyCurveBullets {}
-            LabelText {
-                text: "Ore Emission Curve"
-            }
-                img {
-                    class: "relative w-full h-full object-contain z-10 rounded-lg",
-                    src: asset!("/public/ore-emissions-curve.png")
-                }
         }
     }
 }
@@ -662,10 +885,11 @@ enum Align {
     Left,
     Center,
 }
+
 fn Faq() -> Element {
     rsx! {
         Col {
-            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start my-8",
+            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start",
             Col {
                 class: "w-full h-min justify-start",
                 FaqItem {
@@ -719,11 +943,12 @@ fn Faq() -> Element {
                                 "When mining through the browser, you can only use 1 core. By downloading the ORE "
                             }
                             Link {
+                                class: "ml-1",
                                 new_tab: true,
                                 to: "https://beta.ore.supply/download",
                                 span {
                                     class: "text-elements-gold hover:underline",
-                                    "desktop application"
+                                    " desktop application"
                                 }
                             }
                             ", you can choose how many cores to use, ranging from one to the maximum available on your device."
@@ -764,7 +989,7 @@ fn Faq() -> Element {
 fn StakeFaq() -> Element {
     rsx! {
         Col {
-            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start my-8",
+            class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start",
             Col {
                 class: "w-full h-min justify-start",
                 FaqItem {
@@ -772,6 +997,7 @@ fn StakeFaq() -> Element {
                     answer: "Yes, we plan to add boosts on strategic pairs to further strengthen the ORE liquidity network.",
                 }
                 FaqItem {
+                    // TODO: FIX SPACING
                     question: "Why does the APY change?",
                     answer: "APY is calculated based on a 7-day rolling average. As more ORE is staked in a boost, the yield is split among more participants, causing the APY to decrease. Conversely, if the total staked amount goes down, the APY will rise. This is because a maximum of 1 ORE per minute is distributed between miners and stakers.",
                     answer_with_link: rsx! {
@@ -830,7 +1056,7 @@ fn FaqItem(question: String, answer: Option<String>, answer_with_link: Option<El
                 div {
                     class: "overflow-hidden transition-all duration-300 ease-in-out {answer_class}",
                     p {
-                        class: "text-elements-midEmphasis mt-4 text-left text-lg",
+                        class: "text-elements-midEmphasis mt-4 text-left",
                         "{answer}"
                     }
                 }
@@ -944,7 +1170,7 @@ fn BulletPoint(
 fn StartMiningBullets() -> Element {
     rsx! {
         Col {
-           class: "w-full ml-4 pb-8",
+           class: "w-full ml-4 mb-2",
             BulletPointList {
                 BulletPoint {
                     title: None,
@@ -956,33 +1182,37 @@ fn StartMiningBullets() -> Element {
                                     "Connect any supported Solana wallet"
                                 }
                             }
-                            p {
-                                span {
-                                    class: "text-elements-lowEmphasis text-md",
-                                    "If you do not have a wallet, download the phantom wallet "
-                                }
-                                Link {
-                                    new_tab: true,
-                                    to: "https://phantom.com/download",
-                                    span {
-                                        class: "text-elements-gold hover:underline text-md",
-                                        "here"
-                                    }
-                                }
-                                span {
-                                    class: "text-elements-lowEmphasis text-md",
-                                    " to create a wallet."
-                                }
-                            }
+                            // p {
+                            //     span {
+                            //         class: "text-elements-lowEmphasis text-sm",
+                            //         "If you do not have a wallet, download the phantom wallet "
+                            //     }
+                            //     Link {
+                            //         new_tab: true,
+                            //         to: "https://phantom.com/download",
+                            //         span {
+                            //             class: "text-elements-gold hover:underline text-sm",
+                            //             "here"
+                            //         }
+                            //     }
+                            //     span {
+                            //         class: "text-elements-lowEmphasis text-sm",
+                            //         " to create a wallet."
+                            //     }
+                            // }
                         }
                     }
                 }
                 BulletPoint {
                     title: None,
-                    description: rsx! {
-                        span {
-                            class: "text-lg text-elements-midEmphasis",
-                            "Click \"start\" to begin mining"
+                    description: {
+                        rsx! {
+                            p {
+                                class: "text-lg text-elements-midEmphasis text-left",
+                                span {
+                                    "Click \"start\" to begin mining"
+                                }
+                            }
                         }
                     }
                 }
