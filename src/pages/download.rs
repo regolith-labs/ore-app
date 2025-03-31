@@ -14,7 +14,7 @@ pub fn Download() -> Element {
 #[cfg(feature = "web")]
 pub fn Download() -> Element {
     let url = use_download_url();
-    let (os, arch) = parse_download_url(&url.cloned());
+    let (os, _arch) = parse_download_url(&url.cloned());
 
     let os_icon = match os.as_str() {
         "macOS" => rsx! { AppleIcon { class: "w-16 h-16" } },
