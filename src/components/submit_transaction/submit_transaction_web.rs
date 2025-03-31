@@ -122,7 +122,11 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                             sig,
                                             signer,
                                             transaction_type: tx_type,
-                                            app: AppId::OreWeb,
+                                            app: if cfg!(feature = "web") {
+                                                AppId::OreWeb
+                                            } else {
+                                                AppId::OreDesktop
+                                            },
                                             ts: timestamp,
                                             status: None,
                                             fee: None,
