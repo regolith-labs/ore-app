@@ -78,7 +78,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     });
     rsx! {
         div {
-            class: "flex flex-col h-full w-screen sm:w-96 elevated elevated-border text-white z-50",
+            class: "flex flex-col h-full w-screen sm:w-96 elevated border-l border-gray-800 text-white z-50",
             onclick: move |_e| {
                 keypair_show_export.set(false);
             },
