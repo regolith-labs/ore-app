@@ -13,7 +13,7 @@ use crate::{
 use super::build_commit_claim_instructions;
 
 pub fn use_miner_claim_transaction(
-    member: Resource<GatewayResult<ore_pool_api::state::Member>>,
+    member: Signal<GatewayResult<ore_pool_api::state::Member>>,
     member_db: Resource<GatewayResult<ore_pool_types::Member>>,
     member_claimable_balance: Memo<MemberBalance>,
 ) -> Resource<GatewayResult<Transaction>> {
@@ -39,8 +39,8 @@ pub fn use_miner_claim_transaction(
 
         // Check for memmber
         let member = match member.cloned() {
-            Some(Ok(member)) => member, // Extract the Member if successful
-            _ => return Err(GatewayError::Unknown), // Handle the None case
+            Ok(member) => member, // Extract the Member if successful
+            Err(err) => return Err(err),
         };
 
         // Check for claimable balance

@@ -15,6 +15,7 @@ use super::{use_wss, FromWssMsg, ToWssMsg};
 /// 1) Creating new subscriptions
 /// 2) Routing notifications
 /// 3) Closing subscriptions when the parent component unmounts
+/// TODO: could this be a coroutine where the pubkey arg is sent in?
 pub fn use_wss_subscription<T, U>(
     mut data: Signal<GatewayResult<T>>,
     update_callback: U,

@@ -37,12 +37,10 @@ pub fn Mine() -> Element {
 
 fn MinerData() -> Element {
     // Get resources
-    let mut member = use_member();
     let mut member_record = use_member_record();
 
     // Refresh member account
     on_transaction_done(move |_sig| {
-        member.restart();
         member_record.restart();
     });
 
@@ -64,7 +62,7 @@ fn StopStartButton() -> Element {
     let wallet = use_wallet();
     let pool_url = use_pool_url();
     let mut miner_status = use_miner_status();
-    let mut member = use_member();
+    let member = use_member();
     let mut member_record = use_member_record();
     let mut register_tx_start = use_signal(|| false);
     let register_tx = use_pool_register_transaction(register_tx_start);
@@ -96,7 +94,6 @@ fn StopStartButton() -> Element {
         }
         match use_gateway().register(authority, pool_url).await {
             Ok(_member_record) => {
-                member.restart();
                 member_record.restart();
                 miner_status.set(MinerStatus::FetchingChallenge);
             }
@@ -143,7 +140,7 @@ fn StopStartButton() -> Element {
                 if *is_active.read() {
                     miner_status.set(MinerStatus::Stopped);
                 } else {
-                    if let Some(Ok(_member)) = member.cloned() {
+                    if let Ok(_member) = *member.read() {
                         if let Some(Ok(_member_db)) = member_record.cloned() {
                             miner_status.set(MinerStatus::FetchingChallenge);
                         } else {
@@ -324,37 +321,25 @@ pub enum MemberBalance {
 }
 
 fn MinerRewards() -> Element {
-    let mut member = use_member();
+    let member = use_member();
     let member_db = use_member_record();
-    let mut member_db_balance = use_member_record_balance();
+    let member_db_balance = use_member_record_balance();
     // claimable balance
-    let member_claimable_balance =
-        use_memo(
-            move || match (member_db_balance.cloned(), member.cloned()) {
-                (Some(member_db_balance), Some(member)) => {
-                    if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member) {
-                        let diff = member_db_balance - member.total_balance;
-                        let claimable_balance = member.balance + diff;
-                        MemberBalance::Balance(claimable_balance)
-                    } else {
-                        MemberBalance::Null
-                    }
-                }
-                _ => MemberBalance::Loading,
-            },
-        );
+    let member_claimable_balance = use_memo(move || match member_db_balance.cloned() {
+        Some(member_db_balance) => {
+            if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member.cloned()) {
+                let diff = member_db_balance - member.total_balance;
+                let claimable_balance = member.balance + diff;
+                MemberBalance::Balance(claimable_balance)
+            } else {
+                MemberBalance::Null
+            }
+        }
+        _ => MemberBalance::Loading,
+    });
     // claim transaction builder
     let claim_tx = use_miner_claim_transaction(member, member_db, member_claimable_balance);
     let mut info_hidden = use_signal(|| true);
-    // on claim success restart balance
-    // TODO: wss
-    on_transaction_done(move |_| {
-        spawn(async move {
-            crate::time::sleep(1000).await;
-            member.restart();
-            member_db_balance.restart();
-        });
-    });
     rsx! {
         Col { gap: 4,
             button {
@@ -403,7 +388,7 @@ pub fn MinerRewardsClaimButton(
     tx_type: TransactionType,
 ) -> Element {
     let pool_url = use_pool_url();
-    let mut member = use_member();
+    let member = use_member();
     let mut transaction_status = use_transaction_status();
 
     let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
@@ -418,7 +403,7 @@ pub fn MinerRewardsClaimButton(
             disabled: !enabled,
             onclick: move |_| {
                 spawn(async move {
-                    if let (Some(pool_url), Some(Ok(member)), Some(Ok(tx))) = (
+                    if let (Some(pool_url), Ok(member), Some(Ok(tx))) = (
                         pool_url.cloned(),
                         member.cloned(),
                         transaction.cloned(),
