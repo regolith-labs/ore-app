@@ -8,7 +8,7 @@ use solana_sdk::{
 
 use crate::{
     components::*,
-    gateway::{solana::SolanaGateway, GatewayResult, NativeRpc, Rpc},
+    gateway::{solana::SolanaGateway, GatewayError, GatewayResult, NativeRpc, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
@@ -32,12 +32,22 @@ pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
                 // sign
                 if let Err(err) = sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
                     log::error!("{:?}", err);
-                    transaction_status.set(Some(TransactionStatus::Error));
+                    match err {
+                        GatewayError::WithMessage(msg) => {
+                            transaction_status.set(Some(TransactionStatus::ErrorWithMessage(msg)));
+                        }
+                        _ => {
+                            let error_msg = err.get_message();
+                            transaction_status
+                                .set(Some(TransactionStatus::ErrorWithMessage(error_msg)));
+                        }
+                    }
                 }
             }
             Err(err) => {
                 log::error!("{:?}", err);
-                transaction_status.set(Some(TransactionStatus::Denied));
+                let error_msg = format!("Wallet error: {:?}", err);
+                transaction_status.set(Some(TransactionStatus::ErrorWithMessage(error_msg)));
             }
         }
     });
@@ -70,7 +80,9 @@ async fn sign_submit_confirm(
     if confirmed.is_ok() {
         transaction_status.set(Some(TransactionStatus::Done(sig)));
     } else {
-        transaction_status.set(Some(TransactionStatus::Timeout));
+        transaction_status.set(Some(TransactionStatus::ErrorWithMessage(
+            "Transaction timed out. Please try again.".to_string(),
+        )));
     }
     Ok(())
 }

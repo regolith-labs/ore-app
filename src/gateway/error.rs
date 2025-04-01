@@ -23,6 +23,27 @@ pub enum GatewayError {
     BincodeSerialize,
     BincodeDeserialize,
     Unknown,
+    WithMessage(String),
+}
+
+impl GatewayError {
+    pub fn with_message<S: Into<String>>(msg: S) -> Self {
+        Self::WithMessage(msg.into())
+    }
+
+    pub fn get_message(&self) -> String {
+        match self {
+            Self::WithMessage(msg) => msg.clone(),
+            Self::WalletDisconnected => "Wallet is not connected".to_string(),
+            Self::AccountNotFound => "Account not found".to_string(),
+            Self::NetworkUnavailable => "Network is unavailable".to_string(),
+            Self::TransactionTimeout => "Transaction timed out".to_string(),
+            Self::RequestFailed => "Request failed".to_string(),
+            Self::JupSwapError => "Swap error occurred".to_string(),
+            Self::ProgramBuilderFailed => "Failed to build program".to_string(),
+            _ => format!("{:?}", self),
+        }
+    }
 }
 
 impl From<anyhow::Error> for GatewayError {

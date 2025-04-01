@@ -10,7 +10,7 @@ use solana_sdk::{
 
 use crate::{
     components::*,
-    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc},
+    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayError, GatewayResult, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
@@ -109,6 +109,12 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                     Some(tx) => gateway.rpc.send_transaction(&tx).await.ok(),
                                     None => {
                                         log::info!("error decoding tx");
+                                        transaction_status.set(Some(
+                                            TransactionStatus::ErrorWithMessage(
+                                                "Failed to decode transaction. Please try again."
+                                                    .to_string(),
+                                            ),
+                                        ));
                                         None
                                     }
                                 };
@@ -148,28 +154,43 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                             transaction_status
                                                 .set(Some(TransactionStatus::Done(sig)));
                                         } else {
-                                            transaction_status
-                                                .set(Some(TransactionStatus::Timeout));
+                                            transaction_status.set(Some(
+                                                TransactionStatus::ErrorWithMessage(
+                                                    "Transaction timed out. Please try again."
+                                                        .to_string(),
+                                                ),
+                                            ));
                                         }
                                     }
                                     None => {
                                         log::info!("error sending tx");
-                                        transaction_status.set(Some(TransactionStatus::Error))
+                                        transaction_status.set(Some(
+                                            TransactionStatus::ErrorWithMessage(
+                                                "Failed to send transaction. Please try again."
+                                                    .to_string(),
+                                            ),
+                                        ));
                                     }
                                 }
                             }
 
                             // Process signing errors
                             Ok(serde_json::Value::Null) => {
-                                transaction_status.set(Some(TransactionStatus::Denied))
+                                transaction_status.set(Some(TransactionStatus::ErrorWithMessage(
+                                    "Transaction signature was denied.".to_string(),
+                                )));
                             }
                             Err(err) => {
                                 log::error!("error signing transaction: {}", err);
-                                transaction_status.set(Some(TransactionStatus::Error))
+                                transaction_status.set(Some(TransactionStatus::ErrorWithMessage(
+                                    format!("Error signing transaction: {}", err),
+                                )));
                             }
                             _ => {
                                 log::error!("unrecognized signing response");
-                                transaction_status.set(Some(TransactionStatus::Error))
+                                transaction_status.set(Some(TransactionStatus::ErrorWithMessage(
+                                    "Unrecognized signing response. Please try again.".to_string(),
+                                )));
                             }
                         };
                     }
@@ -177,7 +198,10 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                     // Process eval errors
                     Err(err) => {
                         log::error!("error executing wallet signing script: {}", err);
-                        transaction_status.set(Some(TransactionStatus::Error))
+                        transaction_status.set(Some(TransactionStatus::ErrorWithMessage(format!(
+                            "Error executing wallet signing script: {}",
+                            err
+                        ))));
                     }
                 }
             }
@@ -185,7 +209,10 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
             // Process serialization errors
             Err(err) => {
                 log::error!("err serializing tx: {}", err);
-                transaction_status.set(Some(TransactionStatus::Error))
+                transaction_status.set(Some(TransactionStatus::ErrorWithMessage(format!(
+                    "Error serializing transaction: {}",
+                    err
+                ))));
             }
         };
     });

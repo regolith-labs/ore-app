@@ -14,6 +14,7 @@ pub fn ToastDisplay() -> Element {
             match transaction_status {
                 TransactionStatus::Denied
                 | TransactionStatus::Error
+                | TransactionStatus::ErrorWithMessage(_)
                 | TransactionStatus::Timeout
                 | TransactionStatus::Done(_) => {
                     spawn(async move {
@@ -52,6 +53,14 @@ pub fn ToastDisplay() -> Element {
                     rsx! {
                         Col { class: "{toast_class} border-l-4 border-red-500",
                             span { class: "{title_class} my-auto", "Transaction failed" }
+                        }
+                    }
+                }
+                TransactionStatus::ErrorWithMessage(msg) => {
+                    rsx! {
+                        Col { class: "{toast_class} border-l-4 border-red-500",
+                            span { class: "{title_class} my-auto", "Transaction failed" }
+                            span { class: "{detail_class}", "{msg}" }
                         }
                     }
                 }

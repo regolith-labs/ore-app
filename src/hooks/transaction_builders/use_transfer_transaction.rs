@@ -41,23 +41,31 @@ pub fn use_transfer_transaction(
         // Get the selected token
         let Some(token) = selected_token.cloned() else {
             log::info!("select token");
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::with_message(
+                "No token selected. Please select a token.",
+            ));
         };
 
         // If empty, disable
         let amount_str = input_amount.cloned();
         if amount_str.is_empty() {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::with_message(
+                "Please enter an amount to transfer.",
+            ));
         }
 
         // If input isn't a number, disable
         let Ok(amount_f64) = amount_str.parse::<f64>() else {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::with_message(
+                "Invalid amount format. Please enter a valid number.",
+            ));
         };
 
         // If amount is 0, disable
         if amount_f64 == 0f64 {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::with_message(
+                "Amount must be greater than zero.",
+            ));
         }
 
         // If amount is less than the token balance, disable
@@ -65,18 +73,26 @@ pub fn use_transfer_transaction(
         if let Ok(balance_data) = balance {
             if balance_data.ui_amount.unwrap_or(0.0) < amount_f64 {
                 err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
-                return Err(GatewayError::Unknown);
+                return Err(GatewayError::with_message(format!(
+                    "Insufficient balance for {}.",
+                    token.name
+                )));
             }
         } else {
             // User might not have a token balance to begin with
             err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::with_message(format!(
+                "Unable to confirm balance for {}.",
+                token.name
+            )));
         }
 
         // Check if address is empty
         let destination_str = destination.cloned();
         if destination_str.is_empty() {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::with_message(
+                "Please enter a destination address.",
+            ));
         }
 
         // Check if Pubkey is valid
@@ -84,7 +100,9 @@ pub fn use_transfer_transaction(
             dest
         } else {
             address_err.set(Some(TransferError::InvalidAddress));
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::with_message(
+                "Invalid destination address. Please provide a valid Solana address.",
+            ));
         };
 
         // Aggregate instructions
@@ -118,14 +136,22 @@ pub fn use_transfer_transaction(
         if token.mint == Token::sol().mint {
             ixs.push(transfer(&authority, &destination, amount_u64));
         } else {
-            ixs.push(spl_transfer(
-                &spl_token::ID,
-                &from_ata,
-                &to_ata,
-                &authority,
-                &[],
-                amount_u64,
-            )?);
+            ixs.push(
+                spl_transfer(
+                    &spl_token::ID,
+                    &from_ata,
+                    &to_ata,
+                    &authority,
+                    &[],
+                    amount_u64,
+                )
+                .map_err(|e| {
+                    GatewayError::with_message(format!(
+                        "Failed to create transfer instruction: {}",
+                        e
+                    ))
+                })?,
+            );
         }
 
         // Include ORE app fee
