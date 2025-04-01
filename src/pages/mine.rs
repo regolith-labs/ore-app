@@ -7,12 +7,12 @@ use crate::{
     components::*,
     gateway::{pool::PoolGateway, GatewayError, GatewayResult},
     hooks::{
-        build_commit_claim_instructions, on_transaction_done, use_gateway, use_member,
-        use_member_record, use_member_record_balance, use_miner, use_miner_cores,
+        build_commit_claim_instructions, on_transaction_done, use_gateway, use_help_drawer_state,
+        use_member, use_member_record, use_member_record_balance, use_miner, use_miner_cores,
         use_miner_is_active, use_miner_status, use_ore_balance_wss, use_pool,
         use_pool_register_transaction, use_pool_url, use_sol_balance_wss,
-        use_system_cpu_utilization, use_transaction_status, use_wallet, MinerStatus,
-        PoolRegisterStatus, Wallet,
+        use_system_cpu_utilization, use_transaction_status, use_wallet, HelpDrawerPage,
+        MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -21,14 +21,18 @@ use ore_types::request::TransactionType;
 pub fn Mine() -> Element {
     rsx! {
         Col {
-            // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
-            Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
-                Heading {
-                    class: "w-full",
-                    title: "Mine",
-                    subtitle: "Convert energy into cryptocurrency.",
+            Col {
+                class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
+                Row {
+                    class: "w-full justify-between",
+                    Heading {
+                        class: "w-full",
+                        title: "Mine",
+                        subtitle: "Convert energy into cryptocurrency."
+                    }
+                    MineHelpButton {}
                 }
                 MinerData {}
             }
@@ -53,6 +57,7 @@ fn MinerData() -> Element {
             Col { class: "w-full gap-8",
                 MinerCores {}
                 MinePower {}
+                DownloadCTA {}
             }
             TimeRemaining {}
             MinerRewards {}
@@ -536,18 +541,6 @@ fn MinePower() -> Element {
 
     rsx! {
         Col { class: "relative flex w-full mx-auto pr-2", gap: 4,
-            // Keyframes for the animation
-            // style {
-            //     "@keyframes blockPulse {{
-            //         0% {{ opacity: 0; }}
-            //         100% {{ opacity: 1; }}
-            //     }}"
-            // }
-
-            // span {
-            //     class: "text-elements-lowEmphasis font-medium",
-            //     "Core utilization"
-            // }
 
             // Manual column layout with increased spacing between columns
             div { class: "flex flex-col md:flex-row gap-8 w-full",
@@ -598,6 +591,73 @@ fn MinePower() -> Element {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Help button specific to the Mine page
+fn MineHelpButton() -> Element {
+    let mut drawer_state = use_help_drawer_state();
+
+    rsx! {
+        button {
+            onclick: move |_| {
+                let mut current = drawer_state.read().clone();
+                current.is_open = true;
+                current.current_page = HelpDrawerPage::Mine;
+                drawer_state.set(current);
+            },
+            Row {
+                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer",
+                gap: 2,
+                span {
+                    class: "mx-auto my-auto",
+                    "Help"
+                }
+                BulbIcon {
+                    class: "w-4 text-elements-midEmphasis"
+                }
+            }
+        }
+    }
+}
+
+fn DownloadCTA() -> Element {
+    // Only show the download CTA on web
+    #[cfg(not(feature = "web"))]
+    return rsx! {};
+
+    rsx! {
+        div {
+            class: "w-full mt-4 mb-8",
+            div {
+                class: "flex items-center justify-between rounded-lg py-4 px-6 border border-elements-gold relative",
+                div {
+                    class: "flex items-center",
+                    DownloadIcon {
+                        class: "w-8 h-8 mr-4 text-elements-gold"
+                    }
+                    div {
+                        class: "flex flex-col",
+                        span {
+                            class: "text-elements-highEmphasis font-medium",
+                            "Download the desktop app"
+                        }
+                        span {
+                            class: "text-elements-lowEmphasis text-sm",
+                            "Get more power with the native desktop miner."
+                        }
+                    }
+                }
+                Link {
+                    to: "/download",
+                    class: "h-12 px-6 rounded-full controls-gold flex items-center justify-center",
+                    span {
+                        class: "font-semibold",
+                        "Download"
                     }
                 }
             }
