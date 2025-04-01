@@ -1,10 +1,10 @@
 use crate::components::*;
-use crate::hooks::use_help_drawer_state;
+use crate::hooks::use_docs_drawer_state;
 use dioxus::prelude::*;
 use std::time::Duration;
 
 pub fn DocsDrawer() -> Element {
-    let mut drawer_state = use_help_drawer_state();
+    let mut drawer_state = use_docs_drawer_state();
     let drawer_remount = use_signal(|| false);
     let mut is_animating = use_signal(|| false);
 
@@ -32,7 +32,7 @@ pub fn DocsDrawer() -> Element {
 
 #[component]
 fn DocsDrawerOverlay(
-    drawer_state: Signal<crate::hooks::HelpDrawerState>,
+    drawer_state: Signal<crate::hooks::DocsDrawerState>,
     is_animating: Signal<bool>,
     on_close: EventHandler<MouseEvent>,
     drawer_remount: Signal<bool>,

@@ -7,6 +7,7 @@ use num_format::{Locale, ToFormattedString};
 pub enum TokenValueSize {
     XSmall,
     Small,
+    Medium,
     Large,
 }
 

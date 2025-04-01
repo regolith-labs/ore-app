@@ -9,8 +9,8 @@ pub fn MiningContent() -> Element {
     rsx! {
         ContentSection {
             MiningIntro {}
-            MiningGetStarted {}
             MiningHowItWorks {}
+            MiningGetStarted {}
             MiningFaq {}
         }
     }
@@ -20,7 +20,7 @@ fn MiningIntro() -> Element {
     rsx! {
         span {
             span {
-                class: "font-semibold",
+                class: "font-semibold text-elements-highEmphasis",
                 "Mining is the process by which energy can be converted into cryptocurrency. "
             }
             "It allows anyone to permissionlessly convert electricity into liquid financial capital."
@@ -30,8 +30,7 @@ fn MiningIntro() -> Element {
 
 fn MiningGetStarted() -> Element {
     rsx! {
-        span {
-            class: "font-semibold text-xl pt-8 pb-2",
+        SectionTitle {
             "Get started"
         }
         BulletPointList {
@@ -80,30 +79,28 @@ fn MiningGetStarted() -> Element {
 
 fn MiningHowItWorks() -> Element {
     rsx! {
-        span {
-            class: "font-semibold text-xl pt-8 pb-2",
+        SectionTitle {
             "How it works"
         }
         BulletPointList {
             BulletPoint {
-                "Miners perform large calculations that irreversibly turn electric power into a mathematical solution and heat. These solutions serve as an unforgeable proof that some computation was performed and energy was expended. "
+                "Miners perform large calculations that turn electric power into mathematical solutions and heat. These solutions serve as an unforgeable proof that some computation was performed and energy was expended. "
             }
             BulletPoint {
-                "A smart contract can verify these proofs and use them to securely mint a token, rewarding miners for their work. For this reason, mining is also often referred to as \"proof-of-work.\""
+                "A smart contract can verify these solutions and use them to securely mint a token, rewarding miners for their work. For this reason, mining is also often referred to as \"proof-of-work.\""
             }
             BulletPoint {
                 "The net result of this process is that miners have a means of converting available energy into liquid financial capital."
             }
-        }
-        span {
-            class: "font-semibold text-xl pt-8 pb-2",
-            "FAQ"
         }
     }
 }
 
 fn MiningFaq() -> Element {
     rsx! {
+        SectionTitle {
+            "FAQ"
+        }
         Col {
             class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start",
             Col {
@@ -133,7 +130,7 @@ fn MiningFaq() -> Element {
                     "ORE uses "
                     Link {
                         new_tab: true,
-                        to: "https://beta.ore.supply/download",
+                        to: "https://github.com/regolith-labs/drillx",
                         span { class: "text-elements-gold hover:underline", "Drillx" }
                     }
                     ", a CPU-friendly hash function designed to make mining accessible to anyone with a standard home computer."

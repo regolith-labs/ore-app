@@ -5,10 +5,20 @@ use dioxus::prelude::*;
 pub fn ContentSection(children: Element) -> Element {
     rsx! {
         Col {
-            class: "w-full px-8 pb-8 overflow-y-auto scrollbar-hide text-lg text-elements-highEmphasis",
+            class: "w-full px-8 pb-8 overflow-y-auto scrollbar-hide text-lg text-elements-midEmphasis",
             Col {
                 {children}
             }
+        }
+    }
+}
+
+#[component]
+pub fn SectionTitle(children: Element) -> Element {
+    rsx! {
+        span {
+            class: "font-semibold text-elements-highEmphasis text-xl pt-8 pb-2",
+            {children}
         }
     }
 }

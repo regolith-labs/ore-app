@@ -1048,9 +1048,6 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
-  .items-baseline {
-    align-items: baseline;
-  }
   .items-center {
     align-items: center;
   }
@@ -1118,9 +1115,6 @@
   }
   .overflow-y-auto {
     overflow-y: auto;
-  }
-  .overflow-y-clip {
-    overflow-y: clip;
   }
   .overflow-y-scroll {
     overflow-y: scroll;

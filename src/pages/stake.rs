@@ -18,7 +18,9 @@ pub fn Stake() -> Element {
                     title: "Stake",
                     subtitle: "Provide liquidity and earn yield."
                 }
-                DocsButton {}
+                DocsButton {
+                    tab: DocsTab::Staking
+                }
             }
             Col {
                 gap: 16,

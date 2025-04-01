@@ -6,11 +6,10 @@ use crate::{
     components::*,
     gateway::pool::PoolGateway,
     hooks::{
-        on_transaction_done, use_gateway, use_help_drawer_state, use_member, use_member_record,
-        use_member_record_balance, use_miner, use_miner_claim_transaction, use_miner_cores,
-        use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url,
-        use_system_cpu_utilization, use_wallet, HelpDrawerPage, MinerStatus, PoolRegisterStatus,
-        Wallet,
+        on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
+        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
+        use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
+        use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -30,7 +29,9 @@ pub fn Mine() -> Element {
                         title: "Mine",
                         subtitle: "Convert energy into cryptocurrency."
                     }
-                    DocsButton {}
+                    DocsButton {
+                        tab: DocsTab::Mining
+                    }
                 }
                 MinerData {}
             }

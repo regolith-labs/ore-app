@@ -1,16 +1,18 @@
 use dioxus::prelude::*;
 
 use crate::components::*;
-use crate::hooks::use_help_drawer_state;
+use crate::hooks::use_docs_drawer_state;
 
-pub fn DocsButton() -> Element {
-    let mut drawer_state = use_help_drawer_state();
+#[component]
+pub fn DocsButton(tab: DocsTab) -> Element {
+    let mut drawer_state = use_docs_drawer_state();
 
     rsx! {
         button {
             onclick: move |_| {
                 let mut current = drawer_state.read().clone();
                 current.is_open = true;
+                current.tab = tab;
                 drawer_state.set(current);
             },
             Row {
