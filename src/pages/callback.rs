@@ -69,10 +69,13 @@ pub fn LinkAccount(access_token: AccessTokenResponse) -> Element {
 
 #[component]
 pub fn LinkAccountButton(access_token: AccessTokenResponse, pubkey: Pubkey) -> Element {
+    log::info!("LinkAccountButton: {:?}", access_token.oauth_token);
     rsx! {
         button {
             class: "controls-primary h-12 rounded-full justify-center items-center",
             onclick: move |_| {
+                let access_token = access_token.clone();
+                let pubkey = pubkey.clone();
                 spawn(async move {
                     // Build eval command for wallet signing
                     let mut eval = eval(
@@ -84,7 +87,14 @@ pub fn LinkAccountButton(access_token: AccessTokenResponse, pubkey: Pubkey) -> E
                     );
 
                     // Sign request with wallet
-                    let msg = "Testing".as_bytes().to_base64(b64::STANDARD);
+                    let msg = format!(
+                        "I authorize Regolith Labs to link my X account with my wallet.\n\nUsername: {}\nWallet: {}\nAuth: {}",
+                        access_token.screen_name.clone(),
+                        pubkey,
+                        access_token.oauth_token.clone()
+                    )
+                    .as_bytes()
+                    .to_base64(b64::STANDARD);
                     let _send = eval
                         .send(serde_json::Value::String(msg))
                         .map_err(|err| anyhow::anyhow!(err))

@@ -25,7 +25,7 @@ fn CreatorOnboarding() -> Element {
             gap: 8,
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: "Creator Rewards Program",
+                title: "Creator Rewards",
                 subtitle: "Get paid to create content."
             }
             Col {
@@ -33,14 +33,14 @@ fn CreatorOnboarding() -> Element {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 span {
                     class: "text-lg",
-                    "With the Creator Rewards Program, eligible creators can now earn money by creating and posting content on X about ORE. To get started, log in with your X account below."
+                    "With the Creator Rewards Program, eligible creators can now earn money by creating and posting content about ORE on X. To get started, log in with your X account below."
                 }
                 Col {
                     gap: 4,
                     SignInWithX {}
                     span {
                         class: "text-xs text-elements-lowEmphasis text-center",
-                        "Regolith Labs may modify or cancel Creator Rewards Program at any time in its sole discretion, including for business, financial, or legal reasons."
+                        "By linking your account, you agree to the Terms and Conditions and acknowledge that Regolith Labs operates the oracle which powers the Creator Rewards Program. Regolith Labs may modify or disable the oracle at any time in its sole discretion, including for business, financial, or legal reasons."
                     }
                 }
             }
