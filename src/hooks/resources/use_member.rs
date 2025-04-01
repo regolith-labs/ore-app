@@ -77,17 +77,6 @@ pub fn use_member_resource_deprecated() -> Resource<GatewayResult<Member>> {
     })
 }
 
-pub fn use_member_record_resource_deprecated() -> Resource<GatewayResult<MemberRecord>> {
-    let pool = use_pool_deprecated();
-    let wallet = use_wallet();
-    use_resource(move || async move {
-        let pubkey = wallet.pubkey()?;
-        let Some(pool) = pool.cloned() else {
-            return Err(GatewayError::AccountNotFound);
-        };
-        use_gateway().get_member_record(pubkey, pool.url).await
-    })
-}
 pub fn use_member_record_resource_balance_deprecated() -> Resource<GatewayResult<u64>> {
     let pool = use_pool_deprecated();
     let wallet = use_wallet();
