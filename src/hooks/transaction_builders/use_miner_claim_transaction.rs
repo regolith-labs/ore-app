@@ -94,15 +94,12 @@ pub fn use_miner_claim_transaction(
                 return Err(GatewayError::Unknown);
             }
         };
+        let priority_fee = dynamic_priority_fee.unwrap_or(100);
+let priority_fee_instruction = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+ixs.insert(0, priority_fee_instruction);
 
-        // Add priority fee instruction
-        ixs.insert(
-            1,
-            ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-        );
-
-        // Build final tx with priority fee
-        let tx: VersionedTransaction = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+// Rebuild the transaction with the updated instructions
+let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         Ok(tx)
     })

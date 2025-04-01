@@ -32,34 +32,31 @@ pub fn use_topup_transaction(
 
         // Get the destination pubkey
         let Ok(destination) = destination.cloned() else {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::InvalidPubkey);
         };
 
-        // If empty, disable
-        let amount_str = input_amount.cloned();
+        // Validate input amount
+        let amount_str = input_amount.read().clone();
         if amount_str.is_empty() {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::InvalidInput("Amount is empty".to_string()));
         }
 
-        // If input isn't a number, disable
         let Ok(amount_f64) = amount_str.parse::<f64>() else {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::InvalidInput("Amount is not a number".to_string()));
         };
 
-        // If amount is 0, disable
-        if amount_f64 == 0f64 {
-            return Err(GatewayError::Unknown);
+        if amount_f64 <= 0f64 {
+            return Err(GatewayError::InvalidInput("Amount must be greater than 0".to_string()));
         }
 
-        // If amount is greater than SOL balance, disable
-        if let Ok(sol_balance) = sol_balance.read().as_ref() {
-            if sol_balance.ui_amount.unwrap_or(0.0) < amount_f64 {
-                err.set(Some(TokenInputError::InsufficientBalance(Token::sol())));
-                return Err(GatewayError::Unknown);
-            }
-        } else {
+        // Check SOL balance
+        let Ok(sol_balance) = sol_balance.read().as_ref() else {
             err.set(Some(TokenInputError::InsufficientBalance(Token::sol())));
             return Err(GatewayError::Unknown);
+        };
+        if sol_balance.ui_amount.unwrap_or(0.0) < amount_f64 {
+            err.set(Some(TokenInputError::InsufficientBalance(Token::sol())));
+            return Err(GatewayError::InsufficientFunds);
         }
 
         // Aggregate instructions
@@ -85,27 +82,29 @@ pub fn use_topup_transaction(
         let gateway = use_gateway();
         let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
             Ok(fee) => fee,
-            Err(_) => {
-                log::error!("Failed to fetch priority fee estimate");
-                return Err(GatewayError::Unknown);
+            Err(e) => {
+                log::warn!(
+                    "Failed to fetch priority fee estimate: {:?}, using fallback {}",
+                    e,
+                    *priority_fee.read()
+                );
+                *priority_fee.read() // Fallback to signal value
             }
         };
 
-        // Add priority fee instruction
+        // Add priority fee instruction at the start (like use_boost_claim_all_transaction)
         ixs.insert(
-            1,
+            0,
             ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
         );
 
-        // Calculate priority fee in lamports
+        // Calculate priority fee in lamports for UI (optional, keep for consistency)
         let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
         let dynamic_priority_fee_in_lamports =
             (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
-
-        // Set priority fee for UI
         priority_fee.set(dynamic_priority_fee_in_lamports);
 
-        // Build final tx with priority fee
+        // Build final transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         Ok(tx)

@@ -1,6 +1,9 @@
 use dioxus::prelude::*;
 use ore_api::consts::MINT_ADDRESS;
-use solana_sdk::transaction::Transaction;
+use solana_sdk::{
+    compute_budget::ComputeBudgetInstruction,
+    transaction::Transaction,
+};
 use steel::AccountDeserialize;
 
 use crate::components::{sign_transaction_partial, TransactionStatus};
@@ -124,31 +127,33 @@ async fn build_commit_claim_instructions<R: Rpc>(
 ) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
     use solana_sdk::compute_budget::ComputeBudgetInstruction;
     let mut instructions = Vec::with_capacity(4);
-    // compute budget
-    instructions.push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
-    instructions.push(ComputeBudgetInstruction::set_compute_unit_price(20_000));
-    // add core instructions
+
+    // Add core instructions first to estimate priority fee
     let mut core_instructions =
         build_core_commit_claim_instructions(gateway, pool, member, member_record).await?;
+
+    // Build initial transaction to estimate priority fee
+    let tx = Transaction::new_with_payer(&core_instructions, Some(&member.authority)).into();
+
+    // Get priority fee estimate
+    let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
+        Ok(fee) => fee,
+        Err(_) => {
+            log::error!("Failed to fetch priority fee estimate");
+            return Err(GatewayError::Unknown);
+        }
+    };
+
+    // Set compute unit limit
+    instructions.push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
+
+    // Set dynamic priority fee (with a default of 100 if it fails)
+    let priority_fee = dynamic_priority_fee.unwrap_or(100);
+    let priority_fee_instruction = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+    instructions.push(priority_fee_instruction);
+
+    // Add core instructions
     instructions.append(&mut core_instructions);
+
     Ok(instructions)
-}
-
-#[cfg(feature = "web")]
-async fn build_commit_claim_instructions<R: Rpc>(
-    gateway: &R,
-    pool: &Pool,
-    member: &ore_pool_api::state::Member,
-    member_record: &ore_pool_types::Member,
-) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
-    // For web, we just use the core instructions directly
-    build_core_commit_claim_instructions(gateway, pool, member, member_record).await
-}
-
-#[derive(Copy, Clone)]
-pub enum CommitClaimStatus {
-    Init,
-    Done,
-    Skip,
-    CaughtError,
 }

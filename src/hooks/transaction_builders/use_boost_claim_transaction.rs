@@ -96,6 +96,12 @@ pub fn use_boost_claim_transaction(
                 return Err(GatewayError::Unknown);
             }
         };
+        let priority_fee = dynamic_priority_fee.unwrap_or(100);
+let priority_fee_instruction = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+ixs.insert(0, priority_fee_instruction);
+
+// Rebuild the transaction with the updated instructions
+let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         // Add priority fee instruction
         ixs.insert(

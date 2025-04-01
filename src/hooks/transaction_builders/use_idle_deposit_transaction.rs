@@ -98,24 +98,11 @@ pub fn use_idle_deposit_transaction(
                 return Err(GatewayError::Unknown);
             }
         };
+        let priority_fee = dynamic_priority_fee.unwrap_or(100);
+let priority_fee_instruction = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+ixs.insert(0, priority_fee_instruction);
 
-        // Add priority fee instruction
-        ixs.insert(
-            1,
-            ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-        );
+// Rebuild the transaction with the updated instructions
+let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
-        // Calculate priority fee in lamports
-        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
-        let dynamic_priority_fee_in_lamports =
-            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
-
-        // Set priority fee for UI
-        priority_fee.set(dynamic_priority_fee_in_lamports);
-
-        // Build final tx with priority fee
-        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
-
-        Ok(tx)
-    })
-}
+    

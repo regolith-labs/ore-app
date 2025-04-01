@@ -244,28 +244,12 @@ pub fn use_pair_withdraw_transaction(
                 return Err(GatewayError::Unknown);
             }
         };
-
-        // Add priority fee instruction
-        ixs.insert(
-            1,
-            ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-        );
-
-        // Calculate priority fee in lamports
-        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
-        let dynamic_priority_fee_in_lamports =
-            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
-
-        // Set priority fee for UI
-        priority_fee.set(dynamic_priority_fee_in_lamports);
-
-        // Build final tx with priority fee
-        let tx = VersionedTransaction {
-            signatures: vec![Signature::default()],
-            message: VersionedMessage::V0(
-                Message::try_compile(&authority, &ixs, &luts, Hash::default()).unwrap(),
-            ),
-        };
+        let priority_fee = dynamic_priority_fee.unwrap_or(100);
+        let priority_fee_instruction = ComputeBudgetInstruction::set_compute_unit_price(priority_fee);
+        ixs.insert(0, priority_fee_instruction);
+        
+        // Rebuild the transaction with the updated instructions
+        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         Ok(tx)
     })

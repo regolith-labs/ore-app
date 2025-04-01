@@ -10,7 +10,7 @@ use crate::{
     components::TokenInputError,
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
-    hooks::{use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
+    hooks::{use_gateway, use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
     pages::TransferError,
     solana::{
         spl_associated_token_account,
@@ -24,67 +24,64 @@ pub fn use_transfer_transaction(
     input_amount: Signal<String>,
     token_balance: Signal<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
-    // priority_fee: Signal<u64>,
+    mut priority_fee: Signal<u64>, // Uncommented and used
     mut address_err: Signal<Option<TransferError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
+    let gateway = use_gateway(); // Added for priority fee estimation
     use_resource(move || async move {
         err.set(None);
         address_err.set(None);
 
         // Check if wallet is connected
         let Wallet::Connected(authority) = *wallet.read() else {
-            log::info!("wallet");
+            log::info!("Wallet not connected");
             return Err(GatewayError::WalletDisconnected);
         };
 
         // Get the selected token
-        let Some(token) = selected_token.cloned() else {
-            log::info!("select token");
-            return Err(GatewayError::Unknown);
+        let Some(token) = selected_token.read().clone() else {
+            log::info!("No token selected");
+            return Err(GatewayError::NoTokenSelected);
         };
 
-        // If empty, disable
-        let amount_str = input_amount.cloned();
+        // Validate input amount
+        let amount_str = input_amount.read().clone();
         if amount_str.is_empty() {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::InvalidInput("Amount is empty".to_string()));
         }
 
-        // If input isn't a number, disable
         let Ok(amount_f64) = amount_str.parse::<f64>() else {
-            return Err(GatewayError::Unknown);
+            return Err(GatewayError::InvalidInput("Amount is not a number".to_string()));
         };
 
-        // If amount is 0, disable
-        if amount_f64 == 0f64 {
-            return Err(GatewayError::Unknown);
-        }
+        if amount_f64 <= 0f64 {
+            return Err(GatewayError::InvalidInput("Amount must be greater than 0".to_string()));
+        };
 
-        // If amount is less than the token balance, disable
-        let balance = token_balance.cloned();
-        if let Ok(balance_data) = balance {
-            if balance_data.ui_amount.unwrap_or(0.0) < amount_f64 {
-                err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
-                return Err(GatewayError::Unknown);
-            }
-        } else {
-            // User might not have a token balance to begin with
+        // Check token balance
+        let Ok(balance_data) = token_balance.read().as_ref() else {
             err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
             return Err(GatewayError::Unknown);
+        };
+        if balance_data.ui_amount.unwrap_or(0.0) < amount_f64 {
+            err.set(Some(TokenInputError::InsufficientBalance(token.clone())));
+            return Err(GatewayError::InsufficientFunds);
         }
 
-        // Check if address is empty
-        let destination_str = destination.cloned();
+        // Validate destination address
+        let destination_str = destination.read().clone();
         if destination_str.is_empty() {
-            return Err(GatewayError::Unknown);
+            address_err.set(Some(TransferError::InvalidAddress));
+            return Err(GatewayError::InvalidInput("Destination address is empty".to_string()));
         }
 
-        // Check if Pubkey is valid
-        let destination = if let Ok(dest) = Pubkey::try_from(destination_str.as_str()) {
-            dest
-        } else {
-            address_err.set(Some(TransferError::InvalidAddress));
-            return Err(GatewayError::Unknown);
+        let destination = match Pubkey::try_from(destination_str.as_str()) {
+            Ok(dest) => dest,
+            Err(_) => {
+                address_err.set(Some(TransferError::InvalidAddress));
+                return Err(GatewayError::InvalidPubkey);
+            }
         };
 
         // Aggregate instructions
@@ -104,7 +101,7 @@ pub fn use_transfer_transaction(
         let to_ata =
             spl_associated_token_account::get_associated_token_address(&destination, &token.mint);
 
-        // Always create the token account idempotently (will not fail if it already exists)
+        // Create ATA idempotently
         ixs.push(
             spl_associated_token_account::instruction::create_associated_token_account_idempotent(
                 &authority,
@@ -132,7 +129,35 @@ pub fn use_transfer_transaction(
         let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
         ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
 
-        // Build final tx
+        // Build initial transaction to estimate priority fee
+        let temp_tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+
+        // Get priority fee estimate
+        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&temp_tx).await {
+            Ok(fee) => fee,
+            Err(e) => {
+                log::warn!(
+                    "Failed to fetch priority fee estimate: {:?}, using fallback {}",
+                    e,
+                    *priority_fee.read()
+                );
+                *priority_fee.read() // Fallback to signal value
+            }
+        };
+
+        // Add priority fee instruction at the start
+        ixs.insert(
+            0,
+            ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
+        );
+
+        // Calculate priority fee in lamports for UI
+        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        let dynamic_priority_fee_in_lamports =
+            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
+        priority_fee.set(dynamic_priority_fee_in_lamports);
+
+        // Build final transaction
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
         Ok(tx)
