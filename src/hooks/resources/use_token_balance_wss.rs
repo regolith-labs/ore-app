@@ -116,20 +116,10 @@ where
     U: Fn(&AccountNotificationParams) -> GatewayResult<UiTokenAmount> + Clone + 'static,
 {
     let wallet = use_wallet();
-
     // Create and initialize the data signal
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
-
-    // Set up WebSocket subscription when wallet is connected
     use_effect(move || {
         if let Wallet::Connected(pubkey) = *wallet.read() {
-            let address = match mint.eq(&Token::sol().mint) {
-                true => pubkey,
-                false => crate::solana::spl_associated_token_account::get_associated_token_address(
-                    &pubkey, &mint,
-                ),
-            };
-
             spawn(async move {
                 match get_token_balance(pubkey, mint).await {
                     Ok(initial_data) => data.set(Ok(initial_data)),
@@ -139,8 +129,20 @@ where
                     }
                 }
             });
+        }
+    });
 
-            use_wss_subscription(data.clone(), update_callback.clone(), address);
+    // Subscribe
+    let subscriber = use_wss_subscription(data.clone(), update_callback.clone());
+    use_effect(move || {
+        if let Wallet::Connected(pubkey) = *wallet.read() {
+            let address = match mint.eq(&Token::sol().mint) {
+                true => pubkey,
+                false => crate::solana::spl_associated_token_account::get_associated_token_address(
+                    &pubkey, &mint,
+                ),
+            };
+            subscriber.send(address);
         }
     });
 

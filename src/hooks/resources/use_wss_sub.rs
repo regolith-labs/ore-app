@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use futures::StreamExt;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{AccountNotificationParams, GatewayResult};
@@ -15,12 +16,11 @@ use super::{use_wss, FromWssMsg, ToWssMsg};
 /// 1) Creating new subscriptions
 /// 2) Routing notifications
 /// 3) Closing subscriptions when the parent component unmounts
-/// TODO: could this be a coroutine where the pubkey arg is sent in?
 pub fn use_wss_subscription<T, U>(
     mut data: Signal<GatewayResult<T>>,
     update_callback: U,
-    pubkey: Pubkey,
-) where
+) -> Coroutine<Pubkey>
+where
     T: Clone + 'static,
     U: Fn(&AccountNotificationParams) -> GatewayResult<T> + 'static,
 {
@@ -52,8 +52,10 @@ pub fn use_wss_subscription<T, U>(
     });
 
     // Subscribe when component mounts
-    use_effect(move || {
-        to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
+    let pubkey_tx = use_coroutine(move |mut rx: UnboundedReceiver<Pubkey>| async move {
+        while let Some(pubkey) = rx.next().await {
+            to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
+        }
     });
 
     // Unsubscribe when component is dropped
@@ -63,4 +65,6 @@ pub fn use_wss_subscription<T, U>(
             to_wss.send(ToWssMsg::Unsubscribe(current_sub_id));
         }
     });
+
+    pubkey_tx
 }

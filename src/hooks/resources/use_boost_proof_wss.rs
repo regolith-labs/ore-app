@@ -36,11 +36,9 @@ pub(crate) fn use_boost_proofs_wss_provider() {
 }
 
 fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>> {
+    let gateway = use_gateway();
     // Create and initialize the data signal
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
-    let gateway = use_gateway();
-
-    // Initialize data with current boost
     spawn(async move {
         match gateway.get_proof(proof_address).await {
             Ok(boost) => data.set(Ok(boost)),
@@ -65,8 +63,11 @@ fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>>
         Ok(proof)
     };
 
-    // Set up WebSocket subscription when wallet is connected
-    use_wss_subscription(data.clone(), update_callback.clone(), proof_address);
+    // Subscribe
+    let subscriber = use_wss_subscription(data.clone(), update_callback.clone());
+    use_memo(move || {
+        subscriber.send(proof_address);
+    });
 
     data
 }

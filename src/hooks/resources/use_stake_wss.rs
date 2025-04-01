@@ -67,22 +67,12 @@ fn use_stake_signal(mint_address: Pubkey) -> Signal<GatewayResult<Stake>> {
         Ok(stake)
     };
 
-    // Set up WebSocket subscription when wallet is connected
+    // Subscribe
+    let subscriber = use_wss_subscription(data.clone(), update_callback.clone());
     use_effect(move || {
         if let Wallet::Connected(pubkey) = *wallet.read() {
             let stake_address = stake_pda(pubkey, boost_address).0;
-
-            spawn(async move {
-                match use_gateway().get_stake(stake_address).await {
-                    Ok(stake) => data.set(Ok(stake)),
-                    Err(err) => {
-                        log::error!("Failed to initialize stake: {:?}", err);
-                        data.set(Err(err));
-                    }
-                }
-            });
-
-            use_wss_subscription(data.clone(), update_callback.clone(), stake_address);
+            subscriber.send(stake_address);
         }
     });
 

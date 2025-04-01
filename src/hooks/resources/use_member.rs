@@ -27,7 +27,20 @@ pub fn use_member() -> Signal<GatewayResult<Member>> {
 fn use_member_wss() -> Signal<GatewayResult<Member>> {
     let wallet = use_wallet();
     let pool = use_pool();
+    // init signal
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
+    use_effect(move || {
+        if let (Wallet::Connected(pubkey), Some(pool)) = (wallet.cloned(), pool.cloned()) {
+            let address = member_pda(pubkey, pool.address).0;
+            spawn(async move {
+                let member = use_gateway().get_member(address).await;
+                data.set(member);
+            });
+        } else {
+            log::error!("missing member sub");
+        }
+    });
+    // notif callback
     fn update_callback(notif: &AccountNotificationParams) -> GatewayResult<Member> {
         let data = &notif.result.value.data;
         log::info!("decoding notif data: {:?}", data);
@@ -38,16 +51,12 @@ fn use_member_wss() -> Signal<GatewayResult<Member>> {
         let member = Member::try_from_bytes(data.as_slice())?;
         Ok(*member)
     }
+    // subscribe
+    let subscriber = use_wss_subscription(data, update_callback);
     use_effect(move || {
         if let (Wallet::Connected(pubkey), Some(pool)) = (wallet.cloned(), pool.cloned()) {
             let address = member_pda(pubkey, pool.address).0;
-            spawn(async move {
-                let member = use_gateway().get_member(address).await;
-                data.set(member);
-            });
-            use_wss_subscription(data, update_callback, address);
-        } else {
-            log::error!("missing member sub");
+            subscriber.send(address);
         }
     });
     data

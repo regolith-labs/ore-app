@@ -62,8 +62,9 @@ fn use_boost_signal(boost_address: Pubkey) -> Signal<GatewayResult<Boost>> {
         Ok(boost)
     };
 
-    // Set up WebSocket subscription when wallet is connected
-    use_wss_subscription(data.clone(), update_callback.clone(), boost_address);
+    // subscribe
+    let subscriber = use_wss_subscription(data.clone(), update_callback.clone());
+    use_effect(move || subscriber.send(boost_address));
 
     data
 }
