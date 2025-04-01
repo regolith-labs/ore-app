@@ -5,12 +5,14 @@ use solana_sdk::transaction::Transaction;
 
 use crate::{
     components::*,
-    gateway::{pool::PoolGateway, GatewayResult},
+    gateway::{pool::PoolGateway, GatewayError, GatewayResult},
     hooks::{
-        on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
-        use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_transaction_status, use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
+        build_commit_claim_instructions, on_transaction_done, use_gateway, use_member,
+        use_member_record, use_member_record_balance, use_miner, use_miner_cores,
+        use_miner_is_active, use_miner_status, use_ore_balance_wss, use_pool,
+        use_pool_register_transaction, use_pool_url, use_sol_balance_wss,
+        use_system_cpu_utilization, use_transaction_status, use_wallet, MinerStatus,
+        PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -324,25 +326,68 @@ fn MinerRewards() -> Element {
     let member = use_member();
     let member_db = use_member_record();
     let member_db_balance = use_member_record_balance();
-    // claimable balance
-    let member_claimable_balance = use_memo(move || match member_db_balance.cloned() {
-        Some(member_db_balance) => {
-            if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member.cloned()) {
-                log::info!("///////////////////////////////////////////////////");
-                log::info!("member db balance: {:?}", member_db_balance);
-                log::info!("member balance: {:?}", member.total_balance);
-                let diff = member_db_balance.saturating_sub(member.total_balance);
-                log::info!("diff: {:?}", diff);
-                let claimable_balance = member.balance + diff;
-                MemberBalance::Balance(claimable_balance)
-            } else {
-                MemberBalance::Null
-            }
-        }
-        _ => MemberBalance::Loading,
+    let sol_balance_wss = use_sol_balance_wss();
+    let mut sol_balance = use_signal(|| "0".to_string());
+    let pool = use_pool();
+    use_effect(move || {
+        let b = match sol_balance_wss.cloned() {
+            Ok(b) => b.ui_amount_string,
+            Err(err) => "0".to_string(),
+        };
+        log::info!("sol balance: {}", b);
+        sol_balance.set(b);
     });
-    // claim transaction builder
-    let claim_tx = use_miner_claim_transaction(member, member_db, member_claimable_balance);
+    let ore_balance_wss = use_ore_balance_wss();
+    let mut ore_balance = use_signal(|| "0".to_string());
+    use_effect(move || {
+        let b = match ore_balance_wss.cloned() {
+            Ok(b) => b.ui_amount_string,
+            Err(err) => "0".to_string(),
+        };
+        log::info!("ore balance: {}", b);
+        ore_balance.set(b);
+    });
+    // init claimable balance
+    let mut member_claimable_balance = use_signal(|| MemberBalance::Loading);
+    use_effect(move || {
+        let balance = match member_db_balance.cloned() {
+            Some(member_db_balance) => {
+                if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member.cloned()) {
+                    // claimable balance
+                    log::info!("///////////////////////////////////////////////////");
+                    log::info!("member db total balance: {:?}", member_db_balance);
+                    log::info!("member total balance: {:?}", member.total_balance);
+                    let diff = member_db_balance.saturating_sub(member.total_balance);
+                    log::info!("diff: {:?}", diff);
+                    log::info!("member balance: {:?}", member.balance);
+                    MemberBalance::Balance(member.balance + diff)
+                } else {
+                    MemberBalance::Null
+                }
+            }
+            _ => MemberBalance::Loading,
+        };
+        member_claimable_balance.set(balance);
+    });
+    // init claim transaction
+    let mut claim_tx = use_signal(|| Err(GatewayError::RequestFailed));
+    use_effect(move || {
+        if let (Some(Ok(member_db_balance)), Ok(member), Some(pool)) =
+            (member_db_balance.cloned(), member.cloned(), pool.cloned())
+        {
+            spawn(async move {
+                let gateway = use_gateway();
+                if let Ok(ixs) =
+                    build_commit_claim_instructions(&gateway.rpc, &pool, &member, member_db_balance)
+                        .await
+                {
+                    let tx = Transaction::new_with_payer(&ixs, Some(&member.authority));
+                    claim_tx.set(Ok(tx));
+                }
+            });
+        }
+    });
+    // hidden toggle
     let mut info_hidden = use_signal(|| true);
     rsx! {
         Col { gap: 4,
@@ -383,19 +428,21 @@ fn MinerRewards() -> Element {
             }
             MinerRewardsClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
         }
+            div { "{sol_balance}" }
+            div { "{ore_balance}" }
     }
 }
 
 #[component]
 pub fn MinerRewardsClaimButton(
-    transaction: Resource<GatewayResult<Transaction>>,
+    transaction: Signal<GatewayResult<Transaction>>,
     tx_type: TransactionType,
 ) -> Element {
     let pool_url = use_pool_url();
     let member = use_member();
     let mut transaction_status = use_transaction_status();
 
-    let enabled = if let Some(Ok(_)) = transaction.read().as_ref() {
+    let enabled = if let Ok(_) = transaction.read().as_ref() {
         true
     } else {
         false
@@ -407,7 +454,7 @@ pub fn MinerRewardsClaimButton(
             disabled: !enabled,
             onclick: move |_| {
                 spawn(async move {
-                    if let (Some(pool_url), Ok(member), Some(Ok(tx))) = (
+                    if let (Some(pool_url), Ok(member), Ok(tx)) = (
                         pool_url.cloned(),
                         member.cloned(),
                         transaction.cloned(),

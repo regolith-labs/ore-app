@@ -12,7 +12,7 @@ use crate::solana::spl_associated_token_account;
 
 pub fn use_pool_commit_claim_transaction_submit(
     pool: Resource<Pool>,
-    member_record: Resource<GatewayResult<ore_pool_types::Member>>,
+    member_record_balance: Resource<GatewayResult<u64>>,
     member: Resource<GatewayResult<ore_pool_api::state::Member>>,
     start: Signal<bool>,
 ) -> Signal<CommitClaimStatus> {
@@ -22,9 +22,11 @@ pub fn use_pool_commit_claim_transaction_submit(
         // fired off by register button
         if *start.read() {
             // match on accounts
-            if let (Some(pool), Some(Ok(member)), Some(Ok(member_record))) =
-                (pool.cloned(), member.cloned(), member_record.cloned())
-            {
+            if let (Some(pool), Some(Ok(member)), Some(Ok(member_record_balance))) = (
+                pool.cloned(),
+                member.cloned(),
+                member_record_balance.cloned(),
+            ) {
                 spawn(async move {
                     if let Err(err) = async {
                         transaction_status.set(Some(TransactionStatus::Waiting));
@@ -33,7 +35,7 @@ pub fn use_pool_commit_claim_transaction_submit(
                             &gateway.rpc,
                             &pool,
                             &member,
-                            &member_record,
+                            member_record_balance,
                         )
                         .await?;
                         // build transaction
@@ -73,7 +75,7 @@ pub async fn build_commit_claim_instructions<R: Rpc>(
     gateway: &R,
     pool: &Pool,
     member: &ore_pool_api::state::Member,
-    member_record: &ore_pool_types::Member,
+    member_record_balance: u64,
 ) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
     use solana_sdk::compute_budget::ComputeBudgetInstruction;
     let mut instructions = Vec::with_capacity(4);
@@ -82,7 +84,7 @@ pub async fn build_commit_claim_instructions<R: Rpc>(
     instructions.push(ComputeBudgetInstruction::set_compute_unit_price(20_000));
     // add core instructions
     let mut core_instructions =
-        build_core_commit_claim_instructions(gateway, pool, member, member_record).await?;
+        build_core_commit_claim_instructions(gateway, pool, member, member_record_balance).await?;
     instructions.append(&mut core_instructions);
     Ok(instructions)
 }
@@ -92,10 +94,10 @@ pub async fn build_commit_claim_instructions<R: Rpc>(
     gateway: &R,
     pool: &Pool,
     member: &ore_pool_api::state::Member,
-    member_record: &ore_pool_types::Member,
+    member_record_balance: u64,
 ) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
     // For web, we just use the core instructions directly
-    build_core_commit_claim_instructions(gateway, pool, member, member_record).await
+    build_core_commit_claim_instructions(gateway, pool, member, member_record_balance).await
 }
 
 #[derive(Copy, Clone)]
@@ -110,7 +112,7 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
     gateway: &R,
     pool: &Pool,
     member: &ore_pool_api::state::Member,
-    member_record: &ore_pool_types::Member,
+    member_record_balance: u64,
 ) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
     let mut instructions = Vec::new();
     // commit
@@ -119,7 +121,7 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
     let commit_ix = ore_pool_api::sdk::attribute(
         pool_account.authority,
         member.authority,
-        member_record.total_balance as u64,
+        member_record_balance,
     );
     instructions.push(commit_ix);
     // claim
@@ -143,8 +145,16 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
         instructions.push(create_ata);
     };
     // 2) build claim amount
-    let diff = member_record.total_balance as u64 - member.total_balance;
+    let diff = member_record_balance as u64 - member.total_balance;
     let claim_amount = member.balance + diff;
+    log::info!(
+        "builder: member db total balance: {:?}",
+        member_record_balance
+    );
+    log::info!("builder: member total balance: {}", member.total_balance);
+    log::info!("builder: member balance: {}", member.balance);
+    log::info!("builder: diff: {}", diff);
+    log::info!("builder: claim amount: {}", claim_amount);
     // 3) create claim instruction
     let claim_ix =
         ore_pool_api::sdk::claim(member.authority, claim_ata, pool.address, claim_amount);

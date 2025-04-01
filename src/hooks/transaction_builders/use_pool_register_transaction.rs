@@ -1,9 +1,9 @@
 use crate::{
     gateway::{GatewayError, GatewayResult},
     hooks::{
-        use_gateway, use_member_record_resource_deprecated, use_member_resource_deprecated,
-        use_pool, use_pool_deprecated, use_wallet, GetPubkey, APP_FEE, APP_FEE_ACCOUNT,
-        COMPUTE_UNIT_LIMIT,
+        use_gateway, use_member_record_resource_balance_deprecated,
+        use_member_record_resource_deprecated, use_member_resource_deprecated, use_pool,
+        use_pool_deprecated, use_wallet, GetPubkey, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
     },
 };
 use dioxus::prelude::*;
@@ -32,11 +32,11 @@ pub fn use_pool_register_transaction(
     let pool_deprecated = use_pool_deprecated();
     // deprecated onchain and db member accounts
     let member_deprecated = use_member_resource_deprecated();
-    let member_record_deprecated = use_member_record_resource_deprecated();
+    let member_record_balance_deprecated = use_member_record_resource_balance_deprecated();
     // commit and claim from deprecated pool before joining new pool
     let commit_claim_status = use_pool_commit_claim_transaction_submit(
         pool_deprecated,
-        member_record_deprecated,
+        member_record_balance_deprecated,
         member_deprecated,
         start,
     );
