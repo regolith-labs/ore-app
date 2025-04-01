@@ -1,10 +1,8 @@
 use crate::{
-    components::{Col, Row, StakingContent, TokenomicsContent},
+    components::{Col, MiningContent, Row, StakingContent, TokenomicsContent},
     hooks::{use_docs_drawer_state, DocsDrawerState},
 };
 use dioxus::prelude::*;
-
-use super::docs_mining_content::MiningContent;
 
 #[derive(Clone, Copy, PartialEq)]
 pub(crate) enum DocsTab {
