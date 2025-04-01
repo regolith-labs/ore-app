@@ -47,6 +47,7 @@ pub fn Download() -> Element {
     }
 }
 
+#[cfg(feature = "web")]
 #[component]
 fn DownloadSection(os: String, os_icon: Element, url: String, download_text: String) -> Element {
     rsx! {
