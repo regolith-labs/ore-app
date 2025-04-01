@@ -100,7 +100,6 @@ fn DocsHeader(on_close: EventHandler<MouseEvent>) -> Element {
 fn DocsTabButton(tab: DocsTab) -> Element {
     let mut docs_state = use_docs_drawer_state();
     let current_tab = use_memo(move || docs_state.read().tab);
-
     let title = match tab {
         DocsTab::Mining => "Mining",
         DocsTab::Staking => "Staking",
