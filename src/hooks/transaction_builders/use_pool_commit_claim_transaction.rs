@@ -147,14 +147,6 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
     // 2) build claim amount
     let diff = member_record_balance as u64 - member.total_balance;
     let claim_amount = member.balance + diff;
-    log::info!(
-        "builder: member db total balance: {:?}",
-        member_record_balance
-    );
-    log::info!("builder: member total balance: {}", member.total_balance);
-    log::info!("builder: member balance: {}", member.balance);
-    log::info!("builder: diff: {}", diff);
-    log::info!("builder: claim amount: {}", claim_amount);
     // 3) create claim instruction
     let claim_ix =
         ore_pool_api::sdk::claim(member.authority, claim_ata, pool.address, claim_amount);

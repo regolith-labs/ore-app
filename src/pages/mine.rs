@@ -9,10 +9,9 @@ use crate::{
     hooks::{
         build_commit_claim_instructions, on_transaction_done, use_gateway, use_help_drawer_state,
         use_member, use_member_record, use_member_record_balance, use_miner, use_miner_cores,
-        use_miner_is_active, use_miner_status, use_ore_balance_wss, use_pool,
-        use_pool_register_transaction, use_pool_url, use_sol_balance_wss,
-        use_system_cpu_utilization, use_transaction_status, use_wallet, HelpDrawerPage,
-        MinerStatus, PoolRegisterStatus, Wallet,
+        use_miner_is_active, use_miner_status, use_pool, use_pool_register_transaction,
+        use_pool_url, use_system_cpu_utilization, use_transaction_status, use_wallet,
+        HelpDrawerPage, MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -329,29 +328,8 @@ pub enum MemberBalance {
 
 fn MinerRewards() -> Element {
     let member = use_member();
-    let member_db = use_member_record();
     let member_db_balance = use_member_record_balance();
-    let sol_balance_wss = use_sol_balance_wss();
-    let mut sol_balance = use_signal(|| "0".to_string());
     let pool = use_pool();
-    use_effect(move || {
-        let b = match sol_balance_wss.cloned() {
-            Ok(b) => b.ui_amount_string,
-            Err(err) => "0".to_string(),
-        };
-        log::info!("sol balance: {}", b);
-        sol_balance.set(b);
-    });
-    let ore_balance_wss = use_ore_balance_wss();
-    let mut ore_balance = use_signal(|| "0".to_string());
-    use_effect(move || {
-        let b = match ore_balance_wss.cloned() {
-            Ok(b) => b.ui_amount_string,
-            Err(err) => "0".to_string(),
-        };
-        log::info!("ore balance: {}", b);
-        ore_balance.set(b);
-    });
     // init claimable balance
     let mut member_claimable_balance = use_signal(|| MemberBalance::Loading);
     use_effect(move || {
@@ -359,12 +337,7 @@ fn MinerRewards() -> Element {
             Some(member_db_balance) => {
                 if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member.cloned()) {
                     // claimable balance
-                    log::info!("///////////////////////////////////////////////////");
-                    log::info!("member db total balance: {:?}", member_db_balance);
-                    log::info!("member total balance: {:?}", member.total_balance);
                     let diff = member_db_balance.saturating_sub(member.total_balance);
-                    log::info!("diff: {:?}", diff);
-                    log::info!("member balance: {:?}", member.balance);
                     MemberBalance::Balance(member.balance + diff)
                 } else {
                     MemberBalance::Null
@@ -433,8 +406,6 @@ fn MinerRewards() -> Element {
             }
             MinerRewardsClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
         }
-            div { "{sol_balance}" }
-            div { "{ore_balance}" }
     }
 }
 
@@ -625,11 +596,14 @@ fn MineHelpButton() -> Element {
     }
 }
 
+// Only show the download CTA on web
+#[cfg(not(feature = "web"))]
 fn DownloadCTA() -> Element {
-    // Only show the download CTA on web
-    #[cfg(not(feature = "web"))]
-    return rsx! {};
+    rsx! {}
+}
 
+#[cfg(feature = "web")]
+fn DownloadCTA() -> Element {
     rsx! {
         div {
             class: "w-full mt-4 mb-8",
