@@ -328,7 +328,7 @@ fn MinerRewards() -> Element {
     let member_claimable_balance = use_memo(move || match member_db_balance.cloned() {
         Some(member_db_balance) => {
             if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member.cloned()) {
-                let diff = member_db_balance - member.total_balance;
+                let diff = member_db_balance.saturating_sub(member.total_balance);
                 let claimable_balance = member.balance + diff;
                 MemberBalance::Balance(claimable_balance)
             } else {
