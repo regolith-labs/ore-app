@@ -31,21 +31,16 @@ fn use_member_wss() -> Signal<GatewayResult<Member>> {
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
     use_effect(move || {
         if let (Wallet::Connected(pubkey), Some(pool)) = (wallet.cloned(), pool.cloned()) {
-            log::info!("/////////////////////////////////");
-            log::info!("member sub");
             let address = member_pda(pubkey, pool.address).0;
             spawn(async move {
                 let member = use_gateway().get_member(address).await;
                 data.set(member);
             });
-        } else {
-            log::error!("missing member sub");
         }
     });
     // notif callback
     fn update_callback(notif: &AccountNotificationParams) -> GatewayResult<Member> {
         let data = &notif.result.value.data;
-        log::info!("decoding notif data: {:?}", data);
         let data = data.first().ok_or(GatewayError::AccountNotFound)?;
         let data = BASE64_STANDARD
             .decode(data.clone())
