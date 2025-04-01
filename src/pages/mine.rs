@@ -23,6 +23,7 @@ pub fn Mine() -> Element {
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
             Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
+            DownloadCTA {}
                 Row {
                     class: "w-full justify-between",
                     Heading {
@@ -538,6 +539,42 @@ fn MineHelpButton() -> Element {
                 }
                 BulbIcon {
                     class: "w-4 text-elements-midEmphasis"
+                }
+            }
+        }
+    }
+}
+
+fn DownloadCTA() -> Element {
+    rsx! {
+        div {
+            class: "w-full mt-4 mb-8",
+            div {
+                class: "flex items-center justify-between rounded-lg py-4 px-6 border border-elements-gold",
+                div {
+                    class: "flex items-center",
+                    DownloadIcon {
+                        class: "w-8 h-8 mr-4 text-elements-gold"
+                    }
+                    div {
+                        class: "flex flex-col",
+                        span {
+                            class: "text-elements-highEmphasis font-medium",
+                            "Download our desktop app"
+                        }
+                        span {
+                            class: "text-elements-lowEmphasis text-sm",
+                            "Get more mining power with our native desktop app"
+                        }
+                    }
+                }
+                Link {
+                    to: "/download",
+                    class: "h-12 px-6 rounded-full controls-gold flex items-center justify-center",
+                    span {
+                        class: "font-semibold",
+                        "Download"
+                    }
                 }
             }
         }
