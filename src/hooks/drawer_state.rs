@@ -1,10 +1,6 @@
 use dioxus::prelude::*;
 
-#[derive(Clone)]
-pub enum HelpDrawerPage {
-    Mine,
-    Stake,
-}
+use crate::components::DocsTab;
 
 // Signal for managing the visibility of the wallet drawer
 pub type IsWalletDrawerOpen = bool;
@@ -19,24 +15,24 @@ pub fn use_wallet_drawer_state() -> Signal<IsWalletDrawerOpen> {
     use_context::<Signal<IsWalletDrawerOpen>>()
 }
 
-// Signal for managing the visibility and content of the help drawer
+// Signal for managing the visibility and content of the docs drawer
 #[derive(Clone)]
-pub struct HelpDrawerState {
+pub struct DocsDrawerState {
     pub is_open: bool,
-    pub current_page: HelpDrawerPage,
+    pub tab: DocsTab,
 }
 
 // Provider hook for help drawer state
-pub fn use_help_drawer_state_provider() {
-    use_context_provider::<Signal<HelpDrawerState>>(|| {
-        Signal::new(HelpDrawerState {
+pub fn use_docs_drawer_state_provider() {
+    use_context_provider::<Signal<DocsDrawerState>>(|| {
+        Signal::new(DocsDrawerState {
             is_open: false,
-            current_page: HelpDrawerPage::Mine,
+            tab: DocsTab::Mining,
         })
     });
 }
 
 // Hook to get or set the help drawer state
-pub fn use_help_drawer_state() -> Signal<HelpDrawerState> {
-    use_context::<Signal<HelpDrawerState>>()
+pub fn use_docs_drawer_state() -> Signal<DocsDrawerState> {
+    use_context::<Signal<DocsDrawerState>>()
 }

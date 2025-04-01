@@ -40,10 +40,16 @@ pub fn Trade(token_pair: Option<String>) -> Element {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 8,
-            Heading {
-                class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: "Trade",
-                subtitle: "Swap tokens at the best price."
+            Row {
+                class: "mx-auto w-full max-w-2xl px-5 sm:px-8 justify-between",
+                Heading {
+                    class: "w-full",
+                    title: "Trade",
+                    subtitle: "Swap tokens at the best price."
+                }
+                DocsButton {
+                    tab: DocsTab::Tokenomics
+                }
             }
             SwapForm {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",

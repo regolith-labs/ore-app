@@ -6,11 +6,10 @@ use crate::{
     components::*,
     gateway::pool::PoolGateway,
     hooks::{
-        on_transaction_done, use_gateway, use_help_drawer_state, use_member, use_member_record,
-        use_member_record_balance, use_miner, use_miner_claim_transaction, use_miner_cores,
-        use_miner_is_active, use_miner_status, use_pool_register_transaction, use_pool_url,
-        use_system_cpu_utilization, use_wallet, HelpDrawerPage, MinerStatus, PoolRegisterStatus,
-        Wallet,
+        on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
+        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
+        use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
+        use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -30,7 +29,9 @@ pub fn Mine() -> Element {
                         title: "Mine",
                         subtitle: "Convert energy into cryptocurrency."
                     }
-                    MineHelpButton {}
+                    DocsButton {
+                        tab: DocsTab::Mining
+                    }
                 }
                 MinerData {}
             }
@@ -54,10 +55,13 @@ fn MinerData() -> Element {
         Col { class: "w-full flex-wrap mx-auto justify-between gap-12",
             Alert {}
             MinerStatus {}
-            Col { class: "w-full gap-8",
+            Col {
+                class: "w-full gap-8",
                 MinerCores {}
                 MinePower {}
-                DownloadCTA {}
+                if cfg!(feature = "web") {
+                    DownloadCTA {}
+                }
             }
             TimeRemaining {}
             MinerPendingRewards {}
@@ -296,25 +300,31 @@ fn MinerCores() -> Element {
                     hidden: info_hidden,
                 }
             }
-            Row { class: "justify-between",
-                span { class: "font-semibold text-2xl sm:text-3xl", "{cores}" }
-                Row { gap: 2,
-                    button {
-                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
-                        onclick: move |_| {
-                            let current = cores.peek().clone() - 1;
-                            cores.set(current.max(1));
-                        },
-                        "–"
-                    }
-                    button {
-                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl hover:disabled:cursor-not-allowed",
-                        disabled: cfg!(feature = "web"),
-                        onclick: move |_| {
-                            let current = cores.peek().clone() + 1;
-                            cores.set(current.min(max));
-                        },
-                        "+"
+            Row {
+                class: "justify-between",
+                span {
+                    class: "font-semibold text-2xl sm:text-3xl", "{cores}"
+                }
+                if cfg!(not(feature = "web")) {
+                    Row {
+                        gap: 2,
+                        button {
+                            class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
+                            onclick: move |_| {
+                                let current = cores.peek().clone() - 1;
+                                cores.set(current.max(1));
+                            },
+                            "–"
+                        }
+                        button {
+                            class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl hover:disabled:cursor-not-allowed",
+                            disabled: cfg!(feature = "web"),
+                            onclick: move |_| {
+                                let current = cores.peek().clone() + 1;
+                                cores.set(current.min(max));
+                            },
+                            "+"
+                        }
                     }
                 }
             }
@@ -498,38 +508,8 @@ fn MinePower() -> Element {
     }
 }
 
-// Help button specific to the Mine page
-fn MineHelpButton() -> Element {
-    let mut drawer_state = use_help_drawer_state();
-
-    rsx! {
-        button {
-            onclick: move |_| {
-                let mut current = drawer_state.read().clone();
-                current.is_open = true;
-                current.current_page = HelpDrawerPage::Mine;
-                drawer_state.set(current);
-            },
-            Row {
-                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer",
-                gap: 2,
-                span {
-                    class: "mx-auto my-auto",
-                    "Help"
-                }
-                BulbIcon {
-                    class: "w-4 text-elements-midEmphasis"
-                }
-            }
-        }
-    }
-}
-
+#[cfg(feature = "web")]
 fn DownloadCTA() -> Element {
-    // Only show the download CTA on web
-    #[cfg(not(feature = "web"))]
-    return rsx! {};
-
     rsx! {
         div {
             class: "w-full mt-4 mb-8",
@@ -548,7 +528,7 @@ fn DownloadCTA() -> Element {
                         }
                         span {
                             class: "text-elements-lowEmphasis text-sm",
-                            "Get more power with the native desktop miner."
+                            "Get more power out of your machine with the native desktop miner."
                         }
                     }
                 }

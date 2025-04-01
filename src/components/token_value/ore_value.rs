@@ -55,6 +55,7 @@ pub fn OreValue(
                 "text-base",
                 "font-medium",
             ),
+            TokenValueSize::Medium => ("gap-2", "h-5 w-5", "text-lg", "text-lg", "font-semibold"),
             TokenValueSize::Large => (
                 "gap-3 h-10",
                 "h-6 w-6 sm:h-8 sm:w-8",

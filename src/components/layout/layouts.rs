@@ -16,7 +16,7 @@ pub fn AppLayout() -> Element {
                 Outlet::<Route> {}
             }
             ToastDisplay {}
-            HelpDrawer {}
+            DocsDrawer {}
         }
     }
 }

@@ -74,7 +74,7 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
                         "{first_four}...{last_four}"
                     }
                     DrawerIcon {
-                        class: "w-3 text-gray-700"
+                        class: "w-3 text-elements-lowEmphasis"
                     }
                 }
             }

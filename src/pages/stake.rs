@@ -3,10 +3,7 @@ use ore_types::request::TransactionType;
 
 use crate::{
     components::*,
-    hooks::{
-        use_boost_claim_all_transaction, use_help_drawer_state, use_net_deposits, use_net_yield,
-        HelpDrawerPage,
-    },
+    hooks::{use_boost_claim_all_transaction, use_net_deposits, use_net_yield},
 };
 
 pub fn Stake() -> Element {
@@ -21,7 +18,9 @@ pub fn Stake() -> Element {
                     title: "Stake",
                     subtitle: "Provide liquidity and earn yield."
                 }
-                StakeHelpButton {}
+                DocsButton {
+                    tab: DocsTab::Staking
+                }
             }
             Col {
                 gap: 16,
@@ -122,33 +121,6 @@ fn ClaimButton() -> Element {
             span {
                 class: "my-auto mx-auto text-nowrap",
                 "Claim"
-            }
-        }
-    }
-}
-
-// Help button specific to the Stake page
-fn StakeHelpButton() -> Element {
-    let mut drawer_state = use_help_drawer_state();
-
-    rsx! {
-        button {
-            onclick: move |_| {
-                let mut current = drawer_state.read().clone();
-                current.is_open = true;
-                current.current_page = HelpDrawerPage::Stake;
-                drawer_state.set(current);
-            },
-            Row {
-                class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer",
-                gap: 2,
-                span {
-                    class: "mx-auto my-auto",
-                    "Help"
-                }
-                BulbIcon {
-                    class: "w-4 text-elements-midEmphasis"
-                }
             }
         }
     }
