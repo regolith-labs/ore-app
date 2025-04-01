@@ -46,7 +46,7 @@ pub fn use_wss_provider() {
     let _to_wss = use_coroutine(move |mut rx: UnboundedReceiver<ToWssMsg>| async move {
         if let Err(err) = async {
             // Create channel for sending commands to the WebSocket worker
-            let (cmd_tx, cmd_rx) = mpsc::channel::<WssCommand>(10);
+            let (cmd_tx, cmd_rx) = mpsc::channel::<WssCommand>(100);
 
             // Spawn the WebSocket worker task that owns the WebSocket connection exclusively
             spawn(wss_worker(cmd_rx, from_wss.clone()));
