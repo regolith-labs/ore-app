@@ -1,6 +1,6 @@
 use crate::{
     components::{Col, Row, StakingContent, TokenomicsContent},
-    hooks::DocsDrawerState,
+    hooks::{use_docs_drawer_state, DocsDrawerState},
 };
 use dioxus::prelude::*;
 
@@ -46,7 +46,8 @@ fn DocsCloseButton(on_close: EventHandler<MouseEvent>) -> Element {
 }
 #[component]
 fn DocsContent(on_close: EventHandler<MouseEvent>) -> Element {
-    let current_tab = use_signal(|| DocsTab::Mining);
+    let docs_state = use_docs_drawer_state();
+    let current_tab = use_memo(move || docs_state.read().tab);
     rsx! {
         Fragment {
             Col {
@@ -55,9 +56,9 @@ fn DocsContent(on_close: EventHandler<MouseEvent>) -> Element {
                 DocsHeader { on_close: on_close.clone() }
                 Row {
                     class: "w-full mb-4 bg-surface-elevated border-b border-gray-800",
-                    DocsTabButton { current_tab: current_tab.clone(), tab: DocsTab::Mining }
-                    DocsTabButton { current_tab: current_tab.clone(), tab: DocsTab::Staking }
-                    DocsTabButton { current_tab: current_tab.clone(), tab: DocsTab::Tokenomics }
+                    DocsTabButton { tab: DocsTab::Mining }
+                    DocsTabButton { tab: DocsTab::Staking }
+                    DocsTabButton { tab: DocsTab::Tokenomics }
                 }
                 div {
                     match *current_tab.read() {
@@ -96,7 +97,10 @@ fn DocsHeader(on_close: EventHandler<MouseEvent>) -> Element {
 }
 
 #[component]
-fn DocsTabButton(current_tab: Signal<DocsTab>, tab: DocsTab) -> Element {
+fn DocsTabButton(tab: DocsTab) -> Element {
+    let mut docs_state = use_docs_drawer_state();
+    let current_tab = use_memo(move || docs_state.read().tab);
+
     let title = match tab {
         DocsTab::Mining => "Mining",
         DocsTab::Staking => "Staking",
@@ -110,7 +114,11 @@ fn DocsTabButton(current_tab: Signal<DocsTab>, tab: DocsTab) -> Element {
             } else {
                 "text-lg text-elements-lowEmphasis"
             },
-            onclick: move |_| current_tab.set(tab),
+            onclick: move |_| {
+                let mut current = docs_state.read().clone();
+                current.tab = tab;
+                docs_state.set(current);
+            },
             "{title}"
         }
     }
