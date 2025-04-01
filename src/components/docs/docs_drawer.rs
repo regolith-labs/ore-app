@@ -3,14 +3,14 @@ use crate::hooks::use_help_drawer_state;
 use dioxus::prelude::*;
 use std::time::Duration;
 
-pub fn HelpDrawer() -> Element {
+pub fn DocsDrawer() -> Element {
     let mut drawer_state = use_help_drawer_state();
     let drawer_remount = use_signal(|| false);
     let mut is_animating = use_signal(|| false);
 
     // Only render the drawer, not the button
     rsx! {
-        HelpDrawerOverlay {
+        DocsDrawerOverlay {
             drawer_state: drawer_state,
             is_animating: is_animating,
             on_close: move |_| {
@@ -31,7 +31,7 @@ pub fn HelpDrawer() -> Element {
 }
 
 #[component]
-fn HelpDrawerOverlay(
+fn DocsDrawerOverlay(
     drawer_state: Signal<crate::hooks::HelpDrawerState>,
     is_animating: Signal<bool>,
     on_close: EventHandler<MouseEvent>,
@@ -58,7 +58,7 @@ fn HelpDrawerOverlay(
                 class: "fixed top-0 right-0 h-full w-screen sm:w-[574px] transition-transform duration-500 ease-in-out transform z-[1001] scrollbar-hide",
                 class: if is_open { "wallet-drawer-slide translate-x-0" } else { "wallet-drawer-slide-out translate-x-full" },
                 style: "height: 100vh;",
-                HelpDrawerWrapper {
+                DocsDrawerWrapper {
                     drawer_state: drawer_state,
                     on_close: on_close.clone(),
                     drawer_remount: drawer_remount

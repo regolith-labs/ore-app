@@ -23,16 +23,12 @@ pub fn use_wallet_drawer_state() -> Signal<IsWalletDrawerOpen> {
 #[derive(Clone)]
 pub struct HelpDrawerState {
     pub is_open: bool,
-    pub current_page: HelpDrawerPage,
 }
 
 // Provider hook for help drawer state
 pub fn use_help_drawer_state_provider() {
     use_context_provider::<Signal<HelpDrawerState>>(|| {
-        Signal::new(HelpDrawerState {
-            is_open: false,
-            current_page: HelpDrawerPage::Mine,
-        })
+        Signal::new(HelpDrawerState { is_open: false })
     });
 }
 

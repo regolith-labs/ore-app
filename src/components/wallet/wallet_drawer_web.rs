@@ -105,7 +105,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
 
     rsx! {
         div {
-            class: "flex flex-col h-full w-screen sm:w-96 elevated elevated-border text-white z-50 relative",
+            class: "flex flex-col h-full w-screen sm:w-96 elevated border-l border-gray-800 text-white z-50 relative",
             onclick: move |e| e.stop_propagation(),
 
             // Header section with fixed content

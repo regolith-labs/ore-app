@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::components::*;
+use crate::hooks::use_help_drawer_state;
 use crate::route::Route;
 
 use super::navigation::*;
@@ -16,7 +17,7 @@ pub fn AppLayout() -> Element {
                 Outlet::<Route> {}
             }
             ToastDisplay {}
-            HelpDrawer {}
+            DocsDrawer {}
         }
     }
 }

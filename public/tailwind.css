@@ -1119,6 +1119,12 @@
   .overflow-y-auto {
     overflow-y: auto;
   }
+  .overflow-y-clip {
+    overflow-y: clip;
+  }
+  .overflow-y-scroll {
+    overflow-y: scroll;
+  }
   .rounded {
     border-radius: 0.25rem;
   }
@@ -1156,6 +1162,10 @@
   .border-b {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
+  }
+  .border-l {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 1px;
   }
   .border-l-2 {
     border-left-style: var(--tw-border-style);
@@ -2341,6 +2351,9 @@ body {
   .top-safe {
     top: 0;
     padding-top: env(safe-area-inset-top);
+  }
+  .no-scroll {
+    overflow: hidden;
   }
   .controls-primary {
     display: flex;
