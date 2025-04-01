@@ -19,11 +19,9 @@ use ore_types::request::TransactionType;
 pub fn Mine() -> Element {
     rsx! {
         Col {
-            // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 16,
             Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
-            DownloadCTA {}
                 Row {
                     class: "w-full justify-between",
                     Heading {
@@ -58,6 +56,7 @@ fn MinerData() -> Element {
             Col { class: "w-full gap-8",
                 MinerCores {}
                 MinePower {}
+                DownloadCTA {}
             }
             TimeRemaining {}
             MinerPendingRewards {}
@@ -331,10 +330,6 @@ fn MinerPendingRewards() -> Element {
             if let Some(Ok(member)) = member.cloned() {
                 if member_record_balance > member.total_balance {
                     Col { gap: 4,
-                        // span {
-                        //     class: "text-elements-lowEmphasis font-medium",
-                        //     "Rewards (pending)"
-                        // }
                         button {
                             class: "flex flex-col gap-0 group",
                             onclick: move |_| info_hidden.set(!info_hidden.cloned()),
@@ -371,10 +366,6 @@ fn MinerRewards() -> Element {
     let mut info_hidden = use_signal(|| true);
     rsx! {
         Col { gap: 4,
-            // span {
-            //     class: "text-elements-lowEmphasis font-medium",
-            //     "Rewards"
-            // }
             button {
                 class: "flex flex-col gap-0 group",
                 onclick: move |_| info_hidden.set(!info_hidden.cloned()),
@@ -449,18 +440,6 @@ fn MinePower() -> Element {
 
     rsx! {
         Col { class: "relative flex w-full mx-auto pr-2", gap: 4,
-            // Keyframes for the animation
-            // style {
-            //     "@keyframes blockPulse {{
-            //         0% {{ opacity: 0; }}
-            //         100% {{ opacity: 1; }}
-            //     }}"
-            // }
-
-            // span {
-            //     class: "text-elements-lowEmphasis font-medium",
-            //     "Core utilization"
-            // }
 
             // Manual column layout with increased spacing between columns
             div { class: "flex flex-col md:flex-row gap-8 w-full",
@@ -546,11 +525,15 @@ fn MineHelpButton() -> Element {
 }
 
 fn DownloadCTA() -> Element {
+    // Only show the download CTA on web
+    #[cfg(not(feature = "web"))]
+    return rsx! {};
+
     rsx! {
         div {
             class: "w-full mt-4 mb-8",
             div {
-                class: "flex items-center justify-between rounded-lg py-4 px-6 border border-elements-gold",
+                class: "flex items-center justify-between rounded-lg py-4 px-6 border border-elements-gold relative",
                 div {
                     class: "flex items-center",
                     DownloadIcon {
@@ -560,11 +543,11 @@ fn DownloadCTA() -> Element {
                         class: "flex flex-col",
                         span {
                             class: "text-elements-highEmphasis font-medium",
-                            "Download our desktop app"
+                            "Download the desktop app"
                         }
                         span {
                             class: "text-elements-lowEmphasis text-sm",
-                            "Get more mining power with our native desktop app"
+                            "Get more power with the native desktop miner."
                         }
                     }
                 }

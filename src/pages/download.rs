@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 #[cfg(feature = "web")]
 use crate::{
-    components::{AppleIcon, Col, DownloadIcon, Heading, Row, WindowsIcon},
+    components::{AppleIcon, Col, DownloadIcon, Heading, WindowsIcon},
     hooks::{parse_download_url, use_download_url},
 };
 
