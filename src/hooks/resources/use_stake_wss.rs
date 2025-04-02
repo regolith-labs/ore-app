@@ -36,20 +36,25 @@ fn use_stake_signal(mint_address: Pubkey) -> Signal<GatewayResult<Stake>> {
     // Create and initialize the data signal
     let boost_address = boost_pda(mint_address).0;
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
-    let gateway = use_gateway();
     let wallet = use_wallet();
 
     // Initialize data with current boost
-    spawn(async move {
+    use_effect(move || {
         if let Wallet::Connected(pubkey) = *wallet.read() {
             let stake_address = stake_pda(pubkey, boost_address).0;
-            match gateway.get_stake(stake_address).await {
-                Ok(stake) => data.set(Ok(stake)),
-                Err(err) => {
-                    log::error!("Failed to initialize stake: {:?}", err);
-                    data.set(Err(err));
+            log::info!("stake address: {:?}", stake_address);
+            spawn(async move {
+                let gateway = use_gateway();
+                match gateway.get_stake(stake_address).await {
+                    Ok(stake) => data.set(Ok(stake)),
+                    Err(err) => {
+                        log::error!("Failed to initialize stake: {:?}", err);
+                        data.set(Err(err));
+                    }
                 }
-            }
+            });
+        } else {
+            log::error!("wallet missing");
         }
     });
 

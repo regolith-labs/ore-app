@@ -64,10 +64,10 @@ fn use_liquidity_pair_resource(lp_mint_address: Pubkey) -> Resource<GatewayResul
                     .await?;
                 let token_a = LISTED_TOKENS
                     .get(&pool_metrics.pool_token_mints[0])
-                    .unwrap();
+                    .ok_or(GatewayError::AccountNotFound)?;
                 let token_b = LISTED_TOKENS
                     .get(&pool_metrics.pool_token_mints[1])
-                    .unwrap();
+                    .ok_or(GatewayError::AccountNotFound)?;
                 let balance_a = pool_metrics.pool_token_amounts[0];
                 let balance_b = pool_metrics.pool_token_amounts[1];
                 return Ok(LiquidityPair {
