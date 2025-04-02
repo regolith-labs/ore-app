@@ -39,10 +39,10 @@ fn TokenomicsHowItWorks() -> Element {
                 "ORE issuance is managed programmatically by a smart contract. Miners compete by expending physical energy to produce new units of the token."
             }
             BulletPoint {
-                "The protocol allows a governance community to issue \"boost\" incentives, which allocate a slice of all new emissions to growth initiatives such as marketing, development, liquidity, and more."
+                "The community can issue \"boost\" incentives via governance to allocate a portion of emissions towards funding growth initiatives such as marketing, development, liquidity, and more."
             }
             BulletPoint {
-                "Mining and boosts work together to create a powerful distribution mechanism with flexible incentives while simultaneously protecting holders from undue inflation."
+                "Mining and boosts work together to create powerful and flexible distribution mechanisms while simultaneously protecting holders from undue inflation."
             }
         }
     }
@@ -76,7 +76,7 @@ fn TokenomicsKeyData() -> Element {
                 OreValue {
                     ui_amount_string: "5000000",
                     with_decimal_units: false,
-                    size: TokenValueSize::Medium,
+                    size: TokenValueSize::Small,
                 }
             }
             TokenomicsDataPoint {
@@ -85,7 +85,7 @@ fn TokenomicsKeyData() -> Element {
                     OreValue {
                         ui_amount_string: supply.ui_amount_string,
                         with_decimal_units: false,
-                        size: TokenValueSize::Medium,
+                        size: TokenValueSize::Small,
                     }
                 } else {
                     "–"
@@ -131,7 +131,7 @@ fn TokenomicsKeyData() -> Element {
 fn TokenomicsDataPoint(label: String, children: Element) -> Element {
     rsx! {
         Row {
-            class: "w-full justify-between pt-4",
+            class: "w-full justify-between pt-4 text-base",
             span {
                 class: "text-elements-lowEmphasis",
                 "{label}"

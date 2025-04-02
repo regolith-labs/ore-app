@@ -90,7 +90,7 @@ fn MiningHowItWorks() -> Element {
                 "A smart contract can verify these solutions and use them to securely mint a token, rewarding miners for their work. For this reason, mining is also often referred to as \"proof-of-work.\""
             }
             BulletPoint {
-                "The net result of this process is that miners have a means of converting available energy into liquid financial capital."
+                "The net result of this process is that it gives miners a means of using computers to convert available energy into cryptocurrency which can be used in decentralized finance."
             }
         }
     }
