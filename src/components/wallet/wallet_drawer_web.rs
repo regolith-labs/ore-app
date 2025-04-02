@@ -60,6 +60,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
     #[cfg(feature = "web")]
     let clipboard = WebClipboard::new();
 
+    // token balances
+    let tokens = crate::hooks::use_tokens_with_values();
+
     // wallet
     let wallet = use_wallet();
     let mut pubkey = use_signal(|| "missing pubkey".to_string());
@@ -184,7 +187,6 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
 
                 // Add a token list with click handling to close drawer like in native version
                 {
-                    let tokens = crate::hooks::use_tokens_with_values();
 
                     rsx! {
                         Col {
