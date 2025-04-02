@@ -6,6 +6,7 @@ use futures::{
     FutureExt, SinkExt, StreamExt,
 };
 use solana_sdk::pubkey::Pubkey;
+use std::collections::HashMap;
 
 use crate::gateway::{
     AccountNotificationParams, AccountSubscribe, AccountSubscribeGateway, GatewayError,
@@ -96,6 +97,8 @@ pub fn use_wss_provider() {
 
 /// WebSocket worker function that owns the WebSocket connection exclusively
 async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromWssMsg>) {
+    // Map SubId -> (Pubkey, SubRequestId)
+    let mut active_subscriptions: HashMap<SubId, (Pubkey, SubRequestId)> = HashMap::new();
     let mut retry_delay_ms = 1000u64; // Start with 1 second
     const MAX_RETRY_DELAY_MS: u64 = 60 * 1000; // 60 seconds
 
@@ -121,6 +124,42 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
             }
         };
 
+        // Re-subscribe to all previously active subscriptions
+        let subscriptions_to_restore = active_subscriptions.values().cloned().collect::<Vec<_>>();
+        active_subscriptions.clear(); // Clear old IDs, will be repopulated with new ones
+
+        log::info!(
+            "Attempting to restore {} subscriptions...",
+            subscriptions_to_restore.len()
+        );
+        for (pubkey, request_id) in subscriptions_to_restore {
+            match wss.subscribe(pubkey.to_string().as_str(), request_id).await {
+                Ok(new_sub_id) => {
+                    log::info!(
+                        "Successfully re-subscribed pubkey {} (request_id: {}): new sub_id {}",
+                        pubkey,
+                        request_id,
+                        new_sub_id
+                    );
+                    active_subscriptions.insert(new_sub_id, (pubkey, request_id));
+                    // Notify UI about the new subscription ID for the original request
+                    from_wss.set(FromWssMsg::Subscription(request_id, new_sub_id));
+                }
+                Err(err) => {
+                    log::error!(
+                        "Failed to re-subscribe pubkey {} (request_id: {}): {:?}",
+                        pubkey,
+                        request_id,
+                        err
+                    );
+                    // TODO: How to signal this failure to the specific subscriber?
+                    // For now, the subscription is simply lost. The UI component might
+                    // need to detect the lack of updates and potentially retry manually.
+                }
+            }
+        }
+        log::info!("Finished attempting subscription restoration.");
+
         // Create a channel for forwarding notifications to the handler task
         // This needs to be recreated on each connection attempt as the old task might have ended
         let (notification_tx, mut notification_rx) = mpsc::channel(10);
@@ -145,20 +184,50 @@ async fn wss_worker(mut cmd_rx: Receiver<WssCommand>, mut from_wss: Signal<FromW
                             // that might indicate a dead connection, potentially triggering reconnect.
                             match wss.subscribe(pubkey.to_string().as_str(), request_id).await {
                                 Ok(sub_id) => {
-                                    if let Err(e) = resp_tx.clone().send(sub_id).await {
-                                        log::error!("Failed to send subscription ID response: {:?}", e);
+                                    log::info!(
+                                        "Subscribed pubkey {} (request_id: {}): sub_id {}",
+                                        pubkey,
+                                        request_id,
+                                        sub_id
+                                    );
+                                    // Track the active subscription
+                                    active_subscriptions.insert(sub_id, (pubkey, request_id));
+                                    // Send subscription ID back to the caller (use_wss_subscription)
+                                    if resp_tx.clone().send(sub_id).await.is_err() {
+                                        log::warn!("Failed to send subscription ID response back to caller (channel closed).");
+                                        // If we can't send back, the caller might be gone. Clean up?
+                                        // Attempt to unsubscribe immediately if the caller is gone.
+                                        if let Err(e) = wss.unsubscribe(sub_id).await {
+                                             log::error!("Failed to auto-unsubscribe after caller disappeared: {:?}", e);
+                                        }
+                                        active_subscriptions.remove(&sub_id);
                                     }
+                                    // Also notify the general listener (redundant with resp_tx but follows pattern)
+                                    // This ensures the UI gets the initial sub_id via the FromWssMsg stream too.
+                                    from_wss.set(FromWssMsg::Subscription(request_id, sub_id));
                                 }
                                 Err(err) => {
-                                    log::error!("Failed to subscribe: {:?}", err);
+                                    log::error!("Failed to subscribe pubkey {} (request_id: {}): {:?}", pubkey, request_id, err);
+                                    // TODO: Should we signal failure back via resp_tx? Requires changing resp_tx type.
                                     // Consider if this error warrants a reconnect attempt
                                 }
                             }
                         }
                         Some(WssCommand::Unsubscribe(sub_id)) => {
-                            if let Err(err) = wss.unsubscribe(sub_id).await {
-                                log::error!("Failed to unsubscribe: {:?}", err);
-                                // Consider if this error warrants a reconnect attempt
+                            // Remove from tracking *before* sending unsubscribe, in case of error
+                            if let Some((pubkey, request_id)) = active_subscriptions.remove(&sub_id) {
+                                log::info!(
+                                    "Unsubscribing sub_id {} (pubkey: {}, request_id: {})",
+                                    sub_id, pubkey, request_id
+                                );
+                                if let Err(err) = wss.unsubscribe(sub_id).await {
+                                    log::error!("Failed to unsubscribe sub_id {}: {:?}", sub_id, err);
+                                    // If unsubscribe fails, should we put it back in the map?
+                                    // Probably not, as the state is now uncertain.
+                                    // Consider if this error warrants a reconnect attempt.
+                                }
+                            } else {
+                                log::warn!("Attempted to unsubscribe unknown sub_id: {}", sub_id);
                             }
                         }
                         None => {
