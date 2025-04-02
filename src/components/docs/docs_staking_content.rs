@@ -60,7 +60,7 @@ fn StakingFaq() -> Element {
                     Link {
                         new_tab: true,
                         to: "https://discord.gg/4TQfshAAsT",
-                        span { class: "text-elements-gold hover:underline", "Join the Discord" }
+                        span { class: "text-elements-gold hover:underline font-medium", "Join the Discord" }
                     }
                     " to stay up to date and get involved in the ORE boost governance process."
                 }

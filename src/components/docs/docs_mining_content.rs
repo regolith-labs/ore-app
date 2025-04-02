@@ -37,12 +37,12 @@ fn MiningGetStarted() -> Element {
             BulletPoint {
                 number: "1",
                 span {
-                    "Connect your Solana wallet in the upper righthand corner of the app. If you don't have a wallet yet, you can "
+                    "Connect your Solana wallet in the upper righthand corner of the app. If you don't have a wallet yet, you can install "
                     Link {
-                        class: "text-elements-gold hover:underline",
+                        class: "text-elements-gold hover:underline font-medium",
                         new_tab: true,
                         to: "https://phantom.com",
-                        "install Phantom"
+                        "Phantom"
                     }
                     " to set one up."
                 }
@@ -51,7 +51,7 @@ fn MiningGetStarted() -> Element {
                 number: "2",
                 span {
                     "After connecting, navigate to the " Link {
-                        class: "text-elements-gold hover:underline",
+                        class: "text-elements-gold hover:underline font-medium",
                         to: Route::Mine {},
                         "mining page"
                     }, ", and click \"Start\". You will be asked to pay a small one-time registration fee to join the public mining pool."
@@ -63,11 +63,11 @@ fn MiningGetStarted() -> Element {
                     "Once registered, your miner will begin submitting solutions to the pool! "
 
                     if cfg!(feature = "web") {
-                        "Unfortunately, web browsers will throttle your miner. To get the most power out of your machine, " Link {
-                            class: "text-elements-gold hover:underline",
+                        "Unfortunately, web browsers will throttle your miner. To get the most power out of your machine, download the " Link {
+                            class: "text-elements-gold hover:underline font-medium",
                             to: Route::Download {},
-                            "download"
-                        }, " the ORE desktop app. "
+                            "ORE desktop app"
+                        }, "."
                     } else {
                         "Use the plus and minus buttons to configure how many CPU cores you want to allocate to mining."
                     }
@@ -112,13 +112,13 @@ fn MiningFaq() -> Element {
                 if cfg!(feature = "web") {
                     FaqItem {
                         question: "How much power does it use?",
-                        "When mining through the browser, you can currently only use one CPU core. To get more power, you can download the ORE "
+                        "When mining through the browser, you can currently use only one CPU core. To get more out of your machine, checkout the "
                         Link {
                             new_tab: true,
                             to: "https://beta.ore.supply/download",
-                            span { class: "text-elements-gold hover:underline", "desktop app" }
+                            span { class: "text-elements-gold hover:underline font-medium", "ORE desktop app" }
                         }
-                        ", access more cores, and utilize the full potential of your machine."
+                        ", which allows you to access more cores."
                     }
                 }
                 FaqItem {
@@ -131,7 +131,7 @@ fn MiningFaq() -> Element {
                     Link {
                         new_tab: true,
                         to: "https://github.com/regolith-labs/drillx",
-                        span { class: "text-elements-gold hover:underline", "Drillx" }
+                        span { class: "text-elements-gold hover:underline font-medium", "Drillx" }
                     }
                     ", a CPU-friendly hash function designed to make mining accessible to anyone with a standard home computer."
                 }
