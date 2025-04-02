@@ -589,23 +589,23 @@ fn DownloadCTA() -> Element {
 #[cfg(feature = "web")]
 fn DownloadCTA() -> Element {
     rsx! {
-        div {
-            class: "w-full mt-4 mb-8",
-            div {
-                class: "flex items-center justify-between rounded-lg py-4 px-6 border border-elements-gold relative",
-                div {
-                    class: "flex items-center",
+        Row {
+            class: "w-full my-4",
+            Row {
+                class: "items-center justify-between rounded-lg py-4 px-6 border border-elements-gold relative",
+                Row {
+                    class: "items-center",
                     DownloadIcon {
-                        class: "w-8 h-8 mr-4 text-elements-gold"
+                        class: "w-8 h-8 mr-4 text-elements-gold hidden sm:block"
                     }
-                    div {
-                        class: "flex flex-col",
+                    Col {
+                        class: "gap-2 sm:gap-0",
                         span {
-                            class: "text-elements-highEmphasis font-medium",
+                            class: "text-elements-highEmphasis text-sm md:text-base",
                             "Download the desktop app"
                         }
                         span {
-                            class: "text-elements-lowEmphasis text-sm",
+                            class: "text-elements-lowEmphasis text-xs sm:text-sm",
                             "Get more power out of your machine with the native desktop miner."
                         }
                     }
@@ -614,7 +614,7 @@ fn DownloadCTA() -> Element {
                     to: "/download",
                     class: "h-12 px-6 rounded-full controls-gold flex items-center justify-center",
                     span {
-                        class: "font-semibold",
+                        class: "font-semibold text-xs sm:text-sm md:text-base",
                         "Download"
                     }
                 }
