@@ -124,6 +124,7 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
         member_record_balance,
     );
     instructions.push(commit_ix);
+
     // claim
     //
     // 1) check if ata exists or create
@@ -133,6 +134,7 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
         &member.authority,
         &MINT_ADDRESS,
     );
+
     // 1) check that beneficiary token account exists o.w. create
     let claim_ata_data = gateway.get_account_data(&claim_ata).await;
     if let Err(_err) = claim_ata_data {
@@ -144,9 +146,11 @@ async fn build_core_commit_claim_instructions<R: Rpc>(
         );
         instructions.push(create_ata);
     };
+
     // 2) build claim amount
     let diff = member_record_balance as u64 - member.total_balance;
     let claim_amount = member.balance + diff;
+
     // 3) create claim instruction
     let claim_ix =
         ore_pool_api::sdk::claim(member.authority, claim_ata, pool.address, claim_amount);

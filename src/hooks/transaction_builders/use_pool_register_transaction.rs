@@ -32,7 +32,8 @@ pub fn use_pool_register_transaction(
     let pool_deprecated = use_pool_deprecated();
     // deprecated onchain and db member accounts
     let member_deprecated = use_member_resource_deprecated();
-    let member_record_balance_deprecated = use_member_record_resource_balance_deprecated();
+    let member_record_balance_deprecated =
+        use_member_record_resource_balance_deprecated(member_deprecated);
     // commit and claim from deprecated pool before joining new pool
     let commit_claim_status = use_pool_commit_claim_transaction_submit(
         pool_deprecated,
