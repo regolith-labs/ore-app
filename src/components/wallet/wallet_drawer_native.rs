@@ -100,6 +100,10 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                 }
 
+                Row {
+
+                }
+
                 // Clipboard button
                 button {
                     class: "flex justify-center items-center rounded-full text-center py-4 px-6 w-full controls-secondary hover:cursor-pointer mb-4",
@@ -163,6 +167,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                         }
                     }
                 }
+
+                // Wallet selector component
+                WalletSelector {}
             }
 
             // Token List with overflow handling - the content area
@@ -238,5 +245,163 @@ impl FromStr for Splice {
         Ok(Splice::Pubkey(splice))
     }
 }
+
+fn WalletSelector() -> Element {
+    let mut dropdown_open = use_signal(|| false);
+    let mut clipboard = use_clipboard();
+    let wallet = use_wallet();
+
+    // Get wallet address to display
+    let address = match *wallet.read() {
+        Wallet::Connected(pubkey) => pubkey.to_string(),
+        _ => "".to_string(),
+    };
+
+    // Create shortened display version
+    let shortened_address = if address.len() > 8 {
+        format!("{}...{}", &address[0..4], &address[address.len() - 4..])
+    } else {
+        address.clone()
+    };
+
+    rsx! {
+        div {
+            class: "relative flex items-center",
+
+            // Wallet selector button
+            button {
+                class: "flex items-center bg-gray-900/50 border border-white/10 rounded-full py-2 px-3 text-white cursor-pointer gap-2",
+                // onclick: toggle_dropdown,
+
+                // Wallet icon (three horizontal lines representing Solana logo)
+                div {
+                    class: "text-indigo-500 text-base",
+                    span { "hello" }
+                }
+
+                // Wallet name
+                span {
+                    class: "font-medium",
+                    "text"
+                }
+
+                // Dropdown arrow
+                span {
+                    class: "text-xs opacity-70",
+                    "down"
+                }
+            }
+
+            // Clipboard button
+            button {
+                class: "ml-2 bg-gray-900/50 border border-white/10 rounded-lg text-white p-2 cursor-pointer",
+                // onclick: copy_to_clipboard,
+
+                // Clipboard icon
+                span {
+                    class: "text-white",
+                    "copy"
+                }
+            }
+        }
+    }
+
+    // rsx! {
+    //     div {
+    //         class: "relative w-full mb-4",
+
+    //         // Container for both buttons with flex layout
+    //         div {
+    //             class: "flex items-center justify-between w-full",
+
+    //             // Dropdown button (2/3 width)
+    //             button {
+    //                 class: "flex-grow flex items-center justify-center bg-gray-800 rounded-md py-2 mr-2 text-white hover:bg-gray-700 transition",
+    //                 // onclick: {
+    //                 //     let mut dropdown = dropdown_open.clone();
+    //                 //     move |_| {
+    //                 //         let current = *dropdown.read();
+    //                 //         dropdown.set(!current);
+    //                 //     }
+    //                 // },
+
+    //                 div {
+    //                     class: "flex items-center gap-1",
+    //                     span {
+    //                         class: "font-medium text-sm",
+    //                         "Wallet 1"
+    //                     }
+    //                     svg {
+    //                         class: "w-3 h-3 text-gray-400",
+    //                         view_box: "0 0 20 20",
+    //                         fill: "currentColor",
+    //                         path {
+    //                             d: "M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+    //                         }
+    //                     }
+    //                 }
+    //             }
+
+    //             // Copy address button (1/3 width)
+    //             button {
+    //                 class: "w-1/3 flex items-center justify-center bg-gray-800 rounded-md py-2 text-white hover:bg-gray-700 transition",
+    //                 // onclick: move |_| {
+    //                 //     clipboard.write(&address);
+    //                 // },
+    //                 CopyIcon { class: "h-4 w-4", solid: true }
+    //             }
+    //         }
+
+    //         // Dropdown menu (initially hidden)
+    //         if *dropdown_open.read() {
+    //             div {
+    //                 class: "absolute top-full left-0 mt-1 w-full bg-gray-800 rounded-md shadow-lg z-10",
+
+    //                 // Wallet options
+    //                 div {
+    //                     class: "py-1",
+
+    //                     // Option 1
+    //                     button {
+    //                         class: "w-full text-left px-4 py-2 text-white hover:bg-gray-700 transition",
+    //                         // onclick: {
+    //                         //     let mut dropdown = dropdown_open.clone();
+    //                         //     move |_| {
+    //                         //         dropdown.set(false);
+    //                         //     }
+    //                         // },
+    //                         "Wallet 1"
+    //                     }
+
+    //                     // Option 2
+    //                     button {
+    //                         class: "w-full text-left px-4 py-2 text-white hover:bg-gray-700 transition",
+    //                         // onclick: {
+    //                         //     let mut dropdown = dropdown_open.clone();
+    //                         //     move |_| {
+    //                         //         dropdown.set(false);
+    //                         //     }
+    //                         // },
+    //                         "Wallet 2"
+    //                     }
+
+    //                     // Option 3
+    //                     button {
+    //                         class: "w-full text-left px-4 py-2 text-white hover:bg-gray-700 transition",
+    //                         // onclick: {
+    //                         //     let mut dropdown = dropdown_open.clone();
+    //                         //     move |_| {
+    //                         //         dropdown.set(false);
+    //                         //     }
+    //                         // },
+    //                         "Wallet 3"
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+}
+
 //class: "flex flex-col h-full sm:w-96 w-screen elevated elevated-border text-white pt-8 z-50",
 // class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
