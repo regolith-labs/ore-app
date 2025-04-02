@@ -36,13 +36,13 @@ fn TokenomicsHowItWorks() -> Element {
         }
         BulletPointList {
             BulletPoint {
-                "ORE issuance is managed programmatically by a smart contract. Miners compete by expending physical energy to produce new units of the token."
+                "Token issuance is managed programmatically by a smart contract. Miners compete by expending physical energy to produce new units of the token."
             }
             BulletPoint {
                 "The community can issue \"boost\" incentives via governance to allocate a portion of emissions towards funding growth initiatives such as marketing, development, liquidity, and more."
             }
             BulletPoint {
-                "Mining and boosts work together to create powerful and flexible distribution mechanisms while simultaneously protecting holders from undue inflation."
+                "Mining and boosts work together to create a powerful and flexible distribution mechanism while simultaneously protecting holders from undue inflation."
             }
         }
     }
