@@ -1,5 +1,4 @@
-use ore_api::consts::CONFIG_ADDRESS;
-use ore_api::state::{Config, Proof};
+use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionEvent;
 use solana_sdk::pubkey::Pubkey;
@@ -24,7 +23,6 @@ pub trait OreGateway {
         &self,
         transaction: TransactionEvent,
     ) -> GatewayResult<Signature>;
-    async fn get_config(&self) -> GatewayResult<Config>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -94,14 +92,5 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         let body = resp.text().await.map_err(GatewayError::from)?;
         let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
         Ok(sig)
-    }
-
-    async fn get_config(&self) -> GatewayResult<Config> {
-        let data = self
-            .rpc
-            .get_account_data(&CONFIG_ADDRESS)
-            .await
-            .map_err(GatewayError::from)?;
-        Ok(*Config::try_from_bytes(&data)?)
     }
 }
