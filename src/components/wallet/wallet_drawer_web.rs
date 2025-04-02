@@ -153,6 +153,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
                         a {
                             class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
                             href: "https://solscan.io/account/{pubkey.read()}",
+                            target: "_blank",
                             GlobeIcon { class: "h-5" }
                         }
                         span {
