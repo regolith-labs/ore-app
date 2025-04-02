@@ -58,6 +58,7 @@ fn use_stake_signal(mint_address: Pubkey) -> Signal<GatewayResult<Stake>> {
         }
     });
 
+    // Update
     let update_callback = move |notif: &AccountNotificationParams| {
         // Base64 decode
         let data = &notif.result.value.data;
