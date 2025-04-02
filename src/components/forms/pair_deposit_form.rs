@@ -27,7 +27,6 @@ pub fn PairDepositForm(
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
     let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
-    let priority_fee = use_signal::<u64>(|| 0);
 
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
@@ -46,7 +45,6 @@ pub fn PairDepositForm(
         input_amount_a,
         input_amount_b,
         err,
-        priority_fee,
     );
 
     // Get tokens
@@ -154,7 +152,7 @@ pub fn PairDepositForm(
             }
             Col {
                 class: "w-full px-4",
-                Fee { priority_fee: priority_fee.clone() },
+                Fee {},
             }
 
             SubmitButton {

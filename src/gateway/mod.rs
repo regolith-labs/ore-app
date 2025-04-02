@@ -37,7 +37,7 @@ impl<R: Rpc> Gateway<R> {
         }
     }
 
-    pub async fn get_recent_priority_fee_estimate(
+    pub async fn _get_recent_priority_fee_estimate(
         &self,
         tx: &VersionedTransaction,
     ) -> GatewayResult<u64> {

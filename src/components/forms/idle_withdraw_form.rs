@@ -18,7 +18,6 @@ pub fn IdleWithdrawForm(
     let mut input_amount = use_signal::<String>(|| "".to_owned());
     let token = use_signal(|| Some(Token::ore()));
     let err = use_signal::<Option<TokenInputError>>(|| None);
-    let priority_fee = use_signal::<u64>(|| 0);
 
     // Get the stake balance
     let mut stake_balance = use_signal(|| Err(GatewayError::AccountNotFound));
@@ -39,7 +38,7 @@ pub fn IdleWithdrawForm(
     });
 
     // Build the withdraw transaction
-    let tx = use_idle_withdraw_transaction(stake, input_amount, err, priority_fee);
+    let tx = use_idle_withdraw_transaction(stake, input_amount, err);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {
@@ -62,7 +61,7 @@ pub fn IdleWithdrawForm(
             }
             Col {
                 class: "w-full px-4",
-                Fee { priority_fee: priority_fee.clone() }
+                Fee {}
             }
             SubmitButton {
                 title: "Submit".to_string(),

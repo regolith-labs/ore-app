@@ -11,15 +11,17 @@ use crate::{
     components::TokenInputError,
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
-    hooks::{use_gateway, use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
+    hooks::{use_wallet, Wallet, APP_FEE, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT},
 };
+
+#[cfg(not(feature = "web"))]
+use super::tip_ix;
 
 pub fn use_topup_transaction(
     destination: Memo<Result<Pubkey, ParsePubkeyError>>,
     input_amount: Signal<String>,
     sol_balance: Signal<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
-    mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -78,32 +80,36 @@ pub fn use_topup_transaction(
         let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
         ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
 
-        // Build initial transaction to estimate priority fee
-        let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
+        // // Build initial transaction to estimate priority fee
+        // let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
 
-        // Get priority fee estimate
-        let gateway = use_gateway();
-        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
-            Ok(fee) => fee,
-            Err(_) => {
-                log::error!("Failed to fetch priority fee estimate");
-                return Err(GatewayError::Unknown);
-            }
-        };
+        // // Get priority fee estimate
+        // let gateway = use_gateway();
+        // let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
+        //     Ok(fee) => fee,
+        //     Err(_) => {
+        //         log::error!("Failed to fetch priority fee estimate");
+        //         return Err(GatewayError::Unknown);
+        //     }
+        // };
 
-        // Add priority fee instruction
-        ixs.insert(
-            1,
-            ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-        );
+        // // Add priority fee instruction
+        // ixs.insert(
+        //     1,
+        //     ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
+        // );
 
-        // Calculate priority fee in lamports
-        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
-        let dynamic_priority_fee_in_lamports =
-            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
+        // // Calculate priority fee in lamports
+        // let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
+        // let dynamic_priority_fee_in_lamports =
+        //     (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
 
-        // Set priority fee for UI
-        priority_fee.set(dynamic_priority_fee_in_lamports);
+        // // Set priority fee for UI
+        // priority_fee.set(dynamic_priority_fee_in_lamports);
+
+        #[cfg(not(feature = "web"))]
+        // Add jito tip
+        ixs.push(tip_ix(&authority));
 
         // Build final tx with priority fee
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();

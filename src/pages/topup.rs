@@ -20,9 +20,8 @@ pub fn Topup(address: String) -> Element {
     let destination = use_memo(move || Pubkey::from_str(&address));
     let mut amount = use_signal(|| "0.2".to_string());
     let sol_balance = use_sol_balance_wss();
-    let priority_fee = use_signal(|| 0);
     let err = use_signal::<Option<TokenInputError>>(|| None);
-    let tx = use_topup_transaction(destination, amount, sol_balance, err, priority_fee);
+    let tx = use_topup_transaction(destination, amount, sol_balance, err);
     let mut status = use_signal(|| TopupStatus::Editing);
 
     on_transaction_done(move |_| {
