@@ -3,7 +3,7 @@ cargo install dioxus-cli --version 0.6.1 --locked
 rustup target add wasm32-unknown-unknown
 dx build --release
 
-# Copy assets to web/public
+# Copy static assets to web/public
 cp public/icon.png target/dx/ore-app/release/web/public/assets
 cp public/metadata.json target/dx/ore-app/release/web/public/assets
 cp public/favicon.png target/dx/ore-app/release/web/public/assets
