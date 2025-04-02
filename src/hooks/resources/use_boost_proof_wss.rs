@@ -36,19 +36,22 @@ pub(crate) fn use_boost_proofs_wss_provider() {
 }
 
 fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>> {
-    let gateway = use_gateway();
-    // Create and initialize the data signal
+    // Init
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
-    spawn(async move {
-        match gateway.get_proof(proof_address).await {
-            Ok(boost) => data.set(Ok(boost)),
-            Err(err) => {
-                log::error!("Failed to initialize boost proof: {:?}", err);
-                data.set(Err(err));
+    use_effect(move || {
+        spawn(async move {
+            let gateway = use_gateway();
+            match gateway.get_proof(proof_address).await {
+                Ok(boost) => data.set(Ok(boost)),
+                Err(err) => {
+                    log::error!("Failed to initialize boost proof: {:?}", err);
+                    data.set(Err(err));
+                }
             }
-        }
+        });
     });
 
+    // Update
     let update_callback = move |notif: &AccountNotificationParams| {
         // Base64 decode
         let data = &notif.result.value.data;
