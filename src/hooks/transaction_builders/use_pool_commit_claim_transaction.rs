@@ -6,6 +6,8 @@ use crate::gateway::{GatewayError, Rpc};
 use crate::solana::spl_associated_token_account;
 
 #[cfg(not(feature = "web"))]
+use super::tip_ix;
+#[cfg(not(feature = "web"))]
 pub async fn build_commit_claim_instructions<R: Rpc>(
     gateway: &R,
     pool: &Pool,
