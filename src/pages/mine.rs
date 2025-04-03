@@ -1,3 +1,4 @@
+use dioxus::events::FormData;
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
@@ -16,6 +17,9 @@ use crate::{
 };
 use ore_types::request::TransactionType;
 
+#[cfg(not(feature = "web"))]
+use crate::hooks::{import_private_key, update_wallet_config};
+
 pub fn Mine() -> Element {
     rsx! {
         Col {
@@ -29,6 +33,21 @@ pub fn Mine() -> Element {
                         title: "Mine",
                         subtitle: "Convert energy into cryptocurrency."
                     }
+                    if cfg!(not(feature = "web")) {
+                        ImportKeyTester {}
+                    }
+                    // button {
+                    //     class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
+                    //     onclick: move |_| {
+                    //         if let Err(err) = update_wallet_config() {
+                    //             log::error!("Failed to update wallet: {:?}", err);
+                    //         }
+                    //     },
+                    //     span {
+                    //         class: "mx-auto my-auto",
+                    //         "Change selected wallet"
+                    //     }
+                    // }
                     MineHelpButton {}
                 }
                 MinerData {}
@@ -558,6 +577,69 @@ fn DownloadCTA() -> Element {
                         class: "font-semibold",
                         "Download"
                     }
+                }
+            }
+        }
+    }
+}
+#[cfg(not(feature = "web"))]
+fn ImportKeyTester() -> Element {
+    let mut private_key = use_signal(String::new);
+    let mut import_status = use_signal(String::new);
+
+    let handle_input = move |e: Event<FormData>| {
+        private_key.set(e.data.value().to_string());
+    };
+
+    let handle_import = move |_| {
+        // Validate input is not empty
+        if private_key.read().trim().is_empty() {
+            import_status.set("Please enter a private key".to_string());
+            return;
+        }
+
+        // Try to import the private key
+        let key_to_import = private_key.read().to_string();
+        match import_private_key(&key_to_import) {
+            Ok(pubkey) => {
+                // Success! Show the public key
+                import_status.set(format!("Imported: {}", pubkey));
+                // Clear the input
+                private_key.set(String::new());
+            }
+            Err(err) => {
+                // Show error
+                import_status.set(format!("Error: {:?}", err));
+            }
+        }
+    };
+
+    rsx! {
+        Col {
+            class: "w-full max-w-xs mx-2 gap-2",
+
+            // Simple input field for testing private key import
+            input {
+                class: "w-full px-3 py-2 bg-surface-floating border border-elements-lowEmphasis rounded-md text-elements-highEmphasis",
+                placeholder: "Test: Enter private key",
+                value: "{private_key}",
+                oninput: handle_input,
+            }
+
+            button {
+                class: "flex controls-primary w-full h-10 rounded-full hover:cursor-pointer",
+                onclick: handle_import,
+                span {
+                    class: "mx-auto my-auto",
+                    "Import Key"
+                }
+            }
+
+            // Status message
+            if !import_status.read().is_empty() {
+                div {
+                    class: "text-sm overflow-hidden text-ellipsis",
+                    "{import_status}"
                 }
             }
         }
