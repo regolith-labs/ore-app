@@ -151,7 +151,7 @@ pub fn Topup(address: String) -> Element {
 #[component]
 pub fn Topup(address: String) -> Element {
     use crate::{
-        hooks::{update_wallet, use_wallet, Wallet},
+        hooks::{update_wallet_config, use_wallet, Wallet},
         route::Route,
     };
 
@@ -227,13 +227,13 @@ pub fn Topup(address: String) -> Element {
                     button {
                         class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
                         onclick: move |_| {
-                            if let Err(err) = update_wallet() {
-                                log::error!("Failed to update wallet");
+                            if let Err(err) = update_wallet_config() {
+                                log::error!("Failed to update wallet: {:?}", err);
                             }
                         },
                         span {
                             class: "mx-auto my-auto",
-                            "Change selected wallet"
+                            "Change selected wallret"
                         }
                     }
                 }

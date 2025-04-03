@@ -22,6 +22,10 @@ pub enum GatewayError {
     KeyringNoEntry,
     BincodeSerialize,
     BincodeDeserialize,
+    SaveWalletConfig,
+    UpdateWalletConfig,
+    ConfigNotFound,
+    InvalidPrivateKey,
     Unknown,
 }
 
