@@ -15,10 +15,9 @@ pub async fn build_commit_claim_instructions<R: Rpc>(
     member_record_balance: u64,
 ) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
     use solana_sdk::compute_budget::ComputeBudgetInstruction;
-    let mut instructions = Vec::with_capacity(5);
+    let mut instructions = vec![];
     // compute budget
     instructions.push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
-    instructions.push(ComputeBudgetInstruction::set_compute_unit_price(20_000));
     // add core instructions
     let mut core_instructions =
         build_core_commit_claim_instructions(gateway, pool, member, member_record_balance).await?;
