@@ -87,30 +87,11 @@ pub fn use_boost_claim_transaction(
         let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
         ixs.push(transfer(&authority, &app_fee_account, 5000));
 
-        // // Build initial transaction to estimate priority fee
-        // let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
-
-        // // Get priority fee estimate
-        // let gateway = use_gateway();
-        // let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
-        //     Ok(fee) => fee,
-        //     Err(_) => {
-        //         log::error!("Failed to fetch priority fee estimate");
-        //         return Err(GatewayError::Unknown);
-        //     }
-        // };
-
-        // // Add priority fee instruction
-        // ixs.insert(
-        //     1,
-        //     ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-        // );
-
         #[cfg(not(feature = "web"))]
         // Add jito tip
         ixs.push(tip_ix(&authority));
 
-        // Build final tx with priority fee
+        // Build tx
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();
         Ok(tx)
     })

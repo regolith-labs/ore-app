@@ -27,7 +27,6 @@ pub fn use_transfer_transaction(
     input_amount: Signal<String>,
     token_balance: Signal<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
-    // priority_fee: Signal<u64>,
     mut address_err: Signal<Option<TransferError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
