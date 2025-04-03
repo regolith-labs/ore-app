@@ -15,6 +15,9 @@ use solana_sdk::{
     transaction::{Transaction, VersionedTransaction},
 };
 
+#[cfg(not(feature = "web"))]
+use super::tip_ix;
+
 pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
     // wallet
     let wallet = use_wallet();
@@ -72,24 +75,9 @@ pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransa
             let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
             ixs.push(transfer(&pubkey, &app_fee_account, APP_FEE));
 
-            // // build initial transaction to estimate priority fee
-            // let tx = Transaction::new_with_payer(&ixs, Some(&pubkey)).into();
-
-            // // get priority fee estimate
-            // let gateway = use_gateway();
-            // let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
-            //     Ok(fee) => fee,
-            //     Err(_) => {
-            //         log::error!("Failed to fetch priority fee estimate");
-            //         return Err(GatewayError::Unknown);
-            //     }
-            // };
-
-            // // add priority fee instruction
-            // ixs.insert(
-            //     1,
-            //     ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-            // );
+            #[cfg(not(feature = "web"))]
+            // Add jito tip
+            ixs.push(tip_ix(&pubkey));
 
             // build transaction with priority fee
             let tx_with_priority_fee = Transaction::new_with_payer(&ixs, Some(&pubkey)).into();
