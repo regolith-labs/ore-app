@@ -543,7 +543,7 @@ fn MinePower() -> Element {
                                                 }
                                             }
                                         }
-                                    
+
                                         // Usage percentage for each core
                                         span { class: "text-elements-lowEmphasis text-xs font-medium w-8 text-right flex-shrink-0",
                                             "{rate}%"
@@ -568,15 +568,24 @@ fn DownloadCTA() -> Element {
 #[cfg(feature = "web")]
 fn DownloadCTA() -> Element {
     rsx! {
-        div { class: "w-full mt-4 mb-8",
-            div { class: "flex items-center justify-between rounded-lg py-4 px-6 border border-elements-gold relative",
-                div { class: "flex items-center",
-                    DownloadIcon { class: "w-8 h-8 mr-4 text-elements-gold" }
-                    div { class: "flex flex-col",
-                        span { class: "text-elements-highEmphasis font-medium",
+        Row {
+            class: "w-full my-4",
+            Row {
+                class: "items-center justify-between rounded-lg py-4 px-6 border border-elements-gold relative",
+                gap: 2,
+                Row {
+                    class: "items-center",
+                    DownloadIcon {
+                        class: "w-8 h-8 mr-4 text-elements-gold hidden sm:block"
+                    }
+                    Col {
+                        class: "sm:gap-0",
+                        span {
+                            class: "text-elements-highEmphasis text-sm md:text-base",
                             "Download the desktop app"
                         }
-                        span { class: "text-elements-lowEmphasis text-sm",
+                        span {
+                            class: "text-elements-lowEmphasis text-xs sm:text-sm",
                             "Get more power out of your machine with the native desktop miner."
                         }
                     }
@@ -584,7 +593,10 @@ fn DownloadCTA() -> Element {
                 Link {
                     to: "/download",
                     class: "h-12 px-6 rounded-full controls-gold flex items-center justify-center",
-                    span { class: "font-semibold", "Download" }
+                    span {
+                        class: "font-semibold text-xs sm:text-sm md:text-base",
+                        "Download"
+                    }
                 }
             }
         }
