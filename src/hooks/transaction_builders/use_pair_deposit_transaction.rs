@@ -1,17 +1,5 @@
-use dioxus::prelude::*;
-use ore_boost_api::state::Stake;
-use solana_sdk::{
-    address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount},
-    compute_budget::ComputeBudgetInstruction,
-    hash::Hash,
-    message::{v0::Message, VersionedMessage},
-    native_token::sol_to_lamports,
-    pubkey::Pubkey,
-    signature::Signature,
-    system_instruction::transfer,
-    transaction::VersionedTransaction,
-};
-
+#[cfg(not(feature = "web"))]
+use super::tip_ix;
 use crate::{
     components::TokenInputError,
     config::{BoostMeta, LpType, Token},
@@ -35,6 +23,19 @@ use crate::{
     },
     utils::LiquidityPair,
 };
+use dioxus::prelude::*;
+use ore_boost_api::state::Stake;
+use solana_sdk::{
+    address_lookup_table::{state::AddressLookupTable, AddressLookupTableAccount},
+    compute_budget::ComputeBudgetInstruction,
+    hash::Hash,
+    message::{v0::Message, VersionedMessage},
+    native_token::sol_to_lamports,
+    pubkey::Pubkey,
+    signature::Signature,
+    system_instruction::transfer,
+    transaction::VersionedTransaction,
+};
 
 // Build pair deposit transaction
 pub fn use_pair_deposit_transaction(
@@ -47,7 +48,6 @@ pub fn use_pair_deposit_transaction(
     input_amount_a: Signal<String>,
     input_amount_b: Signal<String>,
     mut err: Signal<Option<TokenInputError>>,
-    mut priority_fee: Signal<u64>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     use_resource(move || async move {
@@ -254,39 +254,11 @@ pub fn use_pair_deposit_transaction(
             }
         }
 
-        // Build initial transaction to estimate priority fee
-        let tx = VersionedTransaction {
-            signatures: vec![Signature::default()],
-            message: VersionedMessage::V0(
-                Message::try_compile(&authority, &ixs, &luts, Hash::default()).unwrap(),
-            ),
-        };
+        #[cfg(not(feature = "web"))]
+        // Add jito tip
+        ixs.push(tip_ix(&authority));
 
-        // Get priority fee estimate
-        let gateway = use_gateway();
-        let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&tx).await {
-            Ok(fee) => fee,
-            Err(_) => {
-                log::error!("Failed to fetch priority fee estimate");
-                return Err(GatewayError::Unknown);
-            }
-        };
-
-        // Add priority fee instruction
-        ixs.insert(
-            1,
-            ComputeBudgetInstruction::set_compute_unit_price(dynamic_priority_fee),
-        );
-
-        // Calculate priority fee in lamports
-        let adjusted_compute_unit_limit_u64: u64 = COMPUTE_UNIT_LIMIT.into();
-        let dynamic_priority_fee_in_lamports =
-            (dynamic_priority_fee * adjusted_compute_unit_limit_u64) / 1_000_000;
-
-        // Set priority fee for UI
-        priority_fee.set(dynamic_priority_fee_in_lamports);
-
-        // Build final tx with priority fee
+        // Build tx
         let tx = VersionedTransaction {
             signatures: vec![Signature::default()],
             message: VersionedMessage::V0(

@@ -18,13 +18,15 @@ use crate::{
     },
 };
 
+#[cfg(not(feature = "web"))]
+use super::tip_ix;
+
 pub fn use_transfer_transaction(
     destination: Signal<String>,
     selected_token: Signal<Option<Token>>,
     input_amount: Signal<String>,
     token_balance: Signal<GatewayResult<UiTokenAmount>>,
     mut err: Signal<Option<TokenInputError>>,
-    // priority_fee: Signal<u64>,
     mut address_err: Signal<Option<TransferError>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
@@ -131,6 +133,10 @@ pub fn use_transfer_transaction(
         // Include ORE app fee
         let app_fee_account = Pubkey::from_str_const(APP_FEE_ACCOUNT);
         ixs.push(transfer(&authority, &app_fee_account, APP_FEE));
+
+        #[cfg(not(feature = "web"))]
+        // Add jito tip
+        ixs.push(tip_ix(&authority));
 
         // Build final tx
         let tx = Transaction::new_with_payer(&ixs, Some(&authority)).into();

@@ -6,6 +6,8 @@ use crate::gateway::{GatewayError, Rpc};
 use crate::solana::spl_associated_token_account;
 
 #[cfg(not(feature = "web"))]
+use super::tip_ix;
+#[cfg(not(feature = "web"))]
 pub async fn build_commit_claim_instructions<R: Rpc>(
     gateway: &R,
     pool: &Pool,
@@ -13,14 +15,15 @@ pub async fn build_commit_claim_instructions<R: Rpc>(
     member_record_balance: u64,
 ) -> Result<Vec<solana_sdk::instruction::Instruction>, GatewayError> {
     use solana_sdk::compute_budget::ComputeBudgetInstruction;
-    let mut instructions = Vec::with_capacity(4);
+    let mut instructions = vec![];
     // compute budget
     instructions.push(ComputeBudgetInstruction::set_compute_unit_limit(100_000));
-    instructions.push(ComputeBudgetInstruction::set_compute_unit_price(20_000));
     // add core instructions
     let mut core_instructions =
         build_core_commit_claim_instructions(gateway, pool, member, member_record_balance).await?;
     instructions.append(&mut core_instructions);
+    // Add jito tip
+    instructions.push(tip_ix(&member.authority));
     Ok(instructions)
 }
 
