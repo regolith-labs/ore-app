@@ -14,17 +14,12 @@ pub fn Fee() -> Element {
     let mut is_open = use_signal(|| false);
     let base_fee = lamports_to_sol(SOLANA_BASE_FEE);
     let app_fee = lamports_to_sol(APP_FEE);
-    let jito_tip_fee = lamports_to_sol(JITO_TIP_AMOUNT);
+    let jito_fee = lamports_to_sol(JITO_TIP_AMOUNT);
 
     #[cfg(feature = "web")]
     let total_fee = base_fee + app_fee;
     #[cfg(not(feature = "web"))]
-    let total_fee = base_fee + app_fee + jito_tip_fee;
-
-    #[cfg(feature = "web")]
-    let show_jito_tip = false;
-    #[cfg(not(feature = "web"))]
-    let show_jito_tip = true;
+    let total_fee = base_fee + app_fee + jito_fee;
 
     let max_height = if *is_open.read() {
         "max-h-32"
@@ -69,23 +64,17 @@ pub fn Fee() -> Element {
                         span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "App fee" }
                         span { class: "font-medium text-sm text-elements-lowEmphasis text-right", "{format_fee(app_fee)}" }
                     }
+                    if cfg!(not(feature = "web")) {
+                        Row {
+                            class: "w-full justify-between",
+                            span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "Jito fee" }
+                            span { class: "font-medium text-sm text-elements-lowEmphasis text-right", "{format_fee(jito_fee)}" }
+                        }
+                    }
                     Row {
                         class: "w-full justify-between",
-                        span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "Solana base fee" }
+                        span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "Solana fee" }
                         span { class: "font-medium text-sm text-elements-lowEmphasis text-right", "{format_fee(base_fee)}" }
-                    }
-                    {
-                        if show_jito_tip {
-                            rsx! {
-                                Row {
-                                    class: "w-full justify-between",
-                                    span { class: "font-medium text-sm text-elements-lowEmphasis text-left", "Jito tip fee" }
-                                    span { class: "font-medium text-sm text-elements-lowEmphasis text-right", "{format_fee(jito_tip_fee)}" }
-                                }
-                            }
-                        } else {
-                            rsx! {}
-                        }
                     }
                 }
             }
