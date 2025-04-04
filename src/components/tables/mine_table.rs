@@ -141,12 +141,12 @@ fn MineTableRowScore(pool_score: u64, member_score: u64) -> Element {
         Col {
             span {
                 class: "font-medium my-auto",
-                "{pool_score}"
-            }
-            span {
-                class: "font-medium text-xs text-elements-lowEmphasis",
                 "{member_score}"
             }
+            // span {
+            //     class: "font-medium text-xs text-elements-lowEmphasis",
+            //     "{member_score}"
+            // }
         }
     }
 }
@@ -158,10 +158,11 @@ fn MineTableRowReward(net_reward: u64, member_reward: u64) -> Element {
         Col {
             OreValue {
                 class: "text-right ml-auto",
-                ui_amount_string: amount_to_ui_amount_string(net_reward, TOKEN_DECIMALS),
+                ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
                 with_decimal_units: true,
                 size: TokenValueSize::Small,
-                color_override: "text-elements-highEmphasis",
+                gold: true,
+                // color_override: "text-elements-highEmphasis",
             }
             // OreValue {
             //     class: "text-right ml-auto",
@@ -170,10 +171,10 @@ fn MineTableRowReward(net_reward: u64, member_reward: u64) -> Element {
             //     size: TokenValueSize::XSmall,
             //     color_override: "text-elements-lowEmphasis",
             // }
-            span {
-                class: "text-right ml-auto h-3 text-xs font-medium text-elements-lowEmphasis",
-                "{member_reward} grams"
-            }
+            // span {
+            //     class: "text-right ml-auto h-3 text-xs font-medium text-elements-lowEmphasis",
+            //     "{member_reward} grams"
+            // }
         }
     }
 }
