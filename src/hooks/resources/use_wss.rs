@@ -1,6 +1,4 @@
 use dioxus::prelude::*;
-
-use dioxus::prelude::*;
 use futures::{
     channel::mpsc::{self, Receiver, Sender},
     FutureExt, SinkExt, StreamExt,
