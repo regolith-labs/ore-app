@@ -9,6 +9,8 @@ default_platform = "web"
 # `build` & `serve` dist path
 out_dir = "dist"
 
+asset_dir = "public"
+
 [package]
 name = "ORE"
 
@@ -28,6 +30,17 @@ index_on_404 = true
 [bundle]
 publisher = "Regolith Labs Inc."
 identifier = "ore.supply"
-icon = ["public/icon.png"]
-[macos]
-info_plist_path = "Info.plist"
+icon = [
+  "icons/32x32.png",
+  "icons/128x128.png",
+  "icons/128x128@2x.png",
+  "icons/icon.icns",
+  "icons/icon.ico",
+]
+
+[bundle.windows]
+icon_path = "icons/icon.ico"
+tsp = false
+allow_downgrades = true
+[bundle.windows.webview_install_mode.EmbedBootstrapper]
+silent = true
