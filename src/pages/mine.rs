@@ -368,7 +368,7 @@ fn MinerRewards() -> Element {
                 }
                 InfoText {
                     class: "text-wrap text-left text-sm max-w-lg mr-auto",
-                    text: "ORE that you have mined and may claim.",
+                    text: "ORE that you have mined and may claim. 1 ORE = 100,000,000,000 grams.",
                     hidden: info_hidden,
                 }
             }
@@ -586,7 +586,7 @@ fn DownloadCTA() -> Element {
                         }
                         span {
                             class: "text-elements-lowEmphasis text-xs sm:text-sm",
-                            "Get more power out of your machine with the native desktop miner."
+                            "Get more out of your machine with the native desktop miner."
                         }
                     }
                 }

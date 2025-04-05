@@ -133,7 +133,7 @@ fn TokenomicsDataPoint(label: String, children: Element) -> Element {
         Row {
             class: "w-full justify-between pt-4 text-base",
             span {
-                class: "text-elements-lowEmphasis",
+                class: "font-medium text-elements-lowEmphasis",
                 "{label}"
             }
             span {

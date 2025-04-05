@@ -47,13 +47,13 @@ pub fn MineTable() -> Element {
                     header: rsx! {
                         TableHeader {
                             left: "Transaction",
-                            right_1: "Date",
+                            right_1: "Time",
                             right_2: "Score",
                             right_3: "Reward",
                             help_left: "Recent transactions submitted by the mining pool.",
-                            help_right_1: "Timestamp of the submitted transaction.",
-                            help_right_2: "Difficulty score of the pool's submitted solution and your contribution.",
-                            help_right_3: "Amount of ORE the pool earned and your share of the reward.",
+                            help_right_1: "Timestamp of the mining pool's submitted transaction.",
+                            help_right_2: "Difficulty score of your best submitted solution.",
+                            help_right_3: "Amount of ORE earned by your solution. 1 ORE = 10^11 grams",
                             help_hidden: info_hidden,
                         }
                     },
@@ -106,18 +106,18 @@ fn MineTableRowDate(timestamp: u64) -> Element {
     let datetime = DateTime::from_timestamp(timestamp as i64, 0)
         .unwrap()
         .with_timezone(&Local);
-    let date = datetime.format("%b %d");
+    // let date = datetime.format("%b %d");
     let time = datetime.format("%I:%M %p");
     rsx! {
         Col {
             span {
                 class: "font-medium my-auto",
-                "{date}"
-            }
-            span {
-                class: "text-xs font-medium text-elements-lowEmphasis",
                 "{time}"
             }
+            // span {
+            //     class: "text-xs font-medium text-elements-lowEmphasis",
+            //     "{time}"
+            // }
         }
     }
 }
@@ -156,14 +156,14 @@ fn MineTableRowReward(net_reward: u64, member_reward: u64) -> Element {
     // let percentage = format_percentage((member_reward as f64 / net_reward as f64) * 100.0);
     rsx! {
         Col {
-            OreValue {
-                class: "text-right ml-auto",
-                ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
-                with_decimal_units: true,
-                size: TokenValueSize::Small,
-                gold: true,
-                // color_override: "text-elements-highEmphasis",
-            }
+            // OreValue {
+            //     class: "text-right ml-auto",
+            //     ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
+            //     with_decimal_units: true,
+            //     size: TokenValueSize::Small,
+            //     gold: true,
+            //     // color_override: "text-elements-highEmphasis",
+            // }
             // OreValue {
             //     class: "text-right ml-auto",
             //     ui_amount_string: amount_to_ui_amount_string(member_reward, TOKEN_DECIMALS),
@@ -171,10 +171,10 @@ fn MineTableRowReward(net_reward: u64, member_reward: u64) -> Element {
             //     size: TokenValueSize::XSmall,
             //     color_override: "text-elements-lowEmphasis",
             // }
-            // span {
-            //     class: "text-right ml-auto h-3 text-xs font-medium text-elements-lowEmphasis",
-            //     "{member_reward} grams"
-            // }
+            span {
+                class: "text-right ml-auto font-medium text-elements-gold",
+                "{member_reward} grams"
+            }
         }
     }
 }
