@@ -22,8 +22,8 @@ use ore_types::request::TransactionType;
 use crate::hooks::{add_new_keypair, use_wallet_config};
 
 pub fn Mine() -> Element {
-    let mut current_wallet_pubkey: Signal<String> = use_signal(String::new);
-    let mut private_key: Signal<String> = use_signal(String::new);
+    let current_wallet_pubkey: Signal<String> = use_signal(String::new);
+    let private_key: Signal<String> = use_signal(String::new);
 
     #[cfg(not(feature = "web"))]
     use_effect(move || {
@@ -42,20 +42,16 @@ pub fn Mine() -> Element {
     };
 
     #[cfg(not(feature = "web"))]
-    let handle_import = move |_| {
-        // if private_key.read().trim().is_empty() {
-        //     import_status.set("Please enter a private key".to_string());
-        //     return;
-        // }
+    let handle_import = move |_: Event<MouseData>| {
+        // Clone the string first to avoid borrowing conflicts
+        let key_value = private_key.read().to_string();
 
-        match add_new_keypair(Some(private_key.read().to_string())) {
+        match add_new_keypair(Some(key_value)) {
             Ok(_) => {
-                // import_status.set("Key imported successfully!".to_string());
                 private_key.set(String::new());
             }
             Err(err) => {
                 log::error!("Error importing key: {:?}", err);
-                // import_status.set(format!("Error: {:?}", err));
             }
         }
     };
@@ -653,26 +649,21 @@ fn PrivateKeyInput() -> Element {
 #[cfg(not(feature = "web"))]
 fn PrivateKeyInput() -> Element {
     let mut private_key: Signal<String> = use_signal(String::new);
-    // let mut import_status: Signal<String> = use_signal(String::new);
 
     let handle_input = move |e: Event<FormData>| {
         private_key.set(e.data.value().to_string());
     };
 
-    let handle_import = move |_| {
-        // if private_key.read().trim().is_empty() {
-        //     // import_status.set("Please enter a private key".to_string());
-        //     // return;
-        // }
+    let handle_import = move |_: Event<MouseData>| {
+        // Clone the string first to avoid borrowing conflicts
+        let key_value = private_key.read().to_string();
 
-        match add_new_keypair(Some(private_key.read().to_string())) {
+        match add_new_keypair(Some(key_value)) {
             Ok(_) => {
-                // import_status.set("Key imported successfully!".to_string());
                 private_key.set(String::new());
             }
             Err(err) => {
                 log::error!("Error importing key: {:?}", err);
-                // import_status.set(format!("Error: {:?}", err));
             }
         }
     };

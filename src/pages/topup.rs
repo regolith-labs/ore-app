@@ -224,18 +224,6 @@ pub fn Topup(address: String) -> Element {
                             "Skip for now"
                         }
                     }
-                    button {
-                        class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
-                        onclick: move |_| {
-                            if let Err(err) = update_wallet_config() {
-                                log::error!("Failed to update wallet: {:?}", err);
-                            }
-                        },
-                        span {
-                            class: "mx-auto my-auto",
-                            "Change selected wallret"
-                        }
-                    }
                 }
             } else {
                 Col {
