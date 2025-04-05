@@ -26,8 +26,10 @@ pub enum GatewayError {
     UpdateWalletConfig,
     ConfigNotFound,
     InvalidPrivateKey,
+    NoKeychainEntries,
     Unknown,
     UnableToDeriveKeypair,
+    NoWalletsFound,
 }
 
 impl From<anyhow::Error> for GatewayError {

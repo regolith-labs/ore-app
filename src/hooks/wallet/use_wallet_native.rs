@@ -2,6 +2,7 @@ use crate::gateway::GatewayError as Error;
 use dioxus::prelude::*;
 use directories::ProjectDirs;
 use keyring::Entry;
+use keyring::Error as KeyringError;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Keypair;
@@ -30,6 +31,18 @@ const MAX_WALLETS_ALLOWED: u8 = 3;
     get the amount of keys in use by the keychain
 */
 
+#[derive(Clone)]
+pub struct ConnectedWallets {
+    pub current_wallet_index: u8,
+    pub wallets: Vec<WalletKeychain>,
+}
+
+#[derive(Clone)]
+pub struct WalletKeychain {
+    pub pubkey: Pubkey,
+    pub index: u8,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct WalletConfig {
     pub current_wallet_index: u8,
@@ -50,6 +63,13 @@ pub fn use_wallet_provider() {
     let mut wallet_signal: Signal<Wallet> =
         use_context_provider(|| Signal::new(Wallet::Disconnected));
 
+    let mut connected_wallets: Signal<ConnectedWallets> = use_context_provider(|| {
+        Signal::new(ConnectedWallets {
+            current_wallet_index: 0,
+            wallets: Vec::with_capacity(MAX_WALLETS_ALLOWED as usize),
+        })
+    });
+
     // Try to load keypair and config
     let mut keychain_data = get_or_set();
 
@@ -67,6 +87,10 @@ pub fn use_wallet_provider() {
 
 pub fn use_wallet_config() -> Signal<WalletConfig> {
     use_context::<Signal<WalletConfig>>()
+}
+
+pub fn use_connected_wallets() -> Signal<ConnectedWallets> {
+    use_context::<Signal<ConnectedWallets>>()
 }
 
 pub fn get_keyring_values_by_index(index: u8) -> (&'static str, &'static str) {
@@ -91,21 +115,82 @@ pub struct MultisigAuthority {
     pub create_key: Keypair,
 }
 
-pub fn get() -> Result<(MultisigAuthority, WalletConfig), Error> {
-    // Let's try to load the config if it exists
-    if let Ok(config) = load_config() {
-        let current_index = config.current_wallet_index;
-        let (service, user_device_key) = get_keyring_values_by_index(current_index);
-        let keyring = Entry::new(service, user_device_key)?;
-        let secret = keyring.get_secret()?;
-        let multisig_authority = bincode::deserialize(secret.as_slice()).map_err(|err| {
+fn get_multisig_authority_by_index(index: u8) -> Result<MultisigAuthority, Error> {
+    let (service, user_device_key) = get_keyring_values_by_index(index);
+    let keyring = Entry::new(service, user_device_key)?;
+    let secret = keyring.get_secret()?;
+    let multisig_authority: MultisigAuthority =
+        bincode::deserialize(secret.as_slice()).map_err(|err| {
             println!("{:?}", err);
             Error::BincodeDeserialize
         })?;
-        Ok((multisig_authority, config))
-    } else {
-        Err(Error::ConfigNotFound)
+    Ok(multisig_authority)
+}
+
+pub fn get() -> Result<(MultisigAuthority, Option<WalletConfig>), Error> {
+    let mut connected_wallets = use_connected_wallets();
+    let mut wallet_count = 0;
+    // Go through all existing keypairs in the keychain and load up those that exist
+    for i in 0..MAX_WALLETS_ALLOWED {
+        // let (service, user_device_key) = get_keyring_values_by_index(i);
+        // let keyring = Entry::new(service, user_device_key)?;
+        // let secret = match keyring.get_secret() {
+        //     Ok(secret) => secret,
+        //     Err(KeyringError::NoEntry) => continue,
+        //     Err(_) => continue,
+        // };
+        // let multisig_authority: MultisigAuthority = bincode::deserialize(secret.as_slice())
+        //     .map_err(|err| {
+        //         println!("{:?}", err);
+        //         Error::BincodeDeserialize
+        //     })?;
+        let multisig_authority = get_multisig_authority_by_index(i)?;
+        connected_wallets.write().wallets.push(WalletKeychain {
+            pubkey: multisig_authority.creator.pubkey(),
+            index: i,
+        });
+        wallet_count += 1;
     }
+    // We didn't find any keypairs in the keychain
+    if wallet_count == 0 {
+        return Err(Error::NoKeychainEntries);
+    } else {
+        // We found keypairs, let's try to load the config to get the current wallet index
+        if let Ok(config) = load_config() {
+            let multisig_authority = get_multisig_authority_by_index(config.current_wallet_index)?;
+            Ok((multisig_authority, Some(config)))
+        } else {
+            // We could not load the config, but we found keypairs, so let's set the first wallet as the current wallet
+            let fallback_index = connected_wallets.read().wallets[0].index;
+            connected_wallets.write().current_wallet_index = fallback_index;
+            // let (service, user_device_key) = get_keyring_values_by_index(fallback_index);
+            // let keyring = Entry::new(service, user_device_key)?;
+            // let secret = keyring.get_secret()?;
+            // let multisig_authority = bincode::deserialize(secret.as_slice()).map_err(|err| {
+            //     println!("{:?}", err);
+            //     Error::BincodeDeserialize
+            // })?;
+            let multisig_authority = get_multisig_authority_by_index(fallback_index)?;
+            Ok((multisig_authority, None))
+        }
+    }
+
+    // Let's try to load the config and set the current wallet index
+
+    // Let's try to load the config if it exists
+    // if let Ok(config) = load_config() {
+    //     let current_index = config.current_wallet_index;
+    //     let (service, user_device_key) = get_keyring_values_by_index(current_index);
+    //     let keyring = Entry::new(service, user_device_key)?;
+    //     let secret = keyring.get_secret()?;
+    //     let multisig_authority = bincode::deserialize(secret.as_slice()).map_err(|err| {
+    //         println!("{:?}", err);
+    //         Error::BincodeDeserialize
+    //     })?;
+    //     Ok((multisig_authority, config))
+    // } else {
+    //     Err(Error::ConfigNotFound)
+    // }
 }
 
 fn set(secret: &[u8], index: u8) -> Result<(), Error> {
@@ -125,7 +210,7 @@ pub fn get_or_set() -> Result<(MultisigAuthority, WalletConfig), Error> {
         ok @ Ok(_) => ok,
         Err(err) => {
             // We didn't find a wallet on the device keychain or config
-            if let Error::KeyringNoEntry | Error::ConfigNotFound = err {
+            if let Error::NoKeychainEntries | Error::KeyringNoEntry | Error::ConfigNotFound = err {
                 let creator = Keypair::new();
                 let create_key = Keypair::new();
                 let multisig_authority = MultisigAuthority {
