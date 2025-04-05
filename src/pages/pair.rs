@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
 use dioxus::prelude::*;
-use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionType;
 use steel::Pubkey;
@@ -11,11 +10,11 @@ use crate::{
     config::{BoostMeta, LpType, LISTED_BOOSTS_BY_MINT},
     gateway::{GatewayResult, UiTokenAmount},
     hooks::{
-        on_transaction_done, use_boost_apr, use_boost_proof_wss, use_boost_wss, use_liquidity_pair,
+        on_transaction_done, use_boost_apr, use_boost_wss, use_liquidity_pair,
         use_lp_deposit_transaction, use_stake_wss, use_token_balance,
         use_token_balances_for_liquidity_pair,
     },
-    pages::{StakeYield, TakeRate, TotalStakers},
+    pages::{StakeYield, TotalStakers, Weight},
     utils::LiquidityPair,
 };
 
@@ -26,7 +25,6 @@ pub fn Pair(lp_mint: String) -> Element {
     let mut liquidity_pair = use_liquidity_pair(lp_mint);
     let mut lp_balance = use_token_balance(lp_mint);
     let boost = use_boost_wss(lp_mint);
-    let boost_proof = use_boost_proof_wss(lp_mint);
     let stake = use_stake_wss(lp_mint);
     let (token_a_balance, token_b_balance) = use_token_balances_for_liquidity_pair(liquidity_pair);
 
@@ -61,7 +59,6 @@ pub fn Pair(lp_mint: String) -> Element {
                     liquidity_pair: liquidity_pair,
                     lp_balance: lp_balance,
                     boost,
-                    boost_proof,
                     stake
                 }
                 BoostMetrics {
@@ -80,7 +77,6 @@ fn AccountMetrics(
     liquidity_pair: Resource<GatewayResult<LiquidityPair>>,
     lp_balance: Resource<GatewayResult<UiTokenAmount>>,
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Signal<GatewayResult<Proof>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
@@ -104,7 +100,6 @@ fn AccountMetrics(
             }
             StakeYield {
                 boost,
-                boost_proof,
                 stake,
             }
         }
@@ -206,9 +201,6 @@ fn BoostMetrics(
             Protocol {
                 boost_meta,
             }
-            TakeRate {
-                boost,
-            }
             TotalDeposits {
                 liquidity_pair,
             }
@@ -217,6 +209,9 @@ fn BoostMetrics(
             }
             Tvl {
                 liquidity_pair,
+            }
+            Weight {
+                boost,
             }
         }
     }

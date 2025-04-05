@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
@@ -27,11 +26,10 @@ use super::tip_ix;
 
 pub fn use_boost_claim_transaction(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Signal<GatewayResult<Proof>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
-    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
+    let claimable_yield = use_claimable_yield(boost, stake);
     let ore_balance = use_ore_balance();
     use_resource(move || async move {
         // Check if wallet is connected

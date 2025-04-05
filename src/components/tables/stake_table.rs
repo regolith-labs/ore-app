@@ -77,7 +77,6 @@ fn IdleTableRow() -> Element {
     let token = Token::ore();
     let stake = use_stake_wss(token.mint);
     let boost = use_boost_wss(token.mint);
-    let boost_proof = use_boost_proof_wss(token.mint);
     rsx! {
         TableRowLink {
             to: Route::Idle {},
@@ -103,7 +102,6 @@ fn IdleTableRow() -> Element {
                 StakeTableRowYield {
                     mint_address: MINT_ADDRESS,
                     boost,
-                    boost_proof,
                     stake,
                 }
             },
@@ -118,7 +116,6 @@ fn StakeTableRow(
 ) -> Element {
     let stake = use_stake_wss(boost_meta.lp_mint);
     let boost = use_boost_wss(boost_meta.lp_mint);
-    let boost_proof = use_boost_proof_wss(boost_meta.lp_mint);
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -147,7 +144,6 @@ fn StakeTableRow(
                 StakeTableRowYield {
                     mint_address: boost_meta.lp_mint,
                     boost,
-                    boost_proof,
                     stake,
                 }
             },
@@ -413,11 +409,10 @@ fn StakeTableRowAPR(mint_address: Pubkey, stake: Signal<GatewayResult<Stake>>) -
 fn StakeTableRowYield(
     mint_address: Pubkey,
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Signal<GatewayResult<Proof>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     // Calculate rewards
-    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
+    let claimable_yield = use_claimable_yield(boost, stake);
 
     rsx! {
         Col {

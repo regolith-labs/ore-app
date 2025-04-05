@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 drillx = "2.2"
 serde = { version = "1.0", features = ["derive"] }
-ore-pool-types = "1.6.1"
+ore-pool-types = "1.7.0-beta"

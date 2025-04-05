@@ -1,6 +1,7 @@
 // mod use_boost;
 mod use_boost_apy;
 // mod use_boost_proof;
+mod use_boost_config_wss;
 mod use_boost_proof_wss;
 mod use_boost_tvl;
 mod use_boost_wss;
@@ -19,6 +20,7 @@ mod use_wss_sub;
 // pub use use_boost::*;
 pub use use_boost_apy::*;
 // pub use use_boost_proof::*;
+pub use use_boost_config_wss::*;
 pub use use_boost_proof_wss::*;
 pub use use_boost_tvl::*;
 pub use use_boost_wss::*;
@@ -38,7 +40,8 @@ pub fn use_cache_provider() {
     // use_boosts_provider();
     use_boosts_wss_provider();
     // use_boost_proofs_provider();
-    use_boost_proofs_wss_provider();
+    use_boost_config_wss_provider();
+    use_boost_proof_wss_provider();
     use_liquidity_pairs_provider();
     // use_stakes_provider();
     use_stakes_wss_provider();
