@@ -57,14 +57,35 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
     let last_four = &address.to_string()[len - 4..len];
 
     let mut drawer_state = use_wallet_drawer_state();
-    let is_open = *drawer_state.read();
+    let _is_open = *drawer_state.read();
+    let mut is_animating = use_signal(|| false);
+
+    // Close function that handles animation
+    let close_drawer = move |_e: MouseEvent| {
+        if !*is_animating.read() {
+            is_animating.set(true);
+            drawer_state.set(false);
+            spawn(async move {
+                // Keep the animation state active during the transition
+                async_std::task::sleep(crate::time::Duration::from_millis(300)).await;
+                is_animating.set(false);
+            });
+        }
+    };
 
     rsx! {
         div {
             class: "relative",
             button {
                 onclick: move |_| {
-                    drawer_state.set(!is_open);
+                    if !is_animating.cloned() {
+                        is_animating.set(true);
+                        drawer_state.set(true);
+                        spawn(async move {
+                            async_std::task::sleep(crate::time::Duration::from_millis(300)).await;
+                            is_animating.set(false);
+                        });
+                    }
                 },
                 Row {
                     class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer gap-3",
@@ -79,11 +100,12 @@ fn ConnectedWalletAdapter(address: Pubkey, wallet_remount: Signal<bool>) -> Elem
                 }
             }
 
-            // Drawer overlay and content
-            WalletDrawerOverlay {
-                is_open: is_open,
-                on_close: move |_| drawer_state.set(false),
-                wallet_remount: wallet_remount
+            if *drawer_state.read() || *is_animating.read() {
+                WalletDrawerOverlay {
+                    is_open: *drawer_state.read(),
+                    on_close: close_drawer,
+                    wallet_remount: wallet_remount
+                }
             }
         }
     }
@@ -95,28 +117,21 @@ fn WalletDrawerOverlay(
     on_close: EventHandler<MouseEvent>,
     wallet_remount: Signal<bool>,
 ) -> Element {
-    // Render nothing when closed
-    if !is_open {
-        return rsx! { Fragment {} };
-    }
-
-    // Render drawer when open
+    // Render drawer always, but with proper animation classes
     rsx! {
         Fragment {
-            // Only show dark backdrop overlay on mobile (sm:hidden)
+            // Background overlay
             div {
-                class: "fixed inset-0 bg-black bg-opacity-50 z-[1000] sm:hidden",
+                class: "fixed inset-0 transition-all duration-300 ease-in-out bg-black/50 z-[1000]",
+                class: if is_open { "wallet-drawer-fade opacity-100" } else { "wallet-drawer-fade-out opacity-0" },
                 style: "height: 100vh; width: 100vw;",
                 onclick: move |e| on_close.call(e)
             }
-            // Invisible overlay for desktop to capture clicks outside (hidden on mobile)
+
+            // Drawer content with slide animation
             div {
-                class: "fixed inset-0 z-[1000] hidden sm:block",
-                style: "height: 100vh; width: 100vw;",
-                onclick: move |e| on_close.call(e)
-            }
-            div {
-                class: "fixed top-0 right-0 bottom-0 h-full w-screen sm:w-96 z-[1001]",
+                class: "fixed top-0 right-0 h-full w-screen sm:w-96 transition-transform duration-300 ease-in-out transform z-[1001]",
+                class: if is_open { "wallet-drawer-slide translate-x-0" } else { "wallet-drawer-slide-out translate-x-full" },
                 style: "height: 100vh;",
                 WalletDrawer {
                     on_close: on_close.clone(),
