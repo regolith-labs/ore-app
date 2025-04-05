@@ -11,6 +11,8 @@ use std::path::PathBuf;
 
 use super::Wallet;
 
+use crate::hooks::use_wallet;
+
 const SERVICE: &str = "ORE";
 const USER_DEVICE_KEY: &str = "user-device-key";
 const SERVICE_TWO: &str = "ORE-two";
@@ -18,6 +20,15 @@ const USER_DEVICE_KEY_TWO: &str = "user-device-key-two";
 const SERVICE_THREE: &str = "ORE-three";
 const USER_DEVICE_KEY_THREE: &str = "user-device-key-three";
 const MAX_WALLETS_ALLOWED: u8 = 3;
+
+/*
+    read all keychains that exists by hardcoded keys
+    only populate keypairs that exist in the keychain
+        try to read all 3 keypairs
+            use the config to which keypair is selected
+            default to the first keypair
+    get the amount of keys in use by the keychain
+*/
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct WalletConfig {
@@ -27,6 +38,7 @@ pub struct WalletConfig {
 }
 
 pub fn use_wallet_provider() {
+    // TODO: vec of Vec<Wallet
     let mut wallet_config_signal = use_context_provider(|| {
         Signal::new(WalletConfig {
             current_wallet_index: 0,
@@ -104,6 +116,11 @@ fn set(secret: &[u8], index: u8) -> Result<(), Error> {
 
 pub fn get_or_set() -> Result<(MultisigAuthority, WalletConfig), Error> {
     match get() {
+        /*
+        read all keypairs,
+        return keypairnoentry for those keypairs that aren't ok
+        only return keypairs that are ok
+         */
         // Return wallet data if found (MultisigAuthority, WalletConfig)
         ok @ Ok(_) => ok,
         Err(err) => {
@@ -203,6 +220,9 @@ fn load_config() -> Result<WalletConfig, Error> {
 }
 
 pub fn add_new_keypair(private_key_string: Option<String>) -> Result<(), Error> {
+    let mut current_wallet = use_wallet();
+    //TODO: check if user has already imported this key
+
     // Get current wallet config
     let mut wallet_config_signal = use_wallet_config();
 
@@ -218,7 +238,14 @@ pub fn add_new_keypair(private_key_string: Option<String>) -> Result<(), Error> 
     // We can only add if we are less than the permissible number of wallets
     if num_wallets_used < MAX_WALLETS_ALLOWED {
         // Derive the keypair from the private key
-        let keypair_from_private_key = Keypair::from_base58_string(&private_key);
+        // let keypair_from_private_key = Keypair::from_base58_string(&private_key);
+
+        let keypair_from_private_key =
+            match std::panic::catch_unwind(|| Keypair::from_base58_string(&private_key)) {
+                Ok(keypair) => keypair,
+                Err(_) => return Err(Error::UnableToDeriveKeypair),
+            };
+
         let pubkey_string = keypair_from_private_key.pubkey().to_string();
 
         // Create pda keypair
@@ -271,6 +298,8 @@ pub fn add_new_keypair(private_key_string: Option<String>) -> Result<(), Error> 
         // Set the secret in the keyring with the new index
         set(bytes.as_slice(), new_index)?;
         log::info!("Set done");
+
+        current_wallet.set(Wallet::Connected(multisig_authority.creator.pubkey()));
 
         // TODO: SET THE NEW WALLET AS THE CURRENT WALLLET (USE_WALLET HOOK)
 

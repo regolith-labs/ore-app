@@ -27,6 +27,7 @@ pub enum GatewayError {
     ConfigNotFound,
     InvalidPrivateKey,
     Unknown,
+    UnableToDeriveKeypair,
 }
 
 impl From<anyhow::Error> for GatewayError {
