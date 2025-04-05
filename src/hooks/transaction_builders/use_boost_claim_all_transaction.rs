@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use ore_api::state::proof_pda;
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
     pubkey::Pubkey,
@@ -10,8 +9,9 @@ use solana_sdk::{
 use crate::{
     gateway::{GatewayError, GatewayResult},
     hooks::{
-        calculate_claimable_yield, use_all_boosts, use_all_stakes, use_boost_proof_wss,
-        use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT, COMPUTE_UNIT_LIMIT,
+        calculate_claimable_yield, use_all_boosts, use_all_stakes, use_boost_config_wss,
+        use_boost_proof_wss, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
+        COMPUTE_UNIT_LIMIT,
     },
     solana::{
         spl_associated_token_account::{
@@ -28,6 +28,7 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
     let wallet = use_wallet();
     let boosts = use_all_boosts();
     let boost_proof = use_boost_proof_wss();
+    let boost_config = use_boost_config_wss();
     let stakes = use_all_stakes();
     let ore_balance = use_ore_balance();
     use_resource(move || {
@@ -65,15 +66,21 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
                     let boost = boosts.get(&stake.boost).unwrap();
                     if let Ok(boost) = boost.cloned() {
                         if let Ok(boost_proof) = boost_proof.cloned() {
-                            let claimable_yield =
-                                calculate_claimable_yield(boost, boost_proof, stake);
-                            if claimable_yield > 0 {
-                                ixs.push(ore_boost_api::sdk::claim(
-                                    authority,
-                                    beneficiary,
-                                    boost.mint,
-                                    claimable_yield,
-                                ));
+                            if let Ok(boost_config) = boost_config.cloned() {
+                                let claimable_yield = calculate_claimable_yield(
+                                    boost,
+                                    boost_proof,
+                                    stake,
+                                    boost_config,
+                                );
+                                if claimable_yield > 0 {
+                                    ixs.push(ore_boost_api::sdk::claim(
+                                        authority,
+                                        beneficiary,
+                                        boost.mint,
+                                        claimable_yield,
+                                    ));
+                                }
                             }
                         }
                     }

@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use solana_sdk::{
     compute_budget::ComputeBudgetInstruction,
