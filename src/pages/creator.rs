@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     gateway::ore::OreGateway,
-    hooks::{use_gateway, use_persistent, use_persistent_override, use_wallet},
+    hooks::{use_gateway, use_wallet},
 };
 
 // 1. Check for existing account.
