@@ -3,13 +3,13 @@ use ore_api::{consts::TOKEN_DECIMALS, state::proof_pda};
 
 use crate::{
     gateway::{GatewayResult, UiTokenAmount},
-    hooks::{calculate_claimable_yield, use_all_boost_proofs, use_all_boosts, use_all_stakes},
+    hooks::{calculate_claimable_yield, use_all_boosts, use_all_stakes, use_boost_proof_wss},
     solana::spl_token::amount_to_ui_amount,
 };
 
 pub fn use_net_yield() -> Memo<GatewayResult<UiTokenAmount>> {
     let boosts = use_all_boosts();
-    let boost_proofs = use_all_boost_proofs();
+    let boost_proof = use_boost_proof_wss();
     let stakes = use_all_stakes();
 
     use_memo(move || {
@@ -19,8 +19,6 @@ pub fn use_net_yield() -> Memo<GatewayResult<UiTokenAmount>> {
             if let Ok(stake) = stake.cloned() {
                 let boost = boosts.get(&stake.boost).unwrap();
                 if let Ok(boost) = boost.cloned() {
-                    let proof_address = proof_pda(stake.boost).0;
-                    let boost_proof = boost_proofs.get(&proof_address).unwrap();
                     if let Ok(boost_proof) = boost_proof.cloned() {
                         let claimable_yield = calculate_claimable_yield(boost, boost_proof, stake);
                         net_yield += claimable_yield;

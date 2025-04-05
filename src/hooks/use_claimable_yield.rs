@@ -5,11 +5,13 @@ use steel::Numeric;
 
 use crate::gateway::GatewayResult;
 
+use super::use_boost_proof_wss;
+
 pub fn use_claimable_yield(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Signal<GatewayResult<Proof>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Memo<u64> {
+    let boost_proof = use_boost_proof_wss();
     use_memo(move || {
         let mut rewards = 0;
         if let Ok(boost) = boost.cloned() {

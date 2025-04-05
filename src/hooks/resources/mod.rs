@@ -38,7 +38,7 @@ pub fn use_cache_provider() {
     // use_boosts_provider();
     use_boosts_wss_provider();
     // use_boost_proofs_provider();
-    use_boost_proofs_wss_provider();
+    use_boost_proof_wss_provider();
     use_liquidity_pairs_provider();
     // use_stakes_provider();
     use_stakes_wss_provider();

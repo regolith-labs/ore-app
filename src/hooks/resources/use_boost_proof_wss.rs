@@ -1,41 +1,22 @@
-use std::collections::HashMap;
-
 use base64::Engine;
 use dioxus::prelude::*;
 
 use base64::prelude::BASE64_STANDARD;
-use ore_api::consts::MINT_ADDRESS;
 use ore_api::state::{proof_pda, Proof};
-use ore_boost_api::state::boost_pda;
-use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
-use crate::config::LISTED_BOOSTS;
 use crate::gateway::ore::OreGateway;
 use crate::gateway::{AccountNotificationParams, GatewayError, GatewayResult};
 use crate::hooks::{use_gateway, use_wss_subscription};
 
-pub(crate) fn use_boost_proofs_wss_provider() {
-    // Hashmap to cache resources
-    let mut boost_proofs = HashMap::new();
-
-    // Idle ORE boost
-    let boost_address = boost_pda(MINT_ADDRESS).0;
-    let proof_address = proof_pda(boost_address).0;
-    boost_proofs.insert(proof_address, use_boost_proof_signal(proof_address));
-
-    // Listed boosts
-    for boost_meta in LISTED_BOOSTS.iter() {
-        let boost_address = boost_pda(boost_meta.lp_mint).0;
-        let proof_address = proof_pda(boost_address).0;
-        boost_proofs.insert(proof_address, use_boost_proof_signal(proof_address));
-    }
-
-    // Setup context provider
-    use_context_provider(|| boost_proofs);
+pub(crate) fn use_boost_proof_wss_provider() {
+    use_context_provider(|| use_boost_proof_signal());
 }
 
-fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>> {
+fn use_boost_proof_signal() -> Signal<GatewayResult<Proof>> {
+    let boost_config_address = ore_boost_api::state::config_pda().0;
+    let proof_address = proof_pda(boost_config_address).0;
+
     // Init
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
     use_effect(move || {
@@ -62,7 +43,6 @@ fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>>
 
         // Unpack the proof account data
         let proof = *Proof::try_from_bytes(data.as_slice()).map_err(|err| anyhow::anyhow!(err))?;
-
         Ok(proof)
     };
 
@@ -75,17 +55,6 @@ fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>>
     data
 }
 
-pub fn use_boost_proof_wss(mint_address: Pubkey) -> Signal<GatewayResult<Proof>> {
-    let boost_proofs: HashMap<Pubkey, Signal<GatewayResult<Proof>>> = use_context();
-    let boost_address = boost_pda(mint_address).0;
-    let proof_address = proof_pda(boost_address).0;
-    if let Some(boost_proof) = boost_proofs.get(&proof_address) {
-        *boost_proof
-    } else {
-        panic!("use_boost_proof_wss: {:?} not found", mint_address);
-    }
-}
-
-pub fn use_all_boost_proofs() -> HashMap<Pubkey, Signal<GatewayResult<Proof>>> {
+pub fn use_boost_proof_wss() -> Signal<GatewayResult<Proof>> {
     use_context()
 }
