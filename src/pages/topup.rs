@@ -151,7 +151,7 @@ pub fn Topup(address: String) -> Element {
 #[component]
 pub fn Topup(address: String) -> Element {
     use crate::{
-        hooks::{update_wallet_config, use_wallet, Wallet},
+        hooks::{use_wallet, Wallet},
         route::Route,
     };
 

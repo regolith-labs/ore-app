@@ -19,9 +19,47 @@ use crate::{
 use ore_types::request::TransactionType;
 
 #[cfg(not(feature = "web"))]
-use crate::hooks::{import_private_key, update_wallet_config};
+use crate::hooks::{add_new_keypair, use_wallet_config};
 
 pub fn Mine() -> Element {
+    let mut current_wallet_pubkey: Signal<String> = use_signal(String::new);
+    let mut private_key: Signal<String> = use_signal(String::new);
+
+    #[cfg(not(feature = "web"))]
+    use_effect(move || {
+        let mut wallet_config = use_wallet_config().cloned();
+        if let Some(pubkey_str) = wallet_config
+            .wallet_pubkeys
+            .get(wallet_config.current_wallet_index as usize)
+        {
+            current_wallet_pubkey.set(pubkey_str.clone());
+        }
+    });
+
+    #[cfg(not(feature = "web"))]
+    let handle_input = move |e: Event<FormData>| {
+        private_key.set(e.data.value().to_string());
+    };
+
+    #[cfg(not(feature = "web"))]
+    let handle_import = move |_| {
+        // if private_key.read().trim().is_empty() {
+        //     import_status.set("Please enter a private key".to_string());
+        //     return;
+        // }
+
+        match add_new_keypair(Some(private_key.read().to_string())) {
+            Ok(_) => {
+                // import_status.set("Key imported successfully!".to_string());
+                private_key.set(String::new());
+            }
+            Err(err) => {
+                log::error!("Error importing key: {:?}", err);
+                // import_status.set(format!("Error: {:?}", err));
+            }
+        }
+    };
+
     rsx! {
         Col { class: "w-full h-full pb-20 sm:pb-16", gap: 16,
             Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
@@ -606,52 +644,51 @@ fn DownloadCTA() -> Element {
         }
     }
 }
+
+#[cfg(feature = "web")]
+fn PrivateKeyInput() -> Element {
+    rsx! {}
+}
+
 #[cfg(not(feature = "web"))]
-fn ImportKeyTester() -> Element {
-    let mut private_key = use_signal(String::new);
-    let mut import_status = use_signal(String::new);
+fn PrivateKeyInput() -> Element {
+    let mut private_key: Signal<String> = use_signal(String::new);
+    // let mut import_status: Signal<String> = use_signal(String::new);
 
     let handle_input = move |e: Event<FormData>| {
         private_key.set(e.data.value().to_string());
     };
 
     let handle_import = move |_| {
-        // Validate input is not empty
-        if private_key.read().trim().is_empty() {
-            import_status.set("Please enter a private key".to_string());
-            return;
-        }
+        // if private_key.read().trim().is_empty() {
+        //     // import_status.set("Please enter a private key".to_string());
+        //     // return;
+        // }
 
-        // Try to import the private key
-        let key_to_import = private_key.read().to_string();
-        match import_private_key(&key_to_import) {
-            Ok(pubkey) => {
-                // Success! Show the public key
-                import_status.set(format!("Imported: {}", pubkey));
-                // Clear the input
+        match add_new_keypair(Some(private_key.read().to_string())) {
+            Ok(_) => {
+                // import_status.set("Key imported successfully!".to_string());
                 private_key.set(String::new());
             }
             Err(err) => {
-                // Show error
-                import_status.set(format!("Error: {:?}", err));
+                log::error!("Error importing key: {:?}", err);
+                // import_status.set(format!("Error: {:?}", err));
             }
         }
     };
 
     rsx! {
-        Col {
-            class: "w-full max-w-xs mx-2 gap-2",
+        input {
+            class: "w-full px-3 py-2 bg-surface-secondary border border-elements-lowEmphasis rounded-md text-elements-highEmphasis",
+            placeholder: "Enter private key",
+            value: "{private_key}",
+            oninput: handle_input
+        }
 
-            // Simple input field for testing private key import
-            input {
-                class: "w-full px-3 py-2 bg-surface-floating border border-elements-lowEmphasis rounded-md text-elements-highEmphasis",
-                placeholder: "Test: Enter private key",
-                value: "{private_key}",
-                oninput: handle_input,
-            }
-
+        Row {
+            gap: 2,
             button {
-                class: "flex controls-primary w-full h-10 rounded-full hover:cursor-pointer",
+                class: "flex controls-primary px-4 h-10 rounded-full hover:cursor-pointer mt-2",
                 onclick: handle_import,
                 span {
                     class: "mx-auto my-auto",
@@ -659,13 +696,12 @@ fn ImportKeyTester() -> Element {
                 }
             }
 
-            // Status message
-            if !import_status.read().is_empty() {
-                div {
-                    class: "text-sm overflow-hidden text-ellipsis",
-                    "{import_status}"
-                }
-            }
+            // if !import_status.read().is_empty() {
+            //     span {
+            //         class: "my-auto ml-4 text-sm",
+            //         "{import_status}"
+            //     }
+            // }
         }
     }
 }

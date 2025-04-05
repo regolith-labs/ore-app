@@ -29,7 +29,3 @@ pub use use_gateway::*;
 #[cfg(not(feature = "web"))]
 pub use use_updater::*;
 pub use wallet::*;
-
-// Explicitly re-export the wallet functions
-#[cfg(not(feature = "web"))]
-pub use wallet::use_wallet_native::{import_private_key, update_wallet_config};

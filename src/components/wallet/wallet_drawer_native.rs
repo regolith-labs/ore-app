@@ -67,8 +67,8 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     // listen for keypair export
     use_effect(move || {
         if *keypair_show_export.read() {
-            if let Ok(kp) = use_wallet_native::get() {
-                let kp = kp.creator.to_base58_string();
+            if let Ok(wallet_data) = use_wallet_native::get() {
+                let kp = wallet_data.0.creator.to_base58_string();
                 keypair.set(kp.clone());
             }
         } else {
