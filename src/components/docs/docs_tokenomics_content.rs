@@ -137,7 +137,7 @@ fn TokenomicsDataPoint(label: String, children: Element) -> Element {
                 "{label}"
             }
             span {
-                class: "font-semibold text-elements-highEmphasis",
+                class: "font-medium text-elements-highEmphasis",
                 {children}
             }
         }
