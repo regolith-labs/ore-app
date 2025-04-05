@@ -78,7 +78,7 @@ fn ConnectedWalletAdapter(address: Pubkey) -> Element {
                     class: "elevated-control elevated-border rounded-full text-sm font-semibold h-12 px-5 hover:cursor-pointer gap-3",
                     gap: 3,
                     span { class: "mx-auto my-auto", "{first_four}...{last_four}" }
-                    DrawerIcon { class: "w-3 text-gray-700" }
+                    DrawerIcon { class: "w-3 text-elements-lowEmphasis" }
                 }
             }
             if *drawer_open.read() || *is_animating.read() {

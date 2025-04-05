@@ -16,6 +16,8 @@ use crate::{
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
 };
 
+#[cfg(not(feature = "web"))]
+use super::tip_ix;
 use crate::hooks::{use_wallet, GetPubkey};
 
 const API_URL: &str = "https://quote-api.jup.ag/v6";
@@ -68,15 +70,7 @@ pub fn use_swap_transaction(
                     GatewayError::FailedDeserialization
                 })?;
 
-            // Get priority fee estimate
-            // let gateway = use_gateway();
-            // let dynamic_priority_fee = match gateway.get_recent_priority_fee_estimate(&vtx).await {
-            //     Ok(fee) => fee,
-            //     Err(_) => {
-            //         log::error!("Failed to fetch priority fee estimate");
-            //         return Err(GatewayError::Unknown);
-            //     }
-            // };
+            // Note: We don't add Jito tip here as Jupiter's API already creates a complete transaction
 
             Ok(vtx)
         }

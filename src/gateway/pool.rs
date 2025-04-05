@@ -80,7 +80,7 @@ impl<R: Rpc> PoolGateway for Gateway<R> {
         authority: Pubkey,
         pool_url: String,
     ) -> GatewayResult<MiningEvent> {
-        async_std::task::sleep(std::time::Duration::from_secs(1)).await;
+        crate::time::sleep(1000).await;
         let get_url = format!("{}/event/latest/{}", pool_url, authority);
         let resp = self
             .http

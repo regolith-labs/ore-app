@@ -36,21 +36,22 @@ pub(crate) fn use_boost_proofs_wss_provider() {
 }
 
 fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>> {
-    // Create and initialize the data signal
+    // Init
     let mut data = use_signal(|| Err(GatewayError::AccountNotFound));
-    let gateway = use_gateway();
-
-    // Initialize data with current boost
-    spawn(async move {
-        match gateway.get_proof(proof_address).await {
-            Ok(boost) => data.set(Ok(boost)),
-            Err(err) => {
-                log::error!("Failed to initialize boost proof: {:?}", err);
-                data.set(Err(err));
+    use_effect(move || {
+        spawn(async move {
+            let gateway = use_gateway();
+            match gateway.get_proof(proof_address).await {
+                Ok(boost) => data.set(Ok(boost)),
+                Err(err) => {
+                    log::error!("Failed to initialize boost proof: {:?}", err);
+                    data.set(Err(err));
+                }
             }
-        }
+        });
     });
 
+    // Update
     let update_callback = move |notif: &AccountNotificationParams| {
         // Base64 decode
         let data = &notif.result.value.data;
@@ -65,8 +66,11 @@ fn use_boost_proof_signal(proof_address: Pubkey) -> Signal<GatewayResult<Proof>>
         Ok(proof)
     };
 
-    // Set up WebSocket subscription when wallet is connected
-    use_wss_subscription(data.clone(), update_callback.clone(), proof_address);
+    // Subscribe
+    let subscriber = use_wss_subscription(data.clone(), update_callback.clone());
+    use_memo(move || {
+        subscriber.send(proof_address);
+    });
 
     data
 }

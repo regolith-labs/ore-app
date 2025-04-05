@@ -60,6 +60,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
     #[cfg(feature = "web")]
     let clipboard = WebClipboard::new();
 
+    // token balances
+    let tokens = crate::hooks::use_tokens_with_values();
+
     // wallet
     let wallet = use_wallet();
     let mut pubkey = use_signal(|| "missing pubkey".to_string());
@@ -105,7 +108,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
 
     rsx! {
         div {
-            class: "flex flex-col h-full w-screen sm:w-96 elevated elevated-border text-white z-50 relative",
+            class: "flex flex-col h-full w-screen sm:w-96 elevated border-l border-gray-800 text-white z-50 relative",
             onclick: move |e| e.stop_propagation(),
 
             // Header section with fixed content
@@ -150,6 +153,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
                         a {
                             class: "flex items-center justify-center w-12 h-12 rounded-full controls-secondary",
                             href: "https://solscan.io/account/{pubkey.read()}",
+                            target: "_blank",
                             GlobeIcon { class: "h-5" }
                         }
                         span {
@@ -184,7 +188,6 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>, wallet_remount: Signal<b
 
                 // Add a token list with click handling to close drawer like in native version
                 {
-                    let tokens = crate::hooks::use_tokens_with_values();
 
                     rsx! {
                         Col {

@@ -20,8 +20,15 @@ use solana_sdk::{
 pub use utils::*;
 pub use wss::*;
 
+#[cfg(feature = "web")]
 pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
+#[cfg(not(feature = "web"))]
+pub const RPC_URL: &str = "https://rpc.ironforge.network/mainnet?apiKey=01JR0QT6CKAF608VC1DKSE1KC3";
+
+#[cfg(feature = "web")]
 pub const WSS_URL: &str = "wss://rpc.ironforge.network/mainnet?apiKey=01J4NJDYJXSGJYE3AN6VXEB5VR";
+#[cfg(not(feature = "web"))]
+pub const WSS_URL: &str = "wss://rpc.ironforge.network/mainnet?apiKey=01JR0QT6CKAF608VC1DKSE1KC3";
 
 pub struct Gateway<R: Rpc> {
     pub rpc: R,
@@ -36,7 +43,7 @@ impl<R: Rpc> Gateway<R> {
         }
     }
 
-    pub async fn get_recent_priority_fee_estimate(
+    pub async fn _get_recent_priority_fee_estimate(
         &self,
         tx: &VersionedTransaction,
     ) -> GatewayResult<u64> {

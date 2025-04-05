@@ -1,33 +1,25 @@
 [application]
-
-# App name
 name = "ORE"
-
-# Default platform
 default_platform = "web"
-
-# `build` & `serve` dist path
 out_dir = "dist"
+asset_dir = "public"
 
 [package]
 name = "ORE"
 
 [web.app]
-
-# HTML title tag content
 title = ""
 
 [web.watcher]
-# when watcher trigger, regenerate the `index.html`
 reload_html = true
-# which files or dirs will be watcher monitoring
 watch_path = ["src", "public"]
-# resolves a hot reloading issue
 index_on_404 = true
 
 [bundle]
 publisher = "Regolith Labs Inc."
 identifier = "ore.supply"
 icon = ["public/icon.png"]
+
 [macos]
 info_plist_path = "Info.plist"
+

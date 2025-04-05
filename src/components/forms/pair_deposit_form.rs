@@ -27,7 +27,6 @@ pub fn PairDepositForm(
     let mut input_stream_a = use_signal::<String>(|| "".to_owned());
     let mut input_stream_b = use_signal::<String>(|| "".to_owned());
     let mut err = use_signal::<Option<TokenInputError>>(|| None);
-    let priority_fee = use_signal::<u64>(|| 0);
 
     // Refresh data, if transaction success
     on_transaction_done(move |_sig| {
@@ -46,7 +45,6 @@ pub fn PairDepositForm(
         input_amount_a,
         input_amount_b,
         err,
-        priority_fee,
     );
 
     // Get tokens
@@ -154,7 +152,7 @@ pub fn PairDepositForm(
             }
             Col {
                 class: "w-full px-4",
-                Fee { priority_fee: priority_fee.clone() },
+                Fee {},
             }
 
             SubmitButton {
@@ -164,7 +162,7 @@ pub fn PairDepositForm(
                 tx_type: TransactionType::BoostDeposit,
                 confirmation: ConfirmationDialog {
                     title: "Financial risks".to_string(),
-                    detail: "Providing liquidity comes with inherentfinancial risk, including but not limited to, divergence loss.\nDivergence loss can occur when the relative price of the deposited tokens changes and the value of the deposit becomes less compared to holding the tokens separately.\nOnce deposited, your exposure to each token can change.".to_string(),
+                    detail: "Providing liquidity comes with inherent financial risk, including but not limited to, divergence loss.\nDivergence loss can occur when the relative price of the deposited tokens changes and the value of the deposit becomes less compared to holding the tokens separately.\nOnce deposited, your exposure to each token can change.".to_string(),
                     ack: "I acknowledge the risks, and I alone am responsible for my financial decisions".to_string(),
                 },
             }

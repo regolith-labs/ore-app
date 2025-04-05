@@ -1,15 +1,17 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
+use solana_sdk::transaction::Transaction;
 
 use crate::{
     components::*,
-    gateway::pool::PoolGateway,
+    gateway::{pool::PoolGateway, GatewayError, GatewayResult},
     hooks::{
-        on_transaction_done, use_gateway, use_member, use_member_record, use_member_record_balance,
-        use_miner, use_miner_claim_transaction, use_miner_cores, use_miner_is_active,
-        use_miner_status, use_pool_register_transaction, use_pool_url, use_system_cpu_utilization,
-        use_wallet, MinerStatus, PoolRegisterStatus, Wallet,
+        build_commit_claim_instructions, on_transaction_done, use_gateway, use_member,
+        use_member_record, use_member_record_balance, use_miner, use_miner_cores,
+        use_miner_is_active, use_miner_status, use_pool, use_pool_register_transaction,
+        use_pool_url, use_system_cpu_utilization, use_transaction_status, use_wallet, MinerStatus,
+        Wallet,
     },
     solana::spl_token::amount_to_ui_amount_string,
 };
@@ -17,15 +19,15 @@ use ore_types::request::TransactionType;
 
 pub fn Mine() -> Element {
     rsx! {
-        Col {
-            // class: "w-full h-full pb-20 sm:pb-16 mx-auto",
-            class: "w-full h-full pb-20 sm:pb-16",
-            gap: 16,
+        Col { class: "w-full h-full pb-20 sm:pb-16", gap: 16,
             Col { class: "w-full max-w-2xl mx-auto px-5 sm:px-8 gap-8",
-                Heading {
-                    class: "w-full",
-                    title: "Mine",
-                    subtitle: "Convert energy into cryptocurrency.",
+                Row { class: "w-full justify-between",
+                    Heading {
+                        class: "w-full",
+                        title: "Mine",
+                        subtitle: "Convert energy into cryptocurrency.",
+                    }
+                    DocsButton { tab: DocsTab::Mining }
                 }
                 MinerData {}
             }
@@ -36,12 +38,10 @@ pub fn Mine() -> Element {
 
 fn MinerData() -> Element {
     // Get resources
-    let mut member = use_member();
     let mut member_record = use_member_record();
 
     // Refresh member account
     on_transaction_done(move |_sig| {
-        member.restart();
         member_record.restart();
     });
 
@@ -52,9 +52,11 @@ fn MinerData() -> Element {
             Col { class: "w-full gap-8",
                 MinerCores {}
                 MinePower {}
+                if cfg!(feature = "web") {
+                    DownloadCTA {}
+                }
             }
             TimeRemaining {}
-            MinerPendingRewards {}
             MinerRewards {}
         }
     }
@@ -64,24 +66,10 @@ fn StopStartButton() -> Element {
     let wallet = use_wallet();
     let pool_url = use_pool_url();
     let mut miner_status = use_miner_status();
-    let mut member = use_member();
+    let member = use_member();
     let mut member_record = use_member_record();
-    let mut register_tx_start = use_signal(|| false);
-    let register_tx = use_pool_register_transaction(register_tx_start);
+    let register_tx = use_pool_register_transaction();
     let is_active = use_miner_is_active();
-
-    // listen for onchain pool registration
-    use_effect(move || match register_tx.cloned() {
-        // commit claim dependency failed, reset
-        Some(Ok(PoolRegisterStatus::CommitClaimFailed)) => {
-            miner_status.set(MinerStatus::Stopped);
-        }
-        // submit tx
-        Some(Ok(PoolRegisterStatus::Transaction(tx))) => {
-            submit_transaction(tx, TransactionType::PoolJoin);
-        }
-        _ => {}
-    });
 
     // offchain pool server registration
     let mut register_with_pool_server = use_future(move || async move {
@@ -96,7 +84,6 @@ fn StopStartButton() -> Element {
         }
         match use_gateway().register(authority, pool_url).await {
             Ok(_member_record) => {
-                member.restart();
                 member_record.restart();
                 miner_status.set(MinerStatus::FetchingChallenge);
             }
@@ -113,8 +100,8 @@ fn StopStartButton() -> Element {
     // first the onchain registration signature lands
     // and then we submit for registration with the offchain pool server
     on_transaction_done(move |sig| {
-        log::info!("registration sig: {:?}", sig);
         if miner_status.cloned() == MinerStatus::Registering {
+            log::info!("registration sig: {:?}", sig);
             register_with_pool_server.restart();
         }
     });
@@ -144,15 +131,19 @@ fn StopStartButton() -> Element {
                 if *is_active.read() {
                     miner_status.set(MinerStatus::Stopped);
                 } else {
-                    if let Some(Ok(_member)) = member.cloned() {
+                    if let Ok(_member) = *member.read() {
                         if let Some(Ok(_member_db)) = member_record.cloned() {
                             miner_status.set(MinerStatus::FetchingChallenge);
                         } else {
                             miner_status.set(MinerStatus::Registering);
                         }
                     } else {
-                        register_tx_start.set(true);
-                        miner_status.set(MinerStatus::Registering);
+                        if let Some(Ok(tx)) = register_tx.cloned() {
+                            spawn(async move {
+                                miner_status.set(MinerStatus::Registering);
+                                submit_transaction(tx, TransactionType::PoolJoin);
+                            });
+                        }
                     }
                 }
             },
@@ -293,23 +284,25 @@ fn MinerCores() -> Element {
             }
             Row { class: "justify-between",
                 span { class: "font-semibold text-2xl sm:text-3xl", "{cores}" }
-                Row { gap: 2,
-                    button {
-                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
-                        onclick: move |_| {
-                            let current = cores.peek().clone() - 1;
-                            cores.set(current.max(1));
-                        },
-                        "–"
-                    }
-                    button {
-                        class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl hover:disabled:cursor-not-allowed",
-                        disabled: cfg!(feature = "web"),
-                        onclick: move |_| {
-                            let current = cores.peek().clone() + 1;
-                            cores.set(current.min(max));
-                        },
-                        "+"
+                if cfg!(not(feature = "web")) {
+                    Row { gap: 2,
+                        button {
+                            class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl",
+                            onclick: move |_| {
+                                let current = cores.peek().clone() - 1;
+                                cores.set(current.max(1));
+                            },
+                            "–"
+                        }
+                        button {
+                            class: "flex items-center justify-center w-12 h-12 controls-secondary rounded-full text-3xl hover:disabled:cursor-not-allowed",
+                            disabled: cfg!(feature = "web"),
+                            onclick: move |_| {
+                                let current = cores.peek().clone() + 1;
+                                cores.set(current.min(max));
+                            },
+                            "+"
+                        }
                     }
                 }
             }
@@ -317,59 +310,56 @@ fn MinerCores() -> Element {
     }
 }
 
-fn MinerPendingRewards() -> Element {
-    let member = use_member();
-    let member_record_balance = use_member_record_balance();
-    let mut info_hidden = use_signal(|| true);
-    rsx! {
-        if let Some(Ok(member_record_balance)) = member_record_balance.cloned() {
-            if let Some(Ok(member)) = member.cloned() {
-                if member_record_balance > member.total_balance {
-                    Col { gap: 4,
-                        // span {
-                        //     class: "text-elements-lowEmphasis font-medium",
-                        //     "Rewards (pending)"
-                        // }
-                        button {
-                            class: "flex flex-col gap-0 group",
-                            onclick: move |_| info_hidden.set(!info_hidden.cloned()),
-                            Row { gap: 2,
-                                span { class: "text-elements-lowEmphasis font-medium",
-                                    "Rewards (pending)"
-                                }
-                                InfoIcon { class: "h-4 w-4 shrink-0 text-elements-lowEmphasis group-hover:text-elements-highEmphasis transition-all duration-300 ease-in-out my-auto" }
-                            }
-                            InfoText {
-                                class: "text-wrap text-left text-sm max-w-lg mr-auto",
-                                text: "ORE that you have mined, but cannot yet claim. Pending rewards are automatically committed to your claimable balance by the mining pool operator every few hours.",
-                                hidden: info_hidden,
-                            }
-                        }
-                        OreValue {
-                            size: TokenValueSize::Large,
-                            ui_amount_string: amount_to_ui_amount_string(
-                                member_record_balance - member.total_balance,
-                                TOKEN_DECIMALS,
-                            ),
-                            with_decimal_units: true,
-                        }
-                    }
-                }
-            }
-        }
-    }
+#[derive(Eq, PartialEq, Clone)]
+pub enum MemberBalance {
+    Loading,
+    Null,
+    Balance(u64),
 }
 
 fn MinerRewards() -> Element {
     let member = use_member();
-    let claim_tx = use_miner_claim_transaction(member);
+    let member_db_balance = use_member_record_balance();
+    let pool = use_pool();
+    // init claimable balance
+    let mut member_claimable_balance = use_signal(|| MemberBalance::Loading);
+    use_effect(move || {
+        let balance = match member_db_balance.cloned() {
+            Some(member_db_balance) => {
+                if let (Ok(member_db_balance), Ok(member)) = (member_db_balance, member.cloned()) {
+                    // claimable balance
+                    let diff = member_db_balance.saturating_sub(member.total_balance);
+                    MemberBalance::Balance(member.balance + diff)
+                } else {
+                    MemberBalance::Null
+                }
+            }
+            _ => MemberBalance::Loading,
+        };
+        member_claimable_balance.set(balance);
+    });
+    // init claim transaction
+    let mut claim_tx = use_signal(|| Err(GatewayError::RequestFailed));
+    use_effect(move || {
+        if let (Some(Ok(member_db_balance)), Ok(member), Some(pool)) =
+            (member_db_balance.cloned(), member.cloned(), pool.cloned())
+        {
+            spawn(async move {
+                let gateway = use_gateway();
+                if let Ok(ixs) =
+                    build_commit_claim_instructions(&gateway.rpc, &pool, &member, member_db_balance)
+                        .await
+                {
+                    let tx = Transaction::new_with_payer(&ixs, Some(&member.authority));
+                    claim_tx.set(Ok(tx));
+                }
+            });
+        }
+    });
+    // hidden toggle
     let mut info_hidden = use_signal(|| true);
     rsx! {
         Col { gap: 4,
-            // span {
-            //     class: "text-elements-lowEmphasis font-medium",
-            //     "Rewards"
-            // }
             button {
                 class: "flex flex-col gap-0 group",
                 onclick: move |_| info_hidden.set(!info_hidden.cloned()),
@@ -379,25 +369,94 @@ fn MinerRewards() -> Element {
                 }
                 InfoText {
                     class: "text-wrap text-left text-sm max-w-lg mr-auto",
-                    text: "ORE that you have mined and may claim.",
+                    text: "ORE that you have mined and may claim. 1 ORE = 100,000,000,000 grams.",
                     hidden: info_hidden,
                 }
             }
-            if let Some(member) = member.cloned() {
-                if let Ok(member) = member {
-                    OreValue {
-                        size: TokenValueSize::Large,
-                        ui_amount_string: amount_to_ui_amount_string(member.balance, TOKEN_DECIMALS),
-                        with_decimal_units: true,
-                        gold: true,
+            match *member_claimable_balance.read() {
+                MemberBalance::Loading => {
+                    rsx! {
+                        LoadingValue {}
                     }
-                } else {
-                    NullValue {}
                 }
-            } else {
-                LoadingValue {}
+                MemberBalance::Null => {
+                    rsx! {
+                        NullValue {}
+                    }
+                }
+                MemberBalance::Balance(u64) => {
+                    rsx! {
+                        OreValue {
+                            size: TokenValueSize::Large,
+                            ui_amount_string: amount_to_ui_amount_string(u64, TOKEN_DECIMALS),
+                            with_decimal_units: true,
+                            gold: true,
+                        }
+                    }
+                }
             }
-            ClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
+            MinerRewardsClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
+        }
+    }
+}
+
+#[component]
+pub fn MinerRewardsClaimButton(
+    transaction: Signal<GatewayResult<Transaction>>,
+    tx_type: TransactionType,
+) -> Element {
+    let pool_url = use_pool_url();
+    let member = use_member();
+    let mut transaction_status = use_transaction_status();
+
+    let enabled = if let Ok(_) = transaction.read().as_ref() {
+        true
+    } else {
+        false
+    };
+
+    rsx! {
+        button {
+            class: "h-12 w-full rounded-full controls-gold",
+            disabled: !enabled,
+            onclick: move |_| {
+                spawn(async move {
+                    if let (Some(pool_url), Ok(member), Ok(tx)) = (
+                        pool_url.cloned(),
+                        member.cloned(),
+                        transaction.cloned(),
+                    ) {
+                        transaction_status.set(Some(TransactionStatus::Waiting));
+                        let sign_partial = sign_transaction_partial(tx).await;
+                        match sign_partial {
+                            Ok((tx, hash)) => {
+                                transaction_status.set(Some(TransactionStatus::Sending(0)));
+                                let gateway = use_gateway();
+                                match gateway
+                                    .commit_claim(member.authority, pool_url, tx, hash)
+                                    .await
+                                {
+                                    Ok(balance_update) => {
+                                        transaction_status
+                                            .set(
+                                                Some(TransactionStatus::Done(balance_update.signature)),
+                                            );
+                                    }
+                                    Err(err) => {
+                                        transaction_status.set(Some(TransactionStatus::Error));
+                                        log::error!("{:?}", err);
+                                    }
+                                }
+                            }
+                            Err(err) => {
+                                transaction_status.set(Some(TransactionStatus::Error));
+                                log::error!("{:?}", err);
+                            }
+                        }
+                    }
+                });
+            },
+            span { class: "mx-auto my-auto font-semibold", "Claim" }
         }
     }
 }
@@ -444,18 +503,6 @@ fn MinePower() -> Element {
 
     rsx! {
         Col { class: "relative flex w-full mx-auto pr-2", gap: 4,
-            // Keyframes for the animation
-            // style {
-            //     "@keyframes blockPulse {{
-            //         0% {{ opacity: 0; }}
-            //         100% {{ opacity: 1; }}
-            //     }}"
-            // }
-
-            // span {
-            //     class: "text-elements-lowEmphasis font-medium",
-            //     "Core utilization"
-            // }
 
             // Manual column layout with increased spacing between columns
             div { class: "flex flex-col md:flex-row gap-8 w-full",
@@ -506,6 +553,50 @@ fn MinePower() -> Element {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Only show the download CTA on web
+#[cfg(not(feature = "web"))]
+fn DownloadCTA() -> Element {
+    rsx! {}
+}
+
+#[cfg(feature = "web")]
+fn DownloadCTA() -> Element {
+    rsx! {
+        Row {
+            class: "w-full my-4",
+            Row {
+                class: "items-center justify-between rounded-lg py-4 px-6 border border-elements-gold relative",
+                gap: 2,
+                Row {
+                    class: "items-center",
+                    DownloadIcon {
+                        class: "w-8 h-8 mr-4 text-elements-gold hidden sm:block"
+                    }
+                    Col {
+                        class: "sm:gap-0",
+                        span {
+                            class: "text-elements-highEmphasis text-sm md:text-base",
+                            "Download the desktop app"
+                        }
+                        span {
+                            class: "text-elements-lowEmphasis text-xs sm:text-sm",
+                            "Get more out of your machine with the native desktop miner."
+                        }
+                    }
+                }
+                Link {
+                    to: "/download",
+                    class: "h-12 px-6 rounded-full controls-gold flex items-center justify-center",
+                    span {
+                        class: "font-semibold text-xs sm:text-sm md:text-base",
+                        "Download"
                     }
                 }
             }

@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use futures::StreamExt;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::gateway::{AccountNotificationParams, GatewayResult};
@@ -18,18 +19,35 @@ use super::{use_wss, FromWssMsg, ToWssMsg};
 pub fn use_wss_subscription<T, U>(
     mut data: Signal<GatewayResult<T>>,
     update_callback: U,
-    pubkey: Pubkey,
-) where
+) -> Coroutine<Pubkey>
+where
     T: Clone + 'static,
     U: Fn(&AccountNotificationParams) -> GatewayResult<T> + 'static,
 {
     let (from_wss, to_wss) = use_wss();
     let mut sub_id = use_signal(|| 0);
-    let sub_request_id = use_memo(move || fastrand::u64(..));
+    let mut sub_request_id = use_signal(|| 0);
+
+    // Subscribe when component mounts
+    let pubkey_tx = use_coroutine(move |mut rx: UnboundedReceiver<Pubkey>| async move {
+        while let Some(pubkey) = rx.next().await {
+            let rid = fastrand::u64(..);
+            // Set sub request id
+            sub_request_id.set(rid);
+            // Unsubscribe from previous wallet first
+            let current_sub_id = *sub_id.read();
+            if current_sub_id > 0 {
+                to_wss.send(ToWssMsg::Unsubscribe(current_sub_id));
+            }
+            // Then subscribe to new wallet
+            to_wss.send(ToWssMsg::Subscribe(rid, pubkey));
+        }
+    });
 
     // Handle subscription ID tracking
     use_effect(move || {
         let msg = from_wss.cloned();
+        let sub_request_id = sub_request_id.cloned();
         // Track subscription ID
         if let FromWssMsg::Subscription(rid, sid) = msg {
             // Only handle subscriptions originating from this component
@@ -50,11 +68,6 @@ pub fn use_wss_subscription<T, U>(
         }
     });
 
-    // Subscribe when component mounts
-    use_effect(move || {
-        to_wss.send(ToWssMsg::Subscribe(sub_request_id(), pubkey));
-    });
-
     // Unsubscribe when component is dropped
     use_drop(move || {
         let current_sub_id = *sub_id.read();
@@ -62,4 +75,6 @@ pub fn use_wss_subscription<T, U>(
             to_wss.send(ToWssMsg::Unsubscribe(current_sub_id));
         }
     });
+
+    pubkey_tx
 }

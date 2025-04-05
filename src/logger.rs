@@ -24,7 +24,7 @@ pub fn init() {
 //
 // cat ~/Library/Caches/ore.supply.ore-app/logs/ore.log
 #[cfg(all(feature = "desktop", target_os = "macos"))]
-fn init_macos() {
+fn _init_macos() {
     use directories::ProjectDirs;
     use fern::Dispatch;
     use log::LevelFilter;
