@@ -1,7 +1,10 @@
-use b64::ToBase64;
+use std::str::FromStr;
+
+use b64::{FromBase64, ToBase64};
 use dioxus::document::eval;
 use dioxus::prelude::*;
-use ore_types::{request::LinkTwitterAccountRequest, response::AccessTokenResponse};
+use ore_types::response::AccessTokenResponse;
+use solana_sdk::signature::Signature;
 use steel::Pubkey;
 
 use crate::{
@@ -17,9 +20,8 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
         let oauth_verifier = oauth_verifier.clone();
         async move {
             use_gateway()
-                .get_access_token(oauth_token, oauth_verifier)
+                .get_x_access_token(oauth_token, oauth_verifier)
                 .await
-                .unwrap()
         }
     });
 
@@ -30,13 +32,13 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
             gap: 8,
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: "Link Account",
-                subtitle: "Link your X account to receive creator rewards."
+                title: "Link account",
+                subtitle: "Link your account to begin earning creator rewards."
             }
             Col {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 gap: 8,
-                if let Some(access_token) = access_token.cloned() {
+                if let Some(Ok(access_token)) = access_token.cloned() {
                     LinkAccount { access_token }
                 } else {
                     "Loading..."
@@ -61,7 +63,7 @@ pub fn LinkAccount(access_token: AccessTokenResponse) -> Element {
             if let Wallet::Connected(pubkey) = *wallet.read() {
                 LinkAccountButton { access_token, pubkey }
             } else {
-                "Connect Wallet"
+                "Connect wallet"
             }
         }
     }
@@ -82,21 +84,24 @@ pub fn LinkAccountButton(access_token: AccessTokenResponse, pubkey: Pubkey) -> E
                         r#"
                 let msg = await dioxus.recv();
                 let signed = await window.OreMsgSigner({b64: msg});
+                console.log("signed", signed);
                 dioxus.send(signed);
                 "#,
                     );
 
                     // Sign request with wallet
                     let msg = format!(
-                        "I authorize Regolith Labs to link my X account with my wallet.\n\nUsername: {}\nWallet: {}\nAuth: {}",
+                        "I authorize Regolith Labs to use content published on my X account for the creator rewards program.\n\nAccount: {}\nAddress: {}\nAuth: {}",
                         access_token.screen_name.clone(),
                         pubkey,
                         access_token.oauth_token.clone()
                     )
                     .as_bytes()
                     .to_base64(b64::STANDARD);
+
+                    // Send message to eval
                     let _send = eval
-                        .send(serde_json::Value::String(msg))
+                        .send(serde_json::Value::String(msg.clone()))
                         .map_err(|err| anyhow::anyhow!(err))
                         .unwrap();
 
@@ -106,17 +111,39 @@ pub fn LinkAccountButton(access_token: AccessTokenResponse, pubkey: Pubkey) -> E
                     // Process eval result
                     match res {
                         // Process valid signing result
-                        Ok(serde_json::Value::String(string)) => {
-                            log::info!("signed message: {}", string);
+                        Ok(serde_json::Value::String(sig)) => {
+                            if let Ok(sig) = sig.from_base64() {
+                                log::info!("sig: {:?}", sig);
+                                if let Ok(sig) = Signature::try_from(sig) {
+                                    log::info!("signed message: {}", sig);
+                                    let response = use_gateway()
+                                        .link_x_account(
+                                            msg,
+                                            sig,
+                                            pubkey,
+                                            access_token.oauth_token.clone(),
+                                        )
+                                        .await;
+                                    log::info!("response: {:?}", response);
+                                } else {
+                                    log::error!("error parsing signature");
+                                }
+                            } else {
+                                log::error!("error decoding signature");
+                            }
                         }
 
-                        _ => {
-                            log::error!("error signing message");
+                        Err(err) => {
+                            log::error!("error signing message: {}", err);
+                        }
+
+                        x => {
+                            log::error!("error signing message: {:?}", x);
                         }
                     }
                 });
             },
-            "Link Account"
+            "Link account"
         }
     }
 }

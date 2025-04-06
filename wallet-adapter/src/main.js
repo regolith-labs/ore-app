@@ -123,14 +123,14 @@ function SignMessage() {
   const { publicKey, signMessage } = useWallet();
   const callback = useCallback(async (msg) => {
     try {
-      const signed = await signMessage(
+      const sig = await signMessage(
         Buffer.from(
           msg.b64,
           "base64"
         )
       );
       const b64 = Buffer.from(
-        signed.serialize()
+        sig
       ).toString("base64");
       return b64
     } catch (err) {

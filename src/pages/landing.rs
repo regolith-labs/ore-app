@@ -93,7 +93,7 @@ fn HeroTitle() -> Element {
                 "Gold"
             }
             span {
-                class: "md:mb-auto z-10 text-elements-midEmphasis leading-12 font-wide font-medium text-2xl md:text-3xl lg:text-4xl text-center md:text-left max-w-2xl",
+                class: "md:mb-auto z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-2xl md:text-3xl lg:text-4xl text-center md:text-left max-w-2xl",
                 "Convert energy into cryptocurrency."
             }
         }

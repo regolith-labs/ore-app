@@ -1,7 +1,7 @@
 use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::{
-    request::TransactionEvent,
+    request::{LinkXAccountRequest, TransactionEvent},
     response::{AccessTokenResponse, RequestTokenResponse},
 };
 use solana_sdk::pubkey::Pubkey;
@@ -27,12 +27,19 @@ pub trait OreGateway {
         &self,
         transaction: TransactionEvent,
     ) -> GatewayResult<Signature>;
-    async fn get_twitter_request_token(&self) -> GatewayResult<String>;
-    async fn get_access_token(
+    async fn get_x_request_token(&self) -> GatewayResult<String>;
+    async fn get_x_access_token(
         &self,
         oauth_token: String,
         oauth_verifier: String,
     ) -> GatewayResult<AccessTokenResponse>;
+    async fn link_x_account(
+        &self,
+        msg: String,
+        signature: Signature,
+        address: Pubkey,
+        access_token: String,
+    ) -> GatewayResult<Signature>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -104,8 +111,8 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         Ok(sig)
     }
 
-    async fn get_twitter_request_token(&self) -> GatewayResult<String> {
-        let get_url = format!("{}/auth/twitter/request_token", ORE_API_URL);
+    async fn get_x_request_token(&self) -> GatewayResult<String> {
+        let get_url = format!("{}/oauth/x/request_token", ORE_API_URL);
         let resp = self
             .http
             .get(get_url)
@@ -118,12 +125,12 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         Ok(token.oauth_token)
     }
 
-    async fn get_access_token(
+    async fn get_x_access_token(
         &self,
         oauth_token: String,
         oauth_verifier: String,
     ) -> GatewayResult<AccessTokenResponse> {
-        let url = format!("{}/auth/twitter/access_token", ORE_API_URL);
+        let url = format!("{}/oauth/x/access_token", ORE_API_URL);
         let resp = self
             .http
             .get(url)
@@ -138,5 +145,30 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         let access_token =
             serde_json::from_str::<AccessTokenResponse>(&body).map_err(GatewayError::from)?;
         Ok(access_token)
+    }
+
+    async fn link_x_account(
+        &self,
+        msg: String,
+        signature: Signature,
+        address: Pubkey,
+        access_token: String,
+    ) -> GatewayResult<Signature> {
+        let url = format!("{}/oauth/x/link_account", ORE_API_URL);
+        let resp = self
+            .http
+            .post(url)
+            .json(&LinkXAccountRequest {
+                msg,
+                signature,
+                address,
+                access_token,
+            })
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
+        let body = resp.text().await.map_err(GatewayError::from)?;
+        let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
+        Ok(sig)
     }
 }
