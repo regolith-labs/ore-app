@@ -137,9 +137,6 @@ fn BoostMetrics(boost: Signal<GatewayResult<Boost>>) -> Element {
                 title: "Boost"
             }
             Apr {}
-            Weight {
-                boost,
-            }
             TotalDeposits {
                 boost,
             }
@@ -147,6 +144,9 @@ fn BoostMetrics(boost: Signal<GatewayResult<Boost>>) -> Element {
                 boost,
             }
             Tvl {
+                boost,
+            }
+            Weight {
                 boost,
             }
         }
