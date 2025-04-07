@@ -33,7 +33,6 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
     let ore_balance = use_ore_balance();
     use_resource(move || {
         let boosts = boosts.clone();
-        let boost_proof = boost_proof.clone();
         let stakes = stakes.clone();
         async move {
             // Check if wallet is connected

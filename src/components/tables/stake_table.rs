@@ -1,9 +1,6 @@
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
-use ore_api::{
-    consts::{MINT_ADDRESS, TOKEN_DECIMALS},
-    state::Proof,
-};
+use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::{Boost, Stake};
 use steel::Pubkey;
 
@@ -12,8 +9,8 @@ use crate::{
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
     hooks::{
-        use_all_liquidity_pairs, use_boost_apr, use_boost_proof_wss, use_boost_tvl, use_boost_wss,
-        use_claimable_yield, use_stake_wss,
+        use_all_liquidity_pairs, use_boost_apr, use_boost_tvl, use_boost_wss, use_claimable_yield,
+        use_stake_wss,
     },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,

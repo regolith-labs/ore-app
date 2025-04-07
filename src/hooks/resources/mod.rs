@@ -37,13 +37,10 @@ pub use use_wss::*;
 pub use use_wss_sub::*;
 
 pub fn use_cache_provider() {
-    // use_boosts_provider();
     use_boosts_wss_provider();
-    // use_boost_proofs_provider();
     use_boost_config_wss_provider();
     use_boost_proof_wss_provider();
     use_liquidity_pairs_provider();
-    // use_stakes_provider();
     use_stakes_wss_provider();
     use_ore_price_provider();
     use_members_provider();
