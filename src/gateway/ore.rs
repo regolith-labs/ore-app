@@ -1,5 +1,5 @@
 use ore_api::state::Proof;
-use ore_boost_api::state::{Boost, Stake};
+use ore_boost_api::state::{Boost, Config as BoostConfig, Stake};
 use ore_types::request::TransactionEvent;
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Signature;
@@ -15,6 +15,7 @@ pub trait OreGateway {
     async fn get_boost(&self, address: Pubkey) -> GatewayResult<Boost>;
     async fn get_stake(&self, address: Pubkey) -> GatewayResult<Stake>;
     async fn get_proof(&self, address: Pubkey) -> GatewayResult<Proof>;
+    async fn get_boost_config(&self, address: Pubkey) -> GatewayResult<BoostConfig>;
 
     // API
     async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64>;
@@ -33,6 +34,15 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .await
             .map_err(GatewayError::from)?;
         Ok(*Boost::try_from_bytes(&data)?)
+    }
+
+    async fn get_boost_config(&self, address: Pubkey) -> GatewayResult<BoostConfig> {
+        let data = self
+            .rpc
+            .get_account_data(&address)
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(*BoostConfig::try_from_bytes(&data)?)
     }
 
     async fn get_stake(&self, address: Pubkey) -> GatewayResult<Stake> {
