@@ -44,8 +44,8 @@ pub fn calculate_claimable_yield(
             Numeric::from_fraction(boost_proof.balance, boost_config.total_weight);
     }
 
-    if config_rewards_factor > boost_rewards_factor {
-        let accumulated_rewards = config_rewards_factor - boost_rewards_factor;
+    if config_rewards_factor > boost.last_rewards_factor {
+        let accumulated_rewards = config_rewards_factor - boost.last_rewards_factor;
         let boost_rewards = accumulated_rewards * Numeric::from_u64(boost.weight);
         boost_rewards_factor += boost_rewards / Numeric::from_u64(boost.total_deposits);
     }
