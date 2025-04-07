@@ -10,7 +10,8 @@ use crate::gateway::{AccountNotificationParams, GatewayError, GatewayResult};
 use crate::hooks::{use_gateway, use_wss_subscription};
 
 pub(crate) fn use_boost_proof_wss_provider() {
-    use_context_provider(|| use_boost_proof_signal());
+    let signal = use_boost_proof_signal();
+    use_context_provider(|| signal);
 }
 
 fn use_boost_proof_signal() -> Signal<GatewayResult<Proof>> {
@@ -48,9 +49,7 @@ fn use_boost_proof_signal() -> Signal<GatewayResult<Proof>> {
 
     // Subscribe
     let subscriber = use_wss_subscription(data.clone(), update_callback.clone());
-    use_memo(move || {
-        subscriber.send(proof_address);
-    });
+    use_effect(move || subscriber.send(proof_address));
 
     data
 }
