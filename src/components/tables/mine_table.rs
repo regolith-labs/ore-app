@@ -4,10 +4,7 @@ use crate::{
 };
 use chrono::{DateTime, Local};
 use dioxus::prelude::*;
-// use ore_api::consts::TOKEN_DECIMALS;
 use solana_sdk::signature::Signature;
-
-// use crate::solana::spl_token::amount_to_ui_amount_string;
 
 pub fn MineTable() -> Element {
     let miner_events = use_miner_events();
