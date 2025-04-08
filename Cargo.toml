@@ -33,6 +33,26 @@ desktop = [
   "tokio",
   "tokio-tungstenite",
 ]
+android = [
+  "cargo-packager-updater",
+  "core_affinity",
+  "dioxus/mobile",
+  "dioxus-sdk/clipboard",
+  "directories",
+  "env_logger",
+  "fern",
+  "solana-account-decoder",
+  "solana-client",
+  "solana-program",
+  "solana-transaction-status",
+  "spl-associated-token-account",
+  "spl-memo",
+  "spl-token",
+  "spl-token-2022",
+  "sysinfo",
+  "tokio",
+  "tokio-tungstenite",
+]
 # Feature for macOS-specific dependencies
 macos-desktop = ["cocoa", "objc"]
 web = [
