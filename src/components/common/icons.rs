@@ -1041,3 +1041,22 @@ pub fn QuestionCircleIcon(class: Option<String>) -> Element {
         }
     }
 }
+
+#[component]
+pub fn ChevronDownIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            stroke_width: "1.5",
+            class: "{class}",
+            path {
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                d: "m19.5 8.25-7.5 7.5-7.5-7.5"
+            }
+        }
+    }
+}

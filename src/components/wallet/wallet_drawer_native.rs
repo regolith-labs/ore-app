@@ -3,13 +3,20 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-use super::token_list::TokenList;
-use crate::components::{Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row};
+// use super::token_list::TokenList;
+// use super::wallet_list::WalletList;
+use crate::components::{
+    ChevronDownIcon, Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row, WalletList,
+    WalletPicker,
+};
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 use crate::route::Route;
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
+    // Add this near the top with other signal declarations
+    let mut show_wallet_picker = use_signal(|| false);
+
     // clipboard
     let mut clipboard = use_clipboard();
     // wallet
@@ -22,6 +29,10 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let mut keypair = use_signal(|| "failed to read private key".to_string());
     let mut keypair_show_export = use_signal(|| false);
     let mut keypair_copied = use_signal(|| false);
+
+    // #[cfg(not(feature = "web"))]
+    let wallet_picker_open = use_signal(|| false);
+
     // listen for wallet update
     use_effect(move || {
         if let Wallet::Connected(pk) = *wallet.read() {
@@ -101,24 +112,73 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                 }
 
                 Row {
-
+                    class: "flex justify-between items-center rounded-full text-center w-full controls-secondary mb-4",
+                    button {
+                        onclick: move |e| {
+                            e.stop_propagation();
+                            show_wallet_picker.set(!show_wallet_picker.cloned());
+                        },
+                        div { class: "flex items-center gap-2 py-2 px-6 hover:cursor-pointer",
+                            div { "{pubkey_splice.read().to_string()}" }
+                            ChevronDownIcon { class: "h-4 w-4" }
+                        }
+                    }
+                    // button {
+                    //     div { class: "flex items-center gap-2 py-2 px-6 hover:cursor-pointer",
+                    //         div { "{pubkey_splice.read().to_string()}" }
+                    //         ChevronDownIcon { class: "h-4 w-4" }
+                    //     }
+                    // }
+                    button {
+                        onclick: move |e| {
+                            e.stop_propagation();
+                            if let Err(err) = clipboard.set(pubkey.to_string()) {
+                                log::error!("failed to set clipboard: {:?}", err);
+                            }
+                            pubkey_splice.set(Splice::Copied);
+                        },
+                        div { class: "mr-4  pl-2 flex items-center py-4 hover:cursor-pointer",
+                            CopyIcon { class: "h-4 w-4", solid: false }
+                        }
+                    }
+                }
+                WalletPicker {
+                    show: show_wallet_picker.cloned(),
+                    on_close: move |_| show_wallet_picker.set(false)
                 }
 
                 // Clipboard button
-                button {
-                    class: "flex justify-center items-center rounded-full text-center py-4 px-6 w-full controls-secondary hover:cursor-pointer mb-4",
-                    onclick: move |e| {
-                        e.stop_propagation();
-                        if let Err(err) = clipboard.set(pubkey.to_string()) {
-                            log::error!("failed to set clipboard: {:?}", err);
-                        }
-                        pubkey_splice.set(Splice::Copied);
-                    },
-                    div { class: "flex items-center gap-2",
-                        div { "{pubkey_splice.read().to_string()}" }
-                        CopyIcon { class: "h-4 w-4", solid: false }
-                    }
-                }
+                // button {
+                //     class: "flex justify-center items-center rounded-full text-center py-4 px-6 w-full controls-secondary hover:cursor-pointer mb-4",
+                //     onclick: move |e| {
+                //         e.stop_propagation();
+                //         if let Err(err) = clipboard.set(pubkey.to_string()) {
+                //             log::error!("failed to set clipboard: {:?}", err);
+                //         }
+                //         pubkey_splice.set(Splice::Copied);
+                //     },
+                //     // div { class: "flex items-center gap-2",
+                //     //     div { "{pubkey_splice.read().to_string()}" }
+                //     //     CopyIcon { class: "h-4 w-4", solid: false }
+                //     // }
+                //     // Row {
+
+                //     // }
+                //     div { class: "flex items-center justify-between w-full",
+                //         // Left side with pubkey and chevron
+                //         div { class: "flex items-center gap-2",
+                //             div { "{pubkey_splice.read().to_string()}" }
+                //             ChevronDownIcon { class: "h-4 w-4" }
+                //         }
+                //         // Divider
+                //         div { class: "h-6 w-px bg-gray-200 mx-4" }
+                //         // Right side with copy button
+                //         div { class: "mr-2",
+                //             CopyIcon { class: "h-4 w-4", solid: false }
+                //         }
+                //     }
+
+                // }
 
                 // Action links row
                 Row {
@@ -176,7 +236,8 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
             div {
                 class: "flex-1 overflow-y-auto",
                 style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
-                TokenList {}
+                // TokenList {}
+                WalletList {}
             }
 
             // Wallet actions at the bottom

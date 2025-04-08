@@ -19,42 +19,80 @@ use crate::{
 use ore_types::request::TransactionType;
 
 #[cfg(not(feature = "web"))]
-use crate::hooks::{add_new_keypair, use_wallet_config};
+use crate::hooks::{add_new_keypair, use_wallet_state};
+
+// #[derive(Props)]
+// pub struct WalletListProps {
+//     connected_wallets: Signal<ConnectedWallets>,
+// }
+
+// pub fn WalletList(cx: Scope<WalletListProps>) -> Element {
+//     let connected_wallets = cx.props.connected_wallets.read();
+
+//     rsx! {
+//         div {
+//             h3 { "Your Connected Wallets" }
+//             ul {
+//                 for wallet in connected_wallets.wallets.iter() {
+//                     li {
+//                         class: if wallet.index == connected_wallets.current_wallet_index { "current-wallet" } else { "" },
+//                         "Wallet {}: {}",
+//                         wallet.index,
+//                         wallet.pubkey.to_string()
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 pub fn Mine() -> Element {
-    let current_wallet_pubkey: Signal<String> = use_signal(String::new);
-    let private_key: Signal<String> = use_signal(String::new);
+    let mut current_wallet_pubkey: Signal<String> = use_signal(String::new);
+    let mut private_key: Signal<String> = use_signal(String::new);
 
     #[cfg(not(feature = "web"))]
     use_effect(move || {
-        let mut wallet_config = use_wallet_config().cloned();
-        if let Some(pubkey_str) = wallet_config
+        let mut wallet_state = use_wallet_state().cloned();
+        if let Some(wallet_key) = wallet_state
             .wallet_pubkeys
-            .get(wallet_config.current_wallet_index as usize)
+            .get(wallet_state.current_wallet_index as usize)
         {
-            current_wallet_pubkey.set(pubkey_str.clone());
+            current_wallet_pubkey.set(wallet_key.pubkey.to_string());
         }
     });
 
-    #[cfg(not(feature = "web"))]
-    let handle_input = move |e: Event<FormData>| {
-        private_key.set(e.data.value().to_string());
-    };
+    // #[cfg(not(feature = "web"))]\
+    // use_effect(move || {
+    //     let connected_wallets = use_connected_wallets().read();
+    //     // Display all wallets from connected_wallets
+    //     for wallet in connected_wallets.wallets.iter() {
+    //         log::info!("Wallet {}: {}", wallet.index, wallet.pubkey.to_string());
+    //         if wallet.index == connected_wallets.current_wallet_index {
+    //             // Set the current wallet pubkey for display
+    //             current_wallet_pubkey.set(wallet.pubkey.to_string());
+    //         }
+    //     }
+    // });
 
-    #[cfg(not(feature = "web"))]
-    let handle_import = move |_: Event<MouseData>| {
-        // Clone the string first to avoid borrowing conflicts
-        let key_value = private_key.read().to_string();
+    // #[cfg(not(feature = "web"))]
+    // let handle_input = move |e: Event<FormData>| {
+    //     private_key.set(e.data.value().to_string());
+    // };
 
-        match add_new_keypair(Some(key_value)) {
-            Ok(_) => {
-                private_key.set(String::new());
-            }
-            Err(err) => {
-                log::error!("Error importing key: {:?}", err);
-            }
-        }
-    };
+    // #[cfg(not(feature = "web"))]
+    // let handle_import = move |_: Event<MouseData>| {
+    //     // Clone the string first to avoid borrowing conflicts
+    //     let key_value = private_key.read().to_string();
+
+    //     match add_new_keypair(Some(key_value)) {
+    //         Ok(_) => {
+    //             private_key.set(String::new());
+    //         }
+    //         Err(err) => {
+    //             log::error!("Error importing key: {:?}", err);
+    //         }
+    //     }
+    // };
 
     rsx! {
         Col { class: "w-full h-full pb-20 sm:pb-16", gap: 16,
@@ -649,6 +687,11 @@ fn PrivateKeyInput() -> Element {
 #[cfg(not(feature = "web"))]
 fn PrivateKeyInput() -> Element {
     let mut private_key: Signal<String> = use_signal(String::new);
+    let mut wallet_name: Signal<String> = use_signal(String::new);
+
+    let handle_name_input = move |e: Event<FormData>| {
+        wallet_name.set(e.data.value().to_string());
+    };
 
     let handle_input = move |e: Event<FormData>| {
         private_key.set(e.data.value().to_string());
@@ -657,10 +700,12 @@ fn PrivateKeyInput() -> Element {
     let handle_import = move |_: Event<MouseData>| {
         // Clone the string first to avoid borrowing conflicts
         let key_value = private_key.read().to_string();
+        let name_value = wallet_name.read().to_string();
 
-        match add_new_keypair(Some(key_value)) {
+        match add_new_keypair(Some(key_value), Some(name_value)) {
             Ok(_) => {
                 private_key.set(String::new());
+                wallet_name.set(String::new());
             }
             Err(err) => {
                 log::error!("Error importing key: {:?}", err);
@@ -674,6 +719,13 @@ fn PrivateKeyInput() -> Element {
             placeholder: "Enter private key",
             value: "{private_key}",
             oninput: handle_input
+        }
+
+        input {
+            class: "w-full px-3 py-2 bg-surface-secondary border border-elements-lowEmphasis rounded-md text-elements-highEmphasis",
+            placeholder: "Enter wallet name",
+            value: "{wallet_name}",
+            oninput: handle_name_input
         }
 
         Row {
