@@ -78,11 +78,11 @@ fn DocsHeader(on_close: EventHandler<MouseEvent>) -> Element {
             Col {
                 gap: 2,
                 span {
-                    class: "text-3xl font-semibold font-wide",
+                    class: "text-3xl font-bold font-wide",
                     "Docs"
                 }
                 span {
-                    class: "text-md text-elements-lowEmphasis",
+                    class: "text-md text-elements-lowEmphasis font-medium",
                     "Learn more about ORE."
                 }
             }
