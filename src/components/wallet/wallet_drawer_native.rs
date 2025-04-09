@@ -3,7 +3,7 @@ use std::str::FromStr;
 use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
-// use super::token_list::TokenList;
+use super::token_list::TokenList;
 // use super::wallet_list::WalletList;
 use crate::components::{
     ChevronDownIcon, Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row, WalletList,
@@ -112,24 +112,19 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                 }
 
                 Row {
-                    class: "flex justify-between items-center rounded-full text-center w-full controls-secondary mb-4",
+                    class: " py-4 px-6 relative flex justify-center items-center rounded-full text-center w-full controls-secondary mb-4",
                     button {
                         onclick: move |e| {
                             e.stop_propagation();
                             show_wallet_picker.set(!show_wallet_picker.cloned());
                         },
-                        div { class: "flex items-center gap-2 py-2 px-6 hover:cursor-pointer",
+                        div { class: "flex items-center gap-2 hover:cursor-pointer",
                             div { "{pubkey_splice.read().to_string()}" }
                             ChevronDownIcon { class: "h-4 w-4" }
                         }
                     }
-                    // button {
-                    //     div { class: "flex items-center gap-2 py-2 px-6 hover:cursor-pointer",
-                    //         div { "{pubkey_splice.read().to_string()}" }
-                    //         ChevronDownIcon { class: "h-4 w-4" }
-                    //     }
-                    // }
                     button {
+                        class: "absolute right-0",
                         onclick: move |e| {
                             e.stop_propagation();
                             if let Err(err) = clipboard.set(pubkey.to_string()) {
@@ -137,7 +132,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                             }
                             pubkey_splice.set(Splice::Copied);
                         },
-                        div { class: "mr-4  pl-2 flex items-center py-4 hover:cursor-pointer",
+                        div { class: "mr-4 pl-2 flex items-center hover:cursor-pointer",
                             CopyIcon { class: "h-4 w-4", solid: false }
                         }
                     }
@@ -229,15 +224,15 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                 }
 
                 // Wallet selector component
-                WalletSelector {}
+                // WalletSelector {}
             }
 
             // Token List with overflow handling - the content area
             div {
                 class: "flex-1 overflow-y-auto",
                 style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
-                // TokenList {}
-                WalletList {}
+                TokenList {}
+                // WalletList {}
             }
 
             // Wallet actions at the bottom
