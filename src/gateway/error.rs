@@ -117,7 +117,7 @@ impl From<solana_client_wasm::ClientError> for GatewayError {
     }
 }
 
-#[cfg(feature = "desktop")]
+#[cfg(not(feature = "web"))]
 impl From<solana_client::client_error::ClientError> for GatewayError {
     fn from(value: solana_client::client_error::ClientError) -> Self {
         log::error!("{:?}", value);

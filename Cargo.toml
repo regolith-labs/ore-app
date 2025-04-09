@@ -34,10 +34,10 @@ desktop = [
   "tokio-tungstenite",
 ]
 android = [
-  "cargo-packager-updater",
+  ## "cargo-packager-updater",
   "core_affinity",
   "dioxus/mobile",
-  "dioxus-sdk/clipboard",
+  ## "dioxus-sdk/clipboard",
   "directories",
   "env_logger",
   "fern",

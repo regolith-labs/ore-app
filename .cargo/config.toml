@@ -2,5 +2,9 @@
 rustflags = ["--cfg=web_sys_unstable_apis"]
 
 [target.aarch64-linux-android]
-linker = "/Users/alex/Library/Android/sdk/ndk/29.0.13113456/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android21-clang"
-rustflags = ["-C", "link-arg=-Wl,--version-script=/Users/alex/Documents/GitHub/ore-supply/ore-app/empty.version"]
+# Use API level 24 linker to match CC setting in android.env
+linker = "/Users/alex/Library/Android/sdk/ndk/29.0.13113456/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android24-clang"
+rustflags = [
+  "-C",
+  "link-arg=-Wl,--version-script=/Users/alex/Documents/GitHub/ore-supply/ore-app/empty.version",
+]
