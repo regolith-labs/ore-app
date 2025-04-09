@@ -210,7 +210,7 @@ pub fn Topup(address: String) -> Element {
                     gap: 8,
                     a {
                         class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
-                        href: "https://beta.ore.supply/topup/{address}",
+                        href: "https://ore.supply/topup/{address}",
                         span {
                             class: "mx-auto my-auto",
                             "Top up →"

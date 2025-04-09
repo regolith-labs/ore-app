@@ -115,7 +115,7 @@ fn MiningFaq() -> Element {
                         "When mining through the browser, you can currently use only one CPU core. To get more out of your machine, checkout the "
                         Link {
                             new_tab: true,
-                            to: "https://beta.ore.supply/download",
+                            to: "https://ore.supply/download",
                             span { class: "text-elements-gold hover:underline font-medium", "ORE desktop app" }
                         }
                         ", which allows you to access more cores."
