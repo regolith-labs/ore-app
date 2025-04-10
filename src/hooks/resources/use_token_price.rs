@@ -154,10 +154,3 @@ async fn fetch_token_values(tokens: &[(Token, f64)]) -> Vec<TokenWithValue> {
 
     results
 }
-
-/*
-Go through the signals, add logs and think about the fail cases
-    - we aren't able to get one of the token balances / price
-
-Ensure that we are making the new index equal to the current wallets used when we write a new keypair
-*/
