@@ -7,7 +7,11 @@ use dioxus::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 
 #[component]
-pub fn WalletPicker(show: bool, on_close: EventHandler<()>) -> Element {
+pub fn WalletPicker(
+    show: bool,
+    on_close: EventHandler<()>,
+    on_drawer_close: EventHandler<MouseEvent>,
+) -> Element {
     let mut wallet_state = use_wallet_state();
     let mut current_wallet = use_wallet();
     let mut show_import_key = use_signal(|| false);
@@ -20,17 +24,26 @@ pub fn WalletPicker(show: bool, on_close: EventHandler<()>) -> Element {
     }
 
     // Function to select a wallet
-    let mut select_wallet = move |pubkey: Pubkey, index: u8| {
-        // Set the current wallet
+    let mut select_wallet = move |pubkey_str: String, index: u8| {
+        // Convert string to pubkey
+        let pubkey = Pubkey::from_str_const(&pubkey_str);
+
+        // Update global wallet
         current_wallet.set(Wallet::Connected(pubkey));
 
         // Update the current_wallet_index in wallet_state
         let mut state = wallet_state.write();
         state.current_wallet_index = index;
-        drop(state);
 
-        // Don't close the drawer, let user continue interacting
+        // Save the config
+        if let Err(err) = use_wallet_native::save_config(&state) {
+            log::info!("Error saving config: {:?}", err);
+        }
+
+        drop(state);
     };
+
+    // Don't close the drawer, let user continue interacting
 
     // Handle private key import
     let handle_import = move |e: MouseEvent| {
@@ -141,8 +154,8 @@ pub fn WalletPicker(show: bool, on_close: EventHandler<()>) -> Element {
 
                     // Error message (if any)
                     if let Some(error) = import_error.read().as_ref() {
-                        div {
-                            class: "text-red-500 text-sm text-center my-2",
+                        span {
+                            class: "text-red-500 text-md text-center mb-4",
                             "{error}"
                         }
                     }
@@ -194,12 +207,10 @@ pub fn WalletPicker(show: bool, on_close: EventHandler<()>) -> Element {
                         class: "flex-1 overflow-y-auto",
                         onclick: move |e| e.stop_propagation(),
                         {wallet_state.read().wallet_pubkeys.iter().map(|wallet| {
-                            let wallet_pubkey = wallet.pubkey.to_string();
                             let wallet_name = wallet.name.clone();
                             let is_selected = wallet.index == wallet_state.read().current_wallet_index;
-                            let wallet_pubkey = wallet.pubkey.to_string();
-                            let wallet_pubkey_splice = format_pubkey(wallet_pubkey);
-                            let pubkey_for_click = wallet.pubkey;
+                            let wallet_pubkey = wallet.pubkey.clone();
+                            let wallet_pubkey_splice = format_pubkey(wallet_pubkey.clone());
                             let index_for_click = wallet.index;
                             rsx! {
                                 button {
@@ -207,7 +218,8 @@ pub fn WalletPicker(show: bool, on_close: EventHandler<()>) -> Element {
                                     class: "w-full justify-between items-center mb-4 py-4 px-4 sm:rounded-md transition duration-300 ease-in-out bg-surface-floating hover:bg-controls-tertiary active:bg-controls-tertiaryHover hover:cursor-pointer",
                                     onclick: move |e| {
                                         e.stop_propagation();
-                                        select_wallet(pubkey_for_click, index_for_click);
+                                        select_wallet(wallet_pubkey.clone(), index_for_click);
+                                        on_drawer_close.call(e);
                                     },
                                     Row {
                                         class: "items-center",
@@ -225,17 +237,20 @@ pub fn WalletPicker(show: bool, on_close: EventHandler<()>) -> Element {
                             }
                         })}
                     }
-                    Col {
-                        class: "px-4 py-4 mb-4",
-                        button {
-                            class: "flex w-full rounded-full py-4 px-6 controls-secondary hover:cursor-pointer justify-center items-center gap-2",
-                            onclick: move |e| {
-                                e.stop_propagation();
-                                show_import_key.set(true);
-                                import_error.set(None); // Clear any previous errors
-                            },
-                            PlusIcon { class: "h-4 w-4" }
-                            "Add new Solana wallet"
+
+                    if wallet_state.read().num_wallets_used < use_wallet_native::MAX_WALLETS_ALLOWED {
+                        Col {
+                            class: "px-4 py-4 mb-4",
+                            button {
+                                class: "flex w-full rounded-full py-4 px-6 controls-secondary hover:cursor-pointer justify-center items-center gap-2",
+                                onclick: move |e| {
+                                    e.stop_propagation();
+                                    show_import_key.set(true);
+                                    import_error.set(None); // Clear any previous errors
+                                },
+                                PlusIcon { class: "h-4 w-4" }
+                                "Add new Solana wallet"
+                            }
                         }
                     }
                     // Add new wallet button

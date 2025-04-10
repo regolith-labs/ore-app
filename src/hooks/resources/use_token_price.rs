@@ -74,6 +74,8 @@ pub fn use_tokens_with_values() -> Vec<TokenWithValue> {
                 let values = fetch_token_values(&tokens).await;
                 token_values.set(values);
             });
+        } else {
+            token_values.set(Vec::new());
         }
     });
 
@@ -133,6 +135,7 @@ async fn fetch_token_values(tokens: &[(Token, f64)]) -> Vec<TokenWithValue> {
         };
 
         match client.quote(&request).await {
+            // Aren't writing
             Ok(response) => {
                 let quote_amount = amount_to_ui_amount(response.out_amount, usdc.decimals);
                 let price = quote_amount / amount;
@@ -151,3 +154,10 @@ async fn fetch_token_values(tokens: &[(Token, f64)]) -> Vec<TokenWithValue> {
 
     results
 }
+
+/*
+Go through the signals, add logs and think about the fail cases
+    - we aren't able to get one of the token balances / price
+
+Ensure that we are making the new index equal to the current wallets used when we write a new keypair
+*/

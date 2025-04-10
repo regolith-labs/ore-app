@@ -19,27 +19,12 @@ const SERVICE_TWO: &str = "ORE-two";
 const USER_DEVICE_KEY_TWO: &str = "user-device-key-two";
 const SERVICE_THREE: &str = "ORE-three";
 const USER_DEVICE_KEY_THREE: &str = "user-device-key-three";
-const MAX_WALLETS_ALLOWED: u8 = 3;
-
-/*
-    read all keychains that exists by hardcoded keys
-    only populate keypairs that exist in the keychain
-        try to read all 3 keypairs
-            use the config to which keypair is selected
-            default to the first keypair
-    get the amount of keys in use by the keychain
-*/
-
-// #[derive(Clone)]
-// pub struct ConnectedWallets {
-//     pub current_wallet_index: u8,
-//     pub wallets: Vec<WalletKey>,
-// }
+pub const MAX_WALLETS_ALLOWED: u8 = 3;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct WalletKey {
     pub name: String,
-    pub pubkey: Pubkey,
+    pub pubkey: String,
     pub index: u8,
 }
 
@@ -123,7 +108,7 @@ pub fn get() -> Result<(MultisigAuthority, WalletState), Error> {
         for i in 0..config.num_wallets_used {
             writable_wallet_state.wallet_pubkeys.push(WalletKey {
                 name: format!("Wallet {}", i + 1),
-                pubkey: config.wallet_pubkeys[i as usize].pubkey,
+                pubkey: config.wallet_pubkeys[i as usize].pubkey.to_string(),
                 index: config.wallet_pubkeys[i as usize].index,
             });
         }
@@ -143,11 +128,6 @@ fn set(secret: &[u8], index: u8) -> Result<(), Error> {
 
 pub fn get_or_set() -> Result<(MultisigAuthority, WalletState), Error> {
     match get() {
-        /*
-        read all keypairs,
-        return keypairnoentry for those keypairs that aren't ok
-        only return keypairs that are ok
-         */
         // Return wallet data if found (MultisigAuthority, WalletConfig)
         ok @ Ok(_) => ok,
         Err(err) => {
@@ -164,17 +144,16 @@ pub fn get_or_set() -> Result<(MultisigAuthority, WalletState), Error> {
                     Error::BincodeSerialize
                 })?;
 
+                // This will be the first wallet we write to the keychain, so we can hardcode the index & num wallets used
                 let mut wallet_state = WalletState {
                     current_wallet_index: 0,
                     num_wallets_used: 1,
                     wallet_pubkeys: Vec::with_capacity(MAX_WALLETS_ALLOWED as usize),
                 };
-                log::info!("pubkey: {:?}", multisig_authority.creator.pubkey());
-                // Setting this as the first wallet, so name will always be 1
                 let wallet_name = format!("Wallet {}", wallet_state.num_wallets_used);
                 wallet_state.wallet_pubkeys.push(WalletKey {
                     name: wallet_name,
-                    pubkey: multisig_authority.creator.pubkey(),
+                    pubkey: multisig_authority.creator.pubkey().to_string(),
                     index: 0,
                 });
 
@@ -219,7 +198,7 @@ fn get_config_path() -> Option<PathBuf> {
     })
 }
 
-fn save_config(config: &WalletState) -> Result<(), Box<dyn std::error::Error>> {
+pub fn save_config(config: &WalletState) -> Result<(), Box<dyn std::error::Error>> {
     if let Some(path) = get_config_path() {
         // Create parent directory if it doesn't exist
         if let Some(parent) = path.parent() {
@@ -255,7 +234,6 @@ pub fn add_new_keypair(
     wallet_name: Option<String>,
 ) -> Result<(), Error> {
     let mut current_wallet = use_wallet();
-    //TODO: check if user has already imported this key
 
     // Get current wallet config
     let mut wallet_state = use_wallet_state();
@@ -274,11 +252,9 @@ pub fn add_new_keypair(
         None => return Err(Error::InvalidWalletName),
     };
 
-    // We can only add if we are less than the permissible number of wallets
+    // Only add if there are available slots
     if num_wallets_used < MAX_WALLETS_ALLOWED {
         // Derive the keypair from the private key
-        // let keypair_from_private_key = Keypair::from_base58_string(&private_key);
-
         let keypair_from_private_key =
             match std::panic::catch_unwind(|| Keypair::from_base58_string(&private_key)) {
                 Ok(keypair) => keypair,
@@ -286,7 +262,6 @@ pub fn add_new_keypair(
             };
 
         let pubkey_string = keypair_from_private_key.pubkey().to_string();
-        let pubkey = keypair_from_private_key.pubkey().clone();
 
         // Create pda keypair
         let create_key = Keypair::new();
@@ -309,43 +284,33 @@ pub fn add_new_keypair(
         // Get the pubkeys for the current wallets
         let mut wallet_pubkeys = wallet_state.wallet_pubkeys.clone();
 
-        // Get and update the current index
-        let new_index = wallet_state.current_wallet_index + 1;
-        wallet_state.current_wallet_index = new_index;
+        // Obtain the index we'll assign to this keypair
+        let key_index = wallet_state.num_wallets_used;
+        wallet_state.current_wallet_index = key_index;
         wallet_state.num_wallets_used += 1;
 
-        // Add the new pubkey to the config
+        // Add the new keypair to the config + our global state
         wallet_pubkeys.push(WalletKey {
             name: wallet_name,
-            pubkey,
-            index: new_index,
+            pubkey: pubkey_string,
+            index: key_index,
         });
         wallet_state.wallet_pubkeys = wallet_pubkeys;
-
-        log::info!(
-            "Wallet state updated to index: {}, Num wallets: {}",
-            wallet_state.current_wallet_index,
-            wallet_state.num_wallets_used,
-            // wallet_state.wallet_pubkeys
-        );
 
         // Save the config first
         save_config(&wallet_state).map_err(|err| {
             println!("{:?}", err);
             Error::SaveWalletConfig
         })?;
-        log::info!("Config saved");
 
         // Drop the lock before calling set
         drop(wallet_state);
 
         // Set the secret in the keyring with the new index
-        set(bytes.as_slice(), new_index)?;
-        log::info!("Set done");
+        set(bytes.as_slice(), key_index)?;
 
+        // Set the new keypair as the current wallet
         current_wallet.set(Wallet::Connected(multisig_authority.creator.pubkey()));
-
-        // TODO: SET THE NEW WALLET AS THE CURRENT WALLLET (USE_WALLET HOOK)
 
         Ok(())
     } else {
@@ -353,84 +318,3 @@ pub fn add_new_keypair(
         Err(Error::UpdateWalletConfig)
     }
 }
-
-// / Returns the public key of the imported wallet on success
-// pub fn import_private_key(private_key_string: &str) -> Result<Pubkey, Error> {
-//     // Validate and parse the private key
-//     let imported_keypair = match Keypair::from_base58_string(private_key_string) {
-//         Ok(keypair) => keypair,
-//         Err(_) => return Err(Error::InvalidPrivateKey),
-//     };
-
-//     log::info!("Parsed private key successfully");
-
-//     // Get current wallet config
-//     let mut wallet_config_signal = use_wallet_config();
-//     let num_wallets_used = wallet_config_signal.read().num_wallets_used;
-
-//     // // Check if we've reached the maximum number of wallets
-//     if num_wallets_used >= MAX_WALLETS_ALLOWED {
-//         log::info!("Maximum number of wallets reached");
-//         return Err(Error::UpdateWalletConfig);
-//     }
-
-//     // Create a new MultisigAuthority with the imported keypair
-//     let create_key = Keypair::new(); // Generate a new create_key
-//     let multisig_authority = MultisigAuthority {
-//         creator: imported_keypair,
-//         create_key,
-//     };
-
-//     // Serialize the multisig authority
-//     let bytes = bincode::serialize(&multisig_authority).map_err(|err| {
-//         log::error!("Failed to serialize multisig authority: {:?}", err);
-//         Error::BincodeSerialize
-//     })?;
-
-//     // Update the wallet config
-//     let mut wallet_config = wallet_config_signal.write();
-//     let new_index = wallet_config.current_wallet_index + 1;
-//     wallet_config.current_wallet_index = new_index;
-//     wallet_config.num_wallets_used += 1;
-
-//     // Save the config to disk
-//     save_config(&wallet_config).map_err(|err| {
-//         log::error!("Failed to save wallet config: {:?}", err);
-//         Error::SaveWalletConfig
-//     })?;
-
-//     // Release the lock before calling set
-//     drop(wallet_config);
-
-//     // Set the secret in the keyring with the new index
-//     set(bytes.as_slice(), new_index)?;
-
-//     // Return the public key so the UI can show it
-//     Ok(imported_keypair.pubkey())
-// }
-
-/*
-    store vec of pubkeys in the config
-
-*/
-
-// // Helper function to use the current wallet index from any component
-// pub fn use_current_wallet() -> Signal<u8> {
-//     use_context().unwrap()
-// }
-
-// // Helper function to switch the current wallet
-// pub fn switch_wallet(index: u8) -> Result<(), Box<dyn std::error::Error>> {
-//     // Get current wallet signal
-//     let mut current_wallet = use_current_wallet();
-
-//     // Update the config
-//     let mut config = load_config()?;
-//     config.current_wallet = index;
-//     save_config(&config)?;
-
-//     // Update the signal
-//     current_wallet.set(index);
-
-//     Ok(())
-// }

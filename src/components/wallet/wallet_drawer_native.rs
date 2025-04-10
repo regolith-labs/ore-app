@@ -4,7 +4,6 @@ use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
 use super::token_list::TokenList;
-// use super::wallet_list::WalletList;
 use crate::components::{
     ChevronDownIcon, Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row, WalletList,
     WalletPicker,
@@ -111,17 +110,16 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                 }
 
-                Row {
-                    class: " py-4 px-6 relative flex justify-center items-center rounded-full text-center w-full controls-secondary mb-4",
-                    button {
-                        onclick: move |e| {
-                            e.stop_propagation();
-                            show_wallet_picker.set(!show_wallet_picker.cloned());
-                        },
-                        div { class: "flex items-center gap-2 hover:cursor-pointer",
-                            div { "{pubkey_splice.read().to_string()}" }
-                            ChevronDownIcon { class: "h-4 w-4" }
-                        }
+                button {
+                    class: " py-4 px-6 relative flex justify-center items-center rounded-full text-center w-full controls-secondary mb-4 hover:cursor-pointer",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        show_wallet_picker.set(!show_wallet_picker.cloned());
+                    },
+                    div {
+                        class: "flex items-center gap-2",
+                        div { "{pubkey_splice.read().to_string()}" }
+                        ChevronDownIcon { class: "h-4 w-4" }
                     }
                     button {
                         class: "absolute right-0",
@@ -139,41 +137,9 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                 }
                 WalletPicker {
                     show: show_wallet_picker.cloned(),
-                    on_close: move |_| show_wallet_picker.set(false)
+                    on_close: move |_| show_wallet_picker.set(false),
+                    on_drawer_close: on_close.clone(),
                 }
-
-                // Clipboard button
-                // button {
-                //     class: "flex justify-center items-center rounded-full text-center py-4 px-6 w-full controls-secondary hover:cursor-pointer mb-4",
-                //     onclick: move |e| {
-                //         e.stop_propagation();
-                //         if let Err(err) = clipboard.set(pubkey.to_string()) {
-                //             log::error!("failed to set clipboard: {:?}", err);
-                //         }
-                //         pubkey_splice.set(Splice::Copied);
-                //     },
-                //     // div { class: "flex items-center gap-2",
-                //     //     div { "{pubkey_splice.read().to_string()}" }
-                //     //     CopyIcon { class: "h-4 w-4", solid: false }
-                //     // }
-                //     // Row {
-
-                //     // }
-                //     div { class: "flex items-center justify-between w-full",
-                //         // Left side with pubkey and chevron
-                //         div { class: "flex items-center gap-2",
-                //             div { "{pubkey_splice.read().to_string()}" }
-                //             ChevronDownIcon { class: "h-4 w-4" }
-                //         }
-                //         // Divider
-                //         div { class: "h-6 w-px bg-gray-200 mx-4" }
-                //         // Right side with copy button
-                //         div { class: "mr-2",
-                //             CopyIcon { class: "h-4 w-4", solid: false }
-                //         }
-                //     }
-
-                // }
 
                 // Action links row
                 Row {
@@ -222,9 +188,6 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                         }
                     }
                 }
-
-                // Wallet selector component
-                // WalletSelector {}
             }
 
             // Token List with overflow handling - the content area
@@ -361,103 +324,4 @@ fn WalletSelector() -> Element {
             }
         }
     }
-
-    // rsx! {
-    //     div {
-    //         class: "relative w-full mb-4",
-
-    //         // Container for both buttons with flex layout
-    //         div {
-    //             class: "flex items-center justify-between w-full",
-
-    //             // Dropdown button (2/3 width)
-    //             button {
-    //                 class: "flex-grow flex items-center justify-center bg-gray-800 rounded-md py-2 mr-2 text-white hover:bg-gray-700 transition",
-    //                 // onclick: {
-    //                 //     let mut dropdown = dropdown_open.clone();
-    //                 //     move |_| {
-    //                 //         let current = *dropdown.read();
-    //                 //         dropdown.set(!current);
-    //                 //     }
-    //                 // },
-
-    //                 div {
-    //                     class: "flex items-center gap-1",
-    //                     span {
-    //                         class: "font-medium text-sm",
-    //                         "Wallet 1"
-    //                     }
-    //                     svg {
-    //                         class: "w-3 h-3 text-gray-400",
-    //                         view_box: "0 0 20 20",
-    //                         fill: "currentColor",
-    //                         path {
-    //                             d: "M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-    //                         }
-    //                     }
-    //                 }
-    //             }
-
-    //             // Copy address button (1/3 width)
-    //             button {
-    //                 class: "w-1/3 flex items-center justify-center bg-gray-800 rounded-md py-2 text-white hover:bg-gray-700 transition",
-    //                 // onclick: move |_| {
-    //                 //     clipboard.write(&address);
-    //                 // },
-    //                 CopyIcon { class: "h-4 w-4", solid: true }
-    //             }
-    //         }
-
-    //         // Dropdown menu (initially hidden)
-    //         if *dropdown_open.read() {
-    //             div {
-    //                 class: "absolute top-full left-0 mt-1 w-full bg-gray-800 rounded-md shadow-lg z-10",
-
-    //                 // Wallet options
-    //                 div {
-    //                     class: "py-1",
-
-    //                     // Option 1
-    //                     button {
-    //                         class: "w-full text-left px-4 py-2 text-white hover:bg-gray-700 transition",
-    //                         // onclick: {
-    //                         //     let mut dropdown = dropdown_open.clone();
-    //                         //     move |_| {
-    //                         //         dropdown.set(false);
-    //                         //     }
-    //                         // },
-    //                         "Wallet 1"
-    //                     }
-
-    //                     // Option 2
-    //                     button {
-    //                         class: "w-full text-left px-4 py-2 text-white hover:bg-gray-700 transition",
-    //                         // onclick: {
-    //                         //     let mut dropdown = dropdown_open.clone();
-    //                         //     move |_| {
-    //                         //         dropdown.set(false);
-    //                         //     }
-    //                         // },
-    //                         "Wallet 2"
-    //                     }
-
-    //                     // Option 3
-    //                     button {
-    //                         class: "w-full text-left px-4 py-2 text-white hover:bg-gray-700 transition",
-    //                         // onclick: {
-    //                         //     let mut dropdown = dropdown_open.clone();
-    //                         //     move |_| {
-    //                         //         dropdown.set(false);
-    //                         //     }
-    //                         // },
-    //                         "Wallet 3"
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 }
-
-//class: "flex flex-col h-full sm:w-96 w-screen elevated elevated-border text-white pt-8 z-50",
-// class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
