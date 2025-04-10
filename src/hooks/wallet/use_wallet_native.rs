@@ -89,7 +89,6 @@ pub struct MultisigAuthority {
 }
 
 pub fn get() -> Result<(MultisigAuthority, WalletState), Error> {
-    let mut wallet_state = use_wallet_state();
     // Let's try to load the config if it exists
     if let Ok(config) = load_config() {
         // Get the current wallet index & load it up in the keypair
@@ -102,18 +101,7 @@ pub fn get() -> Result<(MultisigAuthority, WalletState), Error> {
             Error::BincodeDeserialize
         })?;
 
-        let mut writable_wallet_state = wallet_state.write();
-
-        // Let's get all the pubkeys for the current wallets & add it to global state
-        for i in 0..config.num_wallets_used {
-            writable_wallet_state.wallet_pubkeys.push(WalletKey {
-                name: format!("Wallet {}", i + 1),
-                pubkey: config.wallet_pubkeys[i as usize].pubkey.to_string(),
-                index: config.wallet_pubkeys[i as usize].index,
-            });
-        }
-        drop(writable_wallet_state);
-
+        // Just return the config - we don't need to modify wallet_state here
         Ok((multisig_authority, config))
     } else {
         Err(Error::ConfigNotFound)
