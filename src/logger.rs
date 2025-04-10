@@ -19,6 +19,23 @@ pub fn init() {
     // init_macos()
 }
 
+#[cfg(feature = "android")]
+pub fn init() {
+    use android_logger::{Config, FilterBuilder};
+    // use log::LevelFilter;
+
+    android_logger::init_once(
+        Config::default()
+            // .with_max_level(LevelFilter::Info) // Adjust log level as needed
+            .with_tag("ore-app") // Set a tag for filtering in logcat
+            .with_filter(
+                FilterBuilder::new()
+                    .parse("debug,hello::crate=error") // Example filter
+                    .build(),
+            ),
+    );
+}
+
 // macos logger,
 // use for debugging production apps with no dev server.
 //

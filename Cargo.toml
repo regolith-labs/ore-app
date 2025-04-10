@@ -34,6 +34,7 @@ desktop = [
   "tokio-tungstenite",
 ]
 android = [
+  "android_logger",
   ## "cargo-packager-updater",
   "core_affinity",
   "dioxus/mobile",
@@ -76,6 +77,7 @@ web = [
 directories = ["dep:directories"]
 
 [dependencies]
+android_logger = { version = "0.15", optional = true }
 anyhow = "1.0"
 async-retry = "0.3.1"
 async-std = "1.12.0"

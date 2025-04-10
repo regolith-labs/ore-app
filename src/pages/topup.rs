@@ -225,14 +225,6 @@ pub fn Topup(address: String) -> Element {
                         }
                     }
                 }
-            } else {
-                Col {
-                    class: "mx-auto w-full flex items-center justify-center",
-                    crate::components::ConnectButtonNative {
-                        wallet,
-                        width: 300,
-                    }
-                }
             }
         }
     }

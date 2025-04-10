@@ -8,7 +8,7 @@ mod use_claimable_yield;
 #[cfg(feature = "web")]
 mod use_download_url;
 mod use_gateway;
-#[cfg(not(feature = "web"))]
+#[cfg(feature = "desktop")]
 mod use_updater;
 mod wallet;
 // #[cfg(feature = "web")]
@@ -24,6 +24,6 @@ pub use use_claimable_yield::*;
 #[cfg(feature = "web")]
 pub use use_download_url::*;
 pub use use_gateway::*;
-#[cfg(not(feature = "web"))]
+#[cfg(feature = "desktop")]
 pub use use_updater::*;
 pub use wallet::*;
