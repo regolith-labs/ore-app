@@ -5,8 +5,7 @@ use dioxus_sdk::clipboard::use_clipboard;
 
 use super::token_list::TokenList;
 use crate::components::{
-    ChevronDownIcon, Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row, WalletList,
-    WalletPicker,
+    ChevronDownIcon, Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row, WalletPicker,
 };
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 use crate::route::Route;
