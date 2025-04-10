@@ -193,9 +193,8 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
             // Token List with overflow handling - the content area
             div {
                 class: "flex-1 overflow-y-auto",
-                style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
+                style: "padding-bottom: 1rem;",
                 TokenList {}
-                // WalletList {}
             }
 
             // Wallet actions at the bottom
@@ -262,66 +261,5 @@ impl FromStr for Splice {
         let last_four = &s[len - 4..len];
         let splice = format!("{}...{}", first_four, last_four);
         Ok(Splice::Pubkey(splice))
-    }
-}
-
-fn WalletSelector() -> Element {
-    let mut dropdown_open = use_signal(|| false);
-    let mut clipboard = use_clipboard();
-    let wallet = use_wallet();
-
-    // Get wallet address to display
-    let address = match *wallet.read() {
-        Wallet::Connected(pubkey) => pubkey.to_string(),
-        _ => "".to_string(),
-    };
-
-    // Create shortened display version
-    let shortened_address = if address.len() > 8 {
-        format!("{}...{}", &address[0..4], &address[address.len() - 4..])
-    } else {
-        address.clone()
-    };
-
-    rsx! {
-        div {
-            class: "relative flex items-center",
-
-            // Wallet selector button
-            button {
-                class: "flex items-center bg-gray-900/50 border border-white/10 rounded-full py-2 px-3 text-white cursor-pointer gap-2",
-                // onclick: toggle_dropdown,
-
-                // Wallet icon (three horizontal lines representing Solana logo)
-                div {
-                    class: "text-indigo-500 text-base",
-                    span { "hello" }
-                }
-
-                // Wallet name
-                span {
-                    class: "font-medium",
-                    "text"
-                }
-
-                // Dropdown arrow
-                span {
-                    class: "text-xs opacity-70",
-                    "down"
-                }
-            }
-
-            // Clipboard button
-            button {
-                class: "ml-2 bg-gray-900/50 border border-white/10 rounded-lg text-white p-2 cursor-pointer",
-                // onclick: copy_to_clipboard,
-
-                // Clipboard icon
-                span {
-                    class: "text-white",
-                    "copy"
-                }
-            }
-        }
     }
 }

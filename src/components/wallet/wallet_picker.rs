@@ -37,7 +37,7 @@ pub fn WalletPicker(
 
         // Save the config
         if let Err(err) = use_wallet_native::save_config(&state) {
-            log::info!("Error saving config: {:?}", err);
+            log::error!("Error saving config: {:?}", err);
         }
 
         drop(state);
@@ -194,14 +194,6 @@ pub fn WalletPicker(
                             "Wallets"
                         }
                     }
-                    // // Network selector (Solana)
-                    // button {
-                    //     class: "w-full flex items-center gap-2 p-4 bg-surface-elevated hover:bg-surface-elevated/80 transition-colors",
-                    //     onclick: move |e| e.stop_propagation(),
-                    //     img { class: "w-6 h-6", src: "/path/to/solana-logo.png", alt: "Solana" }
-                    //     span { "Solana" }
-                    //     ChevronDownIcon { class: "h-4 w-4 ml-auto" }
-                    // }
                     // Wallet list
                     div {
                         class: "flex-1 overflow-y-auto",
@@ -253,13 +245,6 @@ pub fn WalletPicker(
                             }
                         }
                     }
-                    // Add new wallet button
-                    // button {
-                    //     class: "w-full flex items-center gap-2 p-4 text-[#4C9EE8] hover:bg-surface-elevated transition-colors border-t border-elements-lowEmphasis hover:cursor-pointer",
-                    //     onclick: move |e| e.stop_propagation(),
-                    //     PlusIcon { class: "h-5 w-5" }
-                    //     span { "Add new Solana wallet" }
-                    // }
                 }
             }
         }

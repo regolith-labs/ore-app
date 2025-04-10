@@ -210,7 +210,6 @@ pub fn save_config(config: &WalletState) -> Result<(), Box<dyn std::error::Error
 
         // Write the config to the file
         fs::write(&path, &json)?;
-        log::info!("Successfully wrote config to: {:?}", path);
     }
     Ok(())
 }
@@ -240,7 +239,6 @@ pub fn add_new_keypair(
 
     // Get the number of wallets used
     let num_wallets_used = wallet_state.read().num_wallets_used;
-    log::info!("num_wallets_used: {:?}", num_wallets_used);
 
     let private_key = match private_key_string {
         Some(private_key) => private_key,
