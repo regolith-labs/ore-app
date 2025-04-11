@@ -276,16 +276,6 @@ fn set(secret: &[u8], index: u8) -> Result<(), Error> {
     keyring.set_secret(secret).map_err(From::from)
 }
 
-fn serialize<S: Serializer>(keypair: &Keypair, serializer: S) -> Result<S::Ok, S::Error> {
-    let bytes = keypair.to_bytes();
-    serializer.serialize_bytes(&bytes)
-}
-
-fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Keypair, D::Error> {
-    let bytes: &[u8] = <&[u8]>::deserialize(deserializer)?;
-    Keypair::from_bytes(bytes).map_err(|_| serde::de::Error::custom("invalid keypair bytes"))
-}
-
 fn get_config_path() -> Result<PathBuf, Error> {
     ProjectDirs::from("", "", "Ore")
         .map(|dirs| {
@@ -305,4 +295,14 @@ fn load_config() -> Result<WalletState, Error> {
     } else {
         Err(Error::ConfigNotFound)
     }
+}
+
+fn serialize<S: Serializer>(keypair: &Keypair, serializer: S) -> Result<S::Ok, S::Error> {
+    let bytes = keypair.to_bytes();
+    serializer.serialize_bytes(&bytes)
+}
+
+fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Keypair, D::Error> {
+    let bytes: &[u8] = <&[u8]>::deserialize(deserializer)?;
+    Keypair::from_bytes(bytes).map_err(|_| serde::de::Error::custom("invalid keypair bytes"))
 }
