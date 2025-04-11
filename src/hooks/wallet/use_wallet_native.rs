@@ -89,22 +89,64 @@ pub struct MultisigAuthority {
 }
 
 pub fn get() -> Result<(MultisigAuthority, WalletState), Error> {
-    // Let's try to load the config if it exists
+    // Case 1: Check if there's a config on the device
     if let Ok(config) = load_config() {
+        log::info!("Case 1: Found config on the device");
         // Get the current wallet index & load it up in the keypair
         let current_index = config.current_wallet_index;
         let (service, user_device_key) = get_keyring_values_by_index(current_index);
         let keyring = Entry::new(service, user_device_key)?;
         let secret = keyring.get_secret()?;
-        let multisig_authority = bincode::deserialize(secret.as_slice()).map_err(|err| {
-            println!("{:?}", err);
-            Error::BincodeDeserialize
-        })?;
+        let multisig_authority =
+            bincode::deserialize(secret.as_slice()).map_err(|err| Error::BincodeDeserialize)?;
 
-        // Just return the config - we don't need to modify wallet_state here
+        // Return the config and the multisig authority
         Ok((multisig_authority, config))
     } else {
-        Err(Error::ConfigNotFound)
+        log::info!("Case 2: No config found on the device");
+        // Case 2: Config not found, let's check if there's an existing keypair at index 0 (legacy wallet index)
+        let (service, user_device_key) = get_keyring_values_by_index(0);
+        let keyring = Entry::new(service, user_device_key);
+
+        // Try to get the existing keypair
+        if let Ok(keyring) = keyring {
+            if let Ok(secret) = keyring.get_secret() {
+                if let Ok(multisig_authority) =
+                    bincode::deserialize::<MultisigAuthority>(secret.as_slice())
+                {
+                    // We found an existing keypair at index 0, create a new config for it
+                    let mut wallet_state = WalletState {
+                        current_wallet_index: 0,
+                        num_wallets_used: 1,
+                        wallet_pubkeys: Vec::with_capacity(MAX_WALLETS_ALLOWED as usize),
+                    };
+                    let wallet_name = format!("Wallet {}", wallet_state.num_wallets_used);
+                    wallet_state.wallet_pubkeys.push(WalletKey {
+                        name: wallet_name,
+                        pubkey: multisig_authority.creator.pubkey().to_string(),
+                        index: 0,
+                    });
+
+                    // Set the keypair in the keyring first to ensure it's properly registered
+                    let bytes = bincode::serialize(&multisig_authority)
+                        .map_err(|err| Error::BincodeSerialize)?;
+                    set(bytes.as_slice(), 0)?;
+
+                    // Then try to save the config
+                    match save_config(&wallet_state) {
+                        Ok(_) => return Ok((multisig_authority, wallet_state)),
+                        Err(e) => {
+                            log::error!("Failed to save config: {:?}", e);
+                            // Even if we can't save the config, return the keypair
+                            return Ok((multisig_authority, wallet_state));
+                        }
+                    }
+                }
+            }
+        }
+
+        // If we get here, we didn't find a config or an existing keypair at index 0
+        Err(Error::NoConfigOrKeypairFound)
     }
 }
 
@@ -119,8 +161,16 @@ pub fn get_or_set() -> Result<(MultisigAuthority, WalletState), Error> {
         // Return wallet data if found (MultisigAuthority, WalletConfig)
         ok @ Ok(_) => ok,
         Err(err) => {
-            // We didn't find a wallet on the device keychain or config
-            if let Error::KeyringNoEntry | Error::ConfigNotFound = err {
+            log::info!(
+                "Case 3: We didn't find a config on the device or an existing keypair at index 0"
+            );
+            // Case 3: We didn't find a config on the device or an existing keypair at index 0
+            // Let's create the config and the first keypair
+            if let Error::KeyringNoEntry
+            | Error::NoConfigOrKeypairFound
+            | Error::BincodeDeserialize = err
+            {
+                // Create a new keypair
                 let creator = Keypair::new();
                 let create_key = Keypair::new();
                 let multisig_authority = MultisigAuthority {
@@ -145,17 +195,17 @@ pub fn get_or_set() -> Result<(MultisigAuthority, WalletState), Error> {
                     index: 0,
                 });
 
-                // Ensure we're able to save the config
+                // Set the secret in the keyring first
+                let current_index = wallet_state.current_wallet_index;
+                set(bytes.as_slice(), current_index)?;
+
+                // Then try to save the config
                 match save_config(&wallet_state) {
-                    Ok(_) => {
-                        let current_index = wallet_state.current_wallet_index;
-                        // Set the secret in the keyring
-                        set(bytes.as_slice(), current_index)?;
-                        Ok((multisig_authority, wallet_state))
-                    }
+                    Ok(_) => Ok((multisig_authority, wallet_state)),
                     Err(e) => {
                         log::error!("Failed to save config: {:?}", e);
-                        Err(Error::SaveWalletConfig)
+                        // Even if we can't save the config, return the keypair
+                        Ok((multisig_authority, wallet_state))
                     }
                 }
             } else {
@@ -283,22 +333,23 @@ pub fn add_new_keypair(
         });
         wallet_state.wallet_pubkeys = wallet_pubkeys;
 
-        // Save the config first
-        save_config(&wallet_state).map_err(|err| {
-            println!("{:?}", err);
-            Error::SaveWalletConfig
-        })?;
-
-        // Drop the lock before calling set
-        drop(wallet_state);
-
-        // Set the secret in the keyring with the new index
+        // Set the secret in the keyring first
         set(bytes.as_slice(), key_index)?;
 
-        // Set the new keypair as the current wallet
-        current_wallet.set(Wallet::Connected(multisig_authority.creator.pubkey()));
-
-        Ok(())
+        // Then try to save the config
+        match save_config(&wallet_state) {
+            Ok(_) => {
+                // Set the new keypair as the current wallet
+                current_wallet.set(Wallet::Connected(multisig_authority.creator.pubkey()));
+                Ok(())
+            }
+            Err(e) => {
+                log::error!("Failed to save config: {:?}", e);
+                // Even if we can't save the config, set the new keypair as the current wallet
+                current_wallet.set(Wallet::Connected(multisig_authority.creator.pubkey()));
+                Ok(())
+            }
+        }
     } else {
         log::info!("Max number of wallets reached");
         Err(Error::UpdateWalletConfig)

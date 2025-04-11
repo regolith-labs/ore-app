@@ -25,6 +25,7 @@ pub enum GatewayError {
     SaveWalletConfig,
     UpdateWalletConfig,
     ConfigNotFound,
+    NoConfigOrKeypairFound,
     InvalidPrivateKey,
     NoKeychainEntries,
     Unknown,
