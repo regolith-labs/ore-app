@@ -214,8 +214,6 @@ pub fn add_new_keypair(
         let key_index = wallet_state.num_wallets_used;
         set(bytes.as_slice(), key_index)?;
 
-        // Get write access to the config and update it
-
         // Get the pubkeys for the current wallets
         let mut wallet_pubkeys = wallet_state.wallet_pubkeys.clone();
 
