@@ -1,3 +1,4 @@
+// use dioxus::events::FormData;
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;

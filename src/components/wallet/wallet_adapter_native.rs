@@ -31,8 +31,8 @@ pub fn ConnectButtonNative(wallet: Signal<Wallet>, width: u64) -> Element {
             class: "rounded-full transition my-auto h-12 text-black bg-white hover:cursor-pointer hover:scale-105 duration-300 ease-in-out bg-controls-primary flex items-center justify-center",
             style: "width: {width}px;",
             onclick: move |_| {
-                if let Ok(keypair) = use_wallet_native::get_or_set() {
-                    wallet.set(Wallet::Connected(keypair.creator.pubkey()));
+                if let Ok(wallet_data) = use_wallet_native::get_or_set() {
+                    wallet.set(Wallet::Connected(wallet_data.0.creator.pubkey()));
                 }
             },
             "Connect"

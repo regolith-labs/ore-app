@@ -22,7 +22,16 @@ pub enum GatewayError {
     KeyringNoEntry,
     BincodeSerialize,
     BincodeDeserialize,
+    SaveWalletConfig,
+    UpdateWalletConfig,
+    ConfigNotFound,
+    NoConfigOrKeypairFound,
+    InvalidPrivateKey,
+    NoKeychainEntries,
     Unknown,
+    UnableToDeriveKeypair,
+    NoWalletsFound,
+    InvalidWalletName,
 }
 
 impl From<anyhow::Error> for GatewayError {

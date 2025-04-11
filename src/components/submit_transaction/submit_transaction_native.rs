@@ -14,7 +14,8 @@ use crate::{
 
 pub async fn sign_transaction_partial(mut tx: Transaction) -> GatewayResult<(Transaction, Hash)> {
     let gateway = use_gateway();
-    let signer = crate::hooks::use_wallet_native::get()?;
+    let wallet_data = crate::hooks::use_wallet_native::get()?;
+    let signer = wallet_data.0;
     let hash = gateway.rpc.get_latest_blockhash().await?;
     tx.try_partial_sign(&[&signer.creator], hash)?;
     Ok((tx, hash))
@@ -26,7 +27,8 @@ pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
         transaction_status.set(Some(TransactionStatus::Waiting));
         // get signer
         match crate::hooks::use_wallet_native::get() {
-            Ok(signer) => {
+            Ok(wallet_data) => {
+                let signer = wallet_data.0;
                 let gateway = use_gateway();
                 transaction_status.set(Some(TransactionStatus::Sending(0)));
                 // sign

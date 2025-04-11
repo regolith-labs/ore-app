@@ -4,10 +4,19 @@ use crate::{components::*, hooks::use_tokens_with_values, route::Route};
 
 pub fn TokenList() -> Element {
     let tokens = use_tokens_with_values();
+
+    // Sort tokens by total_value in descending order (greatest at the top)
+    let mut sorted_tokens = tokens.iter().collect::<Vec<_>>();
+    sorted_tokens.sort_by(|a, b| {
+        b.total_value
+            .partial_cmp(&a.total_value)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
     rsx! {
         Col {
             class: "w-full",
-            {tokens.iter().map(|token| {
+            {sorted_tokens.iter().map(|token| {
                 rsx! {
                     Link {
                         to: Route::TransferWithToken { token_ticker: token.token.ticker.clone() },
