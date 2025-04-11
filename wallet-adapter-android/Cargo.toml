@@ -4,15 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-uniffi = { version = "0.29.1", features = ["cli"] }
-
-[build-dependencies]
-uniffi = { version = "0.29.1", features = ["build"] }
+jni = "0.21.1" # Use the latest appropriate version
 
 [lib]
 crate-type = ["cdylib"]
 name = "wallet_adapter_android"
 
-[[bin]]
-name = "uniffi-bindgen"
-path = "uniffi-bindgen.rs"
+# Removed build-dependencies and bin sections related to uniffi

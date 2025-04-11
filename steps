@@ -1,0 +1,49 @@
+> I see you added the KotlinAdded.kt to the /java dir, why not to the /kotlin dir? Also, take a look at this WryActivity.kt source. Could this help up find the JVM runtime? Take a look at this kotlin dir.
+
+You've asked some great questions! Let's break them down:
+
+1.  **Why `src/main/java` instead of `src/main/kotlin`?**
+    *   This is mostly a convention and build configuration detail. The Android Gradle plugin, when Kotlin support is enabled, treats `src/main/java` as a directory that can contain *both* Java and Kotlin source files.
+    *   In the previous step, we modified `build.gradle.kts` to explicitly add `sourceSets { getByName("main") { java.srcDirs("src/main/java") } }`. This tells Gradle to look for source code (Java *or* Kotlin) in that specific directory.
+    *   We *could* absolutely put it in `src/main/kotlin` instead. If we did that, we would ideally update the `build.gradle.kts` to include `kotlin.srcDirs("src/main/kotlin")` within the `sourceSets` block as well, like this:
+        ```kotlin
+        sourceSets {
+            getByName("main") {
+                java.srcDirs("src/main/java") // Keep if you might have Java files
+                kotlin.srcDirs("src/main/kotlin") // Add this line
+            }
+        }
+        ```
+    *   For simplicity with the existing setup and the single Kotlin file, using the already configured `src/main/java` works perfectly fine. If you prefer the organization of using `src/main/kotlin`, I can provide the updated `build.gradle.kts` change and the new file path for `KotlinAdder.kt`. Just let me know!
+
+2.  **Can `WryActivity.kt` help find the JNI Environment (`JNIEnv`)?**
+    *   Yes, indirectly! `WryActivity.kt` is crucial because it shows the bridge *from* Kotlin *to* Rust. Look at these lines:
+
+        ```kotlin
+        companion object {
+            init {
+                System.loadLibrary("dioxusmain") // Loads your main Rust library
+            }
+        }
+
+        // These are calls INTO Rust code
+        private external fun create(activity: WryActivity)
+        private external fun start()
+        // ... other external funcs
+        ```
+    *   When Kotlin calls a function declared as `external fun` (like `create`), the corresponding native Rust function (which must be exported correctly, usually with `#[no_mangle]` and specific JNI function signatures like `Java_dev_dioxus_main_WryActivity_create`) receives several arguments automatically from the JVM:
+        *   A `JNIEnv` pointer (`JNIEnv<'a>`).
+        *   A `JClass` or `JObject` representing the class or instance the method was called on.
+        *   Any arguments defined in the Kotlin `external fun` signature (like `activity: WryActivity` which becomes a `JObject` in Rust).
+    *   **Therefore, the Rust code implementing `Java_dev_dioxus_main_WryActivity_create` (or potentially `JNI_OnLoad` if your setup uses that) *already has access* to the `JNIEnv`!**
+    *   **The Challenge:** The `JNIEnv` obtained in the `dioxusmain` library's JNI entry points needs to be accessible to your separate `wallet-adapter-android` library where `call_kotlin_add` lives.
+    *   **Common Solution:** The standard way to handle this is:
+        1.  In the initial JNI call (`JNI_OnLoad` or the `create` function implementation in Rust), get the `JavaVM` pointer from the `JNIEnv`. The `JavaVM` is valid across threads and for the lifetime of the process.
+        2.  Store this `JavaVM` pointer safely in a global static variable (e.g., using `once_cell::sync::Lazy` or `lazy_static!` protected by a `Mutex` or `RwLock`).
+        3.  In your `wallet-adapter-android` code (specifically within the `get_jni_env` function we discussed), retrieve the stored `JavaVM` and call its `get_env()` or `attach_current_thread()` method to get a `JNIEnv` valid for the current thread.
+
+    *   **In summary:** `WryActivity.kt` confirms that JNI is active and that the Rust side *does* receive the `JNIEnv` at startup/initialization. The task now is to implement the mechanism (likely storing the `JavaVM` globally) to share that access with your `wallet-adapter-android` crate. The placeholder `get_jni_env()` function in `wallet-adapter-android/src/lib.rs` is where you would implement the logic to retrieve the `JavaVM` and get the current thread's `JNIEnv`.
+
+Let me know if you'd like to proceed with moving the Kotlin file to `src/main/kotlin` and updating the Gradle file accordingly!
+
+**Generation complete!** Please review the code suggestions above.
