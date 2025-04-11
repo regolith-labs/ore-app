@@ -3,7 +3,6 @@ use dioxus::prelude::*;
 use directories::ProjectDirs;
 use keyring::Entry;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Keypair;
 use solana_sdk::signer::Signer;
 use std::fs;
@@ -13,12 +12,6 @@ use super::Wallet;
 
 use crate::hooks::use_wallet;
 
-const SERVICE: &str = "ORE";
-const USER_DEVICE_KEY: &str = "user-device-key";
-const SERVICE_TWO: &str = "ORE-two";
-const USER_DEVICE_KEY_TWO: &str = "user-device-key-two";
-const SERVICE_THREE: &str = "ORE-three";
-const USER_DEVICE_KEY_THREE: &str = "user-device-key-three";
 pub const MAX_WALLETS_ALLOWED: u8 = 3;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -48,7 +41,7 @@ pub fn use_wallet_provider() {
         use_context_provider(|| Signal::new(Wallet::Disconnected));
 
     // Try to load keypair and config
-    let mut keychain_data = get_or_set();
+    let keychain_data = get_or_set();
 
     // Update the signals with the loaded values
     use_effect(move || match &keychain_data {
@@ -64,15 +57,6 @@ pub fn use_wallet_provider() {
 
 pub fn use_wallet_state() -> Signal<WalletState> {
     use_context::<Signal<WalletState>>()
-}
-
-pub fn get_keyring_values_by_index(index: u8) -> (&'static str, &'static str) {
-    match index {
-        0 => ("ORE", "user-device-key"),
-        1 => ("ORE-two", "user-device-key-two"),
-        2 => ("ORE-three", "user-device-key-three"),
-        _ => ("ORE", "user-device-key"),
-    }
 }
 
 /// embeded keypair on device.
@@ -259,17 +243,26 @@ pub fn save_config(config: &WalletState) -> Result<(), Error> {
     Ok(())
 }
 
+fn get_keyring_values_by_index(index: u8) -> Result<(&'static str, &'static str), Error> {
+    match index {
+        0 => Ok(("ORE", "user-device-key")),
+        1 => Ok(("ORE-two", "user-device-key-two")),
+        2 => Ok(("ORE-three", "user-device-key-three")),
+        _ => Err(Error::UnableToDeriveKeypair),
+    }
+}
+
 fn get_keypair(index: u8) -> Result<MultisigAuthority, Error> {
-    let (service, user_device_key) = get_keyring_values_by_index(index);
+    let (service, user_device_key) = get_keyring_values_by_index(index)?;
     let keyring = Entry::new(service, user_device_key)?;
     let secret = keyring.get_secret()?;
     let multisig_authority =
-        bincode::deserialize(secret.as_slice()).map_err(|err| Error::BincodeDeserialize)?;
+        bincode::deserialize(secret.as_slice()).map_err(|_err| Error::BincodeDeserialize)?;
     Ok(multisig_authority)
 }
 
 fn set(secret: &[u8], index: u8) -> Result<(), Error> {
-    let (service, user_device_key) = get_keyring_values_by_index(index);
+    let (service, user_device_key) = get_keyring_values_by_index(index)?;
     let keyring = Entry::new(service, user_device_key)?;
     keyring.set_secret(secret).map_err(From::from)
 }
