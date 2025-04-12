@@ -4,12 +4,17 @@ use dioxus::prelude::*;
 use dioxus_sdk::clipboard::use_clipboard;
 
 use super::token_list::TokenList;
-use crate::components::{Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row};
+use crate::components::{
+    ChevronDownIcon, Col, CopyIcon, GlobeIcon, PaperAirplaneIcon, PlusIcon, Row, WalletPicker,
+};
 use crate::hooks::{use_wallet, use_wallet_native, Wallet};
 use crate::route::Route;
 
 #[component]
 pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
+    // Add this near the top with other signal declarations
+    let mut show_wallet_picker = use_signal(|| false);
+
     // clipboard
     let mut clipboard = use_clipboard();
     // wallet
@@ -22,6 +27,10 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     let mut keypair = use_signal(|| "failed to read private key".to_string());
     let mut keypair_show_export = use_signal(|| false);
     let mut keypair_copied = use_signal(|| false);
+
+    // #[cfg(not(feature = "web"))]
+    let wallet_picker_open = use_signal(|| false);
+
     // listen for wallet update
     use_effect(move || {
         if let Wallet::Connected(pk) = *wallet.read() {
@@ -67,8 +76,8 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
     // listen for keypair export
     use_effect(move || {
         if *keypair_show_export.read() {
-            if let Ok(kp) = use_wallet_native::get() {
-                let kp = kp.creator.to_base58_string();
+            if let Ok(wallet_data) = use_wallet_native::get() {
+                let kp = wallet_data.0.creator.to_base58_string();
                 keypair.set(kp.clone());
             }
         } else {
@@ -100,20 +109,35 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
                     }
                 }
 
-                // Clipboard button
                 button {
-                    class: "flex justify-center items-center rounded-full text-center py-4 px-6 w-full controls-secondary hover:cursor-pointer mb-4",
+                    class: " py-4 px-6 relative flex justify-center items-center rounded-full text-center w-full controls-secondary mb-4 hover:cursor-pointer",
                     onclick: move |e| {
                         e.stop_propagation();
-                        if let Err(err) = clipboard.set(pubkey.to_string()) {
-                            log::error!("failed to set clipboard: {:?}", err);
-                        }
-                        pubkey_splice.set(Splice::Copied);
+                        show_wallet_picker.set(!show_wallet_picker.cloned());
                     },
-                    div { class: "flex items-center gap-2",
+                    div {
+                        class: "flex items-center gap-2",
                         div { "{pubkey_splice.read().to_string()}" }
-                        CopyIcon { class: "h-4 w-4", solid: false }
+                        ChevronDownIcon { class: "h-4 w-4" }
                     }
+                    button {
+                        class: "absolute right-0",
+                        onclick: move |e| {
+                            e.stop_propagation();
+                            if let Err(err) = clipboard.set(pubkey.to_string()) {
+                                log::error!("failed to set clipboard: {:?}", err);
+                            }
+                            pubkey_splice.set(Splice::Copied);
+                        },
+                        div { class: "mr-4 pl-2 flex items-center hover:cursor-pointer",
+                            CopyIcon { class: "h-4 w-4", solid: false }
+                        }
+                    }
+                }
+                WalletPicker {
+                    show: show_wallet_picker.cloned(),
+                    on_close: move |_| show_wallet_picker.set(false),
+                    on_drawer_close: on_close.clone(),
                 }
 
                 // Action links row
@@ -168,7 +192,7 @@ pub fn WalletDrawer(on_close: EventHandler<MouseEvent>) -> Element {
             // Token List with overflow handling - the content area
             div {
                 class: "flex-1 overflow-y-auto",
-                style: "padding-bottom: 1rem;", // Add padding at the bottom for better visibility
+                style: "padding-bottom: 1rem;",
                 TokenList {}
             }
 
@@ -238,5 +262,3 @@ impl FromStr for Splice {
         Ok(Splice::Pubkey(splice))
     }
 }
-//class: "flex flex-col h-full sm:w-96 w-screen elevated elevated-border text-white pt-8 z-50",
-// class: "flex flex-col gap-8 h-full sm:w-96 w-screen elevated elevated-border text-white py-8 z-50",
