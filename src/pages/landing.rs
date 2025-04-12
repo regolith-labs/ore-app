@@ -22,6 +22,7 @@ pub fn Landing() -> Element {
 pub fn Landing() -> Element {
     rsx! {
         Hero {}
+        NextTitle {}
         Mining {}
         Liquidity {}
         Stats {}
@@ -38,9 +39,10 @@ fn Hero() -> Element {
             class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-192",
             LandingNavbar {}
             Col {
-                class: "absolute w-full h-full mx-auto max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
+                // class: "absolute w-full h-full mx-auto max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
+                class: "w-full h-full mx-auto max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
+                // HeroOrb {}
                 HeroTitle {}
-                HeroOrb {}
             }
         }
     }
@@ -78,24 +80,46 @@ fn LaunchButton() -> Element {
 fn HeroTitle() -> Element {
     rsx! {
         Col {
-            class: "absolute left-0 right-0 bottom-16 sm:left-8 sm:right-8 md:bottom-0 md:top-0 font-extended font-bold text-7xl md:text-8xl lg:text-9xl text-center md:text-left text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black",
-            gap: 2,
-            span {
-                class: "md:mt-auto z-30",
-                "Liquid"
+            class: "absolute left-0 right-0 bottom-32 sm:left-8 sm:right-8 md:bottom-32 font-extended font-bold text-6xl md:text-7xl lg:text-8xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black mx-auto max-w-7xl",
+            gap: 8,
+            Col {
+                // class: "mx-auto",
+                gap: 4,
+                span {
+                    class: "z-30",
+                    "Digital gold,"
+                }
+                span {
+                    class: "z-30",
+                    "reimagined."
+                }
             }
             span {
-                class: "z-20",
-                "Digital"
+                class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
+                "Commodity money everyone can mine."
             }
-            span {
-                class: "mb-4 md:mb-8 z-10",
-                "Gold"
+        }
+    }
+}
+
+fn NextTitle() -> Element {
+    rsx! {
+        Col {
+            class: "w-screen h-full min-h-screen md:min-h-224 mt-16 font-extended font-bold text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis ",
+            gap: 8,
+            SectionCopy {
+                tip: "Earn",
+                title: "One token.",
+                subtitle: "Many ways to mine.",
+                // detail: "Discover a strategy that works for you."
+                // detail: "ORE is a digital commodity money anyone can mine."
             }
-            span {
-                class: "md:mb-auto z-10 text-elements-midEmphasis leading-12 font-wide font-medium text-2xl md:text-3xl lg:text-4xl text-center md:text-left max-w-2xl",
-                "Convert energy into cryptocurrency."
-            }
+            // SectionCopyResponsive {
+            //     tip: "Defi",
+            //     title: "One token.",
+            //     subtitle: "Many ways to mine.",
+            //     detail: "Find a strategy that works for you."
+            // }
         }
     }
 }
@@ -111,8 +135,8 @@ fn Mining() -> Element {
                     gap: 8,
                     SectionCopyResponsive {
                         tip: "Fair launch",
-                        title: "Proof of work.",
-                        subtitle: "On Solana.",
+                        title: "Mine crypto.",
+                        subtitle: "In one click.",
                     }
                     MiningGuide {}
                     SectionCtas {
@@ -242,8 +266,8 @@ fn MiningGuide() -> Element {
             }
             GuideStep {
                 step: "3",
-                title: "Mine crypto",
-                detail: "Earn rewards with just a computer."
+                title: "Earn rewards",
+                detail: "Convert energy into cryptocurrency."
             }
         }
     }
@@ -297,12 +321,12 @@ fn Liquidity() -> Element {
                     gap: 8,
                     SectionCopyResponsive {
                         tip: "Defi",
-                        title: "Deep liquidity.",
-                        subtitle: "Native yield.",
+                        title: "Provide liquidity.",
+                        subtitle: "Earn yield.",
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE generates longterm yield for stakers. Farm competitive yield rates by providing liquidity for ORE markets."
+                        "ORE generates longterm yield for stakers. Farm competitive rates by providing liquidity and supporting ORE markets."
                     }
                     SectionCtas {
                         primary_title: "Explore staking →",
@@ -601,15 +625,11 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "ORE allows anyone to convert electricity and spare compute resources into liquid financial capital. This allows data centers to monetize underutilized compute capacity, and individuals to permissionlessly onramp to Solana without relying on financial institutions."
+                    answer: "ORE allows anyone to convert electricity and spare compute resources into liquid financial capital. This allows data centers to monetize underutilized compute capacity, and individuals to permissionlessly onboard to Solana without relying on financial institutions."
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "ORE can be mined by anyone with a laptop or home computer. Simply navigate to the mining page of the app, connect your Solana wallet, and click the \"Start\" button. You will automatically be enrolled in a mining pool and do not need to pay any transaction fees while you mine."
-                }
-                FaqItem {
-                    question: "How does staking work?",
-                    answer: "ORE automatically distributes a portion of all newly mined supply to liquidity providers as yield. These incentives help bootstrap liquidity and maintain active markets with a network of assets in the Solana ecosystem. By providing liquidity for ORE pairs, stakers can earn fees from traders as well as receive additional rewards in the form of ORE yield."
+                    answer: "ORE can be mined in a variety of ways. "
                 }
                 FaqItem {
                     question: "Is it secure?",
