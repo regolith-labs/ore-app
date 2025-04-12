@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace="ore.supply.OreApp"
+    namespace = "ore.supply.OreApp"
     compileSdk = 33
     defaultConfig {
         applicationId = "ore.supply.OreApp"
@@ -27,10 +27,11 @@ android {
         }
         getByName("release") {
             isMinifyEnabled = true
-             proguardFiles(
+            proguardFiles(
                 *fileTree(".") { include("**/*.pro") }
                     .plus(getDefaultProguardFile("proguard-android-optimize.txt"))
-                    .toList().toTypedArray()
+                    .toList()
+                    .toTypedArray(),
             )
         }
     }
