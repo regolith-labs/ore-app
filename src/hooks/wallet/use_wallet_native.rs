@@ -28,6 +28,19 @@ pub struct WalletState {
     pub wallet_pubkeys: Vec<WalletKey>,
 }
 
+/// embeded keypair on device.
+/// field names from sqauds multisig api.
+#[derive(Debug, Deserialize, Serialize)]
+pub struct MultisigAuthority {
+    /// signer embeded on this device
+    #[serde(serialize_with = "serialize", deserialize_with = "deserialize")]
+    pub creator: Keypair,
+    /// ephemeral keypair used to seed multisig pda
+    /// persisted to derive pda
+    #[serde(serialize_with = "serialize", deserialize_with = "deserialize")]
+    pub create_key: Keypair,
+}
+
 pub fn use_wallet_provider() {
     let mut wallet_state = use_context_provider(|| {
         Signal::new(WalletState {
@@ -59,19 +72,6 @@ pub fn use_wallet_state() -> Signal<WalletState> {
     use_context::<Signal<WalletState>>()
 }
 
-/// embeded keypair on device.
-/// field names from sqauds multisig api.
-#[derive(Debug, Deserialize, Serialize)]
-pub struct MultisigAuthority {
-    /// signer embeded on this device
-    #[serde(serialize_with = "serialize", deserialize_with = "deserialize")]
-    pub creator: Keypair,
-    /// ephemeral keypair used to seed multisig pda
-    /// persisted to derive pda
-    #[serde(serialize_with = "serialize", deserialize_with = "deserialize")]
-    pub create_key: Keypair,
-}
-
 pub fn get() -> Result<(MultisigAuthority, WalletState), Error> {
     // Load config
     let config = load_config()?;
@@ -79,6 +79,12 @@ pub fn get() -> Result<(MultisigAuthority, WalletState), Error> {
     let current_index = config.current_wallet_index;
     let multisig_authority = get_keypair(current_index)?;
     Ok((multisig_authority, config))
+}
+
+fn set(secret: &[u8], index: u8) -> Result<(), Error> {
+    let (service, user_device_key) = get_keyring_values_by_index(index)?;
+    let keyring = Entry::new(service, user_device_key)?;
+    keyring.set_secret(secret).map_err(From::from)
 }
 
 pub fn get_or_set() -> Result<(MultisigAuthority, WalletState), Error> {
@@ -157,18 +163,18 @@ pub fn add_new_keypair(
     // Get the number of wallets used
     let num_wallets_used = wallet_state.read().num_wallets_used;
 
-    let private_key = match private_key_string {
-        Some(private_key) => private_key,
-        None => return Err(Error::InvalidPrivateKey),
-    };
-
-    let wallet_name = match wallet_name {
-        Some(wallet_name) => wallet_name,
-        None => return Err(Error::InvalidWalletName),
-    };
-
     // Only add if there are available slots
     if num_wallets_used < MAX_WALLETS_ALLOWED {
+        let private_key = match private_key_string {
+            Some(private_key) => private_key,
+            None => return Err(Error::InvalidPrivateKey),
+        };
+
+        let wallet_name = match wallet_name {
+            Some(wallet_name) => wallet_name,
+            None => return Err(Error::InvalidWalletName),
+        };
+
         // Derive the keypair from the private key
         let keypair_from_private_key =
             match std::panic::catch_unwind(|| Keypair::from_base58_string(&private_key)) {
@@ -228,6 +234,24 @@ pub fn add_new_keypair(
     }
 }
 
+fn get_keypair(index: u8) -> Result<MultisigAuthority, Error> {
+    let (service, user_device_key) = get_keyring_values_by_index(index)?;
+    let keyring = Entry::new(service, user_device_key)?;
+    let secret = keyring.get_secret()?;
+    let multisig_authority =
+        bincode::deserialize(secret.as_slice()).map_err(|_err| Error::BincodeDeserialize)?;
+    Ok(multisig_authority)
+}
+
+fn get_keyring_values_by_index(index: u8) -> Result<(&'static str, &'static str), Error> {
+    match index {
+        0 => Ok(("ORE", "user-device-key")),
+        1 => Ok(("ORE-two", "user-device-key-two")),
+        2 => Ok(("ORE-three", "user-device-key-three")),
+        _ => Err(Error::UnableToDeriveKeypair),
+    }
+}
+
 pub fn save_config(config: &WalletState) -> Result<(), Error> {
     let path = get_config_path()?;
     // Create parent directory if it doesn't exist
@@ -241,30 +265,6 @@ pub fn save_config(config: &WalletState) -> Result<(), Error> {
     // Write the config to the file
     fs::write(&path, &json)?;
     Ok(())
-}
-
-fn get_keyring_values_by_index(index: u8) -> Result<(&'static str, &'static str), Error> {
-    match index {
-        0 => Ok(("ORE", "user-device-key")),
-        1 => Ok(("ORE-two", "user-device-key-two")),
-        2 => Ok(("ORE-three", "user-device-key-three")),
-        _ => Err(Error::UnableToDeriveKeypair),
-    }
-}
-
-fn get_keypair(index: u8) -> Result<MultisigAuthority, Error> {
-    let (service, user_device_key) = get_keyring_values_by_index(index)?;
-    let keyring = Entry::new(service, user_device_key)?;
-    let secret = keyring.get_secret()?;
-    let multisig_authority =
-        bincode::deserialize(secret.as_slice()).map_err(|_err| Error::BincodeDeserialize)?;
-    Ok(multisig_authority)
-}
-
-fn set(secret: &[u8], index: u8) -> Result<(), Error> {
-    let (service, user_device_key) = get_keyring_values_by_index(index)?;
-    let keyring = Entry::new(service, user_device_key)?;
-    keyring.set_secret(secret).map_err(From::from)
 }
 
 fn get_config_path() -> Result<PathBuf, Error> {
