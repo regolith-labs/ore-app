@@ -4,10 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-jni = "0.21.1" # Use the latest appropriate version
+jni = "0.21.1"                                            # Use the latest appropriate version
+dioxus-mobile = { path = "../../dioxus/packages/mobile" }
 
 [lib]
 crate-type = ["cdylib"]
 name = "wallet_adapter_android"
-
-# Removed build-dependencies and bin sections related to uniffi

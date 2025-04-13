@@ -93,7 +93,8 @@ cargo-packager-updater = { git = "https://github.com/regolith-labs/cargo-package
 chrono = { version = "0.4", features = ["wasmbind"] }
 cocoa = { version = "0.24", optional = true, features = [] }
 core_affinity = { version = "0.8.1", optional = true }
-dioxus = { version = "0.6.1", features = ["router"] }
+## dioxus = { version = "0.6.1", features = ["router"] }
+dioxus = { path = "../dioxus/packages/dioxus", features = ["router"] }
 dioxus-sdk = { version = "0.6", features = ["timing"] }
 dioxus-logger = "0.6"
 directories = { version = "6.0.0", optional = true }

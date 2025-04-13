@@ -1,0 +1,10 @@
+# Configuration for the wallet-adapter-android crate
+
+[build]
+# Set the default target for this crate to Android ARM64
+# rust-analyzer will use this target for analysis.
+# Other common targets include:
+# armv7-linux-androideabi (32-bit ARM)
+# i686-linux-android (32-bit x86)
+# x86_64-linux-android (64-bit x86)
+target = "aarch64-linux-android"

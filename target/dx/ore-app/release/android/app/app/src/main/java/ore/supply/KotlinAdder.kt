@@ -20,19 +20,4 @@ public class KotlinAdder {
             return result
         }
     }
-
-    // Example of an instance method (more complex to call from JNI)
-    fun addInstance(
-        left: Long,
-        right: Long,
-    ): Long {
-        Log.d("KotlinAdder", "Kotlin instance add method called with: $left + $right")
-        val result = left + right
-        Log.d("KotlinAdder", "Kotlin instance add result: $result")
-        return result
-    }
-
-    fun yes(): Long {
-        addInstance(1, 2)
-    }
 }

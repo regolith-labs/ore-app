@@ -1,44 +1,8 @@
 // We will use the jni crate to call Kotlin
-use jni::objects::{JClass, JValue};
-use jni::sys::jlong;
-use jni::JNIEnv; // jlong corresponds to Java's long / Kotlin's Long
-
-// *** Critical Placeholder ***
-// We need a way to get the JNIEnv. In a typical Android app, this is passed
-// to native functions (e.g., JNI_OnLoad). In Dioxus/cargo-mobile, we need to
-// find how it's exposed. This might involve using `android_activity` or
-// specific hooks provided by the framework.
-// This function signature is a placeholder!
-fn get_jni_env() -> Option<JNIEnv<'static>> {
-    // Placeholder: In a real scenario, you'd get this from the Android environment.
-    // This might involve unsafe code or specific framework functions.
-    // For example, using android_activity::AndroidApp::jni_env() if available.
-    // Returning None here will cause the call to fail safely in this example.
-    // You MUST replace this with the actual way to get the JNIEnv in your Dioxus setup.
-    eprintln!("WARNING: get_jni_env() is a placeholder and needs implementation!");
-
-    // Example using android_activity (if integrated):
-    /*
-    if let Some(app) = &*APP_HANDLE.lock().unwrap() { // Assuming APP_HANDLE stores android_activity::AndroidApp
-         return Some(app.jni_env());
-    }
-    */
-
-    None
-    // A common but potentially unsafe way if you *know* the current thread is attached:
-    /*
-    use jni::JavaVM;
-    use std::sync::Arc;
-    // Assume JVM: Arc<JavaVM> is stored globally somewhere after JNI_OnLoad
-    match JVM.get_env() {
-        Ok(env) => Some(env),
-        Err(_) => {
-            eprintln!("Failed to get JNIEnv: Thread not attached?");
-            None
-        }
-    }
-    */
-}
+use dioxus_mobile;
+use jni::objects::JValue;
+use jni::sys::jlong; // jlong corresponds to Java's long / Kotlin's Long
+                     // JNIEnv is obtained via the JavaVM instance
 
 /// Calls the static `add` method in the Kotlin `KotlinAdder` class via JNI.
 pub fn call_kotlin_add(left: i64, right: i64) -> Result<i64, String> {
@@ -47,13 +11,25 @@ pub fn call_kotlin_add(left: i64, right: i64) -> Result<i64, String> {
         left, right
     );
 
-    // 1. Get the JNI Environment
-    // SAFETY: Getting the JNIEnv might require unsafe blocks depending on the method.
-    // The lifetime 'static is often used here but needs careful consideration
-    // based on how the JNIEnv is obtained and managed.
-    let env = match get_jni_env() {
-        Some(env) => env,
-        None => return Err("Failed to get JNIEnv".to_string()),
+    // 1. Get the JNI Environment via the JavaVM obtained during JNI_OnLoad
+    let vm = match dioxus_mobile::get_java_vm() {
+        Some(vm) => vm,
+        None => {
+            return Err(
+                "Failed to get JavaVM instance. JNI_OnLoad might not have run or failed."
+                    .to_string(),
+            )
+        }
+    };
+
+    // Attach the current thread to the JVM and get the JNIEnv.
+    // This is necessary for any thread that wants to interact with Java objects.
+    // The resulting JNIEnv is valid only for the current thread and for the duration
+    // of the closure or until detach is called. Using `attach_current_thread`
+    // ensures the thread is detached automatically when the `env` guard goes out of scope.
+    let mut env = match vm.attach_current_thread() {
+        Ok(env) => env,
+        Err(e) => return Err(format!("Failed to attach current thread to JVM: {:?}", e)),
     };
 
     // 2. Find the Kotlin class
