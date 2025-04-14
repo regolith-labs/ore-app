@@ -2,9 +2,9 @@
 # android.update.sh - Build an APK set from the AAB and install it on a connected Android device
 
 # Paths
-BUNDLETOOL_JAR="$HOME/bundletool-all-1.18.1.jar"
-AAB_FILE="./dist/OreApp-aarch64.aab"
-OUTPUT_APKS="./dist/OreApp.apks"
+BUNDLETOOL_JAR="$HOME/bundletool-all-1.18.1.jar" # Make sure this path is correct for your system
+AAB_FILE="./dist/android/ore-app-release.aab"    # Updated path based on android.bundle.sh output
+OUTPUT_APKS="./dist/android/OreApp.apks"         # Output APKS to the same directory
 
 # Check if ADB is installed
 if ! command -v adb &>/dev/null; then
@@ -20,6 +20,11 @@ if [ "$DEVICE_COUNT" -eq 0 ]; then
 fi
 
 echo "Building APK set from AAB..."
+
+# Ensure the output directory exists
+OUTPUT_DIR=$(dirname "$OUTPUT_APKS")
+echo "Ensuring output directory exists: $OUTPUT_DIR"
+mkdir -p "$OUTPUT_DIR"
 
 # Remove existing APK set if it exists
 if [ -f "$OUTPUT_APKS" ]; then
