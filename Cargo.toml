@@ -32,6 +32,7 @@ desktop = [
   "sysinfo",
   "tokio",
   "tokio-tungstenite",
+  "wallet-adapter-android",
 ]
 android = [
   "android_logger",
@@ -162,6 +163,7 @@ tokio-tungstenite = { version = "0.26.2", optional = true, features = [
 ] }
 tracing = "0.1.40"
 url = "2.5.0"
+wallet-adapter-android = { path = "./wallet-adapter-android", optional = true }
 wasm-bindgen = { version = "0.2.99", optional = true }
 wasm-bindgen-futures = { version = "0.4.41", optional = true }
 wasm-logger = { version = "0.2.0", optional = true }

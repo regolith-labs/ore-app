@@ -6131,6 +6131,7 @@ dependencies = [
  "tokio-tungstenite 0.26.2",
  "tracing",
  "url",
+ "wallet-adapter-android",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",
@@ -11054,6 +11055,14 @@ checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
 dependencies = [
  "same-file",
  "winapi-util",
+]
+
+[[package]]
+name = "wallet-adapter-android"
+version = "0.1.0"
+dependencies = [
+ "dioxus-mobile",
+ "jni 0.21.1",
 ]
 
 [[package]]
