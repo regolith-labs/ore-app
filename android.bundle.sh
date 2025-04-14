@@ -54,8 +54,9 @@ else
 fi
 
 # Define the expected location of the generated AAB (relative to the 'app' directory where gradle runs)
-DEFAULT_AAB_PATH="build/outputs/bundle/release/app-release.aab"
-EXPECTED_AAB_DIR="build/outputs/bundle/release" # Define the directory relative to 'app'
+# The output is inside the 'app' module's build directory, which is nested
+DEFAULT_AAB_PATH="app/build/outputs/bundle/release/app-release.aab"
+EXPECTED_AAB_DIR="app/build/outputs/bundle/release" # Define the directory relative to 'app'
 
 # List the contents of the expected output directory for debugging
 ABS_EXPECTED_AAB_DIR="$(pwd)/$EXPECTED_AAB_DIR" # Absolute path for clarity in logs
