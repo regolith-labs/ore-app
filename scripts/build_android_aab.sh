@@ -12,10 +12,8 @@ OUTPUT_DIR="dist/android"
 FINAL_AAB_NAME="ore-app-release.aab"
 # --- End Configuration ---
 
-# Get the absolute path to the script's directory
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-# Get the absolute path to the project root (assuming the script is in a subdirectory like 'scripts')
-PROJECT_ROOT=$(cd -- "$SCRIPT_DIR/.." &>/dev/null && pwd)
+# Get the absolute path to the project root (where the script is located)
+PROJECT_ROOT=$(pwd)
 
 # Absolute paths based on the project root
 ABS_ANDROID_PROJECT_DIR="$PROJECT_ROOT/$ANDROID_PROJECT_DIR"
@@ -55,34 +53,34 @@ else
   exit 1
 fi
 
-# Define the expected location of the generated AAB (relative to the 'app' directory)
-# The build output is inside the 'app' module's build directory
-DEFAULT_AAB_PATH="app/build/outputs/bundle/release/app-release.aab"
-EXPECTED_AAB_DIR="app/build/outputs/bundle/release" # Define the directory
+# Define the expected location of the generated AAB (relative to the 'app' directory where gradle runs)
+DEFAULT_AAB_PATH="build/outputs/bundle/release/app-release.aab"
+EXPECTED_AAB_DIR="build/outputs/bundle/release" # Define the directory relative to 'app'
 
 # List the contents of the expected output directory for debugging
-echo "Checking contents of expected output directory: $(pwd)/$EXPECTED_AAB_DIR"
+ABS_EXPECTED_AAB_DIR="$(pwd)/$EXPECTED_AAB_DIR" # Absolute path for clarity in logs
+echo "Checking contents of expected output directory: $ABS_EXPECTED_AAB_DIR"
 # Create the directory path just in case Gradle didn't, though it should have
-mkdir -p "$EXPECTED_AAB_DIR"
-ls -l "$EXPECTED_AAB_DIR"
+mkdir -p "$EXPECTED_AAB_DIR" # Create relative path
+ls -l "$EXPECTED_AAB_DIR"    # List relative path
 
-# Check if the AAB file was created
+# Check if the AAB file was created (using the relative path from the current 'app' dir)
 if [ ! -f "$DEFAULT_AAB_PATH" ]; then
-  echo "Error: Expected AAB file not found at $DEFAULT_AAB_PATH"
-  # Change back to original directory before exiting on failure
+  echo "Error: Expected AAB file not found at $(pwd)/$DEFAULT_AAB_PATH"
+  # Change back to project root before exiting on failure
   cd "$PROJECT_ROOT"
   exit 1
 fi
 
-echo "AAB generated at: $DEFAULT_AAB_PATH"
+echo "AAB generated at: $(pwd)/$DEFAULT_AAB_PATH"
 
 # Create the output directory if it doesn't exist
 echo "Ensuring output directory exists: $ABS_OUTPUT_DIR"
 mkdir -p "$ABS_OUTPUT_DIR"
 
-# Copy the AAB to the final destination (using path relative to 'app' dir)
+# Copy the AAB to the final destination (using path relative to 'app' dir for source)
 echo "Copying AAB from $(pwd)/$DEFAULT_AAB_PATH to $ABS_FINAL_AAB_PATH"
-cp "$DEFAULT_AAB_PATH" "$ABS_FINAL_AAB_PATH"
+cp "$DEFAULT_AAB_PATH" "$ABS_FINAL_AAB_PATH" # Source path is relative to current dir
 
 # Navigate back to the original directory (project root)
 cd "$PROJECT_ROOT"
