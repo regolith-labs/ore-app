@@ -4,7 +4,7 @@ use jni::objects::{JClass, JObject, JValue};
 use jni::signature::ReturnType;
 use jni::sys::jvalue; // Import the low-level jvalue type
 
-/// Calls the static `diagnoseClassLoading` method in the Kotlin `KotlinAdder` class via JNI.
+/// Calls the static `add` method in the Kotlin `KotlinAdder` class via JNI.
 ///
 /// This function obtains the application context by calling
 /// `android.app.ActivityThread.currentApplication()`, uses that context to get the application's
@@ -44,7 +44,7 @@ pub fn call_kotlin_add(left: i64, right: i64) -> Result<i64, String> {
     let app_obj = unsafe {
         // Pass a reference instead of the value
         env.call_static_method_unchecked(
-            &activity_thread_class,
+            &activity_thread_class, // Pass reference to JClass
             current_app_method_id,
             ret_app,
             &[],
@@ -100,12 +100,17 @@ pub fn call_kotlin_add(left: i64, right: i64) -> Result<i64, String> {
     // Convert the JValue to the low-level jvalue required by call_method_unchecked.
     let jval_arg: jvalue = jvalue_arg.as_jni(); // Use as_jni() instead of deprecated to_jni()
                                                 // Build the arguments array using the jvalue.
-    let args = [jval_arg];
+    let load_args = [jval_arg]; // Renamed to load_args
 
     let ret_class: ReturnType = ReturnType::Object; // Signature is already in get_method_id
     let load_class_result = unsafe {
         // Pass the slice of jvalue.
-        env.call_method_unchecked(class_loader_obj, load_class_method_id, ret_class, &args)
+        env.call_method_unchecked(
+            class_loader_obj,
+            load_class_method_id,
+            ret_class,
+            &load_args,
+        ) // Use load_args here
     };
     if env.exception_check().unwrap_or(false) {
         let _ = env.exception_describe();
@@ -121,20 +126,25 @@ pub fn call_kotlin_add(left: i64, right: i64) -> Result<i64, String> {
         )
     })?;
 
-    // 5. Call the static method diagnoseClassLoading on your loaded class.
-    let method_name = "diagnoseClassLoading";
-    let method_sig = "()V";
+    // 5. Call the static method `add` on your loaded class.
+    let method_name = "add";
+    let method_sig = "(JJ)J"; // Takes two longs (J), returns a long (J)
     println!(
-        "Rust: Calling Kotlin diagnostic method {} with signature {}",
+        "Rust: Calling Kotlin method {} with signature {}",
         method_name, method_sig
     );
+
+    // Prepare arguments for the add method
+    let args = [JValue::Long(left), JValue::Long(right)];
+
     let result = env.call_static_method(
         // Convert the loaded class JObject into a JClass.
         JClass::from(class_obj),
         method_name,
         method_sig,
-        &[],
+        &args, // Pass the arguments for the add method
     );
+
     if env.exception_check().unwrap_or(false) {
         let _ = env.exception_describe();
         let _ = env.exception_clear();
@@ -143,17 +153,21 @@ pub fn call_kotlin_add(left: i64, right: i64) -> Result<i64, String> {
             method_name, method_sig
         ));
     }
-    result.map_err(|e| {
-        format!(
-            "Failed to call static method {} {}: {:?}",
-            method_name, method_sig, e
-        )
-    })?;
+
+    // Extract the long result
+    let sum = result
+        .and_then(|v| v.j()) // Use .j() to extract a long
+        .map_err(|e| {
+            format!(
+                "Failed to call static method {} {} or get long result: {:?}",
+                method_name, method_sig, e
+            )
+        })?;
+
     println!(
-        "Rust: Successfully called Kotlin diagnostic method {}. Check Logcat for output.",
-        method_name
+        "Rust: Successfully called Kotlin method {}. Result: {}",
+        method_name, sum
     );
 
-    // Return a dummy value, as the called method returns void.
-    Ok(0)
+    Ok(sum)
 }
