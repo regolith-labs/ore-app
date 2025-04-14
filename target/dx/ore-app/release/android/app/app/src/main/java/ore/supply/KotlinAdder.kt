@@ -18,6 +18,25 @@ public class KotlinAdder {
             val result = left + right
             Log.d("KotlinAdder", "Kotlin static add result: $result")
             return result
+            return result
+        }
+
+        @JvmStatic
+        fun diagnoseClassLoading() {
+            val className = "ore.supply.KotlinAdder"
+            try {
+                // Attempt to load the class using the default class loader
+                Class.forName(className)
+                Log.d("KotlinAdder", "SUCCESS: Class '$className' found by Class.forName().")
+            } catch (e: ClassNotFoundException) {
+                Log.e("KotlinAdder", "FAILURE: Class '$className' NOT found by Class.forName(). Error: ${e.message}")
+                // Optionally log the stack trace for more details
+                // Log.e("KotlinAdder", "Stack trace:", e)
+            } catch (t: Throwable) {
+                // Catch other potential errors during class loading/initialization
+                Log.e("KotlinAdder", "ERROR: An unexpected error occurred while trying to load class '$className'. Error: ${t.message}")
+                // Log.e("KotlinAdder", "Stack trace:", t)
+            }
         }
     }
 }

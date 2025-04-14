@@ -42,26 +42,28 @@ pub fn call_kotlin_add(left: i64, right: i64) -> Result<i64, String> {
     };
 
     // 3. Call the static method
-    // Method name: "add"
-    // Signature: "(JJ)J" means it takes two longs (J) and returns a long (J).
-    // See JNI type signatures documentation.
-    let method_name = "add";
-    let method_sig = "(JJ)J";
+    // Method name: "diagnoseClassLoading"
+    // Signature: "()V" means it takes no arguments and returns void (V).
+    let method_name = "diagnoseClassLoading";
+    let method_sig = "()V";
 
-    let j_left = JValue::from(left as jlong);
-    let j_right = JValue::from(right as jlong);
+    println!(
+        "Rust: Calling Kotlin diagnostic method {} with signature {}",
+        method_name, method_sig
+    );
 
-    match env.call_static_method(class, method_name, method_sig, &[j_left, j_right]) {
-        Ok(result) => {
-            // 4. Convert the result
-            match result.j() {
-                // .j() attempts to convert JValue to jlong
-                Ok(value) => {
-                    println!("Rust: Received result from Kotlin: {}", value);
-                    Ok(value)
-                }
-                Err(e) => Err(format!("Failed to convert Kotlin result to long: {:?}", e)),
-            }
+    // Call the static void method. No arguments are needed.
+    match env.call_static_method(class, method_name, method_sig, &[]) {
+        Ok(_) => {
+            // Method returned void, so we don't expect a value back other than success.
+            println!(
+                "Rust: Successfully called Kotlin diagnostic method {}. Check Logcat for output.",
+                method_name
+            );
+            // Since the original function expects Result<i64, String>,
+            // we return a dummy Ok value here for the diagnostic run.
+            // In a real scenario, you might change the function signature or handle this differently.
+            Ok(0) // Return a dummy value, the real info is in Logcat.
         }
         Err(e) => Err(format!(
             "Failed to call static method {} {}: {:?}",
