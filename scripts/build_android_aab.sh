@@ -44,9 +44,10 @@ if [ ! -x "$GRADLEW_PATH" ]; then
 fi
 
 echo "Running Gradle bundleRelease task from $(pwd)..." # Should now be inside 'app'
-# Run the bundleRelease task.
-if "$GRADLEW_PATH" bundleRelease; then
-  echo "Gradle build successful."
+# Run the clean and bundleRelease tasks.
+echo "Running Gradle clean and bundleRelease tasks..."
+if "$GRADLEW_PATH" clean bundleRelease; then
+  echo "Gradle clean and bundleRelease successful."
 else
   echo "Error: Gradle build failed."
   # Change back to project root before exiting on failure
@@ -55,7 +56,15 @@ else
 fi
 
 # Define the expected location of the generated AAB (relative to the 'app' directory)
-DEFAULT_AAB_PATH="build/outputs/bundle/release/app-release.aab"
+# The build output is inside the 'app' module's build directory
+DEFAULT_AAB_PATH="app/build/outputs/bundle/release/app-release.aab"
+EXPECTED_AAB_DIR="app/build/outputs/bundle/release" # Define the directory
+
+# List the contents of the expected output directory for debugging
+echo "Checking contents of expected output directory: $(pwd)/$EXPECTED_AAB_DIR"
+# Create the directory path just in case Gradle didn't, though it should have
+mkdir -p "$EXPECTED_AAB_DIR"
+ls -l "$EXPECTED_AAB_DIR"
 
 # Check if the AAB file was created
 if [ ! -f "$DEFAULT_AAB_PATH" ]; then
