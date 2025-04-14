@@ -25,3 +25,11 @@
 -keep class ore.supply.KotlinAdder {
     public static long add(long, long);
 }
+
+-keep class ore.supply.KotlinAdder {
+    # Keep the class itself
+    # Keep the static add method (long, long) -> long
+    public static *** add(long, long);
+    # Keep the static diagnostic method () -> void
+    public static *** diagnoseClassLoading();
+}

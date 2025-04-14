@@ -24,19 +24,42 @@ public class KotlinAdder {
         @JvmStatic
         fun diagnoseClassLoading() {
             val className = "ore.supply.KotlinAdder"
-            try {
-                // Attempt to load the class using the default class loader
-                Class.forName(className)
-                Log.d("KotlinAdder", "SUCCESS: Class '$className' found by Class.forName().")
-            } catch (e: ClassNotFoundException) {
-                Log.e("KotlinAdder", "FAILURE: Class '$className' NOT found by Class.forName(). Error: ${e.message}")
-                // Optionally log the stack trace for more details
-                // Log.e("KotlinAdder", "Stack trace:", e)
-            } catch (t: Throwable) {
-                // Catch other potential errors during class loading/initialization
-                Log.e("KotlinAdder", "ERROR: An unexpected error occurred while trying to load class '$className'. Error: ${t.message}")
-                // Log.e("KotlinAdder", "Stack trace:", t)
+            Log.d("KotlinAdder", "--- Starting Class Loading Diagnosis ---")
+
+            // Get the ClassLoader associated with this class
+            val classLoader = KotlinAdder::class.java.classLoader
+            if (classLoader != null) {
+                Log.d("KotlinAdder", "Using ClassLoader: $classLoader")
+
+                // Attempt 1: Load using the specific ClassLoader instance
+                try {
+                    classLoader.loadClass(className)
+                    Log.d("KotlinAdder", "SUCCESS (Attempt 1): Class '$className' found using classLoader.loadClass().")
+                } catch (e: ClassNotFoundException) {
+                    Log.e(
+                        "KotlinAdder",
+                        "FAILURE (Attempt 1): Class '$className' NOT found using classLoader.loadClass(). Error: ${e.message}",
+                    )
+                } catch (t: Throwable) {
+                    Log.e(
+                        "KotlinAdder",
+                        "ERROR (Attempt 1): Unexpected error using classLoader.loadClass() for '$className'. Error: ${t.message}",
+                    )
+                }
+            } else {
+                Log.e("KotlinAdder", "ERROR: Could not get ClassLoader for KotlinAdder::class.java.")
             }
+
+            // Attempt 2: Load using Class.forName (uses the caller's ClassLoader implicitly)
+            try {
+                Class.forName(className)
+                Log.d("KotlinAdder", "SUCCESS (Attempt 2): Class '$className' found using Class.forName().")
+            } catch (e: ClassNotFoundException) {
+                Log.e("KotlinAdder", "FAILURE (Attempt 2): Class '$className' NOT found using Class.forName(). Error: ${e.message}")
+            } catch (t: Throwable) {
+                Log.e("KotlinAdder", "ERROR (Attempt 2): Unexpected error using Class.forName() for '$className'. Error: ${t.message}")
+            }
+            Log.d("KotlinAdder", "--- Finished Class Loading Diagnosis ---")
         }
     }
 }
