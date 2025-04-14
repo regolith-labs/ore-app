@@ -8,5 +8,4 @@ jni = "0.21.1"                                            # Use the latest appro
 dioxus-mobile = { path = "../../dioxus/packages/mobile" }
 
 [lib]
-crate-type = ["cdylib"]
-name = "wallet_adapter_android"
+crate-type = ["cdylib", "rlib"] # Also build as a Rust library for ore-app

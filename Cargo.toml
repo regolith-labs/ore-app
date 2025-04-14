@@ -32,7 +32,6 @@ desktop = [
   "sysinfo",
   "tokio",
   "tokio-tungstenite",
-  "wallet-adapter-android",
 ]
 android = [
   "android_logger",
@@ -54,6 +53,7 @@ android = [
   "sysinfo",
   "tokio",
   "tokio-tungstenite",
+  "wallet-adapter-android",
 ]
 # Feature for macOS-specific dependencies
 macos-desktop = ["cocoa", "objc"]

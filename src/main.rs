@@ -17,6 +17,8 @@ use dioxus::prelude::*;
 #[cfg(feature = "web")]
 use hooks::use_download_url_provider;
 use tracing::Level;
+#[cfg(feature = "android")]
+use wallet_adapter_android;
 
 #[cfg(all(feature = "desktop", target_os = "macos"))]
 use crate::utils::AppNapDisabler;
@@ -54,6 +56,14 @@ pub fn App() -> Element {
     use_mining_loop();
     use_wallet_drawer_state_provider();
     use_docs_drawer_state_provider();
+
+    if cfg!(feature = "android") {
+        use_effect(move || {
+            log::info!("ata two three");
+            let one = wallet_adapter_android::call_kotlin_add(10, 10);
+            log::info!("one: {:?}", one);
+        });
+    }
 
     rsx! {
         style { "{CSS}" }
