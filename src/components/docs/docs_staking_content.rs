@@ -17,7 +17,7 @@ pub fn StakingContent() -> Element {
         ContentSection {
             StakingIntro {}
             StakingHowItWorks {}
-            StakingGeneratingYield {}
+            // StakingGeneratingYield {}
             StakingFaq {}
         }
     }
