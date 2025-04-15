@@ -752,6 +752,9 @@
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
   }
+  .mb-8 {
+    margin-bottom: calc(var(--spacing) * 8);
+  }
   .mb-auto {
     margin-bottom: auto;
   }
@@ -1033,6 +1036,9 @@
   .resize {
     resize: both;
   }
+  .resize-none {
+    resize: none;
+  }
   .\[appearance\:textfield\] {
     appearance: textfield;
   }
@@ -1226,6 +1232,9 @@
   }
   .bg-controls-secondary {
     background-color: var(--color-controls-secondary);
+  }
+  .bg-elements-gold {
+    background-color: var(--color-elements-gold);
   }
   .bg-elements-green {
     background-color: var(--color-elements-green);
@@ -1516,6 +1525,9 @@
   .text-elements-midEmphasis\/50 {
     color: color-mix(in oklab, var(--color-elements-midEmphasis) 50%, transparent);
   }
+  .text-gray-400 {
+    color: var(--color-gray-400);
+  }
   .text-gray-700 {
     color: var(--color-gray-700);
   }
@@ -1683,6 +1695,13 @@
       color: var(--color-gray-700);
     }
   }
+  .hover\:h-16 {
+    &:hover {
+      @media (hover: hover) {
+        height: calc(var(--spacing) * 16);
+      }
+    }
+  }
   .hover\:scale-105 {
     &:hover {
       @media (hover: hover) {
@@ -1704,6 +1723,13 @@
     &:hover {
       @media (hover: hover) {
         border-color: var(--color-elements-highEmphasis);
+      }
+    }
+  }
+  .hover\:bg-black\/60 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in oklab, var(--color-black) 60%, transparent);
       }
     }
   }
@@ -1766,6 +1792,23 @@
           scale: var(--tw-scale-x) var(--tw-scale-y);
         }
       }
+    }
+  }
+  .focus\:ring-1 {
+    &:focus {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentColor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+  }
+  .focus\:ring-elements-midEmphasis {
+    &:focus {
+      --tw-ring-color: var(--color-elements-midEmphasis);
+    }
+  }
+  .focus\:outline-none {
+    &:focus {
+      --tw-outline-style: none;
+      outline-style: none;
     }
   }
   .active\:bg-controls-tertiaryHover {

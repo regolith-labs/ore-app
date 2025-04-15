@@ -48,7 +48,7 @@ pub fn StakeTable() -> Element {
                         right_2: "TVL",
                         right_3: "Yield",
                         help_left: "Holders of the assets below are eligible to receive ORE yield.",
-                        help_right_1: "Estimated annual percentage rate based on 7d trailing returns.",
+                        help_right_1: "Estimated annual percentage return based on current emissions rate.",
                         help_right_2: "Current notional value of assets deposited in the protocol.",
                         help_right_3: "Amount of yield you have earned and may claim.",
                         help_hidden: info_hidden,
