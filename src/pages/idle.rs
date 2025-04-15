@@ -159,7 +159,7 @@ pub fn Apr() -> Element {
     rsx! {
         TitledRow {
             title: "APR",
-            description: "The annualized percentage rate returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
+            description: "The annualized percentage rate returned to stakers, derived from the current emissions rate divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
                 if let Ok(apr) = apr.cloned() {
                     span {
