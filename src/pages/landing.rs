@@ -22,10 +22,11 @@ pub fn Landing() -> Element {
 pub fn Landing() -> Element {
     rsx! {
         Hero {}
-        NextTitle {}
-        Mining {}
-        Liquidity {}
         Stats {}
+        Development {}
+        // Mining {}
+        Liquidity {}
+        // Stats {}
         Community {}
         Faq {}
         Footer {}
@@ -36,12 +37,14 @@ pub fn Landing() -> Element {
 fn Hero() -> Element {
     rsx! {
         Col {
+            // class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-192",
             class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-192",
+            HeroBg {}
             LandingNavbar {}
             Col {
                 // class: "absolute w-full h-full mx-auto max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
-                class: "w-full h-full mx-auto max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
-                // HeroOrb {}
+                class: "absolute w-full h-full mx-auto justify-center max-w-7xl top-0 bottom-0 left-0 right-0 z-50",
+                HeroOrb {}
                 HeroTitle {}
             }
         }
@@ -80,29 +83,27 @@ fn LaunchButton() -> Element {
 fn HeroTitle() -> Element {
     rsx! {
         Col {
-            class: "absolute left-0 right-0 bottom-32 sm:left-8 sm:right-8 md:bottom-32 font-extended font-bold text-6xl md:text-7xl lg:text-8xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black mx-auto max-w-7xl",
-            gap: 8,
+            class: "gap-4 sm:gap-8 font-extended font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black mx-auto max-w-7xl px-2 sm:px-6 mb-auto",
             Col {
-                // class: "mx-auto",
-                gap: 4,
+                // gap: 4,
                 span {
                     class: "z-30",
                     "Digital gold,"
                 }
                 span {
                     class: "z-30",
-                    "reimagined."
+                    "unchained."
                 }
             }
             span {
-                class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
-                "Commodity money everyone can mine."
+                class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-base sm:text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
+                "Crypto money everyone can mine."
             }
         }
     }
 }
 
-fn NextTitle() -> Element {
+fn Development() -> Element {
     rsx! {
         Col {
             class: "w-screen h-full min-h-screen md:min-h-224 mt-16 font-extended font-bold text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis ",
@@ -111,14 +112,82 @@ fn NextTitle() -> Element {
                 tip: "Earn",
                 title: "One token.",
                 subtitle: "Many ways to mine.",
-                // detail: "Discover a strategy that works for you."
-                // detail: "ORE is a digital commodity money anyone can mine."
+                detail: "Discover a strategy that works for you."
             }
-            // SectionCopyResponsive {
-            //     tip: "Defi",
-            //     title: "One token.",
-            //     subtitle: "Many ways to mine.",
-            //     detail: "Find a strategy that works for you."
+            div {
+                class: "grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto px-4",
+                Card {
+                    asset: asset!("/public/battery.jpg"),
+                    title: "Proof of work",
+                    detail: "Convert raw energy into cryptocurrency using a personal computer or GPU.",
+                    cta: "Learn more →",
+                    route: Route::Mine {}.to_string()
+                }
+                Card {
+                    asset: asset!("/public/ribbon.png"),
+                    title: "Proof of liquidity",
+                    detail: "Farm competitive yield rates by making markets more efficient for traders.",
+                    cta: "Learn more →",
+                    route: Route::Stake {}.to_string()
+                }
+                Card {
+                    asset: asset!("/public/battery.jpg"),
+                    title: "Proof of impression",
+                    detail: "Get paid to create and share crypto content with your followers on social media.",
+                    cta: "Learn more →",
+                    route: Route::Mine {}.to_string()
+                }
+                Card {
+                    asset: asset!("/public/seeker.png"),
+                    title: "Proof of mobile",
+                    detail: "Get a leg up by using a Solana Seeker mobile phone to mine everywhere you go.",
+                    cta: "Learn more →",
+                    route: "https://solanamobile.com/",
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn Card(asset: Asset, title: String, detail: String, cta: String, route: String) -> Element {
+    rsx! {
+        Link {
+            to: route,
+            class: "flex flex-col bg-elements-lowEmphasis/10 rounded-2xl cursor-pointer group",
+            // class: "p-4 cursor-pointer",
+            img {
+                class: "w-full h-72 object-cover",
+                src: asset.to_string()
+                // src: asset!("/public/battery.jpg")
+            }
+            // div {
+            //     class: "w-full h-64 bg-elements-purple flex items-center justify-center",
+            //     // Icon placeholder
+            //     span {
+            //         class: "text-2xl text-white",
+            //         "⚡"
+            //     }
+            // }
+            Col {
+                class: "p-8 max-w-xl mx-auto",
+                gap: 2,
+                p {
+                    class: "font-wide font-semibold text-xl text-elements-highEmphasis text-left",
+                    "{title}"
+                    span {
+                        class: "opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out",
+                        " →"
+                    }
+                }
+                p {
+                    class: "text-elements-lowEmphasis text-lg font-sans font-medium text-left",
+                    "{detail}"
+                }
+            }
+            // span {
+            //     class: "text-sm text-elements-gold font-medium",
+            //     "{cta}"
             // }
         }
     }
@@ -310,26 +379,26 @@ fn Liquidity() -> Element {
     rsx! {
         Col {
             class: "relative w-screen h-full min-h-screen md:min-h-192 px-4 mt-16",
-            img {
-                class: "absolute left-0 right-0 bottom-0 mx-auto max-w-7xl w-full object-contain z-0",
-                src: asset!("/public/ribbon.png")
-            }
+            // img {
+            //     class: "absolute left-0 right-0 bottom-0 mx-auto max-w-7xl w-full object-contain z-0",
+            //     src: asset!("/public/ribbon.png")
+            // }
             Col {
                 class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
-                    gap: 8,
+                    gap: 2,
                     SectionCopyResponsive {
-                        tip: "Defi",
-                        title: "Provide liquidity.",
-                        subtitle: "Earn yield.",
+                        tip: "Why",
+                        title: "Peer to peer.",
+                        subtitle: "Electronic cash.",
                     }
                     span {
                         class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE generates longterm yield for stakers. Farm competitive rates by providing liquidity and supporting ORE markets."
+                        "ORE is a free currency for the open internet — not issued or controlled by any state. It can be earned, spent, and used without middlemen."
                     }
                     SectionCtas {
-                        primary_title: "Explore staking →",
+                        primary_title: "Learn more →",
                         primary_route: Route::Stake {},
                         secondary_title: "Learn more",
                         secondary_route: Route::Stake {}
@@ -349,7 +418,7 @@ fn Community() -> Element {
             SectionCopy {
                 tip: "Social",
                 title: "Join the community.",
-                detail: "Discover why thousands of people around the world love ORE."
+                detail: "Thousands of people around the world love ORE."
             }
             Testimonials {}
         }
@@ -555,12 +624,13 @@ fn Stats() -> Element {
         Col {
             class: "w-full h-min text-elements-highEmphasis px-4",
             Col {
-                class: "md:flex-row md:gap-24 relative w-full py-16 md:py-32 px-4 mx-auto max-w-7xl border-t border-b border-elements-midEmphasis selection:bg-elements-highEmphasis selection:text-black",
+                class: "md:flex-row md:gap-32 relative w-full py-16 md:py-24 px-4 mx-auto max-w-7xl border-t-2 border-b-2 border-elements-midEmphasis selection:bg-elements-highEmphasis selection:text-black",
                 gap: 16,
                 Col {
                     class: "md:ml-auto",
+                    gap: 2,
                     span {
-                        class: "text-4xl lg:text-5xl font-extended font-bold text-center text-elements-highEmphasis",
+                        class: "text-4xl font-extended font-bold text-center text-elements-highEmphasis",
                         if let Some(Ok(holders)) = holders.cloned() {
                             "{format_abbreviated_number(holders as f64)}"
                         } else {
@@ -568,27 +638,29 @@ fn Stats() -> Element {
                         }
                     }
                     span {
-                        class: "text-lg md:text-xl lg:text-2xl font-wide font-semibold text-center text-elements-lowEmphasis",
+                        class: "text-lg md:text-xl font-wide font-semibold text-center text-elements-lowEmphasis",
                         "Holders"
                     }
                 }
 
                 Col {
                     class: "text-left",
+                    gap: 2,
                     span {
-                        class: "text-4xl lg:text-5xl font-extended font-bold text-center text-elements-highEmphasis",
+                        class: "text-4xl font-extended font-bold text-center text-elements-highEmphasis",
                         "5,000,000"
                     }
                     span {
-                        class: "text-lg md:text-xl lg:text-2xl font-wide font-semibold text-center text-elements-lowEmphasis",
-                        "Max Supply"
+                        class: "text-lg md:text-xl font-wide font-semibold text-center text-elements-lowEmphasis",
+                        "Max supply"
                     }
                 }
 
                 Col {
                     class: "md:mr-auto",
+                    gap: 2,
                     span {
-                        class: "text-4xl lg:text-5xl font-extended font-bold text-center text-elements-highEmphasis",
+                        class: "text-4xl font-extended font-bold text-center text-elements-highEmphasis",
                         if let Some(Ok(market_cap)) = market_cap.cloned() {
                             "${format_abbreviated_number(market_cap)}"
                         } else {
@@ -596,8 +668,8 @@ fn Stats() -> Element {
                         }
                     }
                     span {
-                        class: "text-lg md:text-xl lg:text-2xl font-wide font-semibold text-center text-elements-lowEmphasis",
-                        "Market Cap"
+                        class: "text-lg md:text-xl font-wide font-semibold text-center text-elements-lowEmphasis",
+                        "Market cap"
                     }
                 }
             }
@@ -701,8 +773,8 @@ fn SectionCopy(
     };
     rsx! {
         Col {
-            class: "py-8 font-wide font-bold text-4xl md:text-5xl lg:text-6xl text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black px-4 {class} {text_align}",
-            gap: 2,
+            class: "py-8 sm:gap-2 font-wide font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black px-4 {class} {text_align}",
+            // gap: 2,
             if let Some(tip) = tip {
                 span {
                     // class: "z-30 text-elements-gold rounded-full w-min text-sm font-semibold mb-4 text-nowrap {text_margin}",
@@ -722,7 +794,7 @@ fn SectionCopy(
             }
             if let Some(detail) = detail {
                 span {
-                    class: "md:mb-auto mt-4 z-10 text-elements-midEmphasis font-wide font-medium text-lg sm:text-xl md:text-2xl {text_margin}",
+                    class: "md:mb-auto mt-4 z-10 text-elements-midEmphasis font-wide font-medium text-base sm:text-lg md:text-xl lg:text-2xl {text_margin}",
                     "{detail}"
                 }
             }
@@ -760,7 +832,7 @@ fn Footer() -> Element {
                 SocialLinks {}
             }
             Col {
-                class: "w-full h-min mx-auto max-w-7xl border-t border-elements-midEmphasis pt-4",
+                class: "w-full h-min mx-auto max-w-7xl border-t-2 border-elements-midEmphasis pt-4",
                 gap: 16,
                 Row {
                     class: "w-full h-min mx-auto max-w-7xl justify-end px-2",

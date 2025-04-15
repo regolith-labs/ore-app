@@ -20,14 +20,30 @@ use dioxus::prelude::*;
 pub fn HeroOrb() -> Element {
     rsx! {
         div {
-            class: "w-full h-full bg-red-500",
+            class: "w-full h-1/2 my-auto",
             // class: "absolute z-40 -top-32 bottom-32 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-64 md:-right-64 lg:left-72 lg:-right-72 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             // class: "fixed z-40 -top-48 bottom-48 left-0 right-0 sm:-top-32 sm:bottom-32 md:top-0 md:bottom-0 md:left-56 md:-right-56 lg:left-64 lg:-right-64 xl:left-80 xl:-right-80 bg-transparent overflow-visible pointer-events-none",
             // https://prod.spline.design/Y2igVlaEL2MBaBOY/scene.splinecode
+            // https://prod.spline.design/Ow2sG0dhJar0f3VM/scene.splinecode
             dangerous_inner_html: r#"
                 <spline-viewer
                     style="height: 100%; overflow: visible;" 
-                    url="https://prod.spline.design/Ow2sG0dhJar0f3VM/scene.splinecode"
+                    url="https://prod.spline.design/jm1GUfqRPJx3ZY-V/scene.splinecode"
+                />
+            "#
+        }
+    }
+}
+
+#[component]
+pub fn HeroBg() -> Element {
+    rsx! {
+        div {
+            class: "absolute top-0 left-0 right-0 bottom-0",
+            dangerous_inner_html: r#"
+                <spline-viewer
+                    style="height: 100%; overflow: visible;" 
+                    url="https://prod.spline.design/KhvpG2ZZ2ELOEVO9/scene.splinecode"
                 />
             "#
         }
