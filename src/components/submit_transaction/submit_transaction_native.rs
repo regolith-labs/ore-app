@@ -2,8 +2,9 @@ use dioxus::prelude::*;
 use ore_types::request::TransactionType;
 use solana_sdk::{
     hash::Hash,
+    instruction::InstructionError,
     signature::Keypair,
-    transaction::{Transaction, VersionedTransaction},
+    transaction::{Transaction, TransactionError, VersionedTransaction},
 };
 
 use crate::{
@@ -65,6 +66,27 @@ async fn sign_submit_confirm(
     let mut transaction_status = use_transaction_status();
     // sign
     let (signed, _) = sign(rpc, signer, tx).await?;
+    // simulate
+    let simulate_response = rpc.simulate_transaction(&signed).await?;
+    // if let Some(err) = simulate_response.err {
+    //     log::error!("Simulation error: {:?}", err);
+    // }
+
+    if let Some(err) = simulate_response.err {
+        if let TransactionError::InstructionError(index, instruction_error) = err {
+            // Check for system program insufficient funds
+            if matches!(instruction_error, InstructionError::Custom(1)) {
+                // Could verify from logs if it's the System Program
+                log::error!("Insufficient funds error detected");
+                // return ErrorType::InsufficientFunds(index);
+            }
+            // Add other error types as needed
+        }
+    }
+
+    if let Some(logs) = simulate_response.logs {
+        log::info!("Simulation logs: {:?}", logs);
+    }
     // submit
     let sig = rpc.send_transaction(&signed).await?;
     // confirm
