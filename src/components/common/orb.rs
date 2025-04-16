@@ -36,6 +36,22 @@ pub fn HeroOrb() -> Element {
 }
 
 #[component]
+pub fn LandingGlobe() -> Element {
+    rsx! {
+        div {
+            // class: "h-[60rem] w-full my-auto",
+            class: "absolute top-72 -bottom-72 sm:top-64 sm:-bottom-64 md:top-32 md:-bottom-32 right-0 left-0 md:left-64 md:-right-64",
+            dangerous_inner_html: r#"
+                <spline-viewer
+                    style="height: 100%; overflow: visible;" 
+                    url="https://prod.spline.design/eznQUYBmCcX8LG3F/scene.splinecode"
+                />
+            "#
+        }
+    }
+}
+
+#[component]
 pub fn HeroBg() -> Element {
     rsx! {
         div {

@@ -117,21 +117,21 @@ fn Development() -> Element {
             div {
                 class: "grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto px-4",
                 Card {
-                    asset: asset!("/public/battery.jpg"),
+                    asset: asset!("/public/gpu.png"),
                     title: "Proof of work",
                     detail: "Convert raw energy into cryptocurrency using a personal computer or GPU.",
                     cta: "Learn more →",
                     route: Route::Mine {}.to_string()
                 }
                 Card {
-                    asset: asset!("/public/ribbon.png"),
+                    asset: asset!("/public/liquidity.png"),
                     title: "Proof of liquidity",
                     detail: "Farm competitive yield rates by making markets more efficient for traders.",
                     cta: "Learn more →",
                     route: Route::Stake {}.to_string()
                 }
                 Card {
-                    asset: asset!("/public/battery.jpg"),
+                    asset: asset!("/public/impressions.png"),
                     title: "Proof of impression",
                     detail: "Get paid to create and share crypto content with your followers on social media.",
                     cta: "Learn more →",
@@ -181,7 +181,7 @@ fn Card(asset: Asset, title: String, detail: String, cta: String, route: String)
                     }
                 }
                 p {
-                    class: "text-elements-lowEmphasis text-lg font-sans font-medium text-left",
+                    class: "text-elements-midEmphasis text-lg font-sans font-normal text-left",
                     "{detail}"
                 }
             }
@@ -378,18 +378,19 @@ fn GuideStep(step: String, title: String, detail: String) -> Element {
 fn Liquidity() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen md:min-h-192 px-4 mt-16",
+            class: "relative w-screen h-full min-h-screen md:min-h-192 mt-16",
             // img {
             //     class: "absolute left-0 right-0 bottom-0 mx-auto max-w-7xl w-full object-contain z-0",
             //     src: asset!("/public/ribbon.png")
             // }
+            LandingGlobe {}
             Col {
-                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10 px-4",
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 2,
                     SectionCopyResponsive {
-                        tip: "Why",
+                        tip: "Mission",
                         title: "Peer to peer.",
                         subtitle: "Electronic cash.",
                     }
@@ -403,8 +404,8 @@ fn Liquidity() -> Element {
                         secondary_title: "Learn more",
                         secondary_route: Route::Stake {}
                     }
-                    // LandingWave {}
                 }
+
             }
         }
     }
@@ -414,11 +415,11 @@ fn Liquidity() -> Element {
 fn Community() -> Element {
     rsx! {
         Col {
-            class: "relative w-full h-full mx-auto max-w-7xl pt-16",
+            class: "relative w-full h-full mx-auto max-w-7xl pt-32",
             SectionCopy {
                 tip: "Social",
                 title: "Join the community.",
-                detail: "Thousands of people around the world love ORE."
+                detail: "People around the world love ORE."
             }
             Testimonials {}
         }
@@ -693,7 +694,7 @@ fn Faq() -> Element {
                 class: "w-full h-min justify-start md:mt-16",
                 FaqItem {
                     question: "What is ORE?",
-                    answer: "ORE is digital commodity, mineable via proof-of-work on Solana."
+                    answer: "ORE is digital commodity, mineable via proof-of-work on the Solana blockchain."
                 }
                 FaqItem {
                     question: "Why should I care?",
@@ -731,7 +732,7 @@ fn FaqItem(question: String, answer: String) -> Element {
             class: "flex flex-col w-full py-8 px-4 sm:px-8 cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-elements-midEmphasis/10",
             onclick: move |_| is_open.set(!is_open.cloned()),
             Row {
-                class: "justify-between font-wide text-left font-bold text-2xl w-full text-elements-highEmphasis",
+                class: "justify-between font-wide text-left font-bold text-xl w-full text-elements-highEmphasis",
                 gap: 8,
                 "{question}"
                 PlusIcon {
