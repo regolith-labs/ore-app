@@ -111,7 +111,7 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                     if let Some(err) = simulated_tx.err {
                                         if let TransactionError::InstructionError(_index, instruction_error) = err {
                                             if matches!(instruction_error, InstructionError::Custom(1)) {
-                                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientFunds)));
+                                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientSOL)));
                                                 return;
                                             }
                                         }

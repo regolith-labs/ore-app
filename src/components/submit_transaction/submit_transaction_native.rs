@@ -74,7 +74,7 @@ async fn sign_submit_confirm(
     if let Some(err) = simulated_tx.err {
         if let TransactionError::InstructionError(index, instruction_error) = err {
             if matches!(instruction_error, InstructionError::Custom(1)) {
-                return Err(GatewayError::InsufficientFunds);
+                return Err(GatewayError::InsufficientSOL);
             }
         }
     }

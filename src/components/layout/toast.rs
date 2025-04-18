@@ -53,7 +53,7 @@ pub fn ToastDisplay() -> Element {
                 TransactionStatus::Error(err) => {
                     // Display different error messages based on the GatewayError type
                     let error_message = match err {
-                        GatewayError::InsufficientFunds => "Insufficient SOL balance",
+                        GatewayError::InsufficientSOL => "Insufficient SOL balance",
                         GatewayError::Unknown => "Transaction failed",
                         _ => "Transaction failed"
                     };

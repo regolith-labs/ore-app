@@ -447,7 +447,7 @@ pub fn MinerRewardsClaimButton(
                                     if let TransactionError::InstructionError(_index, instruction_error) = err {
                                         if matches!(instruction_error, InstructionError::Custom(1)) {
                                             // Handle insufficient funds error
-                                            transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientFunds)));
+                                            transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientSOL)));
                                             return;
                                         }
                                     }
