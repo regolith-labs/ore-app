@@ -7673,7 +7673,7 @@ dependencies = [
 [[package]]
 name = "solana-client-wasm"
 version = "2.1.9"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#f14fa310506f5fc2f21e768485ccbf56e34f575b"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=cozmo%2Fsimulate-vtx#e6fd8dc34ff8ac2fc8017269fed7c7df60ffd835"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -7816,7 +7816,7 @@ dependencies = [
 [[package]]
 name = "solana-extra-wasm"
 version = "2.1.9"
-source = "git+https://github.com/regolith-labs/solana-playground?branch=master#f14fa310506f5fc2f21e768485ccbf56e34f575b"
+source = "git+https://github.com/regolith-labs/solana-playground?branch=cozmo%2Fsimulate-vtx#e6fd8dc34ff8ac2fc8017269fed7c7df60ffd835"
 dependencies = [
  "Inflector",
  "arrayref",

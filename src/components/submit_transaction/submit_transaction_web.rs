@@ -5,12 +5,13 @@ use ore_types::request::{AppId, TransactionEvent, TransactionType};
 use solana_sdk::{
     hash::Hash,
     message::VersionedMessage,
-    transaction::{Transaction, VersionedTransaction},
+    instruction::InstructionError,
+    transaction::{Transaction, VersionedTransaction, TransactionError},
 };
 
 use crate::{
     components::*,
-    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc},
+    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc, GatewayError},
     hooks::{use_gateway, use_transaction_status},
 };
 
@@ -102,6 +103,20 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                 let decode_res = decode_res.and_then(|buffer| {
                                     bincode::deserialize::<VersionedTransaction>(&buffer).ok()
                                 });
+
+                                let tx_for_simulation = tx.clone();                                
+
+                                // Simulate transaction to check for insufficient funds
+                                if let Ok(simulated_tx) = gateway.rpc.simulate_transaction(&tx_for_simulation).await {
+                                    if let Some(err) = simulated_tx.err {
+                                        if let TransactionError::InstructionError(index, instruction_error) = err {
+                                            if matches!(instruction_error, InstructionError::Custom(1)) {
+                                                transaction_status.set(Some(TransactionStatus::InsufficientFunds));
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }                                
 
                                 // Send transaction to rpc
                                 transaction_status.set(Some(TransactionStatus::Sending(0)));

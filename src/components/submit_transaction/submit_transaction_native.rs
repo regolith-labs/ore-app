@@ -9,7 +9,7 @@ use solana_sdk::{
 
 use crate::{
     components::*,
-    gateway::{solana::SolanaGateway, GatewayResult, NativeRpc, Rpc},
+    gateway::{solana::SolanaGateway, GatewayResult, GatewayError, NativeRpc, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
@@ -35,7 +35,11 @@ pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
                 // sign
                 if let Err(err) = sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
                     log::error!("{:?}", err);
-                    transaction_status.set(Some(TransactionStatus::Error));
+                    if let GatewayError::InsufficientFunds = err {
+                        transaction_status.set(Some(TransactionStatus::InsufficientFunds));
+                    } else {
+                        transaction_status.set(Some(TransactionStatus::Error));
+                    }
                 }
             }
             Err(err) => {
@@ -66,26 +70,16 @@ async fn sign_submit_confirm(
     let mut transaction_status = use_transaction_status();
     // sign
     let (signed, _) = sign(rpc, signer, tx).await?;
-    // simulate
-    let simulate_response = rpc.simulate_transaction(&signed).await?;
-    // if let Some(err) = simulate_response.err {
-    //     log::error!("Simulation error: {:?}", err);
-    // }
+    
+    // simulate transaction to check for insufficient funds
+    let simulated_tx = rpc.simulate_transaction(&signed).await?;        
 
-    if let Some(err) = simulate_response.err {
+    if let Some(err) = simulated_tx.err {
         if let TransactionError::InstructionError(index, instruction_error) = err {
-            // Check for system program insufficient funds
             if matches!(instruction_error, InstructionError::Custom(1)) {
-                // Could verify from logs if it's the System Program
-                log::error!("Insufficient funds error detected");
-                // return ErrorType::InsufficientFunds(index);
+                return Err(GatewayError::InsufficientFunds);
             }
-            // Add other error types as needed
         }
-    }
-
-    if let Some(logs) = simulate_response.logs {
-        log::info!("Simulation logs: {:?}", logs);
     }
     // submit
     let sig = rpc.send_transaction(&signed).await?;

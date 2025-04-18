@@ -13,6 +13,7 @@ pub fn ToastDisplay() -> Element {
         if let Some(transaction_status) = transaction_status.cloned() {
             match transaction_status {
                 TransactionStatus::Denied
+                | TransactionStatus::InsufficientFunds
                 | TransactionStatus::Error
                 | TransactionStatus::Timeout
                 | TransactionStatus::Done(_) => {
@@ -52,6 +53,13 @@ pub fn ToastDisplay() -> Element {
                     rsx! {
                         Col { class: "{toast_class} border-l-4 border-red-500",
                             span { class: "{title_class} my-auto", "Transaction failed" }
+                        }
+                    }
+                }
+                TransactionStatus::InsufficientFunds => {
+                    rsx! {
+                        Col { class: "{toast_class} border-l-4 border-red-500",
+                            span { class: "{title_class} my-auto", "Insufficient SOL balance" }
                         }
                     }
                 }

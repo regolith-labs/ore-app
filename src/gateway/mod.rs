@@ -13,6 +13,7 @@ use serde_json::{json, Value};
 #[cfg(not(feature = "web"))]
 use solana_client::nonblocking::rpc_client::RpcClient;
 
+
 #[cfg(feature = "web")]
 use solana_client_wasm::WasmClient;
 
@@ -20,7 +21,7 @@ use solana_sdk::{
     hash::Hash,
     pubkey::Pubkey,
     signature::Signature,
-    transaction::{Transaction, VersionedTransaction},
+    transaction::VersionedTransaction,
 };
 
 pub use utils::SimulateTransactionResponse;
@@ -108,18 +109,10 @@ pub trait Rpc {
         &self,
         transaction: &VersionedTransaction,
     ) -> GatewayResult<Signature>;
-
-    #[cfg(not(feature = "web"))]
     async fn simulate_transaction(
         &self,
         transaction: &VersionedTransaction,
-    ) -> GatewayResult<SimulateTransactionResponse>;
-
-    #[cfg(feature = "web")]
-    async fn simulate_transaction(
-        &self,
-        transaction: &Transaction,
-    ) -> GatewayResult<SimulateTransactionResponse>;
+    ) -> GatewayResult<SimulateTransactionResponse>;    
 }
 
 #[cfg(not(feature = "web"))]
@@ -288,7 +281,7 @@ impl Rpc for WebRpc {
     }
     async fn simulate_transaction(
         &self,
-        transaction: &Transaction,
+        transaction: &VersionedTransaction,
     ) -> GatewayResult<SimulateTransactionResponse> {
         match self.0.simulate_transaction(transaction).await {
             Ok(response) => Ok(SimulateTransactionResponse {

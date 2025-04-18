@@ -434,7 +434,7 @@ pub fn MinerRewardsClaimButton(
                     ) {
                         transaction_status.set(Some(TransactionStatus::Waiting));
                         let tx_for_signing = tx.clone();
-                        let tx_to_simulate = tx.clone();
+                        let tx_to_simulate = versioned_tx.clone();
 
                         // Simulate transaction
                         let gateway = use_gateway();

@@ -10,6 +10,7 @@ pub enum TransactionStatus {
     Timeout,
     Sending(u8),
     Done(Signature),
+    InsufficientFunds,
 }
 
 impl Display for TransactionStatus {

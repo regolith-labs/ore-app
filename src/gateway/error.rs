@@ -32,6 +32,7 @@ pub enum GatewayError {
     UnableToDeriveKeypair,
     NoWalletsFound,
     InvalidWalletName,
+    InsufficientFunds,
 }
 
 impl From<anyhow::Error> for GatewayError {
