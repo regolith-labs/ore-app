@@ -35,11 +35,8 @@ pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
                 // sign
                 if let Err(err) = sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
                     log::error!("{:?}", err);
-                    if let GatewayError::InsufficientFunds = err {
-                        transaction_status.set(Some(TransactionStatus::InsufficientFunds));
-                    } else {
-                        transaction_status.set(Some(TransactionStatus::Error));
-                    }
+                    let err_clone = err.clone();
+                    transaction_status.set(Some(TransactionStatus::Error(Some(err_clone))));
                 }
             }
             Err(err) => {

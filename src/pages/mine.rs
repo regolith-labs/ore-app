@@ -466,13 +466,15 @@ pub fn MinerRewardsClaimButton(
                                             );
                                     }
                                     Err(err) => {
-                                        transaction_status.set(Some(TransactionStatus::Error));
+                                        // Clone the error before it's moved into TransactionStatus::Error
+                                        transaction_status.set(Some(TransactionStatus::Error(Some(err.clone()))));
                                         log::error!("{:?}", err);
                                     }
                                 }
                             }
                             Err(err) => {
-                                transaction_status.set(Some(TransactionStatus::Error));
+                                // Clone the error before it's moved into TransactionStatus::Error
+                                transaction_status.set(Some(TransactionStatus::Error(Some(err.clone()))));
                                 log::error!("{:?}", err);
                             }
                         }

@@ -1,16 +1,16 @@
 use std::fmt::Display;
 
+use crate::gateway::GatewayError;
 use solana_sdk::signature::Signature;
 
-#[derive(PartialEq, Copy, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug)]
 pub enum TransactionStatus {
     Waiting,
     Denied,
-    Error,
+    Error(Option<GatewayError>),
     Timeout,
     Sending(u8),
     Done(Signature),
-    InsufficientFunds,
 }
 
 impl Display for TransactionStatus {
