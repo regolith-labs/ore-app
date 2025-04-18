@@ -169,8 +169,8 @@ features = [
 ]
 
 [patch.crates-io]
-solana-client-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "cozmo/simulate-vtx" }
-solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "cozmo/simulate-vtx" }
+solana-client-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
+solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }
 meteora-pools-sdk = { git = "https://github.com/regolith-labs/meteora-pools-sdk", branch = "master" }
 meteora-vault-sdk = { git = "https://github.com/regolith-labs/meteora-vault-sdk", branch = "master" }

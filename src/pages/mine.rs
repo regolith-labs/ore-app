@@ -2,11 +2,13 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
-use solana_sdk::transaction::{Transaction, VersionedTransaction};
+use solana_sdk::transaction::{Transaction, VersionedTransaction, TransactionError};
+use solana_sdk::instruction::InstructionError;
+use crate::gateway::GatewayError;
 
 use crate::{
     components::*,
-    gateway::{pool::PoolGateway, GatewayError, GatewayResult, Rpc},
+    gateway::{pool::PoolGateway, GatewayResult, Rpc},
     hooks::{
         build_commit_claim_instructions, on_transaction_done, use_gateway, use_member,
         use_member_record, use_member_record_balance, use_miner, use_miner_cores,
@@ -438,10 +440,17 @@ pub fn MinerRewardsClaimButton(
 
                         // Simulate transaction
                         let gateway = use_gateway();
+                        log::info!("trying to simulate transaction before");
                         match gateway.rpc.simulate_transaction(&tx_to_simulate).await {
                             Ok(response) => {
                                 if let Some(err) = response.err {
-                                    log::error!("Simulation error in mine claim: {:?}", err);
+                                    if let TransactionError::InstructionError(_index, instruction_error) = err {
+                                        if matches!(instruction_error, InstructionError::Custom(1)) {
+                                            // Handle insufficient funds error
+                                            transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientFunds)));
+                                            return;
+                                        }
+                                    }
                                 }
                             },
                             Err(err) => {
@@ -466,15 +475,15 @@ pub fn MinerRewardsClaimButton(
                                             );
                                     }
                                     Err(err) => {
-                                        // Clone the error before it's moved into TransactionStatus::Error
-                                        transaction_status.set(Some(TransactionStatus::Error(Some(err.clone()))));
+                                        // Clone the error for TransactionStatus::Error
+                                        transaction_status.set(Some(TransactionStatus::Error(err.clone())));
                                         log::error!("{:?}", err);
                                     }
                                 }
                             }
                             Err(err) => {
-                                // Clone the error before it's moved into TransactionStatus::Error
-                                transaction_status.set(Some(TransactionStatus::Error(Some(err.clone()))));
+                                // Clone the error for TransactionStatus::Error
+                                transaction_status.set(Some(TransactionStatus::Error(err.clone())));
                                 log::error!("{:?}", err);
                             }
                         }

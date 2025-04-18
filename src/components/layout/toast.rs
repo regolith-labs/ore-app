@@ -49,10 +49,12 @@ pub fn ToastDisplay() -> Element {
                         }
                     }
                 }
+                // Remove option from transcation status & sub gatewayerror::Uknown for None into TransactionStatus::Error
                 TransactionStatus::Error(err) => {
                     // Display different error messages based on the GatewayError type
                     let error_message = match err {
-                        Some(GatewayError::InsufficientFunds) => "Insufficient SOL balance",
+                        GatewayError::InsufficientFunds => "Insufficient SOL balance",
+                        GatewayError::Unknown => "Transaction failed",
                         _ => "Transaction failed"
                     };
                     

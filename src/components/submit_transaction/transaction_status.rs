@@ -7,7 +7,7 @@ use solana_sdk::signature::Signature;
 pub enum TransactionStatus {
     Waiting,
     Denied,
-    Error(Option<GatewayError>),
+    Error(GatewayError),
     Timeout,
     Sending(u8),
     Done(Signature),

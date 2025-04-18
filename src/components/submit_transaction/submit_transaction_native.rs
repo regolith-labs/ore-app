@@ -34,9 +34,9 @@ pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
                 transaction_status.set(Some(TransactionStatus::Sending(0)));
                 // sign
                 if let Err(err) = sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
-                    log::error!("{:?}", err);
+                    // log::error!("{:?}", err);
                     let err_clone = err.clone();
-                    transaction_status.set(Some(TransactionStatus::Error(Some(err_clone))));
+                    transaction_status.set(Some(TransactionStatus::Error(err_clone)));
                 }
             }
             Err(err) => {

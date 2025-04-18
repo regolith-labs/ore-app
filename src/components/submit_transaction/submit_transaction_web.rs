@@ -109,9 +109,9 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                 // Simulate transaction to check for insufficient funds
                                 if let Ok(simulated_tx) = gateway.rpc.simulate_transaction(&tx_for_simulation).await {
                                     if let Some(err) = simulated_tx.err {
-                                        if let TransactionError::InstructionError(index, instruction_error) = err {
+                                        if let TransactionError::InstructionError(_index, instruction_error) = err {
                                             if matches!(instruction_error, InstructionError::Custom(1)) {
-                                                transaction_status.set(Some(TransactionStatus::Error(Some(GatewayError::InsufficientFunds))));
+                                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientFunds)));
                                                 return;
                                             }
                                         }
@@ -169,7 +169,7 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                     }
                                     None => {
                                         log::info!("error sending tx");
-                                        transaction_status.set(Some(TransactionStatus::Error(None)))
+                                        transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
                                     }
                                 }
                             }
@@ -180,11 +180,11 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                             }
                             Err(err) => {
                                 log::error!("error signing transaction: {}", err);
-                                transaction_status.set(Some(TransactionStatus::Error(None)))
+                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
                             }
                             _ => {
                                 log::error!("unrecognized signing response");
-                                transaction_status.set(Some(TransactionStatus::Error(None)))
+                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
                             }
                         };
                     }
@@ -192,7 +192,7 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                     // Process eval errors
                     Err(err) => {
                         log::error!("error executing wallet signing script: {}", err);
-                        transaction_status.set(Some(TransactionStatus::Error(None)))
+                        transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
                     }
                 }
             }
@@ -200,7 +200,7 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
             // Process serialization errors
             Err(err) => {
                 log::error!("err serializing tx: {}", err);
-                transaction_status.set(Some(TransactionStatus::Error(None)))
+                transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
             }
         };
     });
