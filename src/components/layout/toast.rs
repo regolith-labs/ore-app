@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::components::{Col, Row, Spinner, TransactionStatus, Updater};
+use crate::gateway::GatewayError;
 use crate::hooks::use_transaction_status;
 use crate::time::Duration;
 
@@ -10,10 +11,10 @@ pub fn ToastDisplay() -> Element {
     // If terminal status, hide after 5 seconds
     use_effect(move || {
         let mut transaction_status_signal = transaction_status.clone();
-        if let Some(transaction_status) = transaction_status.cloned() {
+        if let Some(transaction_status) = transaction_status.read().clone() {
             match transaction_status {
                 TransactionStatus::Denied
-                | TransactionStatus::Error
+                | TransactionStatus::Error(_)
                 | TransactionStatus::Timeout
                 | TransactionStatus::Done(_) => {
                     spawn(async move {
@@ -31,7 +32,7 @@ pub fn ToastDisplay() -> Element {
     let detail_class = "text-elements-lowEmphasis";
 
     rsx! {
-        if let Some(transaction_status) = transaction_status.cloned() {
+        if let Some(transaction_status) = transaction_status.read().clone() {
             match transaction_status {
                 TransactionStatus::Waiting => {
                     rsx! {
@@ -48,10 +49,18 @@ pub fn ToastDisplay() -> Element {
                         }
                     }
                 }
-                TransactionStatus::Error => {
+                // Remove option from transcation status & sub gatewayerror::Uknown for None into TransactionStatus::Error
+                TransactionStatus::Error(err) => {
+                    // Display different error messages based on the GatewayError type
+                    let error_message = match err {
+                        GatewayError::InsufficientSOL => "Insufficient SOL balance",
+                        GatewayError::Unknown => "Transaction failed",
+                        _ => "Transaction failed"
+                    };
+                    
                     rsx! {
                         Col { class: "{toast_class} border-l-4 border-red-500",
-                            span { class: "{title_class} my-auto", "Transaction failed" }
+                            span { class: "{title_class} my-auto", "{error_message}" }
                         }
                     }
                 }

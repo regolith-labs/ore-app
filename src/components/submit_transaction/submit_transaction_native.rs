@@ -2,13 +2,14 @@ use dioxus::prelude::*;
 use ore_types::request::TransactionType;
 use solana_sdk::{
     hash::Hash,
+    instruction::InstructionError,
     signature::Keypair,
-    transaction::{Transaction, VersionedTransaction},
+    transaction::{Transaction, TransactionError, VersionedTransaction},
 };
 
 use crate::{
     components::*,
-    gateway::{solana::SolanaGateway, GatewayResult, NativeRpc, Rpc},
+    gateway::{solana::SolanaGateway, GatewayResult, GatewayError, NativeRpc, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
@@ -33,8 +34,9 @@ pub fn submit_transaction(tx: VersionedTransaction, _tx_type: TransactionType) {
                 transaction_status.set(Some(TransactionStatus::Sending(0)));
                 // sign
                 if let Err(err) = sign_submit_confirm(&gateway.rpc, &signer.creator, tx).await {
-                    log::error!("{:?}", err);
-                    transaction_status.set(Some(TransactionStatus::Error));
+                    // log::error!("{:?}", err);
+                    let err_clone = err.clone();
+                    transaction_status.set(Some(TransactionStatus::Error(err_clone)));
                 }
             }
             Err(err) => {
@@ -65,6 +67,17 @@ async fn sign_submit_confirm(
     let mut transaction_status = use_transaction_status();
     // sign
     let (signed, _) = sign(rpc, signer, tx).await?;
+    
+    // simulate transaction to check for insufficient funds
+    let simulated_tx = rpc.simulate_transaction(&signed).await?;        
+
+    if let Some(err) = simulated_tx.err {
+        if let TransactionError::InstructionError(index, instruction_error) = err {
+            if matches!(instruction_error, InstructionError::Custom(1)) {
+                return Err(GatewayError::InsufficientSOL);
+            }
+        }
+    }
     // submit
     let sig = rpc.send_transaction(&signed).await?;
     // confirm

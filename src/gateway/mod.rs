@@ -12,11 +12,19 @@ pub use error::*;
 use serde_json::{json, Value};
 #[cfg(not(feature = "web"))]
 use solana_client::nonblocking::rpc_client::RpcClient;
+
+
 #[cfg(feature = "web")]
 use solana_client_wasm::WasmClient;
+
 use solana_sdk::{
-    hash::Hash, pubkey::Pubkey, signature::Signature, transaction::VersionedTransaction,
+    hash::Hash,
+    pubkey::Pubkey,
+    signature::Signature,
+    transaction::VersionedTransaction,
 };
+
+pub use utils::SimulateTransactionResponse;
 pub use utils::*;
 pub use wss::*;
 
@@ -101,6 +109,10 @@ pub trait Rpc {
         &self,
         transaction: &VersionedTransaction,
     ) -> GatewayResult<Signature>;
+    async fn simulate_transaction(
+        &self,
+        transaction: &VersionedTransaction,
+    ) -> GatewayResult<SimulateTransactionResponse>;    
 }
 
 #[cfg(not(feature = "web"))]
@@ -180,6 +192,23 @@ impl Rpc for NativeRpc {
             .await
             .map_err(From::from)
     }
+
+    async fn simulate_transaction(
+        &self,
+        transaction: &VersionedTransaction,
+    ) -> GatewayResult<SimulateTransactionResponse> {
+        match self.0.simulate_transaction(transaction).await {
+            Ok(response) => Ok(SimulateTransactionResponse {
+                err: response.value.err,
+                logs: response.value.logs,
+                units_consumed: response.value.units_consumed,
+            }),
+            Err(err) => {
+                log::error!("Simulation error: {:?}", err);
+                Err(From::from(err))
+            }
+        }
+    }
 }
 
 #[cfg(feature = "web")]
@@ -249,5 +278,21 @@ impl Rpc for WebRpc {
             .send_versioned_transaction(transaction)
             .await
             .map_err(From::from)
+    }
+    async fn simulate_transaction(
+        &self,
+        transaction: &VersionedTransaction,
+    ) -> GatewayResult<SimulateTransactionResponse> {
+        match self.0.simulate_transaction(transaction).await {
+            Ok(response) => Ok(SimulateTransactionResponse {
+                err: response.err,
+                logs: response.logs,
+                units_consumed: response.units_consumed,
+            }),
+            Err(err) => {
+                log::error!("Simulation error: {:?}", err);
+                Err(From::from(err))
+            }
+        }
     }
 }

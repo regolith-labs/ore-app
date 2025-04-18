@@ -79,6 +79,9 @@ pub fn use_pool_register_transaction() -> Resource<GatewayResult<VersionedTransa
             // Add jito tip
             ixs.push(tip_ix(&pubkey));
 
+            // Simulate transaction
+            // gateway.rpc.simulate_transaction
+
             // build transaction with priority fee
             let tx_with_priority_fee = Transaction::new_with_payer(&ixs, Some(&pubkey)).into();
             Ok(tx_with_priority_fee)

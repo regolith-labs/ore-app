@@ -44,7 +44,7 @@ fn use_boost_yield_resource(address: Pubkey) -> Resource<GatewayResult<BoostYiel
     })
 }
 
-pub fn use_boost_yield(mint_address: Pubkey) -> Resource<GatewayResult<BoostYield>> {
+pub fn _use_boost_yield(mint_address: Pubkey) -> Resource<GatewayResult<BoostYield>> {
     let boost_yields: HashMap<Pubkey, Resource<GatewayResult<BoostYield>>> = use_context();
     let boost_address = boost_pda(mint_address).0;
     if let Some(boost_yield) = boost_yields.get(&boost_address) {

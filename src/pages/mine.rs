@@ -2,11 +2,13 @@
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
-use solana_sdk::transaction::Transaction;
+use solana_sdk::transaction::{Transaction, VersionedTransaction, TransactionError};
+use solana_sdk::instruction::InstructionError;
+use crate::gateway::GatewayError;
 
 use crate::{
     components::*,
-    gateway::{pool::PoolGateway, GatewayError, GatewayResult},
+    gateway::{pool::PoolGateway, GatewayResult, Rpc},
     hooks::{
         build_commit_claim_instructions, on_transaction_done, use_gateway, use_member,
         use_member_record, use_member_record_balance, use_miner, use_miner_cores,
@@ -340,6 +342,7 @@ fn MinerRewards() -> Element {
     });
     // init claim transaction
     let mut claim_tx = use_signal(|| Err(GatewayError::RequestFailed));
+    let mut versioned_claim_tx = use_signal(|| Err(GatewayError::RequestFailed));
     use_effect(move || {
         if let (Some(Ok(member_db_balance)), Ok(member), Some(pool)) =
             (member_db_balance.cloned(), member.cloned(), pool.cloned())
@@ -351,7 +354,10 @@ fn MinerRewards() -> Element {
                         .await
                 {
                     let tx = Transaction::new_with_payer(&ixs, Some(&member.authority));
-                    claim_tx.set(Ok(tx));
+                    let tx_clone = tx.clone();
+                    claim_tx.set(Ok(tx_clone));
+                    let versioned_tx = VersionedTransaction::from(tx);
+                    versioned_claim_tx.set(Ok(versioned_tx));
                 }
             });
         }
@@ -395,7 +401,7 @@ fn MinerRewards() -> Element {
                     }
                 }
             }
-            MinerRewardsClaimButton { transaction: claim_tx, tx_type: TransactionType::PoolClaim }
+            MinerRewardsClaimButton { transaction: claim_tx, versioned_transaction: versioned_claim_tx, tx_type: TransactionType::PoolClaim }
         }
     }
 }
@@ -403,6 +409,7 @@ fn MinerRewards() -> Element {
 #[component]
 pub fn MinerRewardsClaimButton(
     transaction: Signal<GatewayResult<Transaction>>,
+    versioned_transaction: Signal<GatewayResult<VersionedTransaction>>,
     tx_type: TransactionType,
 ) -> Element {
     let pool_url = use_pool_url();
@@ -421,17 +428,42 @@ pub fn MinerRewardsClaimButton(
             disabled: !enabled,
             onclick: move |_| {
                 spawn(async move {
-                    if let (Some(pool_url), Ok(member), Ok(tx)) = (
+                    if let (Some(pool_url), Ok(member), Ok(tx), Ok(versioned_tx)) = (
                         pool_url.cloned(),
                         member.cloned(),
                         transaction.cloned(),
+                        versioned_transaction.cloned(),
                     ) {
                         transaction_status.set(Some(TransactionStatus::Waiting));
-                        let sign_partial = sign_transaction_partial(tx).await;
+                        let tx_for_signing = tx.clone();
+                        let tx_to_simulate = versioned_tx.clone();
+
+                        // Simulate transaction
+                        let gateway = use_gateway();
+                        log::info!("trying to simulate transaction before");
+                        match gateway.rpc.simulate_transaction(&tx_to_simulate).await {
+                            Ok(response) => {
+                                if let Some(err) = response.err {
+                                    if let TransactionError::InstructionError(_index, instruction_error) = err {
+                                        if matches!(instruction_error, InstructionError::Custom(1)) {
+                                            // Handle insufficient funds error
+                                            transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientSOL)));
+                                            return;
+                                        }
+                                    }
+                                }
+                            },
+                            Err(err) => {
+                                log::error!("Failed to simulate transaction: {:?}", err);
+                            }
+                        };
+
+                        // Sign the transaction
+                        let sign_partial = sign_transaction_partial(tx_for_signing).await;
+
                         match sign_partial {
                             Ok((tx, hash)) => {
                                 transaction_status.set(Some(TransactionStatus::Sending(0)));
-                                let gateway = use_gateway();
                                 match gateway
                                     .commit_claim(member.authority, pool_url, tx, hash)
                                     .await
@@ -443,13 +475,15 @@ pub fn MinerRewardsClaimButton(
                                             );
                                     }
                                     Err(err) => {
-                                        transaction_status.set(Some(TransactionStatus::Error));
+                                        // Clone the error for TransactionStatus::Error
+                                        transaction_status.set(Some(TransactionStatus::Error(err.clone())));
                                         log::error!("{:?}", err);
                                     }
                                 }
                             }
                             Err(err) => {
-                                transaction_status.set(Some(TransactionStatus::Error));
+                                // Clone the error for TransactionStatus::Error
+                                transaction_status.set(Some(TransactionStatus::Error(err.clone())));
                                 log::error!("{:?}", err);
                             }
                         }

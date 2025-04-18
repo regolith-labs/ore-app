@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 
 use dioxus::prelude::*;
 use ore_boost_api::state::Boost;
@@ -54,7 +53,7 @@ fn StakingHowItWorks() -> Element {
     }
 }
 
-fn StakingGeneratingYield() -> Element {
+fn _StakingGeneratingYield() -> Element {
     let boost_config = use_boost_config_wss();
     let boosts = use_all_boosts();
 
@@ -155,7 +154,7 @@ fn StakingBoostBudget(
                     }
                 }
             }
-            if let Some(selected_item) = *selected_item.read() {
+            if let Some(_selected_item) = *selected_item.read() {
                 StakingBudgetBreakdown {
                     title: "Miners".to_string(),
                     description: "Miners compete to earn rewards by expending hashpower, consuming energy and computational resources. This helps tie ORE to the physical economy, and allows miners to convert electricity into liquid financial capital.".to_string(),
