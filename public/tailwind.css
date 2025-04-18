@@ -593,8 +593,8 @@
   .top-16 {
     top: calc(var(--spacing) * 16);
   }
-  .top-72 {
-    top: calc(var(--spacing) * 72);
+  .top-88 {
+    top: calc(var(--spacing) * 88);
   }
   .-right-16 {
     right: calc(var(--spacing) * -16);
@@ -602,8 +602,8 @@
   .right-0 {
     right: calc(var(--spacing) * 0);
   }
-  .-bottom-72 {
-    bottom: calc(var(--spacing) * -72);
+  .-bottom-88 {
+    bottom: calc(var(--spacing) * -88);
   }
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
@@ -737,8 +737,14 @@
   .mt-32 {
     margin-top: calc(var(--spacing) * 32);
   }
+  .mt-48 {
+    margin-top: calc(var(--spacing) * 48);
+  }
   .mt-auto {
     margin-top: auto;
+  }
+  .mr-0 {
+    margin-right: calc(var(--spacing) * 0);
   }
   .mr-1 {
     margin-right: calc(var(--spacing) * 1);
@@ -773,6 +779,9 @@
   .-ml-6 {
     margin-left: calc(var(--spacing) * -6);
   }
+  .ml-0 {
+    margin-left: calc(var(--spacing) * 0);
+  }
   .ml-8 {
     margin-left: calc(var(--spacing) * 8);
   }
@@ -802,9 +811,6 @@
   }
   .table {
     display: table;
-  }
-  .h-1\/2 {
-    height: calc(1/2 * 100%);
   }
   .h-2 {
     height: calc(var(--spacing) * 2);
@@ -842,11 +848,11 @@
   .h-32 {
     height: calc(var(--spacing) * 32);
   }
-  .h-64 {
-    height: calc(var(--spacing) * 64);
-  }
   .h-72 {
     height: calc(var(--spacing) * 72);
+  }
+  .h-80 {
+    height: calc(var(--spacing) * 80);
   }
   .h-160 {
     height: calc(var(--spacing) * 160);
@@ -1200,6 +1206,9 @@
   .border-elements-gold {
     border-color: var(--color-elements-gold);
   }
+  .border-elements-highEmphasis {
+    border-color: var(--color-elements-highEmphasis);
+  }
   .border-elements-highEmphasis\/30 {
     border-color: color-mix(in oklab, var(--color-elements-highEmphasis) 30%, transparent);
   }
@@ -1208,6 +1217,9 @@
   }
   .border-elements-lowEmphasis\/40 {
     border-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 40%, transparent);
+  }
+  .border-elements-lowEmphasis\/50 {
+    border-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 50%, transparent);
   }
   .border-elements-midEmphasis {
     border-color: var(--color-elements-midEmphasis);
@@ -1262,9 +1274,6 @@
   }
   .bg-elements-midEmphasis\/10 {
     background-color: color-mix(in oklab, var(--color-elements-midEmphasis) 10%, transparent);
-  }
-  .bg-elements-purple {
-    background-color: var(--color-elements-purple);
   }
   .bg-elements-red {
     background-color: var(--color-elements-red);
@@ -1329,9 +1338,6 @@
   .p-5 {
     padding: calc(var(--spacing) * 5);
   }
-  .p-8 {
-    padding: calc(var(--spacing) * 8);
-  }
   .px-0 {
     padding-inline: calc(var(--spacing) * 0);
   }
@@ -1374,6 +1380,9 @@
   .py-5 {
     padding-block: calc(var(--spacing) * 5);
   }
+  .py-6 {
+    padding-block: calc(var(--spacing) * 6);
+  }
   .py-8 {
     padding-block: calc(var(--spacing) * 8);
   }
@@ -1388,6 +1397,9 @@
   }
   .pt-8 {
     padding-top: calc(var(--spacing) * 8);
+  }
+  .pt-16 {
+    padding-top: calc(var(--spacing) * 16);
   }
   .pt-32 {
     padding-top: calc(var(--spacing) * 32);
@@ -1764,10 +1776,24 @@
       }
     }
   }
+  .hover\:bg-elements-highEmphasis {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-elements-highEmphasis);
+      }
+    }
+  }
   .hover\:bg-elements-midEmphasis\/10 {
     &:hover {
       @media (hover: hover) {
         background-color: color-mix(in oklab, var(--color-elements-midEmphasis) 10%, transparent);
+      }
+    }
+  }
+  .hover\:text-black {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-black);
       }
     }
   }
@@ -1848,16 +1874,6 @@
   .sm\:top-0 {
     @media (width >= 40rem) {
       top: calc(var(--spacing) * 0);
-    }
-  }
-  .sm\:top-64 {
-    @media (width >= 40rem) {
-      top: calc(var(--spacing) * 64);
-    }
-  }
-  .sm\:-bottom-64 {
-    @media (width >= 40rem) {
-      bottom: calc(var(--spacing) * -64);
     }
   }
   .sm\:bottom-32 {
@@ -1980,11 +1996,6 @@
       gap: calc(var(--spacing) * 2);
     }
   }
-  .sm\:gap-8 {
-    @media (width >= 40rem) {
-      gap: calc(var(--spacing) * 8);
-    }
-  }
   .sm\:gap-16 {
     @media (width >= 40rem) {
       gap: calc(var(--spacing) * 16);
@@ -2035,6 +2046,11 @@
       padding-bottom: calc(var(--spacing) * 4);
     }
   }
+  .sm\:pb-8 {
+    @media (width >= 40rem) {
+      padding-bottom: calc(var(--spacing) * 8);
+    }
+  }
   .sm\:pb-16 {
     @media (width >= 40rem) {
       padding-bottom: calc(var(--spacing) * 16);
@@ -2080,9 +2096,9 @@
       top: calc(var(--spacing) * 0);
     }
   }
-  .md\:top-32 {
+  .md\:top-16 {
     @media (width >= 48rem) {
-      top: calc(var(--spacing) * 32);
+      top: calc(var(--spacing) * 16);
     }
   }
   .md\:-right-56 {
@@ -2100,9 +2116,9 @@
       right: calc(var(--spacing) * 0);
     }
   }
-  .md\:-bottom-32 {
+  .md\:-bottom-16 {
     @media (width >= 48rem) {
-      bottom: calc(var(--spacing) * -32);
+      bottom: calc(var(--spacing) * -16);
     }
   }
   .md\:bottom-0 {
@@ -2130,14 +2146,34 @@
       left: auto;
     }
   }
+  .md\:mx-0 {
+    @media (width >= 48rem) {
+      margin-inline: calc(var(--spacing) * 0);
+    }
+  }
+  .md\:mx-auto {
+    @media (width >= 48rem) {
+      margin-inline: auto;
+    }
+  }
   .md\:my-auto {
     @media (width >= 48rem) {
       margin-block: auto;
     }
   }
+  .md\:mt-0 {
+    @media (width >= 48rem) {
+      margin-top: calc(var(--spacing) * 0);
+    }
+  }
   .md\:mt-16 {
     @media (width >= 48rem) {
       margin-top: calc(var(--spacing) * 16);
+    }
+  }
+  .md\:mt-32 {
+    @media (width >= 48rem) {
+      margin-top: calc(var(--spacing) * 32);
     }
   }
   .md\:mr-auto {
@@ -2247,9 +2283,19 @@
       background-image: linear-gradient(var(--tw-gradient-stops));
     }
   }
-  .md\:py-24 {
+  .md\:py-32 {
     @media (width >= 48rem) {
-      padding-block: calc(var(--spacing) * 24);
+      padding-block: calc(var(--spacing) * 32);
+    }
+  }
+  .md\:pt-32 {
+    @media (width >= 48rem) {
+      padding-top: calc(var(--spacing) * 32);
+    }
+  }
+  .md\:pb-16 {
+    @media (width >= 48rem) {
+      padding-bottom: calc(var(--spacing) * 16);
     }
   }
   .md\:text-left {
