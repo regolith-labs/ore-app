@@ -808,7 +808,8 @@ fn Testimonial(class: Option<String>, data: TestimonialData) -> Element {
     let class = class.unwrap_or_default();
     rsx! {
         a {
-            class: "flex flex-col bg-elements-midEmphasis/10 rounded-md p-5 border-2 border-transparent hover:border-elements-highEmphasis transition-all duration-300 ease-in-out grow {class}",
+            // class: "flex flex-col bg-elements-midEmphasis/10 rounded-md p-5 border-2 border-transparent hover:border-elements-highEmphasis transition-all duration-300 ease-in-out grow {class}",
+            class: "flex flex-col bg-elements-midEmphasis/10 hover:bg-elements-midEmphasis/20 rounded-md p-5 transition-all duration-300 ease-in-out grow {class}",
             href: "{data.link}",
             target: "_blank",
             Row {
