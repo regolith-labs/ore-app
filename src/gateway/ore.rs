@@ -35,6 +35,7 @@ pub trait OreGateway {
     ) -> GatewayResult<AccessTokenResponse>;
     async fn link_x_account(
         &self,
+        user_id: String,
         msg: String,
         signature: Signature,
         address: Pubkey,
@@ -141,6 +142,45 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .send()
             .await
             .map_err(GatewayError::from)?;
+        
+        // Check for error response
+        if !resp.status().is_success() {            
+            
+            // Special handling for 409 Conflict (already exists)
+            if resp.status() == reqwest::StatusCode::CONFLICT {
+                // Get response text
+                let text = resp.text().await.unwrap_or_default();
+                log::info!("Error response text: {}", text);
+                
+                // Try to parse as JSON
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(&text) {
+                    // Check if it's an account_exists error
+                    if json.get("error").and_then(|e| e.as_str()) == Some("account_exists") {
+                        // Extract user_id and screen_name
+                        let user_id = json.get("user_id")
+                            .and_then(|id| id.as_str())
+                            .unwrap_or("unknown")
+                            .to_string();
+                        let screen_name = json.get("screen_name")
+                            .and_then(|name| name.as_str())
+                            .unwrap_or("unknown")
+                            .to_string();
+                            
+                        log::info!("Account exists error: user_id={}, screen_name={}", user_id, screen_name);
+                        
+                        return Err(GatewayError::XAccountExists { 
+                            user_id, 
+                            screen_name 
+                        });
+                    }
+                }
+            }
+            
+            // For all other errors, or if JSON parsing failed
+            return Err(GatewayError::RequestFailed);
+        }
+        
+        // Success path - deserialize JSON
         let body = resp.text().await.map_err(GatewayError::from)?;
         let access_token =
             serde_json::from_str::<AccessTokenResponse>(&body).map_err(GatewayError::from)?;
@@ -149,6 +189,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
 
     async fn link_x_account(
         &self,
+        user_id: String,
         msg: String,
         signature: Signature,
         address: Pubkey,
@@ -159,6 +200,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .http
             .post(url)
             .json(&LinkXAccountRequest {
+                user_id,
                 msg,
                 signature,
                 address,

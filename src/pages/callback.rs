@@ -9,7 +9,7 @@ use steel::Pubkey;
 
 use crate::{
     components::*,
-    gateway::ore::OreGateway,
+    gateway::{GatewayError, GatewayResult, ore::OreGateway},
     hooks::{use_gateway, use_wallet, Wallet},
 };
 
@@ -23,10 +23,11 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
                 .get_x_access_token(oauth_token, oauth_verifier)
                 .await
         }
+
+        
     });
 
     rsx! {
-
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
             gap: 8,
@@ -38,12 +39,50 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
             Col {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 gap: 8,
-                if let Some(Ok(access_token)) = access_token.cloned() {
-                    LinkAccount { access_token }
-                } else {
-                    "Loading..."
+                match access_token.cloned() {
+                    Some(Ok(token)) => rsx! { LinkAccount { access_token: token.clone() } },
+                    Some(Err(err)) => {
+                        match err {
+                            GatewayError::XAccountExists { user_id, screen_name } => {
+                                // Account already exists error
+                                rsx! { 
+                                    div { 
+                                        class: "p-4 border border-yellow-500 rounded", 
+                                        h3 { class: "font-bold", "X Account Already Linked" }
+                                        p { "The X account @{screen_name} has already been used in the waitlist registration." }
+                                        p { "Please try with a different X account." }
+                                    }
+                                }
+                            },
+                            _ => {
+                                // For all other errors
+                                let err_string = format!("{:?}", err);
+                                log::error!("X account linking error: {}", err_string);
+                                
+                                rsx! { 
+                                    div {
+                                        class: "p-4 border border-red-500 rounded",
+                                        h3 { class: "font-bold", "Error Connecting Account" }
+                                        p { "We couldn't connect your X account. Please try again later." }
+                                        p { class: "mt-2 text-sm text-red-700", "Details: {err_string}" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    None => rsx! { div { "Loading..." } },
                 }
             }
+        }
+    }
+}
+
+#[component]
+fn ErrorView(error: String) -> Element {
+    rsx! {
+        div {
+            class: "p-4 border border-red-500 rounded",
+            "Error getting access token: {error}"
         }
     }
 }
@@ -118,6 +157,7 @@ pub fn LinkAccountButton(access_token: AccessTokenResponse, pubkey: Pubkey) -> E
                                     log::info!("signed message: {}", sig);
                                     let response = use_gateway()
                                         .link_x_account(
+                                            access_token.user_id.clone(),
                                             msg,
                                             sig,
                                             pubkey,
