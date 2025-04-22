@@ -581,7 +581,7 @@ fn PieChart(class: Option<String>, data: Vec<TopHolder>) -> Element {
                 class: "w-full h-full md:h-96 md:w-96 lg:h-128 lg:w-128",
                 view_box: "-1.2 -1.2 2.4 2.4",
                 style: "transform: rotate(-90deg)",
-                for (path_d, label, percentage, idx, outer_start_x, outer_start_y, outer_end_x, outer_end_y) in path_data.clone() {
+                for (path_d, _label, _percentage, idx, _outer_start_x, _outer_start_y, _outer_end_x, _outer_end_y) in path_data.clone() {
                     path {
                         d: "{path_d}",
                         fill: if *selected.read() == idx { "#ECC771" } else { get_color(idx) },
@@ -594,7 +594,7 @@ fn PieChart(class: Option<String>, data: Vec<TopHolder>) -> Element {
                 }
             }
 
-            if let Some((_, label, percentage, idx, _, _, _, _)) = path_data.get(*selected.read()) {
+            if let Some((_, label, percentage, _idx, _, _, _, _)) = path_data.get(*selected.read()) {
                 Col {
                     class: "mx-auto text-center",
                     gap: 2,
