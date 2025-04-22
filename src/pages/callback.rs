@@ -118,6 +118,7 @@ pub fn LinkAccountButton(access_token: AccessTokenResponse, pubkey: Pubkey) -> E
                                     log::info!("signed message: {}", sig);
                                     let response = use_gateway()
                                         .link_x_account(
+                                            access_token.user_id.clone(),
                                             msg,
                                             sig,
                                             pubkey,
