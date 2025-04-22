@@ -376,7 +376,7 @@ fn Technology() -> Element {
                     }
                 }
 
-                Carousel {}
+                // Carousel {}
                 // Integrations {}
             }
         }
