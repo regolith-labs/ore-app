@@ -1073,6 +1073,9 @@
   .\[appearance\:textfield\] {
     appearance: textfield;
   }
+  .auto-rows-fr {
+    grid-auto-rows: minmax(0, 1fr);
+  }
   .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
@@ -1260,9 +1263,6 @@
   }
   .bg-black\/50 {
     background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
-  }
-  .bg-blue-500 {
-    background-color: var(--color-blue-500);
   }
   .bg-controls-primary {
     background-color: var(--color-controls-primary);

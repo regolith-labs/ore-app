@@ -143,7 +143,7 @@ fn Earning() -> Element {
                 detail: "Find a strategy that works for you."
             }
             div {
-                class: "grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto px-4",
+                class: "grid auto-rows-fr grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto px-4",
                 Card {
                     asset: asset!("/public/gpu.png"),
                     title: "Proof of work",
@@ -387,7 +387,7 @@ fn Integrations() -> Element {
 
     let get_border_class = |idx: usize| {
         if *selected.read() == idx {
-            "border-elements-midEmphasis"
+            "border-elements-highEmphasis"
         } else {
             "border-transparent"
         }
