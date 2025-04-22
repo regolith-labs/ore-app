@@ -1,6 +1,7 @@
 use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Config as BoostConfig, Stake};
 use ore_types::request::TransactionEvent;
+use serde::Deserialize;
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Signature;
 use std::str::FromStr;
@@ -9,6 +10,12 @@ use steel::AccountDeserialize;
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
 const ORE_API_URL: &str = "https://api.ore.supply";
+
+#[derive(Deserialize, Clone, PartialEq, Debug)]
+pub struct TopHolder {
+    pub address: String,
+    pub balance: f64,
+}
 
 pub trait OreGateway {
     // Accounts
@@ -20,6 +27,7 @@ pub trait OreGateway {
     // API
     async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64>;
     async fn get_ore_holders(&self) -> GatewayResult<u64>;
+    async fn get_ore_top_holders(&self) -> GatewayResult<Vec<TopHolder>>;
     async fn log_transaction_event(
         &self,
         transaction: TransactionEvent,
@@ -85,6 +93,21 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .map_err(GatewayError::from)?;
         let holders = resp.json::<u64>().await.map_err(GatewayError::from)?;
         Ok(holders)
+    }
+
+    async fn get_ore_top_holders(&self) -> GatewayResult<Vec<TopHolder>> {
+        let get_url = format!("{}/holders/top", ORE_API_URL);
+        let resp = self
+            .http
+            .get(get_url)
+            .send()
+            .await
+            .map_err(GatewayError::from)?;
+        let top_holders = resp
+            .json::<Vec<TopHolder>>()
+            .await
+            .map_err(GatewayError::from)?;
+        Ok(top_holders)
     }
 
     async fn log_transaction_event(

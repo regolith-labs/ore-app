@@ -4,10 +4,10 @@ use dioxus::prelude::*;
 use crate::{
     components::*,
     hooks::{use_ore_holders, use_ore_market_cap},
-    utils::format_abbreviated_number,
+    utils::{format_abbreviated_number, format_abbreviated_pubkey},
 };
 
-use crate::route::Route;
+use crate::{gateway::ore::TopHolder, route::Route};
 
 #[cfg(not(feature = "web"))]
 pub fn Landing() -> Element {
@@ -23,10 +23,10 @@ pub fn Landing() -> Element {
     rsx! {
         Hero {}
         Stats {}
-        Development {}
-        Liquidity {}
-        Tokenomics {}
-        Security {}
+        Earning {}
+        Mission {}
+        Technology {}
+        Distribution {}
         Community {}
         Faq {}
         Footer {}
@@ -38,7 +38,8 @@ fn Hero() -> Element {
     rsx! {
         Col {
             // class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-192",
-            class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-192",
+            // class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-192",
+            class: "relative w-full h-full max-w-screen min-h-screen 2xl:min-h-256",
             HeroBg {}
             LandingNavbar {}
             Col {
@@ -86,23 +87,23 @@ fn HeroTitle() -> Element {
     rsx! {
         Col {
             class: "gap-4 font-extended font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black mx-auto max-w-7xl px-2 sm:px-6 mb-auto",
-            Col {
-                // gap: 4,
-                span {
-                    class: "z-30",
-                    "Digital gold,"
-                }
-                span {
-                    class: "z-30",
-                    "reborn."
-                }
+            gap: 4,
+            span {
+                class: "z-30",
+                "Digital gold,"
+            }
+            span {
+                class: "z-30",
+                "reborn."
             }
             span {
                 class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-base sm:text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
+                // "Hard money for the age of AI."
+                "Hard money for the new internet."
                 // "Crypto for the rest of us."
                 // "Crypto for the many, not the few."
                 // "Hard money for the many, not the few."
-                "Hard money for the rest of us."
+                // "Hard money for the rest of us."
                 // "Fun to mine, easy to use, and defi-native."
                 // "Fun to mine, cheap to use, easy to custody, and defi-native."
             }
@@ -114,7 +115,7 @@ fn HeroTitle() -> Element {
                     class: "flex h-12 w-full md:w-min px-8 rounded-full controls-primary ml-0 md:ml-auto",
                     span {
                         class: "my-auto mx-auto text-nowrap font-semibold text-base font-sans",
-                        "Mine today →"
+                        "Start mining →"
                     }
                 }
                 // Link {
@@ -130,10 +131,10 @@ fn HeroTitle() -> Element {
     }
 }
 
-fn Development() -> Element {
+fn Earning() -> Element {
     rsx! {
         Col {
-            class: "w-screen h-full min-h-screen md:min-h-224 mt-16 font-extended font-bold text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis ",
+            class: "w-screen h-full min-h-screen md:min-h-224 mt-8 md:mt-16 font-extended font-bold text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis ",
             gap: 8,
             SectionCopy {
                 tip: "Earn",
@@ -147,28 +148,28 @@ fn Development() -> Element {
                     asset: asset!("/public/gpu.png"),
                     title: "Proof of work",
                     detail: "Convert raw available energy into ORE using a personal computer or GPU.",
-                    cta: "Learn more →",
+                    cta: "Mine now →",
                     route: Route::Mine {}.to_string()
                 }
                 Card {
                     asset: asset!("/public/liquidity.png"),
                     title: "Proof of liquidity",
                     detail: "Make markets more efficient for traders by providing liquidity to the ORE ecosystem.",
-                    cta: "Learn more →",
+                    cta: "Stake now →",
                     route: Route::Stake {}.to_string()
                 }
                 Card {
                     asset: asset!("/public/impressions.png"),
                     title: "Proof of post",
                     detail: "Get paid to create and share crypto content with your followers on social media.",
-                    cta: "Learn more →",
+                    cta: "Post now →",
                     route: Route::Mine {}.to_string()
                 }
                 Card {
                     asset: asset!("/public/seeker.png"),
                     title: "Proof of mobile",
                     detail: "Use a Solana Seeker mobile phone to mine ORE anywhere and everywhere you go.",
-                    cta: "Learn more →",
+                    cta: "Buy a phone →",
                     route: "https://solanamobile.com/",
                 }
             }
@@ -181,54 +182,30 @@ fn Card(asset: Asset, title: String, detail: String, cta: String, route: String)
     rsx! {
         Link {
             to: route,
-            class: "flex flex-col bg-elements-lowEmphasis/10 rounded-2xl cursor-pointer overflow-hidden group border-2 border-elements-lowEmphasis/50 hover:border-elements-highEmphasis transition-all duration-300 ease-in-out",
-            img {
-                class: "w-full h-72 object-cover overflow-hidden",
-                src: asset.to_string()
+            // class: "flex flex-col bg-elements-lowEmphasis/10 rounded-2xl cursor-pointer overflow-hidden group transition-all duration-300 ease-in-out",
+            class: "flex flex-col bg-elements-midEmphasis/10 hover:bg-elements-midEmphasis/20 rounded-2xl cursor-pointer overflow-hidden group transition-all duration-300 ease-in-out",
+            span {
+                class: "w-full h-72 group-hover:h-64 transition-all duration-300 ease-in-out pt-1 px-1",
+                img {
+                    class: "w-full h-full object-cover overflow-hidden rounded-2xl bg-transparent",
+                    src: asset.to_string()
+                }
             }
             Col {
-                class: "px-8 py-6 max-w-xl mx-auto",
+                class: "px-4 md:px-6 py-4 max-w-xl mx-auto relative",
                 gap: 2,
                 p {
                     class: "font-wide font-semibold text-xl text-elements-highEmphasis text-left",
                     "{title}"
-                    span {
-                        class: "opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out",
-                        " →"
-                    }
                 }
                 p {
                     class: "text-elements-midEmphasis text-lg font-sans font-normal text-left",
                     "{detail}"
                 }
-            }
-        }
-    }
-}
-
-#[cfg(feature = "web")]
-fn Mining() -> Element {
-    rsx! {
-        Col {
-            class: "w-screen h-full min-h-screen md:min-h-224 mt-16",
-            Col {
-                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between",
-                Col {
-                    gap: 8,
-                    SectionCopyResponsive {
-                        tip: "Fair launch",
-                        title: "Mine crypto.",
-                        subtitle: "In one click.",
-                    }
-                    MiningGuide {}
-                    SectionCtas {
-                        primary_title: "Start mining →",
-                        primary_route: Route::Mine {},
-                        secondary_title: "Learn more",
-                        secondary_route: Route::Mine {}
-                    }
+                p {
+                    class: "text-elements-highEmphasis text-sm font-semibold font-wide text-left absolute -bottom-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 ease-in-out",
+                    "{cta}"
                 }
-                MiningIllustration {}
             }
         }
     }
@@ -236,151 +213,18 @@ fn Mining() -> Element {
 
 #[cfg(feature = "web")]
 #[component]
-fn SectionCtas(
-    primary_title: String,
-    primary_route: Route,
-    secondary_title: String,
-    secondary_route: Route,
-) -> Element {
+fn SectionCta(title: String, route: String) -> Element {
     rsx! {
         Col {
-            class: "sm:flex-row mx-auto md:ml-0 h-min mt-8 px-4",
+            // class: "sm:flex-row mx-auto md:ml-0 h-min mt-8 px-4",
+            class: "sm:flex-row ml-0 h-min mt-8 px-4",
             gap: 4,
             Link {
-                to: primary_route,
+                to: route,
                 class: "flex h-12 w-full sm:w-min px-8 rounded-full controls-primary",
                 span {
                     class: "my-auto mx-auto text-nowrap font-semibold",
-                    "{primary_title}"
-                }
-            }
-            // Link {
-            //     to: secondary_route,
-            //     class: "flex h-12 w-full sm:w-min px-8 rounded-full text-elements-lowEmphasis hover:text-elements-highEmphasis transition-colors hover:bg-controls-tertiaryHover duration-300 ease-in-out",
-            //     span {
-            //         class: "my-auto mx-auto text-nowrap font-semibold",
-            //         "{secondary_title}"
-            //     }
-            // }
-        }
-    }
-}
-
-#[cfg(feature = "web")]
-fn MiningIllustration() -> Element {
-    rsx! {
-        div {
-            class: "relative h-160 w-screen md:w-auto overflow-hidden shrink-0 pointer-events-none",
-            div {
-                class: "absolute inset-0 z-0",
-                HashAnimation {}
-            }
-            img {
-                class: "relative w-full h-full pb-8 pt-8 object-contain z-10",
-                src: asset!("/public/rock-phone.png")
-            }
-        }
-    }
-}
-
-#[cfg(feature = "web")]
-fn HashAnimation() -> Element {
-    let mut hash_text = use_signal(|| "".to_string());
-    let length = 512;
-    let _batch_size = 64;
-    let _update_interval = 500;
-    let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    use_effect(move || {
-        // Initialize with random characters
-        let mut current_hash = String::with_capacity(length);
-        for _ in 0..length {
-            let idx = fastrand::usize(..chars.len());
-            current_hash.push(chars.chars().nth(idx).unwrap());
-        }
-        hash_text.set(current_hash.clone());
-
-        // spawn(async move {
-        // Change 10 random positions
-        // loop {
-        //     let mut new_hash = current_hash.clone();
-        //     for _ in 0..batch_size {
-        //         let pos = fastrand::usize(..length);
-        //         let idx = fastrand::usize(..chars.len());
-        //         new_hash.replace_range(pos..pos+1, &chars.chars().nth(idx).unwrap().to_string());
-        //     }
-        //     current_hash = new_hash;
-        //     hash_text.set(current_hash.clone());
-        //     async_std::task::sleep(std::time::Duration::from_millis(update_interval)).await;
-        // }
-        // });
-    });
-
-    rsx! {
-        Col {
-            class: "absolute opacity-20 font-mono font-semibold text-5xl text-elements-lowEmphasis whitespace-normal break-words top-0 left-0 md:right-0 -right-16 bottom-0 z-10",
-            span {
-                class: "bottom-0",
-                "{hash_text}"
-            }
-        }
-        Col {
-            class: "absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b md:bg-gradient-to-r from-black to-transparent z-20",
-        }
-    }
-}
-
-#[cfg(feature = "web")]
-fn MiningGuide() -> Element {
-    rsx! {
-        Col {
-            class: "md:w-lg h-min mx-auto md:mr-auto md:ml-0 px-4",
-            gap: 8,
-            GuideStep {
-                step: "1",
-                title: "Connect wallet",
-                detail: "Authenticate with any Solana wallet."
-            }
-            GuideStep {
-                step: "2",
-                title: "Join a pool",
-                detail: "Lower costs and avoid transaction fees."
-            }
-            GuideStep {
-                step: "3",
-                title: "Earn rewards",
-                detail: "Convert energy into cryptocurrency."
-            }
-        }
-    }
-}
-
-#[cfg(feature = "web")]
-#[component]
-fn GuideStep(step: String, title: String, detail: String) -> Element {
-    rsx! {
-        Row {
-            class: "w-full h-min",
-            gap: 4,
-            div {
-                class: "flex text-sm h-8 w-8 font-semibold border border-elements-lowEmphasis shrink-0 rounded",
-                span {
-                    class: "mx-auto my-auto w-min h-min text-center",
-                    "{step}"
-                }
-            }
-            Col {
-                class: "w-full h-min",
-                div {
-                    class: "flex text-xl font-semibold text-elements-highEmphasis h-8",
-                    span {
-                        class: "my-auto",
-                        "{title}"
-                    }
-                }
-                span {
-                    class: "text-lg text-elements-midEmphasis",
-                    "{detail}"
+                    "{title}"
                 }
             }
         }
@@ -388,18 +232,13 @@ fn GuideStep(step: String, title: String, detail: String) -> Element {
 }
 
 #[cfg(feature = "web")]
-fn Liquidity() -> Element {
+fn Mission() -> Element {
     rsx! {
         Col {
-            // class: "relative w-screen h-full min-h-screen md:min-h-192 mt-16 md:mt-32",
-            class: "relative w-screen h-full min-h-screen mt-16 md:mt-32",
-            // img {
-            //     class: "absolute left-0 right-0 bottom-0 mx-auto max-w-7xl w-full object-contain z-0",
-            //     src: asset!("/public/ribbon.png")
-            // }
+            class: "relative w-screen h-full min-h-screen mt-16 md:mt-32 2xl:min-h-256",
             LandingGlobe {}
             Col {
-                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10 px-4",
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 2,
@@ -409,48 +248,69 @@ fn Liquidity() -> Element {
                         subtitle: "Electronic cash.",
                     }
                     span {
-                        class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is a borderless currency for the open internet — not issued or controlled by any bank. It can be earned, spent, and moved without middlemen."
+                        // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        "ORE is a public currency built for the open internet — not issued or controlled by any state. It can be earned, spent, and moved without middlemen."
                     }
-                    Col {
-                        class: "px-4 mt-8 mb-4 mx-auto md:mx-0 text-elements-lowEmphasis text-base font-medium",
-                        gap: 4,
-                        Row {
-                            gap: 4,
-                            BoltIcon {
-                                class: "w-5 h-5 my-auto"
-                            }
-                            span {
-                                class: "my-auto text-elements-midEmphasis",
-                                "Fast transactions"
+                    Data {
+                        data_points: vec![
+                            DataPoint {
+                                title: "1 sec".to_string(),
+                                detail: "Instant settlement".to_string(),
+                                ore: false,
+                            },
+                            DataPoint {
+                                title: "$0.00064".to_string(),
+                                detail: "Median transaction fee".to_string(),
+                                ore: false,
+                            },
+                            DataPoint {
+                                title: "180+".to_string(),
+                                detail: "Available countries".to_string(),
+                                ore: false,
+                            },
+                        ]
+                    }
+                    SectionCta {
+                        title: "Learn more →",
+                        route: Route::Stake {},
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct DataPoint {
+    title: String,
+    detail: String,
+    ore: bool,
+}
+
+#[component]
+fn Data(data_points: Vec<DataPoint>) -> Element {
+    rsx! {
+        Col {
+            class: "px-4 mt-8 mb-4 mx-0 text-elements-lowEmphasis text-base font-medium",
+            gap: 8,
+            for data_point in data_points {
+                Col {
+                    gap: 2,
+                    Row {
+                        class: "pl-4 border-l-2 border-elements-gold gap-1.5 text-elements-highEmphasis  font-semibold text-2xl",
+                        if data_point.ore {
+                            OreIcon {
+                                class: "h-5 w-5 my-auto",
                             }
                         }
-                        Row {
-                            gap: 4,
-                            TagIcon {
-                                class: "w-5 h-5 my-auto"
-                            }
-                            span {
-                                class: "my-auto text-elements-midEmphasis",
-                                "Low fees"
-                            }
-                        }
-                        Row {
-                            gap: 4,
-                            GlobeIcon {
-                                class: "w-5 h-5 my-auto"
-                            }
-                            span {
-                                class: "my-auto text-elements-midEmphasis",
-                                "Global availability"
-                            }
+                        span {
+                            "{data_point.title}"
                         }
                     }
-                    SectionCtas {
-                        primary_title: "Read whitepaper →",
-                        primary_route: Route::Stake {},
-                        secondary_title: "Learn more",
-                        secondary_route: Route::Stake {}
+                    span {
+                        class: "text-elements-lowEmphasis pl-4 border-l-2 border-transparent",
+                        "{data_point.detail}"
                     }
                 }
             }
@@ -459,29 +319,133 @@ fn Liquidity() -> Element {
 }
 
 #[cfg(feature = "web")]
-fn Tokenomics() -> Element {
+fn Technology() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen mt-48 md:mt-0",
+            class: "relative w-screen h-full min-h-screen mt-80 md:mt-0 2xl:min-h-256",
             Col {
-                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10 px-4",
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
+                gap: 8,
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 2,
                     SectionCopyResponsive {
-                        tip: "Tech",
+                        tip: "Technology",
                         title: "Hard money.",
                         subtitle: "Smart currency.",
                     }
                     span {
-                        class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is digital scarcity built for the age of decentralized finance – fun to mine, easy to move, safe to stake, and endlessly programmable."
+                        // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        "ORE brings digital scarcity to the world of decentralized finance – fun to mine, easy to move, safe to stake, and endlessly programmable."
                     }
-                    SectionCtas {
-                        primary_title: "Build now →",
-                        primary_route: Route::Trade {},
-                        secondary_title: "Learn more",
-                        secondary_route: Route::Trade {}
+                    // Data {
+                    //     data_points: vec![
+                    //         DataPoint {
+                    //             title: "9%".to_string(),
+                    //             detail: "Native yield".to_string(),
+                    //             ore: false,
+                    //         },
+                    //         DataPoint {
+                    //             title: "$1.4m".to_string(),
+                    //             detail: "Total liquidity".to_string(),
+                    //             ore: false,
+                    //         },
+                    //         // DataPoint {
+                    //         //     title: "1495".to_string(),
+                    //         //     detail: "Participating stakers".to_string(),
+                    //         //     ore: false,
+                    //         // },
+                    //     ]
+                    // }
+                    // Row {
+                    //     class: "px-4 mt-8",
+                    //     gap: 2,
+                    //     img {
+                    //         class: "w-12 h-12 rounded-full border-2 border-elements-lowEmphasis/50",
+                    //         src: asset!("/public/kamino_logo.jpg"),
+                    //     }
+                    //     img {
+                    //         class: "w-12 h-12 rounded-full border-2 border-elements-lowEmphasis/50",
+                    //         src: asset!("/public/meteora_logo.jpg"),
+                    //     }
+                    // }
+                    SectionCta {
+                        title: "Explore defi →",
+                        route: Route::Stake {},
+                    }
+                }
+
+                Carousel {}
+                // Integrations {}
+            }
+        }
+    }
+}
+
+fn Integrations() -> Element {
+    let selected = use_signal(|| 0);
+    rsx! {
+        Col {
+            class: "w-full gap-2 mt-8 md:mt-32 text-left my-auto",
+            IntegrationCard {
+                title: "Solana".to_string(),
+                detail: "ORE runs on Solana, one of the fastest and most popular blockchains in the world.".to_string(),
+                selected: selected.clone(),
+                idx: 0,
+            }
+            IntegrationCard {
+                title: "Meteora".to_string(),
+                detail: "ORE integrates with Meteora to power markets for ORE-SOL and ORE-USDC trading pairs.".to_string(),
+                selected: selected.clone(),
+                idx: 1,
+            }
+            IntegrationCard {
+                title: "Kamino".to_string(),
+                detail: "ORE integrates with Kamino to offer a concentrated liquidity strategy for ORE-SOL markets.".to_string(),
+                selected: selected.clone(),
+                idx: 2,
+            }
+            IntegrationCard {
+                title: "Drift".to_string(),
+                detail: "ORE is coming soon to Drift, a leading perpetual futures and lending platform.".to_string(),
+                selected: selected.clone(),
+                idx: 3,
+            }
+        }
+    }
+}
+
+#[component]
+fn IntegrationCard(title: String, detail: String, selected: Signal<usize>, idx: usize) -> Element {
+    let height_class = if *selected.read() == idx {
+        "h-32 opacity-100 mt-2" // Add margin-top when expanded
+    } else {
+        "h-0 opacity-0 mt-0" // Remove margin-top when collapsed
+    };
+
+    let opacity_class = if *selected.read() == idx {
+        "opacity-100"
+    } else {
+        "opacity-0 -translate-y-2"
+    };
+
+    rsx! {
+        button {
+            class: "w-full transition-all duration-300 ease-in-out rounded-xl bg-elements-midEmphasis/10 hover:bg-elements-midEmphasis/20",
+            onclick: move |_| selected.set(idx),
+            Col {
+                class: "p-4", // Remove gap from Col
+                span {
+                    class: "font-medium text-elements-highEmphasis text-xl font-semibold text-left",
+                    "{title}"
+                }
+                div {
+                    class: "relative text-elements-midEmphasis transition-all duration-300 ease-in-out {height_class} overflow-hidden text-left",
+                    "{detail}"
+                    span {
+                        class: "absolute text-nowrap left-0 bottom-0 text-elements-highEmphasis text-sm font-semibold transition-all duration-300 ease-in-out {opacity_class}",
+                        "Learn more →"
                     }
                 }
             }
@@ -490,33 +454,199 @@ fn Tokenomics() -> Element {
 }
 
 #[cfg(feature = "web")]
-fn Security() -> Element {
+fn Distribution() -> Element {
+    use crate::{
+        hooks::{use_ore_supply, use_ore_top_holders},
+        utils::format_whole_number,
+    };
+
+    let supply = use_ore_supply();
+    let holders = use_ore_holders();
+    let top_holders = use_ore_top_holders();
+
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen",
+            class: "relative w-screen h-full min-h-screen 2xl:min-h-256",
             Col {
-                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10 px-4",
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
+                gap: 8,
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 2,
                     SectionCopyResponsive {
-                        tip: "Security",
+                        tip: "Distribution",
                         title: "Fair launch.",
                         subtitle: "Open source.",
                     }
                     span {
-                        class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE has no pre-sale, insider deals, or private allocations. All tokens are mined in the open by audited smart contracts and owned by the community."
+                        // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        "ORE has no pre-sale or insider allocations. All tokens are mined transparently via a public smart contract and owned by the community."
                     }
-                    SectionCtas {
-                        primary_title: "Explore data →",
-                        primary_route: Route::Trade {},
-                        secondary_title: "Learn more",
-                        secondary_route: Route::Trade {}
+                    Data {
+                        data_points: vec![
+                            DataPoint {
+                                title: if let Some(Ok(holders)) = *holders.read() {
+                                    format_whole_number(holders.to_string())
+                                } else {
+                                    "–".to_string()
+                                },
+                                detail: "Token holders".to_string(),
+                                ore: false,
+                            },
+                            DataPoint {
+                                title: if let Some(Ok(supply)) = supply.cloned() {
+                                    format_whole_number(supply.ui_amount_string)
+                                } else {
+                                    "–".to_string()
+                                },
+                                detail: "Circulating supply".to_string(),
+                                ore: true,
+                            },
+                            DataPoint {
+                                title: "1440".to_string(),
+                                detail: "Daily emissions".to_string(),
+                                ore: true,
+                            },
+                        ]
+                    }
+                    SectionCta {
+                        title: "Review data →",
+                        route: "https://dune.com/ore/ore",
+                    }
+                }
+                if let Some(Ok(top_holders)) = top_holders.cloned() {
+                    PieChart {
+                        class: "md:pt-32",
+                        data: top_holders
+                    }
+                } else {
+                    "Loading..."
+                }
+            }
+        }
+    }
+}
+
+#[cfg(feature = "web")]
+#[component]
+fn PieChart(class: Option<String>, data: Vec<TopHolder>) -> Element {
+    // fn PieChart(class: Option<String>, data: Vec<(String, f64)>) -> Element {
+
+    use std::str::FromStr;
+
+    use steel::Pubkey;
+    let class = class.unwrap_or_default();
+    let total: f64 = data.iter().map(|top_holder| top_holder.balance).sum();
+    let mut current_angle = 0.0;
+    let mut selected = use_signal(|| 0_usize);
+
+    let mut path_data = Vec::new();
+    for (idx, top_holder) in data.iter().enumerate() {
+        let percentage = top_holder.balance / total;
+        let angle = percentage * 360.0;
+        let end_angle = current_angle + angle;
+
+        // Outer arc
+        let outer_start_x = (current_angle * std::f64::consts::PI / 180.0).cos();
+        let outer_start_y = (current_angle * std::f64::consts::PI / 180.0).sin();
+        let outer_end_x = (end_angle * std::f64::consts::PI / 180.0).cos();
+        let outer_end_y = (end_angle * std::f64::consts::PI / 180.0).sin();
+
+        // Inner arc (scaled down to 0.6 of outer radius)
+        let inner_start_x = outer_start_x * 0.6;
+        let inner_start_y = outer_start_y * 0.6;
+        let inner_end_x = outer_end_x * 0.6;
+        let inner_end_y = outer_end_y * 0.6;
+
+        let large_arc = if angle > 180.0 { 1 } else { 0 };
+
+        path_data.push((
+            format!(
+                "M {} {} A 1 1 0 {} 1 {} {} L {} {} A 0.6 0.6 0 {} 0 {} {} Z",
+                outer_start_x,
+                outer_start_y,
+                large_arc,
+                outer_end_x,
+                outer_end_y,
+                inner_end_x,
+                inner_end_y,
+                large_arc,
+                inner_start_x,
+                inner_start_y
+            ),
+            top_holder.address.clone(),
+            percentage,
+            idx,
+            outer_start_x,
+            outer_start_y,
+            outer_end_x,
+            outer_end_y,
+        ));
+
+        current_angle = end_angle;
+    }
+
+    let get_scale_class = |idx: usize| {
+        if *selected.read() == idx {
+            "scale-105"
+        } else {
+            ""
+        }
+    };
+
+    rsx! {
+        Col {
+            class: "{class}",
+            gap: 4,
+            svg {
+                class: "w-full h-full md:h-96 md:w-96",
+                view_box: "-1.2 -1.2 2.4 2.4",
+                style: "transform: rotate(-90deg)",
+                for (path_d, label, percentage, idx, outer_start_x, outer_start_y, outer_end_x, outer_end_y) in path_data.clone() {
+                    path {
+                        d: "{path_d}",
+                        fill: if *selected.read() == idx { "#ECC771" } else { get_color(idx) },
+                        // class: "transition-all duration-300 cursor-pointer hover:scale-105",
+                        class: "transition-all duration-300 cursor-pointer {get_scale_class(idx)}",
+                        onmouseover: move |_| {
+                            selected.set(idx);
+                        }
+                    }
+                }
+            }
+
+            if let Some((_, label, percentage, idx, _, _, _, _)) = path_data.get(*selected.read()) {
+                Col {
+                    class: "mx-auto text-center",
+                    gap: 2,
+                    span {
+                        class: "text-lg font-semibold text-elements-highEmphasis",
+                        if let Ok(address) = Pubkey::from_str(&label) {
+                            "{format_abbreviated_pubkey(address)}"
+                        } else {
+                            "{label}"
+                        }
+                    }
+                    span {
+                        class: "text-lg text-elements-midEmphasis",
+                        "{(percentage * 100.0):.5}%"
                     }
                 }
             }
         }
+    }
+}
+
+fn get_color(index: usize) -> &'static str {
+    match index % 6 {
+        0 => "rgba(142, 142, 147, 0.8)",
+        1 => "rgba(99, 99, 102, 0.8)",
+        2 => "rgba(72, 72, 74, 0.8)",
+        3 => "rgba(58, 58, 60, 0.8)",
+        4 => "rgba(44, 44, 46, 0.8)",
+        5 => "rgba(28, 28, 30, 0.8)",
+        _ => "rgba(0, 0, 0, 0.8)",
     }
 }
 
@@ -527,7 +657,7 @@ fn Community() -> Element {
             class: "relative w-full h-full mx-auto max-w-7xl pt-32",
             SectionCopy {
                 tip: "Community",
-                title: "Join a movement.",
+                title: "Join the movement.",
                 detail: "Discover why thousands of people around the world love ORE."
             }
             Testimonials {}
@@ -797,25 +927,25 @@ fn Faq() -> Element {
                 align: Align::Left,
                 tip: "Support",
                 title: "FAQ",
-                detail: "Commonly asked questions."
+                detail: "Get answers to common questions."
             }
             Col {
                 class: "w-full h-min justify-start md:mt-16",
                 FaqItem {
                     question: "What is ORE?",
-                    answer: "ORE is a \"digital gold\" primitive for decentralized finance. It is a programmable commodity money, mineable via proof-of-work on the Solana blockchain."
+                    answer: "ORE is a new \"digital gold\" primitive for decentralized finance. It is a scarce crypto commodity, mineable via proof-of-work on the Solana blockchain."
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "Only a small handful of people can afford to mine and use digital gold on the Bitcoin blockchain. ORE is digital gold for the rest of us –  a commodity money that is fun to mine, easy to self-custody, and native interoperability with decentralized finance on the most active blockchain in the world."
+                    answer: "Only a small handful of people in the world can truly afford to mine and use digital gold on the Bitcoin blockchain. ORE is digital gold for the rest of us –  a hard money asset that is fun to mine, easy to use, and natively interoperable with decentralized finance."
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "ORE can be mined in a variety of ways. Miners can deploy hashpower with home computers or GPUs to convert available energy into ORE. Whereas others can mine on special mobile devices such as the Solana Seeker. Users can even earn tokens by completing other tasks such as providing liquidity or posting content on social media."
+                    answer: "There are many ways to mine ORE. Users can deploy hashpower using a home computer or GPU to convert available energy into tokens. Users can even mine on special mobile devices such as the Solana Seeker, and earn tokens by providing liquidity in public markets, or even by posting content on social media."
                 }
                 FaqItem {
                     question: "Is it secure?",
-                    answer: "ORE has been thoroughly audited by two independent auditing firms. The code is open source and has been battled tested in production. The development team is committed to permenantly freezing the protocol in the near future to guarantee longterm security."
+                    answer: "ORE has been thoroughly audited by two independent auditing firms. The smart contracts are open source and has been battled tested in production. The development team is committed to permanently freezing the protocol in the near future to guarantee longterm security."
                 }
             }
         }
@@ -916,19 +1046,32 @@ fn SectionCopy(
 #[component]
 fn SectionCopyResponsive(tip: Option<String>, title: String, subtitle: Option<String>) -> Element {
     rsx! {
+        // SectionCopy {
+        //     class: "hidden md:flex w-full text-nowrap",
+        //     align: Align::Left,
+        //     tip: tip.clone(),
+        //     title: title.clone(),
+        //     subtitle: subtitle.clone(),
+        // }
+        // SectionCopy {
+        //     class: "md:hidden",
+        //     tip: tip.clone(),
+        //     title: title.clone(),
+        //     subtitle: subtitle.clone(),
+        // }
         SectionCopy {
-            class: "hidden md:flex w-full text-nowrap",
+            class: "flex w-full text-nowrap",
             align: Align::Left,
             tip: tip.clone(),
             title: title.clone(),
             subtitle: subtitle.clone(),
         }
-        SectionCopy {
-            class: "md:hidden",
-            tip: tip.clone(),
-            title: title.clone(),
-            subtitle: subtitle.clone(),
-        }
+        // SectionCopy {
+        //     class: "md:hidden",
+        //     tip: tip.clone(),
+        //     title: title.clone(),
+        //     subtitle: subtitle.clone(),
+        // }
     }
 }
 

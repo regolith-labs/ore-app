@@ -179,7 +179,7 @@ fn IdleTableRowTitle(token: Token, stake: Signal<GatewayResult<Stake>>) -> Eleme
                     }
                     span {
                         class: "font-medium my-auto text-xs text-elements-midEmphasis/50 px-1.5 py-0 rounded bg-elements-lowEmphasis/40",
-                        "Idle"
+                        "Native"
                     }
                 }
                 if let Some(Some(balance)) = balance.cloned() {

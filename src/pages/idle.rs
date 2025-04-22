@@ -24,7 +24,7 @@ pub fn Idle() -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake ORE",
-                subtitle: "Stake unpaired ORE and earn the idle yield rate."
+                subtitle: "Stake ORE and earn the native yield rate."
             }
             Col {
                 gap: 16,
@@ -74,7 +74,7 @@ fn Deposits(stake: Signal<GatewayResult<Stake>>) -> Element {
     rsx! {
         TitledSignalRow {
             title: "Deposits",
-            description: "The amount of ORE you have deposited in the protocol. This ORE is \"idle\" and thus earns the native idle yield rate.",
+            description: "The amount of ORE you have deposited in the protocol. This ORE is \"idle\" and thus earns the native yield rate.",
             signal: stake,
             com: |stake| {
                 rsx! {
