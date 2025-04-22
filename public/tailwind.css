@@ -1261,6 +1261,9 @@
   .bg-black\/50 {
     background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
   }
+  .bg-blue-500 {
+    background-color: var(--color-blue-500);
+  }
   .bg-controls-primary {
     background-color: var(--color-controls-primary);
   }
@@ -2178,6 +2181,11 @@
   .md\:mt-32 {
     @media (width >= 48rem) {
       margin-top: calc(var(--spacing) * 32);
+    }
+  }
+  .md\:mt-48 {
+    @media (width >= 48rem) {
+      margin-top: calc(var(--spacing) * 48);
     }
   }
   .md\:mr-auto {

@@ -235,7 +235,7 @@ fn SectionCta(title: String, route: String) -> Element {
 fn Mission() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen mt-16 md:mt-32 2xl:min-h-256",
+            class: "relative w-screen h-full min-h-screen mt-16 md:mt-48 2xl:min-h-256",
             LandingGlobe {}
             Col {
                 class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
