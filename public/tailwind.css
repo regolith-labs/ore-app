@@ -725,9 +725,6 @@
   .-mt-6 {
     margin-top: calc(var(--spacing) * -6);
   }
-  .mt-0 {
-    margin-top: calc(var(--spacing) * 0);
-  }
   .mt-1 {
     margin-top: calc(var(--spacing) * 1);
   }
@@ -821,9 +818,6 @@
   .table {
     display: table;
   }
-  .h-0 {
-    height: calc(var(--spacing) * 0);
-  }
   .h-2 {
     height: calc(var(--spacing) * 2);
   }
@@ -857,14 +851,14 @@
   .h-24 {
     height: calc(var(--spacing) * 24);
   }
-  .h-32 {
-    height: calc(var(--spacing) * 32);
-  }
   .h-72 {
     height: calc(var(--spacing) * 72);
   }
   .h-80 {
     height: calc(var(--spacing) * 80);
+  }
+  .h-92 {
+    height: calc(var(--spacing) * 92);
   }
   .h-160 {
     height: calc(var(--spacing) * 160);
@@ -1031,10 +1025,6 @@
   }
   .-translate-y-1\/2 {
     --tw-translate-y: calc(calc(1/2 * 100%) * -1);
-    translate: var(--tw-translate-x) var(--tw-translate-y);
-  }
-  .-translate-y-2 {
-    --tw-translate-y: calc(var(--spacing) * -2);
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
   .translate-x-0 {
@@ -1243,9 +1233,6 @@
   }
   .border-elements-lowEmphasis\/40 {
     border-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 40%, transparent);
-  }
-  .border-elements-lowEmphasis\/50 {
-    border-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 50%, transparent);
   }
   .border-elements-midEmphasis {
     border-color: var(--color-elements-midEmphasis);
@@ -2228,6 +2215,11 @@
       height: calc(var(--spacing) * 96);
     }
   }
+  .md\:h-128 {
+    @media (width >= 48rem) {
+      height: calc(var(--spacing) * 128);
+    }
+  }
   .md\:min-h-224 {
     @media (width >= 48rem) {
       min-height: calc(var(--spacing) * 224);
@@ -2304,6 +2296,11 @@
       padding-block: calc(var(--spacing) * 32);
     }
   }
+  .md\:pt-0 {
+    @media (width >= 48rem) {
+      padding-top: calc(var(--spacing) * 0);
+    }
+  }
   .md\:pt-32 {
     @media (width >= 48rem) {
       padding-top: calc(var(--spacing) * 32);
@@ -2371,6 +2368,16 @@
   .lg\:flex {
     @media (width >= 64rem) {
       display: flex;
+    }
+  }
+  .lg\:h-128 {
+    @media (width >= 64rem) {
+      height: calc(var(--spacing) * 128);
+    }
+  }
+  .lg\:w-128 {
+    @media (width >= 64rem) {
+      width: calc(var(--spacing) * 128);
     }
   }
   .lg\:w-xl {

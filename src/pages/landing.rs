@@ -249,8 +249,8 @@ fn Mission() -> Element {
                     }
                     span {
                         // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is a public currency built for the open internet — not issued or controlled by any state. It can be earned, spent, and moved without middlemen."
+                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-xl ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        "ORE is a public currency for the open internet — not issued or controlled by any state. It can be earned, spent, and used without banks or middlemen."
                     }
                     Data {
                         data_points: vec![
@@ -298,7 +298,7 @@ fn Data(data_points: Vec<DataPoint>) -> Element {
                 Col {
                     gap: 2,
                     Row {
-                        class: "pl-4 border-l-2 border-elements-gold gap-1.5 text-elements-highEmphasis  font-semibold text-2xl",
+                        class: "pl-4 border-l-2 border-elements-gold gap-1.5 text-elements-highEmphasis font-semibold text-2xl",
                         if data_point.ore {
                             OreIcon {
                                 class: "h-5 w-5 my-auto",
@@ -330,123 +330,101 @@ fn Technology() -> Element {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 2,
                     SectionCopyResponsive {
-                        tip: "Technology",
+                        tip: "DeFi",
                         title: "Hard money.",
                         subtitle: "Smart currency.",
                     }
                     span {
                         // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-lg ml-0 selection:bg-elements-highEmphasis selection:text-black",
                         "ORE brings digital scarcity to the world of decentralized finance – fun to mine, easy to move, safe to stake, and endlessly programmable."
                     }
-                    // Data {
-                    //     data_points: vec![
-                    //         DataPoint {
-                    //             title: "9%".to_string(),
-                    //             detail: "Native yield".to_string(),
-                    //             ore: false,
-                    //         },
-                    //         DataPoint {
-                    //             title: "$1.4m".to_string(),
-                    //             detail: "Total liquidity".to_string(),
-                    //             ore: false,
-                    //         },
-                    //         // DataPoint {
-                    //         //     title: "1495".to_string(),
-                    //         //     detail: "Participating stakers".to_string(),
-                    //         //     ore: false,
-                    //         // },
-                    //     ]
-                    // }
-                    // Row {
-                    //     class: "px-4 mt-8",
-                    //     gap: 2,
-                    //     img {
-                    //         class: "w-12 h-12 rounded-full border-2 border-elements-lowEmphasis/50",
-                    //         src: asset!("/public/kamino_logo.jpg"),
-                    //     }
-                    //     img {
-                    //         class: "w-12 h-12 rounded-full border-2 border-elements-lowEmphasis/50",
-                    //         src: asset!("/public/meteora_logo.jpg"),
-                    //     }
-                    // }
+
+                    Integrations {}
+
                     SectionCta {
-                        title: "Explore defi →",
+                        title: "Explore DeFi →",
                         route: Route::Stake {},
                     }
                 }
 
-                // Carousel {}
-                // Integrations {}
+                img {
+                    class: "w-full h-full h-92 md:mt-32 md:h-128 lg:h-128 rounded-2xl object-cover overflow-hidden",
+                    src: asset!("/public/iphone-staking.png"),
+                }
             }
         }
     }
+}
+
+#[derive(Clone, PartialEq)]
+struct Integration {
+    name: String,
+    detail: String,
 }
 
 fn Integrations() -> Element {
-    let selected = use_signal(|| 0);
+    let mut selected = use_signal(|| 0);
+
+    let data = vec![
+        Integration {
+            name: "Meteora".to_string(),
+            detail: "Meteora powers market making and price discovery for ORE-SOL and ORE-USDC trading pairs.".to_string(),
+        },
+        Integration {
+            name: "Kamino".to_string(), 
+            detail: "Kamino provides a yield generation strategy for staking in the ORE-SOL concentrated liquidity pool.".to_string(),
+        },
+        Integration {
+            name: "Drift".to_string(),
+            detail: "Drift operates a leading perpetual futures exchange and lending platform on Solana (coming soon).".to_string(),
+        },
+        Integration {
+            name: "Jupiter".to_string(),
+            detail: "Coming soon".to_string(),
+        },
+    ];
+
+    let get_border_class = |idx: usize| {
+        if *selected.read() == idx {
+            "border-elements-midEmphasis"
+        } else {
+            "border-transparent"
+        }
+    };
+
     rsx! {
         Col {
-            class: "w-full gap-2 mt-8 md:mt-32 text-left my-auto",
-            IntegrationCard {
-                title: "Solana".to_string(),
-                detail: "ORE runs on Solana, one of the fastest and most popular blockchains in the world.".to_string(),
-                selected: selected.clone(),
-                idx: 0,
-            }
-            IntegrationCard {
-                title: "Meteora".to_string(),
-                detail: "ORE integrates with Meteora to power markets for ORE-SOL and ORE-USDC trading pairs.".to_string(),
-                selected: selected.clone(),
-                idx: 1,
-            }
-            IntegrationCard {
-                title: "Kamino".to_string(),
-                detail: "ORE integrates with Kamino to offer a concentrated liquidity strategy for ORE-SOL markets.".to_string(),
-                selected: selected.clone(),
-                idx: 2,
-            }
-            IntegrationCard {
-                title: "Drift".to_string(),
-                detail: "ORE is coming soon to Drift, a leading perpetual futures and lending platform.".to_string(),
-                selected: selected.clone(),
-                idx: 3,
-            }
-        }
-    }
-}
-
-#[component]
-fn IntegrationCard(title: String, detail: String, selected: Signal<usize>, idx: usize) -> Element {
-    let height_class = if *selected.read() == idx {
-        "h-32 opacity-100 mt-2" // Add margin-top when expanded
-    } else {
-        "h-0 opacity-0 mt-0" // Remove margin-top when collapsed
-    };
-
-    let opacity_class = if *selected.read() == idx {
-        "opacity-100"
-    } else {
-        "opacity-0 -translate-y-2"
-    };
-
-    rsx! {
-        button {
-            class: "w-full transition-all duration-300 ease-in-out rounded-xl bg-elements-midEmphasis/10 hover:bg-elements-midEmphasis/20",
-            onclick: move |_| selected.set(idx),
-            Col {
-                class: "p-4", // Remove gap from Col
-                span {
-                    class: "font-medium text-elements-highEmphasis text-xl font-semibold text-left",
-                    "{title}"
+            class: "px-4 mt-8",
+            gap: 4,
+            Row {
+                gap: 2,
+                img {
+                    class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(0)}",
+                    src: asset!("/public/meteora_logo.jpg"),
+                    onmouseenter: move |_| selected.set(0)
                 }
-                div {
-                    class: "relative text-elements-midEmphasis transition-all duration-300 ease-in-out {height_class} overflow-hidden text-left",
-                    "{detail}"
-                    span {
-                        class: "absolute text-nowrap left-0 bottom-0 text-elements-highEmphasis text-sm font-semibold transition-all duration-300 ease-in-out {opacity_class}",
-                        "Learn more →"
-                    }
+                img {
+                    class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(1)}",
+                    src: asset!("/public/kamino_logo.jpg"),
+                    onmouseenter: move |_| selected.set(1)
+                }
+                img {
+                    class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(2)}",
+                    src: asset!("/public/drift-logo.webp"),
+                    onmouseenter: move |_| selected.set(2)
+                }
+            }
+            Col {
+                class: "max-w-md w-full pl-1",
+                gap: 2,
+                span {
+                    class: "text-elements-midEmphasis font-semibold",
+                    "{data[*selected.read()].name}"
+                }
+                span {
+                    class: "text-elements-lowEmphasis",
+                    "{data[*selected.read()].detail}"
                 }
             }
         }
@@ -466,7 +444,7 @@ fn Distribution() -> Element {
 
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen 2xl:min-h-256",
+            class: "relative w-screen h-full min-h-screen 2xl:min-h-256 mt-16 md:mt-0",
             Col {
                 class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
                 gap: 8,
@@ -474,13 +452,13 @@ fn Distribution() -> Element {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 2,
                     SectionCopyResponsive {
-                        tip: "Distribution",
+                        tip: "Supply",
                         title: "Fair launch.",
                         subtitle: "Open source.",
                     }
                     span {
                         // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-lg mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-lg ml-0 selection:bg-elements-highEmphasis selection:text-black",
                         "ORE has no pre-sale or insider allocations. All tokens are mined transparently via a public smart contract and owned by the community."
                     }
                     Data {
@@ -600,7 +578,7 @@ fn PieChart(class: Option<String>, data: Vec<TopHolder>) -> Element {
             class: "{class}",
             gap: 4,
             svg {
-                class: "w-full h-full md:h-96 md:w-96",
+                class: "w-full h-full md:h-96 md:w-96 lg:h-128 lg:w-128",
                 view_box: "-1.2 -1.2 2.4 2.4",
                 style: "transform: rotate(-90deg)",
                 for (path_d, label, percentage, idx, outer_start_x, outer_start_y, outer_end_x, outer_end_y) in path_data.clone() {
@@ -654,7 +632,7 @@ fn get_color(index: usize) -> &'static str {
 fn Community() -> Element {
     rsx! {
         Col {
-            class: "relative w-full h-full mx-auto max-w-7xl pt-32",
+            class: "relative w-full h-full mx-auto max-w-7xl pt-32 md:pt-0",
             SectionCopy {
                 tip: "Community",
                 title: "Join the movement.",
@@ -937,15 +915,15 @@ fn Faq() -> Element {
                 }
                 FaqItem {
                     question: "Why should I care?",
-                    answer: "Only a small handful of people in the world can truly afford to mine and use digital gold on the Bitcoin blockchain. ORE is digital gold for the rest of us –  a hard money asset that is fun to mine, easy to use, and natively interoperable with decentralized finance."
+                    answer: "Only a small handful of people in the world can truly afford to mine and use digital gold on the Bitcoin blockchain. ORE is digital gold for everyone else –  a hard money asset that is fun to mine, easy to use, and natively interoperable with decentralized finance."
                 }
                 FaqItem {
                     question: "How does mining work?",
-                    answer: "There are many ways to mine ORE. Users can deploy hashpower using a home computer or GPU to convert available energy into tokens. Users can even mine on special mobile devices such as the Solana Seeker, and earn tokens by providing liquidity in public markets, or even by posting content on social media."
+                    answer: "There are a variety of ways to mine ORE. Users can deploy a home computer or GPU to convert available hashpower into tokens. Users can even mine on special mobile devices such as the Solana Seeker, earn tokens by providing liquidity in public markets, or even get paid to post content on social media."
                 }
                 FaqItem {
                     question: "Is it secure?",
-                    answer: "ORE has been thoroughly audited by two independent auditing firms. The smart contracts are open source and has been battled tested in production. The development team is committed to permanently freezing the protocol in the near future to guarantee longterm security."
+                    answer: "ORE has been thoroughly audited by two independent auditing firms. The smart contracts are open source and have been battled tested in production. The development team is committed to permanently freezing the protocol in the near future to guarantee longterm security."
                 }
             }
         }
