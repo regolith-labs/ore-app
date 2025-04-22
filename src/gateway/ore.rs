@@ -35,6 +35,7 @@ pub trait OreGateway {
     ) -> GatewayResult<AccessTokenResponse>;
     async fn link_x_account(
         &self,
+        user_id: String,
         msg: String,
         signature: Signature,
         address: Pubkey,
@@ -149,6 +150,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
 
     async fn link_x_account(
         &self,
+        user_id: String,
         msg: String,
         signature: Signature,
         address: Pubkey,
@@ -159,6 +161,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .http
             .post(url)
             .json(&LinkXAccountRequest {
+                user_id,
                 msg,
                 signature,
                 address,
