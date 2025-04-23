@@ -99,6 +99,13 @@ body {
     animation: var(--animate-wallet-drawer-slide);
   }
 
+  .scrollbar-hide {
+    scrollbar-width: none;
+    /* For Firefox */
+    -ms-overflow-style: none;
+    /* For Internet Explorer and Edge */
+  }
+
   .loading {
     @apply transition bg-gray-800 animate-pulse;
   }
