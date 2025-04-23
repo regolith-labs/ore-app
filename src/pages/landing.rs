@@ -437,7 +437,7 @@ fn Integrations() -> Element {
                 img {
                     class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(2)}",
                     src: asset!("/public/kamino_logo.jpg"),
-                    onmouseenter: move |_| selected.set(1)
+                    onmouseenter: move |_| selected.set(2)
                 }
                 img {
                     class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(3)}",
