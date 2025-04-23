@@ -404,6 +404,7 @@ fn Integrations() -> Element {
             name: "Drift".to_string(),
             detail: "Drift operates a leading perpetual futures exchange and lending platform on Solana (coming soon).".to_string(),
         },  
+        
     ];
 
     let get_border_class = |idx: usize| {
@@ -431,13 +432,18 @@ fn Integrations() -> Element {
                 }
                 img {
                     class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(1)}",
-                    src: asset!("/public/kamino_logo.jpg"),
+                    src: asset!("/public/orca_logo.png"),
                     onmouseenter: move |_| selected.set(1)
                 }
                 img {
                     class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(2)}",
-                    src: asset!("/public/drift-logo.webp"),
+                    src: asset!("/public/kamino_logo.jpg"),
                     onmouseenter: move |_| selected.set(2)
+                }
+                img {
+                    class: "w-12 h-12 rounded-full border-2 p-1 cursor-pointer transition-all {get_border_class(3)}",
+                    src: asset!("/public/drift_logo.webp"),
+                    onmouseenter: move |_| selected.set(3)
                 }
             }
             Col {
