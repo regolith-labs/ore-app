@@ -40,7 +40,11 @@ pub trait OreGateway {
         signature: Signature,
         address: Pubkey,
         access_token: String,
-    ) -> GatewayResult<Signature>;
+    ) -> GatewayResult<i64>;
+    async fn validate_waitlist_status(
+        &self,        
+        address: Pubkey,
+    ) -> GatewayResult<bool>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -143,37 +147,40 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .await
             .map_err(GatewayError::from)?;
         
-        // Check for error response
+        // Check for error response 
         if !resp.status().is_success() {            
             
-            // Special handling for 409 Conflict (already exists)
+            // Special handling for 409 Conflict (x account already exists with solana address)
             if resp.status() == reqwest::StatusCode::CONFLICT {
                 // Get response text
-                let text = resp.text().await.unwrap_or_default();
-                log::info!("Error response text: {}", text);
-                
-                // Try to parse as JSON
-                if let Ok(json) = serde_json::from_str::<serde_json::Value>(&text) {
-                    // Check if it's an account_exists error
-                    if json.get("error").and_then(|e| e.as_str()) == Some("account_exists") {
-                        // Extract user_id and screen_name
-                        let user_id = json.get("user_id")
-                            .and_then(|id| id.as_str())
-                            .unwrap_or("unknown")
-                            .to_string();
-                        let screen_name = json.get("screen_name")
-                            .and_then(|name| name.as_str())
-                            .unwrap_or("unknown")
-                            .to_string();
-                            
-                        log::info!("Account exists error: user_id={}, screen_name={}", user_id, screen_name);
-                        
-                        return Err(GatewayError::XAccountExists { 
-                            user_id, 
-                            screen_name 
-                        });
+                let text = match resp.text().await {
+                    Ok(text) => text,
+                    Err(e) => {
+                        log::error!("Failed to read error response body: {}", e);
+                        return Err(GatewayError::RequestFailed);
                     }
+                };
+                
+                // Attempt to parse the JSON for user details
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(&text) {
+                    // Extract screen_name and solana_address                    
+                    let screen_name = json.get("screen_name")
+                        .and_then(|name| name.as_str())
+                        .unwrap_or("unknown")
+                        .to_string();
+                    let solana_address = json.get("solana_address")
+                        .and_then(|addr| addr.as_str())
+                        .unwrap_or("unknown")
+                        .to_string();
+                        
+                    return Err(GatewayError::XAccountExists { 
+                        screen_name,
+                        solana_address
+                    });
                 }
+                
+                // If we couldn't parse the response, return a generic error
+                return Err(GatewayError::RequestFailed);
             }
             
             // For all other errors, or if JSON parsing failed
@@ -194,7 +201,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         signature: Signature,
         address: Pubkey,
         access_token: String,
-    ) -> GatewayResult<Signature> {
+    ) -> GatewayResult<i64> {
         let url = format!("{}/oauth/x/link_account", ORE_API_URL);
         let resp = self
             .http
@@ -210,7 +217,46 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .await
             .map_err(GatewayError::from)?;
         let body = resp.text().await.map_err(GatewayError::from)?;
-        let sig = Signature::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
-        Ok(sig)
+        let waitlist_num = i64::from_str(&body).map_err(|_| GatewayError::RequestFailed)?;
+        Ok(waitlist_num)
     }
+
+    async fn validate_waitlist_status(
+        &self,        
+        address: Pubkey,
+    ) -> GatewayResult<bool> {
+        let url = format!("{}/oauth/x/check_waitlist", ORE_API_URL);
+        
+        let resp = self
+            .http
+            .get(url)
+            .query(&[("address", address.to_string())])
+            .send()
+            .await
+            .map_err(|e| {
+                log::error!("Failed to send request: {:?}", e);
+                GatewayError::from(e)
+            })?;    
+        
+        // Check if the response was successful
+        if !resp.status().is_success() {
+            return Err(GatewayError::RequestFailed);
+        }
+        
+        let body = resp.text().await.map_err(GatewayError::from)?;
+        
+        // Handle empty response
+        if body.trim().is_empty() {
+            log::warn!("Received empty response body");
+            return Ok(false); // Assume not on waitlist if response is empty
+        }
+        
+        // Parse the response as a simple boolean
+        let waitlist_status = serde_json::from_str::<bool>(&body).map_err(|e| {
+            GatewayError::from(e)
+        })?;
+    
+        Ok(waitlist_status)
+    }
+    
 }

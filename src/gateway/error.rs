@@ -33,7 +33,7 @@ pub enum GatewayError {
     NoWalletsFound,
     InvalidWalletName,
     InsufficientFunds,
-    XAccountExists { user_id: String, screen_name: String },
+    XAccountExists {screen_name: String, solana_address: String },
 }
 
 impl From<anyhow::Error> for GatewayError {
