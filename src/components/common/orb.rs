@@ -73,7 +73,7 @@ pub fn HeroBg() -> Element {
             class: "absolute top-0 left-0 right-0 bottom-0",
             dangerous_inner_html: r#"
                 <spline-viewer
-                    style="height: 100%; overflow: visible;" 
+                    style="height: 100%; overflow: visible;"
                     url="https://prod.spline.design/KhvpG2ZZ2ELOEVO9/scene.splinecode"
                 />
             "#

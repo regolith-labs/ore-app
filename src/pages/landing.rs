@@ -86,26 +86,22 @@ fn LaunchButton() -> Element {
 fn HeroTitle() -> Element {
     rsx! {
         Col {
-            class: "gap-4 font-extended font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black mx-auto max-w-7xl px-2 sm:px-6 mb-auto",
+            class: "max-w-7xl px-2 sm:px-6 mb-auto",
             gap: 4,
-            span {
-                class: "z-30",
-                "Digital gold,"
+            Col {
+                class: "gap-2 md:gap-4 font-extended font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis selection:bg-elements-highEmphasis selection:text-black mx-auto",
+                span {
+                    class: "z-30",
+                    "Digital gold,"
+                }
+                span {
+                    class: "z-30",
+                    "reborn."
+                }
             }
             span {
-                class: "z-30",
-                "reborn."
-            }
-            span {
-                class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-base sm:text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
-                // "Hard money for the age of AI."
-                "Hard money for the new internet."
-                // "Crypto for the rest of us."
-                // "Crypto for the many, not the few."
-                // "Hard money for the many, not the few."
-                // "Hard money for the rest of us."
-                // "Fun to mine, easy to use, and defi-native."
-                // "Fun to mine, cheap to use, easy to custody, and defi-native."
+                class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
+                "Hard money for the age of DeFi."
             }
             Col {
                 class: "md:flex-row ml-0 md:mx-auto h-min mt-4",
@@ -162,15 +158,15 @@ fn Earning() -> Element {
                     asset: asset!("/public/impressions.png"),
                     title: "Proof of post",
                     detail: "Get paid to create and share crypto content with your followers on social media.",
-                    cta: "Post now →",
-                    route: Route::Mine {}.to_string()
+                    cta: "Coming soon",
+                    // route: Route::Mine {}.to_string()
                 }
                 Card {
                     asset: asset!("/public/seeker.png"),
                     title: "Proof of mobile",
                     detail: "Use a Solana Seeker mobile phone to mine ORE anywhere and everywhere you go.",
-                    cta: "Buy a phone →",
-                    route: "https://solanamobile.com/",
+                    cta: "Coming soon",
+                    // route: "https://solanamobile.com/",
                 }
             }
         }
@@ -178,12 +174,37 @@ fn Earning() -> Element {
 }
 
 #[component]
-fn Card(asset: Asset, title: String, detail: String, cta: String, route: String) -> Element {
+fn Card(asset: Asset, title: String, detail: String, cta: String, route: Option<String>) -> Element {
     rsx! {
-        Link {
-            to: route,
-            // class: "flex flex-col bg-elements-lowEmphasis/10 rounded-2xl cursor-pointer overflow-hidden group transition-all duration-300 ease-in-out",
-            class: "flex flex-col bg-elements-midEmphasis/10 hover:bg-elements-midEmphasis/20 rounded-2xl cursor-pointer overflow-hidden group transition-all duration-300 ease-in-out",
+        if let Some(route) = route {
+            Link {
+                class: "bg-elements-midEmphasis/10 hover:bg-elements-midEmphasis/20 rounded-2xl cursor-pointer overflow-hidden group transition-all duration-300 ease-in-out",
+                to: route,
+                CardContent {
+                    asset: asset,
+                    title: title,
+                    detail: detail,
+                    cta: cta,
+                }
+            }
+        } else {
+            CardContent {
+                class: "bg-elements-midEmphasis/10 hover:bg-elements-midEmphasis/20 rounded-2xl cursor-pointer overflow-hidden group transition-all duration-300 ease-in-out",
+                asset: asset,
+                title: title,
+                detail: detail,
+                cta: cta,
+            }
+        }
+    }
+}
+
+#[component]
+fn CardContent(asset: Asset, title: String, detail: String, cta: String, class: Option<String>) -> Element {
+    let class = class.unwrap_or_default();
+    rsx! {
+        Col {
+            class: "{class}",
             span {
                 class: "w-full h-72 group-hover:h-64 transition-all duration-300 ease-in-out pt-1 px-1",
                 img {
@@ -271,10 +292,10 @@ fn Mission() -> Element {
                             },
                         ]
                     }
-                    SectionCta {
-                        title: "Learn more →",
-                        route: Route::Stake {},
-                    }
+                    // SectionCta {
+                    //     title: "Learn more →",
+                    //     route: Route::Stake {},
+                    // }
                 }
             }
         }
@@ -331,7 +352,7 @@ fn Technology() -> Element {
                     gap: 2,
                     SectionCopyResponsive {
                         tip: "DeFi",
-                        title: "Hard money.",
+                        title: "Sound money.",
                         subtitle: "Smart currency.",
                     }
                     span {
@@ -349,7 +370,7 @@ fn Technology() -> Element {
                 }
 
                 img {
-                    class: "w-full h-full h-92 md:mt-32 md:h-128 lg:h-128 rounded-2xl object-cover overflow-hidden",
+                    class: "w-full h-92 md:mt-32 md:h-128 lg:h-128 rounded-2xl object-cover overflow-hidden",
                     src: asset!("/public/iphone-staking.png"),
                 }
             }
@@ -372,17 +393,17 @@ fn Integrations() -> Element {
             detail: "Meteora powers market making and price discovery for ORE-SOL and ORE-USDC trading pairs.".to_string(),
         },
         Integration {
+            name: "Orca".to_string(),
+            detail: "Orca powers concentrated liquidity pools for ORE-SOL trading pairs.".to_string(),
+        },
+        Integration {
             name: "Kamino".to_string(), 
-            detail: "Kamino provides a yield generation strategy for staking in the ORE-SOL concentrated liquidity pool.".to_string(),
+            detail: "Kamino provides an automated staking strategy for ORE concentrated liquidity pools.".to_string(),
         },
         Integration {
             name: "Drift".to_string(),
             detail: "Drift operates a leading perpetual futures exchange and lending platform on Solana (coming soon).".to_string(),
-        },
-        Integration {
-            name: "Jupiter".to_string(),
-            detail: "Coming soon".to_string(),
-        },
+        },  
     ];
 
     let get_border_class = |idx: usize| {
@@ -397,6 +418,10 @@ fn Integrations() -> Element {
         Col {
             class: "px-4 mt-8",
             gap: 4,
+            span {
+                class: "text-elements-lowEmphasis ",
+                "Integrations"
+            }
             Row {
                 gap: 2,
                 img {
@@ -418,12 +443,12 @@ fn Integrations() -> Element {
             Col {
                 class: "max-w-md w-full pl-1",
                 gap: 2,
+                // span {
+                //     class: "text-elements-midEmphasis font-semibold",
+                //     "{data[*selected.read()].name}"
+                // }
                 span {
-                    class: "text-elements-midEmphasis font-semibold",
-                    "{data[*selected.read()].name}"
-                }
-                span {
-                    class: "text-elements-lowEmphasis",
+                    class: "text-elements-midEmphasis",
                     "{data[*selected.read()].detail}"
                 }
             }

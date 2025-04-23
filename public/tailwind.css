@@ -1282,9 +1282,6 @@
   .bg-elements-lowEmphasis {
     background-color: var(--color-elements-lowEmphasis);
   }
-  .bg-elements-lowEmphasis\/10 {
-    background-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 10%, transparent);
-  }
   .bg-elements-lowEmphasis\/40 {
     background-color: color-mix(in oklab, var(--color-elements-lowEmphasis) 40%, transparent);
   }
@@ -2282,6 +2279,11 @@
   .md\:justify-end {
     @media (width >= 48rem) {
       justify-content: flex-end;
+    }
+  }
+  .md\:gap-4 {
+    @media (width >= 48rem) {
+      gap: calc(var(--spacing) * 4);
     }
   }
   .md\:gap-8 {
