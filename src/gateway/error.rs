@@ -22,7 +22,18 @@ pub enum GatewayError {
     KeyringNoEntry,
     BincodeSerialize,
     BincodeDeserialize,
+    SaveWalletConfig,
+    UpdateWalletConfig,
+    ConfigNotFound,
+    NoConfigOrKeypairFound,
+    InvalidPrivateKey,
+    NoKeychainEntries,
     Unknown,
+    UnableToDeriveKeypair,
+    NoWalletsFound,
+    InvalidWalletName,
+    InsufficientFunds,
+    XAccountExists {screen_name: String, solana_address: String },
 }
 
 impl From<anyhow::Error> for GatewayError {
