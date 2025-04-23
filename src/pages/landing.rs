@@ -469,7 +469,7 @@ fn Distribution() -> Element {
     };
 
     let supply = use_ore_supply();
-    let holders = use_ore_holders();
+    // let holders = use_ore_holders();
     let top_holders = use_ore_top_holders();
 
     rsx! {
@@ -494,13 +494,9 @@ fn Distribution() -> Element {
                     Data {
                         data_points: vec![
                             DataPoint {
-                                title: if let Some(Ok(holders)) = *holders.read() {
-                                    format_whole_number(holders.to_string())
-                                } else {
-                                    "–".to_string()
-                                },
-                                detail: "Token holders".to_string(),
-                                ore: false,
+                                title: "1440".to_string(),
+                                detail: "Daily emissions".to_string(),
+                                ore: true,
                             },
                             DataPoint {
                                 title: if let Some(Ok(supply)) = supply.cloned() {
@@ -512,8 +508,8 @@ fn Distribution() -> Element {
                                 ore: true,
                             },
                             DataPoint {
-                                title: "1440".to_string(),
-                                detail: "Daily emissions".to_string(),
+                                title: "5,000,000".to_string(),
+                                detail: "Max supply".to_string(),
                                 ore: true,
                             },
                         ]
