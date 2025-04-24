@@ -34,6 +34,7 @@ pub enum GatewayError {
     InvalidWalletName,
     InsufficientFunds,
     XAccountExists {screen_name: String, solana_address: String },
+    InsufficientSOL,
 }
 
 impl From<anyhow::Error> for GatewayError {

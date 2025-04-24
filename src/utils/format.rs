@@ -1,3 +1,5 @@
+use steel::Pubkey;
+
 pub fn format_abbreviated_number(amount: f64) -> String {
     if amount >= 1_000_000_000.0 {
         format!("{:.1}B", amount / 1_000_000_000.0)
@@ -7,6 +9,29 @@ pub fn format_abbreviated_number(amount: f64) -> String {
         format!("{:.1}k", amount / 1_000.0)
     } else {
         format!("{:.1}", amount)
+    }
+}
+
+pub fn format_whole_number(amount_string: String) -> String {
+    // Remove any decimal portion
+    let whole_part = amount_string.split('.').next().unwrap_or(&amount_string);
+
+    // Convert to numeric to remove any existing commas
+    if let Ok(num) = whole_part.replace(',', "").parse::<u64>() {
+        if num >= 1_000_000 {
+            format!(
+                "{},{:03},{:03}",
+                num / 1_000_000,
+                (num % 1_000_000) / 1000,
+                num % 1000
+            )
+        } else if num >= 1_000 {
+            format!("{},{:03}", num / 1000, num % 1000)
+        } else {
+            num.to_string()
+        }
+    } else {
+        amount_string
     }
 }
 
@@ -55,11 +80,20 @@ pub fn format_time_since(timestamp: u64) -> String {
     }
 }
 
-pub fn format_bps_as_percent(bps: f64) -> String {
+pub fn _format_bps_as_percent(bps: f64) -> String {
     let percent = bps / ore_boost_api::consts::DENOMINATOR_BPS as f64 * 100.0;
     if percent < 0.1 {
         format!("{:.2}%", percent)
     } else {
         format!("{:.1}%", percent)
     }
+}
+
+pub fn format_abbreviated_pubkey(pubkey: Pubkey) -> String {
+    let pubkey_str = pubkey.to_string();
+    format!(
+        "{}...{}",
+        &pubkey_str[..4],
+        &pubkey_str[pubkey_str.len() - 4..]
+    )
 }

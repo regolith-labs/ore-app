@@ -1,6 +1,6 @@
 [package]
 name = "ore-app"
-version = "1.2.7"
+version = "1.2.13"
 description = "Liquid digital gold."
 edition = "2021"
 license = "Apache-2.0"
@@ -100,14 +100,14 @@ num_cpus = "1.16.0"
 num-format = "0.4.4"
 objc = { version = "0.2", optional = true, features = [] }
 once_cell = "1.18"
-ore-api = "3.4.0"
-ore-boost-api = "3.0.1"
+ore-api = "3.6.0"
+ore-boost-api = "4.0.0"
 ore-miner-types = { path = "./miner-types" }
 ore-miner-web = { path = "./miner-web", features = [
   "app",
 ], default-features = false, optional = true }
-ore-pool-api = "1.6.1"
-ore-pool-types = "1.6.1"
+ore-pool-api = "1.7.0-beta"
+ore-pool-types = "1.7.0-beta"
 ore-types = "0.0.13"
 qrcode-generator = "4.1.9"
 rand = "0.8.5"

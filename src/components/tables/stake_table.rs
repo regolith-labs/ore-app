@@ -1,9 +1,6 @@
 use dioxus::prelude::*;
 use num_format::{Locale, ToFormattedString};
-use ore_api::{
-    consts::{MINT_ADDRESS, TOKEN_DECIMALS},
-    state::Proof,
-};
+use ore_api::consts::{MINT_ADDRESS, TOKEN_DECIMALS};
 use ore_boost_api::state::{Boost, Stake};
 use steel::Pubkey;
 
@@ -12,8 +9,8 @@ use crate::{
     config::{BoostMeta, LpType, Token, LISTED_BOOSTS, LISTED_TOKENS},
     gateway::GatewayResult,
     hooks::{
-        use_all_liquidity_pairs, use_boost_apr, use_boost_proof_wss, use_boost_tvl, use_boost_wss,
-        use_claimable_yield, use_stake_wss,
+        use_all_liquidity_pairs, use_boost_apr, use_boost_tvl, use_boost_wss, use_claimable_yield,
+        use_stake_wss,
     },
     route::Route,
     solana::spl_token::amount_to_ui_amount_string,
@@ -51,7 +48,7 @@ pub fn StakeTable() -> Element {
                         right_2: "TVL",
                         right_3: "Yield",
                         help_left: "Holders of the assets below are eligible to receive ORE yield.",
-                        help_right_1: "Estimated annual percentage rate based on 7d trailing returns.",
+                        help_right_1: "Estimated annual percentage return based on current emissions rate.",
                         help_right_2: "Current notional value of assets deposited in the protocol.",
                         help_right_3: "Amount of yield you have earned and may claim.",
                         help_hidden: info_hidden,
@@ -77,7 +74,6 @@ fn IdleTableRow() -> Element {
     let token = Token::ore();
     let stake = use_stake_wss(token.mint);
     let boost = use_boost_wss(token.mint);
-    let boost_proof = use_boost_proof_wss(token.mint);
     rsx! {
         TableRowLink {
             to: Route::Idle {},
@@ -103,7 +99,6 @@ fn IdleTableRow() -> Element {
                 StakeTableRowYield {
                     mint_address: MINT_ADDRESS,
                     boost,
-                    boost_proof,
                     stake,
                 }
             },
@@ -118,7 +113,6 @@ fn StakeTableRow(
 ) -> Element {
     let stake = use_stake_wss(boost_meta.lp_mint);
     let boost = use_boost_wss(boost_meta.lp_mint);
-    let boost_proof = use_boost_proof_wss(boost_meta.lp_mint);
     rsx! {
         TableRowLink {
             to: Route::Pair { lp_mint: boost_meta.lp_mint.to_string() },
@@ -147,7 +141,6 @@ fn StakeTableRow(
                 StakeTableRowYield {
                     mint_address: boost_meta.lp_mint,
                     boost,
-                    boost_proof,
                     stake,
                 }
             },
@@ -186,7 +179,7 @@ fn IdleTableRowTitle(token: Token, stake: Signal<GatewayResult<Stake>>) -> Eleme
                     }
                     span {
                         class: "font-medium my-auto text-xs text-elements-midEmphasis/50 px-1.5 py-0 rounded bg-elements-lowEmphasis/40",
-                        "Idle"
+                        "Native"
                     }
                 }
                 if let Some(Some(balance)) = balance.cloned() {
@@ -413,11 +406,10 @@ fn StakeTableRowAPR(mint_address: Pubkey, stake: Signal<GatewayResult<Stake>>) -
 fn StakeTableRowYield(
     mint_address: Pubkey,
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Signal<GatewayResult<Proof>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     // Calculate rewards
-    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
+    let claimable_yield = use_claimable_yield(boost, stake);
 
     rsx! {
         Col {

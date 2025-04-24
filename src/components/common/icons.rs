@@ -407,6 +407,23 @@ pub fn UserGroupIcon(class: Option<String>) -> Element {
 }
 
 #[component]
+pub fn TagIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "currentColor",
+            class: "{class}",
+            path {
+                fill_rule: "evenodd",
+                clip_rule: "evenodd",
+                d: "M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 0 0 5.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 0 0-2.122-.879H5.25ZM6.375 7.5a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z"
+            }
+        }
+    }
+}
+
+#[component]
 pub fn GlobeIcon(class: Option<String>) -> Element {
     let class = class.unwrap_or("".to_string());
     rsx! {
@@ -1052,6 +1069,63 @@ pub fn QuestionCircleIcon(class: Option<String>) -> Element {
                 stroke_linecap: "round",
                 stroke_linejoin: "round",
                 d: "M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn ChevronDownIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            stroke_width: "1.5",
+            class: "{class}",
+            path {
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                d: "m19.5 8.25-7.5 7.5-7.5-7.5"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn ArrowLeftIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            stroke_width: "1.5",
+            class: "{class}",
+            path {
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                d: "M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn KeyIcon(class: Option<String>) -> Element {
+    let class = class.unwrap_or("".to_string());
+    rsx! {
+        svg {
+            view_box: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            stroke_width: "1.5",
+            class: "{class}",
+            path {
+                stroke_linecap: "round",
+                stroke_linejoin: "round",
+                d: "M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
             }
         }
     }

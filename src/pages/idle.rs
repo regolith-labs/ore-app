@@ -2,21 +2,19 @@ use crate::{
     components::*,
     gateway::GatewayResult,
     hooks::{
-        use_boost_apr, use_boost_claim_transaction, use_boost_proof_wss, use_boost_wss,
-        use_claimable_yield, use_ore_balance_wss, use_ore_price, use_stake_wss,
+        use_boost_apr, use_boost_claim_transaction, use_boost_wss, use_claimable_yield,
+        use_ore_balance_wss, use_ore_price, use_stake_wss,
     },
     solana::spl_token::{amount_to_ui_amount, amount_to_ui_amount_string},
-    utils::format_bps_as_percent,
 };
 use dioxus::prelude::*;
-use ore_api::{consts::TOKEN_DECIMALS, state::Proof};
+use ore_api::consts::TOKEN_DECIMALS;
 use ore_boost_api::state::{Boost, Stake};
 use ore_types::request::TransactionType;
 
 pub fn Idle() -> Element {
     let balance = use_ore_balance_wss();
     let boost = use_boost_wss(ore_api::consts::MINT_ADDRESS);
-    let boost_proof = use_boost_proof_wss(ore_api::consts::MINT_ADDRESS);
     let stake = use_stake_wss(ore_api::consts::MINT_ADDRESS);
 
     rsx! {
@@ -26,7 +24,7 @@ pub fn Idle() -> Element {
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 title: "Stake ORE",
-                subtitle: "Stake unpaired ORE and earn the idle yield rate."
+                subtitle: "Stake ORE and earn the native yield rate."
             }
             Col {
                 gap: 16,
@@ -37,7 +35,6 @@ pub fn Idle() -> Element {
                 }
                 AccountMetrics {
                     boost,
-                    boost_proof,
                     stake,
                 }
                 BoostMetrics {
@@ -51,7 +48,6 @@ pub fn Idle() -> Element {
 #[component]
 fn AccountMetrics(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Signal<GatewayResult<Proof>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     rsx! {
@@ -67,7 +63,6 @@ fn AccountMetrics(
             }
             StakeYield {
                 boost,
-                boost_proof,
                 stake,
             }
         }
@@ -79,7 +74,7 @@ fn Deposits(stake: Signal<GatewayResult<Stake>>) -> Element {
     rsx! {
         TitledSignalRow {
             title: "Deposits",
-            description: "The amount of ORE you have deposited in the protocol. This ORE is \"idle\" and thus earns the native idle yield rate.",
+            description: "The amount of ORE you have deposited in the protocol. This ORE is \"idle\" and thus earns the native yield rate.",
             signal: stake,
             com: |stake| {
                 rsx! {
@@ -101,12 +96,11 @@ fn Deposits(stake: Signal<GatewayResult<Stake>>) -> Element {
 #[component]
 pub fn StakeYield(
     boost: Signal<GatewayResult<Boost>>,
-    boost_proof: Signal<GatewayResult<Proof>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Element {
     // Build claim transaction
-    let claimable_yield = use_claimable_yield(boost, boost_proof, stake);
-    let claim_tx = use_boost_claim_transaction(boost, boost_proof, stake);
+    let claimable_yield = use_claimable_yield(boost, stake);
+    let claim_tx = use_boost_claim_transaction(boost, stake);
 
     rsx! {
         TitledRow {
@@ -143,9 +137,6 @@ fn BoostMetrics(boost: Signal<GatewayResult<Boost>>) -> Element {
                 title: "Boost"
             }
             Apr {}
-            TakeRate {
-                boost,
-            }
             TotalDeposits {
                 boost,
             }
@@ -153,6 +144,9 @@ fn BoostMetrics(boost: Signal<GatewayResult<Boost>>) -> Element {
                 boost,
             }
             Tvl {
+                boost,
+            }
+            Weight {
                 boost,
             }
         }
@@ -165,7 +159,7 @@ pub fn Apr() -> Element {
     rsx! {
         TitledRow {
             title: "APR",
-            description: "The annualized percentage rate returned to stakers, derived from the last 7 days of yield divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
+            description: "The annualized percentage rate returned to stakers, derived from the current emissions rate divided by the current notional value of total deposits in the protocol. This estimate in no way guarantees future returns.",
             value: rsx! {
                 if let Ok(apr) = apr.cloned() {
                     span {
@@ -181,16 +175,16 @@ pub fn Apr() -> Element {
 }
 
 #[component]
-pub fn TakeRate(boost: Signal<GatewayResult<Boost>>) -> Element {
+pub fn Weight(boost: Signal<GatewayResult<Boost>>) -> Element {
     rsx! {
         TitledSignalRow {
-            title: "Take rate",
-            description: "The percentage of the mining reward that gets allocated to this boost when active. The higher the take rate, the more ORE will be shared with stakers in the protocol.",
+            title: "Weight",
+            description: "The weight given to this boost. The higher the weight, the more ORE will be shared with stakers in the protocol.",
             signal: boost,
             com: |boost| rsx! {
                 span {
                     class: "text-elements-highEmphasis font-medium",
-                    "{format_bps_as_percent(boost.multiplier as f64)}"
+                    "{boost.weight as f64}"
                 }
             }
         }

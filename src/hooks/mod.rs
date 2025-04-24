@@ -8,7 +8,7 @@ mod use_claimable_yield;
 #[cfg(feature = "web")]
 mod use_download_url;
 mod use_gateway;
-// #[cfg(feature = "web")]
+// #[cfg(not(feature = "web"))]
 // mod use_persistent;
 #[cfg(not(feature = "web"))]
 mod use_updater;
@@ -24,6 +24,7 @@ pub use use_claimable_yield::*;
 #[cfg(feature = "web")]
 pub use use_download_url::*;
 pub use use_gateway::*;
+// #[cfg(not(feature = "web"))]
 // pub use use_persistent::*;
 #[cfg(not(feature = "web"))]
 pub use use_updater::*;

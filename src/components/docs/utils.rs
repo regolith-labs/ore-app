@@ -17,7 +17,7 @@ pub fn ContentSection(children: Element) -> Element {
 pub fn SectionTitle(children: Element) -> Element {
     rsx! {
         span {
-            class: "font-semibold text-elements-highEmphasis text-xl pt-8 pb-2",
+            class: "font-semibold text-elements-highEmphasis text-2xl pt-8 pb-4",
             {children}
         }
     }
