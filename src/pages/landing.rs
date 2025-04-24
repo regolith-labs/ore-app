@@ -104,7 +104,7 @@ fn HeroTitle() -> Element {
                 "Hard money for the age of DeFi."
             }
             Col {
-                class: "md:flex-row ml-0 md:mx-auto h-min mt-4",
+                class: "md:flex-row ml-0 md:mx-auto h-min mt-4 pb-8",
                 gap: 4,
                 Link {
                     to: Route::Mine {},
@@ -504,7 +504,7 @@ fn Distribution() -> Element {
                                 } else {
                                     "–".to_string()
                                 },
-                                detail: "Circulating supply".to_string(),
+                                detail: "Current supply".to_string(),
                                 ore: true,
                             },
                             DataPoint {
