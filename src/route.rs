@@ -9,7 +9,7 @@ pub enum Route {
     #[layout(AppLayout)]
         #[route("/mine")]
         Mine {},
-        #[route("/promote")]
+        #[route("/post")]
         Promote {},
         #[route("/stake")]
         Stake {},

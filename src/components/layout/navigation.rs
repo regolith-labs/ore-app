@@ -82,7 +82,7 @@ fn TabBar() -> Element {
                 route: Route::Trade {}
             }
             Tab {
-                title: "Promote",
+                title: "Post",
                 route: Route::Promote {}
             }
         }
@@ -136,7 +136,7 @@ pub(crate) fn MobileTabBar() -> Element {
                 route: Route::Trade {}
             }
             MobileTab {
-                title: "Promote",
+                title: "Post",
                 route: Route::Promote {}
             }
         }

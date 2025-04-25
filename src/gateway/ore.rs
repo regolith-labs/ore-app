@@ -12,8 +12,8 @@ use steel::AccountDeserialize;
 
 use super::{Gateway, GatewayError, GatewayResult, Rpc};
 
-// const ORE_API_URL: &str = "https://api.ore.supply";
-const ORE_API_URL: &str = "http://localhost:3000";
+const ORE_API_URL: &str = "https://api.ore.supply";
+// const ORE_API_URL: &str = "http://localhost:3000";
 
 #[derive(Deserialize, Clone, PartialEq, Debug)]
 pub struct TopHolder {
@@ -50,10 +50,7 @@ pub trait OreGateway {
         address: Pubkey,
         access_token: String,
     ) -> GatewayResult<i64>;
-    async fn validate_waitlist_status(
-        &self,        
-        address: Pubkey,
-    ) -> GatewayResult<bool>;
+    async fn validate_waitlist_status(&self, address: Pubkey) -> GatewayResult<bool>;
 }
 
 impl<R: Rpc> OreGateway for Gateway<R> {
@@ -179,10 +176,9 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .send()
             .await
             .map_err(GatewayError::from)?;
-        
-        // Check for error response 
-        if !resp.status().is_success() {            
-            
+
+        // Check for error response
+        if !resp.status().is_success() {
             // Special handling for 409 Conflict (x account already exists with solana address)
             if resp.status() == reqwest::StatusCode::CONFLICT {
                 // Get response text
@@ -193,33 +189,35 @@ impl<R: Rpc> OreGateway for Gateway<R> {
                         return Err(GatewayError::RequestFailed);
                     }
                 };
-                
+
                 // Attempt to parse the JSON for user details
                 if let Ok(json) = serde_json::from_str::<serde_json::Value>(&text) {
-                    // Extract screen_name and solana_address                    
-                    let screen_name = json.get("screen_name")
+                    // Extract screen_name and solana_address
+                    let screen_name = json
+                        .get("screen_name")
                         .and_then(|name| name.as_str())
                         .unwrap_or("unknown")
                         .to_string();
-                    let solana_address = json.get("solana_address")
+                    let solana_address = json
+                        .get("solana_address")
                         .and_then(|addr| addr.as_str())
                         .unwrap_or("unknown")
                         .to_string();
-                        
-                    return Err(GatewayError::XAccountExists { 
+
+                    return Err(GatewayError::XAccountExists {
                         screen_name,
-                        solana_address
+                        solana_address,
                     });
                 }
-                
+
                 // If we couldn't parse the response, return a generic error
                 return Err(GatewayError::RequestFailed);
             }
-            
+
             // For all other errors, or if JSON parsing failed
             return Err(GatewayError::RequestFailed);
         }
-        
+
         // Success path - deserialize JSON
         let body = resp.text().await.map_err(GatewayError::from)?;
         let access_token =
@@ -254,12 +252,9 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         Ok(waitlist_num)
     }
 
-    async fn validate_waitlist_status(
-        &self,        
-        address: Pubkey,
-    ) -> GatewayResult<bool> {
+    async fn validate_waitlist_status(&self, address: Pubkey) -> GatewayResult<bool> {
         let url = format!("{}/oauth/x/check_waitlist", ORE_API_URL);
-        
+
         let resp = self
             .http
             .get(url)
@@ -269,27 +264,25 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .map_err(|e| {
                 log::error!("Failed to send request: {:?}", e);
                 GatewayError::from(e)
-            })?;    
-        
+            })?;
+
         // Check if the response was successful
         if !resp.status().is_success() {
             return Err(GatewayError::RequestFailed);
         }
-        
+
         let body = resp.text().await.map_err(GatewayError::from)?;
-        
+
         // Handle empty response
         if body.trim().is_empty() {
             log::warn!("Received empty response body");
             return Ok(false); // Assume not on waitlist if response is empty
         }
-        
+
         // Parse the response as a simple boolean
-        let waitlist_status = serde_json::from_str::<bool>(&body).map_err(|e| {
-            GatewayError::from(e)
-        })?;
-    
+        let waitlist_status =
+            serde_json::from_str::<bool>(&body).map_err(|e| GatewayError::from(e))?;
+
         Ok(waitlist_status)
     }
-    
 }
