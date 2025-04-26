@@ -1,9 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::CheckCircleIcon,
     components::*,
-    gateway::ore::OreGateway,
+    gateway::ore::{OreGateway, WaitlistStatus},
     hooks::{use_gateway, use_wallet, Wallet},
 };
 
@@ -15,16 +14,21 @@ pub fn Promote() -> Element {
         if let Wallet::Connected(pubkey) = *wallet.read() {
             use_gateway().validate_waitlist_status(pubkey).await
         } else {
-            Ok(false)
+            Ok(WaitlistStatus {
+                is_registered: false,
+                screen_name: None,
+                waitlist_number: None,
+                profile_image_url: None,
+            })
         }
     });
 
     rsx! {
         match *wallet.read() {
             Wallet::Connected(_) => {
-                match *waitlist_status.read() {
-                    Some(Ok(true)) => rsx! { Waitlist {} },
-                    Some(Ok(false)) => rsx! { Onboarding {} },
+                match waitlist_status.read().as_ref() {
+                    Some(Ok(status)) if status.is_registered => rsx! { Waitlist { status: status.clone() } },
+                    Some(Ok(_)) => rsx! { Onboarding {} },
                     Some(Err(_)) => rsx! { div { class: "mx-auto w-full max-w-2xl px-5 sm:px-8", "Loading..." } },
                     None => rsx! { div { class: "mx-auto w-full max-w-2xl px-5 sm:px-8", "Loading..." } }
                 }
@@ -68,7 +72,6 @@ fn SignInWithX() -> Element {
     let wallet = use_wallet();
     let request_token = use_resource(|| async move { use_gateway().get_x_request_token().await });
 
-    // Check if we have a wallet connected
     let is_wallet_connected = matches!(*wallet.read(), Wallet::Connected(_));
 
     rsx! {
@@ -98,8 +101,8 @@ fn SignInWithX() -> Element {
     }
 }
 
-fn Waitlist() -> Element {
-    // let wallet = use_wallet();
+#[component]
+fn Waitlist(status: WaitlistStatus) -> Element {
     rsx! {
         Col {
             class: "w-full h-full pb-20 sm:pb-16",
@@ -111,21 +114,38 @@ fn Waitlist() -> Element {
             }
             Col {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                gap: 8,
-                CheckCircleIcon {
-                    class: "mx-auto w-24 h-24 text-elements-green mt-8"
-                }
-                Col {
-                    gap: 2,
-                    span {
-                        class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
-                        "You're on the waitlist!"
+                gap: 8,                                
+                {status.profile_image_url.as_ref().map(|url| rsx! {
+                    div {
+                        class: "flex justify-center mb-3",
+                        img {
+                            src: "{url}",
+                            class: "w-16 h-16 rounded-full p-2 border-2 border-elements-mediumEmphasis",
+                            alt: "Profile image"
+                        }
                     }
-                    span {
-                        class: "text-elements-midEmphasis font-medium mx-auto text-center",
-                        "The creator rewards program will be launching soon. Follow @OREsupply on X and check back soon for updates."
+                })}            
+                {
+                    if let (Some(name), Some(number)) = (&status.screen_name, status.waitlist_number) {
+                        rsx! {
+                            span {
+                                class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
+                                "Congratulations @{name}! You're #{number} on the waitlist."
+                            }
+                        }
+                    } else {
+                        rsx! {
+                            span {
+                                class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
+                                "You're on the waitlist!"
+                            }
+                        }
                     }
                 }
+                span {
+                    class: "text-elements-midEmphasis font-medium mx-auto text-center",
+                    "The creator rewards program will be launching soon. Follow @OREsupply on X and check back soon for updates."
+                }                        
             }
         }
     }
