@@ -17,16 +17,17 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
     // Track whether account linking was successful
     let linking_successful = use_signal(|| false);
     let waitlist_number = use_signal(|| 0);
-    let access_token = use_resource(move || {
-        let oauth_token = oauth_token.clone();
-        let oauth_verifier = oauth_verifier.clone();
-
+    
+    let access_token: Resource<Result<AccessTokenResponse, GatewayError>> = use_resource(move || {
+        let oauth_token_value = oauth_token.clone();
+        let oauth_verifier_value = oauth_verifier.clone();
+        
         async move {
             use_gateway()
-                .get_x_access_token(oauth_token, oauth_verifier)
+                .get_x_access_token(oauth_token_value, oauth_verifier_value)
                 .await
         }
-    });
+    });    
 
     rsx! {
         Col {
@@ -45,34 +46,55 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
                 if *linking_successful.read() {
                     SuccessView { waitlist_number: waitlist_number.clone() }
                 } else {
-                    match access_token.cloned() {
-                        Some(Ok(token)) => rsx! { LinkAccount { access_token: token.clone(), linking_successful: linking_successful.clone(), waitlist_number: waitlist_number.clone() } },
+                    match &*access_token.read() {
+                        Some(Ok(token)) => rsx! { LinkAccount { access_token: token.clone(), linking_successful: linking_successful.clone(), waitlist_number: waitlist_number.clone() } },  
                         Some(Err(err)) => {
                             match err {
                                 GatewayError::XAccountExists {screen_name, solana_address } => {
+                                    let abbreviated_address = format!("{}...{}", 
+                                        &solana_address.to_string()[0..4], 
+                                        &solana_address.to_string()[solana_address.to_string().len()-4..]);
+                                    let navigator = use_navigator();           
                                     rsx! {
                                         div {
                                             class: "p-4 border border-yellow-500 rounded",
                                             h3 { class: "font-bold", "X Account Already Linked" }
-                                            p { "The X account @{screen_name} is already registered with {solana_address} in the waitlist registration." }
-                                            p { "Please try with a different X account." }
+                                            p { 
+                                                class: "text-elements-midEmphasis",
+                                                "The X account @{screen_name} is already registered with {abbreviated_address} in the waitlist registration." 
+                                            }
+                                            p { 
+                                                class: "text-elements-midEmphasis",
+                                                "Please try with a different X account." 
+                                            }                                            
+                                        }
+                                        button {
+                                            class: "controls-primary h-12 rounded-full justify-center items-center",
+                                            onclick: move |_| {
+                                                navigator.replace(crate::route::Route::Promote {});
+                                            },
+                                            "Try again"
                                         }
                                     }
-                                },
+                                },                                
                                 _ => {
                                     // For all other errors
-                                    let err_string = format!("{:?}", err);
-                                    log::error!("X account linking error: {}", err_string);
-
+                                    let navigator = use_navigator();           
                                     rsx! {
-                                        div {
+                                        div {                             
                                             class: "p-4 border border-red-500 rounded",
-                                            h3 { class: "font-bold", "Error Connecting Account" }
-                                            p { "We couldn't connect your X account. Please try again later." }
-                                            p { class: "mt-2 text-sm text-red-700", "Details: {err_string}" }
+                                            h3 { class: "font-bold", "X Account Connection Lost" }
+                                            p { "We lost connection to your X account. Please try re-authenticating again." }                                            
+                                        }
+                                        button {
+                                            class: "controls-primary h-12 rounded-full justify-center items-center",
+                                            onclick: move |_| {
+                                                navigator.replace(crate::route::Route::Promote {});
+                                            },
+                                            "Try linking again"
                                         }
                                     }
-                                }
+                                }                            
                             }
                         },
                         None => rsx! { div { "Loading..." } },
@@ -88,10 +110,10 @@ pub fn LinkAccount(
     access_token: AccessTokenResponse,
     linking_successful: Signal<bool>,
     waitlist_number: Signal<i64>,
-) -> Element {
+) -> Element {    
     let wallet = use_wallet();
 
-    // Extract the profile image URL before using in RSX
+    // Extract the profile image URL
     let profile_image_url = match &access_token.profile_image_url {
         Some(url) => url.clone(),
         None => String::new(),
@@ -102,7 +124,6 @@ pub fn LinkAccount(
             class: "p-5 bg-bg-secondary rounded-xl",
             gap: 4,
 
-            // Add profile image
             div {
                 class: "flex justify-center mb-3",
                 img {
@@ -159,7 +180,6 @@ pub fn LinkAccountButton(
     linking_successful: Signal<bool>,
     waitlist_number: Signal<i64>,
 ) -> Element {
-    log::info!("LinkAccountButton: {:?}", access_token.oauth_token);
     rsx! {
         button {
             class: "controls-primary h-12 rounded-full justify-center items-center",
@@ -203,7 +223,6 @@ pub fn LinkAccountButton(
                         // Process valid signing result
                         Ok(serde_json::Value::String(sig)) => {
                             if let Ok(sig) = sig.from_base64() {
-                                log::info!("sig: {:?}", sig);
                                 if let Ok(sig) = Signature::try_from(sig) {
                                     // Call API to link account
                                     let response = use_gateway()
@@ -249,10 +268,10 @@ pub fn LinkAccountButton(
     }
 }
 
-// Simple success view component for when account linking succeeds
 #[component]
 fn SuccessView(waitlist_number: Signal<i64>) -> Element {
     let waitlist_val = waitlist_number.read();
+    let navigator = use_navigator();
     rsx! {
         Col {
             class: "mx-auto w-full",
@@ -262,27 +281,19 @@ fn SuccessView(waitlist_number: Signal<i64>) -> Element {
             }
             span {
                 class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
-                "#{waitlist_val}"
+                "Congratulations! You're #{waitlist_val} on the waitlist."
+            }            
+            span {
+                class: "text-elements-midEmphasis font-medium mx-auto text-center",
+                "Creator rewards are coming soon. Follow @OREsupply on X and check back soon for updates."
             }
-            Col {
-                gap: 2,
-                span {
-                    class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
-                    "You're on the waitlist!"
-                }
-                span {
-                    class: "text-elements-midEmphasis font-medium mx-auto",
-                    "Creator rewards are coming soon. Follow @OREsupply on X and check back soon for updates."
-                }
-            }
-            a {
-                class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer mt-8",
-                href: "/mine",
-                span {
-                    class: "mx-auto my-auto",
-                    "Return to home"
-                }
-            }
+            button {
+                class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
+                onclick: move |_| {
+                    navigator.replace(crate::route::Route::Mine {});
+                },
+                "Return to home"
+            }            
         }
     }
 }
