@@ -23,10 +23,12 @@ pub fn Landing() -> Element {
     rsx! {
         Hero {}
         Stats {}
+        Problem {}
+        Guide {}
         Earning {}
         Mission {}
-        Technology {}
-        Distribution {}
+        // Technology {}
+        // Distribution {}
         Community {}
         Faq {}
         Footer {}
@@ -96,12 +98,12 @@ fn HeroTitle() -> Element {
                 }
                 span {
                     class: "z-30",
-                    "reborn."
+                    "accelerated."
                 }
             }
             span {
                 class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
-                "Hard money for the age of DeFi."
+                "Hard money for a world beyond fiat."
             }
             Col {
                 class: "md:flex-row ml-0 md:mx-auto h-min mt-4 pb-8",
@@ -133,10 +135,12 @@ fn Earning() -> Element {
             class: "w-screen h-full min-h-screen md:min-h-224 mt-8 md:mt-16 font-extended font-bold text-5xl md:text-6xl lg:text-7xl text-center text-elements-highEmphasis ",
             gap: 8,
             SectionCopy {
-                tip: "Earn",
+                // tip: "Earn",
+                // tip: "Earn on your own terms",
+                tip: "Earn your crypto",
                 title: "One token.",
                 subtitle: "Many ways to mine.",
-                detail: "Find a strategy that works for you."
+                // detail: "Earn on your own terms."
             }
             div {
                 class: "grid auto-rows-fr grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto px-4",
@@ -253,25 +257,55 @@ fn SectionCta(title: String, route: String) -> Element {
 }
 
 #[cfg(feature = "web")]
-fn Mission() -> Element {
+fn Problem() -> Element {
     rsx! {
         Col {
-            class: "relative w-screen h-full min-h-screen mt-16 md:mt-48 2xl:min-h-256",
-            LandingGlobe {}
+            class: "relative w-screen h-full min-h-screen mt-16 2xl:min-h-256",
+            // LandingGlobe {}
             Col {
                 class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
                 Col {
                     class: "w-full h-min mx-auto max-w-7xl justify-start",
                     gap: 2,
-                    SectionCopyResponsive {
-                        tip: "Mission",
-                        title: "Peer to peer.",
-                        subtitle: "Electronic cash.",
+                    SectionCopy {
+                        tip: "Keep the dream alive",
+                        // tip: "Don't let the dream die",
+                        title: "Crypto is captured.",
+                        // subtitle: "Electronic cash.",
+                        // detail: 
                     }
                     span {
                         // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-xl ml-0 selection:bg-elements-highEmphasis selection:text-black",
-                        "ORE is a public currency for the open internet — not issued or controlled by any state. It can be earned, spent, and used without banks or middlemen."
+                        // class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-xl ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        class: "text-elements-midEmphasis text-lg mx-auto text-center px-4 -mt-4 max-w-xl selection:bg-elements-highEmphasis selection:text-black",
+                        // "ORE is a public currency for the open internet — not issued or controlled by any state. It can be earned, spent, and used without banks or middlemen."
+                        "Blockchains were built to escape the banks, not lock us in. Rather than getting a new form of money, crypto became just another ETF."
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+#[cfg(feature = "web")]
+fn Guide() -> Element {
+    rsx! {
+        Col {
+            class: "relative w-screen h-full min-h-screen mt-16 2xl:min-h-256",
+            // LandingGlobe {}
+            Col {
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
+                Col {
+                    class: "w-full h-min mx-auto max-w-7xl justify-start",
+                    gap: 2,
+                    SectionCopy {
+                        tip: "Back to the basics",
+                        title: "Peer to peer.",
+                        subtitle: "Electronic cash.",
+                        // subtitle: "Electronic cash.",
+                        // detail: "Money that moves at the speed of the internet. Secured by math, not politicians."
+                        detail: "Hard money at the speed of the internet."
                     }
                     Data {
                         data_points: vec![
@@ -292,15 +326,56 @@ fn Mission() -> Element {
                             },
                         ]
                     }
-                    // SectionCta {
-                    //     title: "Learn more →",
-                    //     route: Route::Stake {},
+                    // span {
+                    //     // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                    //     // class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-xl ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                    //     class: "text-elements-midEmphasis text-lg mx-auto text-center px-4 -mt-4 max-w-xl selection:bg-elements-highEmphasis selection:text-black",
+                    //     // "ORE is a public currency for the open internet — not issued or controlled by any state. It can be earned, spent, and used without banks or middlemen."
+                    //     "Blockchains were built to escape the banks, not lock us in. Rather than getting a new form of money, crypto has become just another ETF."
                     // }
                 }
             }
         }
     }
 }
+
+#[cfg(feature = "web")]
+fn Mission() -> Element {
+    rsx! {
+        Col {
+            class: "relative w-screen h-full min-h-screen mt-16 2xl:min-h-256",
+            // LandingGlobe {}
+            Col {
+                class: "md:flex-row w-full h-min mx-auto max-w-7xl justify-start md:justify-between z-10",
+                Col {
+                    class: "w-full h-min mx-auto max-w-7xl justify-start",
+                    gap: 2,
+                    SectionCopy {
+                        tip: "Believe in something",
+                        // tip: "Stay true to the mission",
+                        // tip: "Don't let the dream die",
+                        title: "Flip fiat.",
+                        // subtitle: "Declare freedom.",
+                        // detail: "Money belongs to the people who use it."
+                    }
+                    span {
+                        // class: "text-elements-midEmphasis text-lg text-center md:text-left px-4 -mt-4 max-w-xl mx-auto md:ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        // class: "text-elements-midEmphasis text-lg text-left px-4 -mt-4 max-w-xl ml-0 selection:bg-elements-highEmphasis selection:text-black",
+                        class: "text-elements-midEmphasis text-lg mx-auto text-center px-4 -mt-4 max-w-xl selection:bg-elements-highEmphasis selection:text-black",
+                        // "ORE is a public currency for the open internet — not issued or controlled by any state. It can be earned, spent, and used without banks or middlemen."
+                        // "Money belongs to the people who use it – not banks or politicians. It should move when you want it to without banks or middlemen."
+                        // "Fiat belongs to the issuers. ORE belongs to you. "
+                        // "You shouldn't need to ask for permission to move your money. "
+                        // "Fiat belongs to the banks. ORE belongs to you. "
+                        "Money should belong to the people who earn it and use it."
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 #[derive(Clone, PartialEq)]
 pub struct DataPoint {
@@ -660,9 +735,9 @@ fn Community() -> Element {
         Col {
             class: "relative w-full h-full mx-auto max-w-7xl pt-32 md:pt-0",
             SectionCopy {
-                tip: "Community",
-                title: "Join the movement.",
-                detail: "Discover why thousands of people around the world love ORE."
+                tip: "Join a movement",
+                title: "Find your community.",
+                // detail: "Discover why thousands of people around the world love ORE."
             }
             Testimonials {}
         }
@@ -1007,7 +1082,7 @@ fn SectionCopy(
     class: Option<String>,
     align: Option<Align>,
     tip: Option<String>,
-    title: String,
+    title: Option<String>,
     subtitle: Option<String>,
     detail: Option<String>,
 ) -> Element {
@@ -1023,13 +1098,16 @@ fn SectionCopy(
             if let Some(tip) = tip {
                 span {
                     // class: "z-30 text-elements-gold rounded-full w-min text-sm font-semibold mb-4 text-nowrap {text_margin}",
-                    class: "z-30 border-2 border-elements-gold text-elements-gold rounded-full w-min px-3 py-1 text-xs font-semibold mb-4 text-nowrap {text_margin}",
+                    // class: "z-30 border-2 border-elements-gold text-elements-gold rounded-full w-min px-3 py-1 text-xs font-semibold mb-4 text-nowrap {text_margin}",
+                    class: "z-30 text-elements-gold font-wide w-min px-2 text-sm font-semibold mb-4 text-nowrap {text_margin}",
                     "{tip}"
                 }
             }
-            span {
-                class: "z-30",
-                "{title}"
+            if let Some(title) = title {
+                span {
+                    class: "z-30",
+                    "{title}"
+                }
             }
             if let Some(subtitle) = subtitle {
                 span {
