@@ -130,7 +130,7 @@ pub fn LinkAccount(
                 class: "flex justify-center mb-3",
                 img {
                     src: "{profile_image_url}",
-                    class: "w-16 h-16 rounded-full p-2 border-2 border-elements-mediumEmphasis",
+                    class: "w-16 h-16 rounded-full",
                     alt: "Profile image"
                 }
             }
