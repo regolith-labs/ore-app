@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::{
         BoltIcon, CircleStackIcon, Col, DexscreenIcon, DiscordIcon, GithubIcon, GlobeIcon,
-        OreWordmarkIcon, Row, WalletAdapter, XIcon,
+        MegaphoneIcon, OreWordmarkIcon, Row, WalletAdapter, XIcon,
     },
     hooks::use_wallet_drawer_state,
     route::Route,
@@ -21,7 +21,7 @@ pub(crate) fn AppNavBar(tabs: bool) -> Element {
                     Logo {}
                 }
                 if tabs {
-                    div {
+                    span {
                         class: "absolute left-1/2 -translate-x-1/2 my-auto",
                         TabBar {}
                     }
@@ -63,11 +63,12 @@ fn TabBar() -> Element {
     let hidden = if is_navbar_hidden(&current_route) {
         "hidden"
     } else {
-        "hidden sm:flex"
+        "hidden lg:flex"
     };
     rsx! {
         Row {
-            class: "{hidden} h-full rounded-full elevated elevated-border overflow-hidden",
+            // class: "{hidden} h-full rounded-full elevated elevated-border overflow-hidden",
+            class: "{hidden}",
             Tab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -80,6 +81,10 @@ fn TabBar() -> Element {
                 title: "Trade",
                 route: Route::Trade {}
             }
+            Tab {
+                title: "Post",
+                route: Route::Post {}
+            }
         }
     }
 }
@@ -88,17 +93,17 @@ fn TabBar() -> Element {
 fn Tab(title: String, route: Route) -> Element {
     let current_route = use_route();
     let selected = is_tab_selected(&route, &current_route);
-    let color = if !selected {
-        "text-elements-lowEmphasis hover:text-elements-midEmphasis"
+    let color = if selected {
+        "text-elements-highEmphasis border-b-2 border-white"
     } else {
-        ""
+        "text-elements-lowEmphasis hover:text-elements-midEmphasis"
     };
     rsx! {
         Link {
-            class: "flex px-8 h-12 elevated-control transition-colors {color}",
+            class: "flex w-20 h-10 transition-colors {color} hover:elevated",
             to: route,
             span {
-                class: "text-sm font-medium font-semibold my-auto",
+                class: "text-sm font-medium font-semibold my-auto mx-auto",
                 "{title}"
             }
         }
@@ -117,7 +122,7 @@ pub(crate) fn MobileTabBar() -> Element {
 
     rsx! {
         Row {
-            class: "{hidden} sm:hidden fixed bottom-0 w-full elevated z-50",
+            class: "{hidden} lg:hidden fixed bottom-0 w-full elevated z-50",
             MobileTab {
                 title: "Mine",
                 route: Route::Mine {}
@@ -129,6 +134,10 @@ pub(crate) fn MobileTabBar() -> Element {
             MobileTab {
                 title: "Trade",
                 route: Route::Trade {}
+            }
+            MobileTab {
+                title: "Post",
+                route: Route::Post {}
             }
         }
     }
@@ -166,6 +175,11 @@ fn MobileTab(title: String, route: Route) -> Element {
                             class: "h-5 w-5 mx-auto"
                         }
                     },
+                    Route::Post {} | Route::PostTerms {} => rsx!{
+                        MegaphoneIcon {
+                            class: "h-5 w-5 mx-auto"
+                        }
+                    },
                     _ => rsx! {}
                 }
                 span {
@@ -179,7 +193,10 @@ fn MobileTab(title: String, route: Route) -> Element {
 
 fn is_navbar_hidden(current_route: &Route) -> bool {
     match current_route {
-        Route::Pay {} => true,
+        Route::Callback {
+            oauth_token: _,
+            oauth_verifier: _,
+        } => true,
         _ => false,
     }
 }
@@ -196,6 +213,10 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
         },
         Route::Trade {} => match current_route {
             Route::Trade {} | Route::TradeWithPair { token_pair: _ } => true,
+            _ => false,
+        },
+        Route::Post {} => match current_route {
+            Route::Post {} | Route::PostTerms {} => true,
             _ => false,
         },
         _ => false,

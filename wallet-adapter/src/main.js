@@ -39,6 +39,7 @@ export const Wallet = () => {
           <Dispatcher />
           <Disconnect />
           <SignTransaction />
+          <SignMessage />
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
@@ -115,5 +116,27 @@ function SignTransaction() {
     }
   }, [publicKey]);
   window.OreTxSigner = callback;
+  return
+}
+
+function SignMessage() {
+  const { publicKey, signMessage } = useWallet();
+  const callback = useCallback(async (msg) => {
+    try {
+      const sig = await signMessage(
+        Buffer.from(
+          msg.b64,
+          "base64"
+        )
+      );
+      const b64 = Buffer.from(
+        sig
+      ).toString("base64");
+      return b64
+    } catch (err) {
+      console.log(err);
+    }
+  }, [publicKey]);
+  window.OreMsgSigner = callback;
   return
 }

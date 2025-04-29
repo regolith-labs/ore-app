@@ -9,8 +9,10 @@ pub enum Route {
     #[layout(AppLayout)]
         #[route("/mine")]
         Mine {},
-        #[route("/pay")]
-        Pay {},
+        #[route("/post")]
+        Post {},
+        #[route("/post_terms")]
+        PostTerms {},
         #[route("/stake")]
         Stake {},
         #[route("/stake/ore")]
@@ -28,6 +30,8 @@ pub enum Route {
     #[end_layout]
 
     #[layout(AppModalLayout)]
+        #[route("/oauth/callback?:oauth_token&:oauth_verifier")]
+        Callback { oauth_token: String, oauth_verifier: String },
         #[route("/topup/:address")]
         Topup { address: String },
     #[end_layout]

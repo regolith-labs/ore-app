@@ -32,6 +32,8 @@ pub enum GatewayError {
     UnableToDeriveKeypair,
     NoWalletsFound,
     InvalidWalletName,
+    InsufficientFunds,
+    XAccountExists {screen_name: String, solana_address: String },
     InsufficientSOL,
 }
 

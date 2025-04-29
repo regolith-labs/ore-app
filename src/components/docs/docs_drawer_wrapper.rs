@@ -53,7 +53,7 @@ fn DocsContent(on_close: EventHandler<MouseEvent>) -> Element {
                 gap: 8,
                 DocsHeader { on_close: on_close.clone() }
                 Row {
-                    class: "w-full mb-4 bg-surface-elevated border-b border-gray-800",
+                    class: "w-full mb-4",
                     DocsTabButton { tab: DocsTab::Mining }
                     DocsTabButton { tab: DocsTab::Staking }
                     DocsTabButton { tab: DocsTab::Tokenomics }
@@ -105,11 +105,11 @@ fn DocsTabButton(tab: DocsTab) -> Element {
     };
     rsx! {
         button {
-            class: "flex-1 h-12 transition-colors font-semibold hover:cursor-pointer border-b",
+            class: "flex-1 h-12 transition-colors font-semibold hover:cursor-pointer border-b-2",
             class: if *current_tab.read() == tab {
                 "text-lg text-white border-controls-primary"
             } else {
-                "text-lg text-elements-lowEmphasis"
+                "text-lg text-elements-lowEmphasis border-transparent"
             },
             onclick: move |_| {
                 let mut current = docs_state.read().clone();
