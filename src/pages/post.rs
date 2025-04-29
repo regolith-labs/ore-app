@@ -4,9 +4,10 @@ use crate::{
     components::*,
     gateway::ore::{OreGateway, WaitlistStatus},
     hooks::{use_gateway, use_wallet, Wallet},
+    route::Route,
 };
 
-pub fn Promote() -> Element {
+pub fn Post() -> Element {
     let wallet = use_wallet();
 
     // Check waitlist status if wallet is connected
@@ -53,14 +54,20 @@ fn Onboarding() -> Element {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 span {
                     class: "text-lg",
-                    "Eligible creators can now mine ORE by creating and sharing engaging content on X dot com. To get started, log in with your X account below."
+                    "Eligible creators will soon be able to earn ORE by creating and sharing engaging content on X dot com. To join the waitlist, log in with your X account below."
                 }
                 Col {
                     gap: 4,
                     SignInWithX {}
                     span {
                         class: "text-xs text-elements-lowEmphasis text-center",
-                        "By logging in with X, you agree to share your data with Regolith Labs and accept the Terms and Conditions of the creator rewards program. Regolith Labs may modify or disable the creator rewards program at any time in its sole discretion, including for business, financial, or legal reasons."
+                        "By logging in with X, you agree to share your data with Regolith Labs and accept the "
+                        Link {
+                            class: "underline",
+                            to: Route::PostTerms {},
+                            "Terms and Conditions"
+                        }
+                        " of the ORE Creator Program. Regolith Labs may modify or disable the ORE Creator Program at any time in its sole discretion, including for business, financial, or legal reasons."
                     }
                 }
             }
@@ -114,23 +121,23 @@ fn Waitlist(status: WaitlistStatus) -> Element {
             }
             Col {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                gap: 8,                                
+                gap: 4,
                 {status.profile_image_url.as_ref().map(|url| rsx! {
                     div {
                         class: "flex justify-center mb-3",
                         img {
                             src: "{url}",
-                            class: "w-16 h-16 rounded-full p-2 border-2 border-elements-mediumEmphasis",
+                            class: "w-16 h-16 rounded-full",
                             alt: "Profile image"
                         }
                     }
-                })}            
+                })}
                 {
-                    if let (Some(name), Some(number)) = (&status.screen_name, status.waitlist_number) {
+                    if let (Some(_name), Some(number)) = (&status.screen_name, status.waitlist_number) {
                         rsx! {
                             span {
                                 class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
-                                "Congratulations @{name}! You're #{number} on the waitlist."
+                                "You're #{number} on the waitlist!"
                             }
                         }
                     } else {
@@ -144,8 +151,8 @@ fn Waitlist(status: WaitlistStatus) -> Element {
                 }
                 span {
                     class: "text-elements-midEmphasis font-medium mx-auto text-center",
-                    "The creator rewards program will be launching soon. Follow @OREsupply on X and check back soon for updates."
-                }                        
+                    "The ORE Creator Program will be launching soon. Follow @OREsupply on X and check back soon for updates."
+                }
             }
         }
     }

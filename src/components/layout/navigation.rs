@@ -83,7 +83,7 @@ fn TabBar() -> Element {
             }
             Tab {
                 title: "Post",
-                route: Route::Promote {}
+                route: Route::Post {}
             }
         }
     }
@@ -137,7 +137,7 @@ pub(crate) fn MobileTabBar() -> Element {
             }
             MobileTab {
                 title: "Post",
-                route: Route::Promote {}
+                route: Route::Post {}
             }
         }
     }
@@ -175,7 +175,7 @@ fn MobileTab(title: String, route: Route) -> Element {
                             class: "h-5 w-5 mx-auto"
                         }
                     },
-                    Route::Promote {} => rsx!{
+                    Route::Post {} | Route::PostTerms {} => rsx!{
                         MegaphoneIcon {
                             class: "h-5 w-5 mx-auto"
                         }
@@ -215,8 +215,8 @@ fn is_tab_selected(route: &Route, current_route: &Route) -> bool {
             Route::Trade {} | Route::TradeWithPair { token_pair: _ } => true,
             _ => false,
         },
-        Route::Promote {} => match current_route {
-            Route::Promote {} => true,
+        Route::Post {} => match current_route {
+            Route::Post {} | Route::PostTerms {} => true,
             _ => false,
         },
         _ => false,

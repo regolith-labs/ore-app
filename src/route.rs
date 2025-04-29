@@ -10,7 +10,9 @@ pub enum Route {
         #[route("/mine")]
         Mine {},
         #[route("/post")]
-        Promote {},
+        Post {},
+        #[route("/post_terms")]
+        PostTerms {},
         #[route("/stake")]
         Stake {},
         #[route("/stake/ore")]

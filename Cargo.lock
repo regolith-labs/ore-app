@@ -5261,7 +5261,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af1844ef2428cc3e1cb900be36181049ef3d3193c63e43026cfe202983b27a56"
 dependencies = [
- "proc-macro-crate 2.0.0",
+ "proc-macro-crate 3.2.0",
  "proc-macro2",
  "quote",
  "syn 2.0.98",
@@ -5752,8 +5752,11 @@ dependencies = [
 
 [[package]]
 name = "ore-types"
-version = "0.0.13"
+version = "0.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0cefa71f44098256c63fdd7984ef1fbb0644ee06a9f4a9e14ccbe089d21bf76c"
 dependencies = [
+ "chrono",
  "serde",
  "serde_json",
  "solana-sdk",

@@ -6,10 +6,10 @@ use solana_sdk::signature::Signature;
 use steel::Pubkey;
 
 use crate::{
-    components::CheckCircleIcon,
-    components::*,
+    components::{CheckCircleIcon, *},
     gateway::{ore::OreGateway, GatewayError},
     hooks::{use_gateway, use_wallet, Wallet},
+    route::Route,
 };
 
 #[component]
@@ -17,17 +17,25 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
     // Track whether account linking was successful
     let linking_successful = use_signal(|| false);
     let waitlist_number = use_signal(|| 0);
-    
-    let access_token: Resource<Result<AccessTokenResponse, GatewayError>> = use_resource(move || {
-        let oauth_token_value = oauth_token.clone();
-        let oauth_verifier_value = oauth_verifier.clone();
-        
-        async move {
-            use_gateway()
-                .get_x_access_token(oauth_token_value, oauth_verifier_value)
-                .await
+
+    let access_token: Resource<Result<AccessTokenResponse, GatewayError>> =
+        use_resource(move || {
+            let oauth_token_value = oauth_token.clone();
+            let oauth_verifier_value = oauth_verifier.clone();
+
+            async move {
+                use_gateway()
+                    .get_x_access_token(oauth_token_value, oauth_verifier_value)
+                    .await
+            }
+        });
+
+    let navigator = use_navigator();
+    use_effect(move || {
+        if *linking_successful.read() {
+            navigator.replace(Route::Post {});
         }
-    });    
+    });
 
     rsx! {
         Col {
@@ -35,70 +43,64 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
             gap: 8,
             Heading {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
-                title: "Link account",
-                subtitle: "Claim account to register for the creator rewards program."
+                title: "Join waitlist",
+                subtitle: "Claim your account to join the waitlist."
             }
 
             Col {
                 class: "mx-auto w-full max-w-2xl px-5 sm:px-8",
                 gap: 8,
-
-                if *linking_successful.read() {
-                    SuccessView { waitlist_number: waitlist_number.clone() }
-                } else {
-                    match &*access_token.read() {
-                        Some(Ok(token)) => rsx! { LinkAccount { access_token: token.clone(), linking_successful: linking_successful.clone(), waitlist_number: waitlist_number.clone() } },  
-                        Some(Err(err)) => {
-                            match err {
-                                GatewayError::XAccountExists {screen_name, solana_address } => {
-                                    let abbreviated_address = format!("{}...{}", 
-                                        &solana_address.to_string()[0..4], 
-                                        &solana_address.to_string()[solana_address.to_string().len()-4..]);
-                                    let navigator = use_navigator();           
-                                    rsx! {
-                                        div {
-                                            class: "p-4 border border-yellow-500 rounded",
-                                            h3 { class: "font-bold", "X Account Already Linked" }
-                                            p { 
-                                                class: "text-elements-midEmphasis",
-                                                "The X account @{screen_name} is already registered with {abbreviated_address} in the waitlist registration." 
-                                            }
-                                            p { 
-                                                class: "text-elements-midEmphasis",
-                                                "Please try with a different X account." 
-                                            }                                            
+                match &*access_token.read() {
+                    Some(Ok(token)) => rsx! { LinkAccount { access_token: token.clone(), linking_successful: linking_successful.clone(), waitlist_number: waitlist_number.clone() } },
+                    Some(Err(err)) => {
+                        match err {
+                            GatewayError::XAccountExists {screen_name, solana_address } => {
+                                let abbreviated_address = format!("{}...{}",
+                                    &solana_address.to_string()[0..4],
+                                    &solana_address.to_string()[solana_address.to_string().len()-4..]);
+                                let navigator = use_navigator();
+                                rsx! {
+                                    div {
+                                        class: "p-4 border border-yellow-500 rounded",
+                                        h3 {
+                                            class: "font-bold",
+                                            "Account already claimed"
                                         }
-                                        button {
-                                            class: "controls-primary h-12 rounded-full justify-center items-center",
-                                            onclick: move |_| {
-                                                navigator.replace(crate::route::Route::Promote {});
-                                            },
-                                            "Try again"
+                                        p {
+                                            class: "text-elements-midEmphasis",
+                                            "The X account @{screen_name} is already registered with another wallet address: {abbreviated_address}. Please try again with a different X account."
                                         }
                                     }
-                                },                                
-                                _ => {
-                                    // For all other errors
-                                    let navigator = use_navigator();           
-                                    rsx! {
-                                        div {                             
-                                            class: "p-4 border border-red-500 rounded",
-                                            h3 { class: "font-bold", "X Account Connection Lost" }
-                                            p { "We lost connection to your X account. Please try re-authenticating again." }                                            
-                                        }
-                                        button {
-                                            class: "controls-primary h-12 rounded-full justify-center items-center",
-                                            onclick: move |_| {
-                                                navigator.replace(crate::route::Route::Promote {});
-                                            },
-                                            "Try linking again"
-                                        }
+                                    button {
+                                        class: "controls-primary h-12 rounded-full justify-center items-center",
+                                        onclick: move |_| {
+                                            navigator.replace(crate::route::Route::Post {});
+                                        },
+                                        "Try again"
                                     }
-                                }                            
+                                }
+                            },
+                            _ => {
+                                // For all other errors
+                                let navigator = use_navigator();
+                                rsx! {
+                                    div {
+                                        class: "p-4 border border-red-500 rounded",
+                                        h3 { class: "font-bold", "Something went wrong" }
+                                        p { "We couldn't fetch your account details. Please try logging in with X again." }
+                                    }
+                                    button {
+                                        class: "controls-primary h-12 rounded-full justify-center items-center",
+                                        onclick: move |_| {
+                                            navigator.replace(crate::route::Route::Post {});
+                                        },
+                                        "Try again"
+                                    }
+                                }
                             }
-                        },
-                        None => rsx! { div { "Loading..." } },
-                    }
+                        }
+                    },
+                    None => rsx! { div { "Loading..." } },
                 }
             }
         }
@@ -110,7 +112,7 @@ pub fn LinkAccount(
     access_token: AccessTokenResponse,
     linking_successful: Signal<bool>,
     waitlist_number: Signal<i64>,
-) -> Element {    
+) -> Element {
     let wallet = use_wallet();
 
     // Extract the profile image URL
@@ -121,7 +123,7 @@ pub fn LinkAccount(
 
     rsx! {
         Col {
-            class: "p-5 bg-bg-secondary rounded-xl",
+            class: "bg-bg-secondary rounded-xl",
             gap: 4,
 
             div {
@@ -133,26 +135,27 @@ pub fn LinkAccount(
                 }
             }
 
-            span {
-                class: "text-elements-highEmphasis font-medium text-2xl",
-                "X Account"
-            }
+            // span {
+            //     class: "text-elements-highEmphasis font-medium text-2xl",
+            //     "X Account"
+            // }
+
             div {
                 class: "flex flex-col gap-2",
                 div {
                     class: "flex justify-between",
-                    span { class: "text-elements-mediumEmphasis", "User ID:" }
-                    span { class: "text-elements-highEmphasis font-medium", "{access_token.user_id}" }
+                    span { class: "text-elements-lowEmphasis text-sm font-medium", "Account" }
+                    span { class: "text-elements-highEmphasis font-medium", "@{access_token.screen_name}" }
                 }
                 div {
                     class: "flex justify-between",
-                    span { class: "text-elements-mediumEmphasis", "Screen Name:" }
-                    span { class: "text-elements-highEmphasis font-medium", "@{access_token.screen_name}" }
+                    span { class: "text-elements-lowEmphasis text-sm font-medium", "ID" }
+                    span { class: "text-elements-highEmphasis font-medium", "{access_token.user_id}" }
                 }
                 if let Wallet::Connected(pubkey) = *wallet.read() {
                     div {
                         class: "flex justify-between",
-                        span { class: "text-elements-mediumEmphasis", "Wallet Address:" }
+                        span { class: "text-elements-lowEmphasis text-sm font-medium", "Wallet" }
                         span {
                             class: "text-elements-highEmphasis font-medium truncate",
                             "{pubkey}"
@@ -160,6 +163,7 @@ pub fn LinkAccount(
                     }
                 }
             }
+
             if let Wallet::Connected(pubkey) = *wallet.read() {
                 LinkAccountButton { access_token, pubkey, linking_successful, waitlist_number }
             } else {
@@ -182,7 +186,7 @@ pub fn LinkAccountButton(
 ) -> Element {
     rsx! {
         button {
-            class: "controls-primary h-12 rounded-full justify-center items-center",
+            class: "controls-primary mt-4 h-12 rounded-full justify-center items-center",
             onclick: move |_| {
                 let access_token = access_token.clone();
                 let pubkey = pubkey.clone();
@@ -201,7 +205,7 @@ pub fn LinkAccountButton(
 
                     // Sign request with wallet
                     let msg = format!(
-                        "I authorize Regolith Labs to use content published on my X account for the creator rewards program.\n\nAccount: {}\nAddress: {}\nAuth: {}",
+                        "I authorize Regolith Labs to use content published from my X account for the ORE Creator Program.\n\nAccount: {}\nAddress: {}\nAuth: {}",
                         access_token.screen_name.clone(),
                         pubkey,
                         access_token.oauth_token.clone()
@@ -263,37 +267,7 @@ pub fn LinkAccountButton(
                     }
                 });
             },
-            "Link account"
-        }
-    }
-}
-
-#[component]
-fn SuccessView(waitlist_number: Signal<i64>) -> Element {
-    let waitlist_val = waitlist_number.read();
-    let navigator = use_navigator();
-    rsx! {
-        Col {
-            class: "mx-auto w-full",
-            gap: 8,
-            CheckCircleIcon {
-                class: "mx-auto w-24 h-24 text-elements-green mt-8"
-            }
-            span {
-                class: "text-elements-highEmphasis font-semibold text-2xl mx-auto",
-                "Congratulations! You're #{waitlist_val} on the waitlist."
-            }            
-            span {
-                class: "text-elements-midEmphasis font-medium mx-auto text-center",
-                "Creator rewards are coming soon. Follow @OREsupply on X and check back soon for updates."
-            }
-            button {
-                class: "flex controls-primary w-full h-12 rounded-full hover:cursor-pointer",
-                onclick: move |_| {
-                    navigator.replace(crate::route::Route::Mine {});
-                },
-                "Return to home"
-            }            
+            "Claim account"
         }
     }
 }
