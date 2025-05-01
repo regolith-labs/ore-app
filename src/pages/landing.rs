@@ -25,8 +25,8 @@ pub fn Landing() -> Element {
         Stats {}
         Earning {}
         Mission {}
-        Technology {}
-        Distribution {}
+        // Technology {}
+        // Distribution {}
         Community {}
         Faq {}
         Footer {}
@@ -96,12 +96,12 @@ fn HeroTitle() -> Element {
                 }
                 span {
                     class: "z-30",
-                    "reborn."
+                    "accelerated."
                 }
             }
             span {
                 class: "z-10 text-elements-midEmphasis leading-10 font-wide font-medium text-lg md:text-xl lg:text-2xl text-center max-w-3xl mx-auto",
-                "Hard money for the age of DeFi."
+                "Mine and earn hard money."
             }
             Col {
                 class: "md:flex-row ml-0 md:mx-auto h-min mt-4 pb-8",
