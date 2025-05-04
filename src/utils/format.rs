@@ -63,7 +63,7 @@ pub fn format_time_since(timestamp: u64) -> String {
         format!("{} sec", diff)
     } else if diff < 3600 {
         format!("{} min", diff / 60)
-    } else if diff < 86400 {
+    } else if diff < 86400 * 7 {
         let hours = diff / 3600;
         if hours == 1 {
             format!("1 hour")
