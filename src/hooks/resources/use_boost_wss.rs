@@ -9,7 +9,7 @@ use ore_boost_api::state::{boost_pda, Boost};
 use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
-use crate::config::LISTED_BOOSTS;
+use crate::config::{LISTED_BOOSTS, UNLISTED_BOOSTS};
 use crate::gateway::ore::OreGateway;
 use crate::gateway::{AccountNotificationParams, GatewayError, GatewayResult};
 use crate::hooks::{use_gateway, use_wss_subscription};
@@ -25,6 +25,12 @@ pub(crate) fn use_boosts_wss_provider() {
     // Listed boosts
     for boost_meta in LISTED_BOOSTS.iter() {
         let boost_address = boost_pda(boost_meta.lp_mint).0;
+        boosts.insert(boost_address, use_boost_signal(boost_address));
+    }
+
+    // Unlisted boosts
+    for boost_meta in UNLISTED_BOOSTS.iter() {
+        let boost_address = boost_pda(boost_meta.mint).0;
         boosts.insert(boost_address, use_boost_signal(boost_address));
     }
 

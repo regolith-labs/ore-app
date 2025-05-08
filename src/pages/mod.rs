@@ -12,6 +12,7 @@ mod stake;
 mod topup;
 mod trade;
 mod transfer;
+mod unlisted;
 
 pub use blog::*;
 pub use callback::*;
@@ -27,3 +28,4 @@ pub use stake::*;
 pub use topup::*;
 pub use trade::*;
 pub use transfer::*;
+pub use unlisted::*;

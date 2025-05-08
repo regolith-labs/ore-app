@@ -19,6 +19,8 @@ pub enum Route {
         Idle {},
         #[route("/stake/:lp_mint")]
         Pair { lp_mint: String },
+        #[route("/stake/unlisted/:mint")]
+        Unlisted { mint: String },
         #[route("/trade")]
         Trade {},
         #[route("/trade/:token_pair")]

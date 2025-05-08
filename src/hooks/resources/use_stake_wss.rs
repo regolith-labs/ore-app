@@ -9,7 +9,7 @@ use ore_boost_api::state::{boost_pda, stake_pda, Stake};
 use solana_sdk::pubkey::Pubkey;
 use steel::AccountDeserialize;
 
-use crate::config::LISTED_BOOSTS;
+use crate::config::{LISTED_BOOSTS, UNLISTED_BOOSTS};
 use crate::gateway::ore::OreGateway;
 use crate::gateway::{AccountNotificationParams, GatewayError, GatewayResult, UiTokenAmount};
 use crate::hooks::{use_gateway, use_wallet, use_wss_subscription, Wallet};
@@ -26,6 +26,11 @@ pub(crate) fn use_stakes_wss_provider() {
     // Listed boosts
     for boost_meta in LISTED_BOOSTS.iter() {
         stakes.insert(boost_meta.lp_mint, use_stake_signal(boost_meta.lp_mint));
+    }
+
+    // Unlisted boosts
+    for boost_meta in UNLISTED_BOOSTS.iter() {
+        stakes.insert(boost_meta.mint, use_stake_signal(boost_meta.mint));
     }
 
     // Setup context provider

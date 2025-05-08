@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -69,6 +69,20 @@ impl Token {
 
     pub fn usdc() -> Self {
         LISTED_TOKENS_BY_TICKER.get("USDC").cloned().unwrap()
+    }
+
+    pub fn colosseum_nft() -> Self {
+        Self {
+            mint: Pubkey::from_str("4U49SrWFUWX91VKKHktGZZadbqbuMEpwtHguS7wCUwfN").unwrap(),
+            name: "Colosseum NFT".to_string(),
+            ticker: "COLOSSEUM".to_string(),
+            description: "Colosseum NFT".to_string(),
+            image: "https://pbs.twimg.com/profile_images/1843973608378421248/CzmuKtDx_400x400.jpg"
+                .to_string(),
+            twitter: "".to_string(),
+            homepage: "".to_string(),
+            decimals: 0,
+        }
     }
 
     pub fn _is_ore(&self) -> bool {
