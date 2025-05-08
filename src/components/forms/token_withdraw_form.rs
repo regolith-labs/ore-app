@@ -2,7 +2,7 @@ use crate::{
     components::{Col, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::Token,
     gateway::{GatewayError, GatewayResult, UiTokenAmount},
-    hooks::{on_transaction_done, use_idle_withdraw_transaction},
+    hooks::{on_transaction_done, use_token_withdraw_transaction},
     solana::spl_token::amount_to_ui_amount,
 };
 use dioxus::prelude::*;
@@ -22,15 +22,18 @@ pub fn TokenWithdrawForm(
     // Get the stake balance
     let mut stake_balance = use_signal(|| Err(GatewayError::AccountNotFound));
     use_effect(move || {
+        let Some(token) = token.cloned() else {
+            return;
+        };
         match stake.cloned() {
             Ok(stake) => {
                 let amount_u64 = stake.balance;
-                let amount_f64 = amount_to_ui_amount(amount_u64, TOKEN_DECIMALS);
+                let amount_f64 = amount_to_ui_amount(amount_u64, token.decimals);
                 stake_balance.set(Ok(UiTokenAmount {
                     ui_amount: Some(amount_f64),
-                    ui_amount_string: format!("{:.1$}", amount_f64, TOKEN_DECIMALS as usize),
+                    ui_amount_string: format!("{:.1$}", amount_f64, token.decimals as usize),
                     amount: amount_u64.to_string(),
-                    decimals: TOKEN_DECIMALS as u8,
+                    decimals: token.decimals as u8,
                 }));
             }
             _ => stake_balance.set(Err(GatewayError::Unknown)),
@@ -38,7 +41,7 @@ pub fn TokenWithdrawForm(
     });
 
     // Build the withdraw transaction
-    let tx = use_idle_withdraw_transaction(stake, input_amount, err);
+    let tx = use_token_withdraw_transaction(stake, input_amount, token, err);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {

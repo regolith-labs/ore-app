@@ -9,7 +9,7 @@ use solana_sdk::native_token::lamports_to_sol;
 use solana_sdk::program_pack::Pack;
 use solana_sdk::pubkey::Pubkey;
 
-use crate::config::{Token, LISTED_TOKENS};
+use crate::config::{Token, LISTED_TOKENS, UNLISTED_TOKENS};
 use crate::gateway::{AccountNotificationParams, GatewayError, GatewayResult, UiTokenAmount};
 use crate::hooks::{use_wallet, use_wss_subscription, Wallet};
 
@@ -25,6 +25,12 @@ pub fn use_token_balance_wss_provider() {
         } else {
             use_spl_balance_wss_provider(token.clone())
         };
+        token_balances.insert(token_mint, signal);
+    }
+
+    for (pubkey, token) in UNLISTED_TOKENS.iter() {
+        let token_mint = *pubkey;
+        let signal = use_spl_balance_wss_provider(token.clone());
         token_balances.insert(token_mint, signal);
     }
 

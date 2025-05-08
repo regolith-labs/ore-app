@@ -1,0 +1,9 @@
+tokens:
+  - mint: 4U49SrWFUWX91VKKHktGZZadbqbuMEpwtHguS7wCUwfN
+    name: Colosseum NFT
+    ticker: COLOSSEUM
+    description: "NFT for Colosseum boost."
+    image: https://pbs.twimg.com/profile_images/1843973608378421248/CzmuKtDx_400x400.jpg
+    twitter: https://x.com/colosseum
+    homepage: https://www.colosseum.org/
+    decimals: 0

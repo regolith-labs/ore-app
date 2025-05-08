@@ -2,7 +2,7 @@ use crate::{
     components::{Col, Fee, SubmitButton, TokenInputError, TokenInputForm},
     config::Token,
     gateway::{GatewayResult, UiTokenAmount},
-    hooks::{on_transaction_done, use_idle_deposit_transaction},
+    hooks::{on_transaction_done, use_token_deposit_transaction},
 };
 use dioxus::prelude::*;
 use ore_boost_api::state::Stake;
@@ -18,7 +18,7 @@ pub fn TokenDepositForm(
     let err = use_signal::<Option<TokenInputError>>(|| None);
 
     // Build the transaction
-    let tx = use_idle_deposit_transaction(stake, balance, input_amount, err);
+    let tx = use_token_deposit_transaction(stake, balance, token, input_amount, err);
 
     // Refresh data if successful transaction
     on_transaction_done(move |_sig| {

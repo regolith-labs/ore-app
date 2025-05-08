@@ -41,7 +41,8 @@ pub fn Unlisted(mint: String) -> Element {
                 AccountMetrics {
                     boost_meta: boost_meta.clone(),
                     boost,
-                    stake
+                    stake,
+                    token,
                 }
                 BoostMetrics {
                     boost,
@@ -57,6 +58,7 @@ fn AccountMetrics(
     boost_meta: UnlistedBoostMeta,
     boost: Signal<GatewayResult<Boost>>,
     stake: Signal<GatewayResult<Stake>>,
+    token: Signal<Option<Token>>,
 ) -> Element {
     rsx! {
         Col {
@@ -68,6 +70,7 @@ fn AccountMetrics(
             }
             Deposits {
                 stake,
+                token,
             }
             StakeYield {
                 boost,
@@ -78,25 +81,27 @@ fn AccountMetrics(
 }
 
 #[component]
-fn Deposits(stake: Signal<GatewayResult<Stake>>) -> Element {
+fn Deposits(stake: Signal<GatewayResult<Stake>>, token: Signal<Option<Token>>) -> Element {
     rsx! {
         TitledRow {
             title: "Deposits",
             description: "The amount of tokens you have deposited in the protocol.",
             value: rsx! {
-                if let Ok(stake) = stake.cloned() {
-                    if stake.balance > 0 {
-                        TokenValueSmall {
-                            class: "ml-auto",
-                            amount: format!("{:.1$}", stake.balance, 0),
-                            ticker: "",
-                            with_decimal_units: false,
+                if let Some(token) = token.cloned() {
+                    if let Ok(stake) = stake.cloned() {
+                        if stake.balance > 0 {
+                            TokenValueSmall {
+                                class: "ml-auto",
+                                amount: format!("{:.1$}", stake.balance, 0),
+                                ticker: token.ticker,
+                                with_decimal_units: false,
+                            }
+                        } else {
+                            NullValue {}
                         }
                     } else {
                         NullValue {}
                     }
-                } else {
-                    NullValue {}
                 }
             }
         }
