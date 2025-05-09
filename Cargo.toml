@@ -170,7 +170,7 @@ features = [
 ]
 
 [patch.crates-io]
-# ore-types = { git = "https://github.com/regolith-labs/ore-infra", branch = "master }
+# ore-types = { git = "https://github.com/regolith-labs/ore-infra", branch = "master" }
 solana-client-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 solana-extra-wasm = { version = "2.1", git = "https://github.com/regolith-labs/solana-playground", branch = "master" }
 kliquidity-sdk = { git = "https://github.com/regolith-labs/kliquidity-sdk", branch = "master" }

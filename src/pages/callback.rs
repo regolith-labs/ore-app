@@ -114,6 +114,7 @@ pub fn LinkAccount(
     waitlist_number: Signal<i64>,
 ) -> Element {
     let wallet = use_wallet();
+    let access_token = access_token.clone();
 
     // Extract the profile image URL
     let profile_image_url = match &access_token.profile_image_url {
