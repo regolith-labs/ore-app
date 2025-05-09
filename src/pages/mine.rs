@@ -260,7 +260,7 @@ fn MinerStatus() -> Element {
                 Col {
                     span { class: "font-semibold text-2xl sm:text-3xl", "{status}" }
                     span { 
-                        class: "text-elements-midEmphasis text-elements-gold text-sm mt-2 text-left", 
+                        class: "text-elements-midEmphasis text-sm mt-2 text-left", 
                         "Mining is currently disabled. Please try again soon." 
                     }
                 }
