@@ -279,6 +279,9 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         oauth_token: String,
         oauth_verifier: String,
     ) -> GatewayResult<AccessTokenResponse> {
+        log::info!("================");
+        log::info!("in get x access token");
+        log::info!("================");
         let url = format!("{}/oauth/x/access_token", ORE_API_URL);
         let resp = self
             .http
@@ -293,6 +296,12 @@ impl<R: Rpc> OreGateway for Gateway<R> {
     
         // Check for error response
         if !resp.status().is_success() {
+            log::info!("================");
+            log::info!("ERROR in get x access token");
+            log::info!("================");
+            // let resp_clone = resp.cloned();  
+            // log::info!("resp status: {:?}", resp_clone.text().await);
+
             // Special handling for 409 Conflict (x account already exists with solana address)
             if resp.status() == reqwest::StatusCode::CONFLICT {
                 // Get response text
@@ -336,6 +345,10 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         let body = resp.text().await.map_err(GatewayError::from)?;
         let access_token =
             serde_json::from_str::<AccessTokenResponse>(&body).map_err(GatewayError::from)?;
+        log::info!("================");
+        // log::info!("access token: {:?}", access_token.clone());
+        log::info!("about to return access token");
+        log::info!("================");
         Ok(access_token)
     }
 

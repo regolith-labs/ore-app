@@ -15,6 +15,10 @@ use crate::{
 #[component]
 pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
     // Track whether account linking was successful
+    log::info!("================");
+    log::info!("oauth token: {:?}", oauth_token);
+    log::info!("oauth verifier: {:?}", oauth_verifier);
+    log::info!("================");
     let linking_successful = use_signal(|| false);
     let waitlist_number = use_signal(|| 0);
 
@@ -36,6 +40,22 @@ pub fn Callback(oauth_token: String, oauth_verifier: String) -> Element {
             navigator.replace(Route::Post {});
         }
     });
+
+    let access_token_clone = access_token.cloned();
+    if let Some(Ok(token)) = access_token_clone {
+        log::info!("================");
+        log::info!("we found access token");
+        log::info!("access token: {:?}", token.oauth_token);
+        log::info!("================");
+    } else {
+        log::info!("access token is not ok");
+    }
+    // log::info!("access token clone: {:?}", access_token_clone);
+    // if let Some(Ok(token)) = *access_token_clone.read() {
+    //     log::info!("access token: {:?}", token.oauth_token);
+    // } else {
+    //     log::info!("access token is not ok");
+    // }
 
     rsx! {
         Col {
@@ -113,6 +133,9 @@ pub fn LinkAccount(
     linking_successful: Signal<bool>,
     waitlist_number: Signal<i64>,
 ) -> Element {
+    log::info!("================");
+    log::info!("in link account");
+    log::info!("================");
     let wallet = use_wallet();
     let access_token = access_token.clone();
 
