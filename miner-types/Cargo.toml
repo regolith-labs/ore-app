@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 drillx = "2.2"
 serde = { version = "1.0", features = ["derive"] }
-ore-pool-types = "1.7.0-beta"
+ore-pool-types = { git = "https://github.com/regolith-labs/ore-pool", branch = "master", ref = "6dd794090bba7cc75f250994210d2162ceca8d9a" }

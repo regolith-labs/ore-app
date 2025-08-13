@@ -80,24 +80,24 @@ fn use_challenge_dispatch(
         if *is_active.read() {
             if let Some(Ok(member_record)) = member_record.cloned() {
                 if let Some(Ok(challenge)) = challenge.cloned() {
-                    spawn(async move {
-                        if let Ok(cutoff_time) = use_gateway()
-                            .get_cutoff(
-                                challenge.challenge.lash_hash_at,
-                                challenge.unix_timestamp,
-                                5,
-                            )
-                            .await
-                        {
-                            miner_status.set(MinerStatus::Hashing);
-                            to_miner.send(ore_miner_types::InputMessage {
-                                member: member_record,
-                                challenge,
-                                cutoff_time,
-                                cores: miner_cores.peek().clone(),
-                            });
-                        }
-                    });
+                    // spawn(async move {
+                    //     if let Ok(cutoff_time) = use_gateway()
+                    //         .get_cutoff(
+                    //             challenge.challenge.lash_hash_at,
+                    //             challenge.unix_timestamp,
+                    //             5,
+                    //         )
+                    //         .await
+                    //     {
+                    //         miner_status.set(MinerStatus::Hashing);
+                    //         to_miner.send(ore_miner_types::InputMessage {
+                    //             member: member_record,
+                    //             challenge,
+                    //             cutoff_time,
+                    //             cores: miner_cores.peek().clone(),
+                    //         });
+                    //     }
+                    // });
                 }
             }
         }
