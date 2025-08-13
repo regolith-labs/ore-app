@@ -1,26 +1,28 @@
 use dioxus::prelude::*;
-use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Config as BoostConfig, Stake};
 use steel::Numeric;
 
-use crate::gateway::GatewayResult;
+use crate::{
+    gateway::{GatewayResult, UiTokenAmount},
+    hooks::use_reserve_balance_wss,
+};
 
-use super::{use_boost_config_wss, use_boost_proof_wss};
+use super::use_boost_config_wss;
 
 pub fn use_claimable_yield(
     boost: Signal<GatewayResult<Boost>>,
     stake: Signal<GatewayResult<Stake>>,
 ) -> Memo<u64> {
-    let boost_proof = use_boost_proof_wss();
+    let reserve_balance = use_reserve_balance_wss();
     let boost_config = use_boost_config_wss();
     use_memo(move || {
         let mut rewards = 0;
         if let Ok(boost) = boost.cloned() {
             if let Ok(stake) = stake.cloned() {
-                if let Ok(boost_proof) = boost_proof.cloned() {
+                if let Ok(reserve_balance) = reserve_balance.cloned() {
                     if let Ok(boost_config) = boost_config.cloned() {
                         rewards +=
-                            calculate_claimable_yield(boost, boost_proof, stake, boost_config);
+                            calculate_claimable_yield(boost, reserve_balance, stake, boost_config);
                     }
                 }
             }
@@ -31,7 +33,7 @@ pub fn use_claimable_yield(
 
 pub fn calculate_claimable_yield(
     boost: Boost,
-    boost_proof: Proof,
+    reserve_balance: UiTokenAmount,
     stake: Stake,
     boost_config: BoostConfig,
 ) -> u64 {
@@ -39,9 +41,10 @@ pub fn calculate_claimable_yield(
     let mut config_rewards_factor = boost_config.rewards_factor;
     let mut boost_rewards_factor = boost.rewards_factor;
 
-    if boost_proof.balance > 0 {
+    let reserve_balance_amount = reserve_balance.amount.parse::<u64>().unwrap();
+    if reserve_balance_amount > 0 {
         config_rewards_factor +=
-            Numeric::from_fraction(boost_proof.balance, boost_config.total_weight);
+            Numeric::from_fraction(reserve_balance_amount, boost_config.total_weight);
     }
 
     if config_rewards_factor > boost.last_rewards_factor && boost.total_deposits > 0 {

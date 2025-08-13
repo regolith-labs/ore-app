@@ -1,8 +1,7 @@
-use ore_api::state::Proof;
 use ore_boost_api::state::{Boost, Config as BoostConfig, Stake};
 use ore_types::{
     request::{LinkXAccountRequest, TransactionEvent},
-    response::{AccessTokenResponse, RequestTokenResponse, WaitlistResponse },
+    response::{AccessTokenResponse, RequestTokenResponse, WaitlistResponse},
 };
 use serde::Deserialize;
 use solana_sdk::pubkey::Pubkey;
@@ -34,7 +33,6 @@ pub trait OreGateway {
     // Accounts
     async fn get_boost(&self, address: Pubkey) -> GatewayResult<Boost>;
     async fn get_stake(&self, address: Pubkey) -> GatewayResult<Stake>;
-    async fn get_proof(&self, address: Pubkey) -> GatewayResult<Proof>;
     async fn get_boost_config(&self, address: Pubkey) -> GatewayResult<BoostConfig>;
 
     // API
@@ -88,15 +86,6 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .await
             .map_err(GatewayError::from)?;
         Ok(*Stake::try_from_bytes(&data)?)
-    }
-
-    async fn get_proof(&self, address: Pubkey) -> GatewayResult<Proof> {
-        let data = self
-            .rpc
-            .get_account_data(&address)
-            .await
-            .map_err(GatewayError::from)?;
-        Ok(*Proof::try_from_bytes(&data)?)
     }
 
     async fn get_boost_yield_7d(&self, boost_address: Pubkey) -> GatewayResult<f64> {
@@ -185,7 +174,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
             .send()
             .await
             .map_err(GatewayError::from)?;
-    
+
         // Check for error response
         if !resp.status().is_success() {
             // Special handling for 409 Conflict (x account already exists with solana address)
@@ -221,7 +210,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
 
                 // If we couldn't parse the response, return a generic error
                 return Err(GatewayError::RequestFailed);
-            }            
+            }
 
             // For all other errors, or if JSON parsing failed
             return Err(GatewayError::RequestFailed);
@@ -281,11 +270,11 @@ impl<R: Rpc> OreGateway for Gateway<R> {
         }
 
         let body = resp.text().await.map_err(GatewayError::from)?;
-        
+
         // Parse json response as WaitlistResponse
         let waitlist_response =
             serde_json::from_str::<WaitlistResponse>(&body).map_err(|e| GatewayError::from(e))?;
-        
+
         // Check if the account exists
         if waitlist_response.exists {
             // Account exists, return WaitlistStatus with data
@@ -296,7 +285,7 @@ impl<R: Rpc> OreGateway for Gateway<R> {
                 profile_image_url: waitlist_response.profile_image_url,
             });
         }
-        
+
         // Continue with normal flow if account doesn't exist
         Ok(WaitlistStatus {
             is_registered: false,

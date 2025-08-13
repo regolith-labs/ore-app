@@ -10,7 +10,7 @@ use crate::{
     gateway::{GatewayError, GatewayResult},
     hooks::{
         calculate_claimable_yield, use_all_boosts, use_all_stakes, use_boost_config_wss,
-        use_boost_proof_wss, use_ore_balance, use_wallet, Wallet, APP_FEE_ACCOUNT,
+        use_ore_balance, use_reserve_balance_wss, use_wallet, Wallet, APP_FEE_ACCOUNT,
         COMPUTE_UNIT_LIMIT,
     },
     solana::{
@@ -27,7 +27,7 @@ use super::tip_ix;
 pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTransaction>> {
     let wallet = use_wallet();
     let boosts = use_all_boosts();
-    let boost_proof = use_boost_proof_wss();
+    let reserve_balance = use_reserve_balance_wss();
     let boost_config = use_boost_config_wss();
     let stakes = use_all_stakes();
     let ore_balance = use_ore_balance();
@@ -64,11 +64,11 @@ pub fn use_boost_claim_all_transaction() -> Resource<GatewayResult<VersionedTran
                 if let Ok(stake) = stake.cloned() {
                     let boost = boosts.get(&stake.boost).unwrap();
                     if let Ok(boost) = boost.cloned() {
-                        if let Ok(boost_proof) = boost_proof.cloned() {
+                        if let Ok(reserve_balance) = reserve_balance.cloned() {
                             if let Ok(boost_config) = boost_config.cloned() {
                                 let claimable_yield = calculate_claimable_yield(
                                     boost,
-                                    boost_proof,
+                                    reserve_balance,
                                     stake,
                                     boost_config,
                                 );
