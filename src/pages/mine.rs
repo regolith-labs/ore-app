@@ -73,9 +73,13 @@ fn StopStartButton() -> Element {
     let mut member_record = use_member_record();
     let register_tx = use_pool_register_transaction();
     let is_active = use_miner_is_active();
+    let disable_mining = true;
 
     // offchain pool server registration
     let mut register_with_pool_server = use_future(move || async move {
+        if disable_mining {
+            return;
+        }
         let Wallet::Connected(authority) = *wallet.read() else {
             return;
         };
@@ -129,7 +133,7 @@ fn StopStartButton() -> Element {
     rsx! {
         button {
             class: "flex flex-row gap-2 my-auto px-8 h-12 rounded-full {controls_class}",
-            disabled: matches!(*wallet.read(), Wallet::Disconnected),
+            disabled: matches!(*wallet.read(), Wallet::Disconnected) || disable_mining,
             onclick: move |_| {
                 if *is_active.read() {
                     miner_status.set(MinerStatus::Stopped);
@@ -150,13 +154,16 @@ fn StopStartButton() -> Element {
                     }
                 }
             },
-            if !*is_active.read() {
+            if disable_mining {
+                PlayIcon { class: "my-auto h-5" }
+                span { class: "my-auto", "Start" }
+            } else if !*is_active.read() {
                 PlayIcon { class: "my-auto h-5" }
                 span { class: "my-auto", "Start" }
             } else {
                 StopIcon { class: "my-auto h-5" }
                 span { class: "my-auto", "Stop" }
-            }
+            }            
         }
     }
 }
@@ -250,9 +257,15 @@ fn MinerStatus() -> Element {
                 }
             }
             Row { class: "justify-between",
-                span { class: "font-semibold text-2xl sm:text-3xl", "{status}" }
-                StopStartButton {}
-            }
+                Col {
+                    span { class: "font-semibold text-2xl sm:text-3xl", "{status}" }
+                    span { 
+                        class: "text-elements-midEmphasis text-sm mt-2 text-left", 
+                        "Mining is currently disabled. Please try again soon." 
+                    }
+                }
+                StopStartButton {}                
+            }            
         }
     }
 }

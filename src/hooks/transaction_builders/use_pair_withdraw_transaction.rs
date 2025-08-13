@@ -184,7 +184,7 @@ pub fn use_pair_withdraw_transaction(
                         shares_amount,
                         amount_a_u64,
                         amount_b_u64,
-                        1,
+                        2,
                         authority,
                     )
                     .await
