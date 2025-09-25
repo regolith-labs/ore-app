@@ -49,7 +49,7 @@ pub trait MeteoraGateway {
 
 impl<R: Rpc + SplGateway + SolanaGateway> MeteoraGateway for Gateway<R> {
     async fn get_meteora_pool_metrics(&self, address: Pubkey) -> GatewayResult<MeteoraPoolMetrics> {
-        let url = format!("https://app.meteora.ag/amm/pools?address={address}");
+        let url = format!("https://damm-api.meteora.ag/pools?address={address}");
         let resp = self.http.get(url).send().await?;
         let metrics = resp.json::<Vec<MeteoraPoolMetrics>>().await?;
         Ok(metrics.get(0).unwrap().clone())
