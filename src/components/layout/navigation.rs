@@ -81,10 +81,10 @@ fn TabBar() -> Element {
                 title: "Trade",
                 route: Route::Trade {}
             }
-            Tab {
-                title: "Post",
-                route: Route::Post {}
-            }
+            // Tab {
+            //     title: "Post",
+            //     route: Route::Post {}
+            // }
         }
     }
 }
@@ -123,10 +123,10 @@ pub(crate) fn MobileTabBar() -> Element {
     rsx! {
         Row {
             class: "{hidden} lg:hidden fixed bottom-0 w-full elevated z-50",
-            MobileTab {
-                title: "Mine",
-                route: Route::Mine {}
-            }
+            // MobileTab {
+            //     title: "Mine",
+            //     route: Route::Mine {}
+            // }
             MobileTab {
                 title: "Stake",
                 route: Route::Stake {}
@@ -135,10 +135,10 @@ pub(crate) fn MobileTabBar() -> Element {
                 title: "Trade",
                 route: Route::Trade {}
             }
-            MobileTab {
-                title: "Post",
-                route: Route::Post {}
-            }
+            // MobileTab {
+            //     title: "Post",
+            //     route: Route::Post {}
+            // }
         }
     }
 }
