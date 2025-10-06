@@ -1,10 +1,10 @@
 // use dioxus::events::FormData;
+use crate::gateway::GatewayError;
 use dioxus::prelude::*;
 use ore_api::consts::TOKEN_DECIMALS;
 use ore_miner_types::OutputMessage;
-use solana_sdk::transaction::{Transaction, VersionedTransaction, TransactionError};
 use solana_sdk::instruction::InstructionError;
-use crate::gateway::GatewayError;
+use solana_sdk::transaction::{Transaction, TransactionError, VersionedTransaction};
 
 use crate::{
     components::*,
@@ -30,11 +30,11 @@ pub fn Mine() -> Element {
                         title: "Mine",
                         subtitle: "Convert energy into cryptocurrency.",
                     }
-                    DocsButton { tab: DocsTab::Mining }
+                    // DocsButton { tab: DocsTab::Mining }
                 }
                 MinerData {}
             }
-            MineTable {}
+            // MineTable {}
         }
     }
 }
@@ -50,16 +50,16 @@ fn MinerData() -> Element {
 
     rsx! {
         Col { class: "w-full flex-wrap mx-auto justify-between gap-12",
-            Alert {}
-            MinerStatus {}
-            Col { class: "w-full gap-8",
-                MinerCores {}
-                MinePower {}
-                if cfg!(feature = "web") {
-                    DownloadCTA {}
-                }
-            }
-            TimeRemaining {}
+            // Alert {}
+            // MinerStatus {}
+            // Col { class: "w-full gap-8",
+            //     MinerCores {}
+            //     MinePower {}
+            //     if cfg!(feature = "web") {
+            //         DownloadCTA {}
+            //     }
+            // }
+            // TimeRemaining {}
             MinerRewards {}
         }
     }
@@ -163,7 +163,7 @@ fn StopStartButton() -> Element {
             } else {
                 StopIcon { class: "my-auto h-5" }
                 span { class: "my-auto", "Stop" }
-            }            
+            }
         }
     }
 }
@@ -259,13 +259,13 @@ fn MinerStatus() -> Element {
             Row { class: "justify-between",
                 Col {
                     span { class: "font-semibold text-2xl sm:text-3xl", "{status}" }
-                    span { 
-                        class: "text-elements-midEmphasis text-sm mt-2 text-left", 
-                        "Mining is currently disabled. Please try again soon." 
+                    span {
+                        class: "text-elements-midEmphasis text-sm mt-2 text-left",
+                        "Mining is currently disabled. Please try again soon."
                     }
                 }
-                StopStartButton {}                
-            }            
+                StopStartButton {}
+            }
         }
     }
 }
