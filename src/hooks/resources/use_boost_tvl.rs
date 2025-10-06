@@ -18,7 +18,7 @@ pub fn use_boost_tvl(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
         };
         if mint_address == MINT_ADDRESS {
             // ORE case
-            let Some(OrePrice(ore_price_f64)) = ore_price.cloned() else {
+            let Some(ore_price_f64) = ore_price.cloned() else {
                 return Err(GatewayError::Unknown);
             };
             let total_deposits_f64 = amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS);

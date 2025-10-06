@@ -99,7 +99,7 @@ pub fn use_boost_apr(mint_address: Pubkey) -> Memo<GatewayResult<f64>> {
         let Ok(boost) = boost.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(OrePrice(ore_price_f64)) = ore_price.cloned() else {
+        let Some(ore_price_f64) = ore_price.cloned() else {
             return Err(GatewayError::Unknown);
         };
 

@@ -241,7 +241,7 @@ fn Tvl(boost: Signal<GatewayResult<Boost>>) -> Element {
                 if let Some(ore_price) = ore_price.cloned() {
                     if let Ok(boost) = boost.cloned() {
                         UsdValue {
-                            ui_amount_string: (amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS) * ore_price.0).to_string(),
+                            ui_amount_string: (amount_to_ui_amount(boost.total_deposits, TOKEN_DECIMALS) * ore_price).to_string(),
                         }
                     } else {
                         LoadingValue {}

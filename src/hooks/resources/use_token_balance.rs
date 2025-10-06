@@ -180,7 +180,7 @@ pub fn use_ore_market_cap() -> Resource<GatewayResult<f64>> {
         let Some(Ok(supply)) = supply.cloned() else {
             return Err(GatewayError::Unknown);
         };
-        let Some(OrePrice(price)) = price.cloned() else {
+        let Some(price) = price.cloned() else {
             return Err(GatewayError::Unknown);
         };
         let Some(supply) = supply.ui_amount else {

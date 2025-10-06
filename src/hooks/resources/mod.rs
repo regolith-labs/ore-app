@@ -45,7 +45,6 @@ pub fn use_cache_provider() {
     use_reserve_balance_wss_provider();
     use_liquidity_pairs_provider();
     use_stakes_wss_provider();
-    use_ore_price_provider();
     use_members_provider();
     use_boost_yield_provider();
     use_token_balance_provider();
