@@ -4,14 +4,14 @@ use js_sys::Date;
 use ore_types::request::{AppId, TransactionEvent, TransactionType};
 use solana_sdk::{
     hash::Hash,
-    message::VersionedMessage,
     instruction::InstructionError,
-    transaction::{Transaction, VersionedTransaction, TransactionError},
+    message::VersionedMessage,
+    transaction::{Transaction, TransactionError, VersionedTransaction},
 };
 
 use crate::{
     components::*,
-    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayResult, Rpc, GatewayError},
+    gateway::{ore::OreGateway, solana::SolanaGateway, GatewayError, GatewayResult, Rpc},
     hooks::{use_gateway, use_transaction_status},
 };
 
@@ -104,19 +104,19 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                     bincode::deserialize::<VersionedTransaction>(&buffer).ok()
                                 });
 
-                                let tx_for_simulation = tx.clone();                                
+                                // let tx_for_simulation = tx.clone();
 
-                                // Simulate transaction to check for insufficient funds
-                                if let Ok(simulated_tx) = gateway.rpc.simulate_transaction(&tx_for_simulation).await {
-                                    if let Some(err) = simulated_tx.err {
-                                        if let TransactionError::InstructionError(_index, instruction_error) = err {
-                                            if matches!(instruction_error, InstructionError::Custom(1)) {
-                                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientSOL)));
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }                                
+                                // // Simulate transaction to check for insufficient funds
+                                // if let Ok(simulated_tx) = gateway.rpc.simulate_transaction(&tx_for_simulation).await {
+                                //     if let Some(err) = simulated_tx.err {
+                                //         if let TransactionError::InstructionError(_index, instruction_error) = err {
+                                //             if matches!(instruction_error, InstructionError::Custom(1)) {
+                                //                 transaction_status.set(Some(TransactionStatus::Error(GatewayError::InsufficientSOL)));
+                                //                 return;
+                                //             }
+                                //         }
+                                //     }
+                                // }
 
                                 // Send transaction to rpc
                                 transaction_status.set(Some(TransactionStatus::Sending(0)));
@@ -169,7 +169,9 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                     }
                                     None => {
                                         log::info!("error sending tx");
-                                        transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
+                                        transaction_status.set(Some(TransactionStatus::Error(
+                                            GatewayError::Unknown,
+                                        )))
                                     }
                                 }
                             }
@@ -180,11 +182,13 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                             }
                             Err(err) => {
                                 log::error!("error signing transaction: {}", err);
-                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
+                                transaction_status
+                                    .set(Some(TransactionStatus::Error(GatewayError::Unknown)))
                             }
                             _ => {
                                 log::error!("unrecognized signing response");
-                                transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
+                                transaction_status
+                                    .set(Some(TransactionStatus::Error(GatewayError::Unknown)))
                             }
                         };
                     }
@@ -192,7 +196,8 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                     // Process eval errors
                     Err(err) => {
                         log::error!("error executing wallet signing script: {}", err);
-                        transaction_status.set(Some(TransactionStatus::Error(GatewayError::Unknown)))
+                        transaction_status
+                            .set(Some(TransactionStatus::Error(GatewayError::Unknown)))
                     }
                 }
             }
