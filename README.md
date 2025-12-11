@@ -1,4 +1,4 @@
-# ORE App
+# ORE App (deprecated)
 
 Liquid digital gold. 
 
