@@ -105,7 +105,6 @@ pub fn submit_transaction(mut tx: VersionedTransaction, tx_type: TransactionType
                                 });
 
                                 // let tx_for_simulation = tx.clone();
-
                                 // // Simulate transaction to check for insufficient funds
                                 // if let Ok(simulated_tx) = gateway.rpc.simulate_transaction(&tx_for_simulation).await {
                                 //     if let Some(err) = simulated_tx.err {
